@@ -40,6 +40,8 @@ import spock.lang.Specification
 
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
@@ -250,7 +252,9 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         }
 
         Runnable runnableCapture
+        Runnable drainRunnableCapture
         AgentManifestMessage manifestMessage = AgentManifestMessage.getDefaultInstance()
+        ScheduledFuture<?> drainTaskFuture = Mock(ScheduledFuture)
 
         when:
         agentFileStreamService.start(jobId, temporaryFolder.getRoot().toPath())
@@ -414,11 +418,27 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.stop()
 
         then:
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            args ->
+                drainRunnableCapture = args[0] as Runnable
+                return drainTaskFuture
+        }
+        1 * drainTaskFuture.get(GRpcAgentFileStreamServiceImpl.DRAIN_TASK_TIMEOUT, TimeUnit.MILLISECONDS) >> {
+            sleep(1000)
+            throw new TimeoutException("...")
+        }
         1 * scheduledTask.cancel(false)
         3 == remoteService.completedTransmitStreams.size()
         5 == remoteService.erroredTransmitStreams.size()
         0 == remoteService.activeTransmitStreams.size()
         1 == remoteService.completedSyncStreams.size()
+        drainRunnableCapture != null
+
+        when:
+        drainRunnableCapture.run()
+
+        then:
+        noExceptionThrown()
     }
 
     class RemoteService extends FileStreamServiceGrpc.FileStreamServiceImplBase {

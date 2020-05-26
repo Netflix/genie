@@ -47,9 +47,13 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of {@link AgentFileStreamService} over gRPC.
@@ -65,6 +69,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     private static final boolean ENABLE_COMPRESSION = true; //TODO make configurable
     private static final int MAX_DATA_CHUNK_SIZE = 1024 * 1024; //TODO make configurable
     private static final int MAX_CONCURRENT_TRANSMIT_STREAMS = 5;  //TODO make configurable
+    private static final long DRAIN_TASK_TIMEOUT = 15_000; //TODO make configurable
 
     private final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub;
     private final TaskScheduler taskScheduler;
@@ -123,6 +128,9 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     public synchronized void stop() {
 
         if (this.started.compareAndSet(true, false)) {
+            if (!this.activeFileTransfers.isEmpty()) {
+                this.drain();
+            }
             this.scheduledTask.cancel(false);
             this.scheduledTask = null;
             this.discardCurrentStream(true);
@@ -153,6 +161,38 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
         return Optional.empty();
+    }
+
+    private void drain() {
+        final AtomicInteger acquiredPermitsCount = new AtomicInteger();
+        // Task that attempts to acquire all available transfer permits.
+        // This ensures no new transfers will be started.
+        // If the task completes successfully, it also guarantees there are no in-progress transfers.
+        final Runnable drainTask = () -> {
+            while (acquiredPermitsCount.get() < MAX_CONCURRENT_TRANSMIT_STREAMS) {
+                try {
+                    if (this.concurrentTransfersSemaphore.tryAcquire(1, TimeUnit.SECONDS)) {
+                        acquiredPermitsCount.incrementAndGet();
+                    }
+                } catch (InterruptedException e) {
+                    log.warn("Interrupted while waiting for a permit");
+                    break;
+                }
+            }
+        };
+
+        // Submit the task for immediate execution, but do not wait more than a fixed amount of time
+        final ScheduledFuture<?> drainTaskFuture = taskScheduler.schedule(drainTask, Instant.now());
+        try {
+            drainTaskFuture.get(DRAIN_TASK_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            log.warn("Failed to wait for in-flight transfers to complete", e);
+        }
+
+        final int ongoingTransfers = MAX_CONCURRENT_TRANSMIT_STREAMS - acquiredPermitsCount.get();
+        if (ongoingTransfers > 0) {
+            log.warn("{} file transfers are still active after waiting for completion", ongoingTransfers);
+        }
     }
 
     private synchronized void pushManifest() {
