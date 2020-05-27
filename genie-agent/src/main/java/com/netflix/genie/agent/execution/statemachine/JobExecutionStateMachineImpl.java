@@ -188,7 +188,7 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
      */
     @Override
     public void onApplicationEvent(final KillService.KillEvent event) {
-        log.info("Received kill signal (source: {}", event.getKillSource());
+        log.info("Shutting down job execution (kill event source: {}", event.getKillSource());
         this.executionContext.setJobKilled(true);
     }
 
