@@ -23,6 +23,9 @@ import org.springframework.context.ApplicationEventPublisher
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.time.Duration
+import java.util.concurrent.atomic.AtomicBoolean
+
 class KillServiceImplSpec extends Specification {
     ApplicationEventPublisher applicationEventPublisher
     KillService service
@@ -50,5 +53,27 @@ class KillServiceImplSpec extends Specification {
         source                                  | _
         KillService.KillSource.SYSTEM_SIGNAL    | _
         KillService.KillSource.API_KILL_REQUEST | _
+    }
+
+    def "Emergency termination"() {
+        setup:
+        AtomicBoolean emergencyTerminationExecuted = new AtomicBoolean(false)
+        service = new KillServiceImpl(
+            applicationEventPublisher,
+            { -> emergencyTerminationExecuted.set(true) },
+            Duration.ofMillis(10)
+        )
+
+        when:
+        service.kill(KillService.KillSource.SYSTEM_SIGNAL)
+
+        then:
+        1 * applicationEventPublisher.publishEvent(_ as KillService.KillEvent)
+
+        when:
+        sleep(100)
+
+        then:
+        emergencyTerminationExecuted.get()
     }
 }
