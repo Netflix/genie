@@ -17,10 +17,13 @@
  */
 package com.netflix.genie.agent.execution.services.impl;
 
+import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.services.KillService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+
+import java.time.Duration;
 
 /**
  * Implementation of {@link KillService}.
@@ -31,10 +34,40 @@ import org.springframework.context.ApplicationEventPublisher;
 @Slf4j
 class KillServiceImpl implements KillService {
 
+    private static final Duration DEFAULT_DELAY = Duration.ofMinutes(10); //TODO: Make configurable
+    private static final Runnable DEFAULT_ACTION = () -> System.exit(ExitCode.EXEC_ABORTED.getCode());
+    private static final String EMERGENCY_TERMINATION_THREAD_NAME = "emergency-shutdown";
+
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final Thread emergencyTerminationThread;
 
     KillServiceImpl(final ApplicationEventPublisher applicationEventPublisher) {
+        this(
+            applicationEventPublisher,
+            DEFAULT_ACTION,
+            DEFAULT_DELAY
+        );
+    }
+
+    KillServiceImpl(
+        final ApplicationEventPublisher applicationEventPublisher,
+        final Runnable emergencyTerminationAction,
+        final Duration emergencyTerminationDelay
+    ) {
         this.applicationEventPublisher = applicationEventPublisher;
+        this.emergencyTerminationThread = new Thread(
+            () -> {
+                log.debug("Emergency shutdown countdown started");
+                try {
+                    Thread.sleep(emergencyTerminationDelay.toMillis());
+                } catch (InterruptedException e) {
+                    log.warn("Interrupted during delayed emergency countdown");
+                }
+                log.warn("Emergency shutdown now");
+                emergencyTerminationAction.run();
+            },
+            EMERGENCY_TERMINATION_THREAD_NAME
+        );
     }
 
     /**
@@ -46,5 +79,9 @@ class KillServiceImpl implements KillService {
         log.debug("Publishing kill event");
         this.applicationEventPublisher.publishEvent(new KillEvent(killSource));
 
+        // Start emergency termination thread, if not already running
+        if (!this.emergencyTerminationThread.isAlive()) {
+            this.emergencyTerminationThread.start();
+        }
     }
 }
