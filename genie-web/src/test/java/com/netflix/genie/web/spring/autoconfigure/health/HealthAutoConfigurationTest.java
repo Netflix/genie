@@ -17,15 +17,9 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.health;
 
-import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
-import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
-import com.netflix.genie.web.health.LocalAgentLauncherHealthIndicator;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -58,24 +52,8 @@ class HealthAutoConfigurationTest {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(GenieAgentHealthIndicator.class);
-                Assertions.assertThat(context).doesNotHaveBean(LocalAgentLauncherHealthIndicator.class);
             }
         );
-    }
-
-    /**
-     * Make sure expected beans are provided for health indicators.
-     */
-    @Test
-    void localAgentHealthIndicatorCreatedIfNecessaryBeansExist() {
-        this.contextRunner
-            .withUserConfiguration(LocalAgentLaunchMockConfiguration.class)
-            .run(
-                context -> {
-                    Assertions.assertThat(context).hasSingleBean(GenieAgentHealthIndicator.class);
-                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherHealthIndicator.class);
-                }
-            );
     }
 
     /**
@@ -91,38 +69,6 @@ class HealthAutoConfigurationTest {
         @Bean
         AgentConnectionTrackingService agentConnectionTrackingService() {
             return Mockito.mock(AgentConnectionTrackingService.class);
-        }
-    }
-
-    /**
-     * Mock configuration for local agent launch health beans.
-     */
-    static class LocalAgentLaunchMockConfiguration {
-        @Bean
-        LocalAgentLauncherProperties localAgentLauncherProperties() {
-            return new LocalAgentLauncherProperties();
-        }
-
-        @Bean
-        LocalAgentLauncherImpl localAgentLauncher() {
-            return Mockito.mock(LocalAgentLauncherImpl.class);
-        }
-
-        @Bean
-        PersistenceService geniePersistenceService() {
-            return Mockito.mock(PersistenceService.class);
-        }
-
-        @Bean
-        GenieHostInfo genieHostInfo() {
-            return Mockito.mock(GenieHostInfo.class);
-        }
-
-        @Bean
-        DataServices genieDataServices(final PersistenceService persistenceService) {
-            final DataServices dataServices = Mockito.mock(DataServices.class);
-            Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
-            return dataServices;
         }
     }
 }

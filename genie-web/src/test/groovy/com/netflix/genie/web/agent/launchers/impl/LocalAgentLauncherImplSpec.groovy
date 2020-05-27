@@ -22,6 +22,7 @@ import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.introspection.GenieWebHostInfo
 import com.netflix.genie.web.introspection.GenieWebRpcInfo
@@ -31,6 +32,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.Executor
 import org.apache.commons.lang3.SystemUtils
+import org.springframework.boot.actuate.health.Status
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -39,6 +41,7 @@ import spock.lang.Unroll
  *
  * @author tgianos
  */
+@SuppressWarnings("GroovyAccessibility")
 class LocalAgentLauncherImplSpec extends Specification {
 
     static final int RPC_PORT = new Random().nextInt()
@@ -74,15 +77,18 @@ class LocalAgentLauncherImplSpec extends Specification {
     Map<String, String> additionalEnvironment
 
     def setup() {
-        this.hostInfo = Mock(GenieWebHostInfo)
-        this.rpcInfo = Mock(GenieWebRpcInfo)
+        this.hostname = UUID.randomUUID().toString()
+        this.hostInfo = Mock(GenieWebHostInfo) {
+            getHostname() >> this.hostname
+        }
+        this.rpcInfo = Mock(GenieWebRpcInfo) {
+            getRpcPort() >> RPC_PORT
+        }
         this.persistenceService = Mock(PersistenceService)
         this.launchProperties = new LocalAgentLauncherProperties()
         this.executorFactory = Mock(ExecutorFactory)
         this.meterRegistry = Mock(MeterRegistry)
-
         this.sharedExecutor = Mock(Executor)
-        this.hostname = UUID.randomUUID().toString()
         this.resolvedJob = Mock(ResolvedJob)
         this.jobMetadata = Mock(JobMetadata)
         this.jobEnvironment = Mock(JobEnvironment)
@@ -99,7 +105,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     @Unroll
     def "Launch agent (runAsUser: #runAsUser)"(boolean runAsUser, List<String> expectedCommandLine) {
         this.launchProperties.setRunAsUserEnabled(runAsUser)
-        this.launchProperties.setAdditionalEnvironment(additionalEnvironment)
+        this.launchProperties.setAdditionalEnvironment(this.additionalEnvironment)
 
         expectedCommandLine = (SystemUtils.IS_OS_LINUX ? ["setsid"] : []) + expectedCommandLine
 
@@ -114,8 +120,6 @@ class LocalAgentLauncherImplSpec extends Specification {
         )
 
         then:
-        1 * this.hostInfo.getHostname() >> this.hostname
-        1 * this.rpcInfo.getRpcPort() >> RPC_PORT
         1 * this.executorFactory.newInstance(false) >> this.sharedExecutor
 
         when:
@@ -150,5 +154,69 @@ class LocalAgentLauncherImplSpec extends Specification {
         runAsUser | expectedCommandLine
         false     | expectedCommandLineBase
         true      | ["sudo", "-E", "-u", USERNAME] + expectedCommandLineBase
+    }
+
+    def "Can report health"() {
+        def jobInfo = Mock(JobInfoAggregate)
+        def maxTotalJobMemory = 100_003L
+        def maxJobMemory = 10_000
+        def properties = Mock(LocalAgentLauncherProperties) {
+            getMaxTotalJobMemory() >> maxTotalJobMemory
+            getMaxJobMemory() >> maxJobMemory
+        }
+
+        def healthIndicator = new LocalAgentLauncherImpl(
+            this.hostInfo,
+            this.rpcInfo,
+            this.dataServices,
+            properties,
+            this.executorFactory,
+            this.meterRegistry
+        )
+
+        when: "Available memory is equal to one max job"
+        def health = healthIndicator.health()
+
+        then: "The system reports healthy"
+        1 * this.persistenceService.getHostJobInformation(this.hostname) >> jobInfo
+        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory
+        1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobInfo.getNumberOfActiveJobs() >> 335L
+        health.getStatus() == Status.UP
+        health.getDetails().get(LocalAgentLauncherImpl.NUMBER_ACTIVE_JOBS_KEY) == 335L
+        health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory)
+        health.getDetails().get(LocalAgentLauncherImpl.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MAX_JOB_CAPACITY) == ((maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory)) / maxJobMemory).toInteger()
+
+        when: "Available memory is equal to more than one max job"
+        health = healthIndicator.health()
+
+        then: "The system reports healthy"
+        1 * this.persistenceService.getHostJobInformation(this.hostname) >> jobInfo
+        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory - 1
+        1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobInfo.getNumberOfActiveJobs() >> 337L
+        health.getStatus() == Status.UP
+        health.getDetails().get(LocalAgentLauncherImpl.NUMBER_ACTIVE_JOBS_KEY) == 337L
+        health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory - 1
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory - 1)
+        health.getDetails().get(LocalAgentLauncherImpl.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MAX_JOB_CAPACITY) == ((maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory - 1)) / maxJobMemory).toInteger()
+
+        when: "Available memory is less than one max job"
+        health = healthIndicator.health()
+
+        then: "The system reports down"
+        1 * this.persistenceService.getHostJobInformation(this.hostname) >> jobInfo
+        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory + 1
+        1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobInfo.getNumberOfActiveJobs() >> 343L
+        health.getStatus() == Status.DOWN
+        health.getDetails().get(LocalAgentLauncherImpl.NUMBER_ACTIVE_JOBS_KEY) == 343L
+        health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory + 1
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory + 1)
+        health.getDetails().get(LocalAgentLauncherImpl.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MAX_JOB_CAPACITY) == ((maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory + 1)) / maxJobMemory).toInteger()
     }
 }

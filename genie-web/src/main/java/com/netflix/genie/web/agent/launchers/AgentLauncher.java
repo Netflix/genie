@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.launchers;
 
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
+import org.springframework.boot.actuate.health.HealthIndicator;
 
 /**
  * A interface which implementations will launch instances of an agent in some manner in order to run a job.
@@ -26,7 +27,7 @@ import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
  * @author tgianos
  * @since 4.0.0
  */
-public interface AgentLauncher {
+public interface AgentLauncher extends HealthIndicator {
 
     /**
      * Launch an agent to execute the given {@link ResolvedJob} information.

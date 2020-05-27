@@ -17,15 +17,9 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.health;
 
-import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
-import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
-import com.netflix.genie.web.health.LocalAgentLauncherHealthIndicator;
 import com.netflix.genie.web.properties.HealthProperties;
-import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -58,29 +52,5 @@ public class HealthAutoConfiguration {
         final AgentConnectionTrackingService agentConnectionTrackingService
     ) {
         return new GenieAgentHealthIndicator(agentConnectionTrackingService);
-    }
-
-    /**
-     * Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.
-     *
-     * @param dataServices       The {@link DataServices} instance to use
-     * @param launcherProperties The properties related to launching agent jobs locally
-     * @param genieHostInfo      The {@link GenieHostInfo} to use
-     * @return A {@link LocalAgentLauncherHealthIndicator} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(LocalAgentLauncherHealthIndicator.class)
-    @ConditionalOnBean(
-        {
-            LocalAgentLauncherProperties.class,
-            LocalAgentLauncherImpl.class
-        }
-    )
-    public LocalAgentLauncherHealthIndicator localAgentLauncherHealthIndicator(
-        final DataServices dataServices,
-        final LocalAgentLauncherProperties launcherProperties,
-        final GenieHostInfo genieHostInfo
-    ) {
-        return new LocalAgentLauncherHealthIndicator(dataServices, launcherProperties, genieHostInfo);
     }
 }
