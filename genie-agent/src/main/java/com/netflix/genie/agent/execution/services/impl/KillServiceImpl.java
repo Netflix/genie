@@ -43,8 +43,8 @@ class KillServiceImpl implements KillService {
     @Override
     public void kill(final KillSource killSource) {
         ConsoleLog.getLogger().info("Job kill requested (source: {})", killSource.name());
-        log.debug("Emitting kill event");
+        log.debug("Publishing kill event");
         this.applicationEventPublisher.publishEvent(new KillEvent(killSource));
-        log.debug("Kill event published");
+
     }
 }

@@ -242,7 +242,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
     @Override
     public void onApplicationEvent(final KillService.KillEvent event) {
         final KillService.KillSource source = event.getKillSource();
-        log.info("Stopping state machine due to kill event (source: {})", source);
+        log.info("Killing job process (kill event source: {})", source);
         this.kill(source);
     }
 
