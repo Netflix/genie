@@ -25,6 +25,7 @@ import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
@@ -40,6 +41,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.SystemUtils;
+import org.springframework.boot.actuate.health.Health;
 
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
@@ -57,10 +59,15 @@ import java.util.Map;
 @Slf4j
 public class LocalAgentLauncherImpl implements AgentLauncher {
 
+    private static final String NUMBER_ACTIVE_JOBS_KEY = "numActiveJobs";
+    private static final String ALLOCATED_MEMORY_KEY = "allocatedMemory";
+    private static final String USED_MEMORY_KEY = "usedMemory";
+    private static final String AVAILABLE_MEMORY = "availableMemory";
+    private static final String AVAILABLE_MAX_JOB_CAPACITY = "availableMaxJobCapacity";
+
     private static final String RUN_USER_PLACEHOLDER = "<GENIE_USER>";
     private static final String SETS_ID = "setsid";
     private static final Object MEMORY_CHECK_LOCK = new Object();
-
 
     private final String hostname;
     private final PersistenceService persistenceService;
@@ -108,10 +115,10 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         final JobMetadata jobMetadata = resolvedJob.getJobMetadata();
         final String user = jobMetadata.getUser();
 
-        if (launcherProperties.isRunAsUserEnabled()) {
+        if (this.launcherProperties.isRunAsUserEnabled()) {
             final String group = jobMetadata.getGroup().orElse(null);
             try {
-                UNIXUtils.createUser(user, group, sharedExecutor);
+                UNIXUtils.createUser(user, group, this.sharedExecutor);
             } catch (IOException e) {
                 log.error("Failed to create user {}: {}", jobMetadata.getUser(), e.getMessage(), e);
                 throw new AgentLaunchException(e);
@@ -193,6 +200,39 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
                 ioe
             );
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Health health() {
+        final JobInfoAggregate jobInfo = this.persistenceService.getHostJobInformation(this.hostname);
+
+        // Use allocated memory to make the host go OOS early enough that we don't throw as many exceptions on
+        // accepted jobs during launch
+        final long memoryAllocated = jobInfo.getTotalMemoryAllocated();
+        final long availableMemory = this.launcherProperties.getMaxTotalJobMemory() - memoryAllocated;
+        final int maxJobMemory = this.launcherProperties.getMaxJobMemory();
+
+        final Health.Builder builder;
+
+        // If we can fit one more max job in we're still healthy
+        if (availableMemory >= maxJobMemory) {
+            builder = Health.up();
+        } else {
+            builder = Health.down();
+        }
+
+        return builder
+            .withDetail(NUMBER_ACTIVE_JOBS_KEY, jobInfo.getNumberOfActiveJobs())
+            .withDetail(ALLOCATED_MEMORY_KEY, memoryAllocated)
+            .withDetail(AVAILABLE_MEMORY, availableMemory)
+            .withDetail(USED_MEMORY_KEY, jobInfo.getTotalMemoryUsed())
+            .withDetail(
+                AVAILABLE_MAX_JOB_CAPACITY,
+                (availableMemory >= 0 && maxJobMemory > 0) ? (availableMemory / maxJobMemory) : 0)
+            .build();
     }
 
     private CommandLine createCommandLine(
