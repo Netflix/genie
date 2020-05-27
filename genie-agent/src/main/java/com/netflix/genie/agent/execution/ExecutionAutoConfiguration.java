@@ -121,7 +121,7 @@ public class ExecutionAutoConfiguration {
 
     @Bean
     @Lazy
-    JobExecutionStateMachine jobExecutionStateMachine2(
+    JobExecutionStateMachine jobExecutionStateMachine(
         @NotEmpty final List<ExecutionStage> executionStages,
         final ExecutionContext executionContext,
         final Collection<JobExecutionListener> listeners
