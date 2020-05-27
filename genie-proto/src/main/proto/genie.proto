@@ -260,6 +260,15 @@ message AgentHeartBeat {
 message ServerHeartBeat {
 }
 
+//--------------------------------------------------------------------
+// JobKill Service
+//
+// This service allows killing remote agents through the server.
+// The agent makes a long-poll request "Should i stop?", the server
+// parks this request and does not answer until it decides the agent
+// should be killed (requested by user, or for other reasons).
+//--------------------------------------------------------------------
+
 service JobKillService {
     rpc registerForKillNotification (JobKillRegistrationRequest) returns (JobKillRegistrationResponse);
 }
