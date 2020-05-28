@@ -109,6 +109,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     def "Launch agent (runAsUser: #runAsUser)"(boolean runAsUser, List<String> expectedCommandLine) {
         this.launchProperties.setRunAsUserEnabled(runAsUser)
         this.launchProperties.setAdditionalEnvironment(this.additionalEnvironment)
+        def jobInfo = Mock(JobInfoAggregate)
 
         expectedCommandLine = (SystemUtils.IS_OS_LINUX ? ["setsid"] : []) + expectedCommandLine
 
@@ -124,7 +125,10 @@ class LocalAgentLauncherImplSpec extends Specification {
 
         then:
         1 * this.executorFactory.newInstance(false) >> this.sharedExecutor
-        1 * this.persistenceService.getHostJobInformation(this.hostname) >> Mock(JobInfoAggregate)
+        1 * this.persistenceService.getHostJobInformation(this.hostname) >> jobInfo
+        1 * jobInfo.getNumberOfActiveJobs() >> 3L
+        1 * jobInfo.getTotalMemoryAllocated() >> 4_000L
+        0 * jobInfo.getTotalMemoryUsed()
 
         when:
         this.launcher.launchAgent(this.resolvedJob)
@@ -232,9 +236,9 @@ class LocalAgentLauncherImplSpec extends Specification {
 
         then: "The system reports healthy and the job info is cached"
         1 * this.persistenceService.getHostJobInformation(this.hostname) >> jobInfo
-        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory
+        2 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory
         1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
-        1 * jobInfo.getNumberOfActiveJobs() >> 335L
+        2 * jobInfo.getNumberOfActiveJobs() >> 335L
         health.getStatus() == Status.UP
         health.getDetails().get(LocalAgentLauncherImpl.NUMBER_ACTIVE_JOBS_KEY) == 335L
         health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory

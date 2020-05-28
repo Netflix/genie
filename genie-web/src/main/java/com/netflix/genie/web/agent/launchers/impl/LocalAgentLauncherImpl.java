@@ -23,6 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
@@ -36,6 +37,7 @@ import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import com.netflix.genie.web.util.ExecutorFactory;
 import com.netflix.genie.web.util.UNIXUtils;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -51,6 +53,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Implementation of {@link AgentLauncher} which launched Agent instances on the local Genie hardware.
@@ -84,6 +88,9 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private final int rpcPort;
     private final LoadingCache<String, JobInfoAggregate> jobInfoCache;
 
+    private final AtomicLong numActiveJobs;
+    private final AtomicLong usedMemory;
+
     /**
      * Constructor.
      *
@@ -111,6 +118,23 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         this.registry = registry;
         this.sharedExecutor = this.executorFactory.newInstance(false);
 
+        this.numActiveJobs = new AtomicLong(0L);
+        this.usedMemory = new AtomicLong(0L);
+
+        final Set<Tag> tags = Sets.newHashSet(
+            Tag.of("launcherClass", this.getClass().getSimpleName())
+        );
+        // TODO: These metrics should either be renamed or tagged so that it's easier to slice and dice them
+        //       Currently we have a single launcher but as more come this won't represent necessarily what the name
+        //       implies. Even now there are agent jobs not launched through the API which are not captured in this
+        //       metric and thus it doesn't accurately give a number of the active jobs in the system instead it gives
+        //       only active jobs running locally on a given node. I'm not renaming it now (5/28/2020) since we don't
+        //       yet have a firm plan in place for a) handling multiple launcher and b) if a leadership task should
+        //       publish the number of running jobs and other aggregate metrics from the system. Leaving these named
+        //       this way also makes it so we don't have to modify as many dashboards or auto scaling policies ATM
+        this.registry.gauge("genie.jobs.active.gauge", tags, this.numActiveJobs);
+        this.registry.gauge("genie.jobs.memory.used.gauge", tags, this.usedMemory);
+
         // Leverage a loading cache to handle the timed async fetching for us rather than creating a thread
         // on a scheduler etc. This also provides atomicity.
         // Note that this is not intended to be used for exact calculations and more for metrics and health checks
@@ -121,7 +145,20 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
             .expireAfterWrite(this.launcherProperties.getHostInfoExpireAfter())
             .refreshAfterWrite(this.launcherProperties.getHostInfoRefreshAfter())
             .initialCapacity(1)
-            .build(this.persistenceService::getHostJobInformation);
+            .build(
+                host -> {
+                    final JobInfoAggregate info = this.persistenceService.getHostJobInformation(host);
+
+                    // this should always be the case but just in case
+                    if (info != null) {
+                        // Proactively update the metric reporting
+                        this.numActiveJobs.set(info.getNumberOfActiveJobs());
+                        this.usedMemory.set(info.getTotalMemoryAllocated());
+                    }
+
+                    return info;
+                }
+            );
 
         // Force the initial fetch so that all subsequent fetches will be non-blocking
         try {

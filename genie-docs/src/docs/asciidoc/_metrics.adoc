@@ -134,8 +134,8 @@ It will have to be added if one is desired otherwise metrics are just published 
 |genie.jobs.active.gauge
 |Number of jobs currently active locally
 |amount
-|JobStateServiceImpl
-|-
+|LocalAgentLauncherImpl
+|launcherClass
 
 |genie.jobs.agentDisconnected.gauge
 |Current number of agent jobs whose agent is not connected to any node.
@@ -208,8 +208,8 @@ for multiple errors.
 |genie.jobs.memory.used.gauge
 |Total amount of memory allocated to local jobs (according to job request)
 |Megabytes
-|JobStateServiceImpl
-|-
+|LocalJobLauncherImpl
+|launcherClass
 
 |genie.jobs.notifications.final-state.counter
 |Count the number of completed job notifications
@@ -222,12 +222,6 @@ for multiple errors.
 |count
 |JobNotificationMetricPublisher
 |fromState, toState
-
-|genie.jobs.running.gauge
-|Number of jobs currently running locally
-|amount
-|JobStateServiceImpl
-|-
 
 |genie.jobs.tasks.applicationTask.applicationSetup.timer
 |Time taken to set up individual applications (creating folders, staging dependencies and configurations)
