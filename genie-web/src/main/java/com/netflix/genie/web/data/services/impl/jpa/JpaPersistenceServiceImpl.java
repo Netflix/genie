@@ -2227,9 +2227,16 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Map<String, UserResourcesSummary> getUserResourcesSummaries() {
-        log.debug("[getUserResourcesSummaries] Called");
-        return this.jobRepository.getUserJobResourcesAggregates()
+    public Map<String, UserResourcesSummary> getUserResourcesSummaries(
+        final Set<JobStatus> statuses,
+        final boolean api
+    ) {
+        log.debug("[getUserResourcesSummaries] Called for statuses {} and api {}", statuses, api);
+        return this.jobRepository
+            .getUserJobResourcesAggregates(
+                statuses.stream().map(JobStatus::name).collect(Collectors.toSet()),
+                api
+            )
             .stream()
             .map(EntityV3DtoConverters::toUserResourceSummaryDto)
             .collect(Collectors.toMap(UserResourcesSummary::getUser, userResourcesSummary -> userResourcesSummary));

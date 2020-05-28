@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.netflix.genie.common.dto.UserResourcesSummary;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.UserMetricsProperties;
@@ -98,7 +99,13 @@ public class UserMetricsTask extends LeaderTask {
     public void run() {
         log.debug("Publishing user metrics");
 
-        final Map<String, UserResourcesSummary> summaries = this.persistenceService.getUserResourcesSummaries();
+        // For now just report the API jobs as they're using resources on Genie web nodes
+        // Get us unblocked for now on agent migration but in future we may want to change this to further dice or
+        // combine reports by CLI vs. API
+        final Map<String, UserResourcesSummary> summaries = this.persistenceService.getUserResourcesSummaries(
+            JobStatus.getActiveStatuses(),
+            true
+        );
 
         // Update number of active users
         log.debug("Number of users with active jobs: {}", summaries.size());

@@ -154,15 +154,20 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * Returns resources usage for each user that has a running job.
      * Only jobs running on Genie servers are considered (i.e. no Agent jobs)
      *
+     * @param statuses The set of statuses a job has to be in to be considered
+     * @param api Whether the job was submitted through the api ({@literal true}) or agent cli ({@literal false})
      * @return The user resource aggregates
      */
     @Query(
-        "SELECT j.user AS user, COUNT(j) as runningJobsCount, SUM(j.memoryUsed) as usedMemory"
+        "SELECT j.user AS user, COUNT(j) as runningJobsCount, COALESCE(SUM(j.memoryUsed), 0) as usedMemory"
             + " FROM JobEntity j"
-            + " WHERE j.status = 'RUNNING' AND j.v4 = FALSE"
+            + " WHERE j.status IN (:statuses) AND j.api = :isApi"
             + " GROUP BY j.user"
     )
-    Set<UserJobResourcesAggregate> getUserJobResourcesAggregates();
+    Set<UserJobResourcesAggregate> getUserJobResourcesAggregates(
+        @Param("statuses") Set<String> statuses,
+        @Param("isApi") boolean api
+    );
 
     /**
      * Find agent jobs in the given set of states.

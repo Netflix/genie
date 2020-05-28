@@ -425,6 +425,7 @@
         v4="false"
         cluster_name="h2query"
         command_name="spark"
+        api="true"
     />
     <job_command_arguments
         job_id="1"
@@ -524,6 +525,7 @@
         v4="false"
         cluster_name="h2query"
         command_name="spark"
+        api="true"
     />
     <job_command_arguments
         job_id="2"
@@ -611,6 +613,7 @@
         v4="false"
         cluster_name="h2query"
         command_name="spark"
+        api="true"
     />
     <job_command_arguments
         job_id="3"
@@ -698,6 +701,7 @@
         v4="true"
         cluster_name="h2query"
         command_name="spark"
+        api="false"
     />
     <job_command_arguments
         job_id="4"
@@ -785,6 +789,7 @@
         v4="true"
         cluster_name="h2query"
         command_name="spark"
+        api="false"
     />
     <job_command_arguments
         job_id="5"

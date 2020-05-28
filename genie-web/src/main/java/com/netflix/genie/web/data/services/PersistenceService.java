@@ -1001,11 +1001,13 @@ public interface PersistenceService {
     long getActiveJobCountForUser(@NotBlank String user);
 
     /**
-     * Get a map of summaries of resources usage for each user with at least one running job.
+     * Get a map of summaries of resources usage for each user with at least one active job.
      *
+     * @param statuses The set of {@link JobStatus} a job must be in to be considered in this request
+     * @param api      Whether the job was submitted via the api ({@literal true}) or the agent cli ({@literal false})
      * @return a map of user resources summaries, keyed on user name
      */
-    Map<String, UserResourcesSummary> getUserResourcesSummaries();
+    Map<String, UserResourcesSummary> getUserResourcesSummaries(Set<JobStatus> statuses, boolean api);
 
     /**
      * Get the amount of memory currently used on the given host by Genie jobs in any of the following states.

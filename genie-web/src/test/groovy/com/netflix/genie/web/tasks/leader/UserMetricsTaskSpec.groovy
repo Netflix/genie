@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader
 
 import com.netflix.genie.common.dto.UserResourcesSummary
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.properties.UserMetricsProperties
@@ -87,7 +88,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * persistenceService.getUserResourcesSummaries() >> fooBarSummariesMap
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, true) >> fooBarSummariesMap
         4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
@@ -102,7 +103,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * persistenceService.getUserResourcesSummaries() >> fooBooSummariesMap
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, true) >> fooBooSummariesMap
         2 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
@@ -119,7 +120,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * persistenceService.getUserResourcesSummaries() >> emptySummariesMap
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, true) >> emptySummariesMap
         measureActiveUsers() == 0
         measureJobs("foo") == Double.NaN
         measureMemory("foo") == Double.NaN
@@ -144,7 +145,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * persistenceService.getUserResourcesSummaries() >> fooBarSummariesMap
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, true) >> fooBarSummariesMap
 
         4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)

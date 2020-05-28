@@ -1166,12 +1166,15 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
     void canGetUserResourceSummaries() {
-        final Map<String, UserResourcesSummary> summaries = this.service.getUserResourcesSummaries();
+        final Map<String, UserResourcesSummary> summaries = this.service.getUserResourcesSummaries(
+            JobStatus.getActiveStatuses(),
+            true
+        );
         Assertions.assertThat(summaries.keySet()).contains("tgianos");
         final UserResourcesSummary userResourcesSummary = summaries.get("tgianos");
         Assertions.assertThat(userResourcesSummary.getUser()).isEqualTo("tgianos");
-        Assertions.assertThat(userResourcesSummary.getRunningJobsCount()).isEqualTo(1L);
-        Assertions.assertThat(userResourcesSummary.getUsedMemory()).isEqualTo(2048L);
+        Assertions.assertThat(userResourcesSummary.getRunningJobsCount()).isEqualTo(2L);
+        Assertions.assertThat(userResourcesSummary.getUsedMemory()).isEqualTo(4096L);
     }
 
     @Test
