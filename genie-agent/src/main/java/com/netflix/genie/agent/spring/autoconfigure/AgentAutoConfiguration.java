@@ -19,10 +19,12 @@ package com.netflix.genie.agent.spring.autoconfigure;
 
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.AgentMetadataImpl;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.internal.util.HostnameUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -40,6 +42,11 @@ import java.net.UnknownHostException;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 public class AgentAutoConfiguration {
 
     /**
