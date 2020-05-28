@@ -17,25 +17,31 @@
  */
 package com.netflix.genie.agent.properties;
 
+import com.netflix.genie.agent.execution.services.AgentFileStreamService;
+import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties;
+import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
 /**
- * Root properties class for agent.
+ * Properties for {@link AgentFileStreamService}.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = AgentProperties.PREFIX)
 @Getter
 @Setter
-public class AgentProperties {
-    static final String PREFIX = "genie.agent";
-
-    private Duration emergencyShutdownDelay = Duration.ofMinutes(30);
-    private FileStreamServiceProperties fileStreamService = new FileStreamServiceProperties();
-    private HeartBeatServiceProperties heartBeatService = new HeartBeatServiceProperties();
+public class FileStreamServiceProperties {
+    private ExponentialBackOffTriggerProperties errorBackOff = new ExponentialBackOffTriggerProperties(
+        ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_BEGIN,
+        Duration.ofSeconds(1),
+        Duration.ofSeconds(10),
+        1.1f
+    );
+    private boolean enableCompression = true;
+    private int dataChunkMaxSize = 1024 * 1024;
+    private int maxConcurrentStreams = 5;
+    private Duration drainTimeout = Duration.ofSeconds(15);
 }

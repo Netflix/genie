@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc
 
+import com.netflix.genie.agent.properties.HeartBeatServiceProperties
 import com.netflix.genie.proto.AgentHeartBeat
 import com.netflix.genie.proto.HeartBeatServiceGrpc
 import com.netflix.genie.proto.ServerHeartBeat
@@ -43,6 +44,7 @@ class GrpcAgentHeartBeatServiceImplSpec extends Specification {
     StreamObserver<ServerHeartBeat> currentResponseObserver
     StreamObserver<AgentHeartBeat> currentRequestObserver
     final List<AgentHeartBeat> heartbeatsReceived = Lists.newArrayList()
+    HeartBeatServiceProperties serviceProperties = new HeartBeatServiceProperties()
 
     void setup() {
         this.jobId = UUID.randomUUID().toString()
@@ -50,7 +52,7 @@ class GrpcAgentHeartBeatServiceImplSpec extends Specification {
         this.heartBeatFuture = Mock(ScheduledFuture)
         this.grpcServerRule.getServiceRegistry().addService(new TestService())
         this.client = HeartBeatServiceGrpc.newStub(grpcServerRule.getChannel())
-        this.service = new GrpcAgentHeartBeatServiceImpl(client, taskScheduler)
+        this.service = new GrpcAgentHeartBeatServiceImpl(client, taskScheduler, serviceProperties)
         this.heartbeatsReceived.clear()
     }
 
@@ -80,7 +82,7 @@ class GrpcAgentHeartBeatServiceImplSpec extends Specification {
         service.start(jobId)
 
         then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> {
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, serviceProperties.getInterval()) >> {
             args ->
                 sendHeartBeatsRunnable = args[0] as Runnable
                 return heartBeatFuture

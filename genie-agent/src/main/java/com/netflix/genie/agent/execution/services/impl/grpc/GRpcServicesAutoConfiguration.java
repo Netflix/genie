@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
@@ -31,6 +32,7 @@ import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -43,6 +45,11 @@ import org.springframework.scheduling.TaskScheduler;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 public class GRpcServicesAutoConfiguration {
 
     /**
@@ -50,6 +57,7 @@ public class GRpcServicesAutoConfiguration {
      *
      * @param heartBeatServiceStub The heart beat service stub to use
      * @param taskScheduler        The task scheduler to use
+     * @param agentProperties      The agent properties
      * @return A {@link GrpcAgentHeartBeatServiceImpl} instance
      */
     @Bean
@@ -57,9 +65,14 @@ public class GRpcServicesAutoConfiguration {
     @ConditionalOnMissingBean(AgentHeartBeatService.class)
     public AgentHeartBeatService agentHeartBeatService(
         final HeartBeatServiceGrpc.HeartBeatServiceStub heartBeatServiceStub,
-        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
+        final AgentProperties agentProperties
     ) {
-        return new GrpcAgentHeartBeatServiceImpl(heartBeatServiceStub, taskScheduler);
+        return new GrpcAgentHeartBeatServiceImpl(
+            heartBeatServiceStub,
+            taskScheduler,
+            agentProperties.getHeartBeatService()
+        );
     }
 
     /**
@@ -105,6 +118,7 @@ public class GRpcServicesAutoConfiguration {
      * @param taskScheduler                      The task scheduler to use
      * @param jobDirectoryManifestProtoConverter The converter to serialize manifests into messages
      * @param jobDirectoryManifestCreatorService The job directory manifest service
+     * @param agentProperties                    The agent properties
      * @return A {@link AgentFileStreamService} instance
      */
     @Bean
@@ -114,13 +128,15 @@ public class GRpcServicesAutoConfiguration {
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
         final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
+        final AgentProperties agentProperties
     ) {
         return new GRpcAgentFileStreamServiceImpl(
             fileStreamServiceStub,
             taskScheduler,
             jobDirectoryManifestProtoConverter,
-            jobDirectoryManifestCreatorService
+            jobDirectoryManifestCreatorService,
+            agentProperties.getFileStreamService()
         );
     }
 }

@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.services.impl.grpc;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import com.netflix.genie.agent.execution.services.AgentFileStreamService;
+import com.netflix.genie.agent.properties.FileStreamServiceProperties;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
@@ -66,19 +67,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
-    private static final boolean ENABLE_COMPRESSION = true; //TODO make configurable
-    private static final int MAX_DATA_CHUNK_SIZE = 1024 * 1024; //TODO make configurable
-    private static final int MAX_CONCURRENT_TRANSMIT_STREAMS = 5;  //TODO make configurable
-    private static final long DRAIN_TASK_TIMEOUT = 15_000; //TODO make configurable
 
     private final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub;
     private final TaskScheduler taskScheduler;
     private final ExponentialBackOffTrigger trigger;
+    private final FileStreamServiceProperties properties;
     private final JobDirectoryManifestProtoConverter manifestProtoConverter;
     private final StreamObserver<ServerControlMessage> responseObserver;
     private final Semaphore concurrentTransfersSemaphore;
     private final Set<FileTransfer> activeFileTransfers;
     private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
+    private final int maxStreams;
 
     private StreamObserver<AgentManifestMessage> controlStreamObserver;
     private String jobId;
@@ -90,20 +89,19 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         final TaskScheduler taskScheduler,
         final JobDirectoryManifestProtoConverter manifestProtoConverter,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
+        final FileStreamServiceProperties properties
     ) {
         this.fileStreamServiceStub = fileStreamServiceStub;
         this.taskScheduler = taskScheduler;
         this.manifestProtoConverter = manifestProtoConverter;
         this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
-        this.trigger = new ExponentialBackOffTrigger(
-            ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_BEGIN,
-            1000, //TODO make configurable
-            10000, //TODO make configurable
-            1.1f //TODO make configurable
-        );
+        this.properties = properties;
+
+        this.trigger = new ExponentialBackOffTrigger(properties.getErrorBackOff());
         this.responseObserver = new ServerControlStreamObserver(this);
-        this.concurrentTransfersSemaphore = new Semaphore(MAX_CONCURRENT_TRANSMIT_STREAMS);
+        this.maxStreams = properties.getMaxConcurrentStreams();
+        this.concurrentTransfersSemaphore = new Semaphore(this.maxStreams);
         this.activeFileTransfers = Sets.newConcurrentHashSet();
     }
 
@@ -169,7 +167,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         // This ensures no new transfers will be started.
         // If the task completes successfully, it also guarantees there are no in-progress transfers.
         final Runnable drainTask = () -> {
-            while (acquiredPermitsCount.get() < MAX_CONCURRENT_TRANSMIT_STREAMS) {
+            while (acquiredPermitsCount.get() < this.maxStreams) {
                 try {
                     if (this.concurrentTransfersSemaphore.tryAcquire(1, TimeUnit.SECONDS)) {
                         acquiredPermitsCount.incrementAndGet();
@@ -184,12 +182,12 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         // Submit the task for immediate execution, but do not wait more than a fixed amount of time
         final ScheduledFuture<?> drainTaskFuture = taskScheduler.schedule(drainTask, Instant.now());
         try {
-            drainTaskFuture.get(DRAIN_TASK_TIMEOUT, TimeUnit.MILLISECONDS);
+            drainTaskFuture.get(this.properties.getDrainTimeout().toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             log.warn("Failed to wait for in-flight transfers to complete", e);
         }
 
-        final int ongoingTransfers = MAX_CONCURRENT_TRANSMIT_STREAMS - acquiredPermitsCount.get();
+        final int ongoingTransfers = this.maxStreams - acquiredPermitsCount.get();
         if (ongoingTransfers > 0) {
             log.warn("{} file transfers are still active after waiting for completion", ongoingTransfers);
         }
@@ -214,7 +212,8 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             if (this.controlStreamObserver == null) {
                 this.controlStreamObserver = fileStreamServiceStub.sync(this.responseObserver);
                 if (this.controlStreamObserver instanceof ClientCallStreamObserver) {
-                    ((ClientCallStreamObserver) this.controlStreamObserver).setMessageCompression(ENABLE_COMPRESSION);
+                    ((ClientCallStreamObserver) this.controlStreamObserver)
+                        .setMessageCompression(this.properties.isEnableCompression());
                 }
             }
 
@@ -275,7 +274,14 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             return;
         }
 
-        final FileTransfer fileTransfer = new FileTransfer(this, streamId, absolutePath, startOffset, endOffset);
+        final FileTransfer fileTransfer = new FileTransfer(
+            this,
+            streamId,
+            absolutePath,
+            startOffset,
+            endOffset,
+            properties.getDataChunkMaxSize()
+        );
         this.activeFileTransfers.add(fileTransfer);
         fileTransfer.start();
     }
@@ -334,7 +340,8 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             final String streamId,
             final Path absolutePath,
             final int startOffset,
-            final int endOffset
+            final int endOffset,
+            final int maxChunkSize
         ) {
             this.gRpcAgentFileStreamService = gRpcAgentFileStreamService;
             this.streamId = streamId;
@@ -343,7 +350,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             this.endOffset = endOffset;
             this.outboundStreamObserver = this.gRpcAgentFileStreamService.fileStreamServiceStub.transmit(this);
             this.watermark = startOffset;
-            this.readBuffer = ByteBuffer.allocate(GRpcAgentFileStreamServiceImpl.MAX_DATA_CHUNK_SIZE);
+            this.readBuffer = ByteBuffer.allocate(maxChunkSize);
         }
 
         void start() {

@@ -32,11 +32,20 @@ class AgentPropertiesSpec extends Specification {
     def "defaults, getters setters"() {
         expect:
         agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(30)
+        agentProperties.getFileStreamService() != null
+        agentProperties.getHeartBeatService() != null
 
         when:
+        def fileStreamServiceProps = Mock(FileStreamServiceProperties)
+        def heartBeatServiceProps = Mock(HeartBeatServiceProperties)
+
         agentProperties.setEmergencyShutdownDelay(Duration.ofMinutes(5))
+        agentProperties.setFileStreamService(fileStreamServiceProps)
+        agentProperties.setHeartBeatService(heartBeatServiceProps)
 
         then:
         agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(5)
+        agentProperties.getFileStreamService() == fileStreamServiceProps
+        agentProperties.getHeartBeatService() == heartBeatServiceProps
     }
 }

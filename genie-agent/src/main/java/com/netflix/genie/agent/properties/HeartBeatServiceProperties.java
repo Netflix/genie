@@ -19,23 +19,18 @@ package com.netflix.genie.agent.properties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
 /**
- * Root properties class for agent.
+ * Properties for {@link com.netflix.genie.agent.execution.services.AgentHeartBeatService}.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = AgentProperties.PREFIX)
 @Getter
 @Setter
-public class AgentProperties {
-    static final String PREFIX = "genie.agent";
-
-    private Duration emergencyShutdownDelay = Duration.ofMinutes(30);
-    private FileStreamServiceProperties fileStreamService = new FileStreamServiceProperties();
-    private HeartBeatServiceProperties heartBeatService = new HeartBeatServiceProperties();
+public class HeartBeatServiceProperties {
+    private Duration interval = Duration.ofSeconds(2);
+    private Duration errorRetryDelay = Duration.ofSeconds(1);
 }

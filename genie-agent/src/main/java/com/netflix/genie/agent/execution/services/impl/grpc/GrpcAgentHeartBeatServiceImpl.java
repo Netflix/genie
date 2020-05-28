@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
+import com.netflix.genie.agent.properties.HeartBeatServiceProperties;
 import com.netflix.genie.proto.AgentHeartBeat;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.ServerHeartBeat;
@@ -44,11 +45,9 @@ import java.util.concurrent.ScheduledFuture;
 @Validated
 class GrpcAgentHeartBeatServiceImpl implements AgentHeartBeatService {
 
-    private static final long HEART_BEAT_PERIOD_MILLIS = 2_000L; //TODO make configurable
-    private static final long STREAM_RESET_DELAY_MILLIS = 1_000L; //TODO make configurable
-
     private final HeartBeatServiceGrpc.HeartBeatServiceStub client;
     private final TaskScheduler taskScheduler;
+    private final HeartBeatServiceProperties properties;
 
     private boolean isConnected;
     private StreamObserver<AgentHeartBeat> requestObserver;
@@ -58,10 +57,12 @@ class GrpcAgentHeartBeatServiceImpl implements AgentHeartBeatService {
 
     GrpcAgentHeartBeatServiceImpl(
         final HeartBeatServiceGrpc.HeartBeatServiceStub client,
-        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler
+        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler,
+        final HeartBeatServiceProperties properties
     ) {
         this.client = client;
         this.taskScheduler = taskScheduler;
+        this.properties = properties;
     }
 
     /**
@@ -80,7 +81,7 @@ class GrpcAgentHeartBeatServiceImpl implements AgentHeartBeatService {
 
         this.heartbeatFuture = taskScheduler.scheduleAtFixedRate(
             this::sendHeartBeatTask,
-            HEART_BEAT_PERIOD_MILLIS
+            this.properties.getInterval()
         );
 
         this.requestObserver = client.heartbeat(new ResponseObserver(this));
@@ -120,7 +121,7 @@ class GrpcAgentHeartBeatServiceImpl implements AgentHeartBeatService {
         // Schedule a stream reset
         this.taskScheduler.schedule(
             this::resetStreamTask,
-            Instant.ofEpochMilli(System.currentTimeMillis() + STREAM_RESET_DELAY_MILLIS)
+            Instant.now().plus(this.properties.getErrorRetryDelay())
         );
     }
 

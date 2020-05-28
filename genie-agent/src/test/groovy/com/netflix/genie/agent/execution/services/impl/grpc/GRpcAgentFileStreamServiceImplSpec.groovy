@@ -19,6 +19,8 @@ package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.google.common.collect.Maps
 import com.netflix.genie.agent.execution.services.AgentFileStreamService
+import com.netflix.genie.agent.properties.AgentProperties
+import com.netflix.genie.agent.properties.FileStreamServiceProperties
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException
@@ -60,6 +62,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     ScheduledFuture<?> scheduledTask
     RemoteService remoteService
     DirectoryManifest manifest
+    FileStreamServiceProperties fileStreamServiceProperties
 
     void setup() {
         this.jobId = UUID.randomUUID().toString()
@@ -69,6 +72,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         this.taskScheduler = Mock(TaskScheduler)
         this.converter = Mock(JobDirectoryManifestProtoConverter)
         this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
+        this.fileStreamServiceProperties = new FileStreamServiceProperties()
 
         this.remoteService = new RemoteService()
         this.grpcServerRule.getServiceRegistry().addService(remoteService)
@@ -77,7 +81,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
             client,
             taskScheduler,
             converter,
-            jobDirectoryManifestService
+            jobDirectoryManifestService,
+            fileStreamServiceProperties
         )
     }
 
@@ -346,7 +351,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 == remoteService.fileMessageReceived.size()
 
         when: "More files are requested than the service is allowed to stream concurrently"
-        for (int i = 0; i < GRpcAgentFileStreamServiceImpl.MAX_CONCURRENT_TRANSMIT_STREAMS; i++) {
+        for (int i = 0; i < fileStreamServiceProperties.getMaxConcurrentStreams(); i++) {
             observer.onNext(
                 ServerControlMessage.newBuilder()
                     .setServerFileRequest(
@@ -423,7 +428,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                 drainRunnableCapture = args[0] as Runnable
                 return drainTaskFuture
         }
-        1 * drainTaskFuture.get(GRpcAgentFileStreamServiceImpl.DRAIN_TASK_TIMEOUT, TimeUnit.MILLISECONDS) >> {
+        1 * drainTaskFuture.get(fileStreamServiceProperties.getDrainTimeout().toMillis(), TimeUnit.MILLISECONDS) >> {
             sleep(1000)
             throw new TimeoutException("...")
         }

@@ -38,6 +38,19 @@ genie:
           - '.*/genie/.*/dependencies'
   agent:
     emergency-shutdown-delay: 30s
+    file-stream-service:
+      errorBackOff:
+        delay-type: FROM_PREVIOUS_EXECUTION_BEGIN
+        min-delay: 1s
+        max-delay: 10s
+        factor: 1.1
+      enableCompression: true
+      dataChunkMaxSize: 1048576
+      maxConcurrentStreams: 5
+      drainTimeout: 15s
+    heart-beat-service:
+      interval: 2s
+      errorRetryDelay: 1s
 
 spring:
   banner:
