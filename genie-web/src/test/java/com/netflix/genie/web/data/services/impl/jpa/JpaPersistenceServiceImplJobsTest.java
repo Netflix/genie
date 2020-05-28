@@ -1079,9 +1079,11 @@ class JpaPersistenceServiceImplJobsTest {
     @Test
     void canGetUserResourceSummariesNoRecords() {
         Mockito
-            .when(this.jobRepository.getUserJobResourcesAggregates())
+            .when(this.jobRepository.getUserJobResourcesAggregates(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET, true))
             .thenReturn(Sets.newHashSet());
-        Assertions.assertThat(this.persistenceService.getUserResourcesSummaries()).isEmpty();
+        Assertions
+            .assertThat(this.persistenceService.getUserResourcesSummaries(JobStatus.getActiveStatuses(), true))
+            .isEmpty();
     }
 
     @Test
@@ -1097,14 +1099,19 @@ class JpaPersistenceServiceImplJobsTest {
         Mockito.when(p2.getRunningJobsCount()).thenReturn(5L);
         Mockito.when(p2.getUsedMemory()).thenReturn(2048L);
 
+        final Set<JobStatus> statuses = JobStatus.getResolvableStatuses();
+        final Set<String> statusStrings = statuses.stream().map(JobStatus::name).collect(Collectors.toSet());
+
         Mockito
-            .when(this.jobRepository.getUserJobResourcesAggregates())
+            .when(this.jobRepository.getUserJobResourcesAggregates(statusStrings, false))
             .thenReturn(Sets.newHashSet(p1, p2));
 
         final HashMap<String, UserResourcesSummary> expectedMap = Maps.newHashMap();
         expectedMap.put("foo", new UserResourcesSummary("foo", 3, 1024));
         expectedMap.put("bar", new UserResourcesSummary("bar", 5, 2048));
-        Assertions.assertThat(this.persistenceService.getUserResourcesSummaries()).isEqualTo(expectedMap);
+        Assertions
+            .assertThat(this.persistenceService.getUserResourcesSummaries(statuses, false))
+            .isEqualTo(expectedMap);
     }
 
     @Test
