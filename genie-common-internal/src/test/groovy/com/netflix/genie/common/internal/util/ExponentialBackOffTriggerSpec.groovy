@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.util
 
+import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties
 import org.springframework.scheduling.TriggerContext
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -139,5 +140,15 @@ class ExponentialBackOffTriggerSpec extends Specification {
         10  | 9   | 2.0f
         10  | 100 | -2.0f
         10  | 100 | 0.0f
+    }
+
+    def "Construct with properties"() {
+        def triggerProperties = new ExponentialBackOffTriggerProperties()
+
+        when:
+        new ExponentialBackOffTrigger(triggerProperties)
+
+        then:
+        noExceptionThrown()
     }
 }
