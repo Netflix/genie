@@ -36,6 +36,9 @@ genie:
           - '.*/temp'
         directory-traversal-reject-patterns:
           - '.*/genie/.*/dependencies'
+  agent:
+    runtime:
+      emergency-shutdown-delay: 5m
 
 spring:
   banner:

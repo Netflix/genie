@@ -19,6 +19,8 @@ package com.netflix.genie.agent.properties
 
 import spock.lang.Specification
 
+import java.time.Duration
+
 class AgentPropertiesSpec extends Specification {
 
     AgentProperties agentProperties
@@ -28,6 +30,13 @@ class AgentPropertiesSpec extends Specification {
     }
 
     def "defaults, getters setters"() {
+        expect:
+        agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(5)
 
+        when:
+        agentProperties.setEmergencyShutdownDelay(Duration.ofMinutes(5))
+
+        then:
+        agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(5)
     }
 }

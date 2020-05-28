@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 /**
  * Root properties class for agent.
  *
@@ -35,4 +37,6 @@ public class AgentProperties {
      * Properties prefix.
      */
     public static final String PREFIX = "genie.agent.runtime";
+
+    private Duration emergencyShutdownDelay = Duration.ofMinutes(5);
 }
