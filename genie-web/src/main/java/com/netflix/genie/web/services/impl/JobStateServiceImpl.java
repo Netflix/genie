@@ -76,11 +76,6 @@ public class JobStateServiceImpl implements JobStateService {
         this.registry = registry;
         this.genieEventBus = genieEventBus;
 
-        // TODO: Active and running seems backwards here. Might want to review
-        this.registry.gauge("genie.jobs.running.gauge", this.jobs, Map::size);
-        this.registry.gauge("genie.jobs.active.gauge", this, JobStateServiceImpl::getNumActiveJobs);
-        this.registry.gauge("genie.jobs.memory.used.gauge", this, JobStateServiceImpl::getUsedMemory);
-
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
     }
 
