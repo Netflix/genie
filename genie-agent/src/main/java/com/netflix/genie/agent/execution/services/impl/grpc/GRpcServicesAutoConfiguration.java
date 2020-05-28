@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
@@ -31,6 +32,7 @@ import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -43,6 +45,11 @@ import org.springframework.scheduling.TaskScheduler;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 public class GRpcServicesAutoConfiguration {
 
     /**

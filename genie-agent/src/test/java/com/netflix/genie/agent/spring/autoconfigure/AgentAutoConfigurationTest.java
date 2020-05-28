@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.spring.autoconfigure;
 
 import com.netflix.genie.agent.AgentMetadataImpl;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import org.assertj.core.api.Assertions;
@@ -65,6 +66,7 @@ public class AgentAutoConfigurationTest {
                     .assertThat(context)
                     .getBean("heartBeatServiceTaskScheduler")
                     .isOfAnyClassIn(ThreadPoolTaskScheduler.class);
+                Assertions.assertThat(context).hasSingleBean(AgentProperties.class);
             }
         );
     }
