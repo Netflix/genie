@@ -18,7 +18,7 @@
 package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.services.KillService
-import com.netflix.genie.agent.execution.services.impl.KillServiceImpl
+import com.netflix.genie.agent.properties.AgentProperties
 import org.springframework.context.ApplicationEventPublisher
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -28,11 +28,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class KillServiceImplSpec extends Specification {
     ApplicationEventPublisher applicationEventPublisher
+    AgentProperties agentProperties
     KillService service
 
     void setup() {
+        agentProperties = new AgentProperties()
         applicationEventPublisher = Mock(ApplicationEventPublisher)
-        service = new KillServiceImpl(applicationEventPublisher)
+        service = new KillServiceImpl(applicationEventPublisher, agentProperties)
     }
 
     @Unroll
@@ -60,9 +62,10 @@ class KillServiceImplSpec extends Specification {
         AtomicBoolean emergencyTerminationExecuted = new AtomicBoolean(false)
         service = new KillServiceImpl(
             applicationEventPublisher,
-            { -> emergencyTerminationExecuted.set(true) },
-            Duration.ofMillis(10)
+            agentProperties,
+            { -> emergencyTerminationExecuted.set(true) }
         )
+        agentProperties.setEmergencyShutdownDelay(Duration.ofMillis(1))
 
         when:
         service.kill(KillService.KillSource.SYSTEM_SIGNAL)

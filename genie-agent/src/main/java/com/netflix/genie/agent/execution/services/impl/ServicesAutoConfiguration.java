@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
@@ -93,13 +94,17 @@ public class ServicesAutoConfiguration {
      * Provide a lazy {@link KillService} bean if one hasn't already been defined.
      *
      * @param applicationEventPublisher The Spring event publisher to use
+     * @param agentProperties           The agent properties
      * @return A {@link KillServiceImpl} instance
      */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(KillService.class)
-    public KillService killService(final ApplicationEventPublisher applicationEventPublisher) {
-        return new KillServiceImpl(applicationEventPublisher);
+    public KillService killService(
+        final ApplicationEventPublisher applicationEventPublisher,
+        final AgentProperties agentProperties
+    ) {
+        return new KillServiceImpl(applicationEventPublisher, agentProperties);
     }
 
     /**
