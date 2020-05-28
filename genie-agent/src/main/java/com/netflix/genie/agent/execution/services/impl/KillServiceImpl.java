@@ -20,10 +20,9 @@ package com.netflix.genie.agent.execution.services.impl;
 import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.properties.AgentProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.time.Duration;
 
 /**
  * Implementation of {@link KillService}.
@@ -34,32 +33,32 @@ import java.time.Duration;
 @Slf4j
 class KillServiceImpl implements KillService {
 
-    private static final Duration DEFAULT_DELAY = Duration.ofMinutes(10); //TODO: Make configurable
     private static final Runnable DEFAULT_ACTION = () -> System.exit(ExitCode.EXEC_ABORTED.getCode());
     private static final String EMERGENCY_TERMINATION_THREAD_NAME = "emergency-shutdown";
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final Thread emergencyTerminationThread;
+    private final AgentProperties agentProperties;
 
-    KillServiceImpl(final ApplicationEventPublisher applicationEventPublisher) {
+    KillServiceImpl(final ApplicationEventPublisher applicationEventPublisher, final AgentProperties agentProperties) {
         this(
             applicationEventPublisher,
-            DEFAULT_ACTION,
-            DEFAULT_DELAY
+            agentProperties, DEFAULT_ACTION
         );
     }
 
     KillServiceImpl(
         final ApplicationEventPublisher applicationEventPublisher,
-        final Runnable emergencyTerminationAction,
-        final Duration emergencyTerminationDelay
+        final AgentProperties agentProperties,
+        final Runnable emergencyTerminationAction
     ) {
         this.applicationEventPublisher = applicationEventPublisher;
+        this.agentProperties = agentProperties;
         this.emergencyTerminationThread = new Thread(
             () -> {
                 log.debug("Emergency shutdown countdown started");
                 try {
-                    Thread.sleep(emergencyTerminationDelay.toMillis());
+                    Thread.sleep(this.agentProperties.getEmergencyShutdownDelay().toMillis());
                 } catch (InterruptedException e) {
                     log.warn("Interrupted during delayed emergency countdown");
                 }
