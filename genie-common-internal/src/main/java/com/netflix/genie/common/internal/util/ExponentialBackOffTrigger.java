@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.util;
 
+import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 
@@ -40,6 +41,23 @@ public class ExponentialBackOffTrigger implements Trigger {
     private final long maxDelay;
     private final float factor;
     private long currentDelay;
+
+    /**
+     * Constructor with properties.
+     * Loads all values during construction. I.e. does not respond to subsequent changes to property values dynamically.
+     *
+     * @param properties the properties
+     */
+    public ExponentialBackOffTrigger(
+        final ExponentialBackOffTriggerProperties properties
+    ) {
+        this(
+            properties.getDelayType(),
+            properties.getMinDelay().toMillis(),
+            properties.getMaxDelay().toMillis(),
+            properties.getFactor()
+        );
+    }
 
     /**
      * Constructor.
