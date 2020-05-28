@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.agent.launchers.impl;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -62,8 +64,12 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private static final String NUMBER_ACTIVE_JOBS_KEY = "numActiveJobs";
     private static final String ALLOCATED_MEMORY_KEY = "allocatedMemory";
     private static final String USED_MEMORY_KEY = "usedMemory";
-    private static final String AVAILABLE_MEMORY = "availableMemory";
-    private static final String AVAILABLE_MAX_JOB_CAPACITY = "availableMaxJobCapacity";
+    private static final String AVAILABLE_MEMORY_KEY = "availableMemory";
+    private static final String AVAILABLE_MAX_JOB_CAPACITY_KEY = "availableMaxJobCapacity";
+    private static final Map<String, String> INFO_UNAVAILABLE_DETAILS = ImmutableMap.of(
+        "jobInfoUnavailable",
+        "Unable to retrieve host job information. State unknown."
+    );
 
     private static final String RUN_USER_PLACEHOLDER = "<GENIE_USER>";
     private static final String SETS_ID = "setsid";
@@ -76,6 +82,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private final MeterRegistry registry;
     private final Executor sharedExecutor;
     private final int rpcPort;
+    private final LoadingCache<String, JobInfoAggregate> jobInfoCache;
 
     /**
      * Constructor.
@@ -103,6 +110,25 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         this.executorFactory = executorFactory;
         this.registry = registry;
         this.sharedExecutor = this.executorFactory.newInstance(false);
+
+        // Leverage a loading cache to handle the timed async fetching for us rather than creating a thread
+        // on a scheduler etc. This also provides atomicity.
+        // Note that this is not intended to be used for exact calculations and more for metrics and health checks
+        // as the data could be somewhat stale
+        this.jobInfoCache = Caffeine
+            .newBuilder()
+            // The refresh fails silently this will protect from stale data
+            .expireAfterWrite(this.launcherProperties.getHostInfoExpireAfter())
+            .refreshAfterWrite(this.launcherProperties.getHostInfoRefreshAfter())
+            .initialCapacity(1)
+            .build(this.persistenceService::getHostJobInformation);
+
+        // Force the initial fetch so that all subsequent fetches will be non-blocking
+        try {
+            this.jobInfoCache.get(this.hostname);
+        } catch (final Exception e) {
+            log.error("Unable to fetch initial job information", e);
+        }
     }
 
     /**
@@ -207,7 +233,19 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
      */
     @Override
     public Health health() {
-        final JobInfoAggregate jobInfo = this.persistenceService.getHostJobInformation(this.hostname);
+        final JobInfoAggregate jobInfo;
+        try {
+            jobInfo = this.jobInfoCache.get(this.hostname);
+        } catch (final Exception e) {
+            log.error("Computing host info threw exception", e);
+            // Could do unknown but if the persistence tier threw an exception we're likely down anyway
+            return Health.down(e).build();
+        }
+        // This should never happen but if it does it's likely a problem deeper in system (persistence tier)
+        if (jobInfo == null) {
+            log.error("Unable to retrieve host info from cache");
+            return Health.unknown().withDetails(INFO_UNAVAILABLE_DETAILS).build();
+        }
 
         // Use allocated memory to make the host go OOS early enough that we don't throw as many exceptions on
         // accepted jobs during launch
@@ -227,10 +265,10 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         return builder
             .withDetail(NUMBER_ACTIVE_JOBS_KEY, jobInfo.getNumberOfActiveJobs())
             .withDetail(ALLOCATED_MEMORY_KEY, memoryAllocated)
-            .withDetail(AVAILABLE_MEMORY, availableMemory)
+            .withDetail(AVAILABLE_MEMORY_KEY, availableMemory)
             .withDetail(USED_MEMORY_KEY, jobInfo.getTotalMemoryUsed())
             .withDetail(
-                AVAILABLE_MAX_JOB_CAPACITY,
+                AVAILABLE_MAX_JOB_CAPACITY_KEY,
                 (availableMemory >= 0 && maxJobMemory > 0) ? (availableMemory / maxJobMemory) : 0)
             .build();
     }

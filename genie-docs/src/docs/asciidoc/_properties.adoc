@@ -45,6 +45,21 @@ Whereas static properties values are bound during application startup and do not
 |/tmp/genie-agent.jar
 |no
 
+|genie.agent.launcher.local.host-info-expire-after
+|How long after the job information for this host is written into a local cache is it evicted. See
+https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion[Spring Docs]
+for Duration conversion details.
+|1m
+|no
+
+|genie.agent.launcher.local.host-info-refresh-after
+|How long after the job information for this host is written should it be automatically refreshed from the underlying
+data source. See
+https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion[Spring Docs]
+ for Duration conversion details.
+|30s
+|no
+
 |genie.agent.launcher.local.launch-command-template
 |The system command that the launcher should use to launch an agent process. Ordered list of arguments. Contains placeholders that will be replaced at runtime.
 |java -jar <AGENT_JAR_PLACEHOLDER> exec --server-host 127.0.0.1 --server-port <SERVER_PORT_PLACEHOLDER> --api-job --job-id <JOB_ID_PLACEHOLDER>
