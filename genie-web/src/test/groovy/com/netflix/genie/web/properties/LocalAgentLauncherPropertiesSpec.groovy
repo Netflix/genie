@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import spock.lang.Specification
 
+import java.time.Duration
+
 /**
  * Specifications for {@link LocalAgentLauncherProperties}.
  *
@@ -45,6 +47,8 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         !properties.isRunAsUserEnabled()
         properties.additionalEnvironment.isEmpty()
         !properties.isProcessOutputCaptureEnabled()
+        properties.getHostInfoExpireAfter() == Duration.ofMinutes(1L)
+        properties.getHostInfoRefreshAfter() == Duration.ofSeconds(30L)
     }
 
     def "Setters and getters work properly"() {
@@ -54,6 +58,8 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         def newMaxTotalJobMemory = 900_000L
         def properties = new LocalAgentLauncherProperties()
         def environment = ImmutableMap.of("FOO", "Bar")
+        def expireAfter = Duration.ofHours(1L)
+        def refreshAfter = Duration.ofMillis(12L)
 
         when:
         properties.setLaunchCommandTemplate(newExecutable)
@@ -63,6 +69,8 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         properties.setRunAsUserEnabled(true)
         properties.setAdditionalEnvironment(environment)
         properties.setProcessOutputCaptureEnabled(true)
+        properties.setHostInfoExpireAfter(expireAfter)
+        properties.setHostInfoRefreshAfter(refreshAfter)
 
         then:
         properties.getLaunchCommandTemplate() == newExecutable
@@ -72,5 +80,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         properties.isRunAsUserEnabled()
         properties.getAdditionalEnvironment() == environment
         properties.isProcessOutputCaptureEnabled()
+        properties.getHostInfoExpireAfter() == expireAfter
+        properties.getHostInfoRefreshAfter() == refreshAfter
     }
 }

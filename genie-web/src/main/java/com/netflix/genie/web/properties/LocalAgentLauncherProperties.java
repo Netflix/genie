@@ -27,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -109,4 +110,19 @@ public class LocalAgentLauncherProperties {
      * Launch agent as the user in the job request (launches as the server user if false).
      */
     private boolean runAsUserEnabled;
+
+    /**
+     * How long after the job information for this host is written into a local cache is it evicted.
+     * <p>
+     * Should be higher than {@link #getHostInfoRefreshAfter()}.
+     */
+    private Duration hostInfoExpireAfter = Duration.ofMinutes(1L);
+
+    /**
+     * How long after the job information for this host is written should it be automatically refreshed from
+     * the underlying data source.
+     * <p>
+     * Should be lower than {@link #getHostInfoExpireAfter()}.
+     */
+    private Duration hostInfoRefreshAfter = Duration.ofSeconds(30L);
 }
