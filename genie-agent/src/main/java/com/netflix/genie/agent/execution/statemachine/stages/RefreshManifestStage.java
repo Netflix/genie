@@ -25,6 +25,7 @@ import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionExcep
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
@@ -39,7 +40,6 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 public class RefreshManifestStage extends ExecutionStage {
-    protected static final int TIMEOUT_SECONDS = 3; //TODO make configurable
     private final AgentFileStreamService agentFileStreamService;
 
     /**
@@ -62,8 +62,9 @@ public class RefreshManifestStage extends ExecutionStage {
             final Optional<ScheduledFuture<?>> optionalFuture = this.agentFileStreamService.forceServerSync();
             if (optionalFuture.isPresent()) {
                 // Give it a little time to complete, but don't block execution if it doesn't
+                final Duration timeout = executionContext.getAgentProperties().getForceManifestRefreshTimeout();
                 try {
-                    optionalFuture.get().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                    optionalFuture.get().get(timeout.toMillis(), TimeUnit.MILLISECONDS);
                 } catch (InterruptedException | TimeoutException e) {
                     log.warn("Forced manifest refresh timeout: {}", e.getMessage());
                 } catch (ExecutionException e) {

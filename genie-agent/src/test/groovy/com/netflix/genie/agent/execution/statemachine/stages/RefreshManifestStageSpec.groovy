@@ -21,8 +21,10 @@ import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.States
+import com.netflix.genie.agent.properties.AgentProperties
 import spock.lang.Specification
 import spock.lang.Unroll
+import sun.management.Agent
 
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ScheduledFuture
@@ -33,10 +35,12 @@ class RefreshManifestStageSpec extends Specification {
 
     ExecutionContext executionContext
     ScheduledFuture<?> future
+    AgentProperties agentProperties
 
     void setup() {
         this.agentFileService = Mock(AgentFileStreamService)
         this.executionContext = Mock(ExecutionContext)
+        this.agentProperties = new AgentProperties()
         this.future = Mock(ScheduledFuture)
     }
 
@@ -50,6 +54,7 @@ class RefreshManifestStageSpec extends Specification {
         then:
         1 * executionContext.getJobDirectory() >> Mock(File)
         1 * agentFileService.forceServerSync() >> Optional.<ScheduledFuture<?>>of(future)
+        1 * executionContext.getAgentProperties() >> agentProperties
         1 * future.get(_, _)
 
         when:
@@ -83,6 +88,7 @@ class RefreshManifestStageSpec extends Specification {
         then:
         1 * executionContext.getJobDirectory() >> Mock(File)
         1 * agentFileService.forceServerSync() >> Optional.<ScheduledFuture<?>>of(future)
+        1 * executionContext.getAgentProperties() >> agentProperties
         1 * future.get(_, _) >> { throw exception }
 
         where:
