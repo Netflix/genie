@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine
 
 import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.process.JobProcessResult
+import com.netflix.genie.agent.properties.AgentProperties
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
@@ -40,8 +41,8 @@ class ExecutionContextSpec extends Specification {
         JobProcessResult jobProcessResult = Mock(JobProcessResult)
         Exception retryableException = new RetryableJobExecutionException("...", null)
         Exception fatalException = new FatalJobExecutionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
-        ExecutionContext executionContext = new ExecutionContext()
-
+        AgentProperties agentProperties = Mock(AgentProperties)
+        ExecutionContext executionContext = new ExecutionContext(agentProperties)
 
         expect:
         executionContext.getAgentClientMetadata() == null
@@ -66,6 +67,7 @@ class ExecutionContextSpec extends Specification {
         executionContext.getCleanupStrategy() == CleanupStrategy.DEFAULT_STRATEGY
         executionContext.getNextJobStatus() == JobStatus.INVALID
         executionContext.getNextJobStatusMessage() == null
+        executionContext.getAgentProperties() != null
 
         when:
         executionContext.setAgentClientMetadata(agentClientMetadata)
@@ -89,7 +91,6 @@ class ExecutionContextSpec extends Specification {
         executionContext.setCleanupStrategy(CleanupStrategy.FULL_CLEANUP)
         executionContext.setNextJobStatus(JobStatus.RUNNING)
         executionContext.setNextJobStatusMessage("Job running")
-
 
         then:
         executionContext.getAgentClientMetadata() == agentClientMetadata
@@ -117,6 +118,5 @@ class ExecutionContextSpec extends Specification {
         executionContext.getCleanupStrategy() == CleanupStrategy.FULL_CLEANUP
         executionContext.getNextJobStatus() == JobStatus.RUNNING
         executionContext.getNextJobStatusMessage() == "Job running"
-
     }
 }

@@ -62,8 +62,10 @@ import com.netflix.genie.agent.execution.statemachine.stages.StopFileServiceStag
 import com.netflix.genie.agent.execution.statemachine.stages.StopHeartbeatServiceStage;
 import com.netflix.genie.agent.execution.statemachine.stages.StopKillServiceStage;
 import com.netflix.genie.agent.execution.statemachine.stages.WaitJobCompletionStage;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -80,6 +82,11 @@ import java.util.List;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 public class ExecutionAutoConfiguration {
 
     /**
@@ -114,9 +121,8 @@ public class ExecutionAutoConfiguration {
     @Bean
     @Lazy
     @ConditionalOnMissingBean
-    ExecutionContext executionContext(
-    ) {
-        return new ExecutionContext();
+    ExecutionContext executionContext(final AgentProperties agentProperties) {
+        return new ExecutionContext(agentProperties);
     }
 
     @Bean

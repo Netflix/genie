@@ -61,6 +61,7 @@ import com.netflix.genie.agent.execution.statemachine.stages.StopFileServiceStag
 import com.netflix.genie.agent.execution.statemachine.stages.StopHeartbeatServiceStage;
 import com.netflix.genie.agent.execution.statemachine.stages.StopKillServiceStage;
 import com.netflix.genie.agent.execution.statemachine.stages.WaitJobCompletionStage;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -131,6 +132,7 @@ class ExecutionAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(ConsoleLogListener.class);
                 Assertions.assertThat(context).hasSingleBean(ExecutionContext.class);
                 Assertions.assertThat(context).hasSingleBean(JobExecutionStateMachine.class);
+                Assertions.assertThat(context).hasSingleBean(AgentProperties.class);
                 uniqueExecutionStages.forEach(
                     stageClass ->
                         Assertions.assertThat(context).hasSingleBean(stageClass)
