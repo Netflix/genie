@@ -51,6 +51,13 @@ genie:
     heart-beat-service:
       interval: 2s
       errorRetryDelay: 1s
+    job-kill-service:
+      response-check-backOff:
+        delay-type: FROM_PREVIOUS_EXECUTION_COMPLETION
+        min-delay: 500ms
+        max-delay: 5s
+        factor: 1.2
+
 
 spring:
   banner:
