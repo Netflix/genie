@@ -17,29 +17,26 @@
  */
 package com.netflix.genie.agent.properties;
 
+import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties;
+import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
 /**
- * Root properties class for agent.
+ * Properties for {@link com.netflix.genie.agent.execution.services.AgentJobKillService}.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = AgentProperties.PREFIX)
 @Getter
 @Setter
-public class AgentProperties {
-    /**
-     * Properties prefix.
-     */
-    public static final String PREFIX = "genie.agent.runtime";
-
-    private Duration emergencyShutdownDelay = Duration.ofMinutes(5);
-    private FileStreamServiceProperties fileStreamService = new FileStreamServiceProperties();
-    private HeartBeatServiceProperties heartBeatService = new HeartBeatServiceProperties();
-    private JobKillServiceProperties jobKillService = new JobKillServiceProperties();
+public class JobKillServiceProperties {
+    private ExponentialBackOffTriggerProperties responseCheckBackOff = new ExponentialBackOffTriggerProperties(
+        ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_COMPLETION,
+        Duration.ofMillis(500),
+        Duration.ofSeconds(5),
+        1.2f
+    );
 }
