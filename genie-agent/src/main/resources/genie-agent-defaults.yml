@@ -38,6 +38,7 @@ genie:
           - '.*/genie/.*/dependencies'
   agent:
     emergency-shutdown-delay: 30s
+    force-manifest-refresh-timeout: 5s
     file-stream-service:
       errorBackOff:
         delay-type: FROM_PREVIOUS_EXECUTION_BEGIN
