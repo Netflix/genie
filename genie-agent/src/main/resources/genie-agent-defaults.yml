@@ -39,6 +39,7 @@ genie:
   agent:
     runtime:
       emergency-shutdown-delay: 5m
+      force-manifest-refresh-timeout: 5s
       file-stream-service:
         error-back-off:
           delay-type: FROM_PREVIOUS_EXECUTION_BEGIN

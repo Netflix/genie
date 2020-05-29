@@ -39,6 +39,7 @@ public class AgentProperties {
     public static final String PREFIX = "genie.agent.runtime";
 
     private Duration emergencyShutdownDelay = Duration.ofMinutes(5);
+    private Duration forceManifestRefreshTimeout = Duration.ofSeconds(5);
     private FileStreamServiceProperties fileStreamService = new FileStreamServiceProperties();
     private HeartBeatServiceProperties heartBeatService = new HeartBeatServiceProperties();
     private JobKillServiceProperties jobKillService = new JobKillServiceProperties();
