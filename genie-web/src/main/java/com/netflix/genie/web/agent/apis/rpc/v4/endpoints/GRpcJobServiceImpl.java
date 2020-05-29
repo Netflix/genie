@@ -26,6 +26,8 @@ import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ClaimJobResponse;
+import com.netflix.genie.proto.ConfigureRequest;
+import com.netflix.genie.proto.ConfigureResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.HandshakeRequest;
 import com.netflix.genie.proto.HandshakeResponse;
@@ -98,6 +100,22 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             responseObserver.onNext(protoErrorComposer.toProtoHandshakeResponse(e));
         }
 
+        responseObserver.onCompleted();
+    }
+
+    /**
+     * This API provides runtime configuration to the agent (example: timeouts, parallelism, etc.).
+     *
+     * @param request          The agent request
+     * @param responseObserver To send the response
+     */
+    @Override
+    public void configure(
+        final ConfigureRequest request,
+        final StreamObserver<ConfigureResponse> responseObserver
+    ) {
+        // TODO currently NOOP, sends back an empty message
+        responseObserver.onNext(ConfigureResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
 
