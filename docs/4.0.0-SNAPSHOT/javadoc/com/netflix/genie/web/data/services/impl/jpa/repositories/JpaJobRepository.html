@@ -146,27 +146,20 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#countByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">countByAgentHostnameAndStatusIn</a></span>(java.lang.String&nbsp;agentHostname,
-                               java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
-<div class="block">Get the number of agent jobs on a given host with the given statuses.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#countJobsByUserAndStatusIn-java.lang.String-java.util.Set-">countJobsByUserAndStatusIn</a></span>(@NotBlank java.lang.String&nbsp;user,
                           @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Count all jobs that belong to a given user and are in any of the given states.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">findByAgentHostnameAndStatusIn</a></span>(java.lang.String&nbsp;agentHostname,
                               java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Find jobs by host name and status.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findJobsCreatedBefore-java.time.Instant-java.util.Set-int-">findJobsCreatedBefore</a></span>(java.time.Instant&nbsp;createdThreshold,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;excludeStatuses,
@@ -174,10 +167,19 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Find a batch of jobs that were created before the given time.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getAgentJobIdsWithStatusIn-java.util.Set-">getAgentJobIdsWithStatusIn</a></span>(@NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Find agent jobs in the given set of states.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getHostJobInfo-java.lang.String-java.util.Set-java.util.Set-">getHostJobInfo</a></span>(java.lang.String&nbsp;agentHostname,
+              java.util.Set&lt;java.lang.String&gt;&nbsp;activeStatuses,
+              java.util.Set&lt;java.lang.String&gt;&nbsp;usedStatuses)</code>
+<div class="block">In a single query get aggregate information for the amount of memory used and count of active jobs on a given
+ host.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -219,7 +221,8 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">UserJobResourcesAggregate</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getUserJobResourcesAggregates--">getUserJobResourcesAggregates</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getUserJobResourcesAggregates-java.util.Set-boolean-">getUserJobResourcesAggregates</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
+                             boolean&nbsp;api)</code>
 <div class="block">Returns resources usage for each user that has a running job.</div>
 </td>
 </tr>
@@ -368,24 +371,6 @@ java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/
 </dl>
 </li>
 </ul>
-<a name="countByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>countByAgentHostnameAndStatusIn</h4>
-<pre>long&nbsp;countByAgentHostnameAndStatusIn(java.lang.String&nbsp;agentHostname,
-                                     java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</pre>
-<div class="block">Get the number of agent jobs on a given host with the given statuses.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>agentHostname</code> - The hostname of the agent</dd>
-<dd><code>statuses</code> - The statuses the job should be in e.g. <a href="../../../../../../../../../com/netflix/genie/common/dto/JobStatus.html#getActiveStatuses--"><code>JobStatus.getActiveStatuses()</code></a></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The number of jobs in the given statuses on that node</dd>
-</dl>
-</li>
-</ul>
 <a name="getTotalMemoryUsedOnHost-java.lang.String-java.util.Set-">
 <!--   -->
 </a>
@@ -404,6 +389,32 @@ long&nbsp;getTotalMemoryUsedOnHost(@Param(value="agentHostname")
 <dd><code>statuses</code> - The job statuses to filter by e.g. <a href="../../../../../../../../../com/netflix/genie/common/dto/JobStatus.html#getActiveStatuses--"><code>JobStatus.getActiveStatuses()</code></a></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The total memory used in MB</dd>
+</dl>
+</li>
+</ul>
+<a name="getHostJobInfo-java.lang.String-java.util.Set-java.util.Set-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHostJobInfo</h4>
+<pre>@Query(value="SELECT (SELECT COALESCE(SUM(j.memory_used), 0) FROM jobs j WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)) as totalMemoryAllocated, (SELECT COALESCE(SUM(j.memory_used), 0) FROM jobs j WHERE j.agent_hostname = :agentHostname and j.status IN (:usedStatuses)) as totalMemoryUsed, (SELECT COUNT(*) FROM jobs j WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)) as numberOfActiveJobs",
+       nativeQuery=true)
+<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a>&nbsp;getHostJobInfo(@Param(value="agentHostname")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       java.lang.String&nbsp;agentHostname,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @Param(value="activeStatuses")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;activeStatuses,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @Param(value="usedStatuses")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;usedStatuses)</pre>
+<div class="block">In a single query get aggregate information for the amount of memory used and count of active jobs on a given
+ host.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentHostname</code> - The hostname where the agent is running the job</dd>
+<dd><code>activeStatuses</code> - The set of statuses to use in order to consider a job "active"</dd>
+<dd><code>usedStatuses</code> - The set of statuses to use in order to consider a job to actively be using memory</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates"><code>JobInfoAggregate</code></a> instance with the requested information</dd>
 </dl>
 </li>
 </ul>
@@ -472,17 +483,23 @@ java.util.Set&lt;java.lang.Long&gt;&nbsp;findJobsCreatedBefore(@Param(value="cre
 </dl>
 </li>
 </ul>
-<a name="getUserJobResourcesAggregates--">
+<a name="getUserJobResourcesAggregates-java.util.Set-boolean-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getUserJobResourcesAggregates</h4>
-<pre>@Query(value="SELECT j.user AS user, COUNT(j) as runningJobsCount, SUM(j.memoryUsed) as usedMemory FROM JobEntity j WHERE j.status = \'RUNNING\' AND j.v4 = FALSE GROUP BY j.user")
-java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">UserJobResourcesAggregate</a>&gt;&nbsp;getUserJobResourcesAggregates()</pre>
+<pre>@Query(value="SELECT j.user AS user, COUNT(j) as runningJobsCount, COALESCE(SUM(j.memoryUsed), 0) as usedMemory FROM JobEntity j WHERE j.status IN (:statuses) AND j.api = :isApi GROUP BY j.user")
+java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">UserJobResourcesAggregate</a>&gt;&nbsp;getUserJobResourcesAggregates(@Param(value="statuses")
+                                                                                                                                                                                                                                                                           java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
+                                                                                                                                                                                                                                                                           @Param(value="isApi")
+                                                                                                                                                                                                                                                                           boolean&nbsp;api)</pre>
 <div class="block">Returns resources usage for each user that has a running job.
  Only jobs running on Genie servers are considered (i.e. no Agent jobs)</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>statuses</code> - The set of statuses a job has to be in to be considered</dd>
+<dd><code>api</code> - Whether the job was submitted through the api (true) or agent cli (false)</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The user resource aggregates</dd>
 </dl>

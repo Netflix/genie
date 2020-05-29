@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -159,21 +159,6 @@ extends java.lang.Object</pre>
 <div class="block">Provide a health indicator tied to agent related information if one hasn't already been provided elsewhere.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieMemoryHealthIndicator</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#genieMemoryHealthIndicator-com.netflix.genie.web.services.JobMetricsService-com.netflix.genie.web.properties.JobsProperties-">genieMemoryHealthIndicator</a></span>(<a href="../../../../../../../com/netflix/genie/web/services/JobMetricsService.html" title="interface in com.netflix.genie.web.services">JobMetricsService</a>&nbsp;jobMetricsService,
-                          <a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</code>
-<div class="block">Provide a health indicator related to job memory usage if one hasn't already been provided elsewhere.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">localAgentLauncherHealthIndicator</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
-                                 <a href="../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
-                                 <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
-<div class="block">Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.</div>
-</td>
-</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -213,30 +198,10 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="genieMemoryHealthIndicator-com.netflix.genie.web.services.JobMetricsService-com.netflix.genie.web.properties.JobsProperties-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>genieMemoryHealthIndicator</h4>
-<pre>@Bean
- @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieMemoryHealthIndicator.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieMemoryHealthIndicator</a>&nbsp;genieMemoryHealthIndicator(<a href="../../../../../../../com/netflix/genie/web/services/JobMetricsService.html" title="interface in com.netflix.genie.web.services">JobMetricsService</a>&nbsp;jobMetricsService,
-                                                                                                                                      <a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</pre>
-<div class="block">Provide a health indicator related to job memory usage if one hasn't already been provided elsewhere.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobMetricsService</code> - Implementation of <a href="../../../../../../../com/netflix/genie/web/services/JobMetricsService.html" title="interface in com.netflix.genie.web.services"><code>JobMetricsService</code></a> to use</dd>
-<dd><code>jobsProperties</code> - The <a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties"><code>JobsProperties</code></a> to use</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>An instance of <a href="../../../../../../../com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health"><code>GenieMemoryHealthIndicator</code></a></dd>
-</dl>
-</li>
-</ul>
 <a name="genieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>genieAgentHealthIndicator</h4>
 <pre>@Bean
@@ -248,29 +213,6 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieAgen
 <dd><code>agentConnectionTrackingService</code> - the agent connection tracking service</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An instance of <a href="../../../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health"><code>GenieAgentHealthIndicator</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>localAgentLauncherHealthIndicator</h4>
-<pre>@Bean
- @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator.class</a>)
- @ConditionalOnBean(value={<a href="../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl.class</a>})
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a>&nbsp;localAgentLauncherHealthIndicator(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
-                                                                                                                                                                                                                                                        <a href="../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
-                                                                                                                                                                                                                                                        <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
-<div class="block">Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>dataServices</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
-<dd><code>launcherProperties</code> - The properties related to launching agent jobs locally</dd>
-<dd><code>genieHostInfo</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> to use</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A <a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health"><code>LocalAgentLauncherHealthIndicator</code></a> instance</dd>
 </dl>
 </li>
 </ul>

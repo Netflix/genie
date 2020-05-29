@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-05-28</span>
+<span id="revdate">2020-05-29</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4822,6 +4822,23 @@ Whereas static properties values are bound during application startup and do not
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.host-info-expire-after</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long after the job information for this host is written into a local cache is it evicted. See
+<a href="https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion">Spring Docs</a>
+for Duration conversion details.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.host-info-refresh-after</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long after the job information for this host is written should it be automatically refreshed from the underlying
+data source. See
+<a href="https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion">Spring Docs</a>
+ for Duration conversion details.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.launch-command-template</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The system command that the launcher should use to launch an agent process. Ordered list of arguments. Contains placeholders that will be replaced at runtime.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java -jar &lt;AGENT_JAR_PLACEHOLDER&gt; exec --server-host 127.0.0.1 --server-port &lt;SERVER_PORT_PLACEHOLDER&gt; --api-job --job-id &lt;JOB_ID_PLACEHOLDER&gt;</p></td>
@@ -5296,7 +5313,7 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.healthIndicatorsToIgnore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genieMemory,mail,genieAgent,localAgentLauncher</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mail,genieAgent,localAgentLauncher</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5937,8 +5954,8 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.active.gauge</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of jobs currently active locally</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobStateServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalAgentLauncherImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>launcherClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.agentDisconnected.gauge</code></p></td>
@@ -6023,8 +6040,8 @@ for multiple errors.</p></td>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.memory.used.gauge</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Total amount of memory allocated to local jobs (according to job request)</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">Megabytes</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobStateServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobLauncherImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>launcherClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.notifications.final-state.counter</code></p></td>
@@ -6039,13 +6056,6 @@ for multiple errors.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>fromState, toState</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.running.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of jobs currently running locally</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobStateServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.applicationTask.applicationSetup.timer</code></p></td>
@@ -6543,7 +6553,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-05-28 19:49:55 UTC
+Last updated 2020-05-29 18:09:58 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

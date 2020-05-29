@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -107,7 +107,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dd>
+<dd><a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>, org.springframework.boot.actuate.health.HealthContributor, org.springframework.boot.actuate.health.HealthIndicator</dd>
 </dl>
 <hr>
 <br>
@@ -162,6 +162,10 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>org.springframework.boot.actuate.health.Health</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#health--">health</a></span>()</code></td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">launchAgent</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)</code>
 <div class="block">Launch an agent to execute the given <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
@@ -174,6 +178,13 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
 <code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.org.springframework.boot.actuate.health.HealthIndicator">
+<!--   -->
+</a>
+<h3>Methods inherited from interface&nbsp;org.springframework.boot.actuate.health.HealthIndicator</h3>
+<code>getHealth</code></li>
 </ul>
 </li>
 </ul>
@@ -225,7 +236,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <a name="launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>launchAgent</h4>
 <pre>public&nbsp;void&nbsp;launchAgent(@Valid
@@ -239,6 +250,19 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <dd><code>resolvedJob</code> - The <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information for the agent to act on</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></code> - For any error launching an Agent instance to run the job</dd>
+</dl>
+</li>
+</ul>
+<a name="health--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>health</h4>
+<pre>public&nbsp;org.springframework.boot.actuate.health.Health&nbsp;health()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>health</code>&nbsp;in interface&nbsp;<code>org.springframework.boot.actuate.health.HealthIndicator</code></dd>
 </dl>
 </li>
 </ul>

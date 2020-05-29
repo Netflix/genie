@@ -2688,10 +2688,6 @@
 <dd>
 <div class="block">Job killed, exit status unknown as done file is unreadable.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#countByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">countByAgentHostnameAndStatusIn(String, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Get the number of agent jobs on a given host with the given statuses.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html#countByServerHostnameEquals-java.lang.String-">countByServerHostnameEquals(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaAgentConnectionRepository</a></dt>
 <dd>
 <div class="block">Find the number of agents currently connected to the given server identified by <code>serverHostName</code>.</div>
@@ -4758,18 +4754,6 @@
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories"><code>JpaRepositories</code></a> container instance if one wasn't already provided.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health"><span class="typeNameLink">GenieMemoryHealthIndicator</span></a> - Class in <a href="com/netflix/genie/web/health/package-summary.html">com.netflix.genie.web.health</a></dt>
-<dd>
-<div class="block">A health indicator based around metrics from the Genie system.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/GenieMemoryHealthIndicator.html#GenieMemoryHealthIndicator-com.netflix.genie.web.services.JobMetricsService-com.netflix.genie.web.properties.JobsProperties-">GenieMemoryHealthIndicator(JobMetricsService, JobsProperties)</a></span> - Constructor for class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieMemoryHealthIndicator</a></dt>
-<dd>
-<div class="block">Constructor.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#genieMemoryHealthIndicator-com.netflix.genie.web.services.JobMetricsService-com.netflix.genie.web.properties.JobsProperties-">genieMemoryHealthIndicator(JobMetricsService, JobsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.health.<a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.health">HealthAutoConfiguration</a></dt>
-<dd>
-<div class="block">Provide a health indicator related to job memory usage if one hasn't already been provided elsewhere.</div>
-</dd>
 <dt><a href="com/netflix/genie/client/configs/GenieNetworkConfiguration.html" title="class in com.netflix.genie.client.configs"><span class="typeNameLink">GenieNetworkConfiguration</span></a> - Class in <a href="com/netflix/genie/client/configs/package-summary.html">com.netflix.genie.client.configs</a></dt>
 <dd>
 <div class="block">An object that encapsulates network configurations for Genie client HTTP requests.</div>
@@ -4963,14 +4947,6 @@
 <dd>
 <div class="block">Get the count of 'active' jobs for a given user across all instances.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveJobCountOnHost-java.lang.String-">getActiveJobCountOnHost(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">Get the number of active Genie jobs on a given host.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getActiveJobCountOnHost-java.lang.String-">getActiveJobCountOnHost(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
-<dd>
-<div class="block">Get the number of active Genie jobs on a given host.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatus.html#getActiveStatuses--">getActiveStatuses()</a></span> - Static method in enum com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a></dt>
 <dd>
 <div class="block">Get an unmodifiable set of all the statuses that make up a job being considered active.</div>
@@ -5030,14 +5006,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getAllHostsWithActiveJobs--">getAllHostsWithActiveJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get a set of host names which are currently have active jobs in the Genie cluster.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getAllocatedMemoryOnHost-java.lang.String-">getAllocatedMemoryOnHost(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">Get the amount of memory currently allocated on the given host by Genie jobs that are currently active.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getAllocatedMemoryOnHost-java.lang.String-">getAllocatedMemoryOnHost(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
-<dd>
-<div class="block">Get the amount of memory currently allocated on the given host by Genie jobs that are currently active.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html#getApiClientMetadata--">getApiClientMetadata()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequestMetadata</a></dt>
 <dd>
@@ -6090,6 +6058,19 @@
 <dd>
 <div class="block">Get the instance identifier of a grouping.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getHostJobInfo-java.lang.String-java.util.Set-java.util.Set-">getHostJobInfo(String, Set&lt;String&gt;, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">In a single query get aggregate information for the amount of memory used and count of active jobs on a given
+ host.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getHostJobInformation-java.lang.String-">getHostJobInformation(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Get all the aggregate metadata information about jobs running on a given hostname.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getHostJobInformation-java.lang.String-">getHostJobInformation(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Get all the aggregate metadata information about jobs running on a given hostname.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/ClientMetadata.html#getHostname--">getHostname()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ClientMetadata</a></dt>
 <dd>
 <div class="block">Get the hostname of the client.</div>
@@ -6661,6 +6642,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html#getNumAttachments--">getNumAttachments()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">FinishedJobProjection</a></dt>
 <dd>
 <div class="block">Get the number of attachments.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html#getNumberOfActiveJobs--">getNumberOfActiveJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a></dt>
+<dd>
+<div class="block">Get the number of jobs in any of the active states on this host.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.html#getNumDirectories--">getNumDirectories()</a></span> - Method in class com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.html" title="class in com.netflix.genie.common.internal.dtos">DirectoryManifest</a></dt>
 <dd>
@@ -7249,6 +7234,14 @@
 <dd>
 <div class="block">Method that returns the OAuth credentials.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html#getTotalMemoryAllocated--">getTotalMemoryAllocated()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a></dt>
+<dd>
+<div class="block">Get the total amount of memory (in MB) that was allocated by jobs on this host.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html#getTotalMemoryUsed--">getTotalMemoryUsed()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a></dt>
+<dd>
+<div class="block">Get the total amount of memory (in MB) that is actively in use by jobs on this host.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getTotalMemoryUsedOnHost-java.lang.String-java.util.Set-">getTotalMemoryUsedOnHost(String, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block">Given the hostname that agents are running on return the total memory their jobs are currently using.</div>
@@ -7405,7 +7398,7 @@
 <dd>
 <div class="block">Get the information about the current session user.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getUserJobResourcesAggregates--">getUserJobResourcesAggregates()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getUserJobResourcesAggregates-java.util.Set-boolean-">getUserJobResourcesAggregates(Set&lt;String&gt;, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block">Returns resources usage for each user that has a running job.</div>
 </dd>
@@ -7413,13 +7406,13 @@
 <dd>
 <div class="block">Get the maximum number of jobs a user is allowed to run concurrently.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUserResourcesSummaries--">getUserResourcesSummaries()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUserResourcesSummaries-java.util.Set-boolean-">getUserResourcesSummaries(Set&lt;JobStatus&gt;, boolean)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
-<div class="block">Get a map of summaries of resources usage for each user with at least one running job.</div>
+<div class="block">Get a map of summaries of resources usage for each user with at least one active job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getUserResourcesSummaries--">getUserResourcesSummaries()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getUserResourcesSummaries-java.util.Set-boolean-">getUserResourcesSummaries(Set&lt;JobStatus&gt;, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
-<div class="block">Get a map of summaries of resources usage for each user with at least one running job.</div>
+<div class="block">Get a map of summaries of resources usage for each user with at least one active job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3Hosts-java.util.Set-">getV3Hosts(Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
@@ -7720,11 +7713,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/apis/rest/v3/hateoas/HateoasAutoConfiguration.html#HateoasAutoConfiguration--">HateoasAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas.<a href="com/netflix/genie/web/spring/autoconfigure/apis/rest/v3/hateoas/HateoasAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas">HateoasAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#health--">health()</a></span> - Method in class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/GenieAgentHealthIndicator.html#health--">health()</a></span> - Method in class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieAgentHealthIndicator</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/GenieCpuHealthIndicator.html#health--">health()</a></span> - Method in class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/GenieCpuHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieCpuHealthIndicator</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/GenieMemoryHealthIndicator.html#health--">health()</a></span> - Method in class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/GenieMemoryHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieMemoryHealthIndicator</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html#health--">health()</a></span> - Method in class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#HEALTH_INDICATOR">HEALTH_INDICATOR</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>
 <div class="block">Key to tag a health indicator name.</div>
@@ -8768,6 +8760,10 @@
 <dd>
 <div class="block">Constructor with message and cause.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates"><span class="typeNameLink">JobInfoAggregate</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.aggregates</a></dt>
+<dd>
+<div class="block">An object to return aggregate data selected with regards to memory usage on a given Genie host.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/jobs/workflow/impl/JobKickoffTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl"><span class="typeNameLink">JobKickoffTask</span></a> - Class in <a href="com/netflix/genie/web/jobs/workflow/impl/package-summary.html">com.netflix.genie.web.jobs.workflow.impl</a></dt>
 <dd>
 <div class="block">Implementation of the workflow task for processing job information for genie mode.</div>
@@ -9672,18 +9668,6 @@
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation which launches local agent processes if no other implementation
  is defined.</div>
-</dd>
-<dt><a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health"><span class="typeNameLink">LocalAgentLauncherHealthIndicator</span></a> - Class in <a href="com/netflix/genie/web/health/package-summary.html">com.netflix.genie.web.health</a></dt>
-<dd>
-<div class="block">Health indicator based on data related to the health of the systems ability to launch more agent processes locally.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html#LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">LocalAgentLauncherHealthIndicator(DataServices, LocalAgentLauncherProperties, GenieHostInfo)</a></span> - Constructor for class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a></dt>
-<dd>
-<div class="block">Constructor.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">localAgentLauncherHealthIndicator(DataServices, LocalAgentLauncherProperties, GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.health.<a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.health">HealthAutoConfiguration</a></dt>
-<dd>
-<div class="block">Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">LocalAgentLauncherImpl</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/impl/package-summary.html">com.netflix.genie.web.agent.launchers.impl</a></dt>
 <dd>
