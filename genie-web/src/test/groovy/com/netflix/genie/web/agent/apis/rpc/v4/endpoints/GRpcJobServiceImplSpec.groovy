@@ -32,6 +32,8 @@ import com.netflix.genie.proto.ChangeJobStatusRequest
 import com.netflix.genie.proto.ChangeJobStatusResponse
 import com.netflix.genie.proto.ClaimJobRequest
 import com.netflix.genie.proto.ClaimJobResponse
+import com.netflix.genie.proto.ConfigureRequest
+import com.netflix.genie.proto.ConfigureResponse
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.HandshakeResponse
@@ -56,6 +58,7 @@ class GRpcJobServiceImplSpec extends Specification {
     AgentJobService agentJobService
     GRpcJobServiceImpl gRpcJobService
     StreamObserver<HandshakeResponse> handshakeResponseObserver
+    StreamObserver<ConfigureResponse> configureResponseObserver
     StreamObserver<ReserveJobIdResponse> reserveJobIdResponseObserver
     StreamObserver<JobSpecificationResponse> jobSpecificationResponseObserver
     StreamObserver<ClaimJobResponse> claimJobResponseObserver
@@ -69,6 +72,7 @@ class GRpcJobServiceImplSpec extends Specification {
         this.agentJobService = Mock(AgentJobService)
         this.gRpcJobService = new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, errorMessageComposer)
         this.handshakeResponseObserver = Mock(StreamObserver)
+        this.configureResponseObserver = Mock(StreamObserver)
         this.reserveJobIdResponseObserver = Mock(StreamObserver)
         this.jobSpecificationResponseObserver = Mock(StreamObserver)
         this.claimJobResponseObserver = Mock(StreamObserver)
@@ -118,6 +122,21 @@ class GRpcJobServiceImplSpec extends Specification {
             args -> assert response == args[0]
         }
         1 * handshakeResponseObserver.onCompleted()
+    }
+
+    def "Configure -- successful"() {
+        ConfigureRequest request = ConfigureRequest.newBuilder().build()
+        ConfigureResponse responseCapture
+
+        when:
+        gRpcJobService.configure(request, configureResponseObserver)
+
+        then:
+        1 * configureResponseObserver.onNext(_ as ConfigureResponse) >> {
+            args -> responseCapture = args[0]
+        }
+        1 * configureResponseObserver.onCompleted()
+        responseCapture != null
     }
 
     def "Reserve job id -- successful"() {

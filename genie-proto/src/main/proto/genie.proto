@@ -44,6 +44,7 @@ message PongResponse {
 //--------------------------------------------------------------------
 service JobService {
     rpc handshake (HandshakeRequest) returns (HandshakeResponse);
+    rpc configure (ConfigureRequest) returns (ConfigureResponse);
     rpc reserveJobId (ReserveJobIdRequest) returns (ReserveJobIdResponse);
     rpc resolveJobSpecification (JobSpecificationRequest) returns (JobSpecificationResponse);
     rpc getJobSpecification (JobSpecificationRequest) returns (JobSpecificationResponse);
@@ -242,6 +243,12 @@ message ChangeJobStatusError {
 message ChangeJobStatusResponse {
     bool successful = 1;
     ChangeJobStatusError error = 2;
+}
+
+message ConfigureRequest {
+}
+
+message ConfigureResponse {
 }
 
 //--------------------------------------------------------------------
