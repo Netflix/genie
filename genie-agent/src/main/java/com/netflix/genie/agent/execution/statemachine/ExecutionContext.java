@@ -30,6 +30,7 @@ import com.netflix.genie.agent.execution.statemachine.stages.LaunchJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ObtainJobSpecificationStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ReserveJobIdStage;
 import com.netflix.genie.agent.execution.statemachine.stages.WaitJobCompletionStage;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
@@ -64,6 +65,12 @@ public class ExecutionContext {
      * List of all exception thrown by state transitions.
      */
     private final List<TransitionExceptionRecord> transitionExceptionRecords = Lists.newArrayList();
+
+    /**
+     * Agent properties.
+     */
+    private final AgentProperties agentProperties;
+
     /**
      * Agent client metadata sent to the server in certain requests.
      * Present if {@link InitializeAgentStage} ran successfully.
@@ -167,6 +174,15 @@ public class ExecutionContext {
      * The message to attach to when the job status is updated.
      */
     private String nextJobStatusMessage;
+
+    /**
+     * Constructor.
+     *
+     * @param agentProperties The agent properties
+     */
+    public ExecutionContext(final AgentProperties agentProperties) {
+        this.agentProperties = agentProperties;
+    }
 
     /**
      * Record an execution exception, even if it is retryable.
