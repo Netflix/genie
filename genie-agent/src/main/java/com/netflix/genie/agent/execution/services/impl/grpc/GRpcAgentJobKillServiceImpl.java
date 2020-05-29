@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.services.impl.grpc;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.properties.JobKillServiceProperties;
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
@@ -34,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implementation of the {@link AgentJobKillService}, listens for kill coming from server using long-polling.
- *
+ * <p>
  * Note: this implementation still suffers from a serious flaw: because it is implemented with a unary call,
  * the server will never realize the client is gone if the connection is broken. This can lead to an accumulation of
  * parked calls on the server. A new protocol (based on a bidirectional stream) is necessary to solve this problem.
@@ -49,6 +50,7 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
     private final KillService killService;
     private final TaskScheduler taskScheduler;
     private final AtomicBoolean started = new AtomicBoolean(false);
+    private final JobKillServiceProperties properties;
     private final ExponentialBackOffTrigger trigger;
     private ScheduledFuture<?> periodicTaskScheduledFuture;
 
@@ -58,21 +60,19 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
      * @param client        The gRPC client to use to call the server
      * @param killService   KillService for killing the agent
      * @param taskScheduler A task scheduler
+     * @param properties    The service properties
      */
     public GRpcAgentJobKillServiceImpl(
         final JobKillServiceGrpc.JobKillServiceFutureStub client,
         final KillService killService,
-        final TaskScheduler taskScheduler
+        final TaskScheduler taskScheduler,
+        final JobKillServiceProperties properties
     ) {
         this.client = client;
         this.killService = killService;
         this.taskScheduler = taskScheduler;
-        this.trigger = new ExponentialBackOffTrigger(
-            ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_COMPLETION,
-            500, //TODO make configurable
-            5_000, //TODO make configurable
-            1.2f //TODO make configurable
-        );
+        this.properties = properties;
+        this.trigger = new ExponentialBackOffTrigger(this.properties.getResponseCheckBackOff());
     }
 
     /**

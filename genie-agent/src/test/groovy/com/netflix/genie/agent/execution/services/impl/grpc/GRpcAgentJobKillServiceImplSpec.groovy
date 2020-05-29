@@ -18,12 +18,11 @@
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.services.KillService
+import com.netflix.genie.agent.properties.JobKillServiceProperties
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
 import com.netflix.genie.proto.JobKillServiceGrpc
-import io.grpc.Status
-import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.junit.Rule
@@ -44,6 +43,7 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
     TaskScheduler taskScheduler
     ScheduledFuture<?> periodicTaskScheduledFuture
     JobKillServiceGrpc.JobKillServiceImplBase server
+    JobKillServiceProperties serviceProperties
 
     void setup() {
         this.server = Mock(JobKillServiceGrpc.JobKillServiceImplBase)
@@ -53,7 +53,8 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         this.killService = Mock(KillService)
         this.taskScheduler = Mock(TaskScheduler)
         this.periodicTaskScheduledFuture = Mock(ScheduledFuture)
-        this.service = new GRpcAgentJobKillServiceImpl(client, killService, taskScheduler)
+        this.serviceProperties = new JobKillServiceProperties()
+        this.service = new GRpcAgentJobKillServiceImpl(client, killService, taskScheduler, serviceProperties)
     }
 
     void cleanup() {
