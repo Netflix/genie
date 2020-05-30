@@ -145,13 +145,7 @@ configure(javaProjects) {
             dependency("org.codehaus.groovy:groovy-all:2.5.7")
             dependency("org.codehaus.janino:janino:3.0.14")
             dependency("org.dbunit:dbunit:2.6.0")
-            dependencySet(group: "org.jruby", version: "9.1.14.0") {
-                entry "jruby-complete"
-                entry "jruby-core"
-                entry "jruby-stdlib"
-            }
             dependency("org.opensaml:opensaml:2.6.4")
-            dependency("org.python:jython-standalone:2.7.1")
         }
     }
 
