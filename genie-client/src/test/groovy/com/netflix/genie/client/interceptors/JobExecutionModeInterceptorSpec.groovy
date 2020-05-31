@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.client.interceptors
 
-
 import okhttp3.Interceptor
 import okhttp3.Protocol
 import okhttp3.Request
@@ -41,7 +40,7 @@ class JobExecutionModeInterceptorSpec extends Specification {
         )
         def chain = Mock(Interceptor.Chain)
         def request = new Request.Builder()
-            .post(RequestBody.create(null, UUID.randomUUID().toString()))
+            .post(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080" + JobExecutionModeInterceptor.JOBS_API)
             .build()
         def response = new Response.Builder()
@@ -102,19 +101,19 @@ class JobExecutionModeInterceptorSpec extends Specification {
         where:
         request      | _
         new Request.Builder()
-            .post(RequestBody.create(null, UUID.randomUUID().toString()))
+            .post(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080/api/v3/applications")
             .build() | _
         new Request.Builder()
-            .post(RequestBody.create(null, UUID.randomUUID().toString()))
+            .post(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080/api/v3/clusters")
             .build() | _
         new Request.Builder()
-            .post(RequestBody.create(null, UUID.randomUUID().toString()))
+            .post(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080/api/v3/commands")
             .build() | _
         new Request.Builder()
-            .post(RequestBody.create(null, UUID.randomUUID().toString()))
+            .post(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080/api/v3/jobs/" + UUID.randomUUID().toString())
             .build() | _
         new Request.Builder()
@@ -122,11 +121,11 @@ class JobExecutionModeInterceptorSpec extends Specification {
             .url("http://localhost:8080/api/v3/jobs")
             .build() | _
         new Request.Builder()
-            .put(RequestBody.create(null, UUID.randomUUID().toString()))
+            .put(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080/api/v3/jobs")
             .build() | _
         new Request.Builder()
-            .patch(RequestBody.create(null, UUID.randomUUID().toString()))
+            .patch(RequestBody.create(UUID.randomUUID().toString(), null))
             .url("http://localhost:8080/api/v3/jobs")
             .build() | _
         new Request.Builder()

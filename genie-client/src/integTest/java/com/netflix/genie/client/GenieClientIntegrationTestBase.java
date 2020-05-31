@@ -19,7 +19,6 @@ package com.netflix.genie.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -27,12 +26,15 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import retrofit2.Retrofit;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -43,31 +45,65 @@ import java.util.UUID;
  * @author amsharma
  * @since 3.0.0
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieTestApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("integration")
-public abstract class GenieClientIntegrationTestBase {
+@Testcontainers(disabledWithoutDocker = true)
+@SuppressWarnings(
+    {
+        "rawtypes"
+    }
+)
+abstract class GenieClientIntegrationTestBase {
 
-    @LocalServerPort
-    private int port;
+    // TODO: Move this to latest.candidate or latest.snapshot once new tagging is established OR
+    //       figure out a good way to build the container for the current commit locally and use that if we desire
+    //       testing same version to same version rather than for compatibility
+    @Container
+    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:4.0.0-rc.56")
+        .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
+        .withExposedPorts(8080);
 
-    /**
-     * Helper method that returns the dynamic url of the genie service.
-     *
-     * @return The genie service url.
-     */
-    String getBaseUrl() {
-        return "http://localhost:" + this.port;
+    protected ApplicationClient applicationClient;
+    protected CommandClient commandClient;
+    protected ClusterClient clusterClient;
+    protected JobClient jobClient;
+
+    @BeforeEach
+    void setup() throws Exception {
+        // Just run these once but don't make it a static BeforeAll in case it would be executed before container starts
+        if (
+            this.applicationClient == null
+                || this.commandClient == null
+                || this.clusterClient == null
+                || this.jobClient == null
+        ) {
+            final String baseUrl = "http://" + GENIE.getContainerIpAddress() + ":" + GENIE.getFirstMappedPort();
+            final Retrofit retrofit = GenieClientUtils.createRetrofitInstance(baseUrl, null, null);
+            if (this.applicationClient == null) {
+                this.applicationClient = new ApplicationClient(retrofit);
+            }
+            if (this.commandClient == null) {
+                this.commandClient = new CommandClient(retrofit);
+            }
+            if (this.clusterClient == null) {
+                this.clusterClient = new ClusterClient(retrofit);
+            }
+            if (this.jobClient == null) {
+                this.jobClient = new JobClient(retrofit, 3);
+            }
+        }
     }
 
-    /**
-     * Helper method to generate a sample Cluster DTO.
-     *
-     * @param id The id of the cluster.
-     * @return A cluster object.
-     */
-    Cluster constructClusterDTO(final String id) {
+    @AfterEach
+    void cleanup() {
+        try {
+            this.clusterClient.deleteAllClusters();
+            this.commandClient.deleteAllCommands();
+            this.applicationClient.deleteAllApplications();
+        } catch (final Exception e) {
+            // swallow
+        }
+    }
 
+    Cluster constructClusterDTO(final String id) {
         final String clusterId;
         if (StringUtils.isBlank(id)) {
             clusterId = UUID.randomUUID().toString();
@@ -91,14 +127,7 @@ public abstract class GenieClientIntegrationTestBase {
             .build();
     }
 
-    /**
-     * Helper method to generate a sample Command DTO.
-     *
-     * @param id The id of the command.
-     * @return A command object.
-     */
     Command constructCommandDTO(final String id) {
-
         final String commandId;
         if (StringUtils.isBlank(id)) {
             commandId = UUID.randomUUID().toString();
@@ -121,14 +150,7 @@ public abstract class GenieClientIntegrationTestBase {
             .build();
     }
 
-    /**
-     * Helper method to generate a sample Application DTO.
-     *
-     * @param id The id of the application.
-     * @return An application object.
-     */
     Application constructApplicationDTO(final String id) {
-
         final String applicationId;
         if (StringUtils.isBlank(id)) {
             applicationId = UUID.randomUUID().toString();

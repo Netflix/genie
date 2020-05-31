@@ -31,17 +31,11 @@ class AccessTokenTest {
 
     private AccessToken accessToken;
 
-    /**
-     * Setup for the tests.
-     */
     @BeforeEach
     void setup() {
         this.accessToken = new AccessToken();
     }
 
-    /**
-     * Make sure can set and get the accessToken variable.
-     */
     @Test
     void canSetAccessToken() {
         final String token = "token";
@@ -49,9 +43,6 @@ class AccessTokenTest {
         Assertions.assertThat(this.accessToken.getAccessToken()).isEqualTo(token);
     }
 
-    /**
-     * Make sure can set and get the tokenType variable.
-     */
     @Test
     void canSetTokenType() {
         final String tokenType = "token_type";
@@ -59,9 +50,6 @@ class AccessTokenTest {
         Assertions.assertThat(this.accessToken.getTokenType()).isEqualTo(tokenType);
     }
 
-    /**
-     * Make sure can set and get the expiresIn variable.
-     */
     @Test
     void canSetExpiresIn() {
         final int expiresIn = 3600;

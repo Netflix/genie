@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
- * Unit Tests for OAuth2SecurityInterceptor Class.
+ * Unit Tests for {@link OAuth2SecurityInterceptor} Class.
  *
  * @author amsharma
  * @since 3.0.0
@@ -37,9 +37,6 @@ class OAuth2SecurityInterceptorTest {
     private static final String GRANT_TYPE = "grant_type";
     private static final String SCOPE = "scope";
 
-    /**
-     * Test to make sure we can construct the object using the constructor.
-     */
     @Test
     void testCanConstruct() {
         Assertions
@@ -47,12 +44,7 @@ class OAuth2SecurityInterceptorTest {
             .doesNotThrowAnyException();
     }
 
-    /**
-     * Method to test valid exception thrown in case of failure to fetch token.
-     *
-     * @throws Exception For any issues.
-     */
-    @Disabled
+    @Disabled("fails randomly")
     @Test
     void testTokenFetchFailure() throws Exception {
         final Interceptor.Chain chain = Mockito.mock(Interceptor.Chain.class);
