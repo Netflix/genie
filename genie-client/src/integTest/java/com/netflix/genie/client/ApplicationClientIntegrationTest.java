@@ -25,85 +25,45 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration Tests for Application Client.
+ * Integration tests for {@link ApplicationClient}.
  *
  * @author amsharma
  */
-public class ApplicationClientIntegrationTest extends GenieClientIntegrationTestBase {
+abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTestBase {
 
-    private CommandClient commandClient;
-    private ApplicationClient applicationClient;
-
-    /**
-     * Setup for tests.
-     *
-     * @throws Exception If there is an error.
-     */
-    @Before
-    public void setup() throws Exception {
-        commandClient = new CommandClient(getBaseUrl(), null, null);
-        applicationClient = new ApplicationClient(getBaseUrl(), null, null);
-    }
-
-    /**
-     * Delete all applications and applications between tests.
-     *
-     * @throws Exception If there is any problem.
-     */
-    @After
-    public void cleanUp() throws Exception {
-        commandClient.deleteAllCommands();
-        applicationClient.deleteAllApplications();
-    }
-
-    /**
-     * Integration test to get all applications from Genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCanCreateAndGetApplication() throws Exception {
-
+    void testCanCreateAndGetApplication() throws Exception {
         final String id = UUID.randomUUID().toString();
-        final Application application = constructApplicationDTO(id);
+        final Application application = this.constructApplicationDTO(id);
 
-        final String applicationId = applicationClient.createApplication(application);
-        Assert.assertEquals(applicationId, id);
+        final String applicationId = this.applicationClient.createApplication(application);
+        Assertions.assertThat(applicationId).isEqualTo(id);
 
         // Make sure Genie Not Found Exception is not thrown for this call.
-        final Application cmd = applicationClient.getApplication(id);
+        final Application app2 = this.applicationClient.getApplication(id);
 
         // Make sure the object returned is exactly what was sent to be created
-        Assert.assertEquals(application.getId(), cmd.getId());
-        Assert.assertEquals(application.getName(), cmd.getName());
-        Assert.assertEquals(application.getDescription(), cmd.getDescription());
-        Assert.assertEquals(application.getConfigs(), cmd.getConfigs());
-        Assert.assertEquals(application.getSetupFile(), cmd.getSetupFile());
-        Assert.assertTrue(cmd.getTags().contains("foo"));
-        Assert.assertTrue(cmd.getTags().contains("bar"));
-        Assert.assertEquals(application.getStatus(), cmd.getStatus());
+        Assertions.assertThat(application.getId()).isEqualTo(app2.getId());
+        Assertions.assertThat(application.getName()).isEqualTo(app2.getName());
+        Assertions.assertThat(application.getDescription()).isEqualTo(app2.getDescription());
+        Assertions.assertThat(application.getConfigs()).isEqualTo(app2.getConfigs());
+        Assertions.assertThat(application.getSetupFile()).isEqualTo(app2.getSetupFile());
+        Assertions.assertThat(application.getTags()).contains("foo", "bar");
+        Assertions.assertThat(application.getStatus()).isEqualTo(app2.getStatus());
     }
 
-    /**
-     * Test getting the applications using the various query parameters.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testGetApplicationsUsingParams() throws Exception {
+    void testGetApplicationsUsingParams() throws Exception {
         final String application1Id = UUID.randomUUID().toString();
         final String application2Id = UUID.randomUUID().toString();
 
@@ -131,21 +91,26 @@ public class ApplicationClientIntegrationTest extends GenieClientIntegrationTest
                 .withTags(application2Tags)
                 .build();
 
-        applicationClient.createApplication(application1);
-        applicationClient.createApplication(application2);
+        this.applicationClient.createApplication(application1);
+        this.applicationClient.createApplication(application2);
 
         // Test get by tags
-        List<Application> applicationList = applicationClient.getApplications(
+        List<Application> applicationList = this.applicationClient.getApplications(
             null,
             null,
             null,
             Lists.newArrayList("foo"),
             null
         );
-        Assert.assertEquals(1, applicationList.size());
-        Assert.assertEquals(application1Id, applicationList.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assertions
+            .assertThat(applicationList)
+            .hasSize(1)
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(application1Id);
 
-        applicationList = applicationClient.getApplications(
+        applicationList = this.applicationClient.getApplications(
             null,
             null,
             null,
@@ -153,12 +118,16 @@ public class ApplicationClientIntegrationTest extends GenieClientIntegrationTest
             null
         );
 
-        Assert.assertEquals(2, applicationList.size());
-        Assert.assertEquals(application2Id, applicationList.get(0).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(application1Id, applicationList.get(1).getId().orElseThrow(IllegalArgumentException::new));
+        Assertions
+            .assertThat(applicationList)
+            .hasSize(2)
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(application2Id, application1Id);
 
         // Test get by name
-        applicationList = applicationClient.getApplications(
+        applicationList = this.applicationClient.getApplications(
             "application1name",
             null,
             null,
@@ -166,10 +135,16 @@ public class ApplicationClientIntegrationTest extends GenieClientIntegrationTest
             null
         );
 
-        Assert.assertEquals(1, applicationList.size());
+        Assertions
+            .assertThat(applicationList)
+            .hasSize(1)
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(application1Id);
 
         // Test get by status
-        applicationList = applicationClient.getApplications(
+        applicationList = this.applicationClient.getApplications(
             null,
             null,
             Lists.newArrayList(ApplicationStatus.ACTIVE.toString()),
@@ -177,9 +152,15 @@ public class ApplicationClientIntegrationTest extends GenieClientIntegrationTest
             null
         );
 
-        Assert.assertEquals(1, applicationList.size());
+        Assertions
+            .assertThat(applicationList)
+            .hasSize(1)
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(application1Id);
 
-        applicationList = applicationClient.getApplications(
+        applicationList = this.applicationClient.getApplications(
             null,
             null,
             Arrays.asList(ApplicationStatus.ACTIVE.toString(), ApplicationStatus.INACTIVE.toString()),
@@ -187,302 +168,244 @@ public class ApplicationClientIntegrationTest extends GenieClientIntegrationTest
             null
         );
 
-        Assert.assertEquals(2, applicationList.size());
+        Assertions
+            .assertThat(applicationList)
+            .hasSize(2)
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactlyInAnyOrder(application1Id, application2Id);
     }
 
-    /**
-     * Test to confirm getting an exception for non existent application.
-     *
-     * @throws Exception If there is a problem.
-     */
-    @Test(expected = IOException.class)
-    public void testApplicationNotExist() throws Exception {
-        applicationClient.getApplication("foo");
-    }
-
-    /**
-     * Test get all applications.
-     *
-     * @throws Exception If there is problem.
-     */
     @Test
-    public void testGetAllAndDeleteAllApplications() throws Exception {
-        final List<Application> initialApplicationList = applicationClient.getApplications();
-        Assert.assertEquals(initialApplicationList.size(), 0);
+    void testApplicationNotExist() {
+        Assertions.assertThatIOException().isThrownBy(() -> this.applicationClient.getApplication("foo"));
+    }
+
+    @Test
+    void testGetAllAndDeleteAllApplications() throws Exception {
+        final List<Application> initialApplicationList = this.applicationClient.getApplications();
+        Assertions.assertThat(initialApplicationList).isEmpty();
 
         final Application application1 = constructApplicationDTO(null);
         final Application application2 = constructApplicationDTO(null);
 
-        applicationClient.createApplication(application1);
-        applicationClient.createApplication(application2);
+        final String app1Id = this.applicationClient.createApplication(application1);
+        final String app2Id = this.applicationClient.createApplication(application2);
 
-        final List<Application> finalApplicationList = applicationClient.getApplications();
-        Assert.assertEquals(finalApplicationList.size(), 2);
+        final List<Application> finalApplicationList = this.applicationClient.getApplications();
+        Assertions.assertThat(finalApplicationList).hasSize(2)
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(app2Id, app1Id);
 
-        Assert.assertEquals(application1.getId(), finalApplicationList.get(1).getId());
-        Assert.assertEquals(application2.getId(), finalApplicationList.get(0).getId());
-
-        applicationClient.deleteAllApplications();
-        Assert.assertEquals(applicationClient.getApplications().size(), 0);
+        this.applicationClient.deleteAllApplications();
+        Assertions.assertThat(this.applicationClient.getApplications()).isEmpty();
     }
 
-    /**
-     * Test whether we can delete a application in Genie.
-     *
-     * @throws Exception If there is any problem.
-     */
-    @Test(expected = IOException.class)
-    public void testDeleteApplication() throws Exception {
-        final Application application1 = constructApplicationDTO(null);
-        applicationClient.createApplication(application1);
-
-        final Application application2
-            = applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(application2.getId(), application1.getId());
-
-        applicationClient.deleteApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
-        applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
-    }
-
-    /**
-     * Test to verify if the update application method is working correctly.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testUpdateApplication() throws Exception {
+    void testDeleteApplication() throws Exception {
         final Application application1 = constructApplicationDTO(null);
-        applicationClient.createApplication(application1);
+        final String appId1 = this.applicationClient.createApplication(application1);
 
-        final Application application2
-            = applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(application2.getName(), application1.getName());
+        final Application application2 = this.applicationClient.getApplication(appId1);
+        Assertions.assertThat(application2.getId()).isPresent().contains(appId1);
 
-        final Application application3
-            = new Application.Builder("newname", "newuser", "new version", ApplicationStatus.ACTIVE)
-            .withId(application1.getId().orElseThrow(IllegalArgumentException::new))
+        this.applicationClient.deleteApplication(appId1);
+        Assertions.assertThatIOException().isThrownBy(() -> this.applicationClient.getApplication(appId1));
+    }
+
+    @Test
+    void testUpdateApplication() throws Exception {
+        final Application application1 = constructApplicationDTO(null);
+        final String app1Id = this.applicationClient.createApplication(application1);
+
+        final Application application2 = this.applicationClient.getApplication(app1Id);
+        Assertions.assertThat(application2.getName()).isEqualTo(application1.getName());
+
+        final Application application3 = new Application.Builder(
+            "newname",
+            "newuser",
+            "new version",
+            ApplicationStatus.ACTIVE
+        )
+            .withId(app1Id)
             .build();
 
-        applicationClient
-            .updateApplication(application1.getId().orElseThrow(IllegalArgumentException::new), application3);
+        this.applicationClient.updateApplication(app1Id, application3);
 
-        final Application application4
-            = applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
+        final Application application4 = this.applicationClient.getApplication(app1Id);
 
-        Assert.assertEquals("newname", application4.getName());
-        Assert.assertEquals("newuser", application4.getUser());
-        Assert.assertEquals("new version", application4.getVersion());
-        Assert.assertEquals(ApplicationStatus.ACTIVE, application4.getStatus());
-        Assert.assertFalse(application4.getSetupFile().isPresent());
-        Assert.assertFalse(application4.getDescription().isPresent());
-        Assert.assertEquals(Collections.emptySet(), application4.getConfigs());
-        Assert.assertFalse(application4.getTags().contains("foo"));
+        Assertions.assertThat(application4.getName()).isEqualTo("newname");
+        Assertions.assertThat(application4.getUser()).isEqualTo("newuser");
+        Assertions.assertThat(application4.getVersion()).isEqualTo("new version");
+        Assertions.assertThat(application4.getStatus()).isEqualByComparingTo(ApplicationStatus.ACTIVE);
+        Assertions.assertThat(application4.getSetupFile()).isNotPresent();
+        Assertions.assertThat(application4.getDescription()).isNotPresent();
+        Assertions.assertThat(application4.getConfigs()).isEmpty();
+        Assertions.assertThat(application4.getTags()).doesNotContain("foo");
     }
 
-    /**
-     * Test all the methods that manipulate tags for a application in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testApplicationTagsMethods() throws Exception {
-
+    void testApplicationTagsMethods() throws Exception {
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
-        final Set<String> configList = Sets.newHashSet("config1", "configs2");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
-            .withId("application1")
-            .withDescription("client Test")
-            .withSetupFile("path to set up file")
             .withTags(initialTags)
-            .withConfigs(configList)
             .build();
 
-        applicationClient.createApplication(application);
+        final String appId = this.applicationClient.createApplication(application);
 
         // Test getTags for application
-        Set<String> tags = applicationClient.getTagsForApplication("application1");
-        Assert.assertEquals(4, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("bar"));
+        Assertions
+            .assertThat(this.applicationClient.getTagsForApplication(appId))
+            .hasSize(4)
+            .contains("foo", "bar");
 
         // Test adding a tag for application
         final Set<String> moreTags = Sets.newHashSet("pi");
 
-        applicationClient.addTagsToApplication("application1", moreTags);
-        tags = applicationClient.getTagsForApplication("application1");
-        Assert.assertEquals(5, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("bar"));
-        Assert.assertTrue(tags.contains("pi"));
+        this.applicationClient.addTagsToApplication(appId, moreTags);
+        Assertions
+            .assertThat(this.applicationClient.getTagsForApplication(appId))
+            .hasSize(5)
+            .contains("foo", "bar", "pi");
 
         // Test removing a tag for application
-        applicationClient.removeTagFromApplication("application1", "bar");
-        tags = applicationClient.getTagsForApplication("application1");
-        Assert.assertEquals(4, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("pi"));
+        this.applicationClient.removeTagFromApplication(appId, "bar");
+        Assertions
+            .assertThat(this.applicationClient.getTagsForApplication(appId))
+            .hasSize(4)
+            .doesNotContain("bar")
+            .contains("foo", "pi");
 
         // Test update tags for a application
-        applicationClient.updateTagsForApplication("application1", initialTags);
-        tags = applicationClient.getTagsForApplication("application1");
-        Assert.assertEquals(4, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("bar"));
+        this.applicationClient.updateTagsForApplication(appId, initialTags);
+        Assertions
+            .assertThat(this.applicationClient.getTagsForApplication(appId))
+            .hasSize(4)
+            .contains("foo", "bar");
 
         // Test delete all tags in a application
-        applicationClient.removeAllTagsForApplication("application1");
-        tags = applicationClient.getTagsForApplication("application1");
-        Assert.assertEquals(2, tags.size());
+        this.applicationClient.removeAllTagsForApplication(appId);
+        Assertions
+            .assertThat(this.applicationClient.getTagsForApplication(appId))
+            .hasSize(2)
+            .doesNotContain("foo", "bar");
     }
 
-    /**
-     * Test all the methods that manipulate configs for a application in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testApplicationConfigsMethods() throws Exception {
-
+    void testApplicationConfigsMethods() throws Exception {
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
-            .withId("application1")
-            .withDescription("client Test")
-            .withSetupFile("path to set up file")
             .withConfigs(initialConfigs)
             .build();
 
-        applicationClient.createApplication(application);
+        final String appId = this.applicationClient.createApplication(application);
 
         // Test getConfigs for application
-        Set<String> configs = applicationClient.getConfigsForApplication("application1");
-        Assert.assertEquals(2, configs.size());
-        Assert.assertTrue(configs.contains("foo"));
-        Assert.assertTrue(configs.contains("bar"));
+        Assertions
+            .assertThat(this.applicationClient.getConfigsForApplication(appId))
+            .hasSize(2)
+            .contains("foo", "bar");
 
-        // Test adding a config for application
+        // Test adding a config to the application
         final Set<String> moreConfigs = Sets.newHashSet("pi");
+        this.applicationClient.addConfigsToApplication(appId, moreConfigs);
+        Assertions
+            .assertThat(this.applicationClient.getConfigsForApplication(appId))
+            .hasSize(3)
+            .contains("foo", "bar", "pi");
 
-        applicationClient.addConfigsToApplication("application1", moreConfigs);
-        configs = applicationClient.getConfigsForApplication("application1");
-        Assert.assertEquals(3, configs.size());
-        Assert.assertTrue(configs.contains("foo"));
-        Assert.assertTrue(configs.contains("bar"));
-        Assert.assertTrue(configs.contains("pi"));
+        // Test update configs for an application
+        this.applicationClient.updateConfigsForApplication(appId, initialConfigs);
+        Assertions
+            .assertThat(this.applicationClient.getConfigsForApplication(appId))
+            .hasSize(2)
+            .contains("foo", "bar");
 
-        // Test update configs for a application
-        applicationClient.updateConfigsForApplication("application1", initialConfigs);
-        configs = applicationClient.getConfigsForApplication("application1");
-        Assert.assertEquals(2, configs.size());
-        Assert.assertTrue(configs.contains("foo"));
-        Assert.assertTrue(configs.contains("bar"));
-
-        // Test delete all configs in a application
-        applicationClient.removeAllConfigsForApplication("application1");
-        configs = applicationClient.getConfigsForApplication("application1");
-        Assert.assertEquals(0, configs.size());
+        // Test delete all configs for an application
+        this.applicationClient.removeAllConfigsForApplication(appId);
+        Assertions.assertThat(this.applicationClient.getConfigsForApplication(appId)).isEmpty();
     }
 
-    /**
-     * Test all the methods that manipulate dependencies for a application in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testApplicationDependenciesMethods() throws Exception {
-
+    void testApplicationDependenciesMethods() throws Exception {
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
-            .withId("application1")
-            .withDescription("client Test")
-            .withSetupFile("path to set up file")
             .withDependencies(initialDependencies)
             .build();
 
-        applicationClient.createApplication(application);
+        final String appId = this.applicationClient.createApplication(application);
 
         // Test getDependencies for application
-        Set<String> dependencies = applicationClient.getDependenciesForApplication("application1");
-        Assert.assertEquals(2, dependencies.size());
-        Assert.assertTrue(dependencies.contains("foo"));
-        Assert.assertTrue(dependencies.contains("bar"));
+        Assertions
+            .assertThat(this.applicationClient.getDependenciesForApplication(appId))
+            .hasSize(2)
+            .contains("foo", "bar");
 
-        // Test adding a dependency for application
+        // Test adding a dependency to the application
         final Set<String> moreDependencies = Sets.newHashSet("pi");
+        this.applicationClient.addDependenciesToApplication(appId, moreDependencies);
+        Assertions
+            .assertThat(this.applicationClient.getDependenciesForApplication(appId))
+            .hasSize(3)
+            .contains("foo", "bar", "pi");
 
-        applicationClient.addDependenciesToApplication("application1", moreDependencies);
-        dependencies = applicationClient.getDependenciesForApplication("application1");
-        Assert.assertEquals(3, dependencies.size());
-        Assert.assertTrue(dependencies.contains("foo"));
-        Assert.assertTrue(dependencies.contains("bar"));
-        Assert.assertTrue(dependencies.contains("pi"));
+        // Test update dependencies for an application
+        this.applicationClient.updateDependenciesForApplication(appId, initialDependencies);
+        Assertions
+            .assertThat(this.applicationClient.getDependenciesForApplication(appId))
+            .hasSize(2)
+            .contains("foo", "bar");
 
-        // Test update dependencies for a application
-        applicationClient.updateDependenciesForApplication("application1", initialDependencies);
-        dependencies = applicationClient.getDependenciesForApplication("application1");
-        Assert.assertEquals(2, dependencies.size());
-        Assert.assertTrue(dependencies.contains("foo"));
-        Assert.assertTrue(dependencies.contains("bar"));
-
-        // Test delete all dependencies in a application
-        applicationClient.removeAllDependenciesForApplication("application1");
-        dependencies = applicationClient.getDependenciesForApplication("application1");
-        Assert.assertEquals(0, dependencies.size());
+        // Test delete all dependencies for an application
+        this.applicationClient.removeAllDependenciesForApplication(appId);
+        Assertions.assertThat(this.applicationClient.getDependenciesForApplication(appId)).isEmpty();
     }
 
-    /**
-     * Test the application patch method.
-     *
-     * @throws Exception If there is any error.
-     */
     @Test
-    public void testApplicationPatchMethod() throws Exception {
+    void testApplicationPatchMethod() throws Exception {
         final ObjectMapper mapper = GenieObjectMapper.getMapper();
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
 
-        final Application application = constructApplicationDTO("application1");
+        final Application application = this.constructApplicationDTO("application1");
 
-        applicationClient.createApplication(application);
-        applicationClient.patchApplication("application1", patch);
+        final String appId = this.applicationClient.createApplication(application);
+        this.applicationClient.patchApplication(appId, patch);
 
-        Assert.assertEquals(newName, applicationClient.getApplication("application1").getName());
+        Assertions
+            .assertThat(this.applicationClient.getApplication(appId))
+            .extracting(Application::getName)
+            .isEqualTo(newName);
     }
 
-    /**
-     * Test to fetch the commands to which an application is linked.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCanGetCommandsForApplication() throws Exception {
-
+    void testCanGetCommandsForApplication() throws Exception {
         final Command command1 = constructCommandDTO(null);
         final Command command2 = constructCommandDTO(null);
 
-        commandClient.createCommand(command1);
-        commandClient.createCommand(command2);
+        final String command1Id = this.commandClient.createCommand(command1);
+        final String command2Id = this.commandClient.createCommand(command2);
 
         final Application application = constructApplicationDTO(null);
 
-        applicationClient.createApplication(application);
+        final String appId = this.applicationClient.createApplication(application);
 
-        commandClient.addApplicationsToCommand(
-            command1.getId().orElseThrow(IllegalArgumentException::new),
-            Lists.newArrayList(application.getId().orElseThrow(IllegalArgumentException::new))
-        );
-        commandClient.addApplicationsToCommand(
-            command2.getId().orElseThrow(IllegalArgumentException::new),
-            Lists.newArrayList(application.getId().orElseThrow(IllegalArgumentException::new))
-        );
+        this.commandClient.addApplicationsToCommand(command1Id, Lists.newArrayList(appId));
+        this.commandClient.addApplicationsToCommand(command2Id, Lists.newArrayList(appId));
 
-        final List<Command> commandList = applicationClient.getCommandsForApplication(
-            application.getId().orElseThrow(IllegalArgumentException::new)
-        );
-
-        Assert.assertEquals(2, commandList.size());
+        Assertions
+            .assertThat(this.applicationClient.getCommandsForApplication(appId))
+            .hasSize(2)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .contains(command1Id, command2Id);
     }
 }

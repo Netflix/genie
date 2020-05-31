@@ -27,92 +27,44 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration Tests for Command Client.
+ * Integration Tests for {@link CommandClient}.
  *
  * @author amsharma
  */
-public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase {
+abstract class CommandClientIntegrationTest extends ApplicationClientIntegrationTest {
 
-    private ClusterClient clusterClient;
-    private CommandClient commandClient;
-    private ApplicationClient applicationClient;
-
-    /**
-     * Setup for tests.
-     *
-     * @throws Exception If there is an error.
-     */
-    @Before
-    public void setup() throws Exception {
-        clusterClient = new ClusterClient(getBaseUrl(), null, null);
-        commandClient = new CommandClient(getBaseUrl(), null, null);
-        applicationClient = new ApplicationClient(getBaseUrl(), null, null);
-    }
-
-    /**
-     * Delete all commands and applications between tests.
-     *
-     * @throws Exception If there is any problem.
-     */
-    @After
-    public void cleanUp() throws Exception {
-        clusterClient.deleteAllClusters();
-        commandClient.deleteAllCommands();
-        applicationClient.deleteAllApplications();
-    }
-
-    /**
-     * Integration test to get all applications from Genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCanCreateAndGetCommand() throws Exception {
-
+    void testCanCreateAndGetCommand() throws Exception {
         final String id = UUID.randomUUID().toString();
-        final Command command = constructCommandDTO(id);
+        final Command command = this.constructCommandDTO(id);
 
-        final String commandId = commandClient.createCommand(command);
-        Assert.assertEquals(commandId, id);
+        final String commandId = this.commandClient.createCommand(command);
+        Assertions.assertThat(commandId).isEqualTo(id);
 
         // Make sure Genie Not Found Exception is not thrown for this call.
-        final Command cmd = commandClient.getCommand(id);
+        final Command cmd = this.commandClient.getCommand(id);
 
         // Make sure the object returned is exactly what was sent to be created
-        Assert.assertEquals(command.getId(), cmd.getId());
-        Assert.assertEquals(command.getName(), cmd.getName());
-        Assert.assertEquals(command.getDescription(), cmd.getDescription());
-        Assert.assertEquals(command.getConfigs(), cmd.getConfigs());
-        Assert.assertEquals(command.getSetupFile(), cmd.getSetupFile());
-        Assert.assertTrue(cmd.getTags().contains("foo"));
-        Assert.assertTrue(cmd.getTags().contains("bar"));
-        Assert.assertEquals(command.getStatus(), cmd.getStatus());
+        Assertions.assertThat(cmd.getId()).isPresent().contains(id);
+        Assertions.assertThat(cmd.getName()).isEqualTo(command.getName());
+        Assertions.assertThat(cmd.getDescription()).isEqualTo(command.getDescription());
+        Assertions.assertThat(cmd.getConfigs()).isEqualTo(command.getConfigs());
+        Assertions.assertThat(cmd.getSetupFile()).isEqualTo(command.getSetupFile());
+        Assertions.assertThat(cmd.getTags()).contains("foo", "bar");
+        Assertions.assertThat(cmd.getStatus()).isEqualByComparingTo(command.getStatus());
     }
 
-    /**
-     * Test getting the commands using the various query parameters.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testGetCommandsUsingParams() throws Exception {
-        final String command1Id = UUID.randomUUID().toString();
-        final String command2Id = UUID.randomUUID().toString();
-
+    void testGetCommandsUsingParams() throws Exception {
         final Set<String> command1Tags = Sets.newHashSet("foo", "pi");
         final Set<String> command2Tags = Sets.newHashSet("bar", "pi");
 
@@ -126,7 +78,6 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
             executableAndArgs,
             1000
         )
-            .withId(command1Id)
             .withTags(command1Tags)
             .build();
 
@@ -139,438 +90,355 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
                 executableAndArgs,
                 1000
             )
-                .withId(command2Id)
                 .withTags(command2Tags)
                 .build();
 
-        commandClient.createCommand(command1);
-        commandClient.createCommand(command2);
+        final String command1Id = this.commandClient.createCommand(command1);
+        final String command2Id = this.commandClient.createCommand(command2);
 
         // Test get by tags
-        List<Command> commandList = commandClient.getCommands(
-            null,
-            null,
-            null,
-            Lists.newArrayList("foo")
-        );
-        Assert.assertEquals(1, commandList.size());
-        Assert.assertEquals(command1Id, commandList.get(0).getId().orElse(UUID.randomUUID().toString()));
+        Assertions
+            .assertThat(this.commandClient.getCommands(null, null, null, Lists.newArrayList("foo")))
+            .hasSize(1)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command1Id);
 
-        commandList = commandClient.getCommands(
-            null,
-            null,
-            null,
-            Lists.newArrayList("pi")
-        );
-
-        Assert.assertEquals(2, commandList.size());
-        Assert.assertEquals(command2Id, commandList.get(0).getId().orElse(UUID.randomUUID().toString()));
-        Assert.assertEquals(command1Id, commandList.get(1).getId().orElse(UUID.randomUUID().toString()));
+        Assertions
+            .assertThat(this.commandClient.getCommands(null, null, null, Lists.newArrayList("pi")))
+            .hasSize(2)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command2Id, command1Id);
 
         // Test get by name
-        commandList = commandClient.getCommands(
-            "command1name",
-            null,
-            null,
-            null
-        );
-
-        Assert.assertEquals(1, commandList.size());
+        Assertions
+            .assertThat(this.commandClient.getCommands("command1name", null, null, null))
+            .hasSize(1)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command1Id);
 
         // Test get by status
-        commandList = commandClient.getCommands(
-            null,
-            null,
-            Lists.newArrayList(CommandStatus.ACTIVE.toString()),
-            null
+        Assertions
+            .assertThat(
+                this.commandClient.getCommands(null, null, Lists.newArrayList(CommandStatus.ACTIVE.toString()), null)
+            )
+            .hasSize(1)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command1Id);
+
+        final List<String> statuses = Lists.newArrayList(
+            CommandStatus.ACTIVE.toString(),
+            CommandStatus.INACTIVE.toString()
         );
+        Assertions
+            .assertThat(this.commandClient.getCommands(null, null, statuses, null))
+            .hasSize(2)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command2Id, command1Id);
 
-        Assert.assertEquals(1, commandList.size());
-
-        commandList = commandClient.getCommands(
-            null,
-            null,
-            Arrays.asList(CommandStatus.ACTIVE.toString(), CommandStatus.INACTIVE.toString()),
-            null
-        );
-
-        Assert.assertEquals(2, commandList.size());
+        // Test find by user
+        Assertions
+            .assertThat(this.commandClient.getCommands(null, "command2user", null, null))
+            .hasSize(1)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command2Id);
     }
 
-    /**
-     * Test to confirm getting an exception for non existent command.
-     *
-     * @throws Exception If there is a problem.
-     */
-    @Test(expected = IOException.class)
-    public void testCommandNotExist() throws Exception {
-        commandClient.getCommand("foo");
-    }
-
-    /**
-     * Test get all commands.
-     *
-     * @throws Exception If there is problem.
-     */
     @Test
-    public void testGetAllAndDeleteAllCommands() throws Exception {
-        final List<Command> initialCommandList = commandClient.getCommands();
-        Assert.assertEquals(initialCommandList.size(), 0);
-
-        final Command command1 = constructCommandDTO(null);
-        final Command command2 = constructCommandDTO(null);
-
-        commandClient.createCommand(command1);
-        commandClient.createCommand(command2);
-
-        final List<Command> finalCommandList = commandClient.getCommands();
-        Assert.assertEquals(finalCommandList.size(), 2);
-
-        Assert.assertEquals(command1.getId(), finalCommandList.get(1).getId());
-        Assert.assertEquals(command2.getId(), finalCommandList.get(0).getId());
-
-        commandClient.deleteAllCommands();
-        Assert.assertEquals(commandClient.getCommands().size(), 0);
+    void testCommandNotExist() {
+        Assertions
+            .assertThatIOException()
+            .isThrownBy(() -> this.commandClient.getCommand(UUID.randomUUID().toString()));
     }
 
-    /**
-     * Test whether we can delete a command in Genie.
-     *
-     * @throws Exception If there is any problem.
-     */
-    @Test(expected = IOException.class)
-    public void testDeleteCommand() throws Exception {
-        final Command command1 = constructCommandDTO(null);
-        commandClient.createCommand(command1);
-
-        final Command command2 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(command2.getId(), command1.getId());
-
-        commandClient.deleteCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
-        commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
-    }
-
-    /**
-     * Test to verify if the update command method is working correctly.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testUpdateCommand() throws Exception {
-        final Command command1 = constructCommandDTO(null);
-        commandClient.createCommand(command1);
+    void testGetAllAndDeleteAllCommands() throws Exception {
+        Assertions.assertThat(this.commandClient.getCommands()).isEmpty();
 
-        final Command command2 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(command2.getName(), command1.getName());
+        final Command command1 = this.constructCommandDTO(null);
+        final Command command2 = this.constructCommandDTO(null);
+
+        final String command1Id = this.commandClient.createCommand(command1);
+        final String command2Id = this.commandClient.createCommand(command2);
+
+        Assertions
+            .assertThat(this.commandClient.getCommands())
+            .hasSize(2)
+            .extracting(Command::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(command2Id, command1Id);
+
+        this.commandClient.deleteAllCommands();
+        Assertions.assertThat(this.commandClient.getCommands()).isEmpty();
+    }
+
+    @Test
+    void testDeleteCommand() throws Exception {
+        final Command command = this.constructCommandDTO(null);
+        final String commandId = this.commandClient.createCommand(command);
+
+        Assertions.assertThat(this.commandClient.getCommand(commandId).getId()).isPresent().contains(commandId);
+
+        this.commandClient.deleteCommand(commandId);
+        Assertions.assertThatIOException().isThrownBy(() -> this.commandClient.getCommand(commandId));
+    }
+
+    @Test
+    void testUpdateCommand() throws Exception {
+        final Command command1 = this.constructCommandDTO(null);
+        final String commandId = this.commandClient.createCommand(command1);
+
+        final Command command2 = this.commandClient.getCommand(commandId);
+        Assertions.assertThat(command2.getId()).isPresent().contains(commandId);
 
         final List<String> executableAndArgs = Lists.newArrayList("exec");
 
-        final Command command3 = new
-            Command.Builder("newname", "newuser", "new version", CommandStatus.ACTIVE, executableAndArgs, 1000)
-            .withId(command1.getId().orElseThrow(IllegalArgumentException::new))
+        final Command command3 = new Command.Builder(
+            "newname",
+            "newuser",
+            "new version",
+            CommandStatus.ACTIVE,
+            executableAndArgs,
+            1000
+        )
+            .withId(commandId)
             .build();
 
-        commandClient.updateCommand(command1.getId().orElseThrow(IllegalArgumentException::new), command3);
+        this.commandClient.updateCommand(commandId, command3);
 
-        final Command command4 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
+        final Command command4 = this.commandClient.getCommand(commandId);
 
-        Assert.assertEquals("newname", command4.getName());
-        Assert.assertEquals("newuser", command4.getUser());
-        Assert.assertEquals("new version", command4.getVersion());
-        Assert.assertEquals(executableAndArgs, command4.getExecutableAndArguments());
-        Assert.assertEquals(CommandStatus.ACTIVE, command4.getStatus());
-        Assert.assertFalse(command4.getSetupFile().isPresent());
-        Assert.assertFalse(command4.getDescription().isPresent());
-        Assert.assertEquals(Collections.emptySet(), command4.getConfigs());
-        Assert.assertFalse(command4.getTags().contains("foo"));
+        Assertions.assertThat(command4.getName()).isEqualTo("newname");
+        Assertions.assertThat(command4.getUser()).isEqualTo("newuser");
+        Assertions.assertThat(command4.getVersion()).isEqualTo("new version");
+        Assertions.assertThat(command4.getExecutableAndArguments()).isEqualTo(executableAndArgs);
+        Assertions.assertThat(command4.getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command4.getSetupFile()).isNotPresent();
+        Assertions.assertThat(command4.getDescription()).isNotPresent();
+        Assertions.assertThat(command4.getConfigs()).isEmpty();
+        Assertions.assertThat(command4.getTags()).doesNotContain("foo");
     }
 
-    /**
-     * Test all the methods that manipulate tags for a command in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCommandTagsMethods() throws Exception {
-
+    void testCommandTagsMethods() throws Exception {
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
-        final Set<String> configList = Sets.newHashSet("config1", "configs2");
         final List<String> executable = Lists.newArrayList("exec");
 
         final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
-            .withId("command1")
-            .withDescription("client Test")
-            .withSetupFile("path to set up file")
             .withTags(initialTags)
-            .withConfigs(configList)
             .build();
 
-        commandClient.createCommand(command);
+        final String commandId = this.commandClient.createCommand(command);
 
         // Test getTags for command
-        Set<String> tags = commandClient.getTagsForCommand("command1");
-        Assert.assertEquals(4, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("bar"));
+        Assertions.assertThat(this.commandClient.getTagsForCommand(commandId)).hasSize(4).contains("foo", "bar");
 
         // Test adding a tag for command
         final Set<String> moreTags = Sets.newHashSet("pi");
 
-        commandClient.addTagsToCommand("command1", moreTags);
-        tags = commandClient.getTagsForCommand("command1");
-        Assert.assertEquals(5, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("bar"));
-        Assert.assertTrue(tags.contains("pi"));
+        this.commandClient.addTagsToCommand(commandId, moreTags);
+        Assertions.assertThat(this.commandClient.getTagsForCommand(commandId)).hasSize(5).contains("foo", "bar", "pi");
 
         // Test removing a tag for command
-        commandClient.removeTagFromCommand("command1", "bar");
-        tags = commandClient.getTagsForCommand("command1");
-        Assert.assertEquals(4, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("pi"));
+        this.commandClient.removeTagFromCommand(commandId, "bar");
+        Assertions.assertThat(this.commandClient.getTagsForCommand(commandId)).hasSize(4).contains("foo", "pi");
 
         // Test update tags for a command
-        commandClient.updateTagsForCommand("command1", initialTags);
-        tags = commandClient.getTagsForCommand("command1");
-        Assert.assertEquals(4, tags.size());
-        Assert.assertTrue(tags.contains("foo"));
-        Assert.assertTrue(tags.contains("bar"));
+        this.commandClient.updateTagsForCommand(commandId, initialTags);
+        Assertions.assertThat(this.commandClient.getTagsForCommand(commandId)).hasSize(4).contains("foo", "bar");
 
         // Test delete all tags in a command
-        commandClient.removeAllTagsForCommand("command1");
-        tags = commandClient.getTagsForCommand("command1");
-        Assert.assertEquals(2, tags.size());
+        this.commandClient.removeAllTagsForCommand(commandId);
+        Assertions.assertThat(this.commandClient.getTagsForCommand(commandId)).hasSize(2);
     }
 
-    /**
-     * Test all the methods that manipulate configs for a command in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCommandConfigsMethods() throws Exception {
-
+    void testCommandConfigsMethods() throws Exception {
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
         final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
-            .withId("command1")
-            .withDescription("client Test")
-            .withSetupFile("path to set up file")
             .withConfigs(initialConfigs)
             .build();
 
-        commandClient.createCommand(command);
+        final String commandId = this.commandClient.createCommand(command);
 
         // Test getConfigs for command
-        Set<String> configs = commandClient.getConfigsForCommand("command1");
-        Assert.assertEquals(2, configs.size());
-        Assert.assertTrue(configs.contains("foo"));
-        Assert.assertTrue(configs.contains("bar"));
+        Assertions.assertThat(this.commandClient.getConfigsForCommand(commandId)).hasSize(2).contains("foo", "bar");
 
-        // Test adding a config for command
+        // Test adding a tag for command
         final Set<String> moreConfigs = Sets.newHashSet("pi");
 
-        commandClient.addConfigsToCommand("command1", moreConfigs);
-        configs = commandClient.getConfigsForCommand("command1");
-        Assert.assertEquals(3, configs.size());
-        Assert.assertTrue(configs.contains("foo"));
-        Assert.assertTrue(configs.contains("bar"));
-        Assert.assertTrue(configs.contains("pi"));
+        this.commandClient.addConfigsToCommand(commandId, moreConfigs);
+        Assertions
+            .assertThat(this.commandClient.getConfigsForCommand(commandId))
+            .hasSize(3)
+            .contains("foo", "bar", "pi");
 
         // Test update configs for a command
-        commandClient.updateConfigsForCommand("command1", initialConfigs);
-        configs = commandClient.getConfigsForCommand("command1");
-        Assert.assertEquals(2, configs.size());
-        Assert.assertTrue(configs.contains("foo"));
-        Assert.assertTrue(configs.contains("bar"));
+        this.commandClient.updateConfigsForCommand(commandId, initialConfigs);
+        Assertions.assertThat(this.commandClient.getConfigsForCommand(commandId)).hasSize(2).contains("foo", "bar");
 
         // Test delete all configs in a command
-        commandClient.removeAllConfigsForCommand("command1");
-        configs = commandClient.getConfigsForCommand("command1");
-        Assert.assertEquals(0, configs.size());
+        this.commandClient.removeAllConfigsForCommand(commandId);
+        Assertions.assertThat(this.commandClient.getConfigsForCommand(commandId)).isEmpty();
     }
 
-    /**
-     * Test all the methods that manipulate dependencies for a command in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCommandDependenciesMethods() throws Exception {
-
+    void testCommandDependenciesMethods() throws Exception {
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
         final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
-            .withId("command1")
-            .withDescription("client Test")
-            .withSetupFile("path to set up file")
             .withDependencies(initialDependencies)
             .build();
 
-        commandClient.createCommand(command);
+        final String commandId = this.commandClient.createCommand(command);
 
         // Test getDependencies for command
-        Set<String> dependencies = commandClient.getDependenciesForCommand("command1");
-        Assert.assertEquals(2, dependencies.size());
-        Assert.assertTrue(dependencies.contains("foo"));
-        Assert.assertTrue(dependencies.contains("bar"));
+        Assertions
+            .assertThat(this.commandClient.getDependenciesForCommand(commandId))
+            .hasSize(2)
+            .contains("foo", "bar");
 
-        // Test adding a dependency for command
+        // Test adding a tag for command
         final Set<String> moreDependencies = Sets.newHashSet("pi");
 
-        commandClient.addDependenciesToCommand("command1", moreDependencies);
-        dependencies = commandClient.getDependenciesForCommand("command1");
-        Assert.assertEquals(3, dependencies.size());
-        Assert.assertTrue(dependencies.contains("foo"));
-        Assert.assertTrue(dependencies.contains("bar"));
-        Assert.assertTrue(dependencies.contains("pi"));
+        this.commandClient.addDependenciesToCommand(commandId, moreDependencies);
+        Assertions
+            .assertThat(this.commandClient.getDependenciesForCommand(commandId))
+            .hasSize(3)
+            .contains("foo", "bar", "pi");
 
-        // Test update dependencies for a command
-        commandClient.updateDependenciesForCommand("command1", initialDependencies);
-        dependencies = commandClient.getDependenciesForCommand("command1");
-        Assert.assertEquals(2, dependencies.size());
-        Assert.assertTrue(dependencies.contains("foo"));
-        Assert.assertTrue(dependencies.contains("bar"));
+        // Test update configs for a command
+        this.commandClient.updateDependenciesForCommand(commandId, initialDependencies);
+        Assertions
+            .assertThat(this.commandClient.getDependenciesForCommand(commandId))
+            .hasSize(2)
+            .contains("foo", "bar");
 
-        // Test delete all dependencies in a command
-        commandClient.removeAllDependenciesForCommand("command1");
-        dependencies = commandClient.getDependenciesForCommand("command1");
-        Assert.assertEquals(0, dependencies.size());
+        // Test delete all configs in a command
+        this.commandClient.removeAllDependenciesForCommand(commandId);
+        Assertions.assertThat(this.commandClient.getDependenciesForCommand(commandId)).isEmpty();
     }
 
-    /**
-     * Test all the methods that manipulate applications for a command in genie.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCommandApplicationsMethods() throws Exception {
-
+    void testCommandApplicationsMethods() throws Exception {
         final Application foo = new Application.Builder(
             "name",
             "user",
             "version",
             ApplicationStatus.ACTIVE
-        ).withId("foo")
-            .build();
+        ).build();
 
-        applicationClient.createApplication(foo);
+        final String fooId = this.applicationClient.createApplication(foo);
 
         final Application bar = new Application.Builder(
             "name",
             "user",
             "version",
             ApplicationStatus.ACTIVE
-        ).withId("bar")
-            .build();
+        ).build();
 
-        applicationClient.createApplication(bar);
+        final String barId = this.applicationClient.createApplication(bar);
 
         final Application pi = new Application.Builder(
             "name",
             "user",
             "version",
             ApplicationStatus.ACTIVE
-        ).withId("pi")
-            .build();
+        ).build();
 
-        applicationClient.createApplication(pi);
+        final String piId = this.applicationClient.createApplication(pi);
 
-        final Command command = constructCommandDTO("command1");
+        final Command command = this.constructCommandDTO("command1");
 
-        commandClient.createCommand(command);
+        final String commandId = this.commandClient.createCommand(command);
 
         // Test add Applications to command
-        final List<String> initialApplications = new ArrayList<>();
-        initialApplications.add("foo");
-        initialApplications.add("bar");
-        initialApplications.add("pi");
+        final List<String> initialApplications = Lists.newArrayList(fooId, barId, piId);
 
-        commandClient.addApplicationsToCommand("command1", initialApplications);
+        this.commandClient.addApplicationsToCommand(commandId, initialApplications);
 
-        List<Application> applications = commandClient.getApplicationsForCommand("command1");
-        Assert.assertEquals(3, applications.size());
-        Assert.assertEquals("foo", applications.get(0).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals("bar", applications.get(1).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals("pi", applications.get(2).getId().orElseThrow(IllegalArgumentException::new));
+        Assertions
+            .assertThat(this.commandClient.getApplicationsForCommand(commandId))
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .isEqualTo(initialApplications);
 
         // Test removing a application for command
-        commandClient.removeApplicationFromCommand("command1", "pi");
+        this.commandClient.removeApplicationFromCommand(commandId, piId);
+        Assertions
+            .assertThat(this.commandClient.getApplicationsForCommand(commandId))
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(fooId, barId);
 
-        applications = commandClient.getApplicationsForCommand("command1");
-        Assert.assertEquals(2, applications.size());
-        Assert.assertEquals("foo", applications.get(0).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals("bar", applications.get(1).getId().orElseThrow(IllegalArgumentException::new));
-
-        final List<String> updatedApplications = new ArrayList<>();
-        updatedApplications.add("foo");
-        updatedApplications.add("pi");
+        final List<String> updatedApplications = Lists.newArrayList(fooId, piId);
 
         // Test update applications for a command
-        commandClient.updateApplicationsForCommand("command1", updatedApplications);
-        applications = commandClient.getApplicationsForCommand("command1");
-        Assert.assertEquals(2, applications.size());
-        Assert.assertEquals("foo", applications.get(0).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals("pi", applications.get(1).getId().orElseThrow(IllegalArgumentException::new));
+        this.commandClient.updateApplicationsForCommand(commandId, updatedApplications);
+        Assertions
+            .assertThat(this.commandClient.getApplicationsForCommand(commandId))
+            .extracting(Application::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactly(fooId, piId);
 
         // Test delete all applications in a command
-        commandClient.removeAllApplicationsForCommand("command1");
-        applications = commandClient.getApplicationsForCommand("command1");
-        Assert.assertEquals(0, applications.size());
+        this.commandClient.removeAllApplicationsForCommand(commandId);
+        Assertions.assertThat(this.commandClient.getApplicationsForCommand(commandId)).isEmpty();
     }
 
-    /**
-     * Test the command patch method.
-     *
-     * @throws Exception If there is any error.
-     */
     @Test
-    public void testCommandPatchMethod() throws Exception {
+    void testCommandPatchMethod() throws Exception {
         final ObjectMapper mapper = GenieObjectMapper.getMapper();
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
 
-        final Command command = constructCommandDTO("command1");
+        final Command command = this.constructCommandDTO(null);
 
-        commandClient.createCommand(command);
-        commandClient.patchCommand("command1", patch);
+        final String commandId = this.commandClient.createCommand(command);
+        this.commandClient.patchCommand(commandId, patch);
 
-        Assert.assertEquals(newName, commandClient.getCommand("command1").getName());
+        Assertions.assertThat(this.commandClient.getCommand(commandId).getName()).isEqualTo(newName);
     }
 
-    /**
-     * Test to fetch the clusters to which a command is linked.
-     *
-     * @throws Exception If there is any problem.
-     */
     @Test
-    public void testCanGetClustersForCommand() throws Exception {
-        final Cluster cluster1 = constructClusterDTO(null);
-        final Cluster cluster2 = constructClusterDTO(null);
+    void testCanGetClustersForCommand() throws Exception {
+        final Cluster cluster1 = this.constructClusterDTO(null);
+        final Cluster cluster2 = this.constructClusterDTO(null);
 
-        final Command command = constructCommandDTO(null);
+        final Command command = this.constructCommandDTO(null);
 
-        commandClient.createCommand(command);
+        final String commandId = this.commandClient.createCommand(command);
 
-        clusterClient.createCluster(cluster1);
-        clusterClient.createCluster(cluster2);
+        final String cluster1Id = this.clusterClient.createCluster(cluster1);
+        final String cluster2Id = this.clusterClient.createCluster(cluster2);
 
-        clusterClient.addCommandsToCluster(
-            cluster1.getId().orElseThrow(IllegalArgumentException::new),
-            Lists.newArrayList(command.getId().orElseThrow(IllegalArgumentException::new))
-        );
-        clusterClient.addCommandsToCluster(
-            cluster2.getId().orElseThrow(IllegalArgumentException::new),
-            Lists.newArrayList(command.getId().orElseThrow(IllegalArgumentException::new))
-        );
+        this.clusterClient.addCommandsToCluster(cluster1Id, Lists.newArrayList(commandId));
+        this.clusterClient.addCommandsToCluster(cluster2Id, Lists.newArrayList(commandId));
 
-        final List<Cluster> clusterList
-            = commandClient.getClustersForCommand(command.getId().orElseThrow(IllegalArgumentException::new));
-
-        Assert.assertEquals(2, clusterList.size());
+        Assertions
+            .assertThat(this.commandClient.getClustersForCommand(commandId))
+            .extracting(Cluster::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsOnly(cluster1Id, cluster2Id);
     }
 }

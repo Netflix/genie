@@ -22,18 +22,17 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
-    testCompile(project(":genie-test-web"))
-    testCompile(project(":genie-web"))
+    testImplementation(project(":genie-test"))
+    testImplementation("com.squareup.okhttp3:mockwebserver")
 
-    testCompile("org.springframework.boot:spring-boot-starter-jetty")
-    testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
-    testCompile("com.squareup.okhttp3:mockwebserver")
+    integTestImplementation("commons-io:commons-io")
+    integTestImplementation("org.testcontainers:testcontainers")
+    integTestImplementation("org.testcontainers:junit-jupiter")
 }

@@ -36,9 +36,6 @@ class TokenFetcherTest {
     private static final String GRANT_TYPE = "grant_type";
     private static final String SCOPE = "scope";
 
-    /**
-     * Test the constructor with URL missing.
-     */
     @Test
     void testConstructorWithEmptyUrl() {
         Assertions
@@ -46,9 +43,6 @@ class TokenFetcherTest {
             .isThrownBy(() -> new TokenFetcher(null, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE));
     }
 
-    /**
-     * Test the constructor with client id missing.
-     */
     @Test
     void testConstructorWithEmptyClientIdl() {
         Assertions
@@ -56,9 +50,6 @@ class TokenFetcherTest {
             .isThrownBy(() -> new TokenFetcher(URL, null, CLIENT_SECRET, GRANT_TYPE, SCOPE));
     }
 
-    /**
-     * Test the constructor with client secret missing.
-     */
     @Test
     void testConstructorWithEmptyClientSecret() {
         Assertions
@@ -66,9 +57,6 @@ class TokenFetcherTest {
             .isThrownBy(() -> new TokenFetcher(URL, CLIENT_ID, null, GRANT_TYPE, SCOPE));
     }
 
-    /**
-     * Test the constructor with grant type missing.
-     */
     @Test
     void testConstructorWithEmptyGrantType() {
         Assertions
@@ -76,9 +64,6 @@ class TokenFetcherTest {
             .isThrownBy(() -> new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, null, SCOPE));
     }
 
-    /**
-     * Test the constructor with scope missing.
-     */
     @Test
     void testConstructorWithEmptyScope() {
         Assertions
@@ -86,9 +71,6 @@ class TokenFetcherTest {
             .isThrownBy(() -> new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, null));
     }
 
-    /**
-     * Test the constructor with malformed url.
-     */
     @Test
     void testConstructorWithMalformedUrl() {
         Assertions
@@ -96,9 +78,6 @@ class TokenFetcherTest {
             .isThrownBy(() -> new TokenFetcher("foo", CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE));
     }
 
-    /**
-     * Test the constructor with valid params.
-     */
     @Test
     void testConstructorWithValidParams() {
         Assertions
@@ -106,9 +85,6 @@ class TokenFetcherTest {
             .doesNotThrowAnyException();
     }
 
-    /**
-     * Test the getToken method for failure.
-     */
     @Test
     @Disabled("Fails from time to time non-deterministically")
     void testGetTokenFailure() {

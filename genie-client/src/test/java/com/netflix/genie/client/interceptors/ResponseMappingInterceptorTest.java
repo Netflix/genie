@@ -17,156 +17,90 @@
  */
 package com.netflix.genie.client.interceptors;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.Options;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.http.HttpStatus;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.UUID;
 
 /**
- * Unit tests for the ResponseMappingInterceptor class.
+ * Unit tests for the {@link ResponseMappingInterceptor} class.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class ResponseMappingInterceptorTest {
+class ResponseMappingInterceptorTest {
 
-    /**
-     * Create a mock server.
-     */
-    @Rule
-    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
-    public WireMockRule wireMock = new WireMockRule(Options.DYNAMIC_PORT);
-
+    private MockWebServer server;
     private OkHttpClient client;
-    private String uri;
+    private HttpUrl baseUrl;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
-        final int port = this.wireMock.port();
-        this.uri = "http://localhost:" + port + "/api/v3/jobs";
+    @BeforeEach
+    void setup() throws IOException {
+        this.server = new MockWebServer();
+        this.server.start();
+        this.baseUrl = this.server.url("/api/v3/jobs");
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.addInterceptor(new ResponseMappingInterceptor());
         this.client = builder.build();
     }
 
-    /**
-     * Test to make sure success just forwards on the response.
-     *
-     * @throws IOException on error
-     */
-    @Test
-    public void canInterceptSuccess() throws IOException {
-        WireMock
-            .stubFor(
-                WireMock
-                    .get(WireMock.urlMatching("/api/.*"))
-                    .willReturn(
-                        WireMock
-                            .aResponse()
-                            .withStatus(HttpStatus.OK.value())
-                    )
-            );
-        final Request request = new Request.Builder().url(this.uri).get().build();
-        final Response response = this.client.newCall(request).execute();
-        Assert.assertThat(response.code(), Matchers.is(HttpStatus.OK.value()));
+    @AfterEach
+    void tearDown() throws IOException {
+        this.server.shutdown();
     }
 
-    /**
-     * Test to make sure success just forwards on the response.
-     *
-     * @throws IOException on error
-     */
     @Test
-    public void canInterceptFailure() throws IOException {
-        WireMock
-            .stubFor(
-                WireMock
-                    .get(WireMock.urlMatching("/api/.*"))
-                    .willReturn(
-                        WireMock
-                            .aResponse()
-                            .withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .withBody((String) null)
-                    )
-            );
+    void canInterceptSuccess() throws IOException {
+        this.server.enqueue(new MockResponse().setResponseCode(HttpURLConnection.HTTP_OK));
+        final Request request = new Request.Builder().url(this.baseUrl).get().build();
+        final Response response = this.client.newCall(request).execute();
+        Assertions.assertThat(response.code()).isEqualTo(HttpURLConnection.HTTP_OK);
+    }
 
-        try {
-            final Request request = new Request.Builder().url(this.uri).get().build();
-            this.client.newCall(request).execute();
-            Assert.fail();
-        } catch (final GenieClientException gce) {
-            Assert.assertThat(gce.getErrorCode(), Matchers.is(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-        }
+    @Test
+    void canInterceptFailure() {
+        this.server.enqueue(new MockResponse().setResponseCode(HttpURLConnection.HTTP_INTERNAL_ERROR));
+        final Request request = new Request.Builder().url(this.baseUrl).get().build();
+        Assertions
+            .assertThatExceptionOfType(GenieClientException.class)
+            .isThrownBy(() -> this.client.newCall(request).execute())
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_INTERNAL_ERROR));
 
         final String message = UUID.randomUUID().toString();
         final String bodyString = "{\"message\":\"" + message + "\"}";
-        final String errorMessage = UUID.randomUUID().toString();
-        WireMock
-            .stubFor(
-                WireMock
-                    .get(WireMock.urlMatching("/api/.*"))
-                    .willReturn(
-                        WireMock
-                            .aResponse()
-                            .withStatusMessage(errorMessage)
-                            .withStatus(HttpStatus.SERVICE_UNAVAILABLE.value())
-                            .withBody(bodyString)
-                    )
-            );
+        this.server.enqueue(
+            new MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_UNAVAILABLE)
+                .setBody(bodyString)
+        );
+        Assertions
+            .assertThatExceptionOfType(GenieClientException.class)
+            .isThrownBy(() -> this.client.newCall(request).execute())
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_UNAVAILABLE))
+            .withMessage(HttpURLConnection.HTTP_UNAVAILABLE + ": " + message);
 
-        try {
-            final Request request = new Request.Builder().url(this.uri).get().build();
-            this.client.newCall(request).execute();
-            Assert.fail();
-        } catch (final GenieClientException gce) {
-            Assert.assertThat(gce.getErrorCode(), Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value()));
-            Assert.assertThat(
-                gce.getMessage(),
-                Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value() + ": " + message)
-            );
-        }
-
-        WireMock
-            .stubFor(
-                WireMock
-                    .get(WireMock.urlMatching("/api/.*"))
-                    .willReturn(
-                        WireMock
-                            .aResponse()
-                            .withStatusMessage(errorMessage)
-                            .withStatus(HttpStatus.PRECONDITION_FAILED.value())
-                            .withBody("this is not valid JSON")
-                    )
-            );
-
-        try {
-            final Request request = new Request.Builder().url(this.uri).get().build();
-            this.client.newCall(request).execute();
-            Assert.fail();
-        } catch (final GenieClientException gce) {
-            Assert.assertThat(gce.getErrorCode(), Matchers.is(-1));
-            Assert.assertThat(
-                gce.getMessage(),
-                Matchers.is("Failed to parse server response as JSON")
-            );
-        }
+        this.server.enqueue(
+            new MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_PRECON_FAILED)
+                .setBody("this is not valid JSON")
+        );
+        Assertions
+            .assertThatExceptionOfType(GenieClientException.class)
+            .isThrownBy(() -> this.client.newCall(request).execute())
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(-1))
+            .withMessage("Failed to parse server response as JSON");
 
     }
 }
