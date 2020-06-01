@@ -53,7 +53,7 @@ task dockerBuildAppImage(type: Exec, group: "Docker", description: "Build docker
     dependsOn tasks.dockerCreateInputDir
     workingDir dockerDir
 
-    def appName = tasks.jar.baseName.toString()
+    def appName = tasks.jar.getArchiveBaseName().get()
 
     def commandArgs = new ArrayList<>()
     commandArgs.add("docker")
@@ -63,7 +63,7 @@ task dockerBuildAppImage(type: Exec, group: "Docker", description: "Build docker
     commandArgs.add("JAR_NAME=${appName}")
     commandArgs.add("--build-arg")
     commandArgs.add("VERSION=${project.version}")
-    for (String tag : this.getDockerTags(appName)) {
+    for (String tag : rootProject.ext.getDockerTags(appName, project.version.toString())) {
         commandArgs.add("-t")
         commandArgs.add(tag)
     }
@@ -79,7 +79,7 @@ task dockerPush(group: "Docker", description: "Push the built docker app image t
     }
     doLast {
         def appName = tasks.jar.archiveBaseName.get()
-        for (String tag : this.getDockerTags(appName)) {
+        for (String tag : rootProject.ext.getDockerTags(appName, project.version.toString())) {
             exec {
                 commandLine "docker", "push", tag
             }

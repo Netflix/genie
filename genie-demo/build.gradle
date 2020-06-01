@@ -23,7 +23,7 @@ task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build doc
     commandArgs.add("docker")
     commandArgs.add("build")
     commandArgs.add("--force-rm")
-    for (String tag : this.getDockerTags(apacheImageName)) {
+    for (String tag : rootProject.ext.getDockerTags(apacheImageName, project.version.toString())) {
         commandArgs.add("-t")
         commandArgs.add(tag)
     }
@@ -39,7 +39,7 @@ task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build doc
     commandArgs.add("docker")
     commandArgs.add("build")
     commandArgs.add("--force-rm")
-    for (String tag : this.getDockerTags(clientImageName)) {
+    for (String tag : rootProject.ext.getDockerTags(clientImageName, project.version.toString())) {
         commandArgs.add("-t")
         commandArgs.add(tag)
     }
@@ -54,12 +54,12 @@ task dockerPush(group: "Docker", description: "Push the demo docker images to do
         System.env."CI"
     }
     doLast {
-        for (String tag : this.getDockerTags(apacheImageName)) {
+        for (String tag : rootProject.ext.getDockerTags(apacheImageName, project.version.toString())) {
             exec {
                 commandLine "docker", "push", tag
             }
         }
-        for (String tag : this.getDockerTags(clientImageName)) {
+        for (String tag : rootProject.ext.getDockerTags(clientImageName, project.version.toString())) {
             exec {
                 commandLine "docker", "push", tag
             }
