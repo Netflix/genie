@@ -48,8 +48,8 @@ public class FileLock implements CloseableLock {
      */
     public FileLock(final File file) throws LockException {
 
-        if (file == null || !file.exists()) {
-            throw new LockException("File is null or does not exist");
+        if (!file.exists()) {
+            throw new LockException("File " + file.toURI() + " does not exist");
         }
 
         try {

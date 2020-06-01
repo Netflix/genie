@@ -338,7 +338,7 @@ class CommandSpec extends Specification {
         def memory = RandomSuppliers.INT.get()
         def checkDelay = RandomSuppliers.LONG.get()
         def clusterCriteria = Lists.newArrayList(
-            new Criterion.Builder().withId(UUID.randomUUID().toString())
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         )
         return new Command(
             id,

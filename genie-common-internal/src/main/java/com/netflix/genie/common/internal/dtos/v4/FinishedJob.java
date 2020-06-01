@@ -42,7 +42,6 @@ import java.util.Optional;
  * @author mprimi
  * @since 4.0.0
  */
-//@Getter
 @ToString(callSuper = true, doNotUseGetters = true)
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @SuppressWarnings("checkstyle:finalclass")
