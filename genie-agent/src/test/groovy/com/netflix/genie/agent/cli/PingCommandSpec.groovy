@@ -30,12 +30,12 @@ import spock.lang.Specification
 
 class PingCommandSpec extends Specification {
 
-    final String agentHostName = "agent.com"
-    final String agentPid = "54321"
-    final String source = agentPid + "@" + agentHostName
+    def agentHostName = "agent.com"
+    def agentPid = "54321"
+    def source = agentPid + "@" + agentHostName
 
     @Rule
-    public final GrpcServerRule grpcServerRule = new GrpcServerRule().directExecutor()
+    GrpcServerRule grpcServerRule = new GrpcServerRule().directExecutor()
     PingServiceGrpc.PingServiceFutureStub pingServiceClient
     PingCommand.PingCommandArguments pingCommandArgs
     PingRequest capturedRequest

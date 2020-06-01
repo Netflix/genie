@@ -127,7 +127,6 @@ configure(javaProjects) {
                 entry "springfox-bean-validators"
             }
             dependency("jakarta.el:jakarta.el-api:3.0.3")
-            dependency("jakarta.persistence:jakarta.persistence-api:2.2.3")
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("net.jcip:jcip-annotations:1.0")
             dependency("org.apache.commons:commons-configuration2:2.5")
@@ -146,7 +145,6 @@ configure(javaProjects) {
             dependency("org.codehaus.groovy:groovy-all:2.5.7")
             dependency("org.codehaus.janino:janino:3.0.14")
             dependency("org.dbunit:dbunit:2.6.0")
-            dependency("org.opensaml:opensaml:2.6.4")
         }
     }
 
@@ -170,7 +168,7 @@ configure(javaProjects) {
 
     configurations {
         all*.exclude group: "javax.servlet", module: "servlet-api"
-        all*.exclude group:"org.springframework.boot", module: "spring-boot-starter-logging"
+        all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
 
     dependencies {
@@ -230,13 +228,20 @@ configure(javaProjects) {
     }
 
     compileJava {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         options.annotationProcessorGeneratedSourcesDirectory = project.generatedSourcesJavaDir
-        options.compilerArgs += ['-s', project.generatedSourcesJavaDir]
+        options.compilerArgs += [
+                "-Xlint:unchecked",
+                "-Xlint:deprecation",
+                "-s",
+                project.generatedSourcesJavaDir
+        ]
     }
 
     compileTestJava {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.compilerArgs += [
+                "-Xlint:unchecked",
+                "-Xlint:deprecation"
+        ]
     }
 
     tasks.withType(Test) {

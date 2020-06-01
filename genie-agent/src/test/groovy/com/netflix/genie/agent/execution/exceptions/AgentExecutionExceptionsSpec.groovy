@@ -22,8 +22,8 @@ import spock.lang.Unroll
 
 class AgentExecutionExceptionsSpec extends Specification {
 
-    final String MESSAGE = "message"
-    final Throwable CAUSE = new IOException()
+    def MESSAGE = "message"
+    def CAUSE = new IOException()
 
     @Unroll
     def "Constructors for exception class #aClass"(Class<? extends Throwable> aClass, boolean checked) {

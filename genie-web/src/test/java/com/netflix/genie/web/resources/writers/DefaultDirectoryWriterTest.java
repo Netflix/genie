@@ -46,7 +46,7 @@ class DefaultDirectoryWriterTest {
     private static final String REQUEST_URL_WITH_PARENT = REQUEST_URL_BASE + "/" + UUID.randomUUID().toString();
 
     private static final long PARENT_SIZE = 0L;
-    private static final Instant PARENT_LAST_MODIFIED = Instant.now();
+    private static final Instant PARENT_LAST_MODIFIED = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     private static final String PARENT_NAME = "../";
     private static final String PARENT_URL = REQUEST_URL_BASE;
 
