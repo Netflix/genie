@@ -18,14 +18,14 @@
 package com.netflix.genie;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Smoke test to make sure the app comes up successfully with all defaults.
@@ -33,14 +33,14 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author tgianos
  * @since 4.0.0
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {
         GenieApp.class
     },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-public class GenieAppSmokeTest {
+class GenieAppSmokeTest {
 
     @LocalServerPort
     private int port;
@@ -48,16 +48,15 @@ public class GenieAppSmokeTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    /**
-     * Make sure the app will start correctly and the health check returns a 200.
-     */
     @Test
-    public void testAppStarts() {
-        Assertions.assertThat(
-            this.restTemplate
-                .getForEntity("http://localhost:" + this.port + "/admin/health", String.class)
-                .getStatusCode()
-        ).isEqualByComparingTo(HttpStatus.OK);
+    void testAppStarts() {
+        Assertions
+            .assertThat(
+                this.restTemplate
+                    .getForEntity("http://localhost:" + this.port + "/admin/health", String.class)
+                    .getStatusCode()
+            )
+            .isEqualByComparingTo(HttpStatus.OK);
     }
 
     // TODO: Could add more

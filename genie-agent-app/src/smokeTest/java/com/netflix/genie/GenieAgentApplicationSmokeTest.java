@@ -19,16 +19,13 @@ package com.netflix.genie;
 
 import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.GenieAgentRunner;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Tests that ensure the app comes up correctly with default values.
@@ -36,35 +33,26 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author tgianos
  * @since 4.0.0
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieAgentApplication.class)
-public class GenieAgentApplicationSmokeTest {
-
-    /**
-     * Used for creating folders and files that are guaranteed to be removed upon test completion.
-     */
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+    classes = GenieAgentApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
+class GenieAgentApplicationSmokeTest {
 
     @Autowired
     private ApplicationContext context;
 
-    /**
-     * Test to ensure the agent app can start up using the default configuration and run smoke tests against each of
-     * the available top level commands.
-     *
-     * @throws Exception on any error
-     */
     @Test
     public void smokeTestCommands() throws Exception {
         final GenieAgentRunner runner = this.context.getBean(GenieAgentRunner.class);
 
         // Test Help
         runner.run("help");
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
+        Assertions.assertThat(runner.getExitCode()).isEqualTo(ExitCode.SUCCESS.getCode());
 
         // Test info
         runner.run("info", "--beans", "--env", "--properties", "--state-machine");
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
+        Assertions.assertThat(runner.getExitCode()).isEqualTo(ExitCode.SUCCESS.getCode());
     }
 }
