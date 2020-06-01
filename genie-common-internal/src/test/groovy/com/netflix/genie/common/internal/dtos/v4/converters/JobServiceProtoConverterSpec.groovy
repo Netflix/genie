@@ -33,6 +33,7 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
+import com.netflix.genie.proto.ConfigureRequest
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
 import com.netflix.genie.proto.HandshakeRequest
@@ -405,6 +406,20 @@ class JobServiceProtoConverterSpec extends Specification {
 
         then:
         AgentMetadata agentMetadata = handshakeRequest.getAgentMetadata()
+        agentMetadata != null
+        agentMetadata.getAgentHostname() == agentHostname
+        agentMetadata.getAgentVersion() == agentVersion
+        agentMetadata.getAgentPid() == agentPid
+    }
+
+    def "Can convert AgentClientMetadata to ConfigureRequest"() {
+        AgentClientMetadata agentClientMetadata = createAgentClientMetadata()
+
+        when:
+        ConfigureRequest configureRequest = converter.toConfigureRequestProto(agentClientMetadata)
+
+        then:
+        AgentMetadata agentMetadata = configureRequest.getAgentMetadata()
         agentMetadata != null
         agentMetadata.getAgentHostname() == agentHostname
         agentMetadata.getAgentVersion() == agentVersion

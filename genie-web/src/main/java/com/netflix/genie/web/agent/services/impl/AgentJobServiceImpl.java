@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.agent.services.impl;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -50,6 +51,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -122,6 +124,17 @@ public class AgentJobServiceImpl implements AgentJobService {
             throw new GenieAgentRejectedException("Agent rejected: " + report.getMessage());
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getAgentProperties(
+        @Valid final AgentClientMetadata agentClientMetadata
+    ) {
+        // TODO: currently NOOP. Implement.
+        return Maps.newHashMap();
     }
 
     /**

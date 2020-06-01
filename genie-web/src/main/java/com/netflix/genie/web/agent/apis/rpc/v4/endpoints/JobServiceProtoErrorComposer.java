@@ -34,6 +34,7 @@ import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobError;
 import com.netflix.genie.proto.ClaimJobResponse;
+import com.netflix.genie.proto.ConfigureResponse;
 import com.netflix.genie.proto.HandshakeResponse;
 import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationResponse;
@@ -198,6 +199,18 @@ public class JobServiceProtoErrorComposer {
         return HandshakeResponse.newBuilder()
             .setMessage(getMessage(e))
             .setType(getErrorType(e, HANDSHAKE_ERROR_MAP, HandshakeResponse.Type.SERVER_ERROR))
+            .build();
+    }
+
+    /**
+     * Build a {@link ConfigureResponse} out of the given {@link Exception}.
+     * Because the configuration is optional, send back an empty message.
+     *
+     * @param e The server exception
+     * @return The response
+     */
+    ConfigureResponse toProtoConfigureResponse(final Exception e) {
+        return ConfigureResponse.newBuilder()
             .build();
     }
 }

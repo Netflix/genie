@@ -33,6 +33,7 @@ import com.netflix.genie.proto.ChangeJobStatusError
 import com.netflix.genie.proto.ChangeJobStatusResponse
 import com.netflix.genie.proto.ClaimJobError
 import com.netflix.genie.proto.ClaimJobResponse
+import com.netflix.genie.proto.ConfigureResponse
 import com.netflix.genie.proto.HandshakeResponse
 import com.netflix.genie.proto.JobSpecificationError
 import com.netflix.genie.proto.JobSpecificationResponse
@@ -160,5 +161,18 @@ class JobServiceProtoErrorComposerSpec extends Specification {
         new GenieAgentRejectedException(MESSAGE)       | HandshakeResponse.Type.REJECTED
         new ConstraintViolationException(MESSAGE, cvs) | HandshakeResponse.Type.INVALID_REQUEST
         new RuntimeException(MESSAGE)                  | HandshakeResponse.Type.SERVER_ERROR
+    }
+
+    @Unroll
+    def "ToProtoConfigureResponse for #exception.class.getSimpleName()"() {
+        when:
+        ConfigureResponse response = errorComposer.toProtoConfigureResponse(exception)
+
+        then:
+        response.getPropertiesMap().isEmpty()
+
+        where:
+        exception                                      | _
+        new RuntimeException(MESSAGE)                  | _
     }
 }

@@ -158,6 +158,17 @@ class AgentJobServiceImplSpec extends Specification {
         1 * counter.increment()
     }
 
+    def "Can get agent properties"() {
+        def agentClientMetadata = Mock(AgentClientMetadata)
+
+        when:
+        Map<String, String> propertiesMap = service.getAgentProperties(agentClientMetadata)
+
+        then:
+        propertiesMap != null
+        propertiesMap.isEmpty()
+    }
+
     def "Can reserve job id"() {
         def jobRequest = Mock(JobRequest)
         def agentClientMetadata = Mock(AgentClientMetadata)

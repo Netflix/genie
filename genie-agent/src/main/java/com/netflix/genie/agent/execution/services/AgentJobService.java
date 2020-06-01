@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.exceptions.ConfigureException;
 import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
@@ -30,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 
 /**
  * Agent side job specification service for resolving and retrieving job specifications from the server.
@@ -50,6 +52,17 @@ public interface AgentJobService {
     void handshake(
         @Valid AgentClientMetadata agentClientMetadata
     ) throws HandshakeException;
+
+    /**
+     * Obtain server-provided configuration properties.
+     *
+     * @param agentClientMetadata metadata about the client making this request
+     * @throws ConfigureException if the server properties cannot be obtained
+     * @return a map of properties
+     */
+    Map<String, String> configure(
+        @Valid AgentClientMetadata agentClientMetadata
+    ) throws ConfigureException;
 
     /**
      * Request a given job id to be reserved for this job, send along the job details, to be persisted by the server.

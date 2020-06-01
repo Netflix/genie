@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
+import com.netflix.genie.agent.execution.exceptions.ConfigureException
 import com.netflix.genie.agent.execution.exceptions.HandshakeException
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException
 import com.netflix.genie.agent.execution.exceptions.JobReservationException
@@ -36,6 +37,8 @@ import com.netflix.genie.proto.ChangeJobStatusResponse
 import com.netflix.genie.proto.ClaimJobError
 import com.netflix.genie.proto.ClaimJobRequest
 import com.netflix.genie.proto.ClaimJobResponse
+import com.netflix.genie.proto.ConfigureRequest
+import com.netflix.genie.proto.ConfigureResponse
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.HandshakeResponse
@@ -63,6 +66,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
     // Set during setup of individual tests as needed.
     HandshakeResponse handshakeResponse
+    ConfigureResponse configureResponse
     ReserveJobIdResponse reserveJobIdResponse
     JobSpecificationResponse jobSpecificationResponse
     ClaimJobResponse claimJobResponse
@@ -128,6 +132,33 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         HandshakeResponse.Type.UNKNOWN         | _
         HandshakeResponse.Type.SERVER_ERROR    | _
         HandshakeResponse.Type.INVALID_REQUEST | _
+    }
+
+    def "Configure -- successful"() {
+        AgentClientMetadata agentClientMetadata = Mock()
+        ConfigureRequest request = ConfigureRequest.getDefaultInstance()
+        this.configureResponse = ConfigureResponse.newBuilder()
+            .build()
+
+        when:
+        Map<String, String> agentProperties = service.configure(agentClientMetadata)
+
+        then:
+        1 * protoConverter.toConfigureRequestProto(agentClientMetadata) >> request
+        agentProperties != null
+    }
+
+    def "Configure -- conversion error"() {
+        AgentClientMetadata agentClientMetadata = Mock()
+        ConfigureRequest request = ConfigureRequest.getDefaultInstance()
+        Exception exception = new GenieConversionException("...")
+
+        when:
+        service.configure(agentClientMetadata)
+
+        then:
+        1 * protoConverter.toConfigureRequestProto(agentClientMetadata) >> { throw exception }
+        thrown(ConfigureException)
     }
 
     def "Reserve job id -- successful"() {
@@ -518,6 +549,11 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         @Override
         void handshake(final HandshakeRequest request, final StreamObserver<HandshakeResponse> responseObserver) {
             sendResponse(responseObserver, handshakeResponse)
+        }
+
+        @Override
+        void configure(final ConfigureRequest request, final StreamObserver<ConfigureResponse> responseObserver) {
+            sendResponse(responseObserver, configureResponse)
         }
 
         @Override

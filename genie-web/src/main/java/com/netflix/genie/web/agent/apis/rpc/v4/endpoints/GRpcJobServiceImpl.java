@@ -40,6 +40,8 @@ import com.netflix.genie.web.agent.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+
 /**
  * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
  * functionality for resolving and fetching specifications for jobs to be run by the Genie Agent.
@@ -114,8 +116,22 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ConfigureRequest request,
         final StreamObserver<ConfigureResponse> responseObserver
     ) {
-        // TODO currently NOOP, sends back an empty message
-        responseObserver.onNext(ConfigureResponse.newBuilder().build());
+        try {
+            final AgentClientMetadata agentMetadata =
+                jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
+
+            final Map<String, String> agentProperties = agentJobService.getAgentProperties(agentMetadata);
+
+            responseObserver.onNext(
+                ConfigureResponse.newBuilder()
+                    .putAllProperties(agentProperties)
+                    .build()
+            );
+
+        } catch (final Exception e) {
+            responseObserver.onNext(protoErrorComposer.toProtoConfigureResponse(e));
+        }
+
         responseObserver.onCompleted();
     }
 
