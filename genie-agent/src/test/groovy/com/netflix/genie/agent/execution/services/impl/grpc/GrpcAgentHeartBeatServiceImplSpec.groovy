@@ -42,7 +42,7 @@ class GrpcAgentHeartBeatServiceImplSpec extends Specification {
 
     StreamObserver<ServerHeartBeat> currentResponseObserver
     StreamObserver<AgentHeartBeat> currentRequestObserver
-    final List<AgentHeartBeat> heartbeatsReceived = Lists.newArrayList()
+    List<AgentHeartBeat> heartbeatsReceived = Lists.newArrayList()
 
     void setup() {
         this.jobId = UUID.randomUUID().toString()

@@ -20,6 +20,8 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
+    implementation("jakarta.annotation:jakarta.annotation-api")
+
     /*******************************
      * Provided Dependencies
      *******************************/

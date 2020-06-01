@@ -18,6 +18,8 @@ dependencies {
      * Annotation Processors
      *******************************/
 
+    annotationProcessor("javax.annotation:javax.annotation-api")
+    annotationProcessor("org.glassfish.jaxb:jaxb-runtime")
     annotationProcessor("org.hibernate:hibernate-jpamodelgen")
     annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -48,6 +50,7 @@ dependencies {
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
     compile("jakarta.persistence:jakarta.persistence-api")
+    compile("jakarta.xml.bind:jakarta.xml.bind-api")
     compile("org.apache.commons:commons-exec")
     compile("org.apache.commons:commons-lang3")
     compile("org.apache.curator:curator-x-discovery")
@@ -55,6 +58,7 @@ dependencies {
     compile("org.bitbucket.b_c:jose4j")
     compile("org.codehaus.groovy:groovy-all")
     compile("org.flywaydb:flyway-core")
+    compile("org.glassfish.jaxb:jaxb-runtime")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.springframework.boot:spring-boot-starter-cache")
