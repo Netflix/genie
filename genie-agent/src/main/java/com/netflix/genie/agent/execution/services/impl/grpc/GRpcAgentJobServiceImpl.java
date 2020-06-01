@@ -17,8 +17,10 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.exceptions.ConfigureException;
 import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
@@ -37,6 +39,8 @@ import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobError;
 import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ClaimJobResponse;
+import com.netflix.genie.proto.ConfigureRequest;
+import com.netflix.genie.proto.ConfigureResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.HandshakeRequest;
 import com.netflix.genie.proto.HandshakeResponse;
@@ -52,6 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -115,6 +120,26 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
                         + response.getMessage()
                 );
         }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> configure(
+        final AgentClientMetadata agentClientMetadata
+    ) throws ConfigureException {
+        final ConfigureRequest request;
+        try {
+            request = jobServiceProtoConverter.toConfigureRequestProto(agentClientMetadata);
+        } catch (final GenieConversionException e) {
+            throw new ConfigureException("Failed to construct request from parameters", e);
+        }
+
+        final ConfigureResponse response = handleResponseFuture(this.client.configure(request));
+
+        return ImmutableMap.copyOf(response.getPropertiesMap());
     }
 
     /**

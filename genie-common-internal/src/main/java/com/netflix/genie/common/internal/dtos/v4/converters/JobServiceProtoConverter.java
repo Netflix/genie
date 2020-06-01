@@ -38,6 +38,7 @@ import com.netflix.genie.proto.AgentConfig;
 import com.netflix.genie.proto.AgentMetadata;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ClaimJobRequest;
+import com.netflix.genie.proto.ConfigureRequest;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.ExecutionResource;
 import com.netflix.genie.proto.HandshakeRequest;
@@ -282,6 +283,23 @@ public class JobServiceProtoConverter {
         final AgentClientMetadata agentClientMetadata
     ) throws GenieConversionException {
         return HandshakeRequest.newBuilder()
+            .setAgentMetadata(
+                toAgentMetadataProto(agentClientMetadata)
+            )
+            .build();
+    }
+
+    /**
+     * Convert parameters into ConfigureRequest for the server.
+     *
+     * @param agentClientMetadata agent client metadata
+     * @return a {@link ConfigureRequest}
+     * @throws GenieConversionException if the inputs are invalid
+     */
+    public ConfigureRequest toConfigureRequestProto(
+        final AgentClientMetadata agentClientMetadata
+    ) throws GenieConversionException {
+        return ConfigureRequest.newBuilder()
             .setAgentMetadata(
                 toAgentMetadataProto(agentClientMetadata)
             )

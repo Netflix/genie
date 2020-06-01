@@ -246,9 +246,11 @@ message ChangeJobStatusResponse {
 }
 
 message ConfigureRequest {
+    AgentMetadata agent_metadata = 1;
 }
 
 message ConfigureResponse {
+    map<string, string> properties = 1;
 }
 
 //--------------------------------------------------------------------

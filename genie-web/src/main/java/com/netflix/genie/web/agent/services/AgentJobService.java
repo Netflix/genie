@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 
 /**
  * A Service to collect the logic for implementing calls from the Agent when a job is launched via the CLI.
@@ -52,6 +53,15 @@ public interface AgentJobService {
      * @throws ConstraintViolationException If the arguments fail validation
      */
     void handshake(@Valid AgentClientMetadata agentMetadata);
+
+    /**
+     * Provide configuration properties for an agent that is beginning to execute a job.
+     *
+     * @param agentMetadata The metadata about the agent starting to run a given job
+     * @throws ConstraintViolationException If the arguments fail validation
+     * @return a map of properties for the agent
+     */
+    Map<String, String> getAgentProperties(@Valid AgentClientMetadata agentMetadata);
 
     /**
      * Reserve a job id and persist job details in the database based on the supplied {@link JobRequest}.

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
-
+import com.google.common.collect.Maps
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
@@ -125,18 +125,25 @@ class GRpcJobServiceImplSpec extends Specification {
     }
 
     def "Configure -- successful"() {
+        AgentMetadata agentMetadata = AgentMetadata.newBuilder().build()
+        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
         ConfigureRequest request = ConfigureRequest.newBuilder().build()
+        Map<String, String> agentProperties = Maps.newHashMap()
+        agentProperties.put("foo", "bar")
         ConfigureResponse responseCapture
 
         when:
         gRpcJobService.configure(request, configureResponseObserver)
 
         then:
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(agentMetadata) >> agentClientMetadata
+        1 * agentJobService.getAgentProperties(agentClientMetadata) >> agentProperties
         1 * configureResponseObserver.onNext(_ as ConfigureResponse) >> {
             args -> responseCapture = args[0]
         }
         1 * configureResponseObserver.onCompleted()
         responseCapture != null
+        responseCapture.getPropertiesMap().get("foo") == "bar"
     }
 
     def "Reserve job id -- successful"() {
