@@ -455,14 +455,15 @@ gitPublishPush {
  * Docker Tasks
  **********************************/
 
-def isLatest() {
-    return (boolean) !project.version.toString().contains("SNAPSHOT") && !project.version.toString().contains("-rc.")
-}
-
-def getDockerTags(String appName) {
-    def tags = ["netflixoss/${appName}:${project.version}"]
-    if (isLatest()) {
+ext.getDockerTags = { String appName, String projectVersion ->
+    def tags = ["netflixoss/${appName}:${projectVersion}"]
+    if (!projectVersion.contains("SNAPSHOT") && !projectVersion.contains("-rc.")) {
         tags.add("netflixoss/${appName}:latest")
+        tags.add("netflixoss/${appName}:latest.release")
+    } else if (projectVersion.contains("-rc.")) {
+        tags.add("netflixoss/${appName}:latest.candidate")
+    } else {
+        tags.add("netflixoss/${appName}:latest.snapshot")
     }
     return tags
 }
