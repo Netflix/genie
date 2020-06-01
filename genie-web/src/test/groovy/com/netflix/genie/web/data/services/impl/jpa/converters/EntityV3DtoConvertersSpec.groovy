@@ -299,11 +299,11 @@ class EntityV3DtoConvertersSpec extends Specification {
         request.getTags() == tags
         request.getCommandArgs().orElseGet(RandomSuppliers.STRING) == StringUtils.join(commandArgs, StringUtils.SPACE)
 
-        def criterias = request.getClusterCriterias()
-        criterias.size() == 3
-        criterias.get(0).getTags() == one
-        criterias.get(1).getTags() == two
-        criterias.get(2).getTags() == three
+        def criteria = request.getClusterCriterias()
+        criteria.size() == 3
+        criteria.get(0).getTags() == one
+        criteria.get(1).getTags() == two
+        criteria.get(2).getTags() == three
 
         request.getCommandCriteria() == commandCriteria
         request.getConfigs() == configs

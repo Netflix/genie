@@ -43,12 +43,6 @@ class FileLockSpec extends Specification {
 
     def "Throws exception for bad file"() {
         when:
-        new FileLock(null)
-
-        then:
-        thrown(LockException)
-
-        when:
         new FileLock(new File(temporaryFolder.getRoot(), UUID.randomUUID().toString()))
 
         then:

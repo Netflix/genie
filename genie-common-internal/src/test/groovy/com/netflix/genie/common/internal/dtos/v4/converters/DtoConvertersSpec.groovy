@@ -48,7 +48,7 @@ import java.time.Instant
 import java.util.stream.Stream
 
 /**
- * Specifications for the {@link com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters} class which handles converting between v3 and v4 DTOs for API
+ * Specifications for the {@link DtoConverters} class which handles converting between v3 and v4 DTOs for API
  * backwards compatibility.
  *
  * @author tgianos
