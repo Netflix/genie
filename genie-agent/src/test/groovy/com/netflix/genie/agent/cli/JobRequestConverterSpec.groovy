@@ -52,6 +52,7 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getRequestedAgentConfig().isInteractive() == jobRequestArgs.isInteractive()
         jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation() == Optional.ofNullable(jobRequestArgs.getJobDirectoryLocation())
+        jobRequest.getRequestedAgentConfig().isArchivingDisabled() == jobRequestArgs.isArchivingDisabled()
         jobRequest.getCriteria() != null
         jobRequest.getCriteria().getApplicationIds() == jobRequestArgs.getApplicationIds()
         jobRequest.getCriteria().getClusterCriteria() == jobRequestArgs.getClusterCriteria()
@@ -123,6 +124,8 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getResources().getConfigs() == Sets.newHashSet(["c1", "c2"])
         1 * jobRequestArgs.getJobSetup() >> "setup.sh"
         jobRequest.getResources().getSetupFile() == Optional.of("setup.sh")
+        1 * jobRequestArgs.isArchivingDisabled() >> true
+        jobRequest.getRequestedAgentConfig().isArchivingDisabled()
         1 * validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
     }
 

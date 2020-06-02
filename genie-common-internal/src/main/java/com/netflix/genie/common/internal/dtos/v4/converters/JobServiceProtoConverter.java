@@ -304,6 +304,7 @@ public class JobServiceProtoConverter {
             )
             .withInteractive(protoAgentConfig.getIsInteractive())
             .withTimeoutRequested(protoAgentConfig.hasTimeout() ? protoAgentConfig.getTimeout().getValue() : null)
+            .withArchivingDisabled(protoAgentConfig.getArchivingDisabled())
             .build();
     }
 
@@ -322,6 +323,7 @@ public class JobServiceProtoConverter {
         agentConfigRequest
             .getTimeoutRequested()
             .ifPresent(requestedTimeout -> builder.setTimeout(Int32Value.of(requestedTimeout)));
+        builder.setArchivingDisabled(agentConfigRequest.isArchivingDisabled());
         return builder.build();
     }
 

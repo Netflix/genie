@@ -58,6 +58,7 @@ class ExecCommandArgumentsSpec extends Specification {
         options.getJobRequestArguments().getJobTags().isEmpty()
         options.getCleanupArguments().getCleanupStrategy() == CleanupStrategy.DEPENDENCIES_CLEANUP
         !options.getRuntimeConfigurationArguments().isLaunchInJobDirectory()
+        !options.getJobRequestArguments().isArchivingDisabled()
     }
 
     def "Parse"() {
@@ -69,7 +70,8 @@ class ExecCommandArgumentsSpec extends Specification {
             "--cluster-criterion", "NAME=prod",
             "--cluster-criterion", "NAME=test",
             "--no-cleanup",
-            "--launch-in-job-directory"
+            "--launch-in-job-directory",
+            "--disableArchiving"
         )
 
         then:
@@ -79,6 +81,7 @@ class ExecCommandArgumentsSpec extends Specification {
         2 == options.getJobRequestArguments().getClusterCriteria().size()
         options.getCleanupArguments().getCleanupStrategy() == CleanupStrategy.NO_CLEANUP
         options.getRuntimeConfigurationArguments().isLaunchInJobDirectory()
+        options.getJobRequestArguments().isArchivingDisabled()
     }
 
     def "InvalidRequestId"() {

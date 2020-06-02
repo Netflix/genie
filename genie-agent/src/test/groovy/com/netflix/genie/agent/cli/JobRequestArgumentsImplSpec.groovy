@@ -69,6 +69,7 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobConfigurations().isEmpty()
         options.jobRequestArguments.getJobDependencies().isEmpty()
         options.jobRequestArguments.getJobSetup() == null
+        !options.jobRequestArguments.isArchivingDisabled()
 
         when:
         options.jobRequestArguments.getCommandArguments()
@@ -113,6 +114,7 @@ class JobRequestArgumentsImplSpec extends Specification {
             "--job-dependency", dep1.getPath().toString(),
             "--job-dependency", dep2.getPath().toString(),
             "--job-setup", setup.getPath().toString(),
+            "--disable-archiving"
         )
 
         then:
@@ -143,6 +145,7 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobConfigurations().containsAll([fileResource(cfg1), fileResource(cfg2)])
         options.jobRequestArguments.getJobDependencies().containsAll([fileResource(dep1), fileResource(dep2)])
         options.jobRequestArguments.getJobSetup() == fileResource(setup)
+        options.jobRequestArguments.isArchivingDisabled()
     }
 
     String fileResource(final File file) {

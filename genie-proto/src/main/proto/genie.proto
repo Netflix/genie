@@ -87,6 +87,7 @@ message AgentConfig {
     bool is_interactive = 1;
     string job_directory_location = 2;
     google.protobuf.Int32Value timeout = 3; // Requested timeout in seconds
+    bool archiving_disabled = 4;
 }
 
 message JobArchivalData {
@@ -155,7 +156,8 @@ message ExecutionResource {
 }
 
 message JobSpecification {
-    repeated string command_args = 1; // Deprecated by fields 11 & 12. Populated for backward compatibility.
+    // Deprecated by fields 11 & 12. Populated for backward compatibility.
+    repeated string command_args = 1 [deprecated = true];
     ExecutionResource job = 2;
     ExecutionResource cluster = 3;
     ExecutionResource command = 4;
