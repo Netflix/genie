@@ -1,5 +1,7 @@
 == Properties
 
+== Genie Web
+
 This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
 http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/[Spring Boot] reference documentation and the http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Spring Cloud] documentation.
@@ -821,5 +823,102 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 |spring.datasource.hikari.data-source-properties.userServerPrepStatements
 |https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
 |true
+
+|===
+
+== Genie Agent
+
+This section describes the various properties that can be set to control the behavior of the Genie agent.
+
+Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
+The server also has a chance to override them during the 'Agent Configuration' execution stage.
+
+=== Default Properties
+
+==== Genie Properties
+
+
+|===
+|Property |Description |Default Value | Notes
+
+| `genie.agent.runtime.emergency-shutdown-delay`
+| Time allowed to the agent to shut down cleanly (archive, cleanup, ...) before the JVM is forcefully shut down
+| 5m
+|
+
+| `genie.agent.runtime.force-manifest-refresh-timeout`
+| Maximum time block when trying to forcefully push a manifest update
+| 5s
+|
+
+| `genie.agent.runtime.file-stream-service.error-back-off.delay-type`
+| Scheduling policy for backoff in case of error during file streaming
+| FROM_PREVIOUS_EXECUTION_BEGIN
+|
+
+| `genie.agent.runtime.file-stream-service.error-back-off.min-delay`
+| Minimum delay before another attempt during file streaming
+| 1s
+|
+
+| `genie.agent.runtime.file-stream-service.error-back-off.max-delay`
+| Maximum delay before another attempt during file streaming
+| 10s
+|
+
+| `genie.agent.runtime.file-stream-service.error-back-off.factor`
+| Multiplication factor for retry delay before another attempt during file streaming
+| 1.1
+|
+
+| `genie.agent.runtime.file-stream-service.enable-compression`
+| Wether to enable compression when transmitting file chunks to the server
+| true
+|
+
+| `genie.agent.runtime.file-stream-service.data-chunk-max-size`
+| Max size of a file chunk sent to the server
+| 1MB
+|
+
+| `genie.agent.runtime.file-stream-service.max-concurrent-streams`
+| Maximum number of files transmitted concurrently to the server
+| 5
+|
+
+| `genie.agent.runtime.file-stream-service.drain-timeout`
+| Maximum time a file transfer is allowed to complete before it is terminated during agent shutdown
+| 15s
+| Should be lower then `genie.agent.runtime.emergency-shutdown-delay`
+
+| `genie.agent.runtime.heart-beat-service.interval`
+| Interval between heartbeats
+| 2s
+|
+
+| `genie.agent.runtime.heart-beat-service.error-retry-delay`
+| Interval to wait before re-establishing the heartbeat stream
+| 1s
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.delay-type`
+| Scheduling policy for backoff in case of error during kill request
+| FROM_PREVIOUS_EXECUTION_COMPLETION
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.min-delay`
+| Minimum delay before another attempt during kill request
+| 500ms
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.max-delay`
+| Maximium delay before another attempt during kill request
+| 5s
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.factor`
+| Multiplication factor for retry delay before another attempt during kill request
+| 1.2
+|
 
 |===
