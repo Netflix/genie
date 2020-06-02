@@ -57,7 +57,6 @@ configure(javaProjects) {
     apply plugin: "java"
     apply plugin: "checkstyle"
     apply plugin: "com.github.spotbugs"
-    apply plugin: "pmd"
     apply plugin: "io.spring.dependency-management"
     apply plugin: "com.gorylenko.gradle-git-properties"
     apply plugin: "groovy"
@@ -296,18 +295,6 @@ configure(javaProjects) {
     spotbugsSmokeTest.enabled = false
 
     tasks.withType(SpotBugsTask) {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    pmd {
-        toolVersion = "6.21.0"
-        ignoreFailures = true
-    }
-
-    tasks.withType(Pmd) {
         reports {
             xml.enabled = false
             html.enabled = true
