@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.agent.services.impl;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -31,6 +30,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundEx
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
+import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.DataServices;
@@ -66,31 +66,36 @@ public class AgentJobServiceImpl implements AgentJobService {
 
     private static final String AGENT_JOB_SERVICE_METRIC_PREFIX = "genie.services.agentJob.";
     private static final String HANDSHAKE_COUNTER_METRIC_NAME = AGENT_JOB_SERVICE_METRIC_PREFIX + "handshake.counter";
+    private static final String GET_AGENT_PROPERTIES_COUNTER_METRIC_NAME
+        = AGENT_JOB_SERVICE_METRIC_PREFIX + "getAgentProperties.counter";
     private static final String AGENT_VERSION_METRIC_TAG_NAME = "agentVersion";
     private static final String AGENT_HOST_METRIC_TAG_NAME = "agentHost";
     private static final String HANDSHAKE_DECISION_METRIC_TAG_NAME = "handshakeDecision";
     private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
     private final AgentFilterService agentFilterService;
+    private final AgentConfigurationService agentConfigurationService;
     private final MeterRegistry meterRegistry;
 
     /**
      * Constructor.
      *
-     * @param dataServices       The {@link DataServices} instance to use
-     * @param jobResolverService The specification service to use
-     * @param agentFilterService The agent filter service to use
-     * @param meterRegistry      The metrics registry to use
+     * @param dataServices              The {@link DataServices} instance to use
+     * @param jobResolverService        The specification service to use
+     * @param agentFilterService        The agent filter service to use
+     * @param agentConfigurationService The agent configuration service
+     * @param meterRegistry             The metrics registry to use
      */
     public AgentJobServiceImpl(
         final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentFilterService agentFilterService,
-        final MeterRegistry meterRegistry
+        final AgentConfigurationService agentConfigurationService, final MeterRegistry meterRegistry
     ) {
         this.persistenceService = dataServices.getPersistenceService();
         this.jobResolverService = jobResolverService;
         this.agentFilterService = agentFilterService;
+        this.agentConfigurationService = agentConfigurationService;
         this.meterRegistry = meterRegistry;
     }
 
@@ -133,8 +138,21 @@ public class AgentJobServiceImpl implements AgentJobService {
     public Map<String, String> getAgentProperties(
         @Valid final AgentClientMetadata agentClientMetadata
     ) {
-        // TODO: currently NOOP. Implement.
-        return Maps.newHashMap();
+        final HashSet<Tag> tags = Sets.newHashSet(
+            Tag.of(AGENT_VERSION_METRIC_TAG_NAME, agentClientMetadata.getVersion().orElse("null")),
+            Tag.of(AGENT_HOST_METRIC_TAG_NAME, agentClientMetadata.getHostname().orElse("null"))
+        );
+
+        try {
+            final Map<String, String> agentPropertiesMap = this.agentConfigurationService.getAgentProperties();
+            MetricsUtils.addSuccessTags(tags);
+            return agentPropertiesMap;
+        } catch (final Exception e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
+        } finally {
+            this.meterRegistry.counter(GET_AGENT_PROPERTIES_COUNTER_METRIC_NAME, tags).increment();
+        }
     }
 
     /**

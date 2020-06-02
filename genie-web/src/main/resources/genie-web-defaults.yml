@@ -27,6 +27,11 @@ cloud:
       auto: false
 
 genie:
+  agent:
+    configuration:
+      agent-properties-filter-pattern: ^genie\.agent\.runtime\..*
+      cache-expiration-interval: 1m
+      cache-refresh-interval: 5m
   file:
     cache:
       location: file://${java.io.tmpdir}genie/cache

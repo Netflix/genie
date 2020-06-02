@@ -19,10 +19,12 @@ package com.netflix.genie.web.spring.autoconfigure.agent.services;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
+import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.agent.services.impl.AgentConfigurationServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
@@ -30,6 +32,7 @@ import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDisco
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.properties.AgentConfigurationProperties;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.curator.framework.listen.Listenable;
@@ -38,8 +41,10 @@ import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.util.List;
@@ -51,14 +56,20 @@ import java.util.List;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        AgentConfigurationProperties.class
+    }
+)
 public class AgentServicesAutoConfiguration {
     /**
      * Get a {@link AgentJobService} instance if there isn't already one.
      *
-     * @param dataServices       The {@link DataServices} instance to use
-     * @param jobResolverService The specification service to use
-     * @param agentFilterService The agent filter service to use
-     * @param meterRegistry      The metrics registry to use
+     * @param dataServices              The {@link DataServices} instance to use
+     * @param jobResolverService        The specification service to use
+     * @param agentFilterService        The agent filter service to use
+     * @param agentConfigurationService The agent configuration service
+     * @param meterRegistry             The metrics registry to use
      * @return An {@link AgentJobServiceImpl} instance.
      */
     @Bean
@@ -67,12 +78,14 @@ public class AgentServicesAutoConfiguration {
         final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentFilterService agentFilterService,
+        final AgentConfigurationService agentConfigurationService,
         final MeterRegistry meterRegistry
     ) {
         return new AgentJobServiceImpl(
             dataServices,
             jobResolverService,
             agentFilterService,
+            agentConfigurationService,
             meterRegistry
         );
     }
@@ -161,5 +174,25 @@ public class AgentServicesAutoConfiguration {
         final List<AgentMetadataInspector> agentMetadataInspectorsList
     ) {
         return new AgentFilterServiceImpl(agentMetadataInspectorsList);
+    }
+
+    /**
+     * Provide a {@link AgentConfigurationService} if one is not defined.
+     *
+     * @param agentConfigurationProperties the service properties
+     * @param environment                  the environment
+     * @return a {@link AgentConfigurationService} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentConfigurationService.class)
+    public AgentConfigurationServiceImpl agentConfigurationService(
+        final AgentConfigurationProperties agentConfigurationProperties,
+        final Environment environment
+    ) {
+        final AgentConfigurationServiceImpl agentConfigurationService =
+            new AgentConfigurationServiceImpl(agentConfigurationProperties, environment);
+        // Warm the cache
+        agentConfigurationService.getAgentProperties();
+        return agentConfigurationService;
     }
 }

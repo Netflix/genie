@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.agent.services;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
+import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
@@ -26,6 +27,7 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.properties.AgentConfigurationProperties;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.AgentRpcEndpointsAutoConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -71,6 +73,8 @@ class AgentServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(AgentJobService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentFilterService.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConfigurationProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConfigurationService.class);
                 }
             );
     }
@@ -89,6 +93,8 @@ class AgentServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentRoutingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentFilterService.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConfigurationProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConfigurationService.class);
                 }
             );
     }

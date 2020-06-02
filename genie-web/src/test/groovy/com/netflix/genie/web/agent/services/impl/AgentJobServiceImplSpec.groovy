@@ -26,6 +26,7 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionEx
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.web.agent.inspectors.InspectionReport
+import com.netflix.genie.web.agent.services.AgentConfigurationService
 import com.netflix.genie.web.agent.services.AgentFilterService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -54,6 +55,7 @@ class AgentJobServiceImplSpec extends Specification {
     PersistenceService persistenceService
     JobResolverService jobSpecificationService
     AgentFilterService agentFilterService
+    AgentConfigurationService agentConfigurationService;
     MeterRegistry meterRegistry
     AgentJobServiceImpl service
     Counter counter
@@ -62,6 +64,7 @@ class AgentJobServiceImplSpec extends Specification {
         this.persistenceService = Mock(PersistenceService)
         this.jobSpecificationService = Mock(JobResolverService)
         this.agentFilterService = Mock(AgentFilterService)
+        this.agentConfigurationService = Mock(AgentConfigurationService)
         this.meterRegistry = Mock(MeterRegistry)
         this.counter = Mock(Counter)
         def dataServices = Mock(DataServices) {
@@ -71,6 +74,7 @@ class AgentJobServiceImplSpec extends Specification {
             dataServices,
             this.jobSpecificationService,
             this.agentFilterService,
+            this.agentConfigurationService,
             this.meterRegistry
         )
     }
@@ -160,13 +164,52 @@ class AgentJobServiceImplSpec extends Specification {
 
     def "Can get agent properties"() {
         def agentClientMetadata = Mock(AgentClientMetadata)
+        Set<Tag> expectedTags = Sets.newHashSet(
+            Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
+            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
+            MetricsUtils.SUCCESS_STATUS_TAG
+        )
 
         when:
         Map<String, String> propertiesMap = service.getAgentProperties(agentClientMetadata)
 
         then:
+        1 * agentConfigurationService.getAgentProperties() >> [:]
+        1 * meterRegistry.counter("genie.services.agentJob.getAgentProperties.counter", _ as Set<Tag>) >> {
+            args ->
+                assert args[1] as Set<Tag> == expectedTags
+                return counter
+        }
+        1 * agentClientMetadata.getVersion() >> Optional.of(version)
+        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
+        1 * counter.increment()
         propertiesMap != null
-        propertiesMap.isEmpty()
+    }
+
+
+    def "Can handle get agent properties exception"() {
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def exception = new RuntimeException("...")
+        Set<Tag> expectedTags = Sets.newHashSet(
+            Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
+            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname)
+        )
+        MetricsUtils.addFailureTagsWithException(expectedTags, exception)
+
+        when:
+        service.getAgentProperties(agentClientMetadata)
+
+        then:
+        1 * agentConfigurationService.getAgentProperties() >> { throw exception }
+        1 * meterRegistry.counter("genie.services.agentJob.getAgentProperties.counter", _ as Set<Tag>) >> {
+            args ->
+                assert args[1] as Set<Tag> == expectedTags
+                return counter
+        }
+        1 * agentClientMetadata.getVersion() >> Optional.of(version)
+        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
+        1 * counter.increment()
+        thrown(RuntimeException)
     }
 
     def "Can reserve job id"() {
