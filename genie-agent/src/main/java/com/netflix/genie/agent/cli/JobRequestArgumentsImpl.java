@@ -53,7 +53,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
 
     @Parameter(
         names = {"--interactive"},
-        description = "Proxi standard {input,output,error} to the parent terminal, also disable console logging"
+        description = "Proxy standard {input,output,error} to the parent terminal, also disable console logging"
     )
     private boolean interactive;
 
@@ -186,6 +186,12 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
         validateValueWith = ArgumentValidators.URIValidator.class
     )
     private String jobSetup;
+
+    @Parameter(
+        names = {"--disableArchiving", "--disable-archiving"},
+        description = "Whether the default archiving of a job directory at the end of a job should be disabled"
+    )
+    private boolean archivingDisabled;
 
     JobRequestArgumentsImpl(final MainCommandArguments mainCommandArguments) {
         this.mainCommandArguments = mainCommandArguments;

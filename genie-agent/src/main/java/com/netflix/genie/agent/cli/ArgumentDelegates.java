@@ -102,6 +102,8 @@ public interface ArgumentDelegates {
         List<String> getJobDependencies();
 
         String getJobSetup();
+
+        boolean isArchivingDisabled();
     }
 
     /**

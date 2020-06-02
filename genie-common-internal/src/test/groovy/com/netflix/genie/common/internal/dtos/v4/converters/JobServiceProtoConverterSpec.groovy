@@ -39,6 +39,7 @@ import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
 import spock.lang.Specification
+
 /**
  * Specifications for the {@link JobServiceProtoConverter} utility class.
  *
@@ -208,6 +209,8 @@ class JobServiceProtoConverterSpec extends Specification {
     def agentPid = 21_031
 
     def converter = new JobServiceProtoConverter()
+
+    def archivingDisabled = true
 
     def "Can convert JobRequest to ReserveJobIdRequest and vice versa"() {
         def jobRequest = createJobRequest(id)
@@ -413,6 +416,7 @@ class JobServiceProtoConverterSpec extends Specification {
             .withInteractive(interactive)
             .withRequestedJobDirectoryLocation(jobDirectoryLocation)
             .withTimeoutRequested(timeout)
+            .withArchivingDisabled(archivingDisabled)
             .build()
 
         def agentConfigRequestWithoutOptionals = new AgentConfigRequest.Builder()
@@ -427,6 +431,7 @@ class JobServiceProtoConverterSpec extends Specification {
         protoWithOptionals.getJobDirectoryLocation() == jobDirectoryLocation
         protoWithOptionals.hasTimeout()
         protoWithOptionals.getTimeout().getValue() == timeout
+        protoWithOptionals.getArchivingDisabled() == archivingDisabled
 
         when:
         def protoWithoutOptionals = converter.toAgentConfigProto(agentConfigRequestWithoutOptionals)
@@ -435,6 +440,7 @@ class JobServiceProtoConverterSpec extends Specification {
         !protoWithoutOptionals.getIsInteractive()
         protoWithoutOptionals.getJobDirectoryLocation() == ""
         !protoWithoutOptionals.hasTimeout()
+        !protoWithoutOptionals.getArchivingDisabled()
 
         when:
         def dtoWithOptionals = converter.toAgentConfigRequestDto(protoWithOptionals)

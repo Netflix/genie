@@ -36,7 +36,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
- * Convert job request arguments delegate into an AgentJobRequest.
+ * Convert job request arguments delegate into an {@link AgentJobRequest}.
  *
  * @author mprimi
  * @since 4.0.0
@@ -97,6 +97,7 @@ public class JobRequestConverter {
             .withRequestedJobDirectoryLocation(jobRequestArguments.getJobDirectoryLocation())
             .withTimeoutRequested(jobRequestArguments.getTimeout())
             .withInteractive(jobRequestArguments.isInteractive())
+            .withArchivingDisabled(jobRequestArguments.isArchivingDisabled())
             .build();
 
         final List<String> configs = jobRequestArguments.getJobConfigurations();
