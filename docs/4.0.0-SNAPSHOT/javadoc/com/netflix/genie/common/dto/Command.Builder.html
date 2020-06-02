@@ -168,7 +168,7 @@ extends <a href="../../../../../com/netflix/genie/common/dto/ExecutionEnvironmen
        java.lang.String&nbsp;executable,
        long&nbsp;checkDelay)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
-<div class="block"><span class="deprecationComment">Use <code>Command.Builder#Builder(String, String, String, CommandStatus, List, long)</code></span></div>
+<div class="block"><span class="deprecationComment">Use <code>#Builder(String, String, String, CommandStatus, List, long)</code></span></div>
 </div>
 </td>
 </tr>
@@ -206,7 +206,7 @@ extends <a href="../../../../../com/netflix/genie/common/dto/ExecutionEnvironmen
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
 <div class="block"><span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
  optional for API backward compatibility. The proper way to construct a Command is via the constructor
- <code>Command.Builder#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
+ <code>#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
 </div>
 </td>
 </tr>
@@ -216,7 +216,7 @@ extends <a href="../../../../../com/netflix/genie/common/dto/ExecutionEnvironmen
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
 <div class="block"><span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
  optional for API backward compatibility. The proper way to construct a Command is via the constructor
- <code>Command.Builder#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
+ <code>#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
 </div>
 </td>
 </tr>
@@ -282,7 +282,7 @@ public&nbsp;Builder(java.lang.String&nbsp;name,
                            <a href="../../../../../com/netflix/genie/common/dto/CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
                            java.lang.String&nbsp;executable,
                            long&nbsp;checkDelay)</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <code>Command.Builder#Builder(String, String, String, CommandStatus, List, long)</code></span></div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <code>#Builder(String, String, String, CommandStatus, List, long)</code></span></div>
 <div class="block">Constructor which has required fields.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -356,7 +356,7 @@ public&nbsp;Builder(java.lang.String&nbsp;name,
 public&nbsp;<a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withExecutable(java.lang.String&nbsp;executable)</pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
  optional for API backward compatibility. The proper way to construct a Command is via the constructor
- <code>Command.Builder#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
+ <code>#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
 <div class="block">Set the executable and its fixed arguments for this command.
  Note that this string is tokenized with a naive strategy (split on space) to break apart the executable from
  its fixed arguments. Escape characters and quotes are ignored in this process. To avoid this tokenization,
@@ -380,7 +380,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/common/dto/Command.Builder
                                                               java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments)</pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
  optional for API backward compatibility. The proper way to construct a Command is via the constructor
- <code>Command.Builder#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
+ <code>#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
 <div class="block">Set the executable and its fixed arguments for this command.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
