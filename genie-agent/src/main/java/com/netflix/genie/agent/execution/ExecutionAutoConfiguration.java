@@ -32,12 +32,13 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl;
 import com.netflix.genie.agent.execution.statemachine.States;
+import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
-import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
+import com.netflix.genie.agent.execution.statemachine.stages.ConfigureAgentStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ConfigureExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CreateJobDirectoryStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CreateJobScriptStage;
@@ -159,6 +160,23 @@ public class ExecutionAutoConfiguration {
     @ConditionalOnMissingBean(HandshakeStage.class)
     HandshakeStage handshakeStage(final AgentJobService agentJobService) {
         return new HandshakeStage(agentJobService);
+    }
+
+    /**
+     * Create a {@link ConfigureAgentStage} bean if one is not already defined.
+     *
+     * @param agentJobService     the agent job service
+     */
+    @Bean
+    @Lazy
+    @Order(25)
+    @ConditionalOnMissingBean(ConfigureAgentStage.class)
+    ConfigureAgentStage configureAgentStage(
+        final AgentJobService agentJobService
+    ) {
+        return new ConfigureAgentStage(
+            agentJobService
+        );
     }
 
     /**

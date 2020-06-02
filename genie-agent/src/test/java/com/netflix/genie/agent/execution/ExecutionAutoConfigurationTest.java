@@ -32,11 +32,12 @@ import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
-import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
+import com.netflix.genie.agent.execution.statemachine.stages.ConfigureAgentStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ConfigureExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CreateJobDirectoryStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CreateJobScriptStage;
@@ -92,6 +93,7 @@ class ExecutionAutoConfigurationTest {
         ArchiveJobOutputsStage.class,
         ClaimJobStage.class,
         CleanupJobDirectoryStage.class,
+        ConfigureAgentStage.class,
         ConfigureExecutionStage.class,
         CreateJobDirectoryStage.class,
         CreateJobScriptStage.class,

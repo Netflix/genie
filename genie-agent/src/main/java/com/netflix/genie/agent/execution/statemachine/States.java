@@ -46,6 +46,11 @@ public enum States {
     HANDSHAKE(3, true, JobStatusMessages.FAILED_AGENT_SERVER_HANDSHAKE),
 
     /**
+     * Configure the agent based on server-provided values.
+     */
+    CONFIGURE_AGENT(1, true),
+
+    /**
      * Configure the execution based on command-line arguments.
      */
     CONFIGURE_EXECUTION(0, true, JobStatusMessages.FAILED_AGENT_CONFIGURATION),
