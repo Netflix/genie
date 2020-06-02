@@ -124,7 +124,6 @@ class CommandSelectorManagedScriptIntegrationTest {
             JOB_METADATA,
             CRITERIA,
             null,
-            null,
             null
         );
     }

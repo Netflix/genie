@@ -233,11 +233,4 @@ public interface V4JobRequestProjection {
      * @return The applications
      */
     List<String> getRequestedApplications();
-
-    /**
-     * Get the archive location prefix uri for a job.
-     *
-     * @return archive location prefix uri for a job wrapped in a {@link Optional}
-     */
-    Optional<String> getRequestedArchiveLocationPrefix();
 }

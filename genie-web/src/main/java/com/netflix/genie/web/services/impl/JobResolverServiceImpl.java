@@ -223,7 +223,10 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         final URI jobDirProperty = jobsProperties.getLocations().getJobs();
         this.defaultJobDirectory = Paths.get(jobDirProperty).toFile();
-        this.defaultArchiveLocation = jobsProperties.getLocations().getArchives().toString();
+        final String archiveLocation = jobsProperties.getLocations().getArchives().toString();
+        this.defaultArchiveLocation = archiveLocation.endsWith(File.separator)
+            ? archiveLocation
+            : archiveLocation + File.separator;
 
         // Metrics
         this.registry = registry;
@@ -751,21 +754,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         //       job completion due to it being served off the node after completion in V3 but now it won't.
         //       Put this back in once all use cases have been hunted down and users are sure of their expected
         //       behavior
-        final String requestedArchiveLocationPrefix =
-            context.getJobRequest()
-                .getRequestedJobArchivalData()
-                .getRequestedArchiveLocationPrefix()
-                .orElse(this.defaultArchiveLocation);
-        final String jobId = context.getJobId();
-        final String archivePrefix = StringUtils.isBlank(requestedArchiveLocationPrefix)
-            ? this.defaultArchiveLocation
-            : requestedArchiveLocationPrefix;
-
-        context.setArchiveLocation(
-            archivePrefix.endsWith(File.separator)
-                ? archivePrefix + jobId
-                : archivePrefix + File.separator + jobId
-        );
+        context.setArchiveLocation(this.defaultArchiveLocation + context.getJobId());
     }
 
     private void resolveJobDirectory(final JobResolutionContext context) {

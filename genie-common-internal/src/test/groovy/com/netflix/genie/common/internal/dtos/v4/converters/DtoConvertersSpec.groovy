@@ -901,8 +901,7 @@ class DtoConvertersSpec extends Specification {
                 .withTimeoutRequested(timeout)
                 .withInteractive(true)
                 .withArchivingDisabled(true)
-                .build(),
-            null
+                .build()
         )
 
         when:

@@ -790,20 +790,6 @@ class JobEntityTest extends EntityTestBase {
      * Test setter/getter.
      */
     @Test
-    void canSetRequestedArchiveLocationPrefix() {
-        Assertions.assertThat(this.jobEntity.getRequestedArchiveLocationPrefix()).isNotPresent();
-        final String requestedArchiveLocationPrefix = UUID.randomUUID().toString();
-        this.jobEntity.setRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix);
-        Assertions
-            .assertThat(this.jobEntity.getRequestedArchiveLocationPrefix())
-            .isPresent()
-            .contains(requestedArchiveLocationPrefix);
-    }
-
-    /**
-     * Test setter/getter.
-     */
-    @Test
     void canSetTimeoutUsed() {
         Assertions.assertThat(this.jobEntity.getTimeoutUsed()).isEmpty();
         this.jobEntity.setTimeoutUsed(null);

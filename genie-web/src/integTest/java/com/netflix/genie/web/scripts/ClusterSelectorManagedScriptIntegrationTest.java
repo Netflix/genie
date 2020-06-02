@@ -108,7 +108,6 @@ class ClusterSelectorManagedScriptIntegrationTest {
             JOB_METADATA,
             CRITERIA,
             null,
-            null,
             null
         );
     }

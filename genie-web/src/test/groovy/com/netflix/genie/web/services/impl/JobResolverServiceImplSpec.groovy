@@ -35,7 +35,6 @@ import com.netflix.genie.common.external.dtos.v4.CommandStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest
 import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
@@ -61,7 +60,6 @@ import javax.annotation.Nullable
 import java.time.Instant
 import java.util.stream.Collectors
 import java.util.stream.Stream
-
 /**
  * Specifications for the {@link JobResolverServiceImpl} class.
  *
@@ -117,16 +115,15 @@ class JobResolverServiceImplSpec extends Specification {
         def command = createCommand(commandId, executable)
 
         def jobId = UUID.randomUUID().toString()
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
 
         def expectedCommandArgs = executable
         def expectedJobArgs = arguments
 
         Map<Cluster, String> clusterCommandMap = ImmutableMap.of(cluster1, commandId, cluster2, commandId)
-        def jobRequest = createJobRequest(arguments, requestedArchiveLocationPrefix, null, null)
-        def jobRequestNoArchivalData = createJobRequest(arguments, null, null, 5_002)
+        def jobRequest = createJobRequest(arguments, null, null)
+        def jobRequestNoArchivalData = createJobRequest(arguments, null, 5_002)
         def requestedMemory = 6_323
-        def savedJobRequest = createJobRequest(arguments, null, requestedMemory, null)
+        def savedJobRequest = createJobRequest(arguments, requestedMemory, null)
 
         when:
         def resolvedJob = this.service.resolveJob(jobId, jobRequest, true)
@@ -166,7 +163,12 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
         jobSpec.getEnvironmentVariables().size() == 19
-        jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
+        jobSpec.getArchiveLocation() ==
+            Optional.of(
+                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
+                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
+                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
+            )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
         jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironment.getCpu() == 1
@@ -297,15 +299,14 @@ class JobResolverServiceImplSpec extends Specification {
         }
 
         def jobId = UUID.randomUUID().toString()
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
 
         def expectedCommandArgs = executable
         def expectedJobArgs = arguments
 
-        def jobRequest0 = createJobRequest(arguments, requestedArchiveLocationPrefix, null, null)
-        def jobRequest1 = createJobRequest(arguments, null, null, 5_002)
+        def jobRequest0 = createJobRequest(arguments, null, null)
+        def jobRequest1 = createJobRequest(arguments, null, 5_002)
         def requestedMemory = 6_323
-        def jobRequest2 = createJobRequest(arguments, null, requestedMemory, null)
+        def jobRequest2 = createJobRequest(arguments, requestedMemory, null)
 
         def command0JobRequest0Clusters = createClustersBasedOnCriteria(2, command0, jobRequest0)
         def command1JobRequest0Clusters = createClustersBasedOnCriteria(3, command1, jobRequest0)
@@ -366,7 +367,12 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
         jobSpec.getEnvironmentVariables().size() == 19
-        jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
+        jobSpec.getArchiveLocation() ==
+            Optional.of(
+                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
+                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
+                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
+            )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
         jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironment.getCpu() == 1
@@ -526,7 +532,6 @@ class JobResolverServiceImplSpec extends Specification {
                 .withGroupingInstance(groupingInstance)
                 .build(),
             new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
-            null,
             null,
             null
         )
@@ -689,7 +694,7 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "can resolve command"() {
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null)
         def jobId = UUID.randomUUID().toString()
         def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
         def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
@@ -860,7 +865,7 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster2 = createCluster(UUID.randomUUID().toString())
         def clusters = Sets.newHashSet(cluster0, cluster1, cluster2)
         def jobId = UUID.randomUUID().toString()
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null)
         def commandClusters = [
             (command)      : clusters,
             (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
@@ -1019,7 +1024,7 @@ class JobResolverServiceImplSpec extends Specification {
             createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
             createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
         )
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null)
 
         // build expected map
         final Map<Command, List<Criterion>> expectedMap = [:]
@@ -1153,7 +1158,6 @@ class JobResolverServiceImplSpec extends Specification {
         def jobId = UUID.randomUUID().toString()
         def jobRequest = createJobRequest(
             Lists.newArrayList(UUID.randomUUID().toString()),
-            null,
             null,
             null
         )
@@ -1339,7 +1343,6 @@ class JobResolverServiceImplSpec extends Specification {
 
     private static JobRequest createJobRequest(
         List<String> commandArgs,
-        @Nullable String requestedArchiveLocationPrefix,
         @Nullable Integer requestedMemory,
         @Nullable Integer requestedTimeout
     ) {
@@ -1365,12 +1368,7 @@ class JobResolverServiceImplSpec extends Specification {
                 : new JobEnvironmentRequest.Builder().withRequestedJobMemory(requestedMemory).build(),
             requestedTimeout == null
                 ? null
-                : new AgentConfigRequest.Builder().withTimeoutRequested(requestedTimeout).build(),
-            requestedArchiveLocationPrefix == null
-                ? null
-                : new JobArchivalDataRequest.Builder()
-                .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-                .build()
+                : new AgentConfigRequest.Builder().withTimeoutRequested(requestedTimeout).build()
         )
     }
 

@@ -42,7 +42,6 @@ class JobRequestSpec extends Specification {
         def timeout = 180
         def interactive = true
         def archivingDisabled = true
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
         def requestedEnvironmentVariables = ImmutableMap.of(
@@ -65,10 +64,6 @@ class JobRequestSpec extends Specification {
             .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
             .build()
 
-        def requestedJobArchivalData = new JobArchivalDataRequest.Builder()
-            .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            .build()
-
         ApiJobRequest jobRequest
 
         when:
@@ -78,7 +73,6 @@ class JobRequestSpec extends Specification {
             .withResources(jobResources)
             .withRequestedAgentEnvironment(requestedJobEnvironment)
             .withRequestedAgentConfig(requestedAgentConfig)
-            .withRequestedJobArchivalData(requestedJobArchivalData)
             .build()
 
         then:
@@ -89,7 +83,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
         jobRequest.getRequestedJobEnvironment() == requestedJobEnvironment
-        jobRequest.getRequestedJobArchivalData() == requestedJobArchivalData
 
         when:
         jobRequest = new ApiJobRequest.Builder(metadata, criteria).build()
@@ -102,14 +95,12 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
-        jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
 
         when:
         jobRequest = new ApiJobRequest.Builder(metadata, criteria)
             .withCommandArgs(null)
             .withRequestedAgentEnvironment(null)
             .withRequestedAgentConfig(null)
-            .withRequestedJobArchivalData(null)
             .build()
 
         then:
@@ -120,14 +111,12 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
-        jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
 
         when: "Command args are blank they're ignored"
         jobRequest = new ApiJobRequest.Builder(metadata, criteria)
             .withCommandArgs(Lists.newArrayList(" ", "\t"))
             .withRequestedAgentEnvironment(null)
             .withRequestedAgentConfig(null)
-            .withRequestedJobArchivalData(null)
             .build()
 
         then:
@@ -138,7 +127,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
-        jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
     }
 
     def "Can build immutable agent job request"() {
@@ -153,7 +141,6 @@ class JobRequestSpec extends Specification {
         def timeout = 180
         def interactive = true
         def archivingDisabled = true
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
         def requestedAgentConfig = new AgentConfigRequest.Builder()
@@ -163,13 +150,10 @@ class JobRequestSpec extends Specification {
             .withRequestedJobDirectoryLocation(jobDirectoryLocation)
             .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
             .build()
-        def requestedJobArchivalData = new JobArchivalDataRequest.Builder()
-            .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            .build()
         AgentJobRequest jobRequest
 
         when:
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig, requestedJobArchivalData)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
             .withRequestedId(requestedId)
             .withCommandArgs(commandArgs)
             .withResources(jobResources)
@@ -182,10 +166,9 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs() == commandArgs
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
-        jobRequest.getRequestedJobArchivalData() == requestedJobArchivalData
 
         when:
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig, requestedJobArchivalData).build()
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig).build()
 
         then:
         jobRequest.getMetadata() == metadata
@@ -194,10 +177,9 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.requestedJobArchivalData == requestedJobArchivalData
 
         when:
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig, requestedJobArchivalData)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
             .withCommandArgs(null)
             .build()
 
@@ -208,10 +190,9 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.requestedJobArchivalData == requestedJobArchivalData
 
         when: "Empty command args are supplied they're ignored"
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig, requestedJobArchivalData)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
             .withCommandArgs(Lists.newArrayList(" ", "\n"))
             .build()
 
@@ -222,10 +203,9 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.requestedJobArchivalData == requestedJobArchivalData
 
         when: "Can build with missing job archival data"
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig, null)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
             .withCommandArgs(Lists.newArrayList(" ", "\n"))
             .build()
 
@@ -236,8 +216,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.requestedJobArchivalData == new JobArchivalDataRequest.Builder().build()
-
     }
 
     def "Can build job request"() {
@@ -252,7 +230,6 @@ class JobRequestSpec extends Specification {
         def timeout = 180
         def interactive = true
         def archivingDisabled = true
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
         def requestedEnvironmentVariables = ImmutableMap.of(
@@ -275,10 +252,6 @@ class JobRequestSpec extends Specification {
             .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
             .build()
 
-        def requestedJobArchivalData = new JobArchivalDataRequest.Builder()
-            .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            .build()
-
         JobRequest jobRequest
 
         when:
@@ -289,8 +262,7 @@ class JobRequestSpec extends Specification {
             metadata,
             criteria,
             requestedJobEnvironment,
-            requestedAgentConfig,
-            requestedJobArchivalData
+            requestedAgentConfig
         )
 
         then:
@@ -301,7 +273,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
         jobRequest.getRequestedJobEnvironment() == requestedJobEnvironment
-        jobRequest.getRequestedJobArchivalData() == requestedJobArchivalData
 
         when:
         jobRequest = new JobRequest(
@@ -310,7 +281,6 @@ class JobRequestSpec extends Specification {
             null,
             metadata,
             criteria,
-            null,
             null,
             null
         )
@@ -323,7 +293,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
-        jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
 
         when:
         "Empty command args are supplied they're ignored"
@@ -334,7 +303,6 @@ class JobRequestSpec extends Specification {
             metadata,
             criteria,
             null,
-            null,
             null
         )
 
@@ -346,7 +314,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
-        jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
     }
 
     def "Test equals"() {
@@ -382,9 +349,8 @@ class JobRequestSpec extends Specification {
         def criteria = Mock(ExecutionResourceCriteria)
         def jobEnvironmentRequest = new JobEnvironmentRequest.Builder().build()
         def agentConfigRequest = new AgentConfigRequest.Builder().build()
-        def jobArchivalDataRequest = new JobArchivalDataRequest.Builder().build()
-        base = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
-        comparable = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        base = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest)
+        comparable = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest)
 
         then:
         base == comparable
@@ -413,9 +379,8 @@ class JobRequestSpec extends Specification {
         def criteria = Mock(ExecutionResourceCriteria)
         def jobEnvironmentRequest = new JobEnvironmentRequest.Builder().build()
         def agentConfigRequest = new AgentConfigRequest.Builder().build()
-        def jobArchivalDataRequest = new JobArchivalDataRequest.Builder().build()
-        one = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
-        two = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        one = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest)
+        two = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest)
 
         then:
         one.hashCode() == two.hashCode()
@@ -444,9 +409,8 @@ class JobRequestSpec extends Specification {
         def criteria = Mock(ExecutionResourceCriteria)
         def jobEnvironmentRequest = new JobEnvironmentRequest.Builder().build()
         def agentConfigRequest = new AgentConfigRequest.Builder().build()
-        def jobArchivalDataRequest = new JobArchivalDataRequest.Builder().build()
-        one = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
-        two = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        one = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest)
+        two = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest)
 
         then:
         one.toString() == two.toString()
@@ -464,7 +428,6 @@ class JobRequestSpec extends Specification {
         def timeout = RandomSuppliers.INT.get()
         def interactive = true
         def archivingDisabled = true
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
         def requestedEnvironmentVariables = ImmutableMap.of(
@@ -487,10 +450,6 @@ class JobRequestSpec extends Specification {
             .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
             .build()
 
-        def requestedJobArchivalData = new JobArchivalDataRequest.Builder()
-            .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            .build()
-
         return new JobRequest(
             requestedId,
             jobResources,
@@ -498,8 +457,7 @@ class JobRequestSpec extends Specification {
             metadata,
             criteria,
             requestedJobEnvironment,
-            requestedAgentConfig,
-            requestedJobArchivalData
+            requestedAgentConfig
         )
     }
 }

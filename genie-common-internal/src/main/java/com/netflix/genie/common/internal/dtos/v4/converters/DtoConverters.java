@@ -38,7 +38,6 @@ import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -441,8 +440,6 @@ public final class DtoConverters {
             .withInteractive(false);
         v3JobRequest.getTimeout().ifPresent(agentConfigBuilder::withTimeoutRequested);
 
-        final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
-
         // Keep arguments as joined string and store them as first (and only element of the list)
         final List<String> commandArgs = Lists.newArrayList();
         v3JobRequest.getCommandArgs().ifPresent(commandArgs::add);
@@ -454,8 +451,7 @@ public final class DtoConverters {
             metadataBuilder.build(),
             criteria,
             jobEnvironmentBuilder.build(),
-            agentConfigBuilder.build(),
-            jobArchivalDataRequestBuilder.build()
+            agentConfigBuilder.build()
         );
     }
 

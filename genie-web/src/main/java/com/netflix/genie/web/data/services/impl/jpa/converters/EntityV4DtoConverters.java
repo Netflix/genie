@@ -30,7 +30,6 @@ import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -238,12 +237,6 @@ public final class EntityV4DtoConverters {
         agentConfigRequestBuilder.withArchivingDisabled(jobRequestProjection.isArchivingDisabled());
         jobRequestProjection.getRequestedTimeout().ifPresent(agentConfigRequestBuilder::withTimeoutRequested);
 
-        //Rebuild Job Archival Data Request
-        final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
-        jobRequestProjection
-            .getRequestedArchiveLocationPrefix()
-            .ifPresent(jobArchivalDataRequestBuilder::withRequestedArchiveLocationPrefix);
-
         // Rebuild the Agent Environment Request
         final JobEnvironmentRequest.Builder jobEnvironmentRequestBuilder = new JobEnvironmentRequest.Builder();
         jobRequestProjection
@@ -261,8 +254,7 @@ public final class EntityV4DtoConverters {
             jobMetadataBuilder.build(),
             executionResourceCriteria,
             jobEnvironmentRequestBuilder.build(),
-            agentConfigRequestBuilder.build(),
-            jobArchivalDataRequestBuilder.build()
+            agentConfigRequestBuilder.build()
         );
     }
 

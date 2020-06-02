@@ -127,7 +127,7 @@ public class Command extends ExecutionEnvironmentDTO {
          * @param executable The executable for the command
          * @param checkDelay How long the system should go between checking the status of jobs run with this command.
          *                   In milliseconds.
-         * @deprecated Use {@link Command.Builder#Builder(String, String, String, CommandStatus, List, long)}
+         * @deprecated Use {@link #Builder(String, String, String, CommandStatus, List, long)}
          */
         @Deprecated
         public Builder(
@@ -207,7 +207,7 @@ public class Command extends ExecutionEnvironmentDTO {
          * @return The builder
          * @deprecated this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
          * optional for API backward compatibility. The proper way to construct a Command is via the constructor
-         * {@link Command.Builder#Builder(String, String, String, CommandStatus, List, long)}.
+         * {@link #Builder(String, String, String, CommandStatus, List, long)}.
          */
         @Deprecated
         public Builder withExecutable(final String executable) {
@@ -222,7 +222,7 @@ public class Command extends ExecutionEnvironmentDTO {
          * @return The builder
          * @deprecated this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
          * optional for API backward compatibility. The proper way to construct a Command is via the constructor
-         * {@link Command.Builder#Builder(String, String, String, CommandStatus, List, long)}.
+         * {@link #Builder(String, String, String, CommandStatus, List, long)}.
          */
         @Deprecated
         public Builder withExecutableAndArguments(@Nullable final List<String> executableAndArguments) {

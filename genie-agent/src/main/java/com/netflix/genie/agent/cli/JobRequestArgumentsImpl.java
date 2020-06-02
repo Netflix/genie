@@ -59,7 +59,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
 
     @Parameter(
         names = {"--archiveLocationPrefix", "--archive-location-prefix"},
-        description = "Prefix for job folder archival location (Currently only s3 URIs are supported)",
+        description = "Deprecated. No-Op.",
         validateWith = ArgumentValidators.S3URIValidator.class
     )
     private String archiveLocationPrefix;

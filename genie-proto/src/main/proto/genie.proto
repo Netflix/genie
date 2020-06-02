@@ -90,7 +90,8 @@ message AgentConfig {
 }
 
 message JobArchivalData {
-    string requested_archive_location_prefix = 1;
+    option deprecated = true;
+    string requested_archive_location_prefix = 1 [deprecated = true];
 }
 
 message HandshakeRequest {
@@ -114,7 +115,7 @@ message ReserveJobIdRequest {
     ExecutionResourceCriteria criteria = 2;
     AgentConfig agent_config = 3;
     AgentMetadata agent_metadata = 4;
-    JobArchivalData job_archival_data = 5;
+    JobArchivalData job_archival_data = 5 [deprecated = true];
 }
 
 message ReserveJobIdError {
