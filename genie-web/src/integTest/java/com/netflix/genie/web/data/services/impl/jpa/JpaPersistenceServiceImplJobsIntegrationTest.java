@@ -41,7 +41,6 @@ import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
@@ -1415,10 +1414,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .withArchivingDisabled(true)
             .withRequestedJobDirectoryLocation(requestedJobDirectoryLocation)
             .build();
-        final JobArchivalDataRequest jobArchivalDataRequest = new JobArchivalDataRequest
-            .Builder()
-            .withRequestedArchiveLocationPrefix(requestedArchivalLocationPrefix)
-            .build();
 
         return new JobRequest(
             requestedId,
@@ -1431,8 +1426,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             jobMetadata,
             criteria,
             jobEnvironmentRequest,
-            agentConfigRequest,
-            jobArchivalDataRequest
+            agentConfigRequest
         );
     }
 

@@ -509,11 +509,6 @@ public class JobEntity extends BaseEntity implements
     @Size(max = 1024, message = "Max length in database is 1024 characters")
     private String archiveLocation;
 
-    @Basic
-    @Column(name = "requested_archive_location_prefix", length = 1024)
-    @Size(max = 1024, message = "Max length in database is 1024 characters")
-    private String requestedArchiveLocationPrefix;
-
     @Basic(optional = false)
     @Column(name = "interactive", nullable = false, updatable = false)
     private boolean interactive;
@@ -1158,14 +1153,6 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getRequestedAgentConfigExt() {
         return Optional.ofNullable(this.requestedAgentConfigExt);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<String> getRequestedArchiveLocationPrefix() {
-        return Optional.ofNullable(this.requestedArchiveLocationPrefix);
     }
 
     /**

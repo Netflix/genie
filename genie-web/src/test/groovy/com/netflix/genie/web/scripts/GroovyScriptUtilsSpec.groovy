@@ -149,7 +149,6 @@ class GroovyScriptUtilsSpec extends Specification {
             ).build(),
             Mock(ExecutionResourceCriteria),
             null,
-            null,
             null
         )
         this.scriptBinding.setVariable(ResourceSelectorScript.JOB_REQUEST_BINDING, expectedJobRequest)

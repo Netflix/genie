@@ -28,7 +28,6 @@ import com.netflix.genie.common.external.dtos.v4.CommandStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest
 import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
@@ -53,7 +52,6 @@ import spock.lang.Specification
 
 import java.time.Instant
 import java.util.function.Consumer
-
 /**
  * Specifications for {@link EntityV4DtoConverters}.
  *
@@ -402,7 +400,6 @@ class EntityV4DtoConvertersSpec extends Specification {
         def requestedTimeout = 32_000
         def requestedMemory = 32_387
         def requestedCpu = 3
-        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
 
         def requestedEnvironmentVariables = ImmutableMap.of(
             UUID.randomUUID().toString(),
@@ -434,10 +431,6 @@ class EntityV4DtoConvertersSpec extends Specification {
             .withTimeoutRequested(requestedTimeout)
             .build()
 
-        def jobArchivalDataRequest = new JobArchivalDataRequest.Builder()
-            .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            .build()
-
         def jobEnvironmentRequest = new JobEnvironmentRequest.Builder()
             .withExt(metadata)
             .withRequestedJobMemory(requestedMemory)
@@ -452,8 +445,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             jobMetadata,
             executionResourceCriteria,
             jobEnvironmentRequest,
-            agentConfigRequest,
-            null
+            agentConfigRequest
         )
         def jobRequest1 = new JobRequest(
             null,
@@ -462,19 +454,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             jobMetadata,
             executionResourceCriteria,
             jobEnvironmentRequest,
-            agentConfigRequest,
-            null
-        )
-
-        def jobRequest2 = new JobRequest(
-            null,
-            new ExecutionEnvironment(configs, dependencies, setupFile),
-            commandArgs,
-            jobMetadata,
-            executionResourceCriteria,
-            jobEnvironmentRequest,
-            agentConfigRequest,
-            jobArchivalDataRequest
+            agentConfigRequest
         )
 
         def jobEntity = new JobEntity()
@@ -544,13 +524,6 @@ class EntityV4DtoConvertersSpec extends Specification {
 
         then:
         jobRequestResult == jobRequest1
-
-        when:
-        jobEntity.setRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-        jobRequestResult = EntityV4DtoConverters.toV4JobRequestDto(jobEntity)
-
-        then:
-        jobRequestResult == jobRequest2
     }
 
     def "Can set JSON field from string"() {

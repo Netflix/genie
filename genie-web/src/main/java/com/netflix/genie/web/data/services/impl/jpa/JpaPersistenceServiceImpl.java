@@ -52,7 +52,6 @@ import com.netflix.genie.common.external.dtos.v4.CommonResource;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
@@ -1833,7 +1832,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
         this.setRequestedJobEnvironmentFields(jobEntity, jobRequest.getRequestedJobEnvironment());
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
-        this.setRequestedJobArchivalData(jobEntity, jobRequest.getRequestedJobArchivalData());
         this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
 
         // Flag to signal to rest of system that this job is V4. Temporary until everything moved to v4
@@ -3075,15 +3073,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         requestedAgentConfig.getExt().ifPresent(
             jsonNode -> EntityV4DtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentConfigExt)
         );
-    }
-
-    private void setRequestedJobArchivalData(
-        final JobEntity jobEntity,
-        final JobArchivalDataRequest requestedJobArchivalData
-    ) {
-        requestedJobArchivalData
-            .getRequestedArchiveLocationPrefix()
-            .ifPresent(jobEntity::setRequestedArchiveLocationPrefix);
     }
 
     private void setRequestMetadataFields(

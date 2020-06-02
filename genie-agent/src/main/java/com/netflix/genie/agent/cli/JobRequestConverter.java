@@ -23,7 +23,6 @@ import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -100,11 +99,6 @@ public class JobRequestConverter {
             .withInteractive(jobRequestArguments.isInteractive())
             .build();
 
-        final JobArchivalDataRequest jobArchivalDataRequest = new JobArchivalDataRequest
-            .Builder()
-            .withRequestedArchiveLocationPrefix(jobRequestArguments.getArchiveLocationPrefix())
-            .build();
-
         final List<String> configs = jobRequestArguments.getJobConfigurations();
         final List<String> deps = jobRequestArguments.getJobDependencies();
         final ExecutionEnvironment jobExecutionResources = new ExecutionEnvironment(
@@ -120,8 +114,7 @@ public class JobRequestConverter {
         final AgentJobRequest agentJobRequest = new AgentJobRequest.Builder(
             jobMetadataBuilder.build(),
             criteria,
-            requestedAgentConfig,
-            jobArchivalDataRequest
+            requestedAgentConfig
         )
             .withCommandArgs(commandArguments)
             .withRequestedId(jobRequestArguments.getJobId())
