@@ -15,6 +15,21 @@ Whereas static properties values are bound during application startup and do not
 |===
 |Property |Description |Default Value |Dynamic
 
+|genie.agent.configuration.agent-properties-filter-pattern
+|Regular expression applied to filter server properties that are forwarded to the agent
+|^genie\.agent\.runtime\..*
+|no
+
+|genie.agent.configuration.cache-expiration-interval
+|Interval after which the agent properties cache is considered stale and re-calculated
+|1m
+|no
+
+|genie.agent.configuration.cache-refresh-interval
+|Interval for after which the agent properties cache is forcefully refreshed in case of no access
+|5m
+|no
+
 |genie.agent.filter.enabled
 |If set to `true`, enables the built-in agent filter service. The filter behavior is controlled by other active `genie.agent.filter.*` properties.
 |
@@ -84,6 +99,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |Whether to launch the agent subprocess as the user specified in the job request
 |false
 |no
+
+|genie.agent.runtime.*
+|Properties with this prefix are forwarded to each agent during startup
+|
+|yes
 
 |genie.aws.credentials.role
 |The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
