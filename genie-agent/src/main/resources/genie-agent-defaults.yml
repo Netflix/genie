@@ -39,6 +39,16 @@ genie:
   agent:
     runtime:
       emergency-shutdown-delay: 5m
+      file-stream-service:
+        error-back-off:
+          delay-type: FROM_PREVIOUS_EXECUTION_BEGIN
+          min-delay: 1s
+          max-delay: 10s
+          factor: 1.1
+        enable-compression: true
+        data-chunk-max-size: 1MB
+        max-concurrent-streams: 5
+        drain-timeout: 15s
 
 spring:
   banner:
