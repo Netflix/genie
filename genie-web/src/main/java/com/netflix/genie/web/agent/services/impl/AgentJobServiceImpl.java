@@ -69,7 +69,6 @@ public class AgentJobServiceImpl implements AgentJobService {
     private static final String GET_AGENT_PROPERTIES_COUNTER_METRIC_NAME
         = AGENT_JOB_SERVICE_METRIC_PREFIX + "getAgentProperties.counter";
     private static final String AGENT_VERSION_METRIC_TAG_NAME = "agentVersion";
-    private static final String AGENT_HOST_METRIC_TAG_NAME = "agentHost";
     private static final String HANDSHAKE_DECISION_METRIC_TAG_NAME = "handshakeDecision";
     private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
@@ -108,8 +107,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     ) throws GenieAgentRejectedException {
 
         final HashSet<Tag> tags = Sets.newHashSet(
-            Tag.of(AGENT_VERSION_METRIC_TAG_NAME, agentClientMetadata.getVersion().orElse("null")),
-            Tag.of(AGENT_HOST_METRIC_TAG_NAME, agentClientMetadata.getHostname().orElse("null"))
+            Tag.of(AGENT_VERSION_METRIC_TAG_NAME, agentClientMetadata.getVersion().orElse("null"))
         );
 
         final InspectionReport report;
@@ -139,8 +137,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         @Valid final AgentClientMetadata agentClientMetadata
     ) {
         final HashSet<Tag> tags = Sets.newHashSet(
-            Tag.of(AGENT_VERSION_METRIC_TAG_NAME, agentClientMetadata.getVersion().orElse("null")),
-            Tag.of(AGENT_HOST_METRIC_TAG_NAME, agentClientMetadata.getHostname().orElse("null"))
+            Tag.of(AGENT_VERSION_METRIC_TAG_NAME, agentClientMetadata.getVersion().orElse("null"))
         );
 
         try {
