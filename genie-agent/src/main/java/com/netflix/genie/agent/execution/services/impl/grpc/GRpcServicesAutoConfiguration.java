@@ -112,6 +112,7 @@ public class GRpcServicesAutoConfiguration {
      * @param taskScheduler                      The task scheduler to use
      * @param jobDirectoryManifestProtoConverter The converter to serialize manifests into messages
      * @param jobDirectoryManifestCreatorService The job directory manifest service
+     * @param agentProperties                    The agent properties
      * @return A {@link AgentFileStreamService} instance
      */
     @Bean
@@ -121,13 +122,15 @@ public class GRpcServicesAutoConfiguration {
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
         final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
+        final AgentProperties agentProperties
     ) {
         return new GRpcAgentFileStreamServiceImpl(
             fileStreamServiceStub,
             taskScheduler,
             jobDirectoryManifestProtoConverter,
-            jobDirectoryManifestCreatorService
+            jobDirectoryManifestCreatorService,
+            agentProperties.getFileStreamService()
         );
     }
 }
