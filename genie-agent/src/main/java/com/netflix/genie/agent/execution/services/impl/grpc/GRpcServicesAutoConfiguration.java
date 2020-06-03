@@ -57,6 +57,7 @@ public class GRpcServicesAutoConfiguration {
      *
      * @param heartBeatServiceStub The heart beat service stub to use
      * @param taskScheduler        The task scheduler to use
+     * @param agentProperties      The agent properties
      * @return A {@link GrpcAgentHeartBeatServiceImpl} instance
      */
     @Bean
@@ -64,9 +65,14 @@ public class GRpcServicesAutoConfiguration {
     @ConditionalOnMissingBean(AgentHeartBeatService.class)
     public AgentHeartBeatService agentHeartBeatService(
         final HeartBeatServiceGrpc.HeartBeatServiceStub heartBeatServiceStub,
-        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
+        final AgentProperties agentProperties
     ) {
-        return new GrpcAgentHeartBeatServiceImpl(heartBeatServiceStub, taskScheduler);
+        return new GrpcAgentHeartBeatServiceImpl(
+            heartBeatServiceStub,
+            taskScheduler,
+            agentProperties.getHeartBeatService()
+        );
     }
 
     /**
