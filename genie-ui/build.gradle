@@ -1,32 +1,35 @@
+apply plugin: "java-library"
 apply plugin: "nebula.node"
 
 dependencies {
     /*******************************
-     * Compile Dependencies
-     *******************************/
-
-    compile(project(":genie-web"))
-    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-    compile("org.springframework.boot:spring-boot-starter-web")
-
-    /*******************************
-     * Provided Dependencies
+     * API Dependencies
      *******************************/
 
     /*******************************
-     * Optional Dependencies
+     * Implementation Dependencies
+     *******************************/
+
+    implementation(project(":genie-web"))
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    /*******************************
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
 
     /*******************************
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
-    testCompile(project(":genie-test-web"))
+    testImplementation(project(":genie-test"))
+    testImplementation(project(":genie-test-web"))
+
+    integTestImplementation("commons-io:commons-io")
 }
 
 license {

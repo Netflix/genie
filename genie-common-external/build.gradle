@@ -6,24 +6,26 @@ dependencies {
      *******************************/
 
     api("com.fasterxml.jackson.core:jackson-databind")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    api("org.hibernate.validator:hibernate-validator")
+    api("jakarta.validation:jakarta.validation-api")
 
     /*******************************
      * Implementation Dependencies
      *******************************/
 
     implementation("com.google.guava:guava")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.apache.commons:commons-lang3")
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
+
+    runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     /*******************************
      * Test Dependencies

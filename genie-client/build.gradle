@@ -5,9 +5,9 @@ dependencies {
      * API Dependencies
      *******************************/
 
-    api project(":genie-common")
-    api project(":genie-common-external")
-
+    api(project(":genie-common"))
+    api(project(":genie-common-external"))
+    api("com.fasterxml.jackson.core:jackson-databind")
     api("com.github.fge:json-patch")
     api("com.squareup.okhttp3:okhttp")
     api("com.squareup.retrofit2:retrofit")
@@ -17,12 +17,15 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
-    implementation("commons-beanutils:commons-beanutils")
-    implementation("org.apache.commons:commons-configuration2")
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 
     /*******************************
      * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
      *******************************/
 
     /*******************************

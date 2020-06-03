@@ -92,7 +92,7 @@ configure(javaProjects) {
             dependency("cglib:cglib-nodep:3.2.12")
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.ppodgorsek:spring-test-dbunit-core:5.2.0")
-            dependency("com.github.spotbugs:spotbugs-annotations:3.1.12")
+            dependency("com.github.spotbugs:spotbugs-annotations:4.0.3")
             dependencySet(group: "com.squareup.okhttp3", version: "4.3.1") {
                 entry "okhttp"
                 entry "mockwebserver"
@@ -101,15 +101,12 @@ configure(javaProjects) {
                 entry "retrofit"
                 entry "converter-jackson"
             }
-            dependency("com.google.code.findbugs:annotations:3.0.1")
             dependency("com.google.guava:guava:20.0")
             dependencySet(group: "com.google.protobuf", version: "3.7.1") {
                 entry "protobuf-java"
                 entry "protobuf-java-util"
                 entry "protoc"
             }
-            dependency("commons-beanutils:commons-beanutils:1.9.3")
-            dependency("commons-httpclient:commons-httpclient:3.1")
             dependency("commons-io:commons-io:2.6")
             dependency("commons-validator:commons-validator:1.6")
             dependencySet(group: "io.grpc", version: "1.20.0") {
@@ -137,11 +134,7 @@ configure(javaProjects) {
             // https://issues.apache.org/jira/browse/ZOOKEEPER-2775
             // https://curator.apache.org/zk-compatibility.html
             dependency("org.apache.zookeeper:zookeeper:3.4.12")
-            dependency("org.bitbucket.b_c:jose4j:0.6.3")
-            // Looks like as of Boot 2.1.x this dependency isn't managed by them anymore. This matches whats available
-            // in Spring per
-            // https://github.com/spring-projects/spring-boot/blob/2.1.x/spring-boot-project/spring-boot-dependencies/pom.xml#L67
-            dependency("org.codehaus.groovy:groovy-all:2.5.7")
+            dependency("org.codehaus.groovy:groovy-all:2.5.9")
             dependency("org.codehaus.janino:janino:3.0.14")
             dependency("org.dbunit:dbunit:2.6.0")
         }
@@ -183,13 +176,14 @@ configure(javaProjects) {
          *******************************/
 
         /*******************************
-         * Provided Dependencies
+         * Compile Only Dependencies
          *******************************/
 
-        compileOnly("com.google.code.findbugs:annotations")
+        compileOnly("net.jcip:jcip-annotations")
+        compileOnly("com.github.spotbugs:spotbugs-annotations")
 
         /*******************************
-         * Runtime Dependencies
+         * Runtime Only Dependencies
          *******************************/
 
         /*******************************
@@ -199,14 +193,15 @@ configure(javaProjects) {
         testAnnotationProcessor("net.jcip:jcip-annotations")
         testAnnotationProcessor("com.github.spotbugs:spotbugs-annotations")
 
-        testCompile("cglib:cglib-nodep")
-        testCompile("org.spockframework:spock-core")
-        testCompile("org.spockframework:spock-spring")
-        testCompile("org.springframework.boot:spring-boot-starter-test")
-        testCompile("org.junit.jupiter:junit-jupiter-api")
-        testCompile("org.junit.jupiter:junit-jupiter-params")
+        testImplementation("cglib:cglib-nodep")
+        testImplementation("org.spockframework:spock-core")
+        testImplementation("org.spockframework:spock-spring")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-params")
 
-        testCompileOnly("com.google.code.findbugs:annotations")
+        testCompileOnly("net.jcip:jcip-annotations")
+        testCompileOnly("com.github.spotbugs:spotbugs-annotations")
 
         testRuntimeOnly("jakarta.el:jakarta.el-api")
         testRuntimeOnly("org.glassfish:jakarta.el")

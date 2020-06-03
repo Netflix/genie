@@ -6,27 +6,26 @@ dependencies {
      *******************************/
 
     api(project(":genie-common-external"))
-
     api("com.fasterxml.jackson.core:jackson-databind")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    api("org.hibernate.validator:hibernate-validator")
+    api("jakarta.validation:jakarta.validation-api")
 
     /*******************************
      * Implementation Dependencies
      *******************************/
 
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.google.guava:guava")
-    implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
+
+    runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     /*******************************
      * Test Dependencies
