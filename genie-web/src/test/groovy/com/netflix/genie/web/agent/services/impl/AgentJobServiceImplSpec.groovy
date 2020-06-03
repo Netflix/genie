@@ -85,7 +85,6 @@ class AgentJobServiceImplSpec extends Specification {
         Set<Tag> expectedTags = Sets.newHashSet(
             Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, InspectionReport.Decision.ACCEPT.name()),
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
-            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
             MetricsUtils.SUCCESS_STATUS_TAG
         )
 
@@ -94,7 +93,6 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
-        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
         2 * inspectionReport.getDecision() >> InspectionReport.Decision.ACCEPT
         0 * inspectionReport.getMessage()
@@ -113,7 +111,6 @@ class AgentJobServiceImplSpec extends Specification {
         Set<Tag> expectedTags = Sets.newHashSet(
             Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, InspectionReport.Decision.REJECT.name()),
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
-            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
             MetricsUtils.SUCCESS_STATUS_TAG
         )
 
@@ -122,7 +119,6 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
-        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
         2 * inspectionReport.getDecision() >> InspectionReport.Decision.REJECT
         1 * inspectionReport.getMessage() >> message
@@ -141,7 +137,6 @@ class AgentJobServiceImplSpec extends Specification {
         def exception = new RuntimeException("...")
         Set<Tag> expectedTags = Sets.newHashSet(
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
-            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
             MetricsUtils.FAILURE_STATUS_TAG,
             Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
         )
@@ -152,7 +147,6 @@ class AgentJobServiceImplSpec extends Specification {
         then:
         thrown(exception.class)
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
-        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> { throw exception }
         1 * meterRegistry.counter("genie.services.agentJob.handshake.counter", _ as Set<Tag>) >> {
             args ->
@@ -166,7 +160,6 @@ class AgentJobServiceImplSpec extends Specification {
         def agentClientMetadata = Mock(AgentClientMetadata)
         Set<Tag> expectedTags = Sets.newHashSet(
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
-            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
             MetricsUtils.SUCCESS_STATUS_TAG
         )
 
@@ -181,7 +174,6 @@ class AgentJobServiceImplSpec extends Specification {
                 return counter
         }
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
-        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * counter.increment()
         propertiesMap != null
     }
@@ -192,7 +184,6 @@ class AgentJobServiceImplSpec extends Specification {
         def exception = new RuntimeException("...")
         Set<Tag> expectedTags = Sets.newHashSet(
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
-            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname)
         )
         MetricsUtils.addFailureTagsWithException(expectedTags, exception)
 
@@ -207,7 +198,6 @@ class AgentJobServiceImplSpec extends Specification {
                 return counter
         }
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
-        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * counter.increment()
         thrown(RuntimeException)
     }
