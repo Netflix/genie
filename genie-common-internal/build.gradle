@@ -1,7 +1,6 @@
 apply plugin: "java-library"
 
 dependencies {
-
     /*******************************
      * Annotation Processors
      *******************************/
@@ -17,26 +16,36 @@ dependencies {
     api(project(":genie-common"))
     api(project(":genie-common-external"))
 
+    api("com.amazonaws:aws-java-sdk-core")
+    api("com.amazonaws:aws-java-sdk-s3")
     api("com.amazonaws:aws-java-sdk-sts")
-    api("org.springframework.cloud:spring-cloud-starter-aws")
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.github.ben-manes.caffeine:caffeine")
+    api("jakarta.validation:jakarta.validation-api")
+    api("org.springframework:spring-context")
+    api("org.springframework:spring-core")
+    api("org.springframework.cloud:spring-cloud-aws-autoconfigure")
 
     /*******************************
      * Implementation Dependencies
      *******************************/
 
     implementation("com.google.guava:guava")
+    implementation("com.google.protobuf:protobuf-java")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
     implementation("org.springframework:spring-context")
-    implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws")
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
+
+    runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     /*******************************
      * Test Dependencies

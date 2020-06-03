@@ -10,11 +10,11 @@ dependencies {
      *******************************/
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
 
     /*******************************

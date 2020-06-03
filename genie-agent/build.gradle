@@ -1,5 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+apply plugin: "java-library"
+
 license {
     exclude "*.yml"
     exclude "*.xml"
@@ -9,7 +11,6 @@ license {
 }
 
 dependencies {
-
     /*******************************
      * Annotation Processors
      *******************************/
@@ -18,40 +19,53 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /*******************************
-     * Compile Dependencies
+     * API Dependencies
      *******************************/
 
-    compile project(":genie-common")
-    compile(project(":genie-common-internal"))
-    compile project(":genie-proto")
-
-    // Spring
-    compile("org.springframework.boot:spring-boot-starter")
-    compile("org.springframework.boot:spring-boot-starter-log4j2")
-    compile("org.springframework.cloud:spring-cloud-starter-aws")
-
-    // Misc
-    compile("com.beust:jcommander")
-    compile("io.grpc:grpc-netty")
-    compile("jakarta.el:jakarta.el-api")
-    compile("org.apache.commons:commons-lang3")
-    compile("org.glassfish:jakarta.el")
-    compile("org.codehaus.janino:janino")
+    api(project(":genie-common-external"))
+    api(project(":genie-common-internal"))
+    api(project(":genie-proto"))
+    api("io.grpc:grpc-core")
+    api("io.grpc:grpc-stub")
+    api("com.beust:jcommander")
+    api("com.google.protobuf:protobuf-java")
+    api("com.google.protobuf:protobuf-java-util")
+    api("jakarta.validation:jakarta.validation-api")
+    api("org.apache.logging.log4j:log4j-core")
+    api("org.springframework:spring-context")
+    api("org.springframework:spring-core")
+    api("org.springframework.boot:spring-boot")
 
     /*******************************
-     * Provided Dependencies
+     * Implementation Dependencies
+     *******************************/
+
+    implementation("io.grpc:grpc-netty")
+    implementation("jakarta.el:jakarta.el-api")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.glassfish:jakarta.el")
+    implementation("org.codehaus.janino:janino")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws")
+
+    /*******************************
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
+
+    runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     /*******************************
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
-    testCompile("io.grpc:grpc-testing")
+    testImplementation(project(":genie-test"))
+    testImplementation("io.grpc:grpc-testing")
 }
 
 def genieVersion = project.version.toString()

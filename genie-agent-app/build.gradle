@@ -13,24 +13,25 @@ license {
 
 dependencies {
     /*******************************
-     * Compile Dependencies
+     * Implementation Dependencies
      *******************************/
 
-    compile project(":genie-agent")
+    implementation(project(":genie-agent"))
+    implementation("org.springframework.boot:spring-boot-starter")
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
 
     /*******************************
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
+    testImplementation(project(":genie-test"))
 }
 
 springBoot {

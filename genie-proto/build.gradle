@@ -6,35 +6,34 @@ ext {
 }
 
 dependencies {
-
     /*******************************
      * API Dependencies
      *******************************/
 
     api("com.google.protobuf:protobuf-java")
     api("com.google.protobuf:protobuf-java-util")
-    api("io.grpc:grpc-stub")
-    api("io.grpc:grpc-protobuf")
 
     /*******************************
      * Implementation Dependencies
      *******************************/
 
+    implementation("io.grpc:grpc-stub")
+    implementation("io.grpc:grpc-protobuf")
     implementation("jakarta.annotation:jakarta.annotation-api")
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
 
     /*******************************
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
+    testImplementation(project(":genie-test"))
 }
 
 // Configure protobuf classes and grpc stubs generation

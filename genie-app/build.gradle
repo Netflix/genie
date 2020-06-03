@@ -2,30 +2,28 @@ apply plugin: "org.springframework.boot"
 
 dependencies {
     /*******************************
-     * Compile Dependencies
+     * Implementation Dependencies
      *******************************/
 
-    compile(project(":genie-web"))
-    compile(project(":genie-ui"))
+    implementation(project(":genie-web"))
+    implementation(project(":genie-ui"))
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     /*******************************
-     * Provided Dependencies
-     *******************************/
-
-    /*******************************
-     * Optional Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Runtime Dependencies
+     * Runtime Only Dependencies
      *******************************/
 
     /*******************************
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
-    testCompile(project(":genie-test-web"))
+    testImplementation(project(":genie-test"))
+    testImplementation(project(":genie-test-web"))
 }
 
 bootJar {

@@ -1,5 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+apply plugin: "java-library"
 apply plugin: "org.asciidoctor.jvm.convert"
 
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
@@ -25,74 +26,88 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /*******************************
-     * Compile Dependencies
+     * API Dependencies
      *******************************/
 
-    // TODO: Switch to java-library plugin
+    api(project(":genie-common"))
+    api(project(":genie-common-external"))
+    api(project(":genie-common-internal"))
+    api(project(":genie-proto"))
+    api("com.amazonaws:aws-java-sdk-sns")
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.github.fge:json-patch")
+    api("com.google.protobuf:protobuf-java")
+    api("io.grpc:grpc-core")
+    api("io.grpc:grpc-stub")
+    api("io.micrometer:micrometer-core")
+    api("jakarta.persistence:jakarta.persistence-api")
+    api("jakarta.validation:jakarta.validation-api")
+    api("org.apache.commons:commons-exec")
+    api("org.apache.curator:curator-framework")
+    api("org.apache.curator:curator-x-discovery")
+    api("org.aspectj:aspectjweaver")
+    api("org.codehaus.groovy:groovy-all")
+    api("org.springframework:spring-beans")
+    api("org.springframework:spring-context")
+    api("org.springframework:spring-context-support")
+    api("org.springframework:spring-core")
+    api("org.springframework:spring-web")
+    api("org.springframework.boot:spring-boot")
+    api("org.springframework.boot:spring-boot-actuator")
+    api("org.springframework.data:spring-data-jpa")
+    api("org.springframework.hateoas:spring-hateoas")
+    api("org.springframework.integration:spring-integration-zookeeper")
+    api("org.springframework.retry:spring-retry")
 
-    compile(project(":genie-common"))
-    compile(project(":genie-common-internal"))
-    compile(project(":genie-proto"))
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
 
-    compile("com.amazonaws:aws-java-sdk-sts")
-    compile("com.github.ben-manes.caffeine:caffeine")
-    compile("com.github.fge:json-patch")
-    compile("com.google.guava:guava")
-    compile("commons-codec:commons-codec")
-    compile("commons-httpclient:commons-httpclient")
-    compile("commons-io:commons-io")
-    compile("commons-validator:commons-validator")
-    compile("io.grpc:grpc-core")
-    compile("io.grpc:grpc-netty")
-    compile("io.grpc:grpc-protobuf")
-    compile("io.grpc:grpc-stub")
-    compile("io.springfox:springfox-swagger2")
-    compile("io.springfox:springfox-swagger-ui")
-    compile("io.springfox:springfox-bean-validators")
-    compile("jakarta.persistence:jakarta.persistence-api")
-    compile("jakarta.xml.bind:jakarta.xml.bind-api")
-    compile("org.apache.commons:commons-exec")
-    compile("org.apache.commons:commons-lang3")
-    compile("org.apache.curator:curator-x-discovery")
-    compile("org.apache.httpcomponents:httpclient")
-    compile("org.bitbucket.b_c:jose4j")
-    compile("org.codehaus.groovy:groovy-all")
-    compile("org.flywaydb:flyway-core")
-    compile("org.glassfish.jaxb:jaxb-runtime")
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("org.springframework.boot:spring-boot-starter-aop")
-    compile("org.springframework.boot:spring-boot-starter-cache")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa") {
+    implementation("com.amazonaws:aws-java-sdk-s3")
+    implementation("com.amazonaws:aws-java-sdk-sts")
+    implementation("com.google.guava:guava")
+    implementation("commons-io:commons-io")
+    implementation("commons-validator:commons-validator")
+    implementation("io.grpc:grpc-netty")
+    implementation("io.grpc:grpc-protobuf")
+    implementation("io.springfox:springfox-bean-validators")
+    implementation("io.springfox:springfox-swagger2")
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.glassfish.jaxb:jaxb-runtime")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: "org.hibernate.javax.persistence"
     }
-    compile("org.springframework.boot:spring-boot-starter-log4j2")
-    compile("org.springframework.boot:spring-boot-starter-mail")
-    compile("org.springframework.boot:spring-boot-starter-hateoas")
-    compile("org.springframework.boot:spring-boot-starter-integration")
-    compile("org.springframework.boot:spring-boot-starter-tomcat")
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.cloud:spring-cloud-starter-aws")
-    compile("org.springframework.cloud:spring-cloud-starter-aws-messaging")
-    compile("org.springframework.cloud:spring-cloud-starter-zookeeper")
-    compile("org.springframework.integration:spring-integration-zookeeper")
-    compile("org.springframework.retry:spring-retry")
-    compile("org.apache.maven:maven-artifact") {
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-hateoas")
+    implementation("org.springframework.boot:spring-boot-starter-integration")
+    implementation("org.springframework.boot:spring-boot-starter-tomcat")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws-messaging")
+    implementation("org.springframework.cloud:spring-cloud-starter-zookeeper")
+    implementation("org.springframework.integration:spring-integration-zookeeper")
+    implementation("org.apache.maven:maven-artifact") {
         transitive = false
     }
 
     /*******************************
-     * Provided Dependencies
+     * Compile Only Dependencies
      *******************************/
 
     /*******************************
-     * Optional Dependencies
+     * Runtime Only Dependencies
      *******************************/
 
-    /*******************************
-     * Runtime Dependencies
-     *******************************/
-
+    runtimeOnly("com.github.ben-manes.caffeine:caffeine")
     runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.flywaydb:flyway-core")
+    runtimeOnly("io.springfox:springfox-swagger-ui")
+    runtimeOnly("org.hibernate.validator:hibernate-validator")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.postgresql:postgresql")
 
@@ -100,20 +115,20 @@ dependencies {
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
-    testCompile(project(":genie-test-web"))
-    testCompile("com.github.ppodgorsek:spring-test-dbunit-core")
-    testCompile("com.jayway.jsonpath:json-path")
-    testCompile("net.sf.jtidy:jtidy")
-    testCompile("org.apache.tomcat:tomcat-jdbc")
-    testCompile("org.apache.curator:curator-test:2.13.0")
-    testCompile("org.dbunit:dbunit")
-    testCompile("org.springframework.boot:spring-boot-starter-jetty")
-    testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
-    testCompile("org.springframework.restdocs:spring-restdocs-core")
-    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
-    testCompile("org.springframework.restdocs:spring-restdocs-restassured")
-    testCompile("io.grpc:grpc-testing")
+    testImplementation(project(":genie-test"))
+    testImplementation(project(":genie-test-web"))
+    testImplementation("com.github.ppodgorsek:spring-test-dbunit-core")
+    testImplementation("com.jayway.jsonpath:json-path")
+    testImplementation("net.sf.jtidy:jtidy")
+    testImplementation("org.apache.tomcat:tomcat-jdbc")
+    testImplementation("org.apache.curator:curator-test:2.13.0")
+    testImplementation("org.dbunit:dbunit")
+    testImplementation("org.springframework.boot:spring-boot-starter-jetty")
+    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
+    testImplementation("org.springframework.restdocs:spring-restdocs-core")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
+    testImplementation("io.grpc:grpc-testing")
 
     /*******************************
      * Agent Dependencies
