@@ -210,34 +210,6 @@ public interface PersistenceService {
     );
 
     /**
-     * Find the clusters and commands that can run a job given the criteria the user asked for in the job.
-     *
-     * @param jobRequest The request to run the job. Not null.
-     * @return a map of cluster to the unique id of the command to use if that cluster is used
-     * @throws GenieException if there is an error
-     * @deprecated To be removed after V4 resource model migration
-     */
-    @Deprecated
-    Map<Cluster, String> findClustersAndCommandsForJob(
-        @Valid com.netflix.genie.common.dto.JobRequest jobRequest
-    ) throws GenieException;
-
-    /**
-     * Find the clusters and commands that can run a job given the criteria the user asked for in the job.
-     *
-     * @param clusterCriteria  The ordered list of cluster criterion provided by user to select a cluster for a job
-     * @param commandCriterion The criterion to use to select a command for a job on a cluster
-     * @return a map of cluster to the unique id of the command to use if that cluster is used
-     * @throws GenieException if there is an error
-     * @deprecated To be removed after V4 resource model migration
-     */
-    @Deprecated
-    Map<Cluster, String> findClustersAndCommandsForCriteria(
-        @NotEmpty List<@NotNull Criterion> clusterCriteria,
-        @NotNull Criterion commandCriterion
-    ) throws GenieException;
-
-    /**
      * Update a {@link Cluster} with the given information.
      *
      * @param id            The id of the cluster to update

@@ -20,8 +20,6 @@ package com.netflix.genie.web.data.services.impl.jpa;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
@@ -53,7 +51,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -68,7 +65,6 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
     private static final String COMMAND_3_ID = "command3";
-    private static final String COMMAND_4_ID = "command4";
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
@@ -210,251 +206,6 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
         Assertions
             .assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> this.service.findClusters(null, null, null, null, null, badPage));
-    }
-
-    @Test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testChooseClusterForJob() throws GenieException {
-        final JobRequest one = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
-            Sets.newHashSet("pig")
-        ).build();
-        final JobRequest two = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster"))),
-            Sets.newHashSet("pig")
-        ).build();
-        final JobRequest three = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
-            Sets.newHashSet("pi")
-        ).build();
-        final JobRequest four = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("pig"))),
-            Sets.newHashSet("pig")
-        ).build();
-        final JobRequest five = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("pig", "hive"))),
-            Sets.newHashSet("pig")
-        ).build();
-
-        Assertions.assertThat(this.service.findClustersAndCommandsForJob(one)).hasSize(1);
-        Assertions.assertThat(this.service.findClustersAndCommandsForJob(two)).isEmpty();
-        Assertions.assertThat(this.service.findClustersAndCommandsForJob(three)).isEmpty();
-        Assertions.assertThat(this.service.findClustersAndCommandsForJob(four)).hasSize(2);
-        Assertions.assertThat(this.service.findClustersAndCommandsForJob(five)).hasSize(2);
-    }
-
-    @Test
-    @SuppressWarnings("checkstyle:methodlength")
-    // TODO: This would be much easier with a spock data test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testChooseClusterAndCommandForCriteria() throws GenieException {
-        Map<Cluster, String> clustersAndCommands;
-
-        // All Good
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withId(CLUSTER_1_ID)
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions
-            .assertThat(clustersAndCommands)
-            .hasSize(1)
-            .containsValue(COMMAND_1_ID)
-            .extractingFromEntries(e -> e.getKey().getId())
-            .containsOnly(CLUSTER_1_ID);
-
-        // Cluster id won't be found
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withId(CLUSTER_1_ID + UUID.randomUUID().toString())
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions.assertThat(clustersAndCommands).isEmpty();
-
-        // Cluster is not UP so this should fail even though the id matches
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withId(CLUSTER_1_ID)
-                    .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions.assertThat(clustersAndCommands).isEmpty();
-
-        // Second cluster criterion should match Cluster 2
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withId(CLUSTER_1_ID)
-                    .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
-                    .build(),
-                new Criterion
-                    .Builder()
-                    .withTags(Sets.newHashSet("hive", "pig", "query"))
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withId(COMMAND_1_ID)
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions
-            .assertThat(clustersAndCommands)
-            .hasSize(1)
-            .containsValue(COMMAND_1_ID)
-            .extractingFromEntries(e -> e.getKey().getId())
-            .containsOnly(CLUSTER_2_ID);
-
-        // Matches both clusters and the deprecated pig command
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withTags(Sets.newHashSet("hive", "pig"))
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withStatus(CommandStatus.DEPRECATED.toString())
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions
-            .assertThat(clustersAndCommands)
-            .hasSize(2)
-            .containsValue(COMMAND_3_ID)
-            .doesNotContainValue(COMMAND_1_ID)
-            .doesNotContainValue(COMMAND_2_ID)
-            .extractingFromEntries(e -> e.getKey().getId())
-            .containsExactlyInAnyOrder(CLUSTER_1_ID, CLUSTER_2_ID);
-
-        // By name
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withName(CLUSTER_2_NAME)
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withName("hive_11_prod")
-                .withStatus(CommandStatus.INACTIVE.toString())
-                .build()
-        );
-        Assertions
-            .assertThat(clustersAndCommands)
-            .hasSize(1)
-            .containsValue(COMMAND_2_ID)
-            .extractingFromEntries(e -> e.getKey().getId())
-            .containsOnly(CLUSTER_2_ID);
-
-        // In this case we're testing the priority ordering. The two clusters have the same pig command only cluster 2
-        // has a different pig command in the highest priority order so the result set should be different for both
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withTags(Sets.newHashSet("hive", "pig"))
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions.assertThat(clustersAndCommands).hasSize(2);
-        clustersAndCommands.forEach(
-            (key, value) -> {
-                switch (key.getId()) {
-                    case CLUSTER_1_ID:
-                        Assertions.assertThat(value).isEqualTo(COMMAND_1_ID);
-                        break;
-                    case CLUSTER_2_ID:
-                        Assertions.assertThat(value).isEqualTo(COMMAND_4_ID);
-                        break;
-                    default:
-                        Assertions.fail("Unknown cluster id " + key.getId());
-                        break;
-                }
-            }
-        );
-
-        // Search by version will break standard find
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withId(CLUSTER_1_ID)
-                    .withVersion(UUID.randomUUID().toString())
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet("pig"))
-                .build()
-        );
-        Assertions.assertThat(clustersAndCommands).isEmpty();
-
-        // Versions match so it'll match like the very first case
-        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
-            Lists.newArrayList(
-                new Criterion
-                    .Builder()
-                    .withId(CLUSTER_1_ID)
-                    .withVersion(CLUSTER_1_VERSION)
-                    .build()
-            ),
-            new Criterion
-                .Builder()
-                .withVersion("7.8.9")
-                .withTags(Sets.newHashSet("pig"))
-                .withStatus(CommandStatus.DEPRECATED.toString())
-                .build()
-        );
-        Assertions
-            .assertThat(clustersAndCommands)
-            .hasSize(1)
-            .containsValue(COMMAND_3_ID)
-            .extractingFromEntries(e -> e.getKey().getId())
-            .containsOnly(CLUSTER_1_ID);
     }
 
     @Test

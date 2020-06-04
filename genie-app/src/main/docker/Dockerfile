@@ -14,7 +14,6 @@ ENTRYPOINT ["java", \
             "-Djava.security.egd=file:/dev/./urandom", \
             "-Dgenie.agent.launcher.local.agent-jar-path=/usr/local/bin/genie-agent.jar", \
             "-Dgenie.jobs.agent-execution.agent-probability=1.0", \
-            "-Dgenie.services.job-resolver.v4-probability=1.0", \
             "-jar", \
             "/usr/local/bin/genie-server.jar" \
             ]

@@ -20,9 +20,7 @@ package com.netflix.genie.web.data.services.impl.jpa;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -32,7 +30,6 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.Application;
@@ -623,44 +620,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             .collect(Collectors.toList());
 
         return new PageImpl<>(clusters, page, totalCount);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Map<Cluster, String> findClustersAndCommandsForJob(
-        @Valid final com.netflix.genie.common.dto.JobRequest jobRequest
-    ) throws GenieException {
-        log.debug("Called");
-
-        final List<Criterion> clusterCriteria = Lists.newArrayList();
-        for (final ClusterCriteria criteria : jobRequest.getClusterCriterias()) {
-            clusterCriteria.add(DtoConverters.toV4Criterion(criteria));
-        }
-
-        final Criterion commandCriterion = DtoConverters.toV4Criterion(jobRequest.getCommandCriteria());
-
-        return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Map<Cluster, String> findClustersAndCommandsForCriteria(
-        @NotEmpty final List<@NotNull Criterion> clusterCriteria,
-        @NotNull final Criterion commandCriterion
-    ) throws GenieException {
-        log.debug(
-            "Attempting to find cluster and commands for cluster criteria {} and command criterion {}",
-            clusterCriteria,
-            commandCriterion
-        );
-
-        return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
     }
 
     /**
@@ -2813,47 +2772,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             clusterEntities.forEach(clusterEntity -> clusterEntity.removeCommand(entity));
         }
         this.commandRepository.delete(entity);
-    }
-
-    // TODO: Delete once V4 is only model
-    private Map<Cluster, String> findClustersAndCommandsForJob(
-        final List<Criterion> clusterCriteria,
-        final Criterion commandCriterion
-    ) throws GenieServerException {
-        final Map<Cluster, String> foundClusters = Maps.newHashMap();
-        for (final Criterion clusterCriterion : clusterCriteria) {
-            final List<Object[]> clusterCommands = this.clusterRepository.resolveClustersAndCommands(
-                clusterCriterion,
-                commandCriterion
-            );
-
-            if (!clusterCommands.isEmpty()) {
-                for (final Object[] ids : clusterCommands) {
-                    if (ids.length != 2) {
-                        throw new GenieServerException("Expected result length 2 but got " + ids.length);
-                    }
-                    final long clusterId;
-                    if (ids[0] instanceof Number) {
-                        clusterId = ((Number) ids[0]).longValue();
-                    } else {
-                        throw new GenieServerException("Expected number type but got " + ids[0].getClass().getName());
-                    }
-                    final String commandUniqueId;
-                    if (ids[1] instanceof String) {
-                        commandUniqueId = (String) ids[1];
-                    } else {
-                        throw new GenieServerException("Expected String type but got " + ids[1].getClass().getName());
-                    }
-
-                    final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
-                    foundClusters.put(EntityV4DtoConverters.toV4ClusterDto(clusterEntity), commandUniqueId);
-                }
-                return foundClusters;
-            }
-        }
-
-        //if we've gotten to here no clusters were found so return empty map
-        return foundClusters;
     }
 
     private void deleteAllClusterCriteria(final CommandEntity commandEntity) {

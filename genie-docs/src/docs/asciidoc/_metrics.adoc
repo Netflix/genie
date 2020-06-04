@@ -397,12 +397,6 @@ for multiple errors.
 |AgentJobServiceImpl
 |status, exceptionClass, agentVersion, agentHost, handshakeDecision
 
-|genie.services.jobResolver.clusterCommandQuery.timer
-|Time taken to query the database and find clusters and commands matching the supplied criteria.
-|nanoseconds
-|JobResolverServiceImpl
-|status, exceptionClass
-
 |genie.services.jobResolver.generateClusterCriteriaPermutations.timer
 |Time taken to generate all the permutations for cluster criteria between the command options and the job request
 |nanoseconds
@@ -438,30 +432,6 @@ for multiple errors.
 |nanoseconds
 |JobResolverServiceImpl
 |status, commandName, commandId, exceptionClass
-
-|genie.services.jobResolver.selectCluster.noneFound.counter
-|Number of times the criteria for cluster selection does not match any cluster
-|count
-|JobResolverServiceImpl
-|-
-
-|genie.services.jobResolver.selectCluster.noneSelected.counter
-|Number of times the cluster selection completed without selecting a cluster
-|count
-|JobResolverServiceImpl
-|-
-
-|genie.services.jobResolver.selectCluster.timer
-|Time taken to select a cluster using the cluster selection strategy
-|nanoseconds
-|JobResolverServiceImpl
-|status, exceptionClass
-
-|genie.services.jobResolver.selectCommand.timer
-|Time taken to resolve a command based on criteria and cluster
-|nanoseconds
-|JobResolverServiceImpl
-|status, exceptionClass
 
 |genie.web.services.archivedJobService.getArchivedJobMetadata.timer
 |The time taken to fetch the metadata of an archived job if it isn't already cached
