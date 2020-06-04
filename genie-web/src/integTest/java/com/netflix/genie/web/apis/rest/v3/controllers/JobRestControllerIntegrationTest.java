@@ -165,6 +165,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final List<String> SLEEP_AND_ECHO_COMMAND_ARGS =
         Lists.newArrayList("-c", "'sleep 1 && echo hello world'");
     private static final ArrayList<String> SLEEP_60_COMMAND_ARGS = Lists.newArrayList("-c", "'sleep 60'");
+    private static final String EXPECTED_STDOUT_CONTENT = "hello world\n";
+    private static final int EXPECTED_STDOUT_LENGTH = EXPECTED_STDOUT_CONTENT.length();
 
     private final boolean agentExecution;
     private ResourceLoader resourceLoader;
@@ -665,57 +667,100 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .body(Matchers.equalTo(expectedRunFileContent));
 
-        // Check stdout content
-        RestAssured
-            .given(this.getRequestSpecification())
-            .when()
-            .port(this.port)
-            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
-            .then()
-            .body(Matchers.is("hello world\n"));
-
-        // Check stderr content
+        // Check stderr content and size
         RestAssured
             .given(this.getRequestSpecification())
             .when()
             .port(this.port)
             .get(JOBS_API + "/{id}/output/{filePath}", id, "stderr")
             .then()
+            .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(0))
             .body(Matchers.emptyString());
 
-        // Test various edge cases with getting a file
-        // Range request, out of range
-        final int stdOutContentLength = Integer.parseInt(
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .extract()
-                .header(HttpHeaders.CONTENT_LENGTH)
-        );
-
-        // Partial content request
+        // Check stdout content and size
         RestAssured
             .given(this.getRequestSpecification())
-            .header(HttpHeaders.RANGE, "bytes=" + (stdOutContentLength - 1) + "-")
             .when()
             .port(this.port)
             .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
             .then()
-            .statusCode(Matchers.is(HttpStatus.PARTIAL_CONTENT.value()));
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(EXPECTED_STDOUT_LENGTH))
+            .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT));
 
-        // Range request, out of range
+        checkGetFileRanges(id);
+    }
+
+    private void checkGetFileRanges(final String id) {
+        // Range request -- full range
         RestAssured
             .given(this.getRequestSpecification())
-            .header(HttpHeaders.RANGE, "bytes=" + stdOutContentLength + "-")
+            .header(HttpHeaders.RANGE, "bytes=0-" + (EXPECTED_STDOUT_LENGTH - 1))
             .when()
             .port(this.port)
             .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
             .then()
-            .statusCode(Matchers.is(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value()));
+            .statusCode(Matchers.is(HttpStatus.PARTIAL_CONTENT.value()))
+            .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(EXPECTED_STDOUT_LENGTH))
+            .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT));
+
+        // Range request -- start offset
+        RestAssured
+            .given(this.getRequestSpecification())
+            .header(HttpHeaders.RANGE, "bytes=" + (EXPECTED_STDOUT_LENGTH - 2) + "-")
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PARTIAL_CONTENT.value()))
+            .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(2))
+            .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT.substring(EXPECTED_STDOUT_LENGTH - 2)));
+
+        // Range request -- suffix
+        RestAssured
+            .given(this.getRequestSpecification())
+            .header(HttpHeaders.RANGE, "bytes=" + (-2))
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PARTIAL_CONTENT.value()))
+            .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(2))
+            .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT.substring(EXPECTED_STDOUT_LENGTH - 2)));
+
+        // Range request -- range
+        RestAssured
+            .given(this.getRequestSpecification())
+            .header(HttpHeaders.RANGE, "bytes=6-10")
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PARTIAL_CONTENT.value()))
+            .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(5))
+            .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT.substring(6, 11)));
+
+        // Range request -- request more than it's available
+        RestAssured
+            .given(this.getRequestSpecification())
+            .header(HttpHeaders.RANGE, "bytes=0-1000")
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .then()
+            .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(EXPECTED_STDOUT_LENGTH))
+            .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT));
+
+        // Range request -- out of range
+        RestAssured
+            .given(this.getRequestSpecification())
+            .header(HttpHeaders.RANGE, "bytes=" + EXPECTED_STDOUT_LENGTH + "-")
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value()))
+            .header(HttpHeaders.CONTENT_LENGTH, Matchers.blankOrNullString());
     }
 
     private void checkJobRequest(
