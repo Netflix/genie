@@ -53,11 +53,19 @@ import java.util.UUID;
 )
 abstract class GenieClientIntegrationTestBase {
 
-    // TODO: Move this to latest.candidate or latest.snapshot once new tagging is established OR
-    //       figure out a good way to build the container for the current commit locally and use that if we desire
-    //       testing same version to same version rather than for compatibility
+    // TODO: Move this to latest.candidate after it's released
+    // Note: Attempt made to make this use the version currently under build however the gradle compiler avoidance
+    //       doesn't work right and generates new images every test / build run. This leaves a lot of orphaned
+    //       layers on the developers machine which takes up a lot of space. Not currently worth the gain.
+    //       Also passing in environment variable from gradle file wasn't being picked up properly in IDE tests for some
+    //       reason. For now just leave it hardcoded as the `latest` tags float anyway. This does become problem
+    //       for making builds repeatable on tags long term though so it might be better to just periodically update
+    //       a static tagged image if we can't get local docker images to reproduce without disk usage overhead.
+    // TODO: Improve genie-app image packaging to leverage unpacked (application plugin) based agent so that startup
+    //       is faster as in agent mode the tests are much slower than embedded. Also once we move to boot 2.3 we can
+    //       leverage their layered jars to produce less changing images.
     @Container
-    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:4.0.0-rc.56")
+    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.snapshot")
         .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
         .withExposedPorts(8080);
 
