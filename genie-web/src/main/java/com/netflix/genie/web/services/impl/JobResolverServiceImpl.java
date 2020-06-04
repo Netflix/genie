@@ -22,8 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
@@ -47,7 +45,6 @@ import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.Getter;
@@ -74,7 +71,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -138,42 +134,6 @@ public class JobResolverServiceImpl implements JobResolverService {
 
     private static final String CLUSTER_SELECTOR_STATUS_SUCCESS = "success";
     private static final String CLUSTER_SELECTOR_STATUS_NO_PREFERENCE = "no preference";
-    private static final String CLUSTER_SELECTOR_STATUS_EXCEPTION = "exception";
-    private static final String CLUSTER_SELECTOR_STATUS_INVALID = "invalid";
-    //endregion
-
-    //region Temporary or Deprecated Constants
-    // TODO: Remove all these after migration to V4 algorithm is complete
-    /**
-     * How long it takes to query the database for cluster command combinations matching supplied criteria.
-     */
-    private static final String CLUSTER_COMMAND_QUERY_TIMER = "genie.services.jobResolver.clusterCommandQuery.timer";
-
-    /**
-     * How long it takes to select a cluster from the set of clusters returned by database query.
-     */
-    private static final String SELECT_CLUSTER_TIMER = "genie.services.jobResolver.selectCluster.timer";
-
-    /**
-     * How long it takes to select a command for a given cluster.
-     */
-    private static final String SELECT_COMMAND_TIMER = "genie.services.jobResolver.selectCommand.timer";
-
-    private static final String V4_PROBABILITY_PROPERTY_KEY = "genie.services.job-resolver.v4-probability";
-    private static final double DEFAULT_V4_PROBABILITY = 0.0;
-    private static final double MIN_V4_PROBABILITY = 0.0;
-    private static final double MAX_V4_PROBABILITY = 1.0;
-    private static final String ALGORITHM_COUNTER = "genie.services.jobResolver.resolutionAlgorithm.counter";
-    private static final String ALGORITHM_TAG = "algorithm";
-    private static final Set<Tag> V3_ALGORITHM_TAGS = ImmutableSet.of(Tag.of(ALGORITHM_TAG, "v3"));
-    private static final Set<Tag> V4_ALGORITHM_TAGS = ImmutableSet.of(Tag.of(ALGORITHM_TAG, "v4"));
-    private static final String V3_COMMAND_TAG = "v3Command";
-    private static final String V4_COMMAND_TAG = "v4Command";
-    private static final String MATCHED_TAG = "matched";
-    private static final Tag MATCHED_TAG_FALSE = Tag.of(MATCHED_TAG, "false");
-    private static final Tag MATCHED_TAG_TRUE = Tag.of(MATCHED_TAG, "true");
-    private static final String DUAL_RESOLVE_PROPERTY_KEY = "genie.services.job-resolver.dual-mode.enabled";
-    private static final String DUAL_RESOLVE_TIMER = "genie.services.jobResolver.v4DualResolve.timer";
     //endregion
 
     //region Members
@@ -185,13 +145,6 @@ public class JobResolverServiceImpl implements JobResolverService {
     // TODO: Switch to path
     private final File defaultJobDirectory;
     private final String defaultArchiveLocation;
-
-    private final Environment environment;
-
-    // TODO: Remove after V4 migration
-    private final Counter noClusterSelectedCounter;
-    private final Counter noClusterFoundCounter;
-    private final Random random;
     //endregion
 
     //region Public APIs
@@ -218,8 +171,6 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.clusterSelectors = clusterSelectors;
         this.commandSelector = commandSelector;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
-        this.environment = environment;
-        this.random = new Random();
 
         final URI jobDirProperty = jobsProperties.getLocations().getJobs();
         this.defaultJobDirectory = Paths.get(jobDirProperty).toFile();
@@ -230,10 +181,6 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         // Metrics
         this.registry = registry;
-        this.noClusterSelectedCounter
-            = this.registry.counter("genie.services.jobResolver.selectCluster.noneSelected.counter");
-        this.noClusterFoundCounter
-            = this.registry.counter("genie.services.jobResolver.selectCluster.noneFound.counter");
     }
 
     /**
@@ -316,64 +263,8 @@ public class JobResolverServiceImpl implements JobResolverService {
 
     //region Resolution Helpers
     private ResolvedJob resolve(final JobResolutionContext context) throws GenieJobResolutionException {
-        final String id = context.getJobId();
-        final JobRequest jobRequest = context.getJobRequest();
-
-        if (this.useV4ResourceSelection()) {
-            this.resolveCommand(context);
-            this.resolveCluster(context);
-        } else {
-            final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
-                jobRequest.getCriteria().getClusterCriteria(),
-                jobRequest.getCriteria().getCommandCriterion()
-            );
-            // Resolve the cluster for the job request based on the tags specified
-            final Cluster v3Cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
-            // Resolve the command for the job request based on command tags and cluster chosen
-            final Command v3Command = this.getCommand(clustersAndCommandsForJob.get(v3Cluster), id);
-
-            // For help during migration. Requested by compute team.
-            if (this.environment.getProperty(DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false)) {
-                final long dualStart = System.nanoTime();
-                final String v3CommandId = v3Command.getId();
-                final Set<Tag> dualModeTags = Sets.newHashSet(Tag.of(V3_COMMAND_TAG, v3CommandId));
-                try {
-                    this.resolveCommand(context);
-                    final Command v4Command = context
-                        .getCommand()
-                        .orElseThrow(() -> new IllegalStateException("Expected command to have been resolved"));
-                    final String v4CommandId = v4Command.getId();
-                    dualModeTags.add(Tag.of(V4_COMMAND_TAG, v4CommandId));
-
-                    if (v4CommandId.equals(v3CommandId)) {
-                        dualModeTags.add(MATCHED_TAG_TRUE);
-                        log.info("V4 resource resolution match for job {} command {}", id, v3CommandId);
-                    } else {
-                        dualModeTags.add(MATCHED_TAG_FALSE);
-                        log.info(
-                            "V4 resource resolution mismatch for job {} V3 command {} V4 command {}",
-                            id,
-                            v3CommandId,
-                            v4CommandId
-                        );
-                    }
-                    MetricsUtils.addSuccessTags(dualModeTags);
-                } catch (final Exception e) {
-                    // Swallow but capture it as a failure and a mismatch
-                    MetricsUtils.addFailureTagsWithException(dualModeTags, e);
-                    dualModeTags.add(MATCHED_TAG_FALSE);
-                    log.info("V4 resource resolution mismatch for job {} due to exception {}", id, e.getMessage(), e);
-                } finally {
-                    this.registry
-                        .timer(DUAL_RESOLVE_TIMER, dualModeTags)
-                        .record(System.nanoTime() - dualStart, TimeUnit.NANOSECONDS);
-                }
-            }
-            // For backwards compatibility
-            context.setCommand(v3Command);
-            context.setCluster(v3Cluster);
-        }
-
+        this.resolveCommand(context);
+        this.resolveCluster(context);
         this.resolveApplications(context);
         this.resolveJobMemory(context);
         this.resolveEnvironmentVariables(context);
@@ -968,210 +859,6 @@ public class JobResolverServiceImpl implements JobResolverService {
             className = possibleProxyObject.getClass().getCanonicalName();
         }
         return className;
-    }
-    //endregion
-
-    //region Deprecated V3 Resolution or Migration Helpers
-    /*
-     * This API will only exist during migration between V3 and V4 resource resolution logic which hopefully will be
-     * short.
-     */
-    @Deprecated
-    private boolean useV4ResourceSelection() {
-        double v4Probability;
-        try {
-            v4Probability = this.environment.getProperty(
-                V4_PROBABILITY_PROPERTY_KEY,
-                Double.class,
-                DEFAULT_V4_PROBABILITY
-            );
-        } catch (final IllegalStateException e) {
-            log.error("Invalid V4 probability. Expected a number between 0.0 and 1.0 inclusive.", e);
-            v4Probability = MIN_V4_PROBABILITY;
-        }
-        // Check for validity
-        if (v4Probability < MIN_V4_PROBABILITY) {
-            log.warn(
-                "Invalid V4 resolution probability {}. Must be >= 0.0. Resetting to {}",
-                v4Probability,
-                MIN_V4_PROBABILITY
-            );
-            v4Probability = MIN_V4_PROBABILITY;
-        }
-        if (v4Probability > MAX_V4_PROBABILITY) {
-            log.warn(
-                "Invalid V4 resolution probability {}. Must be <= 1.0. Resetting to {}",
-                v4Probability,
-                MAX_V4_PROBABILITY
-            );
-            v4Probability = MAX_V4_PROBABILITY;
-        }
-
-        if (this.random.nextDouble() < v4Probability) {
-            this.registry.counter(ALGORITHM_COUNTER, V4_ALGORITHM_TAGS).increment();
-            return true;
-        } else {
-            this.registry.counter(ALGORITHM_COUNTER, V3_ALGORITHM_TAGS).increment();
-            return false;
-        }
-    }
-
-    @Deprecated
-    private Map<Cluster, String> queryForClustersAndCommands(
-        final List<Criterion> clusterCriteria,
-        final Criterion commandCriterion
-    ) throws GenieJobResolutionException {
-        final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
-        try {
-            final Map<Cluster, String> clustersAndCommands
-                = this.persistenceService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion);
-            MetricsUtils.addSuccessTags(tags);
-            return clustersAndCommands;
-        } catch (final Throwable t) {
-            MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
-        } finally {
-            this.registry
-                .timer(CLUSTER_COMMAND_QUERY_TIMER, tags)
-                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-    }
-
-    @Deprecated
-    private Cluster selectCluster(
-        final String id,
-        final JobRequest jobRequest,
-        final Set<Cluster> clusters
-    ) throws GenieJobResolutionException {
-        final long start = System.nanoTime();
-        final Set<Tag> timerTags = Sets.newHashSet();
-        final Set<Tag> counterTags = Sets.newHashSet();
-        try {
-            final Cluster cluster;
-            if (clusters.isEmpty()) {
-                this.noClusterFoundCounter.increment();
-                throw new GeniePreconditionException(
-                    "No cluster/command combination found for the given criteria. Unable to continue"
-                );
-            } else if (clusters.size() == 1) {
-                cluster = clusters
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new GenieServerException("Couldn't get cluster when size was one"));
-            } else {
-                cluster = this.selectClusterUsingClusterSelectors(counterTags, clusters, jobRequest, id);
-            }
-
-            if (cluster == null) {
-                this.noClusterSelectedCounter.increment();
-                throw new GenieJobResolutionException("No cluster found matching given criteria");
-            }
-
-            log.debug("Selected cluster {} for job {}", cluster.getId(), id);
-            MetricsUtils.addSuccessTags(timerTags);
-            return cluster;
-        } catch (final Throwable t) {
-            MetricsUtils.addFailureTagsWithException(timerTags, t);
-            if (t instanceof GenieJobResolutionException) {
-                throw (GenieJobResolutionException) t;
-            } else {
-                throw new GenieJobResolutionException(t);
-            }
-        } finally {
-            this.registry
-                .timer(SELECT_CLUSTER_TIMER, timerTags)
-                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-
-    }
-
-    @Deprecated
-    private Command getCommand(
-        final String commandId,
-        final String jobId
-    ) throws GenieJobResolutionException {
-        final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
-        try {
-            log.info("Selecting command for job {} ", jobId);
-            final Command command = this.persistenceService.getCommand(commandId);
-            log.info("Selected command {} for job {} ", commandId, jobId);
-            MetricsUtils.addSuccessTags(tags);
-            return command;
-        } catch (final Throwable t) {
-            MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
-        } finally {
-            this.registry
-                .timer(SELECT_COMMAND_TIMER, tags)
-                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-    }
-
-    @Deprecated
-    @Nullable
-    private Cluster selectClusterUsingClusterSelectors(
-        final Set<Tag> counterTags,
-        final Set<Cluster> clusters,
-        final JobRequest jobRequest,
-        final String jobId
-    ) {
-        Cluster cluster = null;
-        for (final ClusterSelector clusterSelector : this.clusterSelectors) {
-            final String clusterSelectorClass = this.getProxyObjectClassName(clusterSelector);
-            counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
-            try {
-                final ResourceSelectionResult<Cluster> result = clusterSelector.select(
-                    new ClusterSelectionContext(
-                        jobId,
-                        jobRequest,
-                        true, // TODO: Fix this whole method so it's easier to work with (context?)
-                        null,
-                        clusters
-                    )
-                );
-                final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
-                if (selectedClusterOptional.isPresent()) {
-                    final Cluster selectedCluster = selectedClusterOptional.get();
-                    // Make sure the cluster existed in the original list of clusters
-                    if (clusters.contains(selectedCluster)) {
-                        log.debug(
-                            "Successfully selected cluster {} using selector {}",
-                            selectedCluster.getId(),
-                            clusterSelectorClass
-                        );
-                        counterTags.addAll(
-                            Lists.newArrayList(
-                                Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_SUCCESS),
-                                Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()),
-                                Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName())
-                            )
-                        );
-                        cluster = selectedCluster;
-                        break;
-                    } else {
-                        log.error(
-                            "Successfully selected cluster {} using selector {} but it wasn't in original cluster "
-                                + "set {}",
-                            selectedCluster.getId(),
-                            clusterSelectorClass,
-                            clusters
-                        );
-                        counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_INVALID));
-                    }
-                } else {
-                    counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE));
-                }
-            } catch (final Exception e) {
-                log.error("Cluster selector {} evaluation threw exception:", clusterSelector, e);
-                counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_EXCEPTION));
-            } finally {
-                this.registry.counter(CLUSTER_SELECTOR_COUNTER, counterTags).increment();
-            }
-        }
-
-        return cluster;
     }
     //endregion
 

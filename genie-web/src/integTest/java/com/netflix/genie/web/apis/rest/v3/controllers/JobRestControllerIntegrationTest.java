@@ -1818,18 +1818,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
             .then()
             .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
-
-        final List<String> cmds = Lists.newArrayList(CMD1_ID);
-
-        RestAssured
-            .given(this.getRequestSpecification())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(GenieObjectMapper.getMapper().writeValueAsBytes(cmds))
-            .when()
-            .port(this.port)
-            .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
-            .then()
-            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
     }
 
     private void createAnApplication(final String id, final String appName) throws Exception {

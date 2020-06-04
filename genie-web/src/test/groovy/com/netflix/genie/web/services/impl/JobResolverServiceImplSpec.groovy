@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.services.impl
 
-import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
@@ -60,6 +59,7 @@ import javax.annotation.Nullable
 import java.time.Instant
 import java.util.stream.Collectors
 import java.util.stream.Stream
+
 /**
  * Specifications for the {@link JobResolverServiceImpl} class.
  *
@@ -72,7 +72,6 @@ class JobResolverServiceImplSpec extends Specification {
     ClusterSelector clusterSelector
     CommandSelector commandSelector
     JobsProperties jobsProperties
-    Environment environment
 
     JobResolverServiceImpl service
 
@@ -81,7 +80,6 @@ class JobResolverServiceImplSpec extends Specification {
         this.clusterSelector = Mock(ClusterSelector)
         this.commandSelector = Mock(CommandSelector)
         this.jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        this.environment = Mock(Environment)
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
@@ -91,195 +89,8 @@ class JobResolverServiceImplSpec extends Specification {
             this.commandSelector,
             new SimpleMeterRegistry(),
             this.jobsProperties,
-            this.environment
+            Mock(Environment)
         )
-    }
-
-    def "Can resolve a job with V3 algorithm"() {
-        def cluster1Id = UUID.randomUUID().toString()
-        def cluster2Id = UUID.randomUUID().toString()
-        def cluster1 = createCluster(cluster1Id)
-        def cluster2 = createCluster(cluster2Id)
-        def clusters = Sets.newHashSet(cluster1, cluster2)
-        ResourceSelectionResult<Cluster> clusterSelectionResult = Mock(ResourceSelectionResult) {
-            getSelectorClass() >> this.getClass()
-            getSelectionRationale() >> Optional.empty()
-        }
-
-        def commandId = UUID.randomUUID().toString()
-        def executableBinary = UUID.randomUUID().toString()
-        def executableArgument0 = UUID.randomUUID().toString()
-        def executableArgument1 = UUID.randomUUID().toString()
-        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
-        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
-        def command = createCommand(commandId, executable)
-
-        def jobId = UUID.randomUUID().toString()
-
-        def expectedCommandArgs = executable
-        def expectedJobArgs = arguments
-
-        Map<Cluster, String> clusterCommandMap = ImmutableMap.of(cluster1, commandId, cluster2, commandId)
-        def jobRequest = createJobRequest(arguments, null, null)
-        def jobRequestNoArchivalData = createJobRequest(arguments, null, 5_002)
-        def requestedMemory = 6_323
-        def savedJobRequest = createJobRequest(arguments, requestedMemory, null)
-
-        when:
-        def resolvedJob = this.service.resolveJob(jobId, jobRequest, true)
-        def jobSpec = resolvedJob.getJobSpecification()
-        def jobEnvironment = resolvedJob.getJobEnvironment()
-
-        then:
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> 0.0d
-        1 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
-        0 * this.persistenceService.findCommandsMatchingCriterion(_ as Criterion, _ as boolean)
-        0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
-        1 * this.persistenceService.findClustersAndCommandsForCriteria(
-            jobRequest.getCriteria().getClusterCriteria(),
-            jobRequest.getCriteria().getCommandCriterion()
-        ) >> clusterCommandMap
-        1 * this.clusterSelector.select(
-            {
-                verifyAll(it, ClusterSelectionContext) {
-                    it.getJobId() == jobId
-                    it.getJobRequest() == jobRequest
-                    it.getResources() == clusters
-                }
-            }
-        ) >> clusterSelectionResult
-        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * this.persistenceService.getCommand(commandId) >> command
-        1 * this.persistenceService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        jobSpec.getExecutableArgs() == expectedCommandArgs
-        jobSpec.getJobArgs() == expectedJobArgs
-        jobSpec.getJob().getId() == jobId
-        jobSpec.getCluster().getId() == cluster1Id
-        jobSpec.getCommand().getId() == commandId
-        jobSpec.getApplications().isEmpty()
-        !jobSpec.isInteractive()
-        jobSpec.getEnvironmentVariables().size() == 19
-        jobSpec.getArchiveLocation() ==
-            Optional.of(
-                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
-                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
-                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
-            )
-        jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
-        jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
-        jobEnvironment.getCpu() == 1
-        !jobEnvironment.getExt().isPresent()
-        jobSpec.getTimeout().orElse(null) == com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION
-
-        when:
-        def resolvedJobNoArchivalData = this.service.resolveJob(jobId, jobRequestNoArchivalData, true)
-        def jobSpecNoArchivalData = resolvedJobNoArchivalData.getJobSpecification()
-        def jobEnvironmentNoArchivalData = resolvedJobNoArchivalData.getJobEnvironment()
-
-        then:
-        0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> 0.0d
-        1 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> true
-        1 * this.persistenceService.findCommandsMatchingCriterion(
-            jobRequestNoArchivalData.getCriteria().getCommandCriterion(),
-            true
-        ) >> Sets.newHashSet(createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())))
-        1 * this.persistenceService.findClustersAndCommandsForCriteria(
-            jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
-            jobRequestNoArchivalData.getCriteria().getCommandCriterion()
-        ) >> clusterCommandMap
-        1 * this.clusterSelector.select(
-            {
-                verifyAll(it, ClusterSelectionContext) {
-                    it.getJobId() == jobId
-                    it.getJobRequest() == jobRequestNoArchivalData
-                    it.getResources() == clusters
-                }
-            }
-        ) >> clusterSelectionResult
-        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * this.persistenceService.getCommand(commandId) >> command
-        1 * this.persistenceService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
-        jobSpecNoArchivalData.getJobArgs() == expectedJobArgs
-        jobSpecNoArchivalData.getJob().getId() == jobId
-        jobSpecNoArchivalData.getCluster().getId() == cluster1Id
-        jobSpecNoArchivalData.getCommand().getId() == commandId
-        jobSpecNoArchivalData.getApplications().isEmpty()
-        !jobSpecNoArchivalData.isInteractive()
-        jobSpecNoArchivalData.getEnvironmentVariables().size() == 19
-        jobSpecNoArchivalData.getArchiveLocation() ==
-            Optional.of(
-                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
-                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
-                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
-            )
-        jobEnvironmentNoArchivalData.getEnvironmentVariables() == jobSpecNoArchivalData.getEnvironmentVariables()
-        jobEnvironmentNoArchivalData.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
-        jobEnvironmentNoArchivalData.getCpu() == 1
-        !jobEnvironmentNoArchivalData.getExt().isPresent()
-        jobSpecNoArchivalData.getTimeout().orElse(null) == 5_002
-
-        when: "We try to resolve a saved job"
-        def resolvedSavedJobData = this.service.resolveJob(jobId)
-        def jobSpecSavedData = resolvedSavedJobData.getJobSpecification()
-        def jobEnvironmentSavedData = resolvedSavedJobData.getJobEnvironment()
-
-        then: "the resolution is saved"
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> 0.0d
-        1 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> true
-        1 * this.persistenceService.findCommandsMatchingCriterion(savedJobRequest.getCriteria().getCommandCriterion(), true) >> Sets.newHashSet(command)
-        1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
-        1 * this.persistenceService.isApiJob(jobId) >> false
-        1 * this.persistenceService.getJobRequest(jobId) >> savedJobRequest
-        1 * this.persistenceService.findClustersAndCommandsForCriteria(
-            savedJobRequest.getCriteria().getClusterCriteria(),
-            savedJobRequest.getCriteria().getCommandCriterion()
-        ) >> clusterCommandMap
-        1 * this.clusterSelector.select(
-            {
-                verifyAll(it, ClusterSelectionContext) {
-                    it.getJobId() == jobId
-                    it.getJobRequest() == savedJobRequest
-                    it.getResources() == clusters
-                }
-            }
-        ) >> clusterSelectionResult
-        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * this.persistenceService.getCommand(commandId) >> command
-        1 * this.persistenceService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        1 * this.persistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
-        jobSpecSavedData.getExecutableArgs() == expectedCommandArgs
-        jobSpecSavedData.getJobArgs() == expectedJobArgs
-        jobSpecSavedData.getJob().getId() == jobId
-        jobSpecSavedData.getCluster().getId() == cluster1Id
-        jobSpecSavedData.getCommand().getId() == commandId
-        jobSpecSavedData.getApplications().isEmpty()
-        !jobSpecSavedData.isInteractive()
-        jobSpecSavedData.getEnvironmentVariables().size() == 19
-        jobSpecSavedData.getArchiveLocation() ==
-            Optional.of(
-                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
-                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
-                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
-            )
-        jobEnvironmentSavedData.getEnvironmentVariables() == jobSpecSavedData.getEnvironmentVariables()
-        jobEnvironmentSavedData.getMemory() == requestedMemory
-        jobEnvironmentSavedData.getCpu() == 1
-        !jobEnvironmentSavedData.getExt().isPresent()
-        !jobSpecSavedData.getTimeout().isPresent()
     }
 
     def "Can resolve a job with V4 algorithm"() {
@@ -337,12 +148,6 @@ class JobResolverServiceImplSpec extends Specification {
         def jobEnvironment = resolvedJob.getJobEnvironment()
 
         then: "It is resolved but not saved"
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> 1.0d
-        0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
         1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest0.getCriteria().getCommandCriterion(), true) >> commands
         1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest0Clusters
@@ -386,12 +191,6 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "It is resolved with archive information but not saved"
         0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> 1.0d
-        0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest1.getCriteria().getCommandCriterion(), true) >> commands
         1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest1Clusters
         1 * this.commandSelector.select(_ as CommandSelectionContext) >> commandSelectionResult
@@ -434,12 +233,6 @@ class JobResolverServiceImplSpec extends Specification {
         jobEnvironment = resolvedJob.getJobEnvironment()
 
         then: "The job is resolved and the resolution is saved"
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> 1.0d
-        0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
         1 * this.persistenceService.isApiJob(jobId) >> false
         1 * this.persistenceService.getJobRequest(jobId) >> jobRequest2
@@ -983,41 +776,6 @@ class JobResolverServiceImplSpec extends Specification {
         )
     }
 
-    def "can select proper resolution algorithm"() {
-        when: "An invalid property value is provided"
-        def useV4 = this.service.useV4ResourceSelection()
-
-        then: "V3 is used"
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> { throw new IllegalStateException() }
-        !useV4
-
-        when: "A value over 1.0 is provided"
-        useV4 = this.service.useV4ResourceSelection()
-
-        then: "It is reset to 1.0 and V4 algorithm is used"
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> JobResolverServiceImpl.MAX_V4_PROBABILITY + 0.1
-        useV4
-
-        when: "A value under 0.0 is provided"
-        useV4 = this.service.useV4ResourceSelection()
-
-        then: "It is reset to 0.0 and V3 algorithm is used"
-        1 * this.environment.getProperty(
-            JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
-            Double.class,
-            JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
-        ) >> JobResolverServiceImpl.MIN_V4_PROBABILITY - 0.1
-        !useV4
-    }
-
     def "can generate cluster criteria permutations"() {
         def commands = Sets.newHashSet(
             createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
@@ -1376,6 +1134,7 @@ class JobResolverServiceImplSpec extends Specification {
      * Helper method which creates clusters based on the criteria of the inputted command/job request.
      * Necessary to ensure in memory matching of criterion to clusters succeeds.
      */
+
     private static Set<Cluster> createClustersBasedOnCriteria(int numClusters, Command command, JobRequest jobRequest) {
         final Set<String> tags = Stream.concat(
             jobRequest

@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity>, CriteriaResolutionRepository {
+public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
 
     /**
      * The SQL to find all clusters that aren't attached to any jobs still in the database and were created before
