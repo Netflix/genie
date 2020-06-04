@@ -31,8 +31,11 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.Resource
+import org.springframework.http.HttpRange
 import org.springframework.scheduling.TaskScheduler
+import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.nio.ByteBuffer
 import java.nio.file.Paths
@@ -52,12 +55,18 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     String jobId
     DirectoryManifest manifest
     ByteString data
+    @Shared int dataSize
+    @Shared long lastOffset
+    HttpRange noRange = null
 
     void setup() {
         this.data = ByteString.copyFromUtf8("Hello World!\n")
         this.temporaryFolder.newFile("foo1.txt")
         this.temporaryFolder.newFile("foo2.txt").write(data.toStringUtf8())
         this.temporaryFolder.newFolder("bar")
+        this.dataSize = data.size()
+        this.lastOffset = dataSize - 1
+
 
         this.converter = Mock(JobDirectoryManifestProtoConverter)
         this.taskScheduler = Mock(TaskScheduler)
@@ -153,7 +162,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         StreamObserver<AgentFileMessage> s
 
         when: "Agent not connected"
-        r = service.getResource(jobId, Paths.get("foo.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo.txt"), null, noRange)
 
         then:
         !r.isPresent()
@@ -161,7 +170,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         when: "Agent connected and registered, but no manifest"
         o = service.sync(serverControlObserver)
         o.onNext(manifestMessage)
-        r = service.getResource(jobId, Paths.get("foo.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo.txt"), null, noRange)
 
         then:
         1 * converter.toManifest(manifestMessage) >> { throw new GenieConversionException("...") }
@@ -174,7 +183,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 * converter.toManifest(manifestMessage) >> manifest
 
         when: "Request a file that does not exist"
-        r = service.getResource(jobId, Paths.get("does-not-exist.txt"), null)
+        r = service.getResource(jobId, Paths.get("does-not-exist.txt"), null, noRange)
 
         then:
         1 * manifest.getEntry("does-not-exist.txt")
@@ -182,7 +191,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         !r.get().exists()
 
         when: "Request a file that is empty"
-        r = service.getResource(jobId, Paths.get("foo1.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo1.txt"), null, noRange)
 
         then:
         1 * manifest.getEntry("foo1.txt")
@@ -192,7 +201,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         r.get().exists()
 
         when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
 
         then:
         1 * manifest.getEntry("foo2.txt")
@@ -215,7 +224,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
 
         then:
         1 * manifest.getEntry("foo2.txt")
@@ -244,7 +253,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 * serverTransmitObserver.onError(_ as GenieTimeoutException)
 
         when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
 
         then:
         1 * manifest.getEntry("foo2.txt")
@@ -298,7 +307,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 * converter.toManifest(manifestMessage) >> manifest
 
         when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null)
+        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
 
         then:
         1 * manifest.getEntry("foo2.txt")
@@ -360,7 +369,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         noExceptionThrown()
-//        0 * serverTransmitObserver.onNext(ServerAckMessage.getDefaultInstance())
 
         when: "First chunk is sent with blank stream id"
         s.onNext(
@@ -371,6 +379,76 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         noExceptionThrown()
-//        0 * serverTransmitObserver.onNext(ServerAckMessage.getDefaultInstance())
+    }
+
+    @Unroll
+    def "Transfer stream with range: #range"() {
+        StreamObserver<AgentManifestMessage> o
+        Optional<Resource> r
+        ServerControlMessage c
+        Runnable t
+        StreamObserver<AgentFileMessage> s
+
+        when: "Agent connected and registered, but no manifest"
+        o = service.sync(serverControlObserver)
+        o.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> manifest
+
+        when: "Request a file"
+        r = service.getResource(jobId, Paths.get("foo2.txt"), null, range)
+
+        then:
+        1 * manifest.getEntry("foo2.txt")
+        1 * serverControlObserver.onNext(_ as ServerControlMessage) >> { args -> c = args[0] as ServerControlMessage }
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
+        c != null
+        t != null
+        r.isPresent()
+        r.get().exists()
+        c.getServerFileRequest().getStartOffset() == expectedRangeStart
+        c.getServerFileRequest().getEndOffset() == expectedRangeEnd
+
+        where:
+        range                             | expectedRangeStart | expectedRangeEnd
+        null                              | 0                  | dataSize // No range
+        HttpRange.createSuffixRange(5)    | dataSize - 5       | dataSize // Last 5 bytes
+        HttpRange.createByteRange(5)      | 5                  | dataSize // All minus first 5 bytes
+        HttpRange.createByteRange(4, 8)   | 4                  | 9        // Proper range
+        HttpRange.createSuffixRange(120)  | 0                  | dataSize // More data than it's available
+        HttpRange.createByteRange(3, 120) | 3                  | dataSize // More data than it's available
+        HttpRange.createByteRange(lastOffset, lastOffset)   | lastOffset                  | dataSize        // Last byte
+    }
+
+    @Unroll
+    def "Transfer stream with empty range: #range for #filename "() {
+        StreamObserver<AgentManifestMessage> o
+        Optional<Resource> r
+        HttpRange
+
+        when: "Agent connected and registered, but no manifest"
+        o = service.sync(serverControlObserver)
+        o.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> manifest
+
+        when: "Request a file"
+        r = service.getResource(jobId, Paths.get(filename), null, range)
+
+        then:
+        1 * manifest.getEntry(filename)
+        0 * serverControlObserver.onNext(_)
+        0 * taskScheduler.schedule(_, _)
+        r.isPresent()
+        r.get().exists()
+        r.get().getInputStream().available() == 0
+
+        where:
+        range                                 | filename
+        HttpRange.createByteRange(dataSize)   | "foo2.txt"
+        HttpRange.createByteRange(1000, 1100) | "foo2.txt"
+        HttpRange.createSuffixRange(100)      | "foo1.txt"
     }
 }

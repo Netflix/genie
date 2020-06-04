@@ -18,6 +18,8 @@
 package com.netflix.genie.web.agent.resources
 
 import com.netflix.genie.web.agent.services.AgentFileStreamService
+import org.apache.commons.lang3.tuple.ImmutablePair
+import org.apache.commons.lang3.tuple.Pair
 import spock.lang.Specification
 
 import java.nio.file.Path
@@ -31,7 +33,7 @@ class AgentFileResourceSpec extends Specification {
     Path path = Paths.get("foo/bar.txt")
 
     InputStream inputStream = Mock(InputStream)
-    URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + path)
+    URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + path, null)
     long lastModTime = 1553793121 * 1000
 
     def "Construct for resource"() {

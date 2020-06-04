@@ -19,9 +19,12 @@ package com.netflix.genie.web.util
 
 import com.google.protobuf.ByteString
 import org.apache.commons.lang3.NotImplementedException
+import org.apache.commons.lang3.StringUtils
+import org.springframework.util.unit.DataSize
 import spock.lang.Specification
 import spock.lang.Timeout
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.ThreadLocalRandom
 
 class StreamBufferSpec extends Specification {
@@ -30,7 +33,7 @@ class StreamBufferSpec extends Specification {
 
     void setup() {
         this.random = new Random()
-        this.buffer = new StreamBuffer()
+        this.buffer = new StreamBuffer(0)
     }
 
     def "Non-blocking read and write"() {
@@ -224,5 +227,65 @@ class StreamBufferSpec extends Specification {
 
         then:
         inputData == outputData
+    }
+
+    def "Input stream skip"() {
+        setup:
+        long fileSize = DataSize.ofGigabytes(10).toBytes()
+        String endOfFileData = "That's all folks!"
+        int skipOffset = (fileSize - endOfFileData.length()) as int
+        this.buffer = new StreamBuffer(skipOffset)
+        this.buffer.write(ByteString.copyFromUtf8(endOfFileData))
+        this.buffer.closeForCompleted()
+        InputStream inputStream = buffer.getInputStream()
+        int bufferSize = 4096
+        byte[] readBuffer = new byte[bufferSize]
+
+        expect:
+        inputStream.skip(skipOffset)
+
+        int bufferOffset = 0
+        while(true) {
+            int maxBytesToRead = Math.max(1, random.nextInt(bufferSize + 1 - bufferOffset))
+            int bytesRead = inputStream.read(readBuffer, bufferOffset, maxBytesToRead)
+            bufferOffset += bytesRead
+            if (bytesRead == -1) break
+        }
+        assert bufferOffset + 1 == endOfFileData.size()
+        new String(readBuffer, 0, bufferOffset + 1, StandardCharsets.UTF_8) == endOfFileData
+    }
+
+
+    def "Input stream skip using read()"() {
+        setup:
+        long fileSize = DataSize.ofGigabytes(1).toBytes()
+        String endOfFileData = "That's all folks!"
+        int skipOffset = (fileSize - endOfFileData.length()) as int
+        this.buffer = new StreamBuffer(skipOffset)
+        this.buffer.write(ByteString.copyFromUtf8(endOfFileData))
+        this.buffer.closeForCompleted()
+        InputStream inputStream = buffer.getInputStream()
+
+        expect:
+        int skippedBytes = 0
+        int bufferSize = 4096
+        byte[] readBuffer = new byte[bufferSize]
+        while (skippedBytes < skipOffset) {
+            int maxBytesToRead = Math.max(1, random.nextInt(bufferSize + 1))
+            int bytesRead = inputStream.read(readBuffer, 0, maxBytesToRead)
+            assert bytesRead > 0
+            skippedBytes += bytesRead
+        }
+        assert skippedBytes == skipOffset
+
+        int bufferOffset = 0
+        while(true) {
+            int maxBytesToRead = Math.max(1, random.nextInt(bufferSize + 1 - bufferOffset))
+            int bytesRead = inputStream.read(readBuffer, bufferOffset, maxBytesToRead)
+            bufferOffset += bytesRead
+            if (bytesRead == -1) break
+        }
+        assert bufferOffset + 1 == endOfFileData.size()
+        new String(readBuffer, 0, bufferOffset + 1, StandardCharsets.UTF_8) == endOfFileData
     }
 }
