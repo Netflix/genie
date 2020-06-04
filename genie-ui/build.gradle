@@ -44,14 +44,14 @@ node {
 }
 
 task bundle(type: NpmTask) {
-    inputs.files(fileTree("node_modules"))
-    inputs.files(fileTree("src/main/web"))
+    inputs.dir("${projectDir}/node_modules")
+    inputs.dir("${projectDir}/src/main/web")
     inputs.file("npm-shrinkwrap.json")
     inputs.file("package.json")
     inputs.file("server.js")
     inputs.file("webpack.config.js")
 
-    outputs.dir file("${project.buildDir}/web/bundle")
+    outputs.dir("${project.buildDir}/web/bundle")
 
     dependsOn npmInstall
     args = ["run", "build"]

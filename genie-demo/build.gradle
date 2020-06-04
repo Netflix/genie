@@ -17,6 +17,9 @@ def apacheImageName = "genie-demo-apache"
 def clientImageName = "genie-demo-client"
 
 task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build docker image for demo apache") {
+    onlyIf {
+        rootProject.ext.isDockerRunning()
+    }
     workingDir new File(project.projectDir, "/src/main/docker/apache")
 
     def commandArgs = new ArrayList<>()
@@ -33,6 +36,9 @@ task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build doc
 }
 
 task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build docker image for demo client") {
+    onlyIf {
+        rootProject.ext.isDockerRunning()
+    }
     workingDir new File(project.projectDir, "/src/main/docker/client")
 
     def commandArgs = new ArrayList<>()
@@ -51,7 +57,7 @@ task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build doc
 task dockerPush(group: "Docker", description: "Push the demo docker images to docker hub") {
     dependsOn parent.tasks.dockerLogin, tasks.dockerBuildApacheImage, tasks.dockerBuildClientImage
     onlyIf {
-        System.env."CI"
+        System.env."CI" && rootProject.ext.isDockerRunning()
     }
     doLast {
         for (String tag : rootProject.ext.getDockerTags(apacheImageName, project.version.toString())) {

@@ -443,6 +443,25 @@ gitPublishPush {
  * Docker Tasks
  **********************************/
 
+ext.isDockerRunning = {
+    def dummyOutputStream = new OutputStream() {
+        @Override
+        void write(int b) {}
+    }
+    // See: https://docs.docker.com/config/daemon/#check-whether-docker-is-running
+    def dockerRunning = exec {
+        executable "docker"
+        args "info"
+        ignoreExitValue true
+        standardOutput dummyOutputStream
+        errorOutput dummyOutputStream
+    }
+    if (dockerRunning.exitValue != 0) {
+        println("Docker not running.")
+    }
+    return dockerRunning.exitValue == 0
+}
+
 ext.getDockerTags = { String appName, String projectVersion ->
     def tags = ["netflixoss/${appName}:${projectVersion}"]
     if (!projectVersion.contains("SNAPSHOT") && !projectVersion.contains("-rc.")) {
@@ -457,15 +476,24 @@ ext.getDockerTags = { String appName, String projectVersion ->
 }
 
 task dockerLogout(type: Exec, group: "Docker", description: "Logout of docker hub") {
+    onlyIf {
+        rootProject.ext.isDockerRunning()
+    }
     commandLine "docker", "logout"
 }
 
 task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub using DOCKER_USER and DOCKER_PASSWORD environment variables") {
+    onlyIf {
+        rootProject.ext.isDockerRunning()
+    }
     dependsOn tasks.dockerLogout
     commandLine "docker", "login", "-u", System.getenv("DOCKER_USER"), "-p", System.getenv("DOCKER_PASSWORD")
 }
 
 task dockerBuildAllImages(group: "Docker", description: "Container task for all docker image builds") {
+    onlyIf {
+        rootProject.ext.isDockerRunning()
+    }
     dependsOn ":genie-app:dockerBuildAppImage"
     dependsOn ":genie-demo:dockerBuildApacheImage"
     dependsOn ":genie-demo:dockerBuildClientImage"
