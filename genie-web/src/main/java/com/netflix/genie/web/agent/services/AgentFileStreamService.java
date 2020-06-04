@@ -19,7 +19,9 @@ package com.netflix.genie.web.agent.services;
 
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpRange;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.net.URI;
 import java.nio.file.Path;
@@ -44,9 +46,15 @@ public interface AgentFileStreamService {
      * @param jobId        the job id
      * @param relativePath the relative path in the job directory
      * @param uri          the file uri //TODO redundant
+     * @param range        the list of ranges requested (RFC 7233) or null if no range is specified
      * @return an optional {@link Resource}
      */
-    Optional<AgentFileResource> getResource(@NotBlank String jobId, Path relativePath, URI uri);
+    Optional<AgentFileResource> getResource(
+        @NotBlank String jobId,
+        Path relativePath,
+        URI uri,
+        @Nullable HttpRange range
+    );
 
     /**
      * Returns the manifest for a given job, boxed in an {@link Optional}.

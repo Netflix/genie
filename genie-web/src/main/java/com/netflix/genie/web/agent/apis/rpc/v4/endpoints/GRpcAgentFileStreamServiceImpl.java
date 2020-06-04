@@ -37,6 +37,7 @@ import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.Nullable;
@@ -84,6 +85,7 @@ public class GRpcAgentFileStreamServiceImpl
     private final JobDirectoryManifestProtoConverter converter;
     private final TaskScheduler taskScheduler;
     private final MeterRegistry registry;
+    private final Class<? extends HttpRange> suffixRangeClass = HttpRange.createSuffixRange(1).getClass();
 
     /**
      * Constructor.
@@ -108,7 +110,12 @@ public class GRpcAgentFileStreamServiceImpl
      * {@inheritDoc}
      */
     @Override
-    public Optional<AgentFileResource> getResource(final String jobId, final Path relativePath, final URI uri) {
+    public Optional<AgentFileResource> getResource(
+        final String jobId,
+        final Path relativePath,
+        final URI uri,
+        @Nullable final HttpRange range
+    ) {
 
         final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
         if (streamObserver == null) {
@@ -144,13 +151,25 @@ public class GRpcAgentFileStreamServiceImpl
             jobId
         );
 
-        // TODO: code upstream of here assumes files is requested in its entirety.
-        // But rest of the code downstream actually treats everything as a range request.
-        final int startOffset = 0;
-        final int endOffset = Math.toIntExact(manifestEntry.getSize());
+        final int fileSize = Math.toIntExact(manifestEntry.getSize());
+
+        // Http range is inclusive, protocol is not. Cannot just use range values as-is
+        final int startOffset;
+        final int endOffset;
+
+        if (range == null) {
+            startOffset = 0;
+            endOffset = fileSize;
+        } else if (range.getClass() == suffixRangeClass) {
+            startOffset = Math.toIntExact(range.getRangeStart(fileSize));
+            endOffset = fileSize;
+        } else {
+            startOffset = Math.min(fileSize, Math.toIntExact(range.getRangeStart(fileSize)));
+            endOffset = 1 + Math.toIntExact(range.getRangeEnd(fileSize));
+        }
 
         // Allocate and park the buffer that will store the data in transit.
-        final StreamBuffer buffer = new StreamBuffer();
+        final StreamBuffer buffer = new StreamBuffer(startOffset);
 
         if (endOffset - startOffset == 0) {
             log.debug("Transfer {} file is empty, completing", fileTransferId);

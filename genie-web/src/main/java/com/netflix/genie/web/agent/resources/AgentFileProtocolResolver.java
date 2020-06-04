@@ -24,12 +24,15 @@ import org.apache.http.client.utils.URIBuilder;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpRange;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Resource resolver for files local to an agent running a job that can be streamed to the server and served via API.
@@ -60,17 +63,23 @@ public class AgentFileProtocolResolver implements ProtocolResolver {
     /**
      * Create a URI for the given remote agent file.
      *
-     * @param jobId the job id
-     * @param path  the path of the file within the job directory
+     * @param jobId       the job id
+     * @param path        the path of the file within the job directory
+     * @param rangeHeader the request range header (as per RFC 7233)
      * @return a {@link URI} representing the remote agent file
      * @throws URISyntaxException if constructing the URI fails
      */
-    public static URI createUri(final String jobId, final String path) throws URISyntaxException {
+    public static URI createUri(
+        final String jobId,
+        final String path,
+        @Nullable final String rangeHeader
+    ) throws URISyntaxException {
         final String encodedJobId = Base64.encodeBase64URLSafeString(jobId.getBytes(Charset.defaultCharset()));
         return new URIBuilder()
             .setScheme(URI_SCHEME)
             .setHost(encodedJobId)
             .setPath(path)
+            .setFragment(rangeHeader)
             .build();
     }
 
@@ -107,12 +116,30 @@ public class AgentFileProtocolResolver implements ProtocolResolver {
             return null;
         }
 
+        final String rangeHeader = uri.getFragment();
+
+        final List<HttpRange> ranges;
+        try {
+            ranges = HttpRange.parseRanges(rangeHeader);
+        } catch (final IllegalArgumentException | NullPointerException e) {
+            log.warn("Invalid range header '{}' (Error message: {}).", rangeHeader, e.getMessage());
+            return null;
+        }
+
+        if (ranges.size() > 1) {
+            log.warn("Multiple HTTP ranges not supported");
+            return null;
+        }
+
+        final HttpRange rangeOrNull = ranges.isEmpty() ? null : ranges.get(0);
+
         final AgentFileStreamService.AgentFileResource resourceOrNull =
-            agentFileStreamService.getResource(jobId, relativePath, uri).orElse(null);
+            agentFileStreamService.getResource(jobId, relativePath, uri, rangeOrNull).orElse(null);
 
         if (resourceOrNull != null) {
             log.debug("Returning resource: {}", resourceOrNull.getDescription());
         }
+
         return resourceOrNull;
     }
 }

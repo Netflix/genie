@@ -18,8 +18,10 @@
 package com.netflix.genie.web.agent.resources
 
 import com.netflix.genie.web.agent.services.AgentFileStreamService
+import org.apache.commons.lang3.tuple.ImmutablePair
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
+import org.springframework.http.HttpRange
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -43,19 +45,54 @@ class AgentFileProtocolResolverSpec extends Specification {
         )
     }
 
-    def "Resolve successfully"() {
+    @Unroll
+    def "Resolve successfully with range header #rangeHeader"() {
         setup:
         String jobId = UUID.randomUUID().toString()
         Path relativePath = Paths.get("foo/bar.txt")
-        URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + relativePath)
+        URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + relativePath, rangeHeader)
 
         String location = uri.toString()
         when:
         Resource r = resolver.resolve(location, resourceLoader)
 
         then:
-        1 * fileStreamService.getResource(jobId, relativePath, uri) >> Optional.of(resource)
+        1 * fileStreamService.getResource(jobId, relativePath, uri, httpRange) >> Optional.of(resource)
         r == resource
+
+        where:
+        rangeHeader   | httpRange
+        null          | null
+        ""            | null
+        "bytes=10-20" | HttpRange.createByteRange(10, 20)
+        "bytes=-20"   | HttpRange.createSuffixRange(20)
+        "bytes=20-"   | HttpRange.createByteRange(20)
+        "bytes=10-10" | HttpRange.createByteRange(10, 10)
+    }
+
+    @Unroll
+    def "Reject invalid range header #rangeHeader"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        Path relativePath = Paths.get("foo/bar.txt")
+        URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + relativePath, rangeHeader)
+
+        String location = uri.toString()
+        when:
+        Resource r = resolver.resolve(location, resourceLoader)
+
+        then:
+        r == null
+
+        where:
+        rangeHeader          | _
+        "blah"               | _
+        "10-20"              | _
+        "-20"                | _
+        "20-"                | _
+        "lines=10-20"        | _
+        "bytes=20-10"        | _
+        "bytes=10-20, 30-40" | _
     }
 
     def "Invalid URI"() {
@@ -81,7 +118,7 @@ class AgentFileProtocolResolverSpec extends Specification {
     def "URI representation for job ID: #jobId path: #path"() {
 
         when:
-        URI uri = AgentFileProtocolResolver.createUri(jobId, path)
+        URI uri = AgentFileProtocolResolver.createUri(jobId, path, null)
 
         then:
         AgentFileProtocolResolver.getAgentResourceURIFilePath(uri) == path
@@ -102,7 +139,7 @@ class AgentFileProtocolResolverSpec extends Specification {
     def "URI representation: #path -> #expectedPath"() {
 
         when:
-        URI uri = AgentFileProtocolResolver.createUri(jobId, path)
+        URI uri = AgentFileProtocolResolver.createUri(jobId, path, null)
 
         then:
         AgentFileProtocolResolver.getAgentResourceURIFilePath(uri) == expectedPath

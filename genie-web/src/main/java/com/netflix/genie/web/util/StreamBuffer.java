@@ -32,6 +32,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * To avoid in-memory data growing excessively, this buffer stores a single "chunk" at the time.
  * Only after a chunk is consumed, a new one can be appended.
+ * <p>
+ * To support range requests in a memory-efficient way, {@link StreamBufferInputStream} also allows skipping the first
+ * {@code skipOffset - 1} bytes without allocating memory (or worse: downloading the actual bytes only to have them
+ * thrown away to get to the actual range)
  *
  * @author mprimi
  * @since 4.0.0
@@ -49,9 +53,10 @@ public class StreamBuffer {
 
     /**
      * Constructor.
+     * @param skipOffset index of the first actual byte to return (
      */
-    public StreamBuffer() {
-        this.inputStreamRef.set(new StreamBufferInputStream(this));
+    public StreamBuffer(final int skipOffset) {
+        this.inputStreamRef.set(new StreamBufferInputStream(this, skipOffset));
     }
 
     /**
@@ -158,9 +163,11 @@ public class StreamBuffer {
 
     private static class StreamBufferInputStream extends InputStream {
         private final StreamBuffer streamBuffer;
+        private int skipBytesLeft;
 
-        StreamBufferInputStream(final StreamBuffer streamBuffer) {
+        StreamBufferInputStream(final StreamBuffer streamBuffer, final int skipOffset) {
             this.streamBuffer = streamBuffer;
+            this.skipBytesLeft = skipOffset;
         }
 
         /**
@@ -182,6 +189,14 @@ public class StreamBuffer {
                 throw new IndexOutOfBoundsException("Invalid read( b[" + b.length + "], " + off + ", " + len + ")");
             }
 
+            // Efficiently skip over range of bytes that should be ignored
+            if (this.skipBytesLeft > 0) {
+                final int skippedBytesRead = Math.min(this.skipBytesLeft, len);
+                System.arraycopy(new byte[skippedBytesRead], 0, b, off, skippedBytesRead);
+                this.skipBytesLeft -= skippedBytesRead;
+                return skippedBytesRead;
+            }
+
             final byte[] temporary = new byte[len];
 
             final int bytesRead = this.streamBuffer.read(temporary);
@@ -191,6 +206,21 @@ public class StreamBuffer {
             }
 
             return bytesRead;
+        }
+
+        @Override
+        public long skip(final long n) throws IOException {
+            long skipped = 0;
+            if (this.skipBytesLeft > 0) {
+                skipped = Math.min(n, this.skipBytesLeft);
+                this.skipBytesLeft -= skipped;
+            }
+
+            if (skipped < n) {
+                skipped += super.skip(n - skipped);
+            }
+
+            return skipped;
         }
     }
 

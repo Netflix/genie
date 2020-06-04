@@ -34,11 +34,11 @@ import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException
 import com.netflix.genie.web.exceptions.checked.NotFoundException
 import com.netflix.genie.web.services.ArchivedJobService
-import com.netflix.genie.web.services.JobDirectoryServerService
 import com.netflix.genie.web.services.JobFileService
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -57,7 +57,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     static final String JOB_ID = "123456"
     static final String REL_PATH = "bar/foo.txt"
     static final URL BASE_URL = new URL("https", "genie.com", 8080, "/jobs/" + JOB_ID + "/output/" + REL_PATH)
-    static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + REL_PATH)
+    static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + REL_PATH, null)
     static final URI EXPECTED_V3_JOB_DIR_URI = new URI("file:/tmp/genie/jobs/" + JOB_ID)
 
     ResourceLoader resourceLoader
@@ -65,7 +65,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     JobFileService jobFileService
     AgentFileStreamService agentFileStreamService
     MeterRegistry meterRegistry
-    JobDirectoryServerService service
+    JobDirectoryServerServiceImpl service
     HttpServletRequest request
     HttpServletResponse response
     DirectoryManifest manifest
@@ -164,6 +164,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.persistenceService.isV4(JOB_ID) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
+        1 * this.request.getHeader(HttpHeaders.RANGE)
         1 * this.manifest.getEntry(REL_PATH) >> Optional.of(this.manifestEntry)
         1 * this.manifestEntry.isDirectory() >> false
         1 * this.manifestEntry.getPath() >> REL_PATH
@@ -171,6 +172,36 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
         1 * this.handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> this.handler
         1 * this.handler.handleRequest(this.request, this.response)
+    }
+
+    @Unroll
+    def "ServeResource -- Active V4 job with range: #rangeHeader"() {
+        setup:
+        String expectedResourceUri = EXPECTED_V4_FILE_URI.toString() + (rangeHeader != null ? ("#" + rangeHeader) : "")
+
+        when:
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
+        1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
+        1 * this.manifest.getEntry(REL_PATH) >> Optional.of(this.manifestEntry)
+        1 * this.request.getHeader(HttpHeaders.RANGE) >> rangeHeader
+        1 * this.manifestEntry.isDirectory() >> false
+        1 * this.manifestEntry.getPath() >> REL_PATH
+        1 * this.resourceLoader.getResource(expectedResourceUri) >> this.resource
+        1 * this.manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
+        1 * this.handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> this.handler
+        1 * this.handler.handleRequest(this.request, this.response)
+
+        where:
+        rangeHeader   | _
+        null          | _
+        "bytes=10-20" | _
+        "bytes=10-"   | _
+        "bytes=-20"   | _
     }
 
     def "ServeResource -- Active V3 job"() {

@@ -195,8 +195,9 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             manifest = this.agentFileStreamService.getManifest(jobId).orElseThrow(
                 () -> new GenieServerUnavailableException("Manifest not found for job " + jobId)
             );
+            final String rangeHeader = request.getHeader(HttpHeaders.RANGE);
             try {
-                jobDirRoot = AgentFileProtocolResolver.createUri(jobId, SLASH);
+                jobDirRoot = AgentFileProtocolResolver.createUri(jobId, SLASH, rangeHeader);
             } catch (final URISyntaxException e) {
                 throw new GenieServerException("Failed to construct job directory path", e);
             }
@@ -314,8 +315,10 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             }
         } else {
             final URI location = jobDirectoryRoot.resolve(entry.getPath());
-            log.debug("Get resource: {}", location);
-            final Resource jobResource = this.resourceLoader.getResource(location.toString());
+            final String locationString = location.toString()
+                + (jobDirectoryRoot.getFragment() != null ? ("#" + jobDirectoryRoot.getFragment()) : "");
+            log.debug("Get resource: {}", locationString);
+            final Resource jobResource = this.resourceLoader.getResource(locationString);
             // Every file really should have a media type but if not use text/plain
             final String mediaType = entry.getMimeType().orElse(MediaType.TEXT_PLAIN_VALUE);
             final ResourceHttpRequestHandler handler = this.genieResourceHandlerFactory.get(mediaType, jobResource);
