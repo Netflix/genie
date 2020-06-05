@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -176,55 +176,61 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
+<td class="colFirst"><code>com.netflix.genie.proto.ConfigureRequest</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toConfigureRequestProto-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">toConfigureRequestProto</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
+<div class="block">Convert parameters into ConfigureRequest for the server.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.proto.DryRunJobSpecificationRequest</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toDryRunJobSpecificationRequestProto-com.netflix.genie.common.external.dtos.v4.AgentJobRequest-">toDryRunJobSpecificationRequestProto</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentJobRequest.html" title="interface in com.netflix.genie.common.external.dtos.v4">AgentJobRequest</a>&nbsp;jobRequest)</code>
 <div class="block">Convert a V4 Job Request DTO into a gRPC dry run resolve job specification request to be sent to the server.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.proto.HandshakeRequest</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toHandshakeRequestProto-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">toHandshakeRequestProto</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Convert parameters into HandshakeRequest for the server.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toJobRequestDto-com.netflix.genie.proto.DryRunJobSpecificationRequest-">toJobRequestDto</a></span>(com.netflix.genie.proto.DryRunJobSpecificationRequest&nbsp;request)</code>
 <div class="block">Convert a gRPC request to dry run a job specification resolution into a <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> for use within
  Genie server codebase.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toJobRequestDto-com.netflix.genie.proto.ReserveJobIdRequest-">toJobRequestDto</a></span>(com.netflix.genie.proto.ReserveJobIdRequest&nbsp;request)</code>
 <div class="block">Convert a gRPC reserve job id request into a V4 Job Request DTO for use within Genie codebase.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toJobSpecificationDto-com.netflix.genie.proto.JobSpecification-">toJobSpecificationDto</a></span>(com.netflix.genie.proto.JobSpecification&nbsp;protoSpec)</code>
 <div class="block">Convert a response from server into a Job Specification DTO which can be used in the codebase free of gRPC.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.proto.JobSpecification</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toJobSpecificationProto-com.netflix.genie.common.external.dtos.v4.JobSpecification-">toJobSpecificationProto</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification)</code>
 <div class="block">Convert a Job Specification DTO to a protobuf message representation.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.proto.JobSpecificationRequest</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toJobSpecificationRequestProto-java.lang.String-">toJobSpecificationRequestProto</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Generate a <code>JobSpecificationRequest</code> from the given job id.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.proto.JobSpecificationResponse</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toJobSpecificationResponseProto-com.netflix.genie.common.external.dtos.v4.JobSpecification-">toJobSpecificationResponseProto</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification)</code>
 <div class="block">Build a <code>JobSpecificationResponse</code> out of the given <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobSpecification</code></a>.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.proto.ReserveJobIdRequest</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toReserveJobIdRequestProto-com.netflix.genie.common.external.dtos.v4.AgentJobRequest-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">toReserveJobIdRequestProto</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentJobRequest.html" title="interface in com.netflix.genie.common.external.dtos.v4">AgentJobRequest</a>&nbsp;jobRequest,
                           <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
@@ -474,7 +480,7 @@ extends java.lang.Object</pre>
 <a name="toHandshakeRequestProto-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>toHandshakeRequestProto</h4>
 <pre>public&nbsp;com.netflix.genie.proto.HandshakeRequest&nbsp;toHandshakeRequestProto(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)
@@ -485,6 +491,25 @@ extends java.lang.Object</pre>
 <dd><code>agentClientMetadata</code> - agent client metadata</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <code>HandshakeRequest</code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieConversionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieConversionException</a></code> - if the inputs are invalid</dd>
+</dl>
+</li>
+</ul>
+<a name="toConfigureRequestProto-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toConfigureRequestProto</h4>
+<pre>public&nbsp;com.netflix.genie.proto.ConfigureRequest&nbsp;toConfigureRequestProto(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)
+                                                                 throws <a href="../../../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieConversionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieConversionException</a></pre>
+<div class="block">Convert parameters into ConfigureRequest for the server.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentClientMetadata</code> - agent client metadata</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a <code>ConfigureRequest</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieConversionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieConversionException</a></code> - if the inputs are invalid</dd>
 </dl>

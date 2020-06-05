@@ -832,24 +832,34 @@ b.conum * { color: inherit !important; }
 <li><a href="#_wrap_up_6">8.4. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_properties">9. Properties</a>
+<li><a href="#_properties">9. Properties</a></li>
+<li><a href="#_genie_web">10. Genie Web</a>
 <ul class="sectlevel2">
-<li><a href="#_default_properties">9.1. Default Properties</a>
+<li><a href="#_default_properties">10.1. Default Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_genie_properties">9.1.1. Genie Properties</a></li>
-<li><a href="#_spring_properties">9.1.2. Spring Properties</a></li>
-<li><a href="#_spring_cloud_properties">9.1.3. Spring Cloud Properties</a></li>
-<li><a href="#_grpc_server_properties">9.1.4. gRPC Server properties</a></li>
+<li><a href="#_genie_properties">10.1.1. Genie Properties</a></li>
+<li><a href="#_spring_properties">10.1.2. Spring Properties</a></li>
+<li><a href="#_spring_cloud_properties">10.1.3. Spring Cloud Properties</a></li>
+<li><a href="#_grpc_server_properties">10.1.4. gRPC Server properties</a></li>
 </ul>
 </li>
-<li><a href="#_profile_specific_properties">9.2. Profile Specific Properties</a>
+<li><a href="#_profile_specific_properties">10.2. Profile Specific Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_prod_profile">9.2.1. Prod Profile</a></li>
+<li><a href="#_prod_profile">10.2.1. Prod Profile</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_metrics">10. Metrics</a></li>
+<li><a href="#_genie_agent">11. Genie Agent</a>
+<ul class="sectlevel2">
+<li><a href="#_default_properties_2">11.1. Default Properties</a>
+<ul class="sectlevel3">
+<li><a href="#_genie_properties_2">11.1.1. Genie Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_metrics">12. Metrics</a></li>
 </ul>
 </div>
 </div>
@@ -4755,6 +4765,12 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="sect1">
 <h2 id="_properties"><a class="anchor" href="#_properties"></a><a class="link" href="#_properties">9. Properties</a></h2>
 <div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_genie_web"><a class="anchor" href="#_genie_web"></a><a class="link" href="#_genie_web">10. Genie Web</a></h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
@@ -4762,9 +4778,9 @@ For more information on Spring properties you should see the
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
-<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a><a class="link" href="#_default_properties">9.1. Default Properties</a></h3>
+<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a><a class="link" href="#_default_properties">10.1. Default Properties</a></h3>
 <div class="sect3">
-<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a><a class="link" href="#_genie_properties">9.1.1. Genie Properties</a></h4>
+<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a><a class="link" href="#_genie_properties">10.1.1. Genie Properties</a></h4>
 <div class="paragraph">
 <p>Properties marked 'dynamic' reflect change of property value in the environment happening at runtime.
 Whereas static properties values are bound during application startup and do not change after the application is up and running.</p>
@@ -4785,6 +4801,24 @@ Whereas static properties values are bound during application startup and do not
 </tr>
 </thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.agent-properties-filter-pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Regular expression applied to filter server properties that are forwarded to the agent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">^genie\.agent\.runtime\..*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.cache-expiration-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval after which the agent properties cache is considered stale and re-calculated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.cache-refresh-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for after which the agent properties cache is forcefully refreshed in case of no access</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to <code>true</code>, enables the built-in agent filter service. The filter behavior is controlled by other active <code>genie.agent.filter.*</code> properties.</p></td>
@@ -4867,6 +4901,12 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to launch the agent subprocess as the user specified in the job request</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.runtime.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties with this prefix are forwarded to each agent during startup</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
@@ -5482,7 +5522,7 @@ to the number of CPU cores x 2 + 1</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">9.1.2. Spring Properties</a></h4>
+<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">10.1.2. Spring Properties</a></h4>
 <div class="paragraph">
 <p><a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
@@ -5634,7 +5674,7 @@ for more information. Currently on classpath only none, redis and jdbc will work
 </table>
 </div>
 <div class="sect3">
-<h4 id="_spring_cloud_properties"><a class="anchor" href="#_spring_cloud_properties"></a><a class="link" href="#_spring_cloud_properties">9.1.3. Spring Cloud Properties</a></h4>
+<h4 id="_spring_cloud_properties"><a class="anchor" href="#_spring_cloud_properties"></a><a class="link" href="#_spring_cloud_properties">10.1.3. Spring Cloud Properties</a></h4>
 <div class="paragraph">
 <p>Properties set by default to manipulate various <a href="https://projects.spring.io/spring-cloud/">Spring Cloud</a> libraries.</p>
 </div>
@@ -5689,7 +5729,7 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 </table>
 </div>
 <div class="sect3">
-<h4 id="_grpc_server_properties"><a class="anchor" href="#_grpc_server_properties"></a><a class="link" href="#_grpc_server_properties">9.1.4. gRPC Server properties</a></h4>
+<h4 id="_grpc_server_properties"><a class="anchor" href="#_grpc_server_properties"></a><a class="link" href="#_grpc_server_properties">10.1.4. gRPC Server properties</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -5717,9 +5757,9 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a><a class="link" href="#_profile_specific_properties">9.2. Profile Specific Properties</a></h3>
+<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a><a class="link" href="#_profile_specific_properties">10.2. Profile Specific Properties</a></h3>
 <div class="sect3">
-<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a><a class="link" href="#_prod_profile">9.2.1. Prod Profile</a></h4>
+<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a><a class="link" href="#_prod_profile">10.2.1. Prod Profile</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -5781,7 +5821,139 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 </div>
 </div>
 <div class="sect1">
-<h2 id="_metrics"><a class="anchor" href="#_metrics"></a><a class="link" href="#_metrics">10. Metrics</a></h2>
+<h2 id="_genie_agent"><a class="anchor" href="#_genie_agent"></a><a class="link" href="#_genie_agent">11. Genie Agent</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes the various properties that can be set to control the behavior of the Genie agent.</p>
+</div>
+<div class="paragraph">
+<p>Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
+The server also has a chance to override them during the 'Agent Configuration' execution stage.</p>
+</div>
+<div class="sect2">
+<h3 id="_default_properties_2"><a class="anchor" href="#_default_properties_2"></a><a class="link" href="#_default_properties_2">11.1. Default Properties</a></h3>
+<div class="sect3">
+<h4 id="_genie_properties_2"><a class="anchor" href="#_genie_properties_2"></a><a class="link" href="#_genie_properties_2">11.1.1. Genie Properties</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.emergency-shutdown-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time allowed to the agent to shut down cleanly (archive, cleanup, &#8230;&#8203;) before the JVM is forcefully shut down</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5m</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.force-manifest-refresh-timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum time block when trying to forcefully push a manifest update</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.error-back-off.delay-type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scheduling policy for backoff in case of error during file streaming</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FROM_PREVIOUS_EXECUTION_BEGIN</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.error-back-off.min-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum delay before another attempt during file streaming</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.error-back-off.max-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum delay before another attempt during file streaming</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.error-back-off.factor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor for retry delay before another attempt during file streaming</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.enable-compression</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to enable compression when transmitting file chunks to the server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.data-chunk-max-size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max size of a file chunk sent to the server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1MB</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.max-concurrent-streams</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of files transmitted concurrently to the server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.file-stream-service.drain-timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum time a file transfer is allowed to complete before it is terminated during agent shutdown</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Should be lower then <code>genie.agent.runtime.emergency-shutdown-delay</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.heart-beat-service.interval</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval between heartbeats</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.heart-beat-service.error-retry-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval to wait before re-establishing the heartbeat stream</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.delay-type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scheduling policy for backoff in case of error during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FROM_PREVIOUS_EXECUTION_COMPLETION</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.min-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum delay before another attempt during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">500ms</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.max-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximium delay before another attempt during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.factor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor for retry delay before another attempt during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_metrics"><a class="anchor" href="#_metrics"></a><a class="link" href="#_metrics">12. Metrics</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following is an extensive list of metrics (counters, timers, gauges, &#8230;&#8203;) published organically by Genie, in addition to metrics published by Spring, JVM and system metrics and statistics.</p>
@@ -6553,7 +6725,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-06-05 16:44:30 UTC
+Last updated 2020-06-05 22:03:56 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

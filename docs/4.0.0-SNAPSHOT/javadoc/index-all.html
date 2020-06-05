@@ -392,6 +392,29 @@
 <dd>
 <div class="block">Builder to create an immutable <a href="com/netflix/genie/common/external/dtos/v4/AgentConfigRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>AgentConfigRequest</code></a> instance.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AgentConfigurationProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentConfigurationProperties.html#AgentConfigurationProperties--">AgentConfigurationProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><span class="typeNameLink">AgentConfigurationService</span></a> - Interface in <a href="com/netflix/genie/web/agent/services/package-summary.html">com.netflix.genie.web.agent.services</a></dt>
+<dd>
+<div class="block">Service that provides agent runtime configuration (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">agentConfigurationService(AgentConfigurationProperties, Environment)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><span class="typeNameLink">AgentConfigurationServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/agent/services/impl/package-summary.html">com.netflix.genie.web.agent.services.impl</a></dt>
+<dd>
+<div class="block">This implementation of <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> forwards properties set on the server that match a given
+ set of regular expressions, plus any additional ones specified in configuration.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">AgentConfigurationServiceImpl(AgentConfigurationProperties, Environment)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><span class="typeNameLink">AgentConnectionEntity</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/entities/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.entities</a></dt>
 <dd>
 <div class="block">Agent Connection Entity.</div>
@@ -453,7 +476,7 @@
 <dd>
 <div class="block">This service regularly produces a manifest of the executing job folder and pushes it to the server.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentFileStreamService-com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub-org.springframework.scheduling.TaskScheduler-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">agentFileStreamService(FileStreamServiceGrpc.FileStreamServiceStub, TaskScheduler, JobDirectoryManifestProtoConverter, JobDirectoryManifestCreatorService)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentFileStreamService-com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub-org.springframework.scheduling.TaskScheduler-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.agent.properties.AgentProperties-">agentFileStreamService(FileStreamServiceGrpc.FileStreamServiceStub, TaskScheduler, JobDirectoryManifestProtoConverter, JobDirectoryManifestCreatorService, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy gRPC agent file stream service if one isn't already defined.</div>
 </dd>
@@ -493,7 +516,7 @@
 <dd>
 <div class="block">Service that maintains an active connection with a Genie server node by sending heart beats.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentHeartBeatService-com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub-org.springframework.scheduling.TaskScheduler-">agentHeartBeatService(HeartBeatServiceGrpc.HeartBeatServiceStub, TaskScheduler)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentHeartBeatService-com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">agentHeartBeatService(HeartBeatServiceGrpc.HeartBeatServiceStub, TaskScheduler, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy gRPC agent heart beat service if one isn't already defined.</div>
 </dd>
@@ -526,7 +549,7 @@
 <div class="block">Register an agent to listen for job kill messages from the server
  and respond to them.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-">agentJobKillService(JobKillServiceGrpc.JobKillServiceFutureStub, KillService, TaskScheduler)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">agentJobKillService(JobKillServiceGrpc.JobKillServiceFutureStub, KillService, TaskScheduler, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy gRPC agent job kill service bean if one isn't already defined.</div>
 </dd>
@@ -554,7 +577,7 @@
 <dd>
 <div class="block">A Service to collect the logic for implementing calls from the Agent when a job is launched via the CLI.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">agentJobService(DataServices, JobResolverService, AgentFilterService, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-com.netflix.genie.web.agent.services.AgentConfigurationService-io.micrometer.core.instrument.MeterRegistry-">agentJobService(DataServices, JobResolverService, AgentFilterService, AgentConfigurationService, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get a <a href="com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> instance if there isn't already one.</div>
 </dd>
@@ -562,7 +585,7 @@
 <dd>
 <div class="block">Default implementation of <a href="com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">AgentJobServiceImpl(DataServices, JobResolverService, AgentFilterService, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-com.netflix.genie.web.agent.services.AgentConfigurationService-io.micrometer.core.instrument.MeterRegistry-">AgentJobServiceImpl(DataServices, JobResolverService, AgentFilterService, AgentConfigurationService, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -637,6 +660,12 @@
 <div class="block">Component that inspects an Agent client metadata and makes decision on whether it is allowed to proceed.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#agentPid">agentPid</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">AgentProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
+<dd>
+<div class="block">Root properties class for agent.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/AgentProperties.html#AgentProperties--">AgentProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/agent/resources/AgentResourcesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.resources"><span class="typeNameLink">AgentResourcesAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/web/spring/autoconfigure/agent/resources/package-summary.html">com.netflix.genie.web.spring.autoconfigure.agent.resources</a></dt>
 <dd>
@@ -998,6 +1027,8 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ClaimJobStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ClaimJobStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ClaimJobStage</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CleanupJobDirectoryStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CleanupJobDirectoryStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CleanupJobDirectoryStage</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureAgentStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureAgentStage</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureExecutionStage</a></dt>
 <dd>&nbsp;</dd>
@@ -1904,6 +1935,10 @@
 <dd>
 <div class="block">Execution stages of Agent state machine.</div>
 </dd>
+<dt><a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a> - package com.netflix.genie.agent.properties</dt>
+<dd>
+<div class="block">Agent properties.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/rpc/package-summary.html">com.netflix.genie.agent.rpc</a> - package com.netflix.genie.agent.rpc</dt>
 <dd>
 <div class="block">RPC clients and utilities.</div>
@@ -2619,6 +2654,34 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CONFIGS">CONFIGS</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/AgentJobService.html#configure-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">configure(AgentClientMetadata)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a></dt>
+<dd>
+<div class="block">Obtain server-provided configuration properties.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#configure-com.netflix.genie.proto.ConfigureRequest-io.grpc.stub.StreamObserver-">configure(ConfigureRequest, StreamObserver&lt;ConfigureResponse&gt;)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobServiceImpl</a></dt>
+<dd>
+<div class="block">This API provides runtime configuration to the agent (example: timeouts, parallelism, etc.).</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">ConfigureAgentStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
+<dd>
+<div class="block">Configures the agent with server-provided runtime parameters that are independent of the job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureAgentStage.html#ConfigureAgentStage-com.netflix.genie.agent.execution.services.AgentJobService-">ConfigureAgentStage(AgentJobService)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureAgentStage</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/exceptions/ConfigureException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">ConfigureException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/exceptions/package-summary.html">com.netflix.genie.agent.execution.exceptions</a></dt>
+<dd>
+<div class="block">Failure to obtain configuration properties from server.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/exceptions/ConfigureException.html#ConfigureException-java.lang.String-">ConfigureException(String)</a></span> - Constructor for exception com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/ConfigureException.html" title="class in com.netflix.genie.agent.execution.exceptions">ConfigureException</a></dt>
+<dd>
+<div class="block">Constructor with message.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/exceptions/ConfigureException.html#ConfigureException-java.lang.String-java.lang.Throwable-">ConfigureException(String, Throwable)</a></span> - Constructor for exception com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/ConfigureException.html" title="class in com.netflix.genie.agent.execution.exceptions">ConfigureException</a></dt>
+<dd>
+<div class="block">Constructor with message and cause.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">ConfigureExecutionStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>
 <div class="block">Sets up context state based on the type of execution and other command-line parameters.</div>
@@ -3606,8 +3669,10 @@
 <dd>
 <div class="block">Stores runtime information that is passed from one state to the next.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.html#ExecutionContext--">ExecutionContext()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a></dt>
-<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.html#ExecutionContext-com.netflix.genie.agent.properties.AgentProperties-">ExecutionContext(AgentProperties)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">ExecutionContext.TransitionExceptionRecord</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
 <dd>
 <div class="block">Data object that contains an exception and the state in which it was encountered.</div>
@@ -3699,6 +3764,10 @@
 <dd>
 <div class="block">Trigger implementation whose scheduling delay grows exponentially based on a given factor.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html#ExponentialBackOffTrigger-com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties-">ExponentialBackOffTrigger(ExponentialBackOffTriggerProperties)</a></span> - Constructor for class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html" title="class in com.netflix.genie.common.internal.util">ExponentialBackOffTrigger</a></dt>
+<dd>
+<div class="block">Constructor with properties.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html#ExponentialBackOffTrigger-com.netflix.genie.common.internal.util.ExponentialBackOffTrigger.DelayType-long-long-float-">ExponentialBackOffTrigger(ExponentialBackOffTrigger.DelayType, long, long, float)</a></span> - Constructor for class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html" title="class in com.netflix.genie.common.internal.util">ExponentialBackOffTrigger</a></dt>
 <dd>
 <div class="block">Constructor.</div>
@@ -3707,6 +3776,12 @@
 <dd>
 <div class="block">How the delay is calculated.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/properties/ExponentialBackOffTriggerProperties.html" title="class in com.netflix.genie.common.internal.properties"><span class="typeNameLink">ExponentialBackOffTriggerProperties</span></a> - Class in <a href="com/netflix/genie/common/internal/properties/package-summary.html">com.netflix.genie.common.internal.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html" title="class in com.netflix.genie.common.internal.util"><code>ExponentialBackOffTrigger</code></a> used in various places.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/properties/ExponentialBackOffTriggerProperties.html#ExponentialBackOffTriggerProperties--">ExponentialBackOffTriggerProperties()</a></span> - Constructor for class com.netflix.genie.common.internal.properties.<a href="com/netflix/genie/common/internal/properties/ExponentialBackOffTriggerProperties.html" title="class in com.netflix.genie.common.internal.properties">ExponentialBackOffTriggerProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/properties/ExponentialBackOffTriggerProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">ExponentialBackOffTriggerProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
 <div class="block">Properties to configure an ExponentialBackOffTrigger.</div>
@@ -3885,6 +3960,12 @@
 <dd>
 <div class="block">Provide a prototype bean definition for a <code>FileStreamServiceGrpc.FileStreamServiceStub</code>.</div>
 </dd>
+<dt><a href="com/netflix/genie/agent/properties/FileStreamServiceProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">FileStreamServiceProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentFileStreamService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/FileStreamServiceProperties.html#FileStreamServiceProperties--">FileStreamServiceProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/FileStreamServiceProperties.html" title="class in com.netflix.genie.agent.properties">FileStreamServiceProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">FileSystemAttachmentService</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
 <dd>
 <div class="block">Implementation of the AttachmentService interface which saves and retrieves attachments from the local filesystem.</div>
@@ -4976,6 +5057,22 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#getAgentPid--">getAgentPid()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
 <div class="block">Get the pid of the agent that claimed this job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html#getAgentProperties--">getAgentProperties()</a></span> - Method in interface com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService</a></dt>
+<dd>
+<div class="block">Produce a list of properties to be sent down to the agents running jobs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/AgentJobService.html#getAgentProperties-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">getAgentProperties(AgentClientMetadata)</a></span> - Method in interface com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></dt>
+<dd>
+<div class="block">Provide configuration properties for an agent that is beginning to execute a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#getAgentProperties--">getAgentProperties()</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></dt>
+<dd>
+<div class="block">Produce a list of properties to be sent down to the agents running jobs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#getAgentProperties-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">getAgentProperties(AgentClientMetadata)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></dt>
+<dd>
+<div class="block">Provide configuration properties for an agent that is beginning to execute a job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/AgentMetadata.html#getAgentVersion--">getAgentVersion()</a></span> - Method in interface com.netflix.genie.agent.<a href="com/netflix/genie/agent/AgentMetadata.html" title="interface in com.netflix.genie.agent">AgentMetadata</a></dt>
 <dd>
@@ -7479,7 +7576,7 @@
 <dd>
 <div class="block">Implementation of the <a href="com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a>, listens for kill coming from server using long-polling.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#GRpcAgentJobKillServiceImpl-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-">GRpcAgentJobKillServiceImpl(JobKillServiceGrpc.JobKillServiceFutureStub, KillService, TaskScheduler)</a></span> - Constructor for class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#GRpcAgentJobKillServiceImpl-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.JobKillServiceProperties-">GRpcAgentJobKillServiceImpl(JobKillServiceGrpc.JobKillServiceFutureStub, KillService, TaskScheduler, JobKillServiceProperties)</a></span> - Constructor for class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -7742,6 +7839,12 @@
 <dd>
 <div class="block">Provide a bean for <code>HeartBeatCommand.HeartBeatCommandArguments</code>.</div>
 </dd>
+<dt><a href="com/netflix/genie/agent/properties/HeartBeatServiceProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">HeartBeatServiceProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/agent/execution/services/AgentHeartBeatService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentHeartBeatService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/HeartBeatServiceProperties.html#HeartBeatServiceProperties--">HeartBeatServiceProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/HeartBeatServiceProperties.html" title="class in com.netflix.genie.agent.properties">HeartBeatServiceProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#heartBeatServiceTaskScheduler--">heartBeatServiceTaskScheduler()</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <code>TaskScheduler</code> bean for use by the heart beat service is none has already been
@@ -8777,6 +8880,12 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="com/netflix/genie/agent/properties/JobKillServiceProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">JobKillServiceProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/JobKillServiceProperties.html#JobKillServiceProperties--">JobKillServiceProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/JobKillServiceProperties.html" title="class in com.netflix.genie.agent.properties">JobKillServiceProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/services/impl/JobKillServiceV3.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">JobKillServiceV3</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
 <dd>
 <div class="block">A JobKillService that attempts to kill genie 3.0 jobs running on the local node.</div>
@@ -9515,7 +9624,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-org.springframework.context.ApplicationEventPublisher-">killService(ApplicationEventPublisher)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-org.springframework.context.ApplicationEventPublisher-com.netflix.genie.agent.properties.AgentProperties-">killService(ApplicationEventPublisher, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>KillService</code></a> bean if one hasn't already been defined.</div>
 </dd>
@@ -10193,6 +10302,10 @@
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/PredicateUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates"><span class="typeNameLink">PredicateUtils</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a></dt>
 <dd>
 <div class="block">Utility methods for the JPA <code>Predicate</code> generation.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/AgentProperties.html#PREFIX">PREFIX</a></span> - Static variable in class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a></dt>
+<dd>
+<div class="block">Properties prefix.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html#PREFIX">PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties</a></dt>
 <dd>
@@ -12435,8 +12548,6 @@
 <dd>
 <div class="block">Protected constructor for utility class.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html#TIMEOUT_SECONDS">TIMEOUT_SECONDS</a></span> - Static variable in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RefreshManifestStage</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#TIMEOUT_USED">TIMEOUT_USED</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#timeoutUsed">timeoutUsed</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
@@ -12464,6 +12575,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#toClusterCriteria-com.netflix.genie.common.external.dtos.v4.Criterion-">toClusterCriteria(Criterion)</a></span> - Static method in class com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">DtoConverters</a></dt>
 <dd>
 <div class="block">Convert the given <code>criterion</code> to a V3 <a href="com/netflix/genie/common/dto/ClusterCriteria.html" title="class in com.netflix.genie.common.dto"><code>ClusterCriteria</code></a> object.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toConfigureRequestProto-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">toConfigureRequestProto(AgentClientMetadata)</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a></dt>
+<dd>
+<div class="block">Convert parameters into ConfigureRequest for the server.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toCriterionDto-com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity-">toCriterionDto(CriterionEntity)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">EntityV4DtoConverters</a></dt>
 <dd>

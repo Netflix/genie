@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -108,6 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
+ @EnableConfigurationProperties(value=<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties.class</a>)
 public class <span class="typeNameLabel">AgentServicesAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Auto configuration for services needed in the agent module.</div>
@@ -151,29 +152,37 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">agentConfigurationService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
+                         org.springframework.core.env.Environment&nbsp;environment)</code>
+<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">agentConnectionTrackingService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
                               org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConnectionTrackingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentFilterServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentFilterServiceImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentFilterService-java.util.List-">agentFilterService</a></span>(java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/agent/inspectors/AgentMetadataInspector.html" title="interface in com.netflix.genie.web.agent.inspectors">AgentMetadataInspector</a>&gt;&nbsp;agentMetadataInspectorsList)</code>
 <div class="block">A <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentFilterService</code></a> implementation that federates the decision to a set of
  <a href="../../../../../../../../com/netflix/genie/web/agent/inspectors/AgentMetadataInspector.html" title="interface in com.netflix.genie.web.agent.inspectors"><code>AgentMetadataInspector</code></a>s.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">agentJobService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-com.netflix.genie.web.agent.services.AgentConfigurationService-io.micrometer.core.instrument.MeterRegistry-">agentJobService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                <a href="../../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services">AgentFilterService</a>&nbsp;agentFilterService,
+               <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService</a>&nbsp;agentConfigurationService,
                io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code>
 <div class="block">Get a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> instance if there isn't already one.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">agentRoutingServiceCurator</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                           org.apache.curator.x.discovery.ServiceDiscovery&lt;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.Agent.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl.Agent</a>&gt;&nbsp;serviceDiscovery,
@@ -183,7 +192,7 @@ extends java.lang.Object</pre>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServicePersistence-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingServicePersistence</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
                               <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
@@ -229,7 +238,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">
+<a name="agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-com.netflix.genie.web.agent.services.AgentConfigurationService-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -240,6 +249,7 @@ extends java.lang.Object</pre>
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a>&nbsp;agentJobService(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                                                                                          <a href="../../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                                                                                                          <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services">AgentFilterService</a>&nbsp;agentFilterService,
+                                                                                                         <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService</a>&nbsp;agentConfigurationService,
                                                                                                          io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</pre>
 <div class="block">Get a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> instance if there isn't already one.</div>
 <dl>
@@ -247,6 +257,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - The specification service to use</dd>
 <dd><code>agentFilterService</code> - The agent filter service to use</dd>
+<dd><code>agentConfigurationService</code> - The agent configuration service</dd>
 <dd><code>meterRegistry</code> - The metrics registry to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentJobServiceImpl</code></a> instance.</dd>
@@ -327,7 +338,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <a name="agentFilterService-java.util.List-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>agentFilterService</h4>
 <pre>@Bean
@@ -340,6 +351,26 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <dd><code>agentMetadataInspectorsList</code> - the list of inspectors.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentFilterService</code></a> instance.</dd>
+</dl>
+</li>
+</ul>
+<a name="agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>agentConfigurationService</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService.class</a>)
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a>&nbsp;agentConfigurationService(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
+                                                                                                                                       org.springframework.core.env.Environment&nbsp;environment)</pre>
+<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentConfigurationProperties</code> - the service properties</dd>
+<dd><code>environment</code> - the environment</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> instance</dd>
 </dl>
 </li>
 </ul>

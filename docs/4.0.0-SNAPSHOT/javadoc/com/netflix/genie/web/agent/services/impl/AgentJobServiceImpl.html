@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -139,9 +139,10 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">AgentJobServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-com.netflix.genie.web.agent.services.AgentConfigurationService-io.micrometer.core.instrument.MeterRegistry-">AgentJobServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                    <a href="../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                    <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services">AgentFilterService</a>&nbsp;agentFilterService,
+                   <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService</a>&nbsp;agentConfigurationService,
                    io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -175,31 +176,37 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#getAgentProperties-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">getAgentProperties</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
+<div class="block">Provide configuration properties for an agent that is beginning to execute a job.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#getJobSpecification-java.lang.String-">getJobSpecification</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Get a job specification if has been resolved.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#handshake-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">handshake</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Shake hands and allow a client or reject it based on the supplied <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>AgentClientMetadata</code></a>.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#reserveJobId-com.netflix.genie.common.external.dtos.v4.JobRequest-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">reserveJobId</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
             @Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Reserve a job id and persist job details in the database based on the supplied <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#resolveJobSpecification-java.lang.String-">resolveJobSpecification</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Resolve the job specification for job identified by the given id.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
                <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
@@ -231,7 +238,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">
+<a name="AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-com.netflix.genie.web.agent.services.AgentConfigurationService-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -240,6 +247,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <pre>public&nbsp;AgentJobServiceImpl(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                            <a href="../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                            <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services">AgentFilterService</a>&nbsp;agentFilterService,
+                           <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService</a>&nbsp;agentConfigurationService,
                            io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</pre>
 <div class="block">Constructor.</div>
 <dl>
@@ -247,6 +255,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <dd><code>dataServices</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - The specification service to use</dd>
 <dd><code>agentFilterService</code> - The agent filter service to use</dd>
+<dd><code>agentConfigurationService</code> - The agent configuration service</dd>
 <dd><code>meterRegistry</code> - The metrics registry to use</dd>
 </dl>
 </li>
@@ -276,6 +285,25 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <dd><code>agentClientMetadata</code> - The metadata about the agent starting to run a given job</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieAgentRejectedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieAgentRejectedException</a></code> - If the server rejects the client based on its metadata</dd>
+</dl>
+</li>
+</ul>
+<a name="getAgentProperties-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getAgentProperties</h4>
+<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getAgentProperties(@Valid
+                                                                           @Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
+<div class="block">Provide configuration properties for an agent that is beginning to execute a job.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html#getAgentProperties-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">getAgentProperties</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentClientMetadata</code> - The metadata about the agent starting to run a given job</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a map of properties for the agent</dd>
 </dl>
 </li>
 </ul>

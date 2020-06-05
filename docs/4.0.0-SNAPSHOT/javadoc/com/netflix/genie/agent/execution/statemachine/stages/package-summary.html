@@ -42,7 +42,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">Prev&nbsp;Package</a></li>
-<li><a href="../../../../../../../com/netflix/genie/agent/rpc/package-summary.html">Next&nbsp;Package</a></li>
+<li><a href="../../../../../../../com/netflix/genie/agent/properties/package-summary.html">Next&nbsp;Package</a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/stages/package-summary.html" target="_top">Frames</a></li>
@@ -105,144 +105,150 @@
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ConfigureAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureAgentStage</a></td>
+<td class="colLast">
+<div class="block">Configures the agent with server-provided runtime parameters that are independent of the job.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureExecutionStage</a></td>
 <td class="colLast">
 <div class="block">Sets up context state based on the type of execution and other command-line parameters.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/CreateJobDirectoryStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobDirectoryStage</a></td>
 <td class="colLast">
 <div class="block">Creates the job directory.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobScriptStage</a></td>
 <td class="colLast">
 <div class="block">Creates the job script (a.k.a.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/DetermineJobFinalStatusStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">DetermineJobFinalStatusStage</a></td>
 <td class="colLast">
 <div class="block">Sends the server the final job status, if the job reached a state where it is appropriate to do so.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/DownloadDependenciesStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">DownloadDependenciesStage</a></td>
 <td class="colLast">
 <div class="block">Download dependencies such as binaries and configurations attached to the job and its dependent entities.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/HandshakeStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">HandshakeStage</a></td>
 <td class="colLast">
 <div class="block">Perform server handshake, to ensure server is ok with this agent running a job.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/InitializeAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">InitializeAgentStage</a></td>
 <td class="colLast">
 <div class="block">Performs generic initialization.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/LaunchJobStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">LaunchJobStage</a></td>
 <td class="colLast">
 <div class="block">Launches the job process.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/LogExecutionErrorsStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">LogExecutionErrorsStage</a></td>
 <td class="colLast">
 <div class="block">Logs execution errors encountered so far.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ObtainJobSpecificationStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ObtainJobSpecificationStage</a></td>
 <td class="colLast">
 <div class="block">Obtains job specification from server.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RefreshManifestStage</a></td>
 <td class="colLast">
 <div class="block">Triggers a manual refresh of the cached files manifest.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RelocateLogFileStage</a></td>
 <td class="colLast">
 <div class="block">Moves the agent log file into the job directory from the temporary location.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ReserveJobIdStage</a></td>
 <td class="colLast">
 <div class="block">Performs job reservation, or ensures the job is pre-reserved and ready to be claimed.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusFinal.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusFinal</a></td>
 <td class="colLast">
 <div class="block">Sets the final job status (success/fail/kill).</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusInit</a></td>
 <td class="colLast">
 <div class="block">Updates job status when job starts initializing.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusRunning.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusRunning</a></td>
 <td class="colLast">
 <div class="block">Updates the server job status after launch.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ShutdownStage</a></td>
 <td class="colLast">
 <div class="block">Performs final shutdown.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartFileServiceStage</a></td>
 <td class="colLast">
 <div class="block">Starts the file streaming service.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/StartHeartbeatServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartHeartbeatServiceStage</a></td>
 <td class="colLast">
 <div class="block">Starts the heartbeat service.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartKillServiceStage</a></td>
 <td class="colLast">
 <div class="block">Starts the kill service.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/StopFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopFileServiceStage</a></td>
 <td class="colLast">
 <div class="block">Stops the file streaming service.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopHeartbeatServiceStage</a></td>
 <td class="colLast">
 <div class="block">Stops the heartbeat service.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopKillServiceStage</a></td>
 <td class="colLast">
 <div class="block">Stops the job kill service.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></td>
 <td class="colLast">
 <div class="block">Wait for job process to exit.</div>
@@ -283,7 +289,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">Prev&nbsp;Package</a></li>
-<li><a href="../../../../../../../com/netflix/genie/agent/rpc/package-summary.html">Next&nbsp;Package</a></li>
+<li><a href="../../../../../../../com/netflix/genie/agent/properties/package-summary.html">Next&nbsp;Package</a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/stages/package-summary.html" target="_top">Frames</a></li>

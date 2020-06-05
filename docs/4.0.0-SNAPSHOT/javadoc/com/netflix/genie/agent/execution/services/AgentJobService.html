@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -141,31 +141,37 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html#configure-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">configure</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
+<div class="block">Obtain server-provided configuration properties.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html#getJobSpecification-java.lang.String-">getJobSpecification</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Given a job id retrieve the job specification from the server.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html#handshake-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">handshake</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Perform server handshake.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html#reserveJobId-com.netflix.genie.common.external.dtos.v4.AgentJobRequest-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">reserveJobId</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/AgentJobRequest.html" title="interface in com.netflix.genie.common.external.dtos.v4">AgentJobRequest</a>&nbsp;jobRequest,
             @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Request a given job id to be reserved for this job, send along the job details, to be persisted by the server.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html#resolveJobSpecification-java.lang.String-">resolveJobSpecification</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Given the parameters supplied by the job request attempt to resolve a job specification on the server.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html#resolveJobSpecificationDryRun-com.netflix.genie.common.external.dtos.v4.AgentJobRequest-">resolveJobSpecificationDryRun</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/AgentJobRequest.html" title="interface in com.netflix.genie.common.external.dtos.v4">AgentJobRequest</a>&nbsp;jobRequest)</code>
 <div class="block">Invoke the job specification resolution logic without persisting anything on the server.</div>
@@ -202,6 +208,26 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 <dd><code>agentClientMetadata</code> - metadata about the client making this request</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../com/netflix/genie/agent/execution/exceptions/HandshakeException.html" title="class in com.netflix.genie.agent.execution.exceptions">HandshakeException</a></code> - if the server rejects this client</dd>
+</dl>
+</li>
+</ul>
+<a name="configure-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>configure</h4>
+<pre>java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;configure(@Valid
+                                                           @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)
+                                                    throws <a href="../../../../../../com/netflix/genie/agent/execution/exceptions/ConfigureException.html" title="class in com.netflix.genie.agent.execution.exceptions">ConfigureException</a></pre>
+<div class="block">Obtain server-provided configuration properties.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentClientMetadata</code> - metadata about the client making this request</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a map of properties</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/exceptions/ConfigureException.html" title="class in com.netflix.genie.agent.execution.exceptions">ConfigureException</a></code> - if the server properties cannot be obtained</dd>
 </dl>
 </li>
 </ul>
