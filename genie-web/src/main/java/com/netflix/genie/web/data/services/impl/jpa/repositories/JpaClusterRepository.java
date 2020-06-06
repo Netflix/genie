@@ -59,28 +59,6 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
     );
 
     /**
-     * Find the cluster with the given id but also eagerly load that clusters commands.
-     *
-     * @param id The id of the cluster to get
-     * @return The {@link ClusterEntity} with its command base data loaded or {@link Optional#empty()} if there is no
-     * cluster with the given id
-     */
-    @Query("SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
-    @EntityGraph(value = ClusterEntity.COMMANDS_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
-    Optional<ClusterEntity> getClusterAndCommands(@Param("id") String id);
-
-    /**
-     * Find the cluster with the given id but also eagerly load that clusters commands full dto contents.
-     *
-     * @param id The id of the command to get
-     * @return The {@link ClusterEntity} with its command dto data loaded or {@link Optional#empty()} if there is no
-     * cluster with the given id
-     */
-    @Query("SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
-    @EntityGraph(value = ClusterEntity.COMMANDS_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
-    Optional<ClusterEntity> getClusterAndCommandsDto(@Param("id") String id);
-
-    /**
      * Find the cluster with the given id but also eagerly load all data needed for a cluster DTO.
      *
      * @param id The id of the command to get

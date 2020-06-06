@@ -17,19 +17,14 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Test the Cluster class.
@@ -46,9 +41,6 @@ class ClusterEntityTest extends EntityTestBase {
     private ClusterEntity c;
     private Set<FileEntity> configs;
 
-    /**
-     * Setup the tests.
-     */
     @BeforeEach
     void setup() {
         this.c = new ClusterEntity();
@@ -61,9 +53,6 @@ class ClusterEntityTest extends EntityTestBase {
         this.c.setStatus(ClusterStatus.UP.name());
     }
 
-    /**
-     * Test the default Constructor.
-     */
     @Test
     void testDefaultConstructor() {
         final ClusterEntity entity = new ClusterEntity();
@@ -74,20 +63,13 @@ class ClusterEntityTest extends EntityTestBase {
         Assertions.assertThat(entity.getConfigs()).isEmpty();
         Assertions.assertThat(entity.getDependencies()).isEmpty();
         Assertions.assertThat(entity.getTags()).isEmpty();
-        Assertions.assertThat(entity.getCommands()).isEmpty();
     }
 
-    /**
-     * Make sure validation works on valid apps.
-     */
     @Test
     void testValidate() {
         this.validate(this.c);
     }
 
-    /**
-     * Make sure validation works on with failure from super class.
-     */
     @Test
     void testValidateNoName() {
         this.c.setName("");
@@ -96,9 +78,6 @@ class ClusterEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from super class.
-     */
     @Test
     void testValidateNoUser() {
         this.c.setUser(" ");
@@ -107,9 +86,6 @@ class ClusterEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from super class.
-     */
     @Test
     void testValidateNoVersion() {
         this.c.setVersion("\t");
@@ -118,18 +94,12 @@ class ClusterEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Test setting the status.
-     */
     @Test
     void testSetStatus() {
         this.c.setStatus(ClusterStatus.TERMINATED.name());
         Assertions.assertThat(this.c.getStatus()).isEqualTo(ClusterStatus.TERMINATED.name());
     }
 
-    /**
-     * Test setting the tags.
-     */
     @Test
     void testSetTags() {
         Assertions.assertThat(this.c.getTags()).isEmpty();
@@ -145,9 +115,6 @@ class ClusterEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getTags()).isEmpty();
     }
 
-    /**
-     * Test setting the configs.
-     */
     @Test
     void testSetConfigs() {
         Assertions.assertThat(this.c.getConfigs()).isEmpty();
@@ -158,9 +125,6 @@ class ClusterEntityTest extends EntityTestBase {
         Assertions.assertThat(c.getConfigs()).isEmpty();
     }
 
-    /**
-     * Test setting the dependencies.
-     */
     @Test
     void testSetDependencies() {
         Assertions.assertThat(this.c.getDependencies()).isEmpty();
@@ -174,138 +138,6 @@ class ClusterEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getDependencies()).isEmpty();
     }
 
-    /**
-     * Test setting the commands.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    void testSetCommands() throws GeniePreconditionException {
-        Assertions.assertThat(this.c.getCommands()).isEmpty();
-        final CommandEntity one = new CommandEntity();
-        one.setUniqueId("one");
-        final CommandEntity two = new CommandEntity();
-        two.setUniqueId("two");
-        final List<CommandEntity> commands = new ArrayList<>();
-        commands.add(one);
-        commands.add(two);
-        this.c.setCommands(commands);
-        Assertions.assertThat(this.c.getCommands()).isEqualTo(commands);
-        Assertions.assertThat(one.getClusters()).contains(this.c);
-        Assertions.assertThat(two.getClusters()).contains(this.c);
-        this.c.setCommands(null);
-        Assertions.assertThat(this.c.getCommands()).isEmpty();
-        Assertions.assertThat(one.getClusters()).doesNotContain(this.c);
-        Assertions.assertThat(two.getClusters()).doesNotContain(this.c);
-    }
-
-    /**
-     * Make sure we can't set commands with duplicates.
-     */
-    @Test
-    void cantSetCommandsWithDuplicates() {
-        final CommandEntity one = new CommandEntity();
-        one.setUniqueId(UUID.randomUUID().toString());
-        final CommandEntity two = new CommandEntity();
-        two.setUniqueId(UUID.randomUUID().toString());
-
-        Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
-            .isThrownBy(() -> this.c.setCommands(Lists.newArrayList(one, two, one)));
-    }
-
-    /**
-     * Test adding a command.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    void testAddCommand() throws GeniePreconditionException {
-        final CommandEntity commandEntity = new CommandEntity();
-        commandEntity.setUniqueId("commandId");
-        Assertions.assertThat(this.c.getCommands()).isEmpty();
-        this.c.addCommand(commandEntity);
-        Assertions.assertThat(this.c.getCommands()).contains(commandEntity);
-        Assertions.assertThat(commandEntity.getClusters()).contains(this.c);
-    }
-
-    /**
-     * Make sure we can't add a duplicate command.
-     *
-     * @throws GeniePreconditionException If the command was already in the list
-     */
-    @Test
-    void cantAddDuplicateCommand() throws GeniePreconditionException {
-        final CommandEntity entity = new CommandEntity();
-        entity.setUniqueId(UUID.randomUUID().toString());
-        this.c.addCommand(entity);
-
-        // Should throw exception here
-        Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
-            .isThrownBy(() -> this.c.addCommand(entity));
-    }
-
-    /**
-     * Test removing a command.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    void testRemoveCommand() throws GeniePreconditionException {
-        final CommandEntity one = new CommandEntity();
-        one.setUniqueId("one");
-        final CommandEntity two = new CommandEntity();
-        two.setUniqueId("two");
-        Assertions.assertThat(this.c.getCommands()).isEmpty();
-        this.c.addCommand(one);
-        Assertions.assertThat(this.c.getCommands()).contains(one);
-        Assertions.assertThat(this.c.getCommands()).doesNotContain(two);
-        Assertions.assertThat(one.getClusters()).contains(this.c);
-        Assertions.assertThat(two.getClusters()).isNotNull();
-        Assertions.assertThat(two.getClusters()).isEmpty();
-        this.c.addCommand(two);
-        Assertions.assertThat(this.c.getCommands()).contains(one);
-        Assertions.assertThat(this.c.getCommands()).contains(two);
-        Assertions.assertThat(one.getClusters()).contains(this.c);
-        Assertions.assertThat(two.getClusters()).contains(this.c);
-
-        this.c.removeCommand(one);
-        Assertions.assertThat(this.c.getCommands()).doesNotContain(one);
-        Assertions.assertThat(this.c.getCommands()).contains(two);
-        Assertions.assertThat(one.getClusters()).doesNotContain(this.c);
-        Assertions.assertThat(two.getClusters()).contains(this.c);
-    }
-
-    /**
-     * Test removing all the commands.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    void testRemoveAllCommands() throws GeniePreconditionException {
-        Assertions.assertThat(this.c.getCommands()).isEmpty();
-        final CommandEntity one = new CommandEntity();
-        one.setUniqueId("one");
-        final CommandEntity two = new CommandEntity();
-        two.setUniqueId("two");
-        final List<CommandEntity> commands = new ArrayList<>();
-        commands.add(one);
-        commands.add(two);
-        this.c.setCommands(commands);
-        Assertions.assertThat(this.c.getCommands()).isEqualTo(commands);
-        Assertions.assertThat(one.getClusters()).contains(this.c);
-        Assertions.assertThat(two.getClusters()).contains(this.c);
-
-        this.c.removeAllCommands();
-        Assertions.assertThat(this.c.getCommands()).isEmpty();
-        Assertions.assertThat(one.getClusters()).doesNotContain(this.c);
-        Assertions.assertThat(two.getClusters()).doesNotContain(this.c);
-    }
-
-    /**
-     * Test the setClusterTags method.
-     */
     @Test
     void canSetClusterTags() {
         final TagEntity oneTag = new TagEntity();
@@ -325,9 +157,6 @@ class ClusterEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getTags()).isEmpty();
     }
 
-    /**
-     * Test the toString method.
-     */
     @Test
     void testToString() {
         Assertions.assertThat(this.c.toString()).isNotBlank();

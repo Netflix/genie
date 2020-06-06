@@ -17,21 +17,15 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
-import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
@@ -46,8 +40,6 @@ import org.springframework.dao.DuplicateKeyException;
 
 import javax.persistence.EntityManager;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -67,17 +59,14 @@ class JpaPersistenceServiceImplClustersTest {
 
     private JpaPersistenceServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
-    private JpaCommandRepository jpaCommandRepository;
     private JpaFileRepository jpaFileRepository;
 
     @BeforeEach
     void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
-        this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jpaFileRepository = Mockito.mock(JpaFileRepository.class);
         final JpaRepositories jpaRepositories = Mockito.mock(JpaRepositories.class);
         Mockito.when(jpaRepositories.getClusterRepository()).thenReturn(this.jpaClusterRepository);
-        Mockito.when(jpaRepositories.getCommandRepository()).thenReturn(this.jpaCommandRepository);
         Mockito.when(jpaRepositories.getFileRepository()).thenReturn(this.jpaFileRepository);
         this.service = new JpaPersistenceServiceImpl(
             Mockito.mock(EntityManager.class),
@@ -223,136 +212,6 @@ class JpaPersistenceServiceImplClustersTest {
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.service.removeDependencyForResource(id, "something", Cluster.class));
-    }
-
-    @Test
-    void testAddCommandsForClusterClusterDoesntExist() {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.addCommandsForCluster(id, new ArrayList<>()));
-    }
-
-    @Test
-    void testAddCommandsForClusterCommandDoesntExist() {
-        final List<String> commandIds = new ArrayList<>();
-        final String commandId = UUID.randomUUID().toString();
-        commandIds.add(commandId);
-        final ClusterEntity clusterEntity = Mockito.mock(ClusterEntity.class);
-        Mockito
-            .when(this.jpaClusterRepository.findByUniqueId(Mockito.anyString()))
-            .thenReturn(Optional.of(clusterEntity));
-        Mockito
-            .when(this.jpaCommandRepository.findByUniqueId(commandId))
-            .thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
-            .isThrownBy(() -> this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds));
-    }
-
-    @Test
-    void cantAddDuplicateCommandsToCluster() {
-        final String commandId1 = UUID.randomUUID().toString();
-        final String commandId2 = UUID.randomUUID().toString();
-        final List<String> commandIds = Lists.newArrayList(commandId2);
-        final ClusterEntity clusterEntity = Mockito.mock(ClusterEntity.class);
-        final CommandEntity command1 = Mockito.mock(CommandEntity.class);
-        Mockito.when(command1.getUniqueId()).thenReturn(commandId1);
-        final CommandEntity command2 = Mockito.mock(CommandEntity.class);
-        Mockito.when(command2.getUniqueId()).thenReturn(commandId2);
-        Mockito.when(clusterEntity.getCommands()).thenReturn(Lists.newArrayList(command1, command2));
-
-        Mockito
-            .when(this.jpaClusterRepository.findByUniqueId(Mockito.anyString()))
-            .thenReturn(Optional.of(clusterEntity));
-        Mockito.when(this.jpaCommandRepository.findByUniqueId(commandId1)).thenReturn(Optional.of(command1));
-        Mockito.when(this.jpaCommandRepository.findByUniqueId(commandId2)).thenReturn(Optional.of(command2));
-        Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
-            .isThrownBy(() -> this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds));
-    }
-
-    @Test
-    void testGetCommandsForClusterNoCluster() {
-        final String id = UUID.randomUUID().toString();
-        Mockito
-            .when(this.jpaClusterRepository.findByUniqueId(id, ClusterCommandsProjection.class))
-            .thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.getCommandsForCluster(id, null));
-    }
-
-    @Test
-    void testUpdateCommandsForClusterClusterDoesntExist() {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.setCommandsForCluster(id, new ArrayList<>()));
-    }
-
-    @Test
-    void testSetCommandsForClusterCommandDoesntExist() {
-        final List<String> commandIds = new ArrayList<>();
-        final String commandId = UUID.randomUUID().toString();
-        commandIds.add(commandId);
-        final ClusterEntity cluster
-            = Mockito.mock(ClusterEntity.class);
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(CLUSTER_1_ID)).thenReturn(Optional.of(cluster));
-        Mockito.when(this.jpaCommandRepository.findByUniqueId(commandId)).thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
-            .isThrownBy(() -> this.service.setCommandsForCluster(CLUSTER_1_ID, commandIds));
-    }
-
-    @Test
-    void cantUpdateCommandsForClusterWithDuplicates() {
-        final String commandId1 = UUID.randomUUID().toString();
-        final String commandId2 = UUID.randomUUID().toString();
-        final List<String> commandIds = Lists.newArrayList(commandId1, commandId2, commandId1);
-        final ClusterEntity cluster = Mockito.mock(ClusterEntity.class);
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(CLUSTER_1_ID)).thenReturn(Optional.of(cluster));
-        Mockito
-            .when(this.jpaCommandRepository.findByUniqueId(commandId1))
-            .thenReturn(Optional.of(Mockito.mock(CommandEntity.class)));
-        Mockito
-            .when(this.jpaCommandRepository.findByUniqueId(commandId2))
-            .thenReturn(Optional.of(Mockito.mock(CommandEntity.class)));
-        Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
-            .isThrownBy(() -> this.service.setCommandsForCluster(CLUSTER_1_ID, commandIds));
-    }
-
-    @Test
-    void testRemoveAllCommandsForClusterNoCluster() {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.removeAllCommandsForCluster(id));
-    }
-
-    @Test
-    void testRemoveCommandForClusterNoCluster() {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.removeCommandForCluster(id, UUID.randomUUID().toString()));
-    }
-
-    @Test
-    void testRemoveCommandForClusterNoCommand() {
-        final ClusterEntity clusterEntity
-            = Mockito.mock(ClusterEntity.class);
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(CLUSTER_1_ID)).thenReturn(Optional.of(clusterEntity));
-        final String commandId = UUID.randomUUID().toString();
-        Mockito.when(this.jpaCommandRepository.findByUniqueId(commandId)).thenReturn(Optional.empty());
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.removeCommandForCluster(CLUSTER_1_ID, commandId));
     }
 
     @Test

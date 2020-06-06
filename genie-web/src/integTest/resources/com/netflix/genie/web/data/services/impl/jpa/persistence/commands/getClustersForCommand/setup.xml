@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2020 Netflix, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<dataset>
+
+    <tags
+        id="0"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        tag="prod"
+    />
+    <tags
+        id="1"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        tag="yarn"
+    />
+    <tags
+        id="2"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        tag="pig"
+    />
+    <tags
+        id="3"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        tag="tez"
+    />
+    <tags
+        id="4"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        tag="hive"
+    />
+    <tags
+        id="5"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        tag="deprecated"
+    />
+
+    <criteria
+        id="0"
+    />
+    <criteria_tags
+        criterion_id="0"
+        tag_id="0"
+    />
+    <criteria
+        id="1"
+        name="h2query"
+    />
+    <criteria
+        id="2"
+        unique_id="cluster3"
+    />
+
+    <commands
+        id="1"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        unique_id="command1"
+        genie_user="tgianos"
+        name="pig_13_prod"
+        version="1.2.3"
+        check_delay="18000"
+        status="ACTIVE"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="2"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="0"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="3"
+    />
+    <command_executable_arguments
+        command_id="1"
+        argument="pig"
+        argument_order="0"
+    />
+    <commands_cluster_criteria
+        command_id="1"
+        criterion_id="0"
+        priority_order="0"
+    />
+    <commands_cluster_criteria
+        command_id="1"
+        criterion_id="1"
+        priority_order="1"
+    />
+    <commands_cluster_criteria
+        command_id="1"
+        criterion_id="2"
+        priority_order="2"
+    />
+
+    <clusters
+        id="1"
+        created="2014-07-08 01:49:00"
+        updated="2014-07-08 02:59:00"
+        entity_version="0"
+        unique_id="cluster1"
+        genie_user="tgianos"
+        name="h2prod"
+        version="2.4.0"
+        status="UP"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="4"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="2"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="0"
+    />
+
+    <clusters
+        id="2"
+        created="2014-07-08 01:49:00"
+        updated="2014-07-08 02:59:00"
+        entity_version="0"
+        unique_id="cluster2"
+        genie_user="tgianos"
+        name="h2query"
+        version="2.4.0"
+        status="TERMINATED"
+    />
+
+    <clusters
+        id="3"
+        created="2014-07-08 01:49:00"
+        updated="2014-07-08 02:59:00"
+        entity_version="0"
+        unique_id="cluster3"
+        genie_user="tgianos"
+        name="h2prod"
+        version="2.4.0"
+        status="OUT_OF_SERVICE"
+    />
+</dataset>

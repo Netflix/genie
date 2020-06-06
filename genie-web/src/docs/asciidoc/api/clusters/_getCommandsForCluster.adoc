@@ -1,17 +1,15 @@
 === Get the Commands for a Cluster
 
-==== Description
+WARNING: Deprecated
 
-Get the commands currently linked to the cluster. This indicates the command is able to be run on that cluster.
-
-IMPORTANT: The order of the commands is important. This represents priority order if two commands with same tags match
-for the given cluster the one earlier in the list will be selected.
+NOTE: As of Genie 4.0.0 commands are no longer hard linked to clusters, instead they are dynamically linked by
+resolving a command's cluster criteria against the current set of `UP` clusters. This API is now a no-op.
 
 ==== Endpoint
 
 `GET /api/v3/clusters/{id}/commands`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-add-commands-for-a-cluster/11
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-add-commands-for-a-cluster/3
 :id-base: get-commands-for-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc
@@ -19,8 +17,8 @@ for the given cluster the one earlier in the list will be selected.
 :!request-fields:
 :curl-request: {snippet-base}/curl-request.adoc
 :httpie-request: {snippet-base}/httpie-request.adoc
-:response-headers: {snippet-base}/response-headers.adoc
-:response-fields: {snippet-base}/response-fields.adoc
+:!response-headers:
+:!response-fields:
 :!response-links:
 :http-request: {snippet-base}/http-request.adoc
 :http-response: {snippet-base}/http-response.adoc

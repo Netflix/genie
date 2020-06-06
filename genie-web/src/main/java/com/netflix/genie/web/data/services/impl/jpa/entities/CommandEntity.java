@@ -252,10 +252,6 @@ public class CommandEntity extends BaseEntity {
     @ToString.Exclude
     private List<ApplicationEntity> applications = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private Set<ClusterEntity> clusters = new HashSet<>();
-
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
         name = "commands_cluster_criteria",
@@ -387,18 +383,6 @@ public class CommandEntity extends BaseEntity {
     public void removeApplication(@NotNull final ApplicationEntity application) {
         this.applications.remove(application);
         application.getCommands().remove(this);
-    }
-
-    /**
-     * Set the clusters this command is available on.
-     *
-     * @param clusters the clusters
-     */
-    protected void setClusters(@Nullable final Set<ClusterEntity> clusters) {
-        this.clusters.clear();
-        if (clusters != null) {
-            this.clusters.addAll(clusters);
-        }
     }
 
     /**

@@ -123,23 +123,6 @@
         status="INACTIVE"
     />
 
-    <clusters
-        id="0"
-        created="2020-03-22 01:49:00"
-        updated="2020-03-22 02:59:00"
-        entity_version="0"
-        unique_id="cluster0"
-        genie_user="tgianos"
-        name="h2prod"
-        version="2.4.0"
-        status="UP"
-    />
-    <clusters_commands
-        cluster_id="0"
-        command_id="7"
-        command_order="0"
-    />
-
     <jobs
         id="0"
         created="2020-02-24 01:48:00"

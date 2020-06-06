@@ -1,19 +1,15 @@
 === Set Commands for a Cluster
 
-==== Description
+WARNING: Deprecated
 
-Set the commands (as array of their ID's) that can run on the cluster.
-
-IMPORTANT: The order of the commands is important. This represents priority order if two commands with same tags match
-for the given cluster the one earlier in the list will be selected.
-
-WARNING: The commands for the ID's must already exist in the system
+NOTE: As of Genie 4.0.0 commands are no longer hard linked to clusters, instead they are dynamically linked by
+resolving a command's cluster criteria against the current set of `UP` clusters. This API is now a no-op.
 
 ==== Endpoint
 
 `PUT /api/v3/clusters/{id}/commands`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-set-commands-for-a-cluster/5
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-set-commands-for-a-cluster/3
 :id-base: set-commands-for-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

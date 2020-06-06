@@ -298,22 +298,6 @@
         tag_id="1"
     />
 
-    <clusters_commands
-        cluster_id="1"
-        command_id="1"
-        command_order="0"
-    />
-    <clusters_commands
-        cluster_id="1"
-        command_id="2"
-        command_order="2"
-    />
-    <clusters_commands
-        cluster_id="1"
-        command_id="3"
-        command_order="1"
-    />
-
     <clusters
         id="2"
         created="2014-07-09 01:49:00"
@@ -344,27 +328,6 @@
     <clusters_tags
         cluster_id="2"
         tag_id="4"
-    />
-
-    <clusters_commands
-        cluster_id="2"
-        command_id="4"
-        command_order="0"
-    />
-    <clusters_commands
-        cluster_id="2"
-        command_id="1"
-        command_order="1"
-    />
-    <clusters_commands
-        cluster_id="2"
-        command_id="2"
-        command_order="2"
-    />
-    <clusters_commands
-        cluster_id="2"
-        command_id="3"
-        command_order="3"
     />
 
     <criteria

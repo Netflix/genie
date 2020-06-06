@@ -72,9 +72,6 @@ class CommandEntityTest extends EntityTestBase {
 
     private CommandEntity c;
 
-    /**
-     * Setup the tests.
-     */
     @BeforeEach
     void setup() {
         this.c = new CommandEntity();
@@ -87,9 +84,6 @@ class CommandEntityTest extends EntityTestBase {
         this.c.setMemory(MEMORY);
     }
 
-    /**
-     * Test the default Constructor.
-     */
     @Test
     void testDefaultConstructor() {
         final CommandEntity entity = new CommandEntity();
@@ -103,22 +97,15 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(entity.getConfigs()).isEmpty();
         Assertions.assertThat(entity.getDependencies()).isEmpty();
         Assertions.assertThat(entity.getTags()).isEmpty();
-        Assertions.assertThat(entity.getClusters()).isEmpty();
         Assertions.assertThat(entity.getApplications()).isEmpty();
         Assertions.assertThat(entity.getMemory()).isNotPresent();
     }
 
-    /**
-     * Make sure validation works on valid apps.
-     */
     @Test
     void testValidate() {
         this.validate(this.c);
     }
 
-    /**
-     * Make sure validation works on with failure from super class.
-     */
     @Test
     void testValidateNoName() {
         this.c.setName("");
@@ -127,9 +114,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from super class.
-     */
     @Test
     void testValidateNoUser() {
         this.c.setUser("   ");
@@ -138,9 +122,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from super class.
-     */
     @Test
     void testValidateNoVersion() {
         this.c.setVersion("");
@@ -149,9 +130,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from command.
-     */
     @Test
     void testValidateEmptyExecutable() {
         this.c.setExecutable(Lists.newArrayList());
@@ -160,9 +138,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from command.
-     */
     @Test
     void testValidateBlankExecutable() {
         this.c.setExecutable(Lists.newArrayList("    "));
@@ -171,9 +146,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from command.
-     */
     @Test
     void testValidateExecutableArgumentTooLong() {
         this.c.setExecutable(Lists.newArrayList(StringUtils.leftPad("", 1025, 'e')));
@@ -182,9 +154,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Make sure validation works on with failure from command.
-     */
     @Test
     void testValidateBadCheckDelay() {
         this.c.setCheckDelay(0L);
@@ -193,18 +162,12 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.validate(this.c));
     }
 
-    /**
-     * Test setting the status.
-     */
     @Test
     void testSetStatus() {
         this.c.setStatus(CommandStatus.ACTIVE.name());
         Assertions.assertThat(this.c.getStatus()).isEqualTo(CommandStatus.ACTIVE.name());
     }
 
-    /**
-     * Test setting the setup file.
-     */
     @Test
     void testSetSetupFile() {
         Assertions.assertThat(this.c.getSetupFile()).isNotPresent();
@@ -214,18 +177,12 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getSetupFile()).isPresent().contains(setupFileEntity);
     }
 
-    /**
-     * Test setting the executable.
-     */
     @Test
     void testSetExecutable() {
         this.c.setExecutable(EXECUTABLE);
         Assertions.assertThat(this.c.getExecutable()).isEqualTo(EXECUTABLE);
     }
 
-    /**
-     * Make sure the check delay setter and getter works properly.
-     */
     @Test
     void testSetCheckDelay() {
         final long newDelay = 108327L;
@@ -234,9 +191,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getCheckDelay()).isEqualTo(newDelay);
     }
 
-    /**
-     * Make sure can set the memory for the command if a user desires it.
-     */
     @Test
     void testSetMemory() {
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(MEMORY);
@@ -245,9 +199,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(newMemory);
     }
 
-    /**
-     * Test setting the configs.
-     */
     @Test
     void testSetConfigs() {
         Assertions.assertThat(this.c.getConfigs()).isEmpty();
@@ -259,9 +210,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getConfigs()).isEmpty();
     }
 
-    /**
-     * Test setting the dependencies.
-     */
     @Test
     void testSetDependencies() {
         Assertions.assertThat(this.c.getDependencies()).isEmpty();
@@ -273,9 +221,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getDependencies()).isEmpty();
     }
 
-    /**
-     * Test setting the tags.
-     */
     @Test
     void testSetTags() {
         Assertions.assertThat(this.c.getTags()).isEmpty();
@@ -314,9 +259,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(two.getCommands()).isEmpty();
     }
 
-    /**
-     * Make sure if a List with duplicate applications is sent in it fails.
-     */
     @Test
     void cantSetApplicationsIfDuplicates() {
         final ApplicationEntity one = Mockito.mock(ApplicationEntity.class);
@@ -329,11 +271,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.c.setApplications(Lists.newArrayList(one, two, one)));
     }
 
-    /**
-     * Test to make sure we can add an application.
-     *
-     * @throws PreconditionFailedException On error
-     */
     @Test
     void canAddApplication() throws PreconditionFailedException {
         final String id = UUID.randomUUID().toString();
@@ -345,11 +282,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(app.getCommands()).contains(this.c);
     }
 
-    /**
-     * Test to make sure we can't add an application to a command if it's already in the list.
-     *
-     * @throws PreconditionFailedException on duplicate
-     */
     @Test
     void cantAddApplicationThatAlreadyIsInList() throws PreconditionFailedException {
         final String id = UUID.randomUUID().toString();
@@ -362,11 +294,6 @@ class CommandEntityTest extends EntityTestBase {
             .isThrownBy(() -> this.c.addApplication(app));
     }
 
-    /**
-     * Test removing an application.
-     *
-     * @throws PreconditionFailedException If any precondition isn't met.
-     */
     @Test
     void canRemoveApplication() throws PreconditionFailedException {
         final ApplicationEntity one = new ApplicationEntity();
@@ -392,23 +319,6 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(two.getCommands()).contains(this.c);
     }
 
-    /**
-     * Test setting the clusters.
-     */
-    @Test
-    void testSetClusters() {
-        Assertions.assertThat(this.c.getClusters()).isEmpty();
-        final Set<ClusterEntity> clusterEntities = Sets.newHashSet(new ClusterEntity());
-        this.c.setClusters(clusterEntities);
-        Assertions.assertThat(this.c.getClusters()).isEqualTo(clusterEntities);
-
-        this.c.setClusters(null);
-        Assertions.assertThat(this.c.getClusters()).isEmpty();
-    }
-
-    /**
-     * Test the toString method.
-     */
     @Test
     void testToString() {
         Assertions.assertThat(this.c.toString()).isNotBlank();

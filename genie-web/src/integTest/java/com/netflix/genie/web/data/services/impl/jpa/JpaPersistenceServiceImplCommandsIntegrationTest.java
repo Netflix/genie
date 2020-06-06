@@ -22,7 +22,6 @@ import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
@@ -461,21 +460,10 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testDelete() throws GenieException, GenieCheckedException {
-        List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assertions.assertThat(commands).hasSize(3);
-        boolean found = false;
-        for (final Command command : commands) {
-            if (COMMAND_1_ID.equals(command.getId())) {
-                found = true;
-                break;
-            }
-        }
-        Assertions.assertThat(found).isTrue();
-        // TODO: Fix once Command service goes to V4
+    void testDelete() throws GenieCheckedException {
         Set<Command> appCommands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions.assertThat(appCommands).hasSize(1);
-        found = false;
+        boolean found = false;
         for (final Command command : appCommands) {
             if (COMMAND_1_ID.equals(command.getId())) {
                 found = true;
@@ -486,17 +474,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
         //Actually delete it
         this.service.deleteCommand(COMMAND_1_ID);
-
-        commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assertions.assertThat(commands).hasSize(2);
-        found = false;
-        for (final Command command : commands) {
-            if (COMMAND_1_ID.equals(command.getId())) {
-                found = true;
-                break;
-            }
-        }
-        Assertions.assertThat(found).isFalse();
         appCommands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions.assertThat(appCommands).isEmpty();
 
@@ -746,13 +723,28 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    @DatabaseSetup("persistence/commands/init.xml")
+    @DatabaseSetup("persistence/commands/getClustersForCommand/setup.xml")
     void testGetClustersForCommand() throws GenieCheckedException {
-        final Set<Cluster> clusters = this.service.getClustersForCommand(COMMAND_1_ID, null);
         Assertions
-            .assertThat(clusters)
+            .assertThat(this.service.getClustersForCommand(COMMAND_1_ID, null))
+            .hasSize(3)
+            .extracting(Cluster::getId)
+            .containsExactlyInAnyOrder("cluster1", "cluster2", "cluster3");
+        Assertions
+            .assertThat(this.service.getClustersForCommand(COMMAND_1_ID, EnumSet.of(ClusterStatus.OUT_OF_SERVICE)))
             .hasSize(1)
-            .hasOnlyOneElementSatisfying(cluster -> Assertions.assertThat(cluster.getId()).isEqualTo(CLUSTER_1_ID));
+            .extracting(Cluster::getId)
+            .containsExactlyInAnyOrder("cluster3");
+        Assertions
+            .assertThat(
+                this.service.getClustersForCommand(
+                    COMMAND_1_ID,
+                    EnumSet.of(ClusterStatus.OUT_OF_SERVICE, ClusterStatus.UP)
+                )
+            )
+            .hasSize(2)
+            .extracting(Cluster::getId)
+            .containsExactlyInAnyOrder("cluster1", "cluster3");
     }
 
     @Test
@@ -956,34 +948,24 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    @DatabaseSetup("persistence/commands/deleteUnusedCommands/before.xml")
+    @DatabaseSetup("persistence/commands/deleteUnusedCommands/setup.xml")
+    @ExpectedDatabase(
+        value = "persistence/commands/deleteUnusedCommands/expected.xml",
+        assertionMode = DatabaseAssertionMode.NON_STRICT
+    )
     void testDeleteUnusedCommands() {
         final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
         final Instant createdThreshold = present.minus(1, ChronoUnit.DAYS);
         Assertions.assertThat(this.commandRepository.count()).isEqualTo(8);
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command0")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command1")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command2")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command3")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command4")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command7")).isTrue();
         Assertions.assertThat(this.criterionRepository.count()).isEqualTo(1L);
-        Assertions.assertThat(
-            this.service.deleteUnusedCommands(
-                EnumSet.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED),
-                createdThreshold
+        Assertions
+            .assertThat(
+                this.service.deleteUnusedCommands(
+                    EnumSet.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED),
+                    createdThreshold
+                )
             )
-        ).isEqualTo(2);
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command0")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command1")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command2")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command3")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command4")).isTrue();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isFalse();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isFalse();
-        Assertions.assertThat(this.commandRepository.existsByUniqueId("command7")).isTrue();
+            .isEqualTo(3);
         Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
     }
 
