@@ -19,9 +19,7 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 
@@ -31,31 +29,10 @@ import org.springframework.http.HttpStatus;
  * @author tgianos
  * @since 3.0.0
  */
-public class RootRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
+class RootRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @After
-    @Override
-    public void cleanup() throws Exception {
-        super.cleanup();
-    }
-
-    /**
-     * Make sure we can get the root resource.
-     */
     @Test
-    public void canGetRootResource() {
+    void canGetRootResource() {
         RestAssured
             .given(this.getRequestSpecification())
             .when()

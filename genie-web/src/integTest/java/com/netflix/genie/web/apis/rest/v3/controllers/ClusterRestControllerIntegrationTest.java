@@ -33,10 +33,8 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -59,7 +57,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
+class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = "h2prod";
@@ -72,33 +70,13 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
     private static final String CLUSTERS_COMMANDS_LINK_PATH = CLUSTERS_LIST_PATH + "._links.commands.href";
     private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("bash");
 
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
+    @BeforeEach
+    void beforeClusters() {
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @After
-    @Override
-    public void cleanup() throws Exception {
-        super.cleanup();
-    }
-
-    /**
-     * Test creating a cluster without an ID.
-     *
-     * @throws Exception on configuration issue
-     */
     @Test
-    public void canCreateClusterWithoutId() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-
+    void canCreateClusterWithoutId() throws Exception {
         final RestDocumentationFilter createFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.CONTENT_TYPE_HEADER, // Request headers
@@ -151,17 +129,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 )
             );
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test creating a Cluster with an ID.
-     *
-     * @throws Exception When issue in creation
-     */
     @Test
-    public void canCreateClusterWithId() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canCreateClusterWithId() throws Exception {
         this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
@@ -198,17 +170,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 )
             );
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test to make sure the post API can handle bad input.
-     *
-     * @throws Exception on issue
-     */
     @Test
-    public void canHandleBadInputToCreateCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canHandleBadInputToCreateCluster() throws Exception {
         final Cluster cluster = new Cluster.Builder(" ", " ", " ", ClusterStatus.UP).build();
 
         RestAssured
@@ -226,17 +192,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 Matchers.containsString("A version is required and must be at most 255 characters")
             );
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * Test to make sure that you can search for clusters by various parameters.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canFindClusters() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canFindClusters() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -352,17 +312,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         //TODO: Add tests for searching by min and max update time as those are available parameters
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(3L);
     }
 
-    /**
-     * Test to make sure that a cluster can be updated.
-     *
-     * @throws Exception on configuration errors
-     */
     @Test
-    public void canUpdateCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canUpdateCluster() throws Exception {
         this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
@@ -384,7 +338,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 }
             ).getContent();
         Assertions.assertThat(createdCluster).isNotNull();
-        Assert.assertThat(createdCluster.getStatus(), Matchers.is(ClusterStatus.UP));
+        Assertions.assertThat(createdCluster.getStatus()).isEqualByComparingTo(ClusterStatus.UP);
 
         final Cluster.Builder updateCluster = new Cluster.Builder(
             createdCluster.getName(),
@@ -430,17 +384,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()));
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test to make sure that a cluster can be patched.
-     *
-     * @throws Exception on configuration errors
-     */
     @Test
-    public void canPatchCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canPatchCluster() throws Exception {
         final String id = this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
@@ -489,21 +437,15 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(NAME_PATH, Matchers.is(newName));
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Make sure can successfully delete all clusters.
-     *
-     * @throws Exception on a configuration error
-     */
     @Test
-    public void canDeleteAllClusters() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canDeleteAllClusters() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(), null);
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.OUT_OF_SERVICE).build(), null);
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.TERMINATED).build(), null);
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(3L);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/"
@@ -518,17 +460,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .then()
             .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * Test to make sure that you can delete a cluster.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canDeleteACluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canDeleteACluster() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -554,7 +490,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             new Cluster.Builder(name3, user3, version3, ClusterStatus.TERMINATED).withId(id3).build(),
             null
         );
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(3L);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -583,17 +519,11 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 Matchers.containsString("No cluster with id")
             );
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(2L);
     }
 
-    /**
-     * Test to make sure we can add configurations to the cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddConfigsToCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canAddConfigsToCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
@@ -611,14 +541,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canAddElementsToResource(CLUSTERS_API + "/{id}/configs", ID, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the configurations for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateConfigsForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canUpdateConfigsForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
@@ -630,14 +554,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the configurations for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteConfigsForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canDeleteConfigsForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
@@ -647,14 +565,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/configs", ID, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can add dependencies to the cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddDependenciesToCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canAddDependenciesToCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
@@ -672,14 +584,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canAddElementsToResource(CLUSTERS_API + "/{id}/dependencies", ID, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the dependencies for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateDependenciesForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canUpdateDependenciesForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
@@ -691,14 +597,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the dependencies for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteDependenciesForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canDeleteDependenciesForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
@@ -708,14 +608,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/dependencies", ID, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can add tags to the cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddTagsToCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canAddTagsToCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
 
@@ -734,14 +628,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canAddTagsToResource(api, ID, NAME, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the tags for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateTagsForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canUpdateTagsForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
 
@@ -754,14 +642,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canUpdateTagsForResource(api, ID, NAME, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the tags for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteTagsForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canDeleteTagsForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
@@ -772,14 +654,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteTagsForResource(api, ID, NAME, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can delete a tag for a cluster after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteTagForCluster() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void canDeleteTagForCluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
@@ -789,13 +665,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteTagForResource(api, ID, NAME, deleteFilter);
     }
 
-    /**
-     * Make sure can add the commands for a cluster.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canAddCommandsForACluster() throws Exception {
+    void canAddCommandsForACluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/{id}/commands";
 
@@ -859,13 +730,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .body("$", Matchers.empty());
     }
 
-    /**
-     * Make sure can set the commands for a cluster.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canSetCommandsForACluster() throws Exception {
+    void canSetCommandsForACluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/{id}/commands";
 
@@ -917,13 +783,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .body("$", Matchers.empty());
     }
 
-    /**
-     * Make sure that we can remove all the commands from a cluster.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canRemoveCommandsFromACluster() throws Exception {
+    void canRemoveCommandsFromACluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/{id}/commands";
 
@@ -980,13 +841,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .body("$", Matchers.empty());
     }
 
-    /**
-     * Make sure that we can remove a command from a cluster.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canRemoveCommandFromACluster() throws Exception {
+    void canRemoveCommandFromACluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/{id}/commands";
 
@@ -1026,8 +882,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
      * @throws Exception on error
      */
     @Test
-    public void testPagingDoubleEncoding() throws Exception {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+    void testPagingDoubleEncoding() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -1116,13 +971,8 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         }
     }
 
-    /**
-     * Test creating a cluster with blank files and tag resources.
-     *
-     * @throws Exception when an unexpected error is encountered
-     */
     @Test
-    public void canCreateClusterWithBlankFields() throws Exception {
+    void canCreateClusterWithBlankFields() throws Exception {
         final List<Cluster> invalidClusterResources = Lists.newArrayList(
             new Cluster
                 .Builder(NAME, USER, VERSION, ClusterStatus.UP)
@@ -1145,7 +995,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
 
         long i = 0L;
         for (final Cluster invalidClusterResource : invalidClusterResources) {
-            Assert.assertThat(this.clusterRepository.count(), Matchers.is(i));
+            Assertions.assertThat(this.clusterRepository.count()).isEqualTo(i);
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1157,17 +1007,12 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 .then()
                 .statusCode(Matchers.is(HttpStatus.CREATED.value()));
 
-            Assert.assertThat(this.clusterRepository.count(), Matchers.is(++i));
+            Assertions.assertThat(this.clusterRepository.count()).isEqualTo(++i);
         }
     }
 
-    /**
-     * Test getting a cluster that does not exist produces the expected error.
-     */
     @Test
-    public void testClusterNotFound() {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
-
+    void testClusterNotFound() {
         final List<String> paths = Lists.newArrayList("", "/commands");
 
         for (final String path : paths) {

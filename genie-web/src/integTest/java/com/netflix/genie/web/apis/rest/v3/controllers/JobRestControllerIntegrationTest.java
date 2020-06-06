@@ -41,12 +41,11 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +69,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -89,11 +87,11 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
+class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
 
-    private static final long SLEEP_TIME = 1000L;
+    private static final long SLEEP_TIME = 500L;
     private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
     private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
     private static final String COMMAND_ARGS_PATH = "commandArgs";
@@ -127,7 +125,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
-    private static final long CHECK_DELAY = 500L;
+    private static final long CHECK_DELAY = 250L;
     private static final String BASE_DIR
         = "com/netflix/genie/web/apis/rest/v3/controllers/JobRestControllerIntegrationTests/";
     private static final String FILE_DELIMITER = "/";
@@ -168,7 +166,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String EXPECTED_STDOUT_CONTENT = "hello world\n";
     private static final int EXPECTED_STDOUT_LENGTH = EXPECTED_STDOUT_CONTENT.length();
 
-    private final boolean agentExecution;
+    protected boolean agentExecution;
     private ResourceLoader resourceLoader;
     private JsonNode metadata;
     private String schedulerJobName;
@@ -183,25 +181,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Autowired
     private Resource jobDirResource;
 
-    /**
-     * Constructor.
-     */
-    public JobRestControllerIntegrationTest() {
-        this(false);
+    JobRestControllerIntegrationTest() {
+        this.agentExecution = false;
     }
 
-    JobRestControllerIntegrationTest(final boolean agentExecution) {
-        this.agentExecution = agentExecution;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
-
+    @BeforeEach
+    void beforeJobs() throws Exception {
         this.schedulerJobName = UUID.randomUUID().toString();
         this.schedulerRunId = UUID.randomUUID().toString();
         this.metadata = GenieObjectMapper.getMapper().readTree(
@@ -224,32 +209,13 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.linkAllEntities();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @After
-    @Override
-    public void cleanup() throws Exception {
-        super.cleanup();
-    }
-
-    /**
-     * Test the job submit method for success.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodSuccess() throws Exception {
+    void testSubmitJobMethodSuccess() throws Exception {
         this.submitAndCheckJob(1, true);
     }
 
-    /**
-     * Test to make sure command args are limited to 10,000 characters.
-     *
-     * @throws Exception On error
-     */
     @Test
-    public void testForTooManyCommandArgs() throws Exception {
+    void testForTooManyCommandArgs() throws Exception {
         final JobRequest tooManyCommandArguments = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -278,7 +244,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     }
 
     private void submitAndCheckJob(final int documentationId, final boolean archiveJob) throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs = SLEEP_AND_ECHO_COMMAND_ARGS;
 
         final String clusterTag = LOCALHOST_CLUSTER_TAG;
@@ -342,7 +308,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.checkFindJobs(documentationId, id, JOB_USER);
         this.checkJobArchive(id, archiveJob);
 
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
 
         // Test for conflicts
         this.testForConflicts(id, commandArgs, clusterCriteriaList, commandCriteria);
@@ -1034,38 +1000,28 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private void checkJobArchive(
         final String id,
         final boolean jobShouldBeArchived
-    ) throws URISyntaxException {
+    ) {
         final Path archiveDirectory = Paths.get(this.jobsLocationsProperties.getArchives()).resolve(id);
         // TODO: This is flipped during V4 migration and should be changed back once clients are fixed
 //        if (jobShouldBeArchived) {
-        Assert.assertTrue(Files.exists(archiveDirectory));
-        Assert.assertTrue(Files.isDirectory(archiveDirectory));
+        Assertions.assertThat(Files.exists(archiveDirectory)).isTrue();
+        Assertions.assertThat(Files.isDirectory(archiveDirectory)).isTrue();
 //        } else {
-//            Assert.assertFalse(Files.exists(archiveDirectory));
+//            Assertions.assertThat(Files.exists(archiveDirectory)).isFalse();
 //        }
     }
 
-    /**
-     * Test the job submit method for success twice to validate the file cache use.
-     *
-     * @throws Exception If there is a problem.
-     */
-    @Test
-    public void testSubmitJobMethodTwiceSuccess() throws Exception {
-        submitAndCheckJob(2, true);
-        cleanup();
-        setup();
-        submitAndCheckJob(3, false);
-    }
+//    @Test
+//    public void testSubmitJobMethodTwiceSuccess() throws Exception {
+//        submitAndCheckJob(2, true);
+//        cleanup();
+//        setup();
+//        submitAndCheckJob(3, false);
+//    }
 
-    /**
-     * Test to make sure we can submit a job with attachments.
-     *
-     * @throws Exception on any error
-     */
     @Test
-    public void canSubmitJobWithAttachments() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void canSubmitJobWithAttachments() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(LOCALHOST_CLUSTER_TAG))
@@ -1117,14 +1073,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.waitForDone(this.submitJob(4, jobRequest, Lists.newArrayList(attachment1, attachment2)));
     }
 
-    /**
-     * Test the job submit method for incorrect cluster resolved.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodMissingCluster() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodMissingCluster() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet("undefined");
@@ -1169,17 +1120,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             )
             .body("stackTrace", Matchers.nullValue());
 
-        Assert.assertThat(this.getStatus(jobId), Matchers.is(JobStatus.FAILED));
+        Assertions.assertThat(this.getStatus(jobId)).isEqualByComparingTo(JobStatus.FAILED);
     }
 
-    /**
-     * Test the job submit method for incorrect cluster criteria.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(" ", "", null)));
@@ -1218,14 +1164,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
     }
 
-    /**
-     * Test the job submit method for incorrect cluster criteria.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("ok")));
@@ -1264,14 +1205,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
     }
 
-    /**
-     * Test the job submit method for incorrect command resolved.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodMissingCommand() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodMissingCommand() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1303,17 +1239,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
-        Assert.assertThat(this.getStatus(jobId), Matchers.is(JobStatus.FAILED));
+        Assertions.assertThat(this.getStatus(jobId)).isEqualByComparingTo(JobStatus.FAILED);
     }
 
-    /**
-     * Test the job submit method for when the job is killed by sending a DELETE HTTP call.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodKill() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodKill() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1419,14 +1350,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()));
     }
 
-    /**
-     * Test the job submit method for when the job is killed as it times out.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodKillOnTimeout() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodKillOnTimeout() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1441,7 +1367,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             clusterCriteriaList,
             commandCriteria
         )
-            .withTimeout(5)
+            .withTimeout(1)
             .withDisableLogArchival(true)
             .withCommandArgs(SLEEP_60_COMMAND_ARGS);
 
@@ -1477,14 +1403,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_EXCEEDED_TIMEOUT));
     }
 
-    /**
-     * Test the job submit method for when the job fails.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testSubmitJobMethodFailure() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testSubmitJobMethodFailure() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs;
         commandArgs = Lists.newArrayList("-c", "'exit 1'");
 
@@ -1522,7 +1443,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
         this.waitForDone(id);
 
-        Assert.assertEquals(JobStatus.FAILED, this.getStatus(id));
+        Assertions.assertThat(this.getStatus(id)).isEqualByComparingTo(JobStatus.FAILED);
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1537,14 +1458,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_FAILED));
     }
 
-    /**
-     * Test the response content types to ensure UTF-8.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testResponseContentType() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testResponseContentType() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String utf8 = "UTF-8";
 
         final JobRequest jobRequest = new JobRequest.Builder(
@@ -1606,7 +1522,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
                 .contentType(Matchers.containsString(utf8));
 
         } else {
-
             RestAssured
                 .given(this.getRequestSpecification())
                 .when()
@@ -1663,12 +1578,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .contentType(Matchers.containsString(utf8));
     }
 
-    /**
-     * Test getting a job that does not exist produces the expected error.
-     */
     @Test
-    public void testJobNotFound() {
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(0L));
+    void testJobNotFound() {
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(0L);
 
         final String jobId = UUID.randomUUID().toString();
 
@@ -1707,14 +1619,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No job with id " + jobId));
     }
 
-    /**
-     * Test the requesting a file that does not exist.
-     *
-     * @throws Exception If there is a problem.
-     */
     @Test
-    public void testFileNotFound() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void testFileNotFound() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String utf8 = "UTF-8";
 
         final JobRequest jobRequest = new JobRequest.Builder(

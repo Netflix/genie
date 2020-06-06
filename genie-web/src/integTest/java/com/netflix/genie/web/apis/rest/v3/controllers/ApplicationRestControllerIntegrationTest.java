@@ -29,10 +29,8 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import io.restassured.RestAssured;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -54,7 +52,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class ApplicationRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
+class ApplicationRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     // Use a `.` to ensure that the Spring prefix matcher is turned off
     // see: https://tinyurl.com/yblzglk8
@@ -72,33 +70,13 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
     private static final String APPLICATIONS_COMMANDS_LINK_PATH = APPLICATIONS_LIST_PATH + "._links.commands.href";
     private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("bash");
 
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
+    @BeforeEach
+    void beforeApplications() {
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @After
-    @Override
-    public void cleanup() throws Exception {
-        super.cleanup();
-    }
-
-    /**
-     * Test creating an application without an ID.
-     *
-     * @throws Exception on configuration issue
-     */
     @Test
-    public void canCreateApplicationWithoutId() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
-
+    void canCreateApplicationWithoutId() throws Exception {
         final RestDocumentationFilter creationResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.CONTENT_TYPE_HEADER, // Request headers
@@ -111,7 +89,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
                 .withType(TYPE)
                 .withDependencies(Sets.newHashSet("s3://mybucket/spark/" + VERSION + "/spark.tar.gz"))
-                .withSetupFile("s3://mybucket/spark/" + VERSION + "/setup-spark.sh")
+                .withSetupFile("s3://mybucket/spark/" + VERSION + "/setupBase-spark.sh")
                 .withConfigs(Sets.newHashSet("s3://mybucket/spark/" + VERSION + "/spark-env.sh"))
                 .withDescription("Spark for Genie")
                 .withTags(Sets.newHashSet("type:" + TYPE, "ver:" + VERSION))
@@ -143,7 +121,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .body(VERSION_PATH, Matchers.is(VERSION))
             .body(USER_PATH, Matchers.is(USER))
             .body(DESCRIPTION_PATH, Matchers.is("Spark for Genie"))
-            .body(SETUP_FILE_PATH, Matchers.is("s3://mybucket/spark/" + VERSION + "/setup-spark.sh"))
+            .body(SETUP_FILE_PATH, Matchers.is("s3://mybucket/spark/" + VERSION + "/setupBase-spark.sh"))
             .body(CONFIGS_PATH, Matchers.hasItem("s3://mybucket/spark/" + VERSION + "/spark-env.sh"))
             .body(TAGS_PATH, Matchers.hasSize(4))
             .body(TAGS_PATH, Matchers.hasItem("genie.id:" + id))
@@ -163,25 +141,18 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 )
             );
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test creating an application with an ID.
-     *
-     * @throws Exception When issue in creation
-     */
     @Test
-    public void canCreateApplicationWithId() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
-
+    void canCreateApplicationWithId() throws Exception {
         this.createConfigResource(
             new Application
                 .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
                 .withId(ID)
                 .withType(TYPE)
                 .withDependencies(Sets.newHashSet("s3://mybucket/spark/" + VERSION + "/spark.tar.gz"))
-                .withSetupFile("s3://mybucket/spark/" + VERSION + "/setup-spark.sh")
+                .withSetupFile("s3://mybucket/spark/" + VERSION + "/setupBase-spark.sh")
                 .withConfigs(Sets.newHashSet("s3://mybucket/spark/" + VERSION + "/spark-env.sh"))
                 .withDescription("Spark for Genie")
                 .withTags(Sets.newHashSet("type:" + TYPE, "ver:" + VERSION))
@@ -204,7 +175,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .body(VERSION_PATH, Matchers.is(VERSION))
             .body(USER_PATH, Matchers.is(USER))
             .body(DESCRIPTION_PATH, Matchers.is("Spark for Genie"))
-            .body(SETUP_FILE_PATH, Matchers.is("s3://mybucket/spark/" + VERSION + "/setup-spark.sh"))
+            .body(SETUP_FILE_PATH, Matchers.is("s3://mybucket/spark/" + VERSION + "/setupBase-spark.sh"))
             .body(CONFIGS_PATH, Matchers.hasItem("s3://mybucket/spark/" + VERSION + "/spark-env.sh"))
             .body(TAGS_PATH, Matchers.hasSize(4))
             .body(TAGS_PATH, Matchers.hasItem("genie.id:" + ID))
@@ -225,17 +196,11 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 )
             );
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test to make sure the post API can handle bad input.
-     *
-     * @throws Exception on issue
-     */
     @Test
-    public void canHandleBadInputToCreateApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canHandleBadInputToCreateApplication() throws Exception {
         final Application app = new Application.Builder(" ", " ", " ", ApplicationStatus.ACTIVE).build();
 
         RestAssured
@@ -253,20 +218,14 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 Matchers.containsString("A version is required and must be at most 255 characters")
             );
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * Test to make sure that you can search for applications by various parameters.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canFindApplications() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canFindApplications() throws Exception {
         final Application spark151 = new Application.Builder("spark", "genieUser1", "1.5.1", ApplicationStatus.ACTIVE)
             .withDependencies(Sets.newHashSet("s3://mybucket/spark/spark-1.5.1.tar.gz"))
-            .withSetupFile("s3://mybucket/spark/setup-spark.sh")
+            .withSetupFile("s3://mybucket/spark/setupBase-spark.sh")
             .withConfigs(Sets.newHashSet("s3://mybucket/spark/spark-env.sh"))
             .withDescription("Spark 1.5.1 for Genie")
             .withTags(Sets.newHashSet("type:spark", "ver:1.5.1"))
@@ -275,7 +234,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
 
         final Application spark150 = new Application.Builder("spark", "genieUser2", "1.5.0", ApplicationStatus.ACTIVE)
             .withDependencies(Sets.newHashSet("s3://mybucket/spark/spark-1.5.0.tar.gz"))
-            .withSetupFile("s3://mybucket/spark/setup-spark.sh")
+            .withSetupFile("s3://mybucket/spark/setupBase-spark.sh")
             .withConfigs(Sets.newHashSet("s3://mybucket/spark/spark-env.sh"))
             .withDescription("Spark 1.5.0 for Genie")
             .withTags(Sets.newHashSet("type:spark", "ver:1.5.0"))
@@ -284,7 +243,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
 
         final Application spark141 = new Application.Builder("spark", "genieUser3", "1.4.1", ApplicationStatus.INACTIVE)
             .withDependencies(Sets.newHashSet("s3://mybucket/spark/spark-1.4.1.tar.gz"))
-            .withSetupFile("s3://mybucket/spark/setup-spark.sh")
+            .withSetupFile("s3://mybucket/spark/setupBase-spark.sh")
             .withConfigs(Sets.newHashSet("s3://mybucket/spark/spark-env.sh"))
             .withDescription("Spark 1.4.1 for Genie")
             .withTags(Sets.newHashSet("type:spark", "ver:1.4.1"))
@@ -294,7 +253,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         final Application spark140
             = new Application.Builder("spark", "genieUser4", "1.4.0", ApplicationStatus.DEPRECATED)
             .withDependencies(Sets.newHashSet("s3://mybucket/spark/spark-1.4.0.tar.gz"))
-            .withSetupFile("s3://mybucket/spark/setup-spark.sh")
+            .withSetupFile("s3://mybucket/spark/setupBase-spark.sh")
             .withConfigs(Sets.newHashSet("s3://mybucket/spark/spark-env.sh"))
             .withDescription("Spark 1.4.0 for Genie")
             .withTags(Sets.newHashSet("type:spark", "ver:1.4.0"))
@@ -304,7 +263,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         final Application spark131
             = new Application.Builder("spark", "genieUser5", "1.3.1", ApplicationStatus.DEPRECATED)
             .withDependencies(Sets.newHashSet("s3://mybucket/spark/spark-1.3.1.tar.gz"))
-            .withSetupFile("s3://mybucket/spark/setup-spark.sh")
+            .withSetupFile("s3://mybucket/spark/setupBase-spark.sh")
             .withConfigs(Sets.newHashSet("s3://mybucket/spark/spark-env.sh"))
             .withDescription("Spark 1.3.1 for Genie")
             .withTags(Sets.newHashSet("type:spark", "ver:1.3.1"))
@@ -313,7 +272,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
 
         final Application pig = new Application.Builder("spark", "genieUser6", "0.4.0", ApplicationStatus.ACTIVE)
             .withDependencies(Sets.newHashSet("s3://mybucket/pig/pig-0.15.0.tar.gz"))
-            .withSetupFile("s3://mybucket/pig/setup-pig.sh")
+            .withSetupFile("s3://mybucket/pig/setupBase-pig.sh")
             .withConfigs(Sets.newHashSet("s3://mybucket/pig/pig.properties"))
             .withDescription("Pig 0.15.0 for Genie")
             .withTags(Sets.newHashSet("type:pig", "ver:0.15.0"))
@@ -322,7 +281,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
 
         final Application hive = new Application.Builder("hive", "genieUser7", "1.0.0", ApplicationStatus.ACTIVE)
             .withDependencies(Sets.newHashSet("s3://mybucket/hive/hive-1.0.0.tar.gz"))
-            .withSetupFile("s3://mybucket/hive/setup-hive.sh")
+            .withSetupFile("s3://mybucket/hive/setupBase-hive.sh")
             .withConfigs(
                 Sets.newHashSet("s3://mybucket/hive/hive-env.sh", "s3://mybucket/hive/hive-log4j.properties")
             )
@@ -454,17 +413,11 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
 
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(7L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(7L);
     }
 
-    /**
-     * Test to make sure that an application can be updated.
-     *
-     * @throws Exception on configuration errors
-     */
     @Test
-    public void canUpdateApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canUpdateApplication() throws Exception {
         final String id = this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -485,7 +438,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 }
             ).getContent();
         Assertions.assertThat(createdApp).isNotNull();
-        Assert.assertThat(createdApp.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
+        Assertions.assertThat(createdApp.getStatus()).isEqualByComparingTo(ApplicationStatus.ACTIVE);
 
         final Application.Builder newStatusApp = new Application.Builder(
             createdApp.getName(),
@@ -531,17 +484,11 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(STATUS_PATH, Matchers.is(ApplicationStatus.INACTIVE.toString()));
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test to make sure that an application can be patched.
-     *
-     * @throws Exception on configuration errors
-     */
     @Test
-    public void canPatchApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canPatchApplication() throws Exception {
         final String id = this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -589,17 +536,11 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(USER_PATH, Matchers.is(newUser));
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Make sure can successfully delete all applications.
-     *
-     * @throws Exception on a configuration error
-     */
     @Test
-    public void canDeleteAllApplications() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canDeleteAllApplications() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).build(),
             null
@@ -612,7 +553,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.INACTIVE).build(),
             null
         );
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(3L);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/"
@@ -627,17 +568,11 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .then()
             .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * Test to make sure that you can delete an application.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canDeleteAnApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canDeleteAnApplication() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -672,7 +607,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 .build(),
             null
         );
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(3L);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -701,17 +636,11 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 Matchers.containsString("No application with id")
             );
 
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(2L));
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(2L);
     }
 
-    /**
-     * Test to make sure we can add configurations to the application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddConfigsToApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canAddConfigsToApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -732,14 +661,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canAddElementsToResource(APPLICATIONS_API + "/{id}/configs", ID, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the configurations for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateConfigsForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canUpdateConfigsForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -754,14 +677,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canUpdateElementsForResource(APPLICATIONS_API + "/{id}/configs", ID, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the configurations for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteConfigsForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canDeleteConfigsForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -774,14 +691,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canDeleteElementsFromResource(APPLICATIONS_API + "/{id}/configs", ID, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can add dependencies to the application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddDependenciesToApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canAddDependenciesToApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -807,14 +718,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         );
     }
 
-    /**
-     * Test to make sure we can update the dependencies for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateDependenciesForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canUpdateDependenciesForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -833,14 +738,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         );
     }
 
-    /**
-     * Test to make sure we can delete the dependencies for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteDependenciesForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canDeleteDependenciesForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -857,14 +756,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         );
     }
 
-    /**
-     * Test to make sure we can add tags to the application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddTagsToApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canAddTagsToApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -886,14 +779,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canAddTagsToResource(api, ID, NAME, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the tags for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateTagsForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canUpdateTagsForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -909,14 +796,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canUpdateTagsForResource(api, ID, NAME, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the tags for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteTagsForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canDeleteTagsForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -930,14 +811,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canDeleteTagsForResource(api, ID, NAME, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can delete a tag for an application after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteTagForApplication() throws Exception {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+    void canDeleteTagForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -953,13 +828,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         this.canDeleteTagForResource(api, ID, NAME, deleteFilter);
     }
 
-    /**
-     * Make sure can get all the commands which use a given application.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canGetCommandsForApplication() throws Exception {
+    void canGetCommandsForApplication() throws Exception {
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -1030,7 +900,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             command -> {
                 if (!command.getId().orElseThrow(IllegalArgumentException::new).equals(command1Id)
                     && !command.getId().orElseThrow(IllegalArgumentException::new).equals(command3Id)) {
-                    Assert.fail();
+                    Assertions.fail("Unexpected command");
                 }
             }
         );
@@ -1070,14 +940,8 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .body("[0].id", Matchers.is(command1Id));
     }
 
-    /**
-     * Test creating an application with blank files and tag resources.
-     *
-     * @throws Exception when an unexpected error is encountered
-     */
     @Test
-    public void canCreateApplicationWithBlankFields() throws Exception {
-
+    void canCreateApplicationWithBlankFields() throws Exception {
         final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
 
         final List<Application> invalidApplicationResources = Lists.newArrayList(
@@ -1108,7 +972,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
 
         long i = 0L;
         for (final Application invalidApplicationResource : invalidApplicationResources) {
-            Assert.assertThat(this.applicationRepository.count(), Matchers.is(i));
+            Assertions.assertThat(this.applicationRepository.count()).isEqualTo(i);
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1120,17 +984,12 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 .then()
                 .statusCode(Matchers.is(HttpStatus.CREATED.value()));
 
-            Assert.assertThat(this.applicationRepository.count(), Matchers.is(++i));
+            Assertions.assertThat(this.applicationRepository.count()).isEqualTo(++i);
         }
     }
 
-    /**
-     * Test getting an application that does not exist produces the expected error.
-     */
     @Test
-    public void testApplicationNotFound() {
-        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
-
+    void testApplicationNotFound() {
         final List<String> paths = Lists.newArrayList("", "/commands");
 
         for (final String path : paths) {

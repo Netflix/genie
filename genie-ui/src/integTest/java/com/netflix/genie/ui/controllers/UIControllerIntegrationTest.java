@@ -19,15 +19,15 @@ package com.netflix.genie.ui.controllers;
 
 import com.netflix.genie.web.apis.rest.v3.controllers.GenieExceptionMapper;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -44,10 +44,10 @@ import java.util.UUID;
  * @author mprimi
  * @since 3.2.0
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(UIController.class)
 @ActiveProfiles("integration")
-public class UIControllerIntegrationTest {
+class UIControllerIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
@@ -61,7 +61,7 @@ public class UIControllerIntegrationTest {
      * @throws Exception in case of error
      */
     @Test
-    public void testForwardingToIndex() throws Exception {
+    void testForwardingToIndex() throws Exception {
         final List<String> validPaths = Arrays.asList(
             "/",
             "/applications",
@@ -86,12 +86,12 @@ public class UIControllerIntegrationTest {
      * @throws Exception in case of error
      */
     @Test
-    public void testGetIndex() throws Exception {
+    void testGetIndex() throws Exception {
         final String indexContent;
 
         try (InputStream is = UIController.class.getResourceAsStream("/templates/index.html")) {
-            Assert.assertNotNull(is);
-            Assert.assertTrue(is.available() > 0);
+            Assertions.assertThat(is).isNotNull();
+            Assertions.assertThat(is.available() > 0).isTrue();
             indexContent = IOUtils.toString(is, StandardCharsets.UTF_8);
         }
 
@@ -121,7 +121,7 @@ public class UIControllerIntegrationTest {
      * @throws Exception in case of error
      */
     @Test
-    public void getFile() throws Exception {
+    void getFile() throws Exception {
         final String jobId = UUID.randomUUID().toString();
         final String file = "foo/bar.txt";
 

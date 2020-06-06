@@ -39,9 +39,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockSnippet;
@@ -49,12 +49,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -69,10 +70,15 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.0.0
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(
+    {
+        RestDocumentationExtension.class,
+        SpringExtension.class
+    }
+)
 @SpringBootTest(classes = GenieTestApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
-public abstract class RestControllerIntegrationTestBase {
+abstract class RestControllerIntegrationTestBase {
 
     static final String APPLICATIONS_API = "/api/v3/applications";
     static final String CLUSTERS_API = "/api/v3/clusters";
@@ -94,7 +100,6 @@ public abstract class RestControllerIntegrationTestBase {
     static final String LINKS_PATH = "_links";
     static final String EMBEDDED_PATH = "_embedded";
     static final String EXCEPTION_MESSAGE_PATH = "message";
-    static final String EXCEPTION_CODE_PATH = "errorCode";
 
     // Link Keys
     static final String SELF_LINK_KEY = "self";
@@ -107,12 +112,6 @@ public abstract class RestControllerIntegrationTestBase {
     private static final String URI_HOST = "genie.example.com";
     private static final String URI_SCHEME = "https";
     private static final String LOCAL_TEST_SERVER_PORT_PROPERTY_NAME = "local.server.port";
-
-    /**
-     * Setup for the Spring Rest Docs wiring.
-     */
-    @Rule
-    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;
@@ -168,12 +167,8 @@ public abstract class RestControllerIntegrationTestBase {
         return this.requestSpecification;
     }
 
-    /**
-     * Clean out the db before every test.
-     *
-     * @throws Exception on error
-     */
-    public void setup() throws Exception {
+    @BeforeEach
+    void beforeBase(final RestDocumentationContextProvider documentationContextProvider) {
         this.jobRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
@@ -186,7 +181,7 @@ public abstract class RestControllerIntegrationTestBase {
         this.requestSpecification = new RequestSpecBuilder()
             .addFilter(
                 RestAssuredRestDocumentation
-                    .documentationConfiguration(this.restDocumentation)
+                    .documentationConfiguration(documentationContextProvider)
                     .snippets().withAdditionalDefaults(new WireMockSnippet())
                     .and()
                     .operationPreprocessors()
@@ -209,20 +204,6 @@ public abstract class RestControllerIntegrationTestBase {
         this.port = this.environment.getRequiredProperty(LOCAL_TEST_SERVER_PORT_PROPERTY_NAME, Integer.class);
     }
 
-    /**
-     * Clean out the db after every test.
-     *
-     * @throws Exception on error
-     */
-    public void cleanup() throws Exception {
-        this.jobRepository.deleteAll();
-        this.clusterRepository.deleteAll();
-        this.commandRepository.deleteAll();
-        this.applicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
-    }
-
     void canAddElementsToResource(
         final String api,
         final String id,
@@ -236,7 +217,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.empty());
 
         final String element1 = UUID.randomUUID().toString();
@@ -262,7 +243,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("$", Matchers.hasItem(element1))
             .body("$", Matchers.hasItem(element2));
@@ -306,7 +287,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("$", Matchers.hasItem(element3));
     }
@@ -345,7 +326,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.empty());
     }
 
@@ -363,7 +344,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("$", Matchers.hasItem("genie.id:" + id))
             .body("$", Matchers.hasItem("genie.name:" + name));
@@ -391,7 +372,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(4))
             .body("$", Matchers.hasItem("genie.id:" + id))
             .body("$", Matchers.hasItem("genie.name:" + name))
@@ -438,7 +419,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(3))
             .body("$", Matchers.hasItem("genie.id:" + id))
             .body("$", Matchers.hasItem("genie.name:" + name))
@@ -481,7 +462,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("$", Matchers.hasItem("genie.id:" + id))
             .body("$", Matchers.hasItem("genie.name:" + name));
@@ -522,7 +503,7 @@ public abstract class RestControllerIntegrationTestBase {
             .get(api, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body("$", Matchers.hasSize(3))
             .body("$", Matchers.hasItem("genie.id:" + id))
             .body("$", Matchers.hasItem("genie.name:" + name))
@@ -568,7 +549,7 @@ public abstract class RestControllerIntegrationTestBase {
 
     String getIdFromLocation(@Nullable final String location) {
         if (location == null) {
-            Assert.fail();
+            Assertions.fail("No location provided");
         }
         return location.substring(location.lastIndexOf("/") + 1);
     }
