@@ -8,7 +8,7 @@ Search the clusters that the given command is linked to.
 
 `GET /api/v3/commands/{id}/clusters`
 
-:snippet-base: {snippets}/command-rest-controller-integration-test/can-get-clusters-for-command/8
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-get-clusters-for-command/6
 :id-base: get-clusters-for-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

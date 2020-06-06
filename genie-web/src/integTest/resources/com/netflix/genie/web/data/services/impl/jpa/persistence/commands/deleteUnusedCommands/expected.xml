@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2020 Netflix, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<dataset>
+    <commands
+        id="0"
+        created="2020-03-23 01:47:00"
+        updated="2020-03-23 01:59:00"
+        entity_version="0"
+        unique_id="command0"
+        genie_user="tgianos"
+        name="sparksql"
+        version="1.2.3"
+        check_delay="18000"
+        status="INACTIVE"
+    />
+    <commands
+        id="1"
+        created="2020-02-23 01:47:00"
+        updated="2020-02-23 01:59:00"
+        entity_version="0"
+        unique_id="command1"
+        genie_user="tgianos"
+        name="pig_13_prod"
+        version="1.2.3"
+        check_delay="18000"
+        status="ACTIVE"
+    />
+    <commands
+        id="2"
+        created="2020-01-23 01:46:00"
+        updated="2020-01-23 03:12:00"
+        entity_version="0"
+        unique_id="command2"
+        genie_user="mprimi"
+        name="hive_11_prod"
+        version="4.5.6"
+        check_delay="19000"
+        status="INACTIVE"
+    />
+    <commands
+        id="3"
+        created="2019-12-23 01:49:00"
+        updated="2019-12-23 02:59:00"
+        entity_version="0"
+        unique_id="command3"
+        genie_user="tgianos"
+        name="pig_11_prod"
+        version="7.8.9"
+        check_delay="20000"
+        status="DEPRECATED"
+        metadata=
+            "{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: 65, &quot;key3&quot;: [], &quot;key4&quot;: {}}"
+    />
+    <commands
+        id="4"
+        created="2019-11-23 01:49:00"
+        updated="2019-11-23 02:59:00"
+        entity_version="0"
+        unique_id="command4"
+        genie_user="tgianos"
+        name="oldspark"
+        version="7.8.9"
+        check_delay="20000"
+        status="ACTIVE"
+    />
+
+    <jobs
+        id="0"
+        created="2020-02-24 01:48:00"
+        updated="2020-02-24 02:59:00"
+        entity_version="1"
+        unique_id="job0"
+        genie_user="tgianos"
+        name="testSparkJob2"
+        version="2.4"
+        archiving_disabled="true"
+        status="SUCCEEDED"
+        command_id="3"
+        requested_id="true"
+        resolved="true"
+        api="true"
+    />
+    <jobs
+        id="1"
+        created="2020-03-23 01:48:00"
+        updated="2020-03-23 02:59:00"
+        entity_version="1"
+        unique_id="job1"
+        genie_user="tgianos"
+        name="testSparkJob2"
+        version="2.4"
+        archiving_disabled="true"
+        status="RUNNING"
+        command_id="1"
+        requested_id="true"
+        resolved="true"
+        api="true"
+    />
+    <jobs
+        id="2"
+        created="2020-01-23 01:48:00"
+        updated="2020-01-23 02:59:00"
+        entity_version="1"
+        unique_id="job2"
+        genie_user="tgianos"
+        name="testSparkJob2"
+        version="2.4"
+        status="KILLED"
+        command_id="2"
+        archiving_disabled="true"
+        requested_id="true"
+        resolved="true"
+        api="true"
+    />
+</dataset>

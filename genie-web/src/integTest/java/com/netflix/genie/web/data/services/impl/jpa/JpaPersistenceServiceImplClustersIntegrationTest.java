@@ -18,22 +18,14 @@
 package com.netflix.genie.web.data.services.impl.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
-import com.netflix.genie.common.external.dtos.v4.Command;
-import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
-import com.netflix.genie.common.external.dtos.v4.CommandRequest;
-import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
-import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
-import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +42,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,10 +52,6 @@ import java.util.UUID;
  * @since 2.0.0
  */
 class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceServiceIntegrationTestBase {
-
-    private static final String COMMAND_1_ID = "command1";
-    private static final String COMMAND_2_ID = "command2";
-    private static final String COMMAND_3_ID = "command3";
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
@@ -396,25 +383,9 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
     void testDelete() throws GenieCheckedException {
-        final CommandEntity command1 = this.commandRepository
-            .findByUniqueId(COMMAND_1_ID)
-            .orElseThrow(IllegalStateException::new);
-        final CommandEntity command2 = this.commandRepository
-            .findByUniqueId(COMMAND_1_ID)
-            .orElseThrow(IllegalStateException::new);
-        final CommandEntity command3 = this.commandRepository
-            .findByUniqueId(COMMAND_1_ID)
-            .orElseThrow(IllegalStateException::new);
-
-        Assertions.assertThat(command1.getClusters()).hasSize(2);
-        Assertions.assertThat(command2.getClusters()).hasSize(2);
-        Assertions.assertThat(command3.getClusters()).hasSize(2);
-
+        Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isTrue();
         this.service.deleteCluster(CLUSTER_1_ID);
-
-        Assertions.assertThat(command1.getClusters()).extracting(ClusterEntity::getUniqueId).containsOnly(CLUSTER_2_ID);
-        Assertions.assertThat(command2.getClusters()).extracting(ClusterEntity::getUniqueId).containsOnly(CLUSTER_2_ID);
-        Assertions.assertThat(command3.getClusters()).extracting(ClusterEntity::getUniqueId).containsOnly(CLUSTER_2_ID);
+        Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isFalse();
     }
 
     @Test
@@ -491,124 +462,6 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     @DatabaseSetup("persistence/clusters/init.xml")
     void testGetDependenciesForCluster() throws GenieCheckedException {
         Assertions.assertThat(this.service.getDependenciesForResource(CLUSTER_1_ID, Cluster.class)).hasSize(2);
-    }
-
-    @Test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testAddCommandsForCluster() throws GenieCheckedException, GenieException {
-        final String command1Id = this.service.saveCommand(
-            new CommandRequest.Builder(
-                new CommandMetadata.Builder(
-                    "name",
-                    "user",
-                    "23.1.0",
-                    CommandStatus.ACTIVE
-                )
-                    .build(),
-                Lists.newArrayList("pig")
-            )
-                .withCheckDelay(8108123L)
-                .build()
-        );
-        final String command2Id = this.service.saveCommand(
-            new CommandRequest.Builder(
-                new CommandMetadata.Builder(
-                    "name2",
-                    "user2",
-                    "23.1.1",
-                    CommandStatus.INACTIVE
-                )
-                    .build(),
-                Lists.newArrayList("pig2")
-            )
-                .withCheckDelay(8023423L)
-                .build()
-        );
-        final List<String> newCommandIds = Lists.newArrayList(command1Id, command2Id);
-        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
-        this.service.addCommandsForCluster(CLUSTER_1_ID, newCommandIds);
-        final List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assertions.assertThat(commands).hasSize(5);
-        Assertions.assertThat(commands.get(3).getId()).isEqualTo(command1Id);
-        Assertions.assertThat(commands.get(4).getId()).isEqualTo(command2Id);
-    }
-
-    @Test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetCommandsForCluster() throws GenieException {
-        Assertions
-            .assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null))
-            .hasSize(3)
-            .extracting(Command::getId)
-            .containsExactly(COMMAND_1_ID, COMMAND_3_ID, COMMAND_2_ID);
-    }
-
-    @Test
-    void testGetCommandsForClusterNoId() {
-        Assertions
-            .assertThatExceptionOfType(ConstraintViolationException.class)
-            .isThrownBy(() -> this.service.getCommandsForCluster("", null));
-    }
-
-    @Test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateCommandsForCluster() throws GenieCheckedException, GenieException {
-        final String command1Id = this.service.saveCommand(
-            new CommandRequest.Builder(
-                new CommandMetadata.Builder(
-                    "name",
-                    "user",
-                    "23.1.0",
-                    CommandStatus.ACTIVE
-                )
-                    .build(),
-                Lists.newArrayList("pig")
-            )
-                .withCheckDelay(137324L)
-                .build()
-        );
-        final String command2Id = this.service.saveCommand(
-            new CommandRequest.Builder(
-                new CommandMetadata.Builder(
-                    "name2",
-                    "user2",
-                    "23.1.1",
-                    CommandStatus.INACTIVE
-                )
-                    .build(),
-                Lists.newArrayList("pig2")
-            )
-                .withCheckDelay(23423L)
-                .build()
-        );
-        final List<String> newCommandIds = Lists.newArrayList(command1Id, command2Id);
-        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
-        this.service.setCommandsForCluster(CLUSTER_1_ID, newCommandIds);
-        Assertions
-            .assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null))
-            .hasSize(2)
-            .extracting(Command::getId)
-            .containsExactly(command1Id, command2Id);
-    }
-
-    @Test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testRemoveAllCommandsForCluster() throws GenieException {
-        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
-        this.service.removeAllCommandsForCluster(CLUSTER_1_ID);
-        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).isEmpty();
-    }
-
-    @Test
-    @DatabaseSetup("persistence/clusters/init.xml")
-    void testRemoveCommandForCluster() throws GenieException {
-        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
-        this.service.removeCommandForCluster(CLUSTER_1_ID, COMMAND_1_ID);
-        Assertions
-            .assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null))
-            .hasSize(2)
-            .extracting(Command::getId)
-            .doesNotContain(COMMAND_1_ID);
     }
 
     @Test

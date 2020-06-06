@@ -59,8 +59,7 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + "SELECT DISTINCT(command_id)"
             + " FROM jobs"
             + " WHERE command_id IS NOT NULL"
-            + ")"
-            + " AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands)";
+            + ")";
 
     /**
      * Bulk set the status of commands which match the given inputs. Considers whether a command was used in some

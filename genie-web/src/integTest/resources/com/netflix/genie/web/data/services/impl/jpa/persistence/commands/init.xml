@@ -284,20 +284,4 @@
         cluster_id="1"
         tag_id="0"
     />
-
-    <clusters_commands
-        cluster_id="1"
-        command_id="1"
-        command_order="0"
-    />
-    <clusters_commands
-        cluster_id="1"
-        command_id="2"
-        command_order="2"
-    />
-    <clusters_commands
-        cluster_id="1"
-        command_id="3"
-        command_order="1"
-    />
 </dataset>

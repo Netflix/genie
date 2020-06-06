@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2017 Netflix, Inc.
+ *  Copyright 2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,24 +15,5 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.data.services.impl.jpa.queries.projections;
 
-import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
-
-import java.util.List;
-
-/**
- * Projection to return only the commands for a cluster.
- *
- * @author tgianos
- * @since 3.3.0
- */
-public interface ClusterCommandsProjection {
-
-    /**
-     * Get the commands associated with a cluster.
-     *
-     * @return The list of commands in priority order
-     */
-    List<CommandEntity> getCommands();
-}
+DROP TABLE IF EXISTS clusters_commands;

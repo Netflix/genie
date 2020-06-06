@@ -56,6 +56,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Integration tests for the Commands REST API.
@@ -1567,84 +1568,62 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
      */
     @Test
     public void canGetClustersForCommand() throws Exception {
-        this.createConfigResource(
-            new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
-                .withId(ID)
-                .build(),
-            null
-        );
         final String placeholder = UUID.randomUUID().toString();
-        final String cluster1Id = UUID.randomUUID().toString();
-        final String cluster2Id = UUID.randomUUID().toString();
-        final String cluster3Id = UUID.randomUUID().toString();
-        this.createConfigResource(
-            new Cluster.Builder(placeholder, placeholder, placeholder, ClusterStatus.UP).withId(cluster1Id).build(),
+        final String cluster1Id = this.createConfigResource(
+            new Cluster.Builder(placeholder, placeholder, placeholder, ClusterStatus.UP).build(),
             null
         );
-        this.createConfigResource(
-            new Cluster
-                .Builder(placeholder, placeholder, placeholder, ClusterStatus.OUT_OF_SERVICE)
-                .withId(cluster2Id)
-                .build(),
+        final String cluster2Id = this.createConfigResource(
+            new Cluster.Builder(placeholder, placeholder, placeholder, ClusterStatus.OUT_OF_SERVICE).build(),
             null
         );
-        this.createConfigResource(
+        final String cluster3Id = this.createConfigResource(
             new Cluster
                 .Builder(placeholder, placeholder, placeholder, ClusterStatus.TERMINATED)
-                .withId(cluster3Id)
                 .build(),
             null
         );
 
-        final List<String> commandIds = Lists.newArrayList(ID);
-        RestAssured
-            .given(this.getRequestSpecification())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
-            .when()
-            .port(this.port)
-            .post(CLUSTERS_API + "/{id}/commands", cluster1Id)
-            .then()
-            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+        final String commandId = this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .withClusterCriteria(
+                    Lists.newArrayList(
+                        new Criterion.Builder().withId(cluster1Id).build(),
+                        new Criterion.Builder().withId(cluster2Id).build(),
+                        new Criterion.Builder().withId(cluster3Id).build()
+                    )
+                )
+                .build(),
+            null
+        );
 
-        RestAssured
-            .given(this.getRequestSpecification())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
-            .when()
-            .port(this.port)
-            .post(CLUSTERS_API + "/{id}/commands", cluster3Id)
-            .then()
-            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
-
-        Arrays.stream(
-            GenieObjectMapper.getMapper().readValue(
-                RestAssured
-                    .given(this.getRequestSpecification())
-                    .when()
-                    .port(this.port)
-                    .get(COMMANDS_API + "/{id}/clusters", ID)
-                    .then()
-                    .statusCode(Matchers.is(HttpStatus.OK.value()))
-                    .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
-                    .body("$", Matchers.hasSize(2))
-                    .extract()
-                    .asByteArray(),
-                new TypeReference<EntityModel<Cluster>[]>() {
-                }
+        Assertions
+            .assertThat(
+                Arrays.stream(
+                    GenieObjectMapper.getMapper().readValue(
+                        RestAssured
+                            .given(this.getRequestSpecification())
+                            .when()
+                            .port(this.port)
+                            .get(COMMANDS_API + "/{id}/clusters", commandId)
+                            .then()
+                            .statusCode(Matchers.is(HttpStatus.OK.value()))
+                            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+                            .extract()
+                            .asByteArray(),
+                        new TypeReference<EntityModel<Cluster>[]>() {
+                        }
+                    )
+                )
+                    .map(EntityModel::getContent)
+                    .filter(Objects::nonNull)
+                    .map(Cluster::getId)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList())
             )
-        )
-            .map(EntityModel::getContent)
-            .filter(Objects::nonNull)
-            .forEach(
-                cluster -> {
-                    final String id = cluster.getId().orElseThrow(IllegalArgumentException::new);
-                    if (!id.equals(cluster1Id) && !id.equals(cluster3Id)) {
-                        Assert.fail();
-                    }
-                }
-            );
+            .containsExactlyInAnyOrder(cluster1Id, cluster2Id, cluster3Id);
 
         // Test filtering
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
@@ -1674,7 +1653,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .param("status", ClusterStatus.UP.toString())
             .when()
             .port(this.port)
-            .get(COMMANDS_API + "/{id}/clusters", ID)
+            .get(COMMANDS_API + "/{id}/clusters", commandId)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))

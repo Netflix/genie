@@ -17,9 +17,6 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
-import com.google.common.collect.Lists;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.ClusterCommandsProjection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -33,13 +30,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.OrderColumn;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,43 +52,6 @@ import java.util.Set;
 @NamedEntityGraphs(
     {
         @NamedEntityGraph(
-            name = ClusterEntity.COMMANDS_ENTITY_GRAPH,
-            attributeNodes = {
-                @NamedAttributeNode("commands")
-            }
-        ),
-        @NamedEntityGraph(
-            name = ClusterEntity.COMMANDS_DTO_ENTITY_GRAPH,
-            attributeNodes = {
-                @NamedAttributeNode(
-                    value = "commands",
-                    subgraph = "command-sub-graph"
-                )
-            },
-            subgraphs = {
-                @NamedSubgraph(
-                    name = "command-sub-graph",
-                    attributeNodes = {
-                        @NamedAttributeNode("executable"),
-                        @NamedAttributeNode("setupFile"),
-                        @NamedAttributeNode("configs"),
-                        @NamedAttributeNode("dependencies"),
-                        @NamedAttributeNode("tags"),
-                        @NamedAttributeNode(
-                            value = "clusterCriteria",
-                            subgraph = "criteria-sub-graph"
-                        )
-                    }
-                ),
-                @NamedSubgraph(
-                    name = "criteria-sub-graph",
-                    attributeNodes = {
-                        @NamedAttributeNode("tags")
-                    }
-                )
-            }
-        ),
-        @NamedEntityGraph(
             name = ClusterEntity.DTO_ENTITY_GRAPH,
             attributeNodes = {
                 @NamedAttributeNode("setupFile"),
@@ -107,19 +62,7 @@ import java.util.Set;
         )
     }
 )
-public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
-
-    /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
-     * a clusters commands base fields.
-     */
-    public static final String COMMANDS_ENTITY_GRAPH = "Cluster.commands";
-
-    /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
-     * a clusters commands and create the command DTOs.
-     */
-    public static final String COMMANDS_DTO_ENTITY_GRAPH = "Cluster.commands.dto";
+public class ClusterEntity extends BaseEntity {
 
     /**
      * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
@@ -168,20 +111,6 @@ public class ClusterEntity extends BaseEntity implements ClusterCommandsProjecti
     @ToString.Exclude
     private Set<TagEntity> tags = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "clusters_commands",
-        joinColumns = {
-            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
-        },
-        inverseJoinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
-        }
-    )
-    @OrderColumn(name = "command_order", nullable = false)
-    @ToString.Exclude
-    private List<CommandEntity> commands = new ArrayList<>();
-
     /**
      * Default Constructor.
      */
@@ -223,66 +152,6 @@ public class ClusterEntity extends BaseEntity implements ClusterCommandsProjecti
         if (tags != null) {
             this.tags.addAll(tags);
         }
-    }
-
-    /**
-     * Sets the commands for this cluster.
-     *
-     * @param commands The commands that this cluster supports
-     * @throws GeniePreconditionException If the commands are already added to the list
-     */
-    public void setCommands(@Nullable final List<CommandEntity> commands) throws GeniePreconditionException {
-        if (commands != null
-            && commands.stream().map(CommandEntity::getUniqueId).distinct().count() != commands.size()) {
-            throw new GeniePreconditionException("List of commands to set cannot contain duplicates");
-        }
-
-        //Clear references to this cluster in existing commands
-        for (final CommandEntity command : this.commands) {
-            command.getClusters().remove(this);
-        }
-        this.commands.clear();
-
-        if (commands != null) {
-            // Set the commands for this cluster
-            this.commands.addAll(commands);
-
-            //Add the reference in the new commands
-            for (final CommandEntity command : this.commands) {
-                command.getClusters().add(this);
-            }
-        }
-    }
-
-    /**
-     * Add a new command to this cluster. Manages both sides of relationship.
-     *
-     * @param command The command to add. Not null.
-     * @throws GeniePreconditionException If the command is a duplicate of an existing command
-     */
-    public void addCommand(@NotNull final CommandEntity command) throws GeniePreconditionException {
-        if (this.commands.contains(command)) {
-            throw new GeniePreconditionException("A command with id " + command.getUniqueId() + " is already added");
-        }
-        this.commands.add(command);
-        command.getClusters().add(this);
-    }
-
-    /**
-     * Remove a command from this cluster. Manages both sides of relationship.
-     *
-     * @param command The command to remove. Not null.
-     */
-    public void removeCommand(@NotNull final CommandEntity command) {
-        this.commands.remove(command);
-        command.getClusters().remove(this);
-    }
-
-    /**
-     * Remove all the commands from this application.
-     */
-    public void removeAllCommands() {
-        Lists.newArrayList(this.commands).forEach(this::removeCommand);
     }
 
     /**

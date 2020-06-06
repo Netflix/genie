@@ -660,111 +660,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     public void deleteCluster(@NotBlank final String id) throws PreconditionFailedException {
         log.debug("[deleteCluster] Called for {}", id);
-        final Optional<ClusterEntity> entity = this.clusterRepository.getClusterAndCommands(id);
+        final Optional<ClusterEntity> entity = this.clusterRepository.findByUniqueId(id);
         if (!entity.isPresent()) {
             // There's nothing to do as the caller wants to delete it and it already doesn't exist.
             return;
         }
 
         this.deleteClusterEntity(entity.get());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addCommandsForCluster(
-        @NotBlank final String id,
-        @NotEmpty(message = "No command ids entered. Unable to add commands.") final List<String> commandIds
-    ) throws GenieException {
-        if (commandIds.size() != commandIds.stream().filter(this.commandRepository::existsByUniqueId).count()) {
-            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
-        }
-
-        try {
-            final ClusterEntity clusterEntity = this.clusterRepository
-                .getClusterAndCommands(id)
-                .orElseThrow(() -> new NotFoundException("No cluster with id " + id + " exists"));
-            for (final String commandId : commandIds) {
-                clusterEntity.addCommand(this.getCommandEntity(commandId));
-            }
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<Command> getCommandsForCluster(
-        @NotBlank final String id,
-        @Nullable final Set<CommandStatus> statuses
-    ) throws GenieException {
-        return this.clusterRepository
-            .getClusterAndCommandsDto(id)
-            .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
-            .getCommands()
-            .stream()
-            .filter(
-                commandEntity -> statuses == null
-                    || statuses.contains(DtoConverters.toV4CommandStatus(commandEntity.getStatus()))
-            )
-            .map(EntityV4DtoConverters::toV4CommandDto)
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setCommandsForCluster(
-        @NotBlank final String id,
-        @NotNull final List<String> commandIds
-    ) throws GenieException {
-        if (commandIds.size() != commandIds.stream().filter(this.commandRepository::existsByUniqueId).count()) {
-            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
-        }
-        try {
-            final ClusterEntity clusterEntity = this.clusterRepository
-                .getClusterAndCommands(id)
-                .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"));
-            final List<CommandEntity> commandEntities = new ArrayList<>();
-            for (final String commandId : commandIds) {
-                commandEntities.add(this.getCommandEntity(commandId));
-            }
-
-            clusterEntity.setCommands(commandEntities);
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeAllCommandsForCluster(@NotBlank final String id) throws GenieException {
-        this.clusterRepository
-            .getClusterAndCommands(id)
-            .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
-            .removeAllCommands();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeCommandForCluster(@NotBlank final String id, @NotBlank final String cmdId) throws GenieException {
-        try {
-            this.clusterRepository
-                .getClusterAndCommands(id)
-                .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
-                .removeCommand(this.getCommandEntity(cmdId));
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage());
-        }
     }
 
     /**
@@ -1168,14 +1070,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Nullable final Set<ClusterStatus> statuses
     ) throws NotFoundException {
         log.debug("[getClustersForCommand] Called for {} with statuses {}", id, statuses);
-        return this.getCommandEntity(id)
-            .getClusters()
+        final List<Criterion> clusterCriteria = this.getClusterCriteriaForCommand(id);
+        return this
+            .findClustersMatchingAnyCriterion(Sets.newHashSet(clusterCriteria), false)
             .stream()
-            .filter(
-                clusterEntity -> statuses == null
-                    || statuses.contains(DtoConverters.toV4ClusterStatus(clusterEntity.getStatus()))
-            )
-            .map(EntityV4DtoConverters::toV4ClusterDto)
+            .filter(cluster -> statuses == null || statuses.contains(cluster.getMetadata().getStatus()))
             .collect(Collectors.toSet());
     }
 
@@ -2746,15 +2645,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     }
 
     private void deleteClusterEntity(final ClusterEntity entity) {
-        final List<CommandEntity> commandEntities = entity.getCommands();
-        if (commandEntities != null) {
-            for (final CommandEntity commandEntity : commandEntities) {
-                final Set<ClusterEntity> clusterEntities = commandEntity.getClusters();
-                if (clusterEntities != null) {
-                    clusterEntities.remove(entity);
-                }
-            }
-        }
         this.clusterRepository.delete(entity);
     }
 
@@ -2764,12 +2654,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         if (originalApps != null) {
             final List<ApplicationEntity> applicationEntities = Lists.newArrayList(originalApps);
             applicationEntities.forEach(entity::removeApplication);
-        }
-        //Remove the command from the associated cluster references
-        final Set<ClusterEntity> originalClusters = entity.getClusters();
-        if (originalClusters != null) {
-            final Set<ClusterEntity> clusterEntities = Sets.newHashSet(originalClusters);
-            clusterEntities.forEach(clusterEntity -> clusterEntity.removeCommand(entity));
         }
         this.commandRepository.delete(entity);
     }

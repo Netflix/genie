@@ -374,12 +374,6 @@
         file_id="11"
     />
 
-    <clusters_commands
-        cluster_id="1"
-        command_id="1"
-        command_order="0"
-    />
-
     <criteria
         id="0"
     />

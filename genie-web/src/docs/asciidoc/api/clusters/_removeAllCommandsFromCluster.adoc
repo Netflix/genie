@@ -1,10 +1,9 @@
 === Remove All Commands From a Cluster
 
-==== Description
+WARNING: Deprecated
 
-Remove all the commands currently associated with the given cluster.
-
-NOTE: This does **NOT** delete the command(s) from the system just unlinks them
+NOTE: As of Genie 4.0.0 commands are no longer hard linked to clusters, instead they are dynamically linked by
+resolving a command's cluster criteria against the current set of `UP` clusters. This API is now a no-op.
 
 ==== Endpoint
 
