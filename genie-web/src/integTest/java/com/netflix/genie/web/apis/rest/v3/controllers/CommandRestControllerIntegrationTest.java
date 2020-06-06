@@ -36,10 +36,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -64,7 +62,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.0.0
  */
-public class CommandRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
+class CommandRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = "hive";
@@ -118,33 +116,13 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
     private static final String COMMANDS_CLUSTERS_LINK_PATH = COMMANDS_LIST_PATH + "._links.clusters.href";
     private static final String COMMANDS_ID_LIST_PATH = EMBEDDED_PATH + ".commandList.id";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
+    @BeforeEach
+    void beforeCommands() {
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @After
-    @Override
-    public void cleanup() throws Exception {
-        super.cleanup();
-    }
-
-    /**
-     * Test creating a command without an ID.
-     *
-     * @throws Exception on configuration issue
-     */
     @Test
-    public void canCreateCommandWithoutId() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
-
+    void canCreateCommandWithoutId() throws Exception {
         final RestDocumentationFilter createFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.CONTENT_TYPE_HEADER, // Request headers
@@ -264,17 +242,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 )
             );
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test creating a Command with an ID.
-     *
-     * @throws Exception When issue in creation
-     */
     @Test
-    public void canCreateCommandWithId() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canCreateCommandWithId() throws Exception {
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
                 .withId(ID)
@@ -339,17 +311,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 )
             );
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test to make sure the post API can handle bad input.
-     *
-     * @throws Exception on issue
-     */
     @Test
-    public void canHandleBadInputToCreateCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canHandleBadInputToCreateCommand() throws Exception {
         final Command cluster =
             new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, Lists.newArrayList(""), -1L).build();
         RestAssured
@@ -368,17 +334,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 )
             );
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * Test to make sure that you can search for commands by various parameters.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canFindCommands() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canFindCommands() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -529,17 +489,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
 
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(3L);
     }
 
-    /**
-     * Test to make sure that a command can be updated.
-     *
-     * @throws Exception on configuration errors
-     */
     @Test
-    public void canUpdateCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canUpdateCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -564,7 +518,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 }
             ).getContent();
         Assertions.assertThat(createdCommand).isNotNull();
-        Assert.assertThat(createdCommand.getStatus(), Matchers.is(CommandStatus.ACTIVE));
+        Assertions.assertThat(createdCommand.getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
 
         final Command.Builder updateCommand = new Command.Builder(
             createdCommand.getName(),
@@ -612,17 +566,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(STATUS_PATH, Matchers.is(CommandStatus.INACTIVE.toString()));
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Test to make sure that a command can be patched.
-     *
-     * @throws Exception on configuration errors
-     */
     @Test
-    public void canPatchCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canPatchCommand() throws Exception {
         final String id = this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -673,17 +621,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(NAME_PATH, Matchers.is(newName));
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Make sure can successfully delete all commands.
-     *
-     * @throws Exception on a configuration error
-     */
     @Test
-    public void canDeleteAllCommands() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canDeleteAllCommands() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -702,7 +644,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 .build(),
             null
         );
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(3L);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/"
@@ -717,17 +659,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .then()
             .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(0L);
     }
 
-    /**
-     * Test to make sure that you can delete a command.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canDeleteACommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canDeleteACommand() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -762,7 +698,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 .build(),
             null
         );
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(3L);
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -792,17 +728,11 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 )
             );
 
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(2L));
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(2L);
     }
 
-    /**
-     * Test to make sure we can add configurations to the command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddConfigsToCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canAddConfigsToCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -826,14 +756,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canAddElementsToResource(COMMANDS_API + "/{id}/configs", ID, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the configurations for a command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateConfigsForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canUpdateConfigsForCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -851,14 +775,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canUpdateElementsForResource(COMMANDS_API + "/{id}/configs", ID, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the configurations for a command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteConfigsForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canDeleteConfigsForCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -874,14 +792,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteElementsFromResource(COMMANDS_API + "/{id}/configs", ID, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can add dependencies to the command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddDependenciesToCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canAddDependenciesToCommand() throws Exception {
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
                 .withId(ID)
@@ -909,14 +821,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         );
     }
 
-    /**
-     * Test to make sure we can update the dependencies for an command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateDependenciesForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canUpdateDependenciesForCommand() throws Exception {
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
                 .withId(ID)
@@ -937,14 +843,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         );
     }
 
-    /**
-     * Test to make sure we can delete the dependencies for an command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteDependenciesForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canDeleteDependenciesForCommand() throws Exception {
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
                 .withId(ID)
@@ -963,14 +863,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         );
     }
 
-    /**
-     * Test to make sure we can add tags to the command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canAddTagsToCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canAddTagsToCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -995,14 +889,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canAddTagsToResource(api, ID, NAME, addFilter, getFilter);
     }
 
-    /**
-     * Test to make sure we can update the tags for a command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canUpdateTagsForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canUpdateTagsForCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1021,14 +909,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canUpdateTagsForResource(api, ID, NAME, updateFilter);
     }
 
-    /**
-     * Test to make sure we can delete the tags for a command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteTagsForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canDeleteTagsForCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1045,14 +927,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteTagsForResource(api, ID, NAME, deleteFilter);
     }
 
-    /**
-     * Test to make sure we can delete a tag for a command after it is created.
-     *
-     * @throws Exception on configuration problems
-     */
     @Test
-    public void canDeleteTagForCommand() throws Exception {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+    void canDeleteTagForCommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1071,13 +947,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         this.canDeleteTagForResource(api, ID, NAME, deleteFilter);
     }
 
-    /**
-     * Make sure can add the applications for a command.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canAddApplicationsForACommand() throws Exception {
+    void canAddApplicationsForACommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1213,13 +1084,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body("[2].id", Matchers.is(applicationId3));
     }
 
-    /**
-     * Make sure can set the applications for a command.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canSetApplicationsForACommand() throws Exception {
+    void canSetApplicationsForACommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1372,13 +1238,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body("$", Matchers.empty());
     }
 
-    /**
-     * Make sure that we can remove all the applications from a command.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canRemoveApplicationsFromACommand() throws Exception {
+    void canRemoveApplicationsFromACommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1441,13 +1302,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body("$", Matchers.empty());
     }
 
-    /**
-     * Make sure that we can remove an application from a command.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canRemoveApplicationFromACommand() throws Exception {
+    void canRemoveApplicationFromACommand() throws Exception {
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
@@ -1561,13 +1417,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body("[0].id", Matchers.is(ID));
     }
 
-    /**
-     * Make sure can get all the clusters which use a given command.
-     *
-     * @throws Exception on configuration error
-     */
     @Test
-    public void canGetClustersForCommand() throws Exception {
+    void canGetClustersForCommand() throws Exception {
         final String placeholder = UUID.randomUUID().toString();
         final String cluster1Id = this.createConfigResource(
             new Cluster.Builder(placeholder, placeholder, placeholder, ClusterStatus.UP).build(),
@@ -1661,14 +1512,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body("[0].id", Matchers.is(cluster1Id));
     }
 
-    /**
-     * Test creating a command with blank files and tag resources.
-     *
-     * @throws Exception when an unexpected error is encountered
-     */
     @Test
-    public void canCreateCommandWithBlankFields() throws Exception {
-
+    void canCreateCommandWithBlankFields() throws Exception {
         final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
 
         final List<Command> invalidCommandResources = Lists.newArrayList(
@@ -1696,7 +1541,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
 
         long i = 0L;
         for (final Command invalidCommandResource : invalidCommandResources) {
-            Assert.assertThat(this.commandRepository.count(), Matchers.is(i));
+            Assertions.assertThat(this.commandRepository.count()).isEqualTo(i);
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1708,17 +1553,12 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 .then()
                 .statusCode(Matchers.is(HttpStatus.CREATED.value()));
 
-            Assert.assertThat(this.commandRepository.count(), Matchers.is(++i));
+            Assertions.assertThat(this.commandRepository.count()).isEqualTo(++i);
         }
     }
 
-    /**
-     * Test getting a command that does not exist produces the expected error.
-     */
     @Test
-    public void testCommandNotFound() {
-        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
-
+    void testCommandNotFound() {
         final List<String> paths = Lists.newArrayList("", "/applications", "/clusters", "/clusterCriteria");
 
         for (final String relationPath : paths) {
@@ -1734,13 +1574,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         }
     }
 
-    /**
-     * Test {@link CommandRestController#getClusterCriteriaForCommand(String)}.
-     *
-     * @throws Exception on unexpected error
-     */
     @Test
-    public void testGetClusterCriteria() throws Exception {
+    void testGetClusterCriteria() throws Exception {
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters
@@ -1767,13 +1602,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         Assertions.assertThat(clusterCriteria).isEqualTo(CLUSTER_CRITERIA);
     }
 
-    /**
-     * Test {@link CommandRestController#removeAllClusterCriteriaFromCommand(String)}.
-     *
-     * @throws Exception on unexpected error
-     */
     @Test
-    public void testRemoveAllClusterCriteriaFromCommand() throws Exception {
+    void testRemoveAllClusterCriteriaFromCommand() throws Exception {
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM // Path parameters
@@ -1793,13 +1623,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         Assertions.assertThat(this.getClusterCriteria(id)).isEmpty();
     }
 
-    /**
-     * Test {@link CommandRestController#addClusterCriterionForCommand(String, Criterion)}.
-     *
-     * @throws Exception on any error
-     */
     @Test
-    public void testAddLowestPriorityClusterCriterion() throws Exception {
+    void testAddLowestPriorityClusterCriterion() throws Exception {
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters,
@@ -1836,13 +1661,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .isEqualTo(newCriterion);
     }
 
-    /**
-     * Test {@link CommandRestController#setClusterCriteriaForCommand(String, List)}.
-     *
-     * @throws Exception On unexpected error
-     */
     @Test
-    public void testSetClusterCriteriaForCommand() throws Exception {
+    void testSetClusterCriteriaForCommand() throws Exception {
         final RestDocumentationFilter setFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters,
@@ -1872,13 +1692,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
         Assertions.assertThat(this.getClusterCriteria(id)).isEqualTo(newCriteria);
     }
 
-    /**
-     * Test {@link CommandRestController#insertClusterCriterionForCommand(String, int, Criterion)}.
-     *
-     * @throws Exception On unexpected error
-     */
     @Test
-    public void testInsertClusterCriterionForCommand() throws Exception {
+    void testInsertClusterCriterionForCommand() throws Exception {
         final RestDocumentationFilter insertFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             // Path parameters
@@ -1920,13 +1735,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .containsExactly(CLUSTER_CRITERIA.get(0), newCriterion, CLUSTER_CRITERIA.get(1));
     }
 
-    /**
-     * Test {@link CommandRestController#removeClusterCriterionFromCommand(String, int)}.
-     *
-     * @throws Exception On unexpected error
-     */
     @Test
-    public void testRemoveClusterCriterionFromCommand() throws Exception {
+    void testRemoveClusterCriterionFromCommand() throws Exception {
         final RestDocumentationFilter removeFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             // Path parameters
@@ -1965,13 +1775,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
-    /**
-     * Test to make sure we can resolve clusters for a commands cluster criteria.
-     *
-     * @throws Exception on unexpected error
-     */
     @Test
-    public void testResolveClustersForCommandClusterCriteria() throws Exception {
+    void testResolveClustersForCommandClusterCriteria() throws Exception {
         final Cluster cluster0 = new Cluster.Builder(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
