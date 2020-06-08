@@ -59,7 +59,6 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
         final String sleepCommandId = this.createSleepCommand();
         final String dateCommandId = this.createDateCommand();
         final String echoCommandId = this.createEchoCommand();
-        this.linkClusterToCommands(dummyClusterId, Lists.newArrayList(sleepCommandId, dateCommandId, echoCommandId));
 
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(DUMMY_TAG))
@@ -320,9 +319,5 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
                 )
                 .build()
         );
-    }
-
-    private void linkClusterToCommands(final String clusterId, final List<String> commandIds) throws Exception {
-        this.clusterClient.addCommandsToCluster(clusterId, commandIds);
     }
 }
