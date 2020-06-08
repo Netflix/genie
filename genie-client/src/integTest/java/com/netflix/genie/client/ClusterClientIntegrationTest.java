@@ -30,7 +30,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -216,41 +215,14 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
         // Test add Commands to cluster
         final List<String> initialCommands = Lists.newArrayList(fooId, barId, piId);
 
+        // These are all no-ops now so just make sure they don't throw exceptions
         this.clusterClient.addCommandsToCluster(clusterId, initialCommands);
-
-        Assertions
-            .assertThat(this.clusterClient.getCommandsForCluster(clusterId))
-            .hasSize(3)
-            .extracting(Command::getId)
-            .filteredOn(Optional::isPresent)
-            .extracting(Optional::get)
-            .containsExactly(fooId, barId, piId);
-
-        // Test removing a command for cluster
-        this.clusterClient.removeCommandFromCluster(clusterId, barId);
-        Assertions
-            .assertThat(this.clusterClient.getCommandsForCluster(clusterId))
-            .hasSize(2)
-            .extracting(Command::getId)
-            .filteredOn(Optional::isPresent)
-            .extracting(Optional::get)
-            .containsExactly(fooId, piId);
-
-        final List<String> updatedCommands = Lists.newArrayList(barId, fooId);
-
-        // Test update commands for a cluster
-        this.clusterClient.updateCommandsForCluster(clusterId, updatedCommands);
-        Assertions
-            .assertThat(this.clusterClient.getCommandsForCluster(clusterId))
-            .hasSize(2)
-            .extracting(Command::getId)
-            .filteredOn(Optional::isPresent)
-            .extracting(Optional::get)
-            .containsExactly(barId, fooId);
-
-        // Test delete all commands in a cluster
-        this.clusterClient.removeAllCommandsForCluster(clusterId);
         Assertions.assertThat(this.clusterClient.getCommandsForCluster(clusterId)).isEmpty();
+        this.clusterClient.removeCommandFromCluster(clusterId, barId);
+        Assertions.assertThat(this.clusterClient.getCommandsForCluster(clusterId)).isEmpty();
+        this.clusterClient.updateCommandsForCluster(clusterId, Lists.newArrayList(barId, fooId));
+        Assertions.assertThat(this.clusterClient.getCommandsForCluster(clusterId)).isEmpty();
+        this.clusterClient.removeAllCommandsForCluster(clusterId);
     }
 
     @Test

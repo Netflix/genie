@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -424,15 +425,25 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         final Cluster cluster1 = this.constructClusterDTO(null);
         final Cluster cluster2 = this.constructClusterDTO(null);
 
-        final Command command = this.constructCommandDTO(null);
-
-        final String commandId = this.commandClient.createCommand(command);
-
         final String cluster1Id = this.clusterClient.createCluster(cluster1);
         final String cluster2Id = this.clusterClient.createCluster(cluster2);
 
-        this.clusterClient.addCommandsToCluster(cluster1Id, Lists.newArrayList(commandId));
-        this.clusterClient.addCommandsToCluster(cluster2Id, Lists.newArrayList(commandId));
+        final Command command = new Command.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+            CommandStatus.ACTIVE,
+            Lists.newArrayList(UUID.randomUUID().toString()),
+            100L
+        )
+            .withClusterCriteria(
+                Lists.newArrayList(
+                    new Criterion.Builder().withId(cluster1Id).build(),
+                    new Criterion.Builder().withId(cluster2Id).build()
+                )
+            )
+            .build();
+
+        final String commandId = this.commandClient.createCommand(command);
 
         Assertions
             .assertThat(this.commandClient.getClustersForCommand(commandId))
