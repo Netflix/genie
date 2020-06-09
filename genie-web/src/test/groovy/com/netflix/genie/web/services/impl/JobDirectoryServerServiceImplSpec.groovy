@@ -29,6 +29,7 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService
 import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.dtos.ArchivedJobMetadata
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException
@@ -59,6 +60,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     static final URL BASE_URL = new URL("https", "genie.com", 8080, "/jobs/" + JOB_ID + "/output/" + REL_PATH)
     static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + REL_PATH, null)
     static final URI EXPECTED_V3_JOB_DIR_URI = new URI("file:/tmp/genie/jobs/" + JOB_ID)
+    static final URI ARCHIVE_BASE_URI = new URI("s3://genie-bucket/genie-archived/" + JOB_ID + "/")
+    static final String EXPECTED_ARCHIVE_FILE_LOCATION = ARCHIVE_BASE_URI.toString() + REL_PATH
 
     ResourceLoader resourceLoader
     PersistenceService persistenceService
@@ -250,6 +253,39 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
         1 * this.handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> this.handler
         1 * this.handler.handleRequest(this.request, this.response)
+    }
+
+    @Unroll
+    def "ServeResource -- archived job with range: #rangeHeader"() {
+        setup:
+        ArchivedJobMetadata archivedJobMetadata = Mock(ArchivedJobMetadata)
+        String expectedResourceLocation = EXPECTED_ARCHIVE_FILE_LOCATION + (rangeHeader != null ? ("#" + rangeHeader) : "")
+
+        when:
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
+        1 * this.persistenceService.isV4(JOB_ID) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> false
+        1 * archivedJobService.getArchivedJobMetadata(JOB_ID) >> archivedJobMetadata
+        1 * archivedJobMetadata.getManifest() >> manifest
+        1 * archivedJobMetadata.getArchiveBaseUri() >> ARCHIVE_BASE_URI
+        1 * this.manifest.getEntry(REL_PATH) >> Optional.of(this.manifestEntry)
+        1 * this.request.getHeader(HttpHeaders.RANGE) >> rangeHeader
+        1 * this.manifestEntry.isDirectory() >> false
+        1 * this.manifestEntry.getPath() >> REL_PATH
+        1 * this.resourceLoader.getResource(expectedResourceLocation) >> this.resource
+        1 * this.manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
+        1 * this.handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> this.handler
+        1 * this.handler.handleRequest(this.request, this.response)
+
+        where:
+        rangeHeader   | _
+        null          | _
+        "bytes=10-20" | _
+        "bytes=10-"   | _
+        "bytes=-20"   | _
     }
 
     @Unroll

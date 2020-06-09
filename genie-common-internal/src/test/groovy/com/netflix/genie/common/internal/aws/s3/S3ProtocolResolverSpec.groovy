@@ -19,6 +19,10 @@ package com.netflix.genie.common.internal.aws.s3
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3URI
+import com.amazonaws.services.s3.model.GetObjectMetadataRequest
+import com.amazonaws.services.s3.model.ObjectMetadata
+import org.apache.commons.lang3.tuple.ImmutablePair
+import org.apache.commons.lang3.tuple.Pair
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.core.task.TaskExecutor
@@ -33,16 +37,15 @@ import spock.lang.Unroll
  */
 class S3ProtocolResolverSpec extends Specification {
 
-    @Shared
-    def successClosure = { result -> result != null && result instanceof SimpleStorageResource }
-
-    @Shared
-    def failedClosure = { result -> result == null }
-
     @Unroll
-    def "#can resolve #location"() {
+    def "can resolve #location"() {
         def s3TaskExecutor = Mock(TaskExecutor)
-        def s3Client = Mock(AmazonS3)
+        def s3ObjectMetadata = Mock(ObjectMetadata) {
+            getContentLength() >> 100
+        }
+        def s3Client = Mock(AmazonS3) {
+            getObjectMetadata(_) >> s3ObjectMetadata
+        }
         def s3ClientFactory = Mock(S3ClientFactory) {
             getClient(_ as AmazonS3URI) >> s3Client
         }
@@ -53,17 +56,99 @@ class S3ProtocolResolverSpec extends Specification {
         def resource = s3ProtocolResolver.resolve(location, resourceLoader)
 
         then:
-        resultClosure.call(resource)
+        resource != null
+        resource instanceof SimpleStorageRangeResource
 
         where:
-        location                                               | can     | resultClosure
-        "s3://aBucket/key/path/file.tar.gz"                    | "can"   | successClosure
-        "file:/tmp/blah.txt"                                   | "can't" | failedClosure
-        "s3n://aBucket/blah.txt"                               | "can"   | successClosure
-        "s3a://aBucket/blah.txt"                               | "can"   | successClosure
-        "s3z://aBucket/blah.txt"                               | "can't" | failedClosure
-        "http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg" | "can"   | successClosure
-        "http://mybucket.s3.amazonaws.com/puppy.jpg"           | "can"   | successClosure
-        "http://example.com/blah.txt"                          | "can't" | failedClosure
+        location                                               | _
+        "s3://aBucket/key/path/file.tar.gz"                    | _
+        "s3n://aBucket/blah.txt"                               | _
+        "s3a://aBucket/blah.txt"                               | _
+        "http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg" | _
+        "http://mybucket.s3.amazonaws.com/puppy.jpg"           | _
+    }
+
+    @Unroll
+    def "can't resolve #location"() {
+        def s3TaskExecutor = Mock(TaskExecutor)
+        def s3ObjectMetadata = Mock(ObjectMetadata) {
+            getContentLength() >> 100
+        }
+        def s3Client = Mock(AmazonS3) {
+            getObjectMetadata(_) >> s3ObjectMetadata
+        }
+        def s3ClientFactory = Mock(S3ClientFactory) {
+            getClient(_ as AmazonS3URI) >> s3Client
+        }
+        def resourceLoader = Mock(ResourceLoader)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+
+        when:
+        def resource = s3ProtocolResolver.resolve(location, resourceLoader)
+
+        then:
+        resource == null
+
+        where:
+        location                      | _
+        "file:/tmp/blah.txt"          | _
+        "s3z://aBucket/blah.txt"      | _
+        "http://example.com/blah.txt" | _
+    }
+
+    @Unroll
+    def "can resolve #location with valid range"() {
+        def s3TaskExecutor = Mock(TaskExecutor)
+        def resourceLoader = Mock(ResourceLoader)
+        def s3Client = Mock(AmazonS3)
+        def s3ClientFactory = Mock(S3ClientFactory)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+        def s3ObjectMetadata = Mock(ObjectMetadata)
+        GetObjectMetadataRequest requestCapture
+
+        when:
+        def resource = s3ProtocolResolver.resolve(location, resourceLoader)
+
+        then:
+        1 * s3ClientFactory.getClient(_ as AmazonS3URI) >> s3Client
+        1 * s3Client.getObjectMetadata(_ as GetObjectMetadataRequest) >> {
+            args ->
+                requestCapture = args[0] as GetObjectMetadataRequest
+                return s3ObjectMetadata
+        }
+        1 * s3ObjectMetadata.getContentLength() >> 100
+        requestCapture != null
+        requestCapture.getBucketName() == "aBucket"
+        requestCapture.getKey() == "key/path/file.tar.gz"
+        resource != null
+
+        where:
+        location                                        | _
+        "s3://aBucket/key/path/file.tar.gz#bytes=10-20" | _
+        "s3://aBucket/key/path/file.tar.gz#bytes=-20"   | _
+        "s3://aBucket/key/path/file.tar.gz#bytes=10-"   | _
+        "s3://aBucket/key/path/file.tar.gz#"            | _
+        "s3://aBucket/key/path/file.tar.gz"             | _
+    }
+
+    @Unroll
+    def "can parse range header: #rangeHeader"() {
+        Pair<Integer, Integer> range
+
+        when:
+        range = S3ProtocolResolver.parseRangeHeader(rangeHeader)
+
+        then:
+        range == expectedRange
+
+        where:
+        rangeHeader   | expectedRange
+        "bytes="      | ImmutablePair.of(null, null)
+        "blah"        | ImmutablePair.of(null, null)
+        ""            | ImmutablePair.of(null, null)
+        null          | ImmutablePair.of(null, null)
+        "bytes=-10"   | ImmutablePair.of(null, 10)
+        "bytes=10-20" | ImmutablePair.of(10, 20)
+        "bytes=10-"   | ImmutablePair.of(10, null)
     }
 }
