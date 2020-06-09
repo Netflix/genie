@@ -20,11 +20,18 @@ package com.netflix.genie.common.internal.aws.s3;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.aws.core.io.s3.SimpleStorageResource;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
+
+import javax.annotation.Nullable;
+import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class implements the {@link ProtocolResolver} interface. When an instance of this class is added to a
@@ -44,6 +51,8 @@ public class S3ProtocolResolver implements ProtocolResolver {
     private static final String S3A_PROTOCOL = "s3a:";
     private static final String S3_REGEX = "s3.:";
     private static final String S3_REPLACEMENT = "s3:";
+    private static final Pair<Integer, Integer> NULL_RANGE = ImmutablePair.of(null, null);
+    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d*)-(\\d*)");
 
     private final S3ClientFactory s3ClientFactory;
     private final TaskExecutor s3TaskExecutor;
@@ -78,25 +87,72 @@ public class S3ProtocolResolver implements ProtocolResolver {
         }
 
         final AmazonS3URI s3URI;
+        final URI uri;
         try {
             s3URI = new AmazonS3URI(normalizedLocation);
+            uri = URI.create(location);
         } catch (final IllegalArgumentException iae) {
             log.debug("{} is not a valid S3 resource (Error message: {}).", normalizedLocation, iae.getMessage());
             return null;
         }
 
-        final AmazonS3 client = this.s3ClientFactory.getClient(s3URI);
+        // Remove the fragment portion of the URI path (which stores the range requested, if any)
+        final int fragmentIndex = s3URI.getKey().lastIndexOf("#");
+        final String normalizedKey;
+        if (fragmentIndex == -1) {
+            normalizedKey = s3URI.getKey();
+        } else {
+            normalizedKey = s3URI.getKey().substring(0, fragmentIndex);
+        }
 
+        final String rangeHeader = uri.getFragment();
+        final Pair<Integer, Integer> range = parseRangeHeader(rangeHeader);
+
+        final AmazonS3 client = this.s3ClientFactory.getClient(s3URI);
         log.debug("{} is a valid S3 resource.", location);
 
         // TODO: This implementation from Spring Cloud AWS always wraps the passed in client with a proxy that follows
         //       redirects. I'm not sure if we want that or not. Probably ok for now but maybe revisit later?
-        return new SimpleStorageResource(
+        return new SimpleStorageRangeResource(
             client,
             s3URI.getBucket(),
-            s3URI.getKey(),
+            normalizedKey,
+            s3URI.getVersionId(),
             this.s3TaskExecutor,
-            s3URI.getVersionId()
+            range
         );
+    }
+
+    /**
+     * TODO: It would be nice to use Spring's HttpRange for this parsing, but this module does not
+     * currently depend on spring-web. And this class cannot be moved to genie-web since it is used by
+     * {@link S3ProtocolResolver} which is shared with the genie-agent module.
+     */
+    static Pair<Integer, Integer> parseRangeHeader(@Nullable final String rangeHeader) {
+        if (StringUtils.isBlank(rangeHeader)) {
+            return NULL_RANGE;
+        }
+
+        final Matcher matcher = RANGE_HEADER_PATTERN.matcher(rangeHeader);
+
+        if (!matcher.matches()) {
+            return NULL_RANGE;
+        }
+
+        final String rangeStartString = matcher.group(1);
+        final String rangeEndString = matcher.group(2);
+
+        Integer rangeStart = null;
+        Integer rangeEnd = null;
+
+        if (!StringUtils.isBlank(rangeStartString)) {
+            rangeStart = Integer.parseInt(rangeStartString);
+        }
+
+        if (!StringUtils.isBlank(rangeEndString)) {
+            rangeEnd = Integer.parseInt(rangeEndString);
+        }
+
+        return ImmutablePair.of(rangeStart, rangeEnd);
     }
 }

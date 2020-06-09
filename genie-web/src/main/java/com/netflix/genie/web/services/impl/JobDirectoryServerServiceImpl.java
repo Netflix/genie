@@ -44,6 +44,7 @@ import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -224,8 +225,10 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             log.debug("Routing request to archive");
             try {
                 final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(jobId);
+                final String rangeHeader = request.getHeader(HttpHeaders.RANGE);
                 manifest = archivedJobMetadata.getManifest();
-                jobDirRoot = archivedJobMetadata.getArchiveBaseUri();
+                final URI baseJobDirRoot = archivedJobMetadata.getArchiveBaseUri();
+                jobDirRoot = new URIBuilder(baseJobDirRoot).setFragment(rangeHeader).build();
             } catch (final JobNotArchivedException e) {
                 throw new GeniePreconditionException("Job outputs were not archived", e);
             } catch (final JobNotFoundException | JobDirectoryManifestNotFoundException e) {
