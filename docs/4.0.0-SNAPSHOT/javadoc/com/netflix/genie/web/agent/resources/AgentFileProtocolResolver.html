@@ -159,8 +159,9 @@ implements org.springframework.core.io.ProtocolResolver</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static java.net.URI</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html#createUri-java.lang.String-java.lang.String-">createUri</a></span>(java.lang.String&nbsp;jobId,
-         java.lang.String&nbsp;path)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html#createUri-java.lang.String-java.lang.String-java.lang.String-">createUri</a></span>(java.lang.String&nbsp;jobId,
+         java.lang.String&nbsp;path,
+         java.lang.String&nbsp;rangeHeader)</code>
 <div class="block">Create a URI for the given remote agent file.</div>
 </td>
 </tr>
@@ -213,20 +214,23 @@ implements org.springframework.core.io.ProtocolResolver</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="createUri-java.lang.String-java.lang.String-">
+<a name="createUri-java.lang.String-java.lang.String-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>createUri</h4>
 <pre>public static&nbsp;java.net.URI&nbsp;createUri(java.lang.String&nbsp;jobId,
-                                     java.lang.String&nbsp;path)
+                                     java.lang.String&nbsp;path,
+                                     @Nullable
+                                     java.lang.String&nbsp;rangeHeader)
                               throws java.net.URISyntaxException</pre>
 <div class="block">Create a URI for the given remote agent file.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - the job id</dd>
 <dd><code>path</code> - the path of the file within the job directory</dd>
+<dd><code>rangeHeader</code> - the request range header (as per RFC 7233)</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <code>URI</code> representing the remote agent file</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>

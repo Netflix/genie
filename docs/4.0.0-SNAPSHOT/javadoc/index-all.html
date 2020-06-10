@@ -2853,7 +2853,7 @@
 <dd>
 <div class="block">Convert a set of TagEntities to the '|' delimited tag search string.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html#createUri-java.lang.String-java.lang.String-">createUri(String, String)</a></span> - Static method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html" title="class in com.netflix.genie.web.agent.resources">AgentFileProtocolResolver</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html#createUri-java.lang.String-java.lang.String-java.lang.String-">createUri(String, String, String)</a></span> - Static method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html" title="class in com.netflix.genie.web.agent.resources">AgentFileProtocolResolver</a></dt>
 <dd>
 <div class="block">Create a URI for the given remote agent file.</div>
 </dd>
@@ -6198,6 +6198,7 @@
 <dd>
 <div class="block">Return the getIndex.html template for requests to root.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/aws/s3/SimpleStorageRangeResource.html#getInputStream--">getInputStream()</a></span> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/SimpleStorageRangeResource.html" title="class in com.netflix.genie.common.internal.aws.s3">SimpleStorageRangeResource</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#getInputStream--">getInputStream()</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/StreamBuffer.html#getInputStream--">getInputStream()</a></span> - Method in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/StreamBuffer.html" title="class in com.netflix.genie.web.util">StreamBuffer</a></dt>
 <dd>
@@ -6969,11 +6970,11 @@
 <dd>
 <div class="block">Get an unmodifiable set of all the statuses from which a job can be marked resolved.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#getResource-java.lang.String-java.nio.file.Path-java.net.URI-">getResource(String, Path, URI)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#getResource-java.lang.String-java.nio.file.Path-java.net.URI-org.springframework.http.HttpRange-">getResource(String, Path, URI, HttpRange)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
 <dd>
 <div class="block">Returns a Resource for the given job file boxed in an <code>Optional</code>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html#getResource-java.lang.String-java.nio.file.Path-java.net.URI-">getResource(String, Path, URI)</a></span> - Method in interface com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html#getResource-java.lang.String-java.nio.file.Path-java.net.URI-org.springframework.http.HttpRange-">getResource(String, Path, URI, HttpRange)</a></span> - Method in interface com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a></dt>
 <dd>
 <div class="block">Returns a Resource for the given job file boxed in an <code>Optional</code>.</div>
 </dd>
@@ -12046,6 +12047,10 @@
 <dd>
 <div class="block">An interceptor which writes requests to the logs.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/SimpleStorageRangeResource.html" title="class in com.netflix.genie.common.internal.aws.s3"><span class="typeNameLink">SimpleStorageRangeResource</span></a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
+<dd>
+<div class="block">This class extends <code>SimpleStorageResource</code> in order to efficiently handle range requests.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></dt>
 <dd>
 <div class="block">Skip the Applications table when performing database cleanup.</div>
@@ -12379,7 +12384,7 @@
 <dd>
 <div class="block">A temporary in-memory structure to hold in-transit data.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/StreamBuffer.html#StreamBuffer--">StreamBuffer()</a></span> - Constructor for class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/StreamBuffer.html" title="class in com.netflix.genie.web.util">StreamBuffer</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/StreamBuffer.html#StreamBuffer-int-">StreamBuffer(int)</a></span> - Constructor for class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/StreamBuffer.html" title="class in com.netflix.genie.web.util">StreamBuffer</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>

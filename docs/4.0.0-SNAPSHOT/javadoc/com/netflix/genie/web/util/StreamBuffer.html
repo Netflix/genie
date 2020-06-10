@@ -114,7 +114,11 @@ extends java.lang.Object</pre>
  Provides an <code>InputStream</code> for reading, reading blocks until data becomes available or the buffer is closed.
  <p>
  To avoid in-memory data growing excessively, this buffer stores a single "chunk" at the time.
- Only after a chunk is consumed, a new one can be appended.</div>
+ Only after a chunk is consumed, a new one can be appended.
+ <p>
+ To support range requests in a memory-efficient way, <code>StreamBufferInputStream</code> also allows skipping the first
+ <code>skipOffset - 1</code> bytes without allocating memory (or worse: downloading the actual bytes only to have them
+ thrown away to get to the actual range)</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -137,7 +141,7 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/util/StreamBuffer.html#StreamBuffer--">StreamBuffer</a></span>()</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/util/StreamBuffer.html#StreamBuffer-int-">StreamBuffer</a></span>(int&nbsp;skipOffset)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -203,14 +207,18 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="StreamBuffer--">
+<a name="StreamBuffer-int-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>StreamBuffer</h4>
-<pre>public&nbsp;StreamBuffer()</pre>
+<pre>public&nbsp;StreamBuffer(int&nbsp;skipOffset)</pre>
 <div class="block">Constructor.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>skipOffset</code> - index of the first actual byte to return (</dd>
+</dl>
 </li>
 </ul>
 </li>

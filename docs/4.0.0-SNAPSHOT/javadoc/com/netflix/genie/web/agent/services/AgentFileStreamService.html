@@ -157,9 +157,10 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.AgentFileResource.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService.AgentFileResource</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html#getResource-java.lang.String-java.nio.file.Path-java.net.URI-">getResource</a></span>(@NotBlank java.lang.String&nbsp;jobId,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html#getResource-java.lang.String-java.nio.file.Path-java.net.URI-org.springframework.http.HttpRange-">getResource</a></span>(@NotBlank java.lang.String&nbsp;jobId,
            java.nio.file.Path&nbsp;relativePath,
-           java.net.URI&nbsp;uri)</code>
+           java.net.URI&nbsp;uri,
+           org.springframework.http.HttpRange&nbsp;range)</code>
 <div class="block">Returns a Resource for the given job file boxed in an <code>Optional</code>.</div>
 </td>
 </tr>
@@ -178,7 +179,7 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="getResource-java.lang.String-java.nio.file.Path-java.net.URI-">
+<a name="getResource-java.lang.String-java.nio.file.Path-java.net.URI-org.springframework.http.HttpRange-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -187,7 +188,9 @@ var activeTableTab = "activeTableTab";
 <pre>java.util.Optional&lt;<a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.AgentFileResource.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService.AgentFileResource</a>&gt;&nbsp;getResource(@NotBlank
                                                                          @NotBlank java.lang.String&nbsp;jobId,
                                                                          java.nio.file.Path&nbsp;relativePath,
-                                                                         java.net.URI&nbsp;uri)</pre>
+                                                                         java.net.URI&nbsp;uri,
+                                                                         @Nullable
+                                                                         org.springframework.http.HttpRange&nbsp;range)</pre>
 <div class="block">Returns a Resource for the given job file boxed in an <code>Optional</code>.
  If the service is unable to determine whether the file exists, the optional is empty.
  In all other cases, the optional is not empty. However the resource may return false to <code>exist()</code> calls
@@ -198,6 +201,7 @@ var activeTableTab = "activeTableTab";
 <dd><code>jobId</code> - the job id</dd>
 <dd><code>relativePath</code> - the relative path in the job directory</dd>
 <dd><code>uri</code> - the file uri //TODO redundant</dd>
+<dd><code>range</code> - the list of ranges requested (RFC 7233) or null if no range is specified</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>an optional <code>Resource</code></dd>
 </dl>
