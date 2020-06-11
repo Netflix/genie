@@ -84,6 +84,12 @@ class SimpleStorageRangeResourceSpec extends Specification {
         then:
         1 * this.objectInputStream.read(buffer, 0, buffer.size()) >> 100
 
+        when:
+        inputStream.close()
+
+        then:
+        1 * this.objectInputStream.close()
+
         where:
         range                        | _
         ImmutablePair.of(null, null) | _
@@ -136,6 +142,12 @@ class SimpleStorageRangeResourceSpec extends Specification {
         then:
         bytesRead == readBytes
         1 * this.objectInputStream.read(buffer, 0, buffer.size()) >> (requestedRangeEnd - requestedRangeStart) + 1
+
+        when:
+        inputStream.close()
+
+        then:
+        1 * this.objectInputStream.close()
 
         where:
         rangeHeader    | rangeStart | rangeEnd | requestedRangeStart | requestedRangeEnd | skippedBytes | readBytes | useSkip

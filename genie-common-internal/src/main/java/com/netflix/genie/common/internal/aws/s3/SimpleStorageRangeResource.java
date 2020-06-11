@@ -145,6 +145,12 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         }
 
         @Override
+        public void close() throws IOException {
+            super.close();
+            this.objectRangeInputStream.close();
+        }
+
+        @Override
         public int read() throws IOException {
             // Overriding other read(...) methods and hoping nobody is using this one directly.
             throw new NotImplementedException("Not implemented");
