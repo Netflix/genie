@@ -191,7 +191,10 @@ public class ScriptManager {
             // On timeout, stop evaluation. In other cases doesn't hurt
             taskFuture.cancel(true);
             MetricsUtils.addFailureTagsWithException(tags, e);
-            throw new ScriptExecutionException("Script evaluation failed: " + scriptUri + ": " + e.getMessage(), e);
+            throw new ScriptExecutionException(
+                "Script evaluation failed: " + scriptUri + ": " + e.getClass().getSimpleName() + ": " + e.getMessage(),
+                e
+            );
         } finally {
             final long durationNano = System.nanoTime() - start;
             this.meterRegistry.timer(
