@@ -29,6 +29,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,14 +114,19 @@ public class S3ProtocolResolver implements ProtocolResolver {
 
         // TODO: This implementation from Spring Cloud AWS always wraps the passed in client with a proxy that follows
         //       redirects. I'm not sure if we want that or not. Probably ok for now but maybe revisit later?
-        return new SimpleStorageRangeResource(
-            client,
-            s3URI.getBucket(),
-            normalizedKey,
-            s3URI.getVersionId(),
-            this.s3TaskExecutor,
-            range
-        );
+        try {
+            return new SimpleStorageRangeResource(
+                client,
+                s3URI.getBucket(),
+                normalizedKey,
+                s3URI.getVersionId(),
+                this.s3TaskExecutor,
+                range
+            );
+        } catch (IOException e) {
+            log.error("Failed to create S3 resource: " + location + ": " + e.getMessage());
+            return null;
+        }
     }
 
     /**

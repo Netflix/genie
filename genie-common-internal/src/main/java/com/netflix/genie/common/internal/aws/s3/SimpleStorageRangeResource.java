@@ -18,7 +18,6 @@
 package com.netflix.genie.common.internal.aws.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -27,6 +26,7 @@ import org.springframework.cloud.aws.core.io.s3.AmazonS3ProxyFactory;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResource;
 import org.springframework.core.task.TaskExecutor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -54,18 +54,23 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         final String key,
         final String versionId, final TaskExecutor s3TaskExecutor,
         final Pair<Integer, Integer> range
-    ) {
+    ) throws IOException {
         super(client, bucket, key, s3TaskExecutor, versionId);
         this.client =  AmazonS3ProxyFactory.createProxy(client);
         this.bucket = bucket;
         this.key = key;
         this.versionId = versionId;
         this.range = range;
+
+        long tempContentLength = -1;
         try {
-            this.contentLength = super.contentLength();
-        } catch (IOException e) {
-            throw new AmazonS3Exception("Failed to retrieve object range", e);
+            tempContentLength = super.contentLength();
+        } catch (FileNotFoundException e) {
+            // S3 object does not exist.
+            // Upstream code will handle this correctly by checking exists(), contentLength(), etc.
+            log.warn("Returning non-existent S3 resource {}/{}", bucket, key);
         }
+        this.contentLength = tempContentLength;
 
         final Integer lower = this.range.getLeft();
         final Integer upper = this.range.getRight();
@@ -78,11 +83,24 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         }
     }
 
+
+    @Override
+    public boolean exists() {
+        if (this.contentLength == -1) {
+            return false;
+        }
+        return super.exists();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public InputStream getInputStream() throws IOException {
+
+        if (!this.exists()) {
+            throw new FileNotFoundException("No such object: " + this.bucket + "/" + key);
+        }
 
         // Index of first and last byte to fetch (inclusive)
         final long rangeStart;

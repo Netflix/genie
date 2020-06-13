@@ -215,26 +215,48 @@ class SimpleStorageRangeResourceSpec extends Specification {
         ImmutablePair.of(null, null)| 0             | 0
     }
 
-    def "Handle metadata error"() {
-        when:
-        new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, nullRange)
-
-        then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> objectMetadata
-        1 * objectMetadata.getContentLength() >> {
-            throw new IOException("...")
-        }
-        thrown(AmazonS3Exception)
-    }
-
-    def "Handle content length error"() {
+    @Unroll
+    def "Handle metadata error #exception"() {
         when:
         new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, nullRange)
 
         then:
         1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> {
-            throw new AmazonS3Exception("...")
+            throw exception
         }
-        thrown(AmazonS3Exception)
+        thrown(Exception)
+
+        where:
+        exception                         | _
+        new FileNotFoundException("...")  | _
+        new InvalidObjectException("...") | _
+        new IOException("...")            | _
+        new AmazonS3Exception("...")      | _
+    }
+
+    @Unroll
+    def "Handle non-existent object (status code: #statusCode)"() {
+        when:
+        def resource = new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, nullRange)
+        def exists = resource.exists()
+
+        then:
+        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> {
+            def exception = new AmazonS3Exception("...")
+            exception.setStatusCode(statusCode)
+            throw exception
+        }
+        !exists
+
+        when:
+        resource.getInputStream()
+
+        then:
+        thrown(FileNotFoundException)
+
+        where:
+        statusCode | _
+        404        | _
+        // Not testing 301 because the client has non-trivial logic that is harder to mock, but should behave the same
     }
 }
