@@ -149,7 +149,7 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
             }
 
             final Resource manifestResource = this.resourceLoader.getResource(manifestLocation.toString());
-            if (!manifestResource.exists()) {
+            if (manifestResource == null || !manifestResource.exists()) {
                 throw new JobDirectoryManifestNotFoundException(
                     "No job directory manifest exists at " + manifestLocation
                 );
