@@ -456,14 +456,7 @@ public class JobClient {
      * @throws IOException          For Network and other IO issues.
      */
     public InputStream getJobStdout(final String jobId) throws IOException, GenieClientException {
-        if (StringUtils.isEmpty(jobId)) {
-            throw new IllegalArgumentException("Missing required parameter: jobId.");
-        }
-        final ResponseBody body = this.jobService.getJobStdout(jobId).execute().body();
-        if (body == null) {
-            throw new GenieClientException("No data for job std out returned");
-        }
-        return body.byteStream();
+        return getJobOutputFile(jobId, "stdout");
     }
 
     /**
@@ -477,12 +470,34 @@ public class JobClient {
     public InputStream getJobStderr(
         final String jobId
     ) throws IOException, GenieClientException {
+        return getJobOutputFile(jobId, "stderr");
+    }
+
+    /**
+     * Method to fetch an output file for a job from Genie.
+     *
+     * <p>
+     * <b>NOTE</b>: If the specified outputFilePath is a directory, then the directory
+     * manifest is returned.
+     * </p>
+     *
+     * @param jobId The id of the job whose output file is desired.
+     * @param outputFilePath The path to the file within output directory.
+     * @return An input stream to the output file contents.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public InputStream getJobOutputFile(
+        final String jobId, final String outputFilePath
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
-        final ResponseBody body = this.jobService.getJobStderr(jobId).execute().body();
+        final String pathArg = StringUtils.isEmpty(outputFilePath) ? "" : outputFilePath;
+        final ResponseBody body = this.jobService.getJobOutputFile(jobId, pathArg).execute().body();
         if (body == null) {
-            throw new GenieClientException("No data for job std out returned");
+            throw new GenieClientException(
+                String.format("No data for %s returned", outputFilePath));
         }
         return body.byteStream();
     }
