@@ -125,24 +125,22 @@ public interface JobService {
     Call<Job> getJob(@Path("id") String jobId);
 
     /**
-     * Method to fetch the stdout of a job from Genie.
+     * Method to fetch an output file for a job from Genie.
      *
-     * @param jobId The id of the job whose stdout is desired.
+     * <p>
+     * <b>NOTE</b>: If the specified outputFilePath is a directory, then the directory
+     * manifest is returned.
+     * </p>
+     *
+     * @param jobId The id of the job whose output file is desired.
+     * @param outputFilePath The path to the file within output directory.
      * @return A callable object.
      */
     @Streaming
-    @GET(JOBS_URL_SUFFIX + "/{id}/output/stdout")
-    Call<ResponseBody> getJobStdout(@Path("id") String jobId);
-
-    /**
-     * Method to fetch the stderr of a job from Genie.
-     *
-     * @param jobId The id of the job whose stderr is desired.
-     * @return A callable object.
-     */
-    @Streaming
-    @GET(JOBS_URL_SUFFIX + "/{id}/output/stderr")
-    Call<ResponseBody> getJobStderr(@Path("id") String jobId);
+    @GET(JOBS_URL_SUFFIX + "/{id}/output/{path}")
+    Call<ResponseBody> getJobOutputFile(
+        @Path("id") String jobId,
+        @Path(value = "path", encoded = true) String outputFilePath);
 
     /**
      * Method to get Job status.
