@@ -32,6 +32,31 @@ Whereas static properties values are bound during application startup and do not
 |5m
 |no
 
+|genie.agent.filestream.max-concurrent-transfers
+|Maximum number of concurrent file transfers that a server allows
+|100
+|no
+
+|genie.agent.filestream.unclaimed-stream-start-timeout
+|Interval after which a transfer stream is shut down if it didn't send the first chunk of data
+|10s
+|no
+
+|genie.agent.filestream.stalled-transfer-timeout
+|Interval after which a transfer stream is shut down if it didn't send any more data
+|20s
+|no
+
+|genie.agent.filestream.stalled-transfer-check-interval
+|Interval for checking on stalled downloads
+|5s
+|no
+
+|genie.agent.filestream.write-retry-delay
+|Interval between attempts to write data into a stream buffer
+|300ms
+|no
+
 |genie.agent.filter.enabled
 |If set to `true`, enables the built-in agent filter service. The filter behavior is controlled by other active `genie.agent.filter.*` properties.
 |

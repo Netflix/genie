@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2019 Netflix, Inc.
+ *  Copyright 2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,437 +18,647 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.google.protobuf.ByteString
-import com.netflix.genie.common.exceptions.GenieTimeoutException
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.proto.AgentFileMessage
 import com.netflix.genie.proto.AgentManifestMessage
 import com.netflix.genie.proto.ServerAckMessage
 import com.netflix.genie.proto.ServerControlMessage
+import com.netflix.genie.proto.ServerFileRequestMessage
+import com.netflix.genie.web.properties.AgentFileStreamProperties
 import io.grpc.stub.StreamObserver
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.DistributionSummary
+import io.micrometer.core.instrument.MeterRegistry
+import org.junit.platform.commons.util.StringUtils
+import org.springframework.boot.actuate.info.Info
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpRange
 import org.springframework.scheduling.TaskScheduler
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.nio.ByteBuffer
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.TimeoutException
 
-class GRpcAgentFileStreamServiceImplSpec extends Specification {
+class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
+    static final int FILE_SIZE = 100
 
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
-
+    GRpcAgentFileStreamServiceImpl service
     JobDirectoryManifestProtoConverter converter
     TaskScheduler taskScheduler
-    GRpcAgentFileStreamServiceImpl service
-    StreamObserver<ServerControlMessage> serverControlObserver
-    StreamObserver<ServerAckMessage> serverTransmitObserver
-    AgentManifestMessage manifestMessage
+    AgentFileStreamProperties serviceProperties
+    MeterRegistry registry
     String jobId
-    DirectoryManifest manifest
-    ByteString data
-    @Shared int dataSize
-    @Shared long lastOffset
-    HttpRange noRange = null
+    DirectoryManifest directoryManifest
+    Path relativePath = Paths.get("stdout")
+    URI uri = URI.create("agent://host/stdout")
+    DirectoryManifest.ManifestEntry manifestEntry
+    AgentManifestMessage manifestMessage
+    StreamObserver<ServerControlMessage> controlStreamResponseObserver
+    StreamObserver<ServerAckMessage> transferStreamResponseObserver
+    Info.Builder infoBuilder
+    Runnable stalledTransfersTask
 
     void setup() {
-        this.data = ByteString.copyFromUtf8("Hello World!\n")
-        this.temporaryFolder.newFile("foo1.txt")
-        this.temporaryFolder.newFile("foo2.txt").write(data.toStringUtf8())
-        this.temporaryFolder.newFolder("bar")
-        this.dataSize = data.size()
-        this.lastOffset = dataSize - 1
-
-
         this.converter = Mock(JobDirectoryManifestProtoConverter)
-        this.taskScheduler = Mock(TaskScheduler)
-        this.service = new GRpcAgentFileStreamServiceImpl(
-            converter,
-            taskScheduler,
-            new SimpleMeterRegistry()
-        )
-        this.serverControlObserver = Mock(StreamObserver)
-        this.serverTransmitObserver = Mock(StreamObserver)
-
+        this.taskScheduler = Mock(TaskScheduler) {
+            scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
+                Runnable r, Duration d ->
+                    this.stalledTransfersTask = r
+                    return null
+            }
+        }
+        this.serviceProperties = Mock(AgentFileStreamProperties) {
+            getUnclaimedStreamStartTimeout() >> Duration.ofSeconds(3)
+            getMaxConcurrentTransfers() >> 10
+            getStalledTransferCheckInterval() >> Duration.ofSeconds(3)
+            getWriteRetryDelay() >> Duration.ofMillis(250)
+            getStalledTransferTimeout() >> Duration.ofSeconds(5)
+            getManifestCacheExpiration() >> Duration.ofSeconds(10)
+        }
+        this.registry = Mock(MeterRegistry) {
+            counter(_ as String) >> Mock(Counter)
+            summary(_ as String) >> Mock(DistributionSummary)
+        }
         this.jobId = UUID.randomUUID().toString()
+        this.controlStreamResponseObserver = Mock(StreamObserver)
+        this.transferStreamResponseObserver = Mock(StreamObserver)
+        this.directoryManifest = Mock(DirectoryManifest)
         this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
-        this.manifest = Spy(new DirectoryManifest.Factory().getDirectoryManifest(this.temporaryFolder.getRoot().toPath(), true))
+        this.manifestEntry = Mock(DirectoryManifest.ManifestEntry) {
+            getLastModifiedTime() >> Instant.now()
+            getSize() >> FILE_SIZE
+        }
+        this.service = new GRpcAgentFileStreamServiceImpl(converter, taskScheduler, serviceProperties, registry)
+
+        // Use InfoContributor interface to print internal state of service to console during tests (in a 'when' block)
+        this.infoBuilder = Mock(Info.Builder) {
+            withDetail(_ as String, _ as Object) >> {
+                String s, Object o ->
+                    println(" [(I)] + " + s + " : " + o.toString())
+                    return this.infoBuilder
+            }
+            withDetails(_ as Map) >> {
+                Map<String, Object> m ->
+                    m.entrySet()
+                        .forEach({
+                            e -> println(" [(I)] " + e.key + " : " + e.getValue().toString())
+                        })
+                    return this.infoBuilder
+            }
+        }
+        assert this.stalledTransfersTask != null
     }
 
-    void cleanup() {
-    }
+    def "Get manifest"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        AgentManifestMessage manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
 
-    def "Control stream"() {
-        setup:
-        Optional<DirectoryManifest> m
-        StreamObserver<AgentManifestMessage> o
-
-        when: "Fetch manifest before any agent connected"
-        m = service.getManifest(jobId)
+        Optional<DirectoryManifest> optionalManifest
+        when:
+        optionalManifest = this.service.getManifest(jobId)
 
         then:
-        !m.isPresent()
+        !optionalManifest.isPresent()
 
-        when: "Have one agent connect"
-        o = service.sync(serverControlObserver)
-
-        then:
-        noExceptionThrown()
-
-        when: "Fetch manifest before any manifest is received"
-        m = service.getManifest(jobId)
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        optionalManifest = this.service.getManifest(jobId)
 
         then:
-        !m.isPresent()
+        !optionalManifest.isPresent()
 
-        when: "Send a manifest"
-        o.onNext(manifestMessage)
-
-        then:
-        1 * converter.toManifest(manifestMessage) >> manifest
-
-        when: "Fetch manifest"
-        m = service.getManifest(jobId)
-
-        then:
-        m.isPresent()
-        m.get() == manifest
-
-        when: "Send a manifest that fails to deserialize"
-        o.onNext(manifestMessage)
+        when: "Manifest sent, fails conversion"
+        controlStreamRequestObserver.onNext(manifestMessage)
+        optionalManifest = this.service.getManifest(jobId)
 
         then:
         1 * converter.toManifest(manifestMessage) >> { throw new GenieConversionException("...") }
+        !optionalManifest.isPresent()
 
-        when: "Fetch latest valid manifest"
-        m = service.getManifest(jobId)
-
-        then:
-        m.isPresent()
-        m.get() == manifest
-
-        when: "Complete stream"
-        o.onCompleted()
+        when: "Manifest sent successfully"
+        controlStreamRequestObserver.onNext(manifestMessage)
+        optionalManifest = this.service.getManifest(jobId)
+        this.service.contribute(infoBuilder)
 
         then:
-        noExceptionThrown()
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+        optionalManifest.isPresent()
+        optionalManifest.get() == directoryManifest
 
-        when: "Fetch manifest after agent has disconnected"
-        m = service.getManifest(jobId)
-
-        then:
-        !m.isPresent()
-
-        when: "Have one agent connect then close the stream with an error"
-        service.sync(serverControlObserver).onError(new RuntimeException("..."))
+        when: "Control stream is closed by client"
+        controlStreamRequestObserver.onCompleted()
+        optionalManifest = this.service.getManifest(jobId)
+        this.service.contribute(infoBuilder)
 
         then:
-        noExceptionThrown()
+        optionalManifest.isPresent()
     }
 
-    def "Transfer stream"() {
-        StreamObserver<AgentManifestMessage> o
-        Optional<Resource> r
-        ServerControlMessage c
-        Runnable t
-        StreamObserver<AgentFileMessage> s
-
-        when: "Agent not connected"
-        r = service.getResource(jobId, Paths.get("foo.txt"), null, noRange)
+    def "No manifest"() {
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, null)
 
         then:
-        !r.isPresent()
-
-        when: "Agent connected and registered, but no manifest"
-        o = service.sync(serverControlObserver)
-        o.onNext(manifestMessage)
-        r = service.getResource(jobId, Paths.get("foo.txt"), null, noRange)
-
-        then:
-        1 * converter.toManifest(manifestMessage) >> { throw new GenieConversionException("...") }
-        !r.isPresent()
-
-        when: "Send valid manifest"
-        o.onNext(manifestMessage)
-
-        then:
-        1 * converter.toManifest(manifestMessage) >> manifest
-
-        when: "Request a file that does not exist"
-        r = service.getResource(jobId, Paths.get("does-not-exist.txt"), null, noRange)
-
-        then:
-        1 * manifest.getEntry("does-not-exist.txt")
-        r.isPresent()
-        !r.get().exists()
-
-        when: "Request a file that is empty"
-        r = service.getResource(jobId, Paths.get("foo1.txt"), null, noRange)
-
-        then:
-        1 * manifest.getEntry("foo1.txt")
-        0 * serverControlObserver.onNext(_)
-        0 * taskScheduler.schedule(_, _)
-        r.isPresent()
-        r.get().exists()
-
-        when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
-
-        then:
-        1 * manifest.getEntry("foo2.txt")
-        1 * serverControlObserver.onNext(_ as ServerControlMessage) >> { args -> c = args[0] as ServerControlMessage }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-        c != null
-        c.getMessageCase() == ServerControlMessage.MessageCase.SERVER_FILE_REQUEST
-        c.getServerFileRequest().getStreamId() != ""
-        c.getServerFileRequest().getStartOffset() == 0
-        c.getServerFileRequest().getEndOffset() == data.size()
-        c.getServerFileRequest().getRelativePath() == "foo2.txt"
-        t != null
-        r.isPresent()
-        r.get().exists()
-
-        when: "Timeout before stream is initiated"
-        t.run()
-
-        then:
-        noExceptionThrown()
-
-        when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
-
-        then:
-        1 * manifest.getEntry("foo2.txt")
-        1 * serverControlObserver.onNext(_ as ServerControlMessage) >> { args -> c = args[0] as ServerControlMessage }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-        c != null
-        c.getMessageCase() == ServerControlMessage.MessageCase.SERVER_FILE_REQUEST
-        c.getServerFileRequest().getStreamId() != ""
-        c.getServerFileRequest().getStartOffset() == 0
-        c.getServerFileRequest().getEndOffset() == data.size()
-        c.getServerFileRequest().getRelativePath() == "foo2.txt"
-        t != null
-        r.isPresent()
-        r.get().exists()
-
-        when: "Agent initiates stream"
-        s = service.transmit(serverTransmitObserver)
-
-        then:
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-
-        when: "Timeout before first chunk is received"
-        t.run()
-
-        then:
-        1 * serverTransmitObserver.onError(_ as GenieTimeoutException)
-
-        when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
-
-        then:
-        1 * manifest.getEntry("foo2.txt")
-        1 * serverControlObserver.onNext(_ as ServerControlMessage) >> { args -> c = args[0] as ServerControlMessage }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-        c != null
-        t != null
-        r.isPresent()
-        r.get().exists()
-
-        when: "Agent initiates stream"
-        s = service.transmit(serverTransmitObserver)
-
-        then:
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-
-        when: "First (and only) chunk is sent"
-        s.onNext(
-            AgentFileMessage.newBuilder()
-                .setStreamId(c.getServerFileRequest().getStreamId())
-                .setData(data)
-                .build()
-        )
-
-        then:
-        ByteBuffer buffer = ByteBuffer.allocate(data.size())
-        r.get().readableChannel().read(buffer)
-        buffer.rewind()
-        buffer.array() == data.toByteArray()
-
-        when: "Transfer completed"
-        s.onCompleted()
-
-        then:
-        noExceptionThrown()
+        !resource.isPresent()
     }
 
-    def "Transfer stream errors"() {
-        StreamObserver<AgentManifestMessage> o
-        Optional<Resource> r
-        ServerControlMessage c
-        Runnable t
-        StreamObserver<AgentFileMessage> s
+    def "No manifest entry"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
 
-        o = service.sync(serverControlObserver)
-
-        when: "Send valid manifest"
-        o.onNext(manifestMessage)
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
 
         then:
-        1 * converter.toManifest(manifestMessage) >> manifest
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
 
-        when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null, noRange)
-
-        then:
-        1 * manifest.getEntry("foo2.txt")
-        1 * serverControlObserver.onNext(_ as ServerControlMessage) >> { args -> c = args[0] as ServerControlMessage }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-        c != null
-        t != null
-        r.isPresent()
-        r.get().exists()
-
-        when: "Agent initiates stream"
-        s = service.transmit(serverTransmitObserver)
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, null)
 
         then:
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-
-        when: "Stream error before first chunk"
-        s.onError(new IOException("..."))
-
-        then:
-        noExceptionThrown()
-
-        when: "Agent initiates stream"
-        s = service.transmit(serverTransmitObserver)
-
-        then:
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-
-        when: "First chunk is sent"
-        s.onNext(
-            AgentFileMessage.newBuilder()
-                .setStreamId(c.getServerFileRequest().getStreamId())
-                .setData(data)
-                .build()
-        )
-
-        then:
-        noExceptionThrown()
-
-        when: "Stream error during in-progress transfer"
-        s.onError(new IOException("..."))
-
-        then:
-        noExceptionThrown()
-
-        when: "Agent initiates stream"
-        s = service.transmit(serverTransmitObserver)
-
-        then:
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-
-        when: "First chunk is sent but stream id does not match the request"
-        s.onNext(
-            AgentFileMessage.newBuilder()
-                .setStreamId("?")
-                .setData(data)
-                .build()
-        )
-
-        then:
-        noExceptionThrown()
-
-        when: "First chunk is sent with blank stream id"
-        s.onNext(
-            AgentFileMessage.newBuilder()
-                .setData(data)
-                .build()
-        )
-
-        then:
-        noExceptionThrown()
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.empty()
+        resource.isPresent()
+        !resource.get().exists()
     }
 
     @Unroll
-    def "Transfer stream with range: #range"() {
-        StreamObserver<AgentManifestMessage> o
-        Optional<Resource> r
-        ServerControlMessage c
-        Runnable t
-        StreamObserver<AgentFileMessage> s
+    def "No control stream due to #description"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
 
-        when: "Agent connected and registered, but no manifest"
-        o = service.sync(serverControlObserver)
-        o.onNext(manifestMessage)
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
 
         then:
-        1 * converter.toManifest(manifestMessage) >> manifest
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
 
-        when: "Request a file"
-        r = service.getResource(jobId, Paths.get("foo2.txt"), null, range)
+        when: "Manifest stream is shut down"
+        streamTerminationClosure.call(controlStreamRequestObserver)
 
         then:
-        1 * manifest.getEntry("foo2.txt")
-        1 * serverControlObserver.onNext(_ as ServerControlMessage) >> { args -> c = args[0] as ServerControlMessage }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> { args -> t = args[0] as Runnable; return null }
-        c != null
-        t != null
-        r.isPresent()
-        r.get().exists()
-        c.getServerFileRequest().getStartOffset() == expectedRangeStart
-        c.getServerFileRequest().getEndOffset() == expectedRangeEnd
+        noExceptionThrown()
+
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        !resource.isPresent()
 
         where:
-        range                             | expectedRangeStart | expectedRangeEnd
-        null                              | 0                  | dataSize // No range
-        HttpRange.createSuffixRange(5)    | dataSize - 5       | dataSize // Last 5 bytes
-        HttpRange.createByteRange(5)      | 5                  | dataSize // All minus first 5 bytes
-        HttpRange.createByteRange(4, 8)   | 4                  | 9        // Proper range
-        HttpRange.createSuffixRange(120)  | 0                  | dataSize // More data than it's available
-        HttpRange.createByteRange(3, 120) | 3                  | dataSize // More data than it's available
-        HttpRange.createByteRange(lastOffset, lastOffset)   | lastOffset                  | dataSize        // Last byte
+        description         | streamTerminationClosure
+        "stream error"      | { observer -> observer.onError(new GenieRuntimeException("...")) }
+        "stream completion" | { observer -> observer.onCompleted() }
     }
 
     @Unroll
-    def "Transfer stream with empty range: #range for #filename "() {
-        StreamObserver<AgentManifestMessage> o
-        Optional<Resource> r
-        HttpRange
+    def "Anonymous control stream termination due to #description"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
 
-        when: "Agent connected and registered, but no manifest"
-        o = service.sync(serverControlObserver)
-        o.onNext(manifestMessage)
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
 
         then:
-        1 * converter.toManifest(manifestMessage) >> manifest
+        noExceptionThrown()
 
-        when: "Request a file"
-        r = service.getResource(jobId, Paths.get(filename), null, range)
+        when: "Manifest stream termination"
+        streamTerminationClosure.call(controlStreamRequestObserver)
 
         then:
-        1 * manifest.getEntry(filename)
-        0 * serverControlObserver.onNext(_)
-        0 * taskScheduler.schedule(_, _)
-        r.isPresent()
-        r.get().exists()
-        r.get().getInputStream().available() == 0
+        noExceptionThrown()
 
         where:
-        range                                 | filename
-        HttpRange.createByteRange(dataSize)   | "foo2.txt"
-        HttpRange.createByteRange(1000, 1100) | "foo2.txt"
-        HttpRange.createSuffixRange(100)      | "foo1.txt"
+        description         | streamTerminationClosure
+        "stream error"      | { observer -> observer.onError(new GenieRuntimeException("...")) }
+        "stream completion" | { observer -> observer.onCompleted() }
+    }
+
+    def "Newer control stream replaces and closes a previous one"() {
+        StreamObserver<ServerControlMessage> controlStreamResponseObserver1 = Mock(StreamObserver)
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver1
+        StreamObserver<ServerControlMessage> controlStreamResponseObserver2 = Mock(StreamObserver)
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver2
+        AgentManifestMessage manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
+
+
+        when: "Control stream established"
+        controlStreamRequestObserver1 = this.service.sync(controlStreamResponseObserver1)
+        controlStreamRequestObserver1.onNext(manifestMessage)
+        controlStreamRequestObserver1.onNext(manifestMessage)
+        controlStreamRequestObserver1.onNext(manifestMessage)
+
+        then:
+        3 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Another Control stream established for the same job"
+        controlStreamRequestObserver2 = this.service.sync(controlStreamResponseObserver2)
+        controlStreamRequestObserver2.onNext(manifestMessage)
+        this.service.contribute(infoBuilder)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+        1 * controlStreamResponseObserver1.onError(_ as IllegalStateException)
+    }
+
+    def "Handle control stream error"() {
+        StreamObserver<ServerControlMessage> controlStreamResponseObserver1 = Mock(StreamObserver)
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver1
+        StreamObserver<ServerControlMessage> controlStreamResponseObserver2 = Mock(StreamObserver)
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver2
+        AgentManifestMessage manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
+
+        when: "Control stream established and error before receiving manifest"
+        controlStreamRequestObserver1 = this.service.sync(controlStreamResponseObserver1)
+        controlStreamRequestObserver1.onError(new RuntimeException("..."))
+
+        then:
+        0 * controlStreamResponseObserver._
+
+        when: "Another Control stream established and error after sending a manifest"
+        controlStreamRequestObserver2 = this.service.sync(controlStreamResponseObserver2)
+        controlStreamRequestObserver2.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+        0 * controlStreamResponseObserver2._
+    }
+
+    @Unroll
+    def "Successful transfer with range: #range"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+        String streamId
+        InputStream inputStream
+        int bytesRead
+        Runnable streamTimeoutTask
+
+        ServerFileRequestMessage fileRequestCapture
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, range)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage) >> {
+            args ->
+                fileRequestCapture = (args[0] as ServerControlMessage).getServerFileRequest()
+                streamId = fileRequestCapture.getStreamId()
+        }
+        resource.isPresent()
+        fileRequestCapture != null
+        fileRequestCapture.getStartOffset() == offsetStart
+        fileRequestCapture.getEndOffset() == offsetEnd
+        streamId != null
+        StringUtils.isNotBlank(streamId)
+        fileRequestCapture.getRelativePath() == relativePath.toString()
+
+        when: "File transfer begins"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+        transferStreamRequestObserver.onNext(
+            AgentFileMessage.newBuilder()
+                .setStreamId(streamId)
+                .setData(ByteString.copyFrom(new byte[chunkSize]))
+                .build()
+        )
+        this.service.contribute(infoBuilder)
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                streamTimeoutTask = r
+                return null
+        }
+        1 * taskScheduler.schedule(_ as Runnable, _ as Date) >> {
+            runnable, date ->
+                runnable.run()
+        }
+        1 * transferStreamResponseObserver.onNext(_ as ServerAckMessage)
+        streamTimeoutTask != null
+
+        when: "Both timeout tasks run"
+        streamTimeoutTask.run()
+        stalledTransfersTask.run()
+
+        then:
+        noExceptionThrown()
+
+        when: "Read data"
+        inputStream = resource.get().getInputStream()
+        inputStream.skip(offsetStart)
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        bytesRead == chunkSize
+
+        when: "Read more"
+        transferStreamRequestObserver.onCompleted()
+        bytesRead = inputStream.read(new byte[512])
+        this.service.contribute(infoBuilder)
+
+        then:
+        bytesRead == -1
+
+        where:
+        range                              | offsetStart | offsetEnd | chunkSize
+        null                               | 0           | FILE_SIZE | FILE_SIZE
+        HttpRange.createByteRange(50)      | 50          | FILE_SIZE | 50
+        HttpRange.createSuffixRange(50)    | 50          | FILE_SIZE | 50
+        HttpRange.createByteRange(10, 20)  | 10          | 21        | 10
+        HttpRange.createByteRange(50, 300) | 50          | FILE_SIZE | 50
+    }
+
+    @Unroll
+    def "Request empty file or empty range (range: #range size: #fileSize)"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        InputStream inputStream
+        int bytesRead
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, range)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        2 * manifestEntry.getSize() >> fileSize
+        0 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        0 * taskScheduler.schedule(_ as Runnable, _ as Instant)
+        resource.isPresent()
+
+        when: "Read data"
+        inputStream = resource.get().getInputStream()
+        inputStream.skip(skip)
+        bytesRead = inputStream.read(new byte[512])
+        this.service.contribute(infoBuilder)
+
+        then:
+        bytesRead == -1
+
+        where:
+        range                               | fileSize | skip
+        null                                | 0        | 0
+        HttpRange.createByteRange(100)      | 100      | 100
+        HttpRange.createByteRange(100, 200) | 100      | 100
+    }
+
+    def "Transfer start timeout"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+        int bytesRead
+        Optional<Resource> resource
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        resource = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        resource.isPresent()
+
+        when: "Timeout transfer before transfer stream is established"
+        stalledTransfersTask.run()
+
+        then:
+        1 * serviceProperties.getStalledTransferTimeout() >> Duration.ofSeconds(-1)
+
+        when: "Read data"
+        bytesRead = resource.get().getInputStream().read(new byte[512])
+
+        then:
+        bytesRead == -1
+
+        when: "Request file transfer"
+        resource = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        resource.isPresent()
+
+        when: "Transfer stream is established but not associated with the transfer"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+
+        then:
+        transferStreamRequestObserver != null
+        resource.isPresent()
+
+        when: "Timeout transfer before the stream sends its first message"
+        stalledTransfersTask.run()
+
+        then:
+        1 * serviceProperties.getStalledTransferTimeout() >> Duration.ofSeconds(-1)
+        0 * transferStreamResponseObserver.onError(_ as TimeoutException)
+
+        when: "Read data"
+        bytesRead = resource.get().getInputStream().read(new byte[512])
+
+        then:
+        bytesRead == -1
+    }
+
+    def "Unclaimed stream timeout"() {
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+
+        Runnable streamTimeoutTask
+
+        when: "File transfer stream established"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            args ->
+                streamTimeoutTask = args[0] as Runnable
+                return null
+        }
+        streamTimeoutTask != null
+
+        when: "New stream has not been claimed"
+        streamTimeoutTask.run()
+        this.service.contribute(infoBuilder)
+
+        then:
+        1 * transferStreamResponseObserver.onError(_ as TimeoutException)
+    }
+
+    def "Unclaimed stream error"() {
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+
+        Runnable streamTimeoutTask
+
+        when: "File transfer stream established"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            args ->
+                streamTimeoutTask = args[0] as Runnable
+                return null
+        }
+        streamTimeoutTask != null
+
+        when: "Unclaimed stream error"
+        transferStreamRequestObserver.onError(new RuntimeException("..."));
+
+        then:
+        0 * transferStreamResponseObserver.onError(_ as TimeoutException)
+
+        when: "Unclaimed stream timeout after error"
+        streamTimeoutTask.run()
+        this.service.contribute(infoBuilder)
+
+        then:
+        0 * transferStreamResponseObserver.onError(_ as TimeoutException)
+    }
+
+    def "In progress stream error"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+        String streamId
+        InputStream inputStream
+        int bytesRead
+
+        ServerFileRequestMessage fileRequestCapture
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage) >> {
+            args ->
+                fileRequestCapture = (args[0] as ServerControlMessage).getServerFileRequest()
+                streamId = fileRequestCapture.getStreamId()
+        }
+        resource.isPresent()
+        fileRequestCapture != null
+        streamId != null
+        StringUtils.isNotBlank(streamId)
+
+        when: "File transfer begins"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+        transferStreamRequestObserver.onNext(
+            AgentFileMessage.newBuilder()
+                .setStreamId(streamId)
+                .setData(ByteString.copyFrom(new byte[FILE_SIZE / 2]))
+                .build()
+        )
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Date) >> {
+            runnable, date -> runnable.run() // Write data in buffer and send ack
+        }
+        1 * transferStreamResponseObserver.onNext(_ as ServerAckMessage)
+
+        when: "Transfer stream error"
+        transferStreamRequestObserver.onError(new RuntimeException("..."))
+        this.service.contribute(infoBuilder)
+
+        then:
+        noExceptionThrown()
+
+        when: "Read data"
+        inputStream = resource.get().getInputStream()
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        bytesRead == FILE_SIZE / 2 as int
+
+        when: "Read more"
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        bytesRead == -1
+    }
+
+    def "Exceed maximum number of transfers"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request 2 file transfers"
+        Optional<Resource> resource1 = service.getResource(jobId, relativePath, uri, null)
+        Optional<Resource> resource2 = service.getResource(jobId, relativePath, uri, null)
+        this.service.contribute(infoBuilder)
+
+        then:
+        2 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        2 * serviceProperties.getMaxConcurrentTransfers() >> 2
+        2 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        resource1.isPresent()
+        resource2.isPresent()
+
+        when: "Request one more file transfer"
+        Optional<Resource> resource3 = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * serviceProperties.getMaxConcurrentTransfers() >> 2
+        0 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        !resource3.isPresent()
+
+        when: "One of the transfers times out"
+        stalledTransfersTask.run()
+
+        then:
+        2 * serviceProperties.getStalledTransferTimeout() >> Duration.ofSeconds(-1) >> Duration.ofSeconds(100)
+
+        when: "Retry to request file transfer"
+        resource3 = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * serviceProperties.getMaxConcurrentTransfers() >> 2
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        resource3.isPresent()
+    }
+
+    def "Contribute Info"() {
+        when:
+        this.service.contribute(infoBuilder)
+
+        then:
+        noExceptionThrown()
     }
 }

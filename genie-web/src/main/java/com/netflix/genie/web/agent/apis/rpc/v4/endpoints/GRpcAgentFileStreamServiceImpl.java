@@ -17,10 +17,11 @@
  */
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
-import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
@@ -32,36 +33,48 @@ import com.netflix.genie.proto.ServerControlMessage;
 import com.netflix.genie.proto.ServerFileRequestMessage;
 import com.netflix.genie.web.agent.resources.AgentFileResourceImpl;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.properties.AgentFileStreamProperties;
 import com.netflix.genie.web.util.StreamBuffer;
 import io.grpc.stub.StreamObserver;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.Nullable;
+import javax.naming.LimitExceededException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * {@link AgentFileStreamService} gRPC implementation.
  * Receives and caches manifests from connected agents.
- * Allows requesting a file, which is returned in the form of a {@link AgentFileStreamService.AgentFileResource}.
+ * Allows requesting a file, which is returned in the form of a {@link AgentFileResource}.
  * <p>
  * Implementation overview:
- * Each agent maintains a single 'sync' channel, through which manifests are pushed to the server.
- * On top of the same channel, the server can request a file.
- * When a file is requested, the agent opens a separate 'transmit' stream and sends the file in chunks.
- * The server acknowledges a chunk in order to request the next one.
+ * Each agent maintains a single "control" bidirectional stream (through the 'sync' RPC method).
+ * This stream is used by the agent to regularly push manifests.
+ * And it is used by the server to request files.
+ * <p>
+ * When a file is requested, the agent opens a separate "transfer" bidirectional stream (through the 'transmit' RPC
+ * method) for that file transfer and starts sending chunks (currently one at the time), the server sends
+ * acknowledgements in the same stream.
  * <p>
  * This service returns a resource immediately, but maintains a handle on a buffer where data is written as it is
  * received.
@@ -72,38 +85,38 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class GRpcAgentFileStreamServiceImpl
     extends FileStreamServiceGrpc.FileStreamServiceImplBase
-    implements AgentFileStreamService {
+    implements AgentFileStreamService, InfoContributor {
 
-    private static final long FILE_TRANSFER_BEGIN_TIMEOUT_MILLIS = 3000;
-    private static final String PENDING_TRANSFERS_GAUGE_NAME = "genie.agents.fileTransfers.pending.gauge";
-    private static final String IN_PROGRESS_TRANSFERS_GAUGE_NAME = "genie.agents.fileTransfers.inProgress.gauge";
+    private static final String METRICS_PREFIX = "genie.agents.fileTransfers";
+    private static final String TRANSFER_COUNTER = METRICS_PREFIX + ".requested.counter";
+    private static final String TRANSFER_LIMIT_EXCEEDED_COUNTER = METRICS_PREFIX + ".rejected.counter";
+    private static final String MANIFEST_CACHE_SIZE_GAUGE = METRICS_PREFIX + ".manifestCache.size";
+    private static final String CONTROL_STREAMS_GAUGE = METRICS_PREFIX + ".controlStreams.size";
+    private static final String TRANSFER_TIMEOUT_COUNTER = METRICS_PREFIX + ".timeout.counter";
+    private static final String TRANSFER_SIZE_DISTRIBUTION = METRICS_PREFIX + ".transferSize.summary";
+    private static final String ACTIVE_TRANSFER_GAUGE = METRICS_PREFIX + ".activeTransfers.size";
 
-    private final Map<String, ControlStreamObserver> jobIdControlStreamMap = Maps.newConcurrentMap();
-    private final Map<String, StreamBuffer> pendingTransferBuffersMap = Maps.newConcurrentMap();
-    private final Set<FileTransferStreamObserver> pendingTransferObserversSet = Sets.newConcurrentHashSet();
-    private final Map<String, StreamBuffer> inProgressTransferBuffersMap = Maps.newConcurrentMap();
-    private final JobDirectoryManifestProtoConverter converter;
-    private final TaskScheduler taskScheduler;
-    private final MeterRegistry registry;
-    private final Class<? extends HttpRange> suffixRangeClass = HttpRange.createSuffixRange(1).getClass();
+    private final ControlStreamManager controlStreamsManager;
+    private final TransferManager transferManager;
+    private final Counter fileTransferLimitExceededCounter;
 
     /**
      * Constructor.
      *
      * @param converter     The {@link JobDirectoryManifestProtoConverter} instance to use
      * @param taskScheduler A {@link TaskScheduler} instance to use
+     * @param properties    The service properties
      * @param registry      The meter registry
      */
     public GRpcAgentFileStreamServiceImpl(
         final JobDirectoryManifestProtoConverter converter,
         final TaskScheduler taskScheduler,
+        final AgentFileStreamProperties properties,
         final MeterRegistry registry
     ) {
-        this.converter = converter;
-        this.taskScheduler = taskScheduler;
-        this.registry = registry;
-        this.registry.gaugeMapSize(PENDING_TRANSFERS_GAUGE_NAME, Sets.newHashSet(), pendingTransferBuffersMap);
-        this.registry.gaugeMapSize(IN_PROGRESS_TRANSFERS_GAUGE_NAME, Sets.newHashSet(), inProgressTransferBuffersMap);
+        this.fileTransferLimitExceededCounter = registry.counter(TRANSFER_LIMIT_EXCEEDED_COUNTER);
+        this.controlStreamsManager = new ControlStreamManager(converter, properties, registry);
+        this.transferManager = new TransferManager(controlStreamsManager, taskScheduler, properties, registry);
     }
 
     /**
@@ -116,19 +129,15 @@ public class GRpcAgentFileStreamServiceImpl
         final URI uri,
         @Nullable final HttpRange range
     ) {
+        log.debug("Attempting to stream file: {} of job: {}", relativePath, jobId);
+        final Optional<DirectoryManifest> optionalManifest = this.getManifest(jobId);
 
-        final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
-        if (streamObserver == null) {
-            log.warn("Stream Record not found for job id: {}", jobId);
+        if (!optionalManifest.isPresent()) {
+            log.warn("No manifest found for job: {}" + jobId);
             return Optional.empty();
         }
 
-        final DirectoryManifest manifest = streamObserver.manifestRef.get();
-        if (manifest == null) {
-            log.warn("Stream record for job id: {} does not have a manifest", jobId);
-            return Optional.empty();
-        }
-
+        final DirectoryManifest manifest = optionalManifest.get();
         final DirectoryManifest.ManifestEntry manifestEntry =
             manifest.getEntry(relativePath.toString()).orElse(null);
 
@@ -142,84 +151,35 @@ public class GRpcAgentFileStreamServiceImpl
             return Optional.of(AgentFileResourceImpl.forNonExistingResource());
         }
 
-        // A unique ID for this file transfer
-        final String fileTransferId = UUID.randomUUID().toString();
-        log.debug(
-            "Initiating transfer {} for file: {} of job: {}",
-            fileTransferId,
-            relativePath,
-            jobId
-        );
-
-        final int fileSize = Math.toIntExact(manifestEntry.getSize());
-
-        // Http range is inclusive, protocol is not. Cannot just use range values as-is
-        final int startOffset;
-        final int endOffset;
-
-        if (range == null) {
-            startOffset = 0;
-            endOffset = fileSize;
-        } else if (range.getClass() == suffixRangeClass) {
-            startOffset = Math.toIntExact(range.getRangeStart(fileSize));
-            endOffset = fileSize;
-        } else {
-            startOffset = Math.min(fileSize, Math.toIntExact(range.getRangeStart(fileSize)));
-            endOffset = 1 + Math.toIntExact(range.getRangeEnd(fileSize));
+        final FileTransfer fileTransfer;
+        try {
+            // Attempt to start a file transfer
+            fileTransfer = this.transferManager.startFileTransfer(
+                jobId,
+                manifestEntry,
+                relativePath,
+                range
+            );
+        } catch (NotFoundException e) {
+            log.warn("No available stream to request file {} from agent running job: {}", relativePath, jobId);
+            return Optional.empty();
+        } catch (LimitExceededException e) {
+            log.warn("No available slots to request file {} from agent running job: {}", relativePath, jobId);
+            this.fileTransferLimitExceededCounter.increment();
+            return Optional.empty();
         }
 
-        // Allocate and park the buffer that will store the data in transit.
-        final StreamBuffer buffer = new StreamBuffer(startOffset);
-
-        if (endOffset - startOffset == 0) {
-            log.debug("Transfer {} file is empty, completing", fileTransferId);
-            // When requesting an empty file (or a range of 0 bytes), short-circuit and just return an empty resource.
-            buffer.closeForCompleted();
-        } else {
-            log.debug("Transfer {} initiating (offsets: ({}-{}])", fileTransferId, startOffset, endOffset);
-
-            // Expecting some data. Track this stream and its buffer so incoming chunks can be appended.
-            this.pendingTransferBuffersMap.put(fileTransferId, buffer);
-
-            // Request file over control channel
-            streamObserver.responseObserver.onNext(
-                ServerControlMessage.newBuilder()
-                    .setServerFileRequest(
-                        ServerFileRequestMessage.newBuilder()
-                            .setStreamId(fileTransferId)
-                            .setRelativePath(relativePath.toString())
-                            .setStartOffset(startOffset)
-                            .setEndOffset(endOffset)
-                            .build()
-                    )
-                    .build()
-            );
-
-            // Schedule a timeout for this transfer to start (first chunk received)
-            this.taskScheduler.schedule(
-                () -> {
-                    final StreamBuffer b = pendingTransferBuffersMap.remove(fileTransferId);
-                    // Is this stream/buffer still in the 'pending' map?
-                    if (b != null) {
-                        b.closeForError(
-                            new TimeoutException("Timeout waiting for transfer to start")
-                        );
-                    }
-                },
-                Instant.now().plusMillis(FILE_TRANSFER_BEGIN_TIMEOUT_MILLIS)
-            );
-        }
-
-        final AgentFileResource resource = AgentFileResourceImpl.forAgentFile(
-            uri,
-            manifestEntry.getSize(),
-            manifestEntry.getLastModifiedTime(),
-            Paths.get(manifestEntry.getPath()),
-            jobId,
-            buffer.getInputStream()
+        // Return the resource
+        return Optional.of(
+            AgentFileResourceImpl.forAgentFile(
+                uri,
+                manifestEntry.getSize(),
+                manifestEntry.getLastModifiedTime(),
+                relativePath,
+                jobId,
+                fileTransfer.getInputStream()
+            )
         );
-
-        return Optional.of(resource);
     }
 
     /**
@@ -227,12 +187,7 @@ public class GRpcAgentFileStreamServiceImpl
      */
     @Override
     public Optional<DirectoryManifest> getManifest(final String jobId) {
-        final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
-        if (streamObserver != null) {
-            return Optional.ofNullable(streamObserver.manifestRef.get());
-        }
-        log.warn("Stream Record not found for job id: {}", jobId);
-        return Optional.empty();
+        return Optional.ofNullable(this.controlStreamsManager.getManifest(jobId));
     }
 
     /**
@@ -240,8 +195,7 @@ public class GRpcAgentFileStreamServiceImpl
      */
     @Override
     public StreamObserver<AgentManifestMessage> sync(final StreamObserver<ServerControlMessage> responseObserver) {
-        log.info("New agent control stream established");
-        return new ControlStreamObserver(this, responseObserver);
+        return this.controlStreamsManager.handleNewControlStream(responseObserver);
     }
 
     /**
@@ -249,226 +203,578 @@ public class GRpcAgentFileStreamServiceImpl
      */
     @Override
     public StreamObserver<AgentFileMessage> transmit(final StreamObserver<ServerAckMessage> responseObserver) {
-        log.info("New file transfer stream established");
-        final FileTransferStreamObserver fileTransferStreamObserver =
-            new FileTransferStreamObserver(this, responseObserver);
-
-        this.pendingTransferObserversSet.add(fileTransferStreamObserver);
-
-        // Schedule a timeout for this transfer to start (first chunk received)
-        this.taskScheduler.schedule(
-            () -> {
-                final boolean removed = pendingTransferObserversSet.remove(fileTransferStreamObserver);
-                if (removed) {
-                    fileTransferStreamObserver.responseObserver.onError(
-                        new GenieTimeoutException("Timeout waiting for transfer to begin")
-                    );
-                }
-            },
-            Instant.now().plusMillis(FILE_TRANSFER_BEGIN_TIMEOUT_MILLIS)
-        );
-
-        return fileTransferStreamObserver;
+        return this.transferManager.handleNewTransferStream(responseObserver);
     }
 
-    private void registerControlStream(final String jobId, final ControlStreamObserver controlStreamObserver) {
-        final ControlStreamObserver previousObserver = this.jobIdControlStreamMap.put(jobId, controlStreamObserver);
-        if (previousObserver != null) {
-            // In theory, this cannot happen
-            log.warn("Found an previous observer for job id: {}", jobId);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contribute(final Info.Builder builder) {
+        this.controlStreamsManager.contribute(builder);
+        this.transferManager.contribute(builder);
     }
 
-    private void unregisterControlStream(final String jobId, final ControlStreamObserver controlStreamObserver) {
-        final boolean removed = this.jobIdControlStreamMap.remove(jobId, controlStreamObserver);
-        if (!removed) {
-            log.warn("Could not remove observer for job: {}, not found in map", jobId);
-        }
-    }
+    // Manages control streams, in theory one for each agent connected to this node
+    private static final class ControlStreamManager implements InfoContributor {
+        private final Map<String, ControlStreamObserver> controlStreamMap = Maps.newHashMap();
+        private final Cache<String, DirectoryManifest> manifestCache;
+        private final JobDirectoryManifestProtoConverter converter;
+        private final Counter fileTansferCounter;
+        private final MeterRegistry registry;
 
-    private void handleFileTransferChunk(
-        final FileTransferStreamObserver fileTransferStreamObserver,
-        final String streamId,
-        final ByteString data
-    ) {
+        private ControlStreamManager(
+            final JobDirectoryManifestProtoConverter converter,
+            final AgentFileStreamProperties properties,
+            final MeterRegistry registry
+        ) {
+            this.converter = converter;
+            this.manifestCache = Caffeine.newBuilder()
+                .expireAfterWrite(properties.getManifestCacheExpiration())
+                .build();
+            this.fileTansferCounter = registry.counter(TRANSFER_COUNTER);
 
-        // Remove observer from the set of transfers waiting to start.
-        final boolean removed = this.pendingTransferObserversSet.remove(fileTransferStreamObserver);
-        if (removed) {
-            log.debug("Removed observer for file stream: {} from 'pending' set", streamId);
-        }
-
-        // Remove buffer from the set of transfers waiting to start and move it to the 'in progress' map.
-        final StreamBuffer streamBufferFromPending = this.pendingTransferBuffersMap.remove(streamId);
-        if (streamBufferFromPending != null) {
-            log.debug("Moving buffer for file stream: {} from 'pending' to 'in progress'", streamId);
-            this.inProgressTransferBuffersMap.put(streamId, streamBufferFromPending);
+            this.registry = registry;
         }
 
-        // Look up the buffer where chunk data is written into
-        final StreamBuffer streamBuffer = this.inProgressTransferBuffersMap.get(streamId);
+        private synchronized void requestFile(
+            final String jobId,
+            final String fileTransferId,
+            final String relativePath,
+            final int startOffset,
+            final int endOffset
+        ) throws NotFoundException {
 
-        // Write into it, if the stream is still there
-        if (streamBuffer != null) {
-            log.debug("Writing {} bytes into stream of transfer {}", data.size(), streamId);
-            streamBuffer.write(data);
-        }
-    }
-
-    private void handleFileTransferError(
-        final FileTransferStreamObserver fileTransferStreamObserver,
-        @Nullable final String streamId,
-        final Throwable t
-    ) {
-        log.error("Error in file transfer stream: {}: {}", streamId, t.getMessage(), t);
-
-        this.pendingTransferObserversSet.remove(fileTransferStreamObserver);
-
-        if (streamId != null) {
-            final StreamBuffer pendingTransferBuffer = this.pendingTransferBuffersMap.remove(streamId);
-            if (pendingTransferBuffer != null) {
-                pendingTransferBuffer.closeForError(t);
+            final ControlStreamObserver controlStreamObserver = this.controlStreamMap.get(jobId);
+            if (controlStreamObserver == null) {
+                throw new NotFoundException("No active stream control stream for job: " + jobId);
             }
 
-            final StreamBuffer inProgressTransferBuffer = this.inProgressTransferBuffersMap.remove(streamId);
-            if (inProgressTransferBuffer != null) {
-                inProgressTransferBuffer.closeForError(t);
-            }
-        }
-    }
+            this.fileTansferCounter.increment();
 
-    private void handleFileTransferCompletion(
-        final FileTransferStreamObserver fileTransferStreamObserver,
-        @Nullable final String streamId
-    ) {
-        log.info("Completed file transfer: {}", streamId);
-        this.pendingTransferObserversSet.remove(fileTransferStreamObserver);
-
-        final StreamBuffer pendingTransferBuffer = this.pendingTransferBuffersMap.remove(streamId);
-        if (pendingTransferBuffer != null) {
-            pendingTransferBuffer.closeForCompleted();
+            // Send the file request
+            controlStreamObserver.responseObserver.onNext(
+                ServerControlMessage.newBuilder()
+                    .setServerFileRequest(
+                        ServerFileRequestMessage.newBuilder()
+                            .setStreamId(fileTransferId)
+                            .setRelativePath(relativePath)
+                            .setStartOffset(startOffset)
+                            .setEndOffset(endOffset)
+                            .build()
+                    )
+                    .build()
+            );
         }
 
-        final StreamBuffer inProgressTransferBuffer = this.inProgressTransferBuffersMap.remove(streamId);
-        if (inProgressTransferBuffer != null) {
-            inProgressTransferBuffer.closeForCompleted();
-        }
-    }
-
-    private static class ControlStreamObserver implements StreamObserver<AgentManifestMessage> {
-        private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
-        private final StreamObserver<ServerControlMessage> responseObserver;
-        private final AtomicReference<DirectoryManifest> manifestRef = new AtomicReference<>();
-        private final AtomicReference<String> jobIdRef = new AtomicReference<>();
-
-        ControlStreamObserver(
-            final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService,
+        private StreamObserver<AgentManifestMessage> handleNewControlStream(
             final StreamObserver<ServerControlMessage> responseObserver
         ) {
-            this.gRpcAgentFileStreamService = gRpcAgentFileStreamService;
-            this.responseObserver = responseObserver;
+            log.info("New agent control stream established");
+            return new ControlStreamObserver(this, responseObserver);
+        }
+
+        private DirectoryManifest getManifest(final String jobId) {
+            return this.manifestCache.getIfPresent(jobId);
+        }
+
+        private synchronized void updateManifestAndStream(
+            final ControlStreamObserver controlStreamObserver,
+            final String jobId,
+            final DirectoryManifest manifest
+        ) {
+            // Keep the most recent manifest for each job id
+            this.manifestCache.put(jobId, manifest);
+
+            // Keep the most recent control stream for each job id
+            final ControlStreamObserver previousObserver = this.controlStreamMap.put(jobId, controlStreamObserver);
+            if (previousObserver != null && previousObserver != controlStreamObserver) {
+                // If the older one is still present, close it
+                previousObserver.closeStreamWithError(
+                    new IllegalStateException("A new stream was registered for the same job id: " + jobId)
+                );
+            }
+
+            this.registry.gauge(MANIFEST_CACHE_SIZE_GAUGE, this.manifestCache.estimatedSize());
+            this.registry.gauge(CONTROL_STREAMS_GAUGE, this.controlStreamMap.size());
+        }
+
+        private synchronized void removeControlStream(
+            final ControlStreamObserver controlStreamObserver,
+            @Nullable final Throwable t
+        ) {
+            log.debug("Control stream {}", t == null ? "completed" : "error: " + t.getMessage());
+
+            final boolean foundAndRemoved = this.controlStreamMap
+                .entrySet()
+                .removeIf(entry -> entry.getValue() == controlStreamObserver);
+
+            if (foundAndRemoved) {
+                log.debug(
+                    "Removed a control stream due to {}",
+                    t == null ? "completion" : "error: " + t.getMessage()
+                );
+            }
         }
 
         @Override
-        public void onNext(final AgentManifestMessage value) {
-            log.debug("Received a manifest");
+        public synchronized void contribute(final Info.Builder builder) {
+            builder
+                .withDetail("file_control_streams", this.controlStreamMap.size())
+                .withDetail("cached_manifests", this.manifestCache.estimatedSize());
+        }
+    }
 
+    private static final class ControlStreamObserver implements StreamObserver<AgentManifestMessage> {
+        private final ControlStreamManager controlStreamManager;
+        private final StreamObserver<ServerControlMessage> responseObserver;
+
+        private ControlStreamObserver(
+            final ControlStreamManager controlStreamManager,
+            final StreamObserver<ServerControlMessage> responseObserver
+        ) {
+            this.controlStreamManager = controlStreamManager;
+            this.responseObserver = responseObserver;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onNext(final AgentManifestMessage value) {
             final String jobId = value.getJobId();
 
-            final boolean isFirstMessage = this.jobIdRef.compareAndSet(null, jobId);
-
-            if (isFirstMessage) {
-                this.gRpcAgentFileStreamService.registerControlStream(jobId, this);
-            }
-
-            // Save the manifest just received
+            DirectoryManifest manifest = null;
             try {
-                manifestRef.set(
-                    this.gRpcAgentFileStreamService.converter.toManifest(value)
-                );
+                manifest = this.controlStreamManager.converter.toManifest(value);
             } catch (GenieConversionException e) {
                 log.warn("Failed to parse manifest for job id: {}", jobId, e);
             }
-        }
 
-        @Override
-        public void onError(final Throwable t) {
-            log.warn("Manifest stream error", t);
-            this.unregisterStream();
-        }
-
-        @Override
-        public void onCompleted() {
-            log.debug("Manifest stream completed");
-            this.unregisterStream();
-        }
-
-        private void unregisterStream() {
-            final String jobId = jobIdRef.get();
-            if (jobId != null) {
-                this.gRpcAgentFileStreamService.unregisterControlStream(jobId, this);
+            if (manifest != null) {
+                this.controlStreamManager.updateManifestAndStream(this, jobId, manifest);
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onError(final Throwable t) {
+            // Drop the stream, no other actions necessary
+            this.controlStreamManager.removeControlStream(this, t);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onCompleted() {
+            // Drop the stream, no other actions necessary
+            this.controlStreamManager.removeControlStream(this, null);
+        }
+
+        public void closeStreamWithError(final Throwable e) {
+            this.responseObserver.onError(e);
+        }
     }
 
-    private static class FileTransferStreamObserver implements StreamObserver<AgentFileMessage> {
-        private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
-        private final StreamObserver<ServerAckMessage> responseObserver;
-        private final AtomicReference<String> streamId = new AtomicReference<>();
+    // Manages in-progress file transfers
+    private static final class TransferManager implements InfoContributor {
+        private final Map<String, FileTransfer> activeTransfers = Maps.newHashMap();
+        private final Set<AgentFileChunkObserver> unclaimedTransferStreams = Sets.newHashSet();
+        // Little hack to get private inner class
+        private final Class<? extends HttpRange> suffixRangeClass = HttpRange.createSuffixRange(1).getClass();
+        private final ControlStreamManager controlStreamsManager;
+        private final TaskScheduler taskScheduler;
+        private final AgentFileStreamProperties properties;
+        private final Counter transferTimeOutCounter;
+        private final DistributionSummary transferSizeDistribution;
+        private final MeterRegistry registry;
 
-        FileTransferStreamObserver(
-            final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService,
+        private TransferManager(
+            final ControlStreamManager controlStreamsManager,
+            final TaskScheduler taskScheduler,
+            final AgentFileStreamProperties properties,
+            final MeterRegistry registry
+        ) {
+            this.controlStreamsManager = controlStreamsManager;
+            this.taskScheduler = taskScheduler;
+            this.properties = properties;
+            this.registry = registry;
+            this.transferTimeOutCounter = registry.counter(TRANSFER_TIMEOUT_COUNTER);
+            this.transferSizeDistribution = registry.summary(TRANSFER_SIZE_DISTRIBUTION);
+
+            this.taskScheduler.scheduleAtFixedRate(
+                this::reapStalledTransfers,
+                this.properties.getStalledTransferCheckInterval()
+            );
+        }
+
+        private synchronized void reapStalledTransfers() {
+            final AtomicInteger stalledTrasfersCounter = new AtomicInteger();
+            final Instant now = Instant.now();
+            // Iterate active transfers, shut down and remove the ones that are not making progress
+            this.activeTransfers.entrySet().removeIf(
+                entry -> {
+                    final String transferId = entry.getKey();
+                    final FileTransfer transfer = entry.getValue();
+                    final Instant deadline =
+                        transfer.lastAckTimestamp.plus(this.properties.getStalledTransferTimeout());
+                    if (now.isAfter(deadline)) {
+                        stalledTrasfersCounter.incrementAndGet();
+                        log.warn("Transfer {} is stalled, shutting it down", transferId);
+                        final TimeoutException exception = new TimeoutException("Transfer not making progress");
+                        // Shut down stream, if one was associated to this transfer
+                        final AgentFileChunkObserver observer = transfer.getAgentFileChunkObserver();
+                        if (observer != null) {
+                            observer.getResponseObserver().onError(exception);
+                        }
+                        // Close the buffer
+                        transfer.closeWithError(exception);
+                        // Remove from active transfers
+                        return true;
+                    } else {
+                        // Do not remove from active, made progress recently enough.
+                        return false;
+                    }
+                }
+            );
+
+            this.transferTimeOutCounter.increment(stalledTrasfersCounter.get());
+            this.registry.gauge(ACTIVE_TRANSFER_GAUGE, this.activeTransfers.size());
+        }
+
+        private synchronized FileTransfer startFileTransfer(
+            final String jobId,
+            final DirectoryManifest.ManifestEntry manifestEntry,
+            final Path relativePath,
+            @Nullable final HttpRange range
+        ) throws NotFoundException, LimitExceededException {
+            // Create a unique ID for this file transfer
+            final String fileTransferId = UUID.randomUUID().toString();
+            log.debug(
+                "Initiating transfer {} for file: {} of job: {}",
+                fileTransferId,
+                relativePath,
+                jobId
+            );
+
+            // No need to use a semaphore since class is synchronized
+            if (this.activeTransfers.size() >= properties.getMaxConcurrentTransfers()) {
+                log.warn("Rejecting request for {}:{}, too many active transfers", jobId, relativePath);
+                throw new LimitExceededException("Too many concurrent downloads");
+            }
+
+            final int fileSize = Math.toIntExact(manifestEntry.getSize());
+
+            // Http range is inclusive, agent protocol is not.
+            // Convert from one to the other.
+            final int startOffset;
+            final int endOffset;
+
+            if (range == null) {
+                startOffset = 0;
+                endOffset = fileSize;
+            } else if (range.getClass() == this.suffixRangeClass) {
+                startOffset = Math.toIntExact(range.getRangeStart(fileSize));
+                endOffset = fileSize;
+            } else {
+                startOffset = Math.min(fileSize, Math.toIntExact(range.getRangeStart(fileSize)));
+                endOffset = 1 + Math.toIntExact(range.getRangeEnd(fileSize));
+            }
+
+            log.debug("Transfer {} effective range {}-{}: ", fileTransferId, startOffset, endOffset);
+
+            // Allocate and park the buffer that will store the data in transit.
+            final StreamBuffer buffer = new StreamBuffer(startOffset);
+
+            // Create a file transfer
+            final FileTransfer fileTransfer = new FileTransfer(
+                fileTransferId,
+                jobId,
+                relativePath,
+                startOffset,
+                endOffset,
+                fileSize,
+                buffer
+            );
+
+            this.transferSizeDistribution.record(endOffset - startOffset);
+
+            if (endOffset - startOffset == 0) {
+                log.debug("Transfer {} is empty, completing", fileTransferId);
+                // When requesting an empty file (or a range of 0 bytes), short-circuit and just return an empty
+                // buffer, without tracking it as active transfer.
+                buffer.closeForCompleted();
+            } else {
+                log.debug("Tracking new transfer {}", fileTransferId);
+                // Expecting some data. Track this stream and its buffer so incoming chunks can be appended.
+                this.activeTransfers.put(fileTransferId, fileTransfer);
+
+                log.debug("Requesting start of transfer {}", fileTransferId);
+                // Request file over control channel
+                try {
+                    this.controlStreamsManager.requestFile(
+                        jobId,
+                        fileTransferId,
+                        relativePath.toString(),
+                        startOffset,
+                        endOffset
+                    );
+                } catch (NotFoundException e) {
+                    log.error(
+                        "Failed to request file {}:{}, terminating transfer {}: {}",
+                        jobId,
+                        relativePath,
+                        fileTransferId,
+                        e.getMessage()
+                    );
+                    this.activeTransfers.remove(fileTransferId, fileTransfer);
+                    buffer.closeForError(e);
+                    throw e;
+                }
+            }
+
+            return fileTransfer;
+        }
+
+        private synchronized StreamObserver<AgentFileMessage> handleNewTransferStream(
             final StreamObserver<ServerAckMessage> responseObserver
         ) {
-            this.gRpcAgentFileStreamService = gRpcAgentFileStreamService;
+            log.info("New file transfer stream established");
+            final AgentFileChunkObserver agentFileChunkObserver =
+                new AgentFileChunkObserver(this, responseObserver);
+
+            // Observer are not associated to a specific transfer until the first message is received
+            this.unclaimedTransferStreams.add(agentFileChunkObserver);
+
+            // Schedule a timeout for this stream to get associated with a pending transfer
+            taskScheduler.schedule(
+                () -> this.handleUnclaimedStreamTimeout(agentFileChunkObserver),
+                Instant.now().plus(properties.getUnclaimedStreamStartTimeout())
+            );
+
+            return agentFileChunkObserver;
+        }
+
+        private synchronized void handleUnclaimedStreamTimeout(final AgentFileChunkObserver agentFileChunkObserver) {
+            final boolean streamUnclaimed = this.unclaimedTransferStreams.remove(agentFileChunkObserver);
+            if (streamUnclaimed) {
+                // If found in the unclaimed set, this stream did not send any message yet, shut down the stream
+                log.warn("Shutting down unclaimed transfer stream");
+                agentFileChunkObserver.getResponseObserver().onError(
+                    new TimeoutException("No messages received in stream")
+                );
+                this.transferTimeOutCounter.increment();
+            }
+        }
+
+        private synchronized void handleFileChunk(
+            final String transferStreamId,
+            final AgentFileChunkObserver agentFileChunkObserver,
+            final ByteString data
+        ) {
+            final FileTransfer fileTransfer = this.activeTransfers.get(transferStreamId);
+            final boolean unclaimedStream = this.unclaimedTransferStreams.remove(agentFileChunkObserver);
+
+            if (fileTransfer != null) {
+                if (unclaimedStream) {
+                    // There is a transfer pending, and this stream just sent the first chunk of data
+                    // Associate the stream to the file transfer
+                    fileTransfer.claimStreamObserver(agentFileChunkObserver);
+                }
+
+                // Write and ack in a different thread, to avoid locking this during a potentially blocking operation
+                this.taskScheduler.schedule(
+                    () -> this.writeDataAndAck(fileTransfer, data),
+                    new Date() // Ack: use date rather than instant to make the distinction easier in tests
+                );
+
+            } else {
+                log.warn("Received a chunk for a transfer no longer in progress: {}", transferStreamId);
+            }
+        }
+
+        private synchronized void removeTransferStream(
+            final AgentFileChunkObserver agentFileChunkObserver,
+            @Nullable final Throwable t
+        ) {
+            // Received error or completion on a transfer stream.
+            final FileTransfer fileTransfer = this.findFileTransfer(agentFileChunkObserver);
+            if (fileTransfer != null) {
+                // Transfer is no longer active, remove it
+                final boolean removed = this.activeTransfers.remove(fileTransfer.getTransferId(), fileTransfer);
+                if (removed && t == null) {
+                    fileTransfer.close();
+                } else if (removed) {
+                    fileTransfer.closeWithError(t);
+                }
+                // If not removed, another thread already got to it, for example due to timeout. Nothing to do
+            } else {
+                // Stream is not associated with a file transfer, may be unclaimed.
+                // Remove it so the timeout task does not try to close it again.
+                this.unclaimedTransferStreams.remove(agentFileChunkObserver);
+            }
+        }
+
+        private synchronized FileTransfer findFileTransfer(final AgentFileChunkObserver agentFileChunkObserver) {
+            // Find a transfer by iterating over the active ones.
+            // Could keep a map indexed by observers, but this should be fine since it's only called when a stream
+            // terminates.
+            for (final FileTransfer fileTransfer : this.activeTransfers.values()) {
+                if (fileTransfer.getAgentFileChunkObserver() == agentFileChunkObserver) {
+                    return fileTransfer;
+                }
+            }
+            return null;
+        }
+
+        // N.B. this should not synchronized to avoid locking up the transfer manager
+        private void writeDataAndAck(final FileTransfer fileTransfer, final ByteString data) {
+            final String fileTransferId = fileTransfer.getTransferId();
+            try {
+                // Try to write. May fail if buffer consumer is slow and buffer is not drained yet.
+                if (fileTransfer.append(data)) {
+                    log.debug("Wrote chunk of transfer {} to buffer. Sending ack", fileTransferId);
+                    fileTransfer.sendAck();
+                } else {
+                    // Try again in a little bit
+                    this.taskScheduler.schedule(
+                        () -> this.writeDataAndAck(fileTransfer, data),
+                        Instant.now().plus(this.properties.getWriteRetryDelay())
+                    );
+                }
+            } catch (IllegalStateException e) {
+                // Eventually retries will stop because the transfer times out due to lack of progress
+                log.warn("Buffer of transfer {} is closed", fileTransferId);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public synchronized void contribute(final Info.Builder builder) {
+            builder
+                .withDetail(
+                    "active_file_transfers",
+                    this.activeTransfers.values()
+                        .stream()
+                        .map(FileTransfer::toString)
+                        .collect(Collectors.toList())
+                )
+                .withDetail("unclaimed_transfer_streams", this.unclaimedTransferStreams.size());
+        }
+    }
+
+    private static final class FileTransfer {
+        @Getter
+        private final String transferId;
+        @Getter
+        private AgentFileChunkObserver agentFileChunkObserver;
+        private final StreamBuffer buffer;
+        private final String description;
+        private State state = State.NEW;
+        private Instant lastAckTimestamp;
+
+        private enum State {
+            NEW,
+            IN_PROGRESS,
+            COMPLETED,
+            FAILED
+        }
+
+        private FileTransfer(
+            final String transferId,
+            final String jobId,
+            final Path relativePath,
+            final int startOffset,
+            final int endOffset,
+            final int fileSize,
+            final StreamBuffer buffer
+        ) {
+            this.transferId = transferId;
+            this.buffer = buffer;
+            this.lastAckTimestamp = Instant.now();
+            this.description = "FileTransfer " + transferId
+                + ", agent://" + jobId + "/" + relativePath + " "
+                + "(range: (" + startOffset + "-" + endOffset + "] file.size: " + fileSize + ")";
+        }
+
+        @Override
+        public String toString() {
+            return "" + this.state + " " + this.description;
+        }
+
+        private void claimStreamObserver(final AgentFileChunkObserver observer) {
+            this.state = State.IN_PROGRESS;
+            this.agentFileChunkObserver = observer;
+        }
+
+        private InputStream getInputStream() {
+            return this.buffer.getInputStream();
+        }
+
+        private boolean append(final ByteString data) {
+            return buffer.tryWrite(data);
+        }
+
+        private void closeWithError(final Throwable t) {
+            this.state = State.FAILED;
+            this.buffer.closeForError(t);
+        }
+
+        private void close() {
+            this.state = State.COMPLETED;
+            this.buffer.closeForCompleted();
+        }
+
+        private void sendAck() {
+            this.getAgentFileChunkObserver().getResponseObserver().onNext(
+                ServerAckMessage.newBuilder().build()
+            );
+            this.lastAckTimestamp = Instant.now();
+        }
+    }
+
+    private static final class AgentFileChunkObserver implements StreamObserver<AgentFileMessage> {
+        private final TransferManager transferManager;
+        @Getter
+        private final StreamObserver<ServerAckMessage> responseObserver;
+
+        AgentFileChunkObserver(
+            final TransferManager transferManager,
+            final StreamObserver<ServerAckMessage> responseObserver
+        ) {
+            this.transferManager = transferManager;
             this.responseObserver = responseObserver;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onNext(final AgentFileMessage value) {
-            final String messageStreamId = value.getStreamId();
-
-            if (StringUtils.isBlank(messageStreamId)) {
-                log.warn("Received file chunk with empty stream identifier");
-                return;
-            }
-
-            if (streamId.compareAndSet(null, messageStreamId)) {
-                log.debug("Received first chunk for transfer: {}", messageStreamId);
-            }
-
-            if (!messageStreamId.equals(streamId.get())) {
-                log.warn(
-                    "Received chunk with id: {}, but this stream was previously used by stream: {}",
-                    messageStreamId,
-                    streamId.get()
-                );
-                return;
-            }
-
-            // May block if the queue of chunks is full
-            this.gRpcAgentFileStreamService.handleFileTransferChunk(
-                this,
-                value.getStreamId(),
-                value.getData()
-            );
-
-            // Send ACK after successfully enqueuing chunk for consumption
-            this.responseObserver.onNext(
-                ServerAckMessage.newBuilder().build()
-            );
+            final String transferStreamId = value.getStreamId();
+            log.debug("Received file chunk of transfer: {}", transferStreamId);
+            this.transferManager.handleFileChunk(transferStreamId, this, value.getData());
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onError(final Throwable t) {
-            this.gRpcAgentFileStreamService.handleFileTransferError(this, streamId.get(), t);
+            this.transferManager.removeTransferStream(this, t);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onCompleted() {
-            this.gRpcAgentFileStreamService.handleFileTransferCompletion(this, streamId.get());
+            this.transferManager.removeTransferStream(this, null);
         }
     }
-
 }
