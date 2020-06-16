@@ -34,10 +34,12 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorCom
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.properties.AgentFileStreamProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -51,6 +53,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 @Configuration
 @Slf4j
+@EnableConfigurationProperties(
+    {
+        AgentFileStreamProperties.class
+    }
+)
 public class AgentRpcEndpointsAutoConfiguration {
 
     private static final int SINGLE_THREAD = 1;
@@ -85,6 +92,7 @@ public class AgentRpcEndpointsAutoConfiguration {
      *
      * @param converter     The {@link JobDirectoryManifestProtoConverter} instance to use
      * @param taskScheduler The {@link TaskScheduler} to use to schedule tasks
+     * @param properties    The service properties
      * @param registry      The meter registry
      * @return An instance of {@link GRpcAgentFileStreamServiceImpl}
      */
@@ -93,9 +101,10 @@ public class AgentRpcEndpointsAutoConfiguration {
     public GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService(
         final JobDirectoryManifestProtoConverter converter,
         @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
+        final AgentFileStreamProperties properties,
         final MeterRegistry registry
     ) {
-        return new GRpcAgentFileStreamServiceImpl(converter, taskScheduler, registry);
+        return new GRpcAgentFileStreamServiceImpl(converter, taskScheduler, properties, registry);
     }
 
     /**

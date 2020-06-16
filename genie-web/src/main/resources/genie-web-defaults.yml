@@ -35,6 +35,12 @@ genie:
   file:
     cache:
       location: file://${java.io.tmpdir}genie/cache
+  filestream:
+    max-concurrent-transfers: 100
+    unclaimed-stream-start-timeout: 10s
+    stalled-transfer-timeout: 20s
+    stalled-transfer-check-interval: 5s
+    write-retry-delay: 300ms
   health:
     maxCpuLoadPercent: 80
   jobs:

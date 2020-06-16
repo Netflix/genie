@@ -59,14 +59,44 @@ It will have to be added if one is desired otherwise metrics are just published 
 |GRpcHeartBeatServiceImpl
 |-
 
-|genie.agents.fileTransfers.pending.gauge
-|The number of pending file transfers requested from connected agents
+|genie.agents.fileTransfers.requested.counter
+|Count of file transfer from remote agents to this node
 |count
-|GRpcHeartBeatServiceImpl
+|GRpcAgentFileStreamServiceImpl
 |-
 
-|genie.agents.fileTransfers.inProgress.gauge
-|The number of in progress file transfers from connected agents
+|genie.agents.fileTransfers.rejected.counter
+|Count of attempted file transfers that were rejected because too many transfers are already in progress on this node
+|count
+|GRpcAgentFileStreamServiceImpl
+|-
+
+|genie.agents.fileTransfers.manifestCache.size
+|Size of the manifest cache
+|count
+|GRpcAgentFileStreamServiceImpl
+|-
+
+|genie.agents.fileTransfers.controlStreams.size
+|Number of active agent control streams
+|size
+|GRpcAgentFileStreamServiceImpl
+|-
+
+|genie.agents.fileTransfers.timeout.counter
+|Count of transfers that timed out on this node
+|count
+|GRpcAgentFileStreamServiceImpl
+|-
+
+|genie.agents.fileTransfers.transferSize.summary
+|Number of bytes requested from the agent for a given transfer
+|distribution (bytes)
+|GRpcAgentFileStreamServiceImpl
+|-
+
+|genie.agents.fileTransfers.activeTransfers.size
+|Number of active transfers on this node
 |count
 |GRpcAgentFileStreamServiceImpl
 |-

@@ -117,6 +117,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         this.jobId = claimedJobId;
         this.jobDirectoryPath = jobDirectoryRoot;
         this.scheduledTask = this.taskScheduler.schedule(this::pushManifest, trigger);
+        log.debug("Started");
     }
 
     /**
@@ -124,6 +125,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
      */
     @Override
     public synchronized void stop() {
+        log.debug("Stopping");
 
         if (this.started.compareAndSet(true, false)) {
             if (!this.activeFileTransfers.isEmpty()) {
@@ -133,6 +135,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             this.scheduledTask = null;
             this.discardCurrentStream(true);
             while (!this.activeFileTransfers.isEmpty()) {
+                log.debug("{} transfers are still active after waiting", this.activeFileTransfers.size());
                 try {
                     final FileTransfer fileTransfer = this.activeFileTransfers.iterator().next();
                     if (this.activeFileTransfers.remove(fileTransfer)) {
@@ -143,6 +146,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
                 }
             }
         }
+        log.debug("Stopped");
     }
 
     /**
@@ -152,6 +156,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     public synchronized Optional<ScheduledFuture<?>> forceServerSync() {
         if (started.get()) {
             try {
+                log.debug("Forcing a manifest refresh");
                 this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 return Optional.of(this.taskScheduler.schedule(this::pushManifest, Instant.now()));
             } catch (Exception e) {
@@ -210,6 +215,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
 
             if (this.controlStreamObserver == null) {
+                log.debug("Creating new control stream");
                 this.controlStreamObserver = fileStreamServiceStub.sync(this.responseObserver);
                 if (this.controlStreamObserver instanceof ClientCallStreamObserver) {
                     ((ClientCallStreamObserver) this.controlStreamObserver)
@@ -217,24 +223,27 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
                 }
             }
 
+            log.debug("Sending manifest via control stream");
             this.controlStreamObserver.onNext(jobFileManifest);
         }
     }
 
     private void handleControlStreamError(final Throwable t) {
-        log.warn("Manifest stream error: {}", t.getMessage(), t);
+        log.warn("Control stream error: {}", t.getMessage(), t);
         this.trigger.reset();
         this.discardCurrentStream(false);
     }
 
     private void handleControlStreamCompletion() {
-        log.debug("Manifest stream completed");
+        log.debug("Control stream completed");
         this.discardCurrentStream(false);
     }
 
     private synchronized void discardCurrentStream(final boolean sendStreamCompletion) {
         if (this.controlStreamObserver != null) {
+            log.debug("Discarding current control stream");
             if (sendStreamCompletion) {
+                log.debug("Sending control stream completion");
                 this.controlStreamObserver.onCompleted();
             }
             this.controlStreamObserver = null;
@@ -284,11 +293,13 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         );
         this.activeFileTransfers.add(fileTransfer);
         fileTransfer.start();
+        log.debug("Created and started new file transfer: {}", fileTransfer.streamId);
     }
 
     private void handleTransferComplete(final FileTransfer fileTransfer) {
         this.activeFileTransfers.remove(fileTransfer);
         this.concurrentTransfersSemaphore.release();
+        log.debug("File transfer completed: {}", fileTransfer.streamId);
     }
 
     private static class ServerControlStreamObserver implements StreamObserver<ServerControlMessage> {
@@ -301,6 +312,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         @Override
         public void onNext(final ServerControlMessage value) {
             if (value.getMessageCase() == ServerControlMessage.MessageCase.SERVER_FILE_REQUEST) {
+                log.debug("Received control stream file request");
                 final ServerFileRequestMessage fileRequest = value.getServerFileRequest();
                 this.gRpcAgentFileManifestService.handleFileRequest(
                     fileRequest.getStreamId(),
@@ -315,11 +327,13 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
         @Override
         public void onError(final Throwable t) {
+            log.debug("Received control stream error: {}", t.getClass().getSimpleName());
             this.gRpcAgentFileManifestService.handleControlStreamError(t);
         }
 
         @Override
         public void onCompleted() {
+            log.debug("Received control stream completion");
             this.gRpcAgentFileManifestService.handleControlStreamCompletion();
         }
     }
@@ -351,9 +365,17 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             this.outboundStreamObserver = this.gRpcAgentFileStreamService.fileStreamServiceStub.transmit(this);
             this.watermark = startOffset;
             this.readBuffer = ByteBuffer.allocate(Math.toIntExact(maxChunkSize));
+            log.debug(
+                "Created new FileTransfer: {} (path: {} range: {}-{})",
+                streamId,
+                absolutePath,
+                startOffset,
+                endOffset
+            );
         }
 
         void start() {
+            log.debug("Starting file transfer: {}", streamId);
             try {
                 this.sendChunk();
             } catch (IOException e) {
@@ -364,10 +386,19 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
         private void completeTransfer(final boolean shutdownStream, @Nullable final Exception error) {
             if (this.completed.compareAndSet(false, true)) {
+                log.debug(
+                    "Completing transfer: {} (shutdown: {}, error: {})",
+                    streamId,
+                    shutdownStream,
+                    error != null
+                );
+
                 if (shutdownStream) {
                     if (error != null) {
+                        log.debug("Terminating transfer stream {} with error", streamId);
                         this.outboundStreamObserver.onError(error);
                     } else {
+                        log.debug("Terminating transfer stream {} without error", streamId);
                         this.outboundStreamObserver.onCompleted();
                     }
                 }
@@ -379,30 +410,34 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         private void sendChunk() throws IOException {
 
             if (this.watermark < this.endOffset - 1) {
+                // Reset mark before reading!
+                readBuffer.rewind();
+
                 final int bytesRead;
                 try (FileChannel channel = FileChannel.open(this.absolutePath, StandardOpenOption.READ)) {
                     channel.position(this.watermark);
                     bytesRead = channel.read(readBuffer);
                 }
 
-                // Reset mark before reading!
-                readBuffer.rewind();
-
                 final AgentFileMessage chunkMessage = AgentFileMessage.newBuilder()
                     .setStreamId(this.streamId)
                     .setData(ByteString.copyFrom(readBuffer, bytesRead))
                     .build();
 
+                log.debug("Sending next chunk in stream {} ({} bytes)", streamId, bytesRead);
+
                 this.outboundStreamObserver.onNext(chunkMessage);
 
                 this.watermark += bytesRead;
             } else {
+                log.debug("All data transmitted");
                 this.completeTransfer(true, null);
             }
         }
 
         @Override
         public void onNext(final ServerAckMessage value) {
+            log.debug("Received chunk acknowledgement");
             try {
                 sendChunk();
             } catch (IOException e) {
