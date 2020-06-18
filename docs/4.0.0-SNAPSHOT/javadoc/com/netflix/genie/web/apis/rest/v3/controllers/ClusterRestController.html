@@ -222,7 +222,7 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#getCommandsForCluster-java.lang.String-java.util.Set-">getCommandsForCluster</a></span>(java.lang.String&nbsp;id,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
-<div class="block">Get all the commandIds configured for a given cluster.</div>
+<div class="block">Get all the commands configured for a given cluster.</div>
 </td>
 </tr>
 <tr id="i10" class="altColor">
@@ -278,7 +278,7 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#removeCommandForCluster-java.lang.String-java.lang.String-">removeCommandForCluster</a></span>(java.lang.String&nbsp;id,
                        java.lang.String&nbsp;commandId)</code>
-<div class="block">Remove an command from a given cluster.</div>
+<div class="block">Remove a command from a given cluster.</div>
 </td>
 </tr>
 <tr id="i19" class="rowColor">
@@ -854,15 +854,12 @@ public&nbsp;void&nbsp;removeTagForCluster(@PathVariable(value="id")
 public&nbsp;void&nbsp;addCommandsForCluster(@PathVariable(value="id")
                                                                                                                                                     java.lang.String&nbsp;id,
                                                                                                                                                     @RequestBody
-                                                                                                                                                    java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)
-                                                                                                                                             throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="block">Add new commandIds to the given cluster.</div>
+                                                                                                                                                    java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)</pre>
+<div class="block">Add new commandIds to the given cluster. This is a no-op as of 4.0.0.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to add the commandIds to. Not null/empty/blank.</dd>
 <dd><code>commandIds</code> - The ids of the commandIds to add. Not null.</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
 </dl>
 </li>
 </ul>
@@ -879,8 +876,8 @@ public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href
                                                                                                                                                                                                           java.lang.String&nbsp;id,
                                                                                                                                                                                                           @RequestParam(value="status",required=false) @Nullable
                                                                                                                                                                                                           java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)
-                                                                                                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="block">Get all the commandIds configured for a given cluster.</div>
+                                                                                                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<div class="block">Get all the commands configured for a given cluster. This is a no-op as of 4.0.0.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to get the command files for. Not NULL/empty/blank.</dd>
@@ -888,7 +885,7 @@ public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The active set of commandIds for the cluster.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If the cluster doesn't exist</dd>
 </dl>
 </li>
 </ul>
@@ -904,15 +901,12 @@ public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href
 public&nbsp;void&nbsp;setCommandsForCluster(@PathVariable(value="id")
                                                                                                                                                   java.lang.String&nbsp;id,
                                                                                                                                                   @RequestBody
-                                                                                                                                                  java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)
-                                                                                                                                           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="block">Set the commandIds for a given cluster.</div>
+                                                                                                                                                  java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)</pre>
+<div class="block">Set the commandIds for a given cluster. This is a no-op as of 4.0.0.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to update the configuration files for. Not null/empty/blank.</dd>
 <dd><code>commandIds</code> - The ids of the commands to replace existing commands with. Not null/empty/blank.</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
 </dl>
 </li>
 </ul>
@@ -925,14 +919,11 @@ public&nbsp;void&nbsp;setCommandsForCluster(@PathVariable(value="id")
 <pre>@DeleteMapping(value="/{id}/commands")
  @ResponseStatus(value=NO_CONTENT)
 public&nbsp;void&nbsp;removeAllCommandsForCluster(@PathVariable(value="id")
-                                                                                                                  java.lang.String&nbsp;id)
-                                                                                                           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="block">Remove the all commandIds from a given cluster.</div>
+                                                                                                                  java.lang.String&nbsp;id)</pre>
+<div class="block">Remove the all commandIds from a given cluster. This is a no-op as of 4.0.0.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to delete the commandIds from. Not null/empty/blank.</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
 </dl>
 </li>
 </ul>
@@ -947,15 +938,12 @@ public&nbsp;void&nbsp;removeAllCommandsForCluster(@PathVariable(value="id")
 public&nbsp;void&nbsp;removeCommandForCluster(@PathVariable(value="id")
                                                                                                                           java.lang.String&nbsp;id,
                                                                                                                           @PathVariable(value="commandId")
-                                                                                                                          java.lang.String&nbsp;commandId)
-                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="block">Remove an command from a given cluster.</div>
+                                                                                                                          java.lang.String&nbsp;commandId)</pre>
+<div class="block">Remove a command from a given cluster. This is a no-op as of 4.0.0.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to delete the command from. Not null/empty/blank.</dd>
 <dd><code>commandId</code> - The id of the command to remove. Not null/empty/blank.</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
 </dl>
 </li>
 </ul>

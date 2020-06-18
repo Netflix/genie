@@ -106,53 +106,33 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#addCommandsForCluster-java.lang.String-java.util.List-">com.netflix.genie.web.data.services.PersistenceService.addCommandsForCluster(String, List&lt;String&gt;)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
-</td>
-</tr>
-<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/services/AttachmentService.html#copy-java.lang.String-java.io.File-">com.netflix.genie.web.services.AttachmentService.copy(String, File)</a>
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/AttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-"><code>AttachmentService.copyAll(String, Path)</code></a> instead</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#createJob-com.netflix.genie.common.dto.JobRequest-com.netflix.genie.common.dto.JobMetadata-com.netflix.genie.common.dto.Job-com.netflix.genie.common.dto.JobExecution-">com.netflix.genie.web.data.services.PersistenceService.createJob(JobRequest, JobMetadata, Job, JobExecution)</a>
 <div class="block"><span class="deprecationComment">To be removed at completion of agent migration</span></div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#createJob-com.netflix.genie.common.dto.JobRequest-com.netflix.genie.common.dto.JobMetadata-com.netflix.genie.common.dto.Job-com.netflix.genie.common.dto.JobExecution-">com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl.createJob(JobRequest, JobMetadata, Job, JobExecution)</a></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/services/AttachmentService.html#delete-java.lang.String-">com.netflix.genie.web.services.AttachmentService.delete(String)</a>
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/AttachmentService.html#deleteAll-java.lang.String-"><code>AttachmentService.deleteAll(String)</code></a> instead</span></div>
 </td>
 </tr>
-<tr class="rowColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#findClustersAndCommandsForCriteria-java.util.List-com.netflix.genie.common.external.dtos.v4.Criterion-">com.netflix.genie.web.data.services.PersistenceService.findClustersAndCommandsForCriteria(List&lt;Criterion&gt;, Criterion)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
-</td>
-</tr>
 <tr class="altColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#findClustersAndCommandsForJob-com.netflix.genie.common.dto.JobRequest-">com.netflix.genie.web.data.services.PersistenceService.findClustersAndCommandsForJob(JobRequest)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
-</td>
-</tr>
-<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusters-groovy.lang.Binding-">com.netflix.genie.web.scripts.GroovyScriptUtils.getClusters(Binding)</a>
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
  instead</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommands-groovy.lang.Binding-">com.netflix.genie.web.scripts.GroovyScriptUtils.getCommands(Binding)</a>
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
  instead</span></div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getCommandsForCluster-java.lang.String-java.util.Set-">com.netflix.genie.web.data.services.PersistenceService.getCommandsForCluster(String, Set&lt;CommandStatus&gt;)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
 </td>
 </tr>
 <tr class="altColor">
@@ -187,75 +167,60 @@
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#removeAllCommandsForCluster-java.lang.String-">com.netflix.genie.web.data.services.PersistenceService.removeAllCommandsForCluster(String)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#removeCommandForCluster-java.lang.String-java.lang.String-">com.netflix.genie.web.data.services.PersistenceService.removeCommandForCluster(String, String)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
-</td>
-</tr>
-<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/services/AttachmentService.html#save-java.lang.String-java.lang.String-java.io.InputStream-">com.netflix.genie.web.services.AttachmentService.save(String, String, InputStream)</a>
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/AttachmentService.html#saveAll-java.util.Map-"><code>AttachmentService.saveAll(Map)</code></a> instead</span></div>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#setCommandsForCluster-java.lang.String-java.util.List-">com.netflix.genie.web.data.services.PersistenceService.setCommandsForCluster(String, List&lt;String&gt;)</a>
-<div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
-</td>
-</tr>
-<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#setJobCompletionInformation-java.lang.String-int-com.netflix.genie.common.dto.JobStatus-java.lang.String-java.lang.Long-java.lang.Long-">com.netflix.genie.web.data.services.PersistenceService.setJobCompletionInformation(String, int, JobStatus, String, Long, Long)</a>
 <div class="block"><span class="deprecationComment">To be removed at completion of agent migration</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setJobCompletionInformation-java.lang.String-int-com.netflix.genie.common.dto.JobStatus-java.lang.String-java.lang.Long-java.lang.Long-">com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl.setJobCompletionInformation(String, int, JobStatus, String, Long, Long)</a></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#setJobRunningInformation-java.lang.String-int-long-java.time.Instant-">com.netflix.genie.web.data.services.PersistenceService.setJobRunningInformation(String, int, long, Instant)</a>
 <div class="block"><span class="deprecationComment">To be removed at completion of agent migration</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setJobRunningInformation-java.lang.String-int-long-java.time.Instant-">com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl.setJobRunningInformation(String, int, long, Instant)</a></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#updateJobStatus-java.lang.String-com.netflix.genie.common.dto.JobStatus-java.lang.String-">com.netflix.genie.web.data.services.PersistenceService.updateJobStatus(String, JobStatus, String)</a>
 <div class="block"><span class="deprecationComment">To be removed at completion of agent migration</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateJobStatus-java.lang.String-com.netflix.genie.common.dto.JobStatus-java.lang.String-">com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl.updateJobStatus(String, JobStatus, String)</a></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/PersistenceService.html#updateJobWithRuntimeEnvironment-java.lang.String-java.lang.String-java.lang.String-java.util.List-int-">com.netflix.genie.web.data.services.PersistenceService.updateJobWithRuntimeEnvironment(String, String, String, List&lt;String&gt;, int)</a>
 <div class="block"><span class="deprecationComment">To be removed at completion of agent migration</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateJobWithRuntimeEnvironment-java.lang.String-java.lang.String-java.lang.String-java.util.List-int-">com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl.updateJobWithRuntimeEnvironment(String, String, String, List&lt;String&gt;, int)</a></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><a href="com/netflix/genie/common/dto/JobRequest.Builder.html#withCommandArgs-java.lang.String-">com.netflix.genie.common.dto.JobRequest.Builder.withCommandArgs(String)</a>
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/common/dto/JobRequest.Builder.html#withCommandArgs-java.util.List-"><code>JobRequest.Builder.withCommandArgs(List)</code></a></span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/common/dto/Job.Builder.html#withCommandArgs-java.lang.String-">com.netflix.genie.common.dto.Job.Builder.withCommandArgs(String)</a>
 <div class="block"><span class="deprecationComment">See <a href="com/netflix/genie/common/dto/Job.Builder.html#withCommandArgs-java.util.List-"><code>Job.Builder.withCommandArgs(List)</code></a></span></div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><a href="com/netflix/genie/common/dto/Command.Builder.html#withExecutable-java.lang.String-">com.netflix.genie.common.dto.Command.Builder.withExecutable(String)</a>
 <div class="block"><span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
  optional for API backward compatibility. The proper way to construct a Command is via the constructor
  <code>#Builder(String, String, String, CommandStatus, List, long)</code>.</span></div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><a href="com/netflix/genie/common/dto/Command.Builder.html#withExecutableAndArguments-java.util.List-">com.netflix.genie.common.dto.Command.Builder.withExecutableAndArguments(List&lt;String&gt;)</a>
 <div class="block"><span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
  optional for API backward compatibility. The proper way to construct a Command is via the constructor
