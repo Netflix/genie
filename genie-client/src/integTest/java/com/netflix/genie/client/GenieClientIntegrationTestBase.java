@@ -53,7 +53,6 @@ import java.util.UUID;
 )
 abstract class GenieClientIntegrationTestBase {
 
-    // TODO: Move this to latest.candidate after it's released
     // Note: Attempt made to make this use the version currently under build however the gradle compiler avoidance
     //       doesn't work right and generates new images every test / build run. This leaves a lot of orphaned
     //       layers on the developers machine which takes up a lot of space. Not currently worth the gain.
@@ -65,7 +64,7 @@ abstract class GenieClientIntegrationTestBase {
     //       is faster as in agent mode the tests are much slower than embedded. Also once we move to boot 2.3 we can
     //       leverage their layered jars to produce less changing images.
     @Container
-    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.snapshot")
+    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.candidate")
         .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
         .withExposedPorts(8080);
 
