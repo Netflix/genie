@@ -88,6 +88,65 @@ class StreamBufferSpec extends Specification {
         dataToWrite == dataRead
     }
 
+    def "read and non-blocking write"() {
+        setup:
+        byte[] dataToWrite = new byte[30]
+        byte[] dataRead = new byte[30]
+
+        // Populate with random bytes
+        this.random.nextBytes(dataToWrite)
+
+        int lastReadSize
+        InputStream inputStream = buffer.getInputStream()
+        boolean written
+
+        when:
+        // W: 0-9
+        written = this.buffer.tryWrite(ByteString.copyFrom(dataToWrite, 0, 10))
+
+        then:
+        written
+
+        when:
+        // W: 10-19
+        written = this.buffer.tryWrite(ByteString.copyFrom(dataToWrite, 10, 10))
+        // R: 0-9
+        lastReadSize = inputStream.read(dataRead, 0, 30)
+
+        then:
+        !written
+        lastReadSize == 10
+
+        when:
+        // W: 10-19
+        written = this.buffer.tryWrite(ByteString.copyFrom(dataToWrite, 10, 10))
+        // R: 10-14
+        lastReadSize = inputStream.read(dataRead, 10, 5)
+
+        then:
+        written
+        lastReadSize == 5
+
+        when:
+        // W: 20-29
+        written = this.buffer.tryWrite(ByteString.copyFrom(dataToWrite, 20, 10))
+        lastReadSize = inputStream.read(dataRead, 15, 15)
+
+        then:
+        !written
+        lastReadSize == 5
+
+        when:
+        // W: 20-29
+        written = this.buffer.tryWrite(ByteString.copyFrom(dataToWrite, 20, 10))
+        lastReadSize = inputStream.read(dataRead, 20, 10)
+
+        then:
+        written
+        lastReadSize == 10
+        dataToWrite == dataRead
+    }
+
     def "Write after closing"() {
 
         when:
