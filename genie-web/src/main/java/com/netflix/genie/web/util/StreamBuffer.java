@@ -90,24 +90,40 @@ public class StreamBuffer {
      */
     public void write(final ByteString data) {
         synchronized (this.lock) {
-            while (true) {
-                if (this.closed) {
-                    throw new IllegalStateException("Attempting to write after closing");
-                } else if (this.currentChunk == null) {
-                    // Save this chunk so it can be consumed
-                    this.currentChunk = data;
-                    this.currentChunkWatermark = 0;
-                    // Wake up reading thread
-                    this.lock.notifyAll();
-                    return;
-                } else {
-                    // Previous chunk of data is still being consumed. Wait.
-                    try {
-                        this.lock.wait();
-                    } catch (InterruptedException e) {
-                        log.warn("Interrupted while waiting to write next chunk of data");
-                    }
+            while (!tryWrite(data)) {
+                try {
+                    this.lock.wait();
+                } catch (InterruptedException e) {
+                    log.warn("Interrupted while waiting to write next chunk of data");
                 }
+            }
+        }
+    }
+
+
+    /**
+     * Try to append a chunk of data for consumption.
+     * If the previous buffer is still not drained, then does not block and returns false.
+     *
+     * @param data the data to write into the buffer
+     * @return true if the data was added to the buffer, false otherwise
+     * @throws IllegalStateException if writing is attempted after the buffer has been closed
+     */
+    public boolean tryWrite(final ByteString data) {
+        synchronized (this.lock) {
+            if (this.closed) {
+                throw new IllegalStateException("Attempting to write after closing");
+            } else if (this.currentChunk == null) {
+                // Save this chunk so it can be consumed
+                this.currentChunk = data;
+                this.currentChunkWatermark = 0;
+                // Wake up reading thread
+                this.lock.notifyAll();
+                return true;
+            } else {
+                // Previous chunk of data is still being consumed.
+                this.lock.notifyAll();
+                return false;
             }
         }
     }
