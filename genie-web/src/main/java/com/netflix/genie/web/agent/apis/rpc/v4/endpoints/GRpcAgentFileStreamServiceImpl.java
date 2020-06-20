@@ -42,8 +42,6 @@ import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.info.Info;
-import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -60,7 +58,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * {@link AgentFileStreamService} gRPC implementation.
@@ -85,7 +82,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GRpcAgentFileStreamServiceImpl
     extends FileStreamServiceGrpc.FileStreamServiceImplBase
-    implements AgentFileStreamService, InfoContributor {
+    implements AgentFileStreamService {
 
     private static final String METRICS_PREFIX = "genie.agents.fileTransfers";
     private static final String TRANSFER_COUNTER = METRICS_PREFIX + ".requested.counter";
@@ -206,17 +203,8 @@ public class GRpcAgentFileStreamServiceImpl
         return this.transferManager.handleNewTransferStream(responseObserver);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void contribute(final Info.Builder builder) {
-        this.controlStreamsManager.contribute(builder);
-        this.transferManager.contribute(builder);
-    }
-
     // Manages control streams, in theory one for each agent connected to this node
-    private static final class ControlStreamManager implements InfoContributor {
+    private static final class ControlStreamManager {
         private final Map<String, ControlStreamObserver> controlStreamMap = Maps.newHashMap();
         private final Cache<String, DirectoryManifest> manifestCache;
         private final JobDirectoryManifestProtoConverter converter;
@@ -316,13 +304,6 @@ public class GRpcAgentFileStreamServiceImpl
                 );
             }
         }
-
-        @Override
-        public synchronized void contribute(final Info.Builder builder) {
-            builder
-                .withDetail("file_control_streams", this.controlStreamMap.size())
-                .withDetail("cached_manifests", this.manifestCache.estimatedSize());
-        }
     }
 
     private static final class ControlStreamObserver implements StreamObserver<AgentManifestMessage> {
@@ -380,7 +361,7 @@ public class GRpcAgentFileStreamServiceImpl
     }
 
     // Manages in-progress file transfers
-    private static final class TransferManager implements InfoContributor {
+    private static final class TransferManager {
         private final Map<String, FileTransfer> activeTransfers = Maps.newHashMap();
         private final Set<AgentFileChunkObserver> unclaimedTransferStreams = Sets.newHashSet();
         // Little hack to get private inner class
@@ -649,22 +630,6 @@ public class GRpcAgentFileStreamServiceImpl
                 // Eventually retries will stop because the transfer times out due to lack of progress
                 log.warn("Buffer of transfer {} is closed", fileTransferId);
             }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public synchronized void contribute(final Info.Builder builder) {
-            builder
-                .withDetail(
-                    "active_file_transfers",
-                    this.activeTransfers.values()
-                        .stream()
-                        .map(FileTransfer::toString)
-                        .collect(Collectors.toList())
-                )
-                .withDetail("unclaimed_transfer_streams", this.unclaimedTransferStreams.size());
         }
     }
 

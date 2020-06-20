@@ -62,7 +62,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
     AgentManifestMessage manifestMessage
     StreamObserver<ServerControlMessage> controlStreamResponseObserver
     StreamObserver<ServerAckMessage> transferStreamResponseObserver
-    Info.Builder infoBuilder
     Runnable stalledTransfersTask
 
     void setup() {
@@ -96,23 +95,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
             getSize() >> FILE_SIZE
         }
         this.service = new GRpcAgentFileStreamServiceImpl(converter, taskScheduler, serviceProperties, registry)
-
-        // Use InfoContributor interface to print internal state of service to console during tests (in a 'when' block)
-        this.infoBuilder = Mock(Info.Builder) {
-            withDetail(_ as String, _ as Object) >> {
-                String s, Object o ->
-                    println(" [(I)] + " + s + " : " + o.toString())
-                    return this.infoBuilder
-            }
-            withDetails(_ as Map) >> {
-                Map<String, Object> m ->
-                    m.entrySet()
-                        .forEach({
-                            e -> println(" [(I)] " + e.key + " : " + e.getValue().toString())
-                        })
-                    return this.infoBuilder
-            }
-        }
         assert this.stalledTransfersTask != null
     }
 
@@ -145,7 +127,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         when: "Manifest sent successfully"
         controlStreamRequestObserver.onNext(manifestMessage)
         optionalManifest = this.service.getManifest(jobId)
-        this.service.contribute(infoBuilder)
 
         then:
         1 * converter.toManifest(manifestMessage) >> directoryManifest
@@ -155,7 +136,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         when: "Control stream is closed by client"
         controlStreamRequestObserver.onCompleted()
         optionalManifest = this.service.getManifest(jobId)
-        this.service.contribute(infoBuilder)
 
         then:
         optionalManifest.isPresent()
@@ -260,7 +240,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         when: "Another Control stream established for the same job"
         controlStreamRequestObserver2 = this.service.sync(controlStreamResponseObserver2)
         controlStreamRequestObserver2.onNext(manifestMessage)
-        this.service.contribute(infoBuilder)
 
         then:
         1 * converter.toManifest(manifestMessage) >> directoryManifest
@@ -334,7 +313,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
                 .setData(ByteString.copyFrom(new byte[chunkSize]))
                 .build()
         )
-        this.service.contribute(infoBuilder)
 
         then:
         transferStreamRequestObserver != null
@@ -368,7 +346,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         when: "Read more"
         transferStreamRequestObserver.onCompleted()
         bytesRead = inputStream.read(new byte[512])
-        this.service.contribute(infoBuilder)
 
         then:
         bytesRead == -1
@@ -409,7 +386,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         inputStream = resource.get().getInputStream()
         inputStream.skip(skip)
         bytesRead = inputStream.read(new byte[512])
-        this.service.contribute(infoBuilder)
 
         then:
         bytesRead == -1
@@ -502,7 +478,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
 
         when: "New stream has not been claimed"
         streamTimeoutTask.run()
-        this.service.contribute(infoBuilder)
 
         then:
         1 * transferStreamResponseObserver.onError(_ as TimeoutException)
@@ -533,7 +508,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
 
         when: "Unclaimed stream timeout after error"
         streamTimeoutTask.run()
-        this.service.contribute(infoBuilder)
 
         then:
         0 * transferStreamResponseObserver.onError(_ as TimeoutException)
@@ -588,7 +562,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
 
         when: "Transfer stream error"
         transferStreamRequestObserver.onError(new RuntimeException("..."))
-        this.service.contribute(infoBuilder)
 
         then:
         noExceptionThrown()
@@ -620,7 +593,6 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         when: "Request 2 file transfers"
         Optional<Resource> resource1 = service.getResource(jobId, relativePath, uri, null)
         Optional<Resource> resource2 = service.getResource(jobId, relativePath, uri, null)
-        this.service.contribute(infoBuilder)
 
         then:
         2 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
@@ -652,13 +624,5 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         1 * serviceProperties.getMaxConcurrentTransfers() >> 2
         1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
         resource3.isPresent()
-    }
-
-    def "Contribute Info"() {
-        when:
-        this.service.contribute(infoBuilder)
-
-        then:
-        noExceptionThrown()
     }
 }
