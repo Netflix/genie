@@ -458,6 +458,12 @@
 <div class="block">Implementation of <code>Resource</code> for files local to an agent running a job that can be
  requested and streamed to the server (so they can be served via API).</div>
 </dd>
+<dt><a href="com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AgentFileStreamProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to <a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentFileStreamService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentFileStreamProperties.html#AgentFileStreamProperties--">AgentFileStreamProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services"><span class="typeNameLink">AgentFileStreamService</span></a> - Interface in <a href="com/netflix/genie/agent/execution/services/package-summary.html">com.netflix.genie.agent.execution.services</a></dt>
 <dd>
 <div class="block">This service regularly produces a manifest of the executing job folder and pushes it to the server.</div>
@@ -7469,7 +7475,7 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#groupingInstance">groupingInstance</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcAgentFileStreamService-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcAgentFileStreamService(JobDirectoryManifestProtoConverter, TaskScheduler, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcAgentFileStreamService-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentFileStreamProperties-io.micrometer.core.instrument.MeterRegistry-">gRpcAgentFileStreamService(JobDirectoryManifestProtoConverter, TaskScheduler, AgentFileStreamProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide an implementation of <code>FileStreamServiceGrpc.FileStreamServiceImplBase</code>
  if no other is provided.</div>
@@ -7482,7 +7488,7 @@
 <dd>
 <div class="block"><a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentFileStreamService</code></a> gRPC implementation.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">GRpcAgentFileStreamServiceImpl(JobDirectoryManifestProtoConverter, TaskScheduler, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentFileStreamProperties-io.micrometer.core.instrument.MeterRegistry-">GRpcAgentFileStreamServiceImpl(JobDirectoryManifestProtoConverter, TaskScheduler, AgentFileStreamProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -10287,6 +10293,10 @@
 <dd>
 <div class="block">The property prefix for all properties in this group.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentFileStreamProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties</a></dt>
+<dd>
+<div class="block">Prefix for all properties related to the agent file transfer service.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AwsCredentialsProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AwsCredentialsProperties.html" title="class in com.netflix.genie.web.properties">AwsCredentialsProperties</a></dt>
 <dd>
 <div class="block">The property prefix for Genie AWS Credentials.</div>
@@ -12692,6 +12702,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html#TransitionExceptionRecord--">TransitionExceptionRecord()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext.TransitionExceptionRecord</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#transmit-io.grpc.stub.StreamObserver-">transmit(StreamObserver&lt;ServerAckMessage&gt;)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/StreamBuffer.html#tryWrite-com.google.protobuf.ByteString-">tryWrite(ByteString)</a></span> - Method in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/StreamBuffer.html" title="class in com.netflix.genie.web.util">StreamBuffer</a></dt>
+<dd>
+<div class="block">Try to append a chunk of data for consumption.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#type">type</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#TYPE">TYPE</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>

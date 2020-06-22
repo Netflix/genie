@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -180,6 +180,12 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/util/StreamBuffer.html#tryWrite-com.google.protobuf.ByteString-">tryWrite</a></span>(com.google.protobuf.ByteString&nbsp;data)</code>
+<div class="block">Try to append a chunk of data for consumption.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/util/StreamBuffer.html#write-com.google.protobuf.ByteString-">write</a></span>(com.google.protobuf.ByteString&nbsp;data)</code>
 <div class="block">Append a chunk of data for consumption.</div>
@@ -267,6 +273,25 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>data</code> - the data to write into the buffer</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.lang.IllegalStateException</code> - if writing is attempted after the buffer has been closed</dd>
+</dl>
+</li>
+</ul>
+<a name="tryWrite-com.google.protobuf.ByteString-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>tryWrite</h4>
+<pre>public&nbsp;boolean&nbsp;tryWrite(com.google.protobuf.ByteString&nbsp;data)</pre>
+<div class="block">Try to append a chunk of data for consumption.
+ If the previous buffer is still not drained, then does not block and returns false.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>data</code> - the data to write into the buffer</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the data was added to the buffer, false otherwise</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.lang.IllegalStateException</code> - if writing is attempted after the buffer has been closed</dd>
 </dl>

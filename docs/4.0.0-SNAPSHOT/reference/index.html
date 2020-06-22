@@ -4820,6 +4820,36 @@ Whereas static properties values are bound during application startup and do not
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filestream.max-concurrent-transfers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of concurrent file transfers that a server allows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filestream.unclaimed-stream-start-timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval after which a transfer stream is shut down if it didn&#8217;t send the first chunk of data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filestream.stalled-transfer-timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval after which a transfer stream is shut down if it didn&#8217;t send any more data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filestream.stalled-transfer-check-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for checking on stalled downloads</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filestream.write-retry-delay</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval between attempts to write data into a stream buffer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300ms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to <code>true</code>, enables the built-in agent filter service. The filter behavior is controlled by other active <code>genie.agent.filter.*</code> properties.</p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -6039,15 +6069,50 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.pending.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of pending file transfers requested from connected agents</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.requested.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of file transfer from remote agents to this node</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcHeartBeatServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.inProgress.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of in progress file transfers from connected agents</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.rejected.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of attempted file transfers that were rejected because too many transfers are already in progress on this node</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.manifestCache.size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the manifest cache</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.controlStreams.size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of active agent control streams</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">size</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.timeout.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of transfers that timed out on this node</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.transferSize.summary</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of bytes requested from the agent for a given transfer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">distribution (bytes)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.activeTransfers.size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of active transfers on this node</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
@@ -6690,7 +6755,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-06-22 17:04:11 UTC
+Last updated 2020-06-22 22:16:12 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

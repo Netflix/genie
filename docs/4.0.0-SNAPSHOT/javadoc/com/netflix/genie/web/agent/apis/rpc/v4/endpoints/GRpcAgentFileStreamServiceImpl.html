@@ -121,13 +121,16 @@ extends com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase
 implements <a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a></pre>
 <div class="block"><a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentFileStreamService</code></a> gRPC implementation.
  Receives and caches manifests from connected agents.
- Allows requesting a file, which is returned in the form of a <code>AgentFileStreamService.AgentFileResource</code>.
+ Allows requesting a file, which is returned in the form of a <code>AgentFileResource</code>.
  <p>
  Implementation overview:
- Each agent maintains a single 'sync' channel, through which manifests are pushed to the server.
- On top of the same channel, the server can request a file.
- When a file is requested, the agent opens a separate 'transmit' stream and sends the file in chunks.
- The server acknowledges a chunk in order to request the next one.
+ Each agent maintains a single "control" bidirectional stream (through the 'sync' RPC method).
+ This stream is used by the agent to regularly push manifests.
+ And it is used by the server to request files.
+ <p>
+ When a file is requested, the agent opens a separate "transfer" bidirectional stream (through the 'transmit' RPC
+ method) for that file transfer and starts sending chunks (currently one at the time), the server sends
+ acknowledgements in the same stream.
  <p>
  This service returns a resource immediately, but maintains a handle on a buffer where data is written as it is
  received.</div>
@@ -168,8 +171,9 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/agent/servi
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">GRpcAgentFileStreamServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentFileStreamProperties-io.micrometer.core.instrument.MeterRegistry-">GRpcAgentFileStreamServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
                               org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                              <a href="../../../../../../../../../com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties</a>&nbsp;properties,
                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -241,7 +245,7 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/agent/servi
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
+<a name="GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentFileStreamProperties-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -249,12 +253,14 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/agent/servi
 <h4>GRpcAgentFileStreamServiceImpl</h4>
 <pre>public&nbsp;GRpcAgentFileStreamServiceImpl(<a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
                                       org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                      <a href="../../../../../../../../../com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties</a>&nbsp;properties,
                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>converter</code> - The <a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters"><code>JobDirectoryManifestProtoConverter</code></a> instance to use</dd>
 <dd><code>taskScheduler</code> - A <code>TaskScheduler</code> instance to use</dd>
+<dd><code>properties</code> - The service properties</dd>
 <dd><code>registry</code> - The meter registry</dd>
 </dl>
 </li>
