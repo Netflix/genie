@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -170,18 +171,12 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             // Log all the job initial job information
             this.persistenceService.createJob(jobRequest, jobMetadata, jobBuilder.build(), jobExecution);
             this.jobStateService.init(jobId);
-            log.info("Finding possible clusters and commands for job {}", jobRequest.getId().orElse(NO_ID_FOUND));
-            final JobSpecification jobSpecification;
-            try {
-                jobSpecification = this.jobResolverService.resolveJob(
-                    jobId,
-                    DtoConverters.toV4JobRequest(jobRequest),
-                    true
-                ).getJobSpecification();
-            } catch (final GenieJobResolutionException e) {
-                // Remap to existing contract
-                throw new GeniePreconditionException(e.getMessage(), e);
-            }
+            log.info("Attempting to resolve job {}", jobRequest.getId().orElse(NO_ID_FOUND));
+            final JobSpecification jobSpecification = this.jobResolverService.resolveJob(
+                jobId,
+                DtoConverters.toV4JobRequest(jobRequest),
+                true
+            ).getJobSpecification();
             final Cluster cluster = this.persistenceService.getCluster(jobSpecification.getCluster().getId());
             final Command command = this.persistenceService.getCommand(jobSpecification.getCommand().getId());
 
@@ -285,6 +280,22 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 this.persistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw e;
+        } catch (final GenieJobResolutionException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            //
+            // Need to check if the job exists in the JobStateService
+            // because this error can happen before the job is initiated.
+            //
+            if (this.jobStateService.jobExists(jobId)) {
+                this.jobStateService.done(jobId);
+                this.persistenceService.updateJobStatus(
+                    jobId,
+                    jobStatus,
+                    JobStatusMessages.FAILED_TO_RESOLVE_JOB
+                );
+            }
+            // Remap to existing contract
+            throw new GeniePreconditionException(e.getMessage(), e);
         } catch (final Exception e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
             //

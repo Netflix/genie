@@ -184,7 +184,7 @@ public class JobCoordinatorServiceImplTest {
                 .verify(this.registry, Mockito.times(1))
                 .timer(
                     JobCoordinatorServiceImpl.OVERALL_COORDINATION_TIMER_NAME,
-                    MetricsUtils.newFailureTagsSetForException(new GeniePreconditionException("test"))
+                    MetricsUtils.newFailureTagsSetForException(new GenieJobResolutionException())
                 );
         }
     }
