@@ -113,7 +113,7 @@ public class DataServiceRetryAspect implements Ordered {
         ) {
             throw e;
         } catch (Throwable e) {
-            throw new GenieRuntimeException("Failed to execute data service method", e);
+            throw new GenieRuntimeException("Failed to execute data service method due to " + e.getMessage(), e);
         }
     }
 
