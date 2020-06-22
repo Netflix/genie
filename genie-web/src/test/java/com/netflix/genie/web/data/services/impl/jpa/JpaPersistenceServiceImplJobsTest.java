@@ -61,6 +61,7 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepositor
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.AttachmentService;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -1175,5 +1176,19 @@ class JpaPersistenceServiceImplJobsTest {
         Assertions
             .assertThat(this.persistenceService.getUnclaimedAgentJobs())
             .isEqualTo(Sets.newHashSet());
+    }
+
+    @Test
+    void testUpdateJobStatusWithTooLongMessage() throws GenieCheckedException {
+        final String id = UUID.randomUUID().toString();
+        final JobEntity jobEntity = new JobEntity();
+        jobEntity.setStatus(JobStatus.INIT.name());
+        final String tooLong = StringUtils.leftPad("a", 256, 'b');
+
+        Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.of(jobEntity));
+        this.persistenceService.updateJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, tooLong);
+
+        Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.RUNNING.name());
+        Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(StringUtils.truncate(tooLong, 255));
     }
 }

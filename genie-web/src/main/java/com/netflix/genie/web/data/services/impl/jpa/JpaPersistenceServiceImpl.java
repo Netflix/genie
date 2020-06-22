@@ -108,6 +108,7 @@ import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.AttachmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -193,6 +194,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         .collect(Collectors.toSet());
 
     private static final String LOAD_GRAPH_HINT = "javax.persistence.loadgraph";
+    private static final int MAX_STATUS_MESSAGE_LENGTH = 255;
 
     private final EntityManager entityManager;
 
@@ -2697,7 +2699,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         // Only change the status if the entity isn't already in a terminal state
         if (currentStatus.isActive()) {
             jobEntity.setStatus(newStatus.name());
-            jobEntity.setStatusMsg(statusMsg);
+            jobEntity.setStatusMsg(StringUtils.truncate(statusMsg, MAX_STATUS_MESSAGE_LENGTH));
 
             if (newStatus.equals(JobStatus.RUNNING)) {
                 // Status being changed to running so set start date.
@@ -2789,7 +2791,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         job.getStarted().ifPresent(jobEntity::setStarted);
         job.getFinished().ifPresent(jobEntity::setFinished);
         jobEntity.setStatus(job.getStatus().name());
-        job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
+        job
+            .getStatusMsg()
+            .ifPresent(statusMsg -> jobEntity.setStatusMsg(StringUtils.truncate(statusMsg, MAX_STATUS_MESSAGE_LENGTH)));
 
         // Fields set by system as part of job execution
         jobEntity.setAgentHostname(jobExecution.getHostName());
