@@ -188,6 +188,12 @@ public final class JobStatusMessages {
     public static final String FAILED_AGENT_CONFIGURATION = "Failed to configure execution";
 
     /**
+     * Could not resolve the job.
+     */
+    public static final String FAILED_TO_RESOLVE_JOB
+        = "Failed to resolve job given original request and available resources";
+
+    /**
      * Private constructor, this class is not meant to be instantiated.
      */
     private JobStatusMessages() {

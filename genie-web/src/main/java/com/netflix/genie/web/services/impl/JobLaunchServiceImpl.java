@@ -18,6 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
@@ -113,7 +114,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                     jobId,
                     JobStatus.RESERVED,
                     JobStatus.FAILED,
-                    t.getMessage()
+                    JobStatusMessages.FAILED_TO_RESOLVE_JOB // TODO: Move somewhere not in genie-common
                 );
                 throw t; // Caught below for metrics gathering
             }
