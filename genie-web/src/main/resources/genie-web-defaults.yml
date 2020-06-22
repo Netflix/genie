@@ -32,15 +32,15 @@ genie:
       agent-properties-filter-pattern: ^genie\.agent\.runtime\..*
       cache-expiration-interval: 1m
       cache-refresh-interval: 5m
+    filestream:
+      max-concurrent-transfers: 100
+      unclaimed-stream-start-timeout: 10s
+      stalled-transfer-timeout: 20s
+      stalled-transfer-check-interval: 5s
+      write-retry-delay: 300ms
   file:
     cache:
       location: file://${java.io.tmpdir}genie/cache
-  filestream:
-    max-concurrent-transfers: 100
-    unclaimed-stream-start-timeout: 10s
-    stalled-transfer-timeout: 20s
-    stalled-transfer-check-interval: 5s
-    write-retry-delay: 300ms
   health:
     maxCpuLoadPercent: 80
   jobs:
