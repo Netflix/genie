@@ -285,7 +285,7 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
         }
 
         if (instance == null) {
-            log.warn("Could not find agent connection for job {}", jobId);
+            log.debug("Could not find agent connection for job {}", jobId);
             return Optional.empty();
         }
 
