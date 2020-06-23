@@ -31,6 +31,7 @@ import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.ServerAckMessage;
 import com.netflix.genie.proto.ServerControlMessage;
 import com.netflix.genie.proto.ServerFileRequestMessage;
+import io.grpc.Context;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -283,17 +284,23 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             return;
         }
 
-        final FileTransfer fileTransfer = new FileTransfer(
-            this,
-            streamId,
-            absolutePath,
-            startOffset,
-            endOffset,
-            properties.getDataChunkMaxSize().toBytes()
+        // Decouple outgoing file transfer from incoming file request
+        Context.current().run(
+            () -> {
+                final FileTransfer fileTransfer = new FileTransfer(
+                    this,
+                    streamId,
+                    absolutePath,
+                    startOffset,
+                    endOffset,
+                    properties.getDataChunkMaxSize().toBytes()
+                );
+                this.activeFileTransfers.add(fileTransfer);
+                fileTransfer.start();
+                log.debug("Created and started new file transfer: {}", fileTransfer.streamId);
+            }
         );
-        this.activeFileTransfers.add(fileTransfer);
-        fileTransfer.start();
-        log.debug("Created and started new file transfer: {}", fileTransfer.streamId);
+
     }
 
     private void handleTransferComplete(final FileTransfer fileTransfer) {
