@@ -19,7 +19,6 @@ package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.google.common.collect.Maps
 import com.netflix.genie.agent.execution.services.AgentFileStreamService
-import com.netflix.genie.agent.properties.AgentProperties
 import com.netflix.genie.agent.properties.FileStreamServiceProperties
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter
@@ -247,7 +246,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         0 == remoteService.erroredSyncStreams.size()
     }
 
-    def "Transmit empty file"() {
+    def "Transmit empty/small/nonexistent files"() {
 
         setup:
         temporaryFolder.newFile("file.txt")
@@ -446,6 +445,113 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         noExceptionThrown()
     }
 
+    def "Transmit large file"() {
+
+        setup:
+        Random r = new Random()
+        int fileSize = 0
+        File largeFile = temporaryFolder.newFile("large-file.txt")
+        while(fileSize <= fileStreamServiceProperties.getDataChunkMaxSize().toBytes() * 2) {
+            byte[] buf = new byte[512]
+            r.nextBytes(buf)
+            largeFile.append(buf)
+            fileSize += buf.size()
+        }
+        File largeFileReceived = temporaryFolder.newFile("large-file-received.txt")
+
+        Runnable runnableCapture
+        Runnable drainRunnableCapture
+        AgentManifestMessage manifestMessage = AgentManifestMessage.getDefaultInstance()
+        ScheduledFuture<?> drainTaskFuture = Mock(ScheduledFuture)
+
+        when:
+        agentFileStreamService.start(jobId, temporaryFolder.getRoot().toPath())
+
+        then:
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            args ->
+                runnableCapture = args[0] as Runnable
+                return scheduledTask
+        }
+        runnableCapture != null
+
+        when:
+        runnableCapture.run()
+
+        then: "A sync channel is open and a manifest is transmitted"
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
+        1 == remoteService.activeSyncStreams.size()
+        1 == remoteService.manifestMessageReceived.size()
+        manifestMessage == remoteService.manifestMessageReceived.get(0)
+
+        when: "A file is requested (content does not fit in a single message)"
+        StreamObserver<ServerControlMessage> controlObserver = remoteService.activeSyncStreams.entrySet().iterator().next().getValue()
+        controlObserver.onNext(
+            ServerControlMessage.newBuilder()
+                .setServerFileRequest(
+                    ServerFileRequestMessage.newBuilder()
+                        .setRelativePath("large-file.txt")
+                        .setStreamId(UUID.randomUUID().toString())
+                        .setStartOffset(0)
+                        .setEndOffset(fileSize)
+                        .build()
+                )
+                .build()
+        )
+
+        then: "Expect first chunk"
+        0 == remoteService.completedTransmitStreams.size()
+        1 == remoteService.activeTransmitStreams.size()
+        1 == remoteService.fileMessageReceived.size()
+        largeFileReceived.append(remoteService.fileMessageReceived.get(0).getData().toByteArray())
+
+        when: "Acknowledge the first chunk"
+        StreamObserver<ServerAckMessage> transferObserver = remoteService.activeTransmitStreams.entrySet().iterator().next().getValue()
+        transferObserver.onNext(
+            ServerAckMessage.newBuilder().build()
+        )
+
+        then: "Expect second chunk"
+        0 == remoteService.completedTransmitStreams.size()
+        1 == remoteService.activeTransmitStreams.size()
+        2 == remoteService.fileMessageReceived.size()
+        largeFileReceived.append(remoteService.fileMessageReceived.get(1).getData().toByteArray())
+
+        when: "Acknowledge the second chunk"
+        transferObserver.onNext(
+            ServerAckMessage.newBuilder().build()
+        )
+
+        then: "Expect third chunk"
+        0 == remoteService.completedTransmitStreams.size()
+        1 == remoteService.activeTransmitStreams.size()
+        3 == remoteService.fileMessageReceived.size()
+        largeFileReceived.append(remoteService.fileMessageReceived.get(2).getData().toByteArray())
+
+        when: "Acknowledge the third chunk"
+        transferObserver.onNext(
+            ServerAckMessage.newBuilder().build()
+        )
+
+        then: "Expect transfer completion"
+        1 == remoteService.completedTransmitStreams.size()
+        0 == remoteService.activeTransmitStreams.size()
+        3 == remoteService.fileMessageReceived.size()
+        largeFile.getBytes() == largeFileReceived.getBytes()
+
+        when:
+        agentFileStreamService.stop()
+
+        then:
+        0 * taskScheduler.schedule(_ as Runnable, _ as Instant)
+        1 * scheduledTask.cancel(false)
+        1 == remoteService.completedTransmitStreams.size()
+        0 == remoteService.erroredTransmitStreams.size()
+        0 == remoteService.activeTransmitStreams.size()
+        1 == remoteService.completedSyncStreams.size()
+    }
+
     class RemoteService extends FileStreamServiceGrpc.FileStreamServiceImplBase {
 
         Map<StreamObserver<AgentManifestMessage>, StreamObserver<ServerControlMessage>> activeSyncStreams = Maps.newHashMap()
@@ -467,20 +573,20 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
                 @Override
                 void onNext(final AgentManifestMessage value) {
-                    printf("Received manifest")
+                    println("Received manifest")
                     manifestMessageReceived.add(value)
                 }
 
                 @Override
                 void onError(final Throwable t) {
-                    printf("Sync stream error")
+                    println("Sync stream error: " + t.getClass() + ": " + t.getMessage())
                     StreamObserver<ServerControlMessage> observer = activeSyncStreams.remove(this)
                     erroredSyncStreams.put(this, observer)
                 }
 
                 @Override
                 void onCompleted() {
-                    printf("Sync stream completed")
+                    println("Sync stream completed")
                     StreamObserver<ServerControlMessage> observer = activeSyncStreams.remove(this)
                     completedSyncStreams.put(this, observer)
                 }
@@ -500,13 +606,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
                 @Override
                 void onNext(final AgentFileMessage value) {
-                    printf("Received file chunk")
+                    println("Received file chunk")
                     fileMessageReceived.add(value)
                 }
 
                 @Override
                 void onError(final Throwable t) {
-                    printf("Transmit stream error")
+                    println("Transmit stream error: " + t.getClass() + ": " + t.getMessage())
                     StreamObserver<ServerAckMessage> observer = activeTransmitStreams.remove(this)
                     observer.onError(t)
                     erroredTransmitStreams.put(this, observer)
@@ -514,7 +620,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
                 @Override
                 void onCompleted() {
-                    printf("Transmit stream completed")
+                    println("Transmit stream completed")
                     StreamObserver<ServerAckMessage> observer = activeTransmitStreams.remove(this)
                     observer.onCompleted()
                     completedTransmitStreams.put(this, observer)

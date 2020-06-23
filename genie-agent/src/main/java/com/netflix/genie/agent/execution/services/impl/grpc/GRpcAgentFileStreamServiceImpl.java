@@ -410,7 +410,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         private void sendChunk() throws IOException {
 
             if (this.watermark < this.endOffset - 1) {
-                // Reset mark before reading!
+                // Reset mark before reading into the buffer
                 readBuffer.rewind();
 
                 final int bytesRead;
@@ -418,6 +418,9 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
                     channel.position(this.watermark);
                     bytesRead = channel.read(readBuffer);
                 }
+
+                // Reset mark again before copying data out
+                readBuffer.rewind();
 
                 final AgentFileMessage chunkMessage = AgentFileMessage.newBuilder()
                     .setStreamId(this.streamId)
