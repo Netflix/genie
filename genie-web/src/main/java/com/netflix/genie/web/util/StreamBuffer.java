@@ -50,6 +50,7 @@ public class StreamBuffer {
     private boolean closed;
     private ByteString currentChunk;
     private int currentChunkWatermark;
+    private Throwable closeCause;
 
     /**
      * Constructor.
@@ -67,7 +68,10 @@ public class StreamBuffer {
      */
     public void closeForError(final Throwable t) {
         log.error("Closing buffer due to error: " + t.getClass().getSimpleName() + ": " + t.getMessage());
-        this.closeForCompleted();
+        synchronized (this.lock) {
+            this.closeCause = t;
+            this.closeForCompleted();
+        }
     }
 
     /**
@@ -142,7 +146,7 @@ public class StreamBuffer {
         return inputStream;
     }
 
-    private int read(final byte[] destination) {
+    private int read(final byte[] destination) throws IOException {
         synchronized (this.lock) {
             while (true) {
                 if (currentChunk != null) {
@@ -164,7 +168,14 @@ public class StreamBuffer {
                     return bytesRead;
                 } else if (this.closed) {
                     // There won't be another chunk appended
-                    return -1;
+                    log.debug("Buffer was closed");
+                    if (this.closeCause != null) {
+                        // Throw rather than returning -1 in case of error, so the request is shut down immediately
+                        throw new IOException(this.closeCause.getMessage());
+                    } else {
+                        // All data was consumed
+                        return -1;
+                    }
                 } else {
                     try {
                         this.lock.wait();
