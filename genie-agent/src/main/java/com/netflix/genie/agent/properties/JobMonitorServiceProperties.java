@@ -17,31 +17,24 @@
  */
 package com.netflix.genie.agent.properties;
 
+import com.netflix.genie.agent.execution.services.JobMonitorService;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
 
 /**
- * Root properties class for agent.
+ * Properties of {@link JobMonitorService}.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = AgentProperties.PREFIX)
 @Getter
 @Setter
-public class AgentProperties {
-    /**
-     * Properties prefix.
-     */
-    public static final String PREFIX = "genie.agent.runtime";
-
-    private Duration emergencyShutdownDelay = Duration.ofMinutes(5);
-    private Duration forceManifestRefreshTimeout = Duration.ofSeconds(5);
-    private FileStreamServiceProperties fileStreamService = new FileStreamServiceProperties();
-    private HeartBeatServiceProperties heartBeatService = new HeartBeatServiceProperties();
-    private JobKillServiceProperties jobKillService = new JobKillServiceProperties();
-    private JobMonitorServiceProperties jobMonitorService = new JobMonitorServiceProperties();
+public class JobMonitorServiceProperties {
+    private Duration checkInterval = Duration.ofMinutes(1);
+    private int maxFiles = 64_000;
+    private DataSize maxTotalSize = DataSize.ofGigabytes(16);
+    private DataSize maxFileSize = DataSize.ofGigabytes(8);
 }

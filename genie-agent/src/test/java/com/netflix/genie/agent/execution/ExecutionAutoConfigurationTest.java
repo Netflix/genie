@@ -28,6 +28,7 @@ import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
+import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
@@ -212,6 +213,11 @@ class ExecutionAutoConfigurationTest {
         @Bean
         AgentLogManager agentLogManager() {
             return Mockito.mock(AgentLogManager.class);
+        }
+
+        @Bean
+        JobMonitorService jobMonitorService() {
+            return Mockito.mock(JobMonitorService.class);
         }
     }
 }

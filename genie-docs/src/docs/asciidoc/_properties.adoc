@@ -926,6 +926,26 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | 1s
 |
 
+| `genie.agent.runtime.job-monitor-service.check-interval`
+| How often to check for files limits
+| 1m
+|
+
+| `genie.agent.runtime.job-monitor-service.max-files`
+| Maximum number of files in the job directory
+| 64000
+|
+
+| `genie.agent.runtime.job-monitor-service.max-file-size`
+| Maximum size of the largest file in the job directory
+| 8GB
+|
+
+| `genie.agent.runtime.job-monitor-service.max-total-size`
+| Maximum total size of the job directory
+| 16GB
+|
+
 | `genie.agent.runtime.job-kill-service.response-check-back-off.delay-type`
 | Scheduling policy for backoff in case of error during kill request
 | FROM_PREVIOUS_EXECUTION_COMPLETION

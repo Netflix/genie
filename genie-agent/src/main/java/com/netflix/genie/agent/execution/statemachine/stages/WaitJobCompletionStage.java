@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.stages;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.JobProcessResult;
+import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
@@ -27,6 +28,7 @@ import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionExcep
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * Wait for job process to exit.
@@ -37,15 +39,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WaitJobCompletionStage extends ExecutionStage {
     private final JobProcessManager jobProcessManager;
+    private final JobMonitorService jobMonitorService;
 
     /**
      * Constructor.
      *
      * @param jobProcessManager the job process manager
+     * @param jobMonitorService the job monitor service
      */
-    public WaitJobCompletionStage(final JobProcessManager jobProcessManager) {
+    public WaitJobCompletionStage(
+        final JobProcessManager jobProcessManager,
+        final JobMonitorService jobMonitorService
+    ) {
         super(States.WAIT_JOB_COMPLETION);
         this.jobProcessManager = jobProcessManager;
+        this.jobMonitorService = jobMonitorService;
     }
 
     @Override
@@ -56,11 +64,14 @@ public class WaitJobCompletionStage extends ExecutionStage {
         // In case of abort, this state may be reached even if there was no attempt to launch the process.
         if (executionContext.isJobLaunched()) {
             log.info("Monitoring job process");
+            this.jobMonitorService.start(executionContext.getJobDirectory().toPath());
             final JobProcessResult jobProcessResult;
             try {
                 jobProcessResult = this.jobProcessManager.waitFor();
             } catch (final InterruptedException e) {
                 throw createFatalException(e);
+            } finally {
+                this.jobMonitorService.stop();
             }
 
             executionContext.setJobProcessResult(jobProcessResult);
@@ -70,6 +81,5 @@ public class WaitJobCompletionStage extends ExecutionStage {
         } else {
             log.debug("Job not launched, skipping");
         }
-
     }
 }

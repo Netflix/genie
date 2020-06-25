@@ -59,6 +59,11 @@ genie:
           min-delay: 500ms
           max-delay: 5s
           factor: 1.2
+      job-monitor-service:
+        check-interval: 1m
+        max-files: 64000
+        max-file-size: 8GB
+        max-total-size: 16GB
 
 spring:
   banner:
