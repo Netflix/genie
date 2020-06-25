@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -167,12 +167,21 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>com.netflix.genie.agent.execution.services.impl.JobMonitorServiceImpl</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">jobMonitorService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
+                 <a href="../../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;manifestCreatorService,
+                 org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                 <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
+<div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobMonitorService</code></a> bean if one hasn't already been defined.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-">jobSetupService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/DownloadService.html" title="interface in com.netflix.genie.agent.execution.services">DownloadService</a>&nbsp;downloadService)</code>
 <div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobSetupService</code></a> bean if one hasn't already been defined.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-org.springframework.context.ApplicationEventPublisher-com.netflix.genie.agent.properties.AgentProperties-">killService</a></span>(org.springframework.context.ApplicationEventPublisher&nbsp;applicationEventPublisher,
            <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
@@ -290,7 +299,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 <a name="jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>jobSetupService</h4>
 <pre>@Bean
@@ -303,6 +312,32 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 <dd><code>downloadService</code> - the download service</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>JobSetupServiceImpl</code> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>jobMonitorService</h4>
+<pre>@Bean
+ @Lazy
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService.class</a>)
+public&nbsp;com.netflix.genie.agent.execution.services.impl.JobMonitorServiceImpl&nbsp;jobMonitorService(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
+                                                                                                                                                                      <a href="../../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;manifestCreatorService,
+                                                                                                                                                                      @Qualifier(value="sharedAgentTaskScheduler")
+                                                                                                                                                                      org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                                                      <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
+<div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobMonitorService</code></a> bean if one hasn't already been defined.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>killService</code> - the kill service</dd>
+<dd><code>manifestCreatorService</code> - the manifest creator service</dd>
+<dd><code>taskScheduler</code> - the task scheduler</dd>
+<dd><code>agentProperties</code> - the agent properties</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <code>JobMonitorServiceImpl</code> instance</dd>
 </dl>
 </li>
 </ul>

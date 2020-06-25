@@ -8251,6 +8251,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#JOB_DIRECTORY_LOCATION">JOB_DIRECTORY_LOCATION</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_EXCEEDED_FILES_LIMIT">JOB_EXCEEDED_FILES_LIMIT</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
+<dd>
+<div class="block">Job killed because a limit related to the size of the directory was exceeded.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_EXCEEDED_STDERR_LENGTH">JOB_EXCEEDED_STDERR_LENGTH</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
 <div class="block">Job killed because maximum stderr length was exceeded.</div>
@@ -8933,6 +8937,20 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">jobMonitorService(KillService, JobDirectoryManifestCreatorService, TaskScheduler, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobMonitorService</code></a> bean if one hasn't already been defined.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><span class="typeNameLink">JobMonitorService</span></a> - Interface in <a href="com/netflix/genie/agent/execution/services/package-summary.html">com.netflix.genie.agent.execution.services</a></dt>
+<dd>
+<div class="block">Service that monitors the job directory and may decide to kill the job if some limit is exceeded.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/properties/JobMonitorServiceProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">JobMonitorServiceProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
+<dd>
+<div class="block">Properties of <a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobMonitorService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/JobMonitorServiceProperties.html#JobMonitorServiceProperties--">JobMonitorServiceProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/JobMonitorServiceProperties.html" title="class in com.netflix.genie.agent.properties">JobMonitorServiceProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/exceptions/checked/JobNotArchivedException.html" title="class in com.netflix.genie.web.exceptions.checked"><span class="typeNameLink">JobNotArchivedException</span></a> - Exception in <a href="com/netflix/genie/web/exceptions/checked/package-summary.html">com.netflix.genie.web.exceptions.checked</a></dt>
 <dd>
 <div class="block">An exception thrown when a job is completed but wasn't archived and thus output isn't available.</div>
@@ -12010,6 +12028,10 @@
 <dd>
 <div class="block">Start listening for job termination notification.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/JobMonitorService.html#start-java.nio.file.Path-">start(Path)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService</a></dt>
+<dd>
+<div class="block">Starts the service.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#start--">start()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
 <dd>
 <div class="block">Start the service (i.e.</div>
@@ -12196,6 +12218,10 @@
 <div class="block">Stop the service.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#stop--">stop()</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></dt>
+<dd>
+<div class="block">Stop the service.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/JobMonitorService.html#stop--">stop()</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService</a></dt>
 <dd>
 <div class="block">Stop the service.</div>
 </dd>
@@ -13378,7 +13404,7 @@ the order they are declared.</div>
 <dd>
 <div class="block">Wait for job process to exit.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#WaitJobCompletionStage-com.netflix.genie.agent.execution.process.JobProcessManager-">WaitJobCompletionStage(JobProcessManager)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#WaitJobCompletionStage-com.netflix.genie.agent.execution.process.JobProcessManager-com.netflix.genie.agent.execution.services.JobMonitorService-">WaitJobCompletionStage(JobProcessManager, JobMonitorService)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>

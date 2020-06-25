@@ -137,7 +137,8 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#WaitJobCompletionStage-com.netflix.genie.agent.execution.process.JobProcessManager-">WaitJobCompletionStage</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a>&nbsp;jobProcessManager)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#WaitJobCompletionStage-com.netflix.genie.agent.execution.process.JobProcessManager-com.netflix.genie.agent.execution.services.JobMonitorService-">WaitJobCompletionStage</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a>&nbsp;jobProcessManager,
+                      <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService</a>&nbsp;jobMonitorService)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -191,17 +192,19 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="WaitJobCompletionStage-com.netflix.genie.agent.execution.process.JobProcessManager-">
+<a name="WaitJobCompletionStage-com.netflix.genie.agent.execution.process.JobProcessManager-com.netflix.genie.agent.execution.services.JobMonitorService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>WaitJobCompletionStage</h4>
-<pre>public&nbsp;WaitJobCompletionStage(<a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a>&nbsp;jobProcessManager)</pre>
+<pre>public&nbsp;WaitJobCompletionStage(<a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a>&nbsp;jobProcessManager,
+                              <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService</a>&nbsp;jobMonitorService)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobProcessManager</code> - the job process manager</dd>
+<dd><code>jobMonitorService</code> - the job monitor service</dd>
 </dl>
 </li>
 </ul>

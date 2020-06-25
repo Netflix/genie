@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-06-23</span>
+<span id="revdate">2020-06-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5953,6 +5953,30 @@ The server also has a chance to override them during the 'Agent Configuration' e
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.check-interval</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How often to check for files limits</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1m</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.max-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of files in the job directory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64000</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.max-file-size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum size of the largest file in the job directory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8GB</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.max-total-size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum total size of the job directory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16GB</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.delay-type</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Scheduling policy for backoff in case of error during kill request</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">FROM_PREVIOUS_EXECUTION_COMPLETION</p></td>
@@ -6755,7 +6779,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-06-23 19:43:40 UTC
+Last updated 2020-06-25 19:20:55 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
