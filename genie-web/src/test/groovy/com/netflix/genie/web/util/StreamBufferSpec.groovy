@@ -26,6 +26,7 @@ import spock.lang.Timeout
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.TimeoutException
 
 class StreamBufferSpec extends Specification {
     StreamBuffer buffer
@@ -145,6 +146,23 @@ class StreamBufferSpec extends Specification {
         written
         lastReadSize == 10
         dataToWrite == dataRead
+    }
+
+    def "Read after closing"() {
+
+        when:
+        this.buffer.write(ByteString.copyFromUtf8("Hello World!"))
+        this.buffer.closeForError(new TimeoutException("..."))
+
+        then:
+        noExceptionThrown()
+
+        when:
+        this.buffer.read(new byte[100]) // Consume data already in buffer
+        this.buffer.read(new byte[100]) // Throw because it was closed with error
+
+        then:
+        thrown(IOException)
     }
 
     def "Write after closing"() {

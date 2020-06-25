@@ -33,7 +33,6 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
 import org.junit.platform.commons.util.StringUtils
-import org.springframework.boot.actuate.info.Info
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpRange
 import org.springframework.scheduling.TaskScheduler
@@ -46,7 +45,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeoutException
 
-class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
+class GRpcAgentFileStreamServiceImplSpec extends Specification {
     static final int FILE_SIZE = 100
 
     GRpcAgentFileStreamServiceImpl service
@@ -425,10 +424,10 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         1 * serviceProperties.getStalledTransferTimeout() >> Duration.ofSeconds(-1)
 
         when: "Read data"
-        bytesRead = resource.get().getInputStream().read(new byte[512])
+        resource.get().getInputStream().read(new byte[512])
 
         then:
-        bytesRead == -1
+        thrown(IOException)
 
         when: "Request file transfer"
         resource = service.getResource(jobId, relativePath, uri, null)
@@ -453,10 +452,10 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         0 * transferStreamResponseObserver.onError(_ as TimeoutException)
 
         when: "Read data"
-        bytesRead = resource.get().getInputStream().read(new byte[512])
+        resource.get().getInputStream().read(new byte[512])
 
         then:
-        bytesRead == -1
+        thrown(IOException)
     }
 
     def "Unclaimed stream timeout"() {
@@ -574,10 +573,10 @@ class GRpcAgentFileStreamServiceImpl2Spec extends Specification {
         bytesRead == FILE_SIZE / 2 as int
 
         when: "Read more"
-        bytesRead = inputStream.read(new byte[512])
+        inputStream.read(new byte[512])
 
         then:
-        bytesRead == -1
+        thrown(IOException)
     }
 
     def "Exceed maximum number of transfers"() {
