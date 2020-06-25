@@ -20,11 +20,13 @@ package com.netflix.genie.agent.execution.services.impl;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
+import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -35,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 
 import java.io.IOException;
 
@@ -120,5 +123,26 @@ public class ServicesAutoConfiguration {
         final DownloadService downloadService
     ) {
         return new JobSetupServiceImpl(downloadService);
+    }
+
+    /**
+     * Provide a lazy {@link JobMonitorService} bean if one hasn't already been defined.
+     *
+     * @param killService            the kill service
+     * @param manifestCreatorService the manifest creator service
+     * @param taskScheduler          the task scheduler
+     * @param agentProperties        the agent properties
+     * @return A {@link JobMonitorServiceImpl} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(JobMonitorService.class)
+    public JobMonitorServiceImpl jobMonitorService(
+        final KillService killService,
+        final JobDirectoryManifestCreatorService manifestCreatorService,
+        @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
+        final AgentProperties agentProperties
+    ) {
+        return new JobMonitorServiceImpl(killService, manifestCreatorService, taskScheduler, agentProperties);
     }
 }

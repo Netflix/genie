@@ -32,24 +32,31 @@ class AgentPropertiesSpec extends Specification {
     def "defaults, getters setters"() {
         expect:
         agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(5)
+        agentProperties.getForceManifestRefreshTimeout() == Duration.ofSeconds(5)
         agentProperties.getFileStreamService() != null
         agentProperties.getHeartBeatService() != null
         agentProperties.getJobKillService() != null
+        agentProperties.getJobMonitorService() != null
 
         when:
         def fileStreamServiceProps = Mock(FileStreamServiceProperties)
         def heartBeatServiceProps = Mock(HeartBeatServiceProperties)
         def jobKillServiceProps = Mock(JobKillServiceProperties)
+        def jobLimitsProps = Mock(JobMonitorServiceProperties)
 
-        agentProperties.setEmergencyShutdownDelay(Duration.ofMinutes(5))
+        agentProperties.setEmergencyShutdownDelay(Duration.ofMinutes(10))
+        agentProperties.setForceManifestRefreshTimeout(Duration.ofSeconds(10))
         agentProperties.setFileStreamService(fileStreamServiceProps)
         agentProperties.setHeartBeatService(heartBeatServiceProps)
         agentProperties.setJobKillService(jobKillServiceProps)
+        agentProperties.setJobMonitorService(jobLimitsProps)
 
         then:
-        agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(5)
+        agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(10)
+        agentProperties.getForceManifestRefreshTimeout() == Duration.ofSeconds(10)
         agentProperties.getFileStreamService() == fileStreamServiceProps
         agentProperties.getHeartBeatService() == heartBeatServiceProps
         agentProperties.getJobKillService() == jobKillServiceProps
+        agentProperties.getJobMonitorService() == jobLimitsProps
     }
 }

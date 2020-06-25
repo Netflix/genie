@@ -19,23 +19,32 @@ package com.netflix.genie.agent.execution.statemachine.stages
 
 import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.process.JobProcessResult
+import com.netflix.genie.agent.execution.services.JobMonitorService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import spock.lang.Specification
 
+import java.nio.file.Path
+
 class WaitJobCompletionStageSpec extends Specification {
     ExecutionStage stage
     ExecutionContext executionContext
     JobProcessManager jobProcessManager
     JobProcessResult jobProcessResult
+    JobMonitorService jobDirectoryLimitsService
+    File jobDirectory
+    Path jobDirectoryPath
 
     void setup() {
         this.jobProcessResult = Mock(JobProcessResult)
         this.jobProcessManager = Mock(JobProcessManager)
         this.executionContext = Mock(ExecutionContext)
-        this.stage = new WaitJobCompletionStage(jobProcessManager)
+        this.jobDirectoryLimitsService = Mock(JobMonitorService)
+        this.jobDirectory = Mock(File)
+        this.jobDirectoryPath = Mock(Path)
+        this.stage = new WaitJobCompletionStage(jobProcessManager, jobDirectoryLimitsService)
     }
 
     def "AttemptTransition -- not launched"() {
@@ -45,6 +54,9 @@ class WaitJobCompletionStageSpec extends Specification {
         then:
         1 * executionContext.isJobLaunched() >> false
         0 * jobProcessManager.waitFor()
+        0 * executionContext.getJobDirectory()
+        0 * jobDirectoryLimitsService.start(_)
+        0 * jobDirectoryLimitsService.stop()
     }
 
     def "AttemptTransition -- success"() {
@@ -53,7 +65,11 @@ class WaitJobCompletionStageSpec extends Specification {
 
         then:
         1 * executionContext.isJobLaunched() >> true
+        1 * executionContext.getJobDirectory() >> jobDirectory
+        1 * jobDirectory.toPath() >> jobDirectoryPath
+        1 * jobDirectoryLimitsService.start(jobDirectory)
         1 * jobProcessManager.waitFor() >> jobProcessResult
+        1 * jobDirectoryLimitsService.stop()
         1 * executionContext.setJobProcessResult(jobProcessResult)
         1 * jobProcessResult.getFinalStatus() >> JobStatus.KILLED
     }
@@ -67,10 +83,15 @@ class WaitJobCompletionStageSpec extends Specification {
 
         then:
         1 * executionContext.isJobLaunched() >> true
+        1 * executionContext.getJobDirectory() >> jobDirectory
+        1 * jobDirectory.toPath() >> jobDirectoryPath
+        1 * jobDirectoryLimitsService.start(jobDirectory)
         1 * jobProcessManager.waitFor() >> { throw interruptedException }
+        1 * jobDirectoryLimitsService.stop()
         def e = thrown(FatalJobExecutionException)
         e.getCause() == interruptedException
         0 * executionContext.setJobProcessResult(jobProcessResult)
         0 * jobProcessResult.getFinalStatus() >> JobStatus.KILLED
     }
+
 }

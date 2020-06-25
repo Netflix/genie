@@ -52,6 +52,10 @@ public interface KillService {
          * The job has exceeded its max execution duration.
          */
         TIMEOUT,
+        /**
+         * The job has exceeded one of the files limit (files count, file size, etc.).
+         */
+        FILES_LIMIT,
     }
 
     /**

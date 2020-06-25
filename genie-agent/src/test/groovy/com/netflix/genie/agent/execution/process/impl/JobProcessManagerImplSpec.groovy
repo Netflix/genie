@@ -24,7 +24,6 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
-import com.netflix.genie.common.internal.jobs.JobConstants
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.scheduling.TaskScheduler
@@ -70,7 +69,7 @@ class JobProcessManagerImplSpec extends Specification {
         File jobScript = new File(this.temporaryFolder.getRoot(), "run")
         jobScript.append("echo Hello stdout;\n");
         jobScript.append("echo Hello stderr 1>&2;\n");
-        jobScript.append("touch " + expectedFile +";\n");
+        jobScript.append("touch " + expectedFile + ";\n");
         jobScript.setExecutable(true)
 
         when:
@@ -339,7 +338,8 @@ class JobProcessManagerImplSpec extends Specification {
         1 * future.cancel(true)
     }
 
-    def "Kill running process via event"() {
+    @Unroll
+    def "Kill running process via event (source: #killSource)"() {
         File jobScript = new File(this.temporaryFolder.getRoot(), "run")
         jobScript.write("sleep 60 \n");
         jobScript.setExecutable(true)
@@ -358,7 +358,7 @@ class JobProcessManagerImplSpec extends Specification {
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
-        this.manager.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST))
+        this.manager.onApplicationEvent(new KillService.KillEvent(killSource))
 
         then:
         noExceptionThrown()
@@ -368,12 +368,19 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         result.getFinalStatus() == JobStatus.KILLED
-        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getFinalStatusMessage() == expectedStatusMessage
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
         result.getExitCode() == 143
         !this.stdErr.exists()
         !this.stdOut.exists()
+
+        where:
+        killSource                              | expectedStatusMessage
+        KillService.KillSource.TIMEOUT          | JobStatusMessages.JOB_EXCEEDED_TIMEOUT
+        KillService.KillSource.FILES_LIMIT      | JobStatusMessages.JOB_EXCEEDED_FILES_LIMIT
+        KillService.KillSource.API_KILL_REQUEST | JobStatusMessages.JOB_KILLED_BY_USER
+        KillService.KillSource.SYSTEM_SIGNAL    | JobStatusMessages.JOB_KILLED_BY_USER
     }
 
     // TODO: This test seems to verify incorrect behavior

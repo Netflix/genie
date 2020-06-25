@@ -52,6 +52,11 @@ public final class JobStatusMessages {
     public static final String JOB_EXCEEDED_TIMEOUT = "Job exceeded timeout.";
 
     /**
+     * Job killed because a limit related to the size of the directory was exceeded.
+     */
+    public static final String JOB_EXCEEDED_FILES_LIMIT = "Job files exceeded limit.";
+
+    /**
      * Job killed by user.
      */
     public static final String JOB_KILLED_BY_USER = "Job was killed by user.";

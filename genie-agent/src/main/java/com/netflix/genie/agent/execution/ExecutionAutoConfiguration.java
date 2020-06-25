@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
+import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
@@ -165,7 +166,7 @@ public class ExecutionAutoConfiguration {
     /**
      * Create a {@link ConfigureAgentStage} bean if one is not already defined.
      *
-     * @param agentJobService     the agent job service
+     * @param agentJobService the agent job service
      */
     @Bean
     @Lazy
@@ -404,13 +405,17 @@ public class ExecutionAutoConfiguration {
      * Create a {@link WaitJobCompletionStage} bean if one is not already defined.
      *
      * @param jobProcessManager the job process manager
+     * @param jobMonitorService the job monitor service
      */
     @Bean
     @Lazy
     @Order(170)
     @ConditionalOnMissingBean(WaitJobCompletionStage.class)
-    WaitJobCompletionStage waitJobCompletionStage(final JobProcessManager jobProcessManager) {
-        return new WaitJobCompletionStage(jobProcessManager);
+    WaitJobCompletionStage waitJobCompletionStage(
+        final JobProcessManager jobProcessManager,
+        final JobMonitorService jobMonitorService
+    ) {
+        return new WaitJobCompletionStage(jobProcessManager, jobMonitorService);
     }
 
     /**
