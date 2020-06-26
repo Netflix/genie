@@ -344,6 +344,7 @@ public class GRpcAgentFileStreamServiceImpl
         public void onError(final Throwable t) {
             // Drop the stream, no other actions necessary
             this.controlStreamManager.removeControlStream(this, t);
+            this.responseObserver.onCompleted();
         }
 
         /**
@@ -353,6 +354,7 @@ public class GRpcAgentFileStreamServiceImpl
         public void onCompleted() {
             // Drop the stream, no other actions necessary
             this.controlStreamManager.removeControlStream(this, null);
+            this.responseObserver.onCompleted();
         }
 
         public void closeStreamWithError(final Throwable e) {
@@ -581,6 +583,7 @@ public class GRpcAgentFileStreamServiceImpl
             final AgentFileChunkObserver agentFileChunkObserver,
             @Nullable final Throwable t
         ) {
+            log.info("Removing file transfer: {}", t == null ? "completed" : t.getMessage());
             // Received error or completion on a transfer stream.
             final FileTransfer fileTransfer = this.findFileTransfer(agentFileChunkObserver);
             if (fileTransfer != null) {
@@ -732,6 +735,7 @@ public class GRpcAgentFileStreamServiceImpl
         @Override
         public void onError(final Throwable t) {
             this.transferManager.removeTransferStream(this, t);
+            this.responseObserver.onCompleted();
         }
 
         /**
@@ -740,6 +744,7 @@ public class GRpcAgentFileStreamServiceImpl
         @Override
         public void onCompleted() {
             this.transferManager.removeTransferStream(this, null);
+            this.responseObserver.onCompleted();
         }
     }
 }
