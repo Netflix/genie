@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.ConfigureException;
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
@@ -42,6 +43,8 @@ import com.netflix.genie.proto.ClaimJobResponse;
 import com.netflix.genie.proto.ConfigureRequest;
 import com.netflix.genie.proto.ConfigureResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
+import com.netflix.genie.proto.GetJobStatusRequest;
+import com.netflix.genie.proto.GetJobStatusResponse;
 import com.netflix.genie.proto.HandshakeRequest;
 import com.netflix.genie.proto.HandshakeResponse;
 import com.netflix.genie.proto.JobServiceGrpc;
@@ -263,6 +266,21 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
 
         if (!response.getSuccessful()) {
             throwForChangeJobStatusError(response.getError());
+        }
+    }
+
+    @Override
+    public JobStatus getJobStatus(@NotBlank final String jobId) throws GetJobStatusException {
+        final GetJobStatusRequest request = this.jobServiceProtoConverter.toGetJobStatusRequestProto(jobId);
+
+        final GetJobStatusResponse response = handleResponseFuture((this.client.getJobStatus(request)));
+
+        final String statusString = response.getStatus();
+
+        try {
+            return JobStatus.valueOf(statusString);
+        } catch (IllegalArgumentException e) {
+            throw new GetJobStatusException("Invalid job status in response: " + statusString);
         }
     }
 

@@ -41,6 +41,7 @@ import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ConfigureRequest;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.ExecutionResource;
+import com.netflix.genie.proto.GetJobStatusRequest;
 import com.netflix.genie.proto.HandshakeRequest;
 import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
@@ -343,6 +344,16 @@ public class JobServiceProtoConverter {
             .ifPresent(requestedTimeout -> builder.setTimeout(Int32Value.of(requestedTimeout)));
         builder.setArchivingDisabled(agentConfigRequest.isArchivingDisabled());
         return builder.build();
+    }
+
+    /**
+     * Creates a request to fetch the job status currently seen by the server.
+     *
+     * @param jobId the job id
+     * @return A {@link GetJobStatusRequest} message instance
+     */
+    public GetJobStatusRequest toGetJobStatusRequestProto(final String jobId) {
+        return GetJobStatusRequest.newBuilder().setId(jobId).build();
     }
 
     private JobSpecification.ExecutionResource toExecutionResourceDto(final ExecutionResource protoResource) {
