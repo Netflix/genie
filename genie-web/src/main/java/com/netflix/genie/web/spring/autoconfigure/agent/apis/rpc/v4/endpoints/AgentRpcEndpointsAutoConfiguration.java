@@ -35,6 +35,7 @@ import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AgentFileStreamProperties;
+import com.netflix.genie.web.properties.HeartBeatProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,7 +56,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Slf4j
 @EnableConfigurationProperties(
     {
-        AgentFileStreamProperties.class
+        AgentFileStreamProperties.class,
+        HeartBeatProperties.class,
     }
 )
 public class AgentRpcEndpointsAutoConfiguration {
@@ -112,6 +114,7 @@ public class AgentRpcEndpointsAutoConfiguration {
      * if no other is provided.
      *
      * @param agentConnectionTrackingService The {@link AgentConnectionTrackingService} implementation to use
+     * @param properties                     The service properties
      * @param taskScheduler                  The {@link TaskScheduler} instance to use
      * @param registry                       The meter registry
      * @return A {@link GRpcHeartBeatServiceImpl} instance
@@ -120,10 +123,11 @@ public class AgentRpcEndpointsAutoConfiguration {
     @ConditionalOnMissingBean(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class)
     public GRpcHeartBeatServiceImpl gRpcHeartBeatService(
         final AgentConnectionTrackingService agentConnectionTrackingService,
+        final HeartBeatProperties properties,
         @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
         final MeterRegistry registry
     ) {
-        return new GRpcHeartBeatServiceImpl(agentConnectionTrackingService, taskScheduler, registry);
+        return new GRpcHeartBeatServiceImpl(agentConnectionTrackingService, properties, taskScheduler, registry);
     }
 
     /**

@@ -34,6 +34,7 @@ import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentFileStreamProperties;
+import com.netflix.genie.web.properties.HeartBeatProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -82,6 +83,9 @@ class AgentRpcEndpointsAutoConfigurationTest {
                         .hasSingleBean(GRpcAgentFileStreamServiceImpl.class);
                     Assertions
                         .assertThat(context)
+                        .hasSingleBean(HeartBeatProperties.class);
+                    Assertions
+                        .assertThat(context)
                         .hasSingleBean(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class);
                     Assertions
                         .assertThat(context)
@@ -128,6 +132,9 @@ class AgentRpcEndpointsAutoConfigurationTest {
                     Assertions
                         .assertThat(context)
                         .doesNotHaveBean(GRpcAgentFileStreamServiceImpl.class);
+                    Assertions
+                        .assertThat(context)
+                        .hasSingleBean(HeartBeatProperties.class);
                     Assertions
                         .assertThat(context)
                         .hasSingleBean(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class);

@@ -20,12 +20,13 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 import com.netflix.genie.proto.AgentHeartBeat
 import com.netflix.genie.proto.ServerHeartBeat
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService
-import com.netflix.genie.web.agent.services.AgentRoutingService
+import com.netflix.genie.web.properties.HeartBeatProperties
 import io.grpc.stub.StreamObserver
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
+import java.time.Duration
 import java.util.concurrent.ScheduledFuture
 
 class GRpcHeartBeatServiceImplSpec extends Specification {
@@ -35,11 +36,12 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
     TaskScheduler taskScheduler
     ScheduledFuture taskFuture
     Runnable task
+    HeartBeatProperties props
 
     void setup() {
         this.taskFuture = Mock(ScheduledFuture)
         this.taskScheduler = Mock(TaskScheduler) {
-            1 * scheduleWithFixedDelay(_ as Runnable, _ as Long) >> {
+            scheduleWithFixedDelay(_ as Runnable, _ as Duration) >> {
                 args ->
                     this.task = args[0] as Runnable
                     return taskFuture
@@ -47,7 +49,8 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         }
         this.agentConnectionTrackingService = Mock(AgentConnectionTrackingService)
         this.responseObserver = Mock(StreamObserver)
-        this.service = new GRpcHeartBeatServiceImpl(agentConnectionTrackingService, taskScheduler, new SimpleMeterRegistry())
+        this.props = new HeartBeatProperties()
+        this.service = new GRpcHeartBeatServiceImpl(agentConnectionTrackingService, props, taskScheduler, new SimpleMeterRegistry())
         assert task != null
     }
 

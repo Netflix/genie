@@ -77,6 +77,11 @@ Whereas static properties values are bound during application startup and do not
 |
 |yes
 
+|genie.agent.heart-beat.send-interval
+|Interval for sending heartbeats to all connected clients.
+|5s
+|no
+
 |genie.agent.launcher.local.additional-environment
 |Environment variables to set when spawning an agent (in addition to the inherited server environment)
 |
