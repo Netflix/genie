@@ -24,6 +24,7 @@ import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.ServerHeartBeat;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.properties.HeartBeatProperties;
 import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +47,9 @@ import java.util.concurrent.ScheduledFuture;
 @Slf4j
 public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImplBase {
 
-    private static final long HEART_BEAT_PERIOD_MILLIS = 5_000L; // TODO make configurable
     private static final String HEARTBEATING_GAUGE_NAME = "genie.agents.heartbeating.gauge";
     private final AgentConnectionTrackingService agentConnectionTrackingService;
+    private final HeartBeatProperties properties;
     private final Map<String, AgentStreamRecord> activeStreamsMap = Maps.newHashMap();
     private final ScheduledFuture<?> sendHeartbeatsFuture;
     private final MeterRegistry registry;
@@ -57,18 +58,21 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
      * Constructor.
      *
      * @param agentConnectionTrackingService The {@link AgentRoutingService} implementation to use
+     * @param properties                     The service properties
      * @param taskScheduler                  The {@link TaskScheduler} instance to use
      * @param registry                       The meter registry
      */
     public GRpcHeartBeatServiceImpl(
         final AgentConnectionTrackingService agentConnectionTrackingService,
+        final HeartBeatProperties properties,
         final TaskScheduler taskScheduler,
         final MeterRegistry registry
     ) {
         this.agentConnectionTrackingService = agentConnectionTrackingService;
+        this.properties = properties;
         this.sendHeartbeatsFuture = taskScheduler.scheduleWithFixedDelay(
             this::sendHeartbeats,
-            HEART_BEAT_PERIOD_MILLIS
+            this.properties.getSendInterval()
         );
         this.registry = registry;
         this.registry.gaugeMapSize(HEARTBEATING_GAUGE_NAME, Sets.newHashSet(), activeStreamsMap);

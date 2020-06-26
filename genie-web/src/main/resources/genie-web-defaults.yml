@@ -38,6 +38,8 @@ genie:
       stalled-transfer-timeout: 20s
       stalled-transfer-check-interval: 5s
       write-retry-delay: 300ms
+    heart-beat:
+      send-interval: 5s
   file:
     cache:
       location: file://${java.io.tmpdir:/tmp}/genie/cache
