@@ -251,4 +251,16 @@ public class AgentJobServiceImpl implements AgentJobService {
             throw new GenieJobNotFoundException(e);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobStatus getJobStatus(@NotBlank final String id) {
+        try {
+            return this.persistenceService.getJobStatus(id);
+        } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e);
+        }
+    }
 }

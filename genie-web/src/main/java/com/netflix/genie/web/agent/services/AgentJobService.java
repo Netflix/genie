@@ -58,8 +58,8 @@ public interface AgentJobService {
      * Provide configuration properties for an agent that is beginning to execute a job.
      *
      * @param agentMetadata The metadata about the agent starting to run a given job
-     * @throws ConstraintViolationException If the arguments fail validation
      * @return a map of properties for the agent
+     * @throws ConstraintViolationException If the arguments fail validation
      */
     Map<String, String> getAgentProperties(@Valid AgentClientMetadata agentMetadata);
 
@@ -144,4 +144,14 @@ public interface AgentJobService {
         JobStatus newStatus,
         @Nullable String newStatusMessage
     );
+
+    /**
+     * Retrieve the status of the job identified with {@code id}.
+     *
+     * @param id The id of the job to look up.
+     * @return the current status of the job, as seen by this node
+     * @throws GenieJobNotFoundException    if no job with the given {@code id} exists
+     * @throws ConstraintViolationException If the arguments fail validation
+     */
+    JobStatus getJobStatus(@NotBlank String id);
 }

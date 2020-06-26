@@ -19,6 +19,7 @@ package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.ConfigureException
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException
 import com.netflix.genie.agent.execution.exceptions.HandshakeException
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException
 import com.netflix.genie.agent.execution.exceptions.JobReservationException
@@ -40,6 +41,8 @@ import com.netflix.genie.proto.ClaimJobResponse
 import com.netflix.genie.proto.ConfigureRequest
 import com.netflix.genie.proto.ConfigureResponse
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
+import com.netflix.genie.proto.GetJobStatusRequest
+import com.netflix.genie.proto.GetJobStatusResponse
 import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.HandshakeResponse
 import com.netflix.genie.proto.JobServiceGrpc
@@ -71,6 +74,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     JobSpecificationResponse jobSpecificationResponse
     ClaimJobResponse claimJobResponse
     ChangeJobStatusResponse changeJobStatusResponse
+    GetJobStatusResponse getJobStatusResponse
 
     void setup() {
         this.grpcServerRule.getServiceRegistry().addService(new TestService())
@@ -545,6 +549,31 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         thrown(GenieRuntimeException)
     }
 
+    def "Get job status -- successful"() {
+        this.getJobStatusResponse = GetJobStatusResponse.newBuilder().setStatus(JobStatus.RUNNING.name()).build()
+        GetJobStatusRequest request = GetJobStatusRequest.getDefaultInstance()
+
+        when:
+        service.getJobStatus(id)
+
+        then:
+        1 * protoConverter.toGetJobStatusRequestProto(id) >> request
+    }
+
+
+    def "Get job status -- invalid response"() {
+        this.getJobStatusResponse = GetJobStatusResponse.getDefaultInstance()
+        GetJobStatusRequest request = GetJobStatusRequest.getDefaultInstance()
+
+        when:
+        service.getJobStatus(id)
+
+        then:
+        1 * protoConverter.toGetJobStatusRequestProto(id) >> request
+
+        thrown(GetJobStatusException)
+    }
+
     private class TestService extends JobServiceGrpc.JobServiceImplBase {
         @Override
         void handshake(final HandshakeRequest request, final StreamObserver<HandshakeResponse> responseObserver) {
@@ -602,6 +631,14 @@ class GRpcAgentJobServiceImplSpec extends Specification {
             final StreamObserver<ChangeJobStatusResponse> responseObserver
         ) {
             sendResponse(responseObserver, changeJobStatusResponse)
+        }
+
+        @Override
+        void getJobStatus(
+            final GetJobStatusRequest getJobStatusRequest,
+            final StreamObserver<GetJobStatusResponse> responseObserver
+        ) {
+            sendResponse(responseObserver, getJobStatusResponse)
         }
 
         private <ResponseType> void sendResponse(

@@ -36,6 +36,7 @@ import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.ConfigureRequest
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
+import com.netflix.genie.proto.GetJobStatusRequest
 import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
@@ -464,6 +465,15 @@ class JobServiceProtoConverterSpec extends Specification {
         then:
         agentConfigRequestWithOptionals == dtoWithOptionals
         agentConfigRequestWithoutOptionals == dtoWithoutOptionals
+    }
+
+    def "Can create GetJobStatusRequest"() {
+        when:
+        GetJobStatusRequest proto = converter.toGetJobStatusRequestProto(id)
+
+        then:
+        proto != null
+        proto.getId() == id
     }
 
     AgentJobRequest createJobRequest(String id) {

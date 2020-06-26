@@ -24,6 +24,7 @@ import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentConfigurationService
@@ -305,5 +306,28 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * persistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
+    }
+
+    def "Can get job status"() {
+        def id = UUID.randomUUID().toString()
+        def status = JobStatus.KILLED
+
+        when:
+        def s = service.getJobStatus(id)
+
+        then:
+        1 * persistenceService.getJobStatus(id) >> status
+        s == status
+    }
+
+    def "Can handle get job status not found"() {
+        def id = UUID.randomUUID().toString()
+
+        when:
+        service.getJobStatus(id)
+
+        then:
+        1 * persistenceService.getJobStatus(id) >> { throw new NotFoundException("...") }
+        thrown(GenieJobNotFoundException)
     }
 }

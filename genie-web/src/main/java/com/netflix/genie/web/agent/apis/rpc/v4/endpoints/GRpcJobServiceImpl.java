@@ -29,6 +29,8 @@ import com.netflix.genie.proto.ClaimJobResponse;
 import com.netflix.genie.proto.ConfigureRequest;
 import com.netflix.genie.proto.ConfigureResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
+import com.netflix.genie.proto.GetJobStatusRequest;
+import com.netflix.genie.proto.GetJobStatusResponse;
 import com.netflix.genie.proto.HandshakeRequest;
 import com.netflix.genie.proto.HandshakeResponse;
 import com.netflix.genie.proto.JobServiceGrpc;
@@ -280,5 +282,28 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             responseObserver.onNext(protoErrorComposer.toProtoChangeJobStatusResponse(e));
         }
         responseObserver.onCompleted();
+    }
+
+    /**
+     * When the agent wants to confirm it's status is still the expected one (i.e. that the leader didn't mark the
+     * job failed).
+     *
+     * @param request          The request containing the job id to look up
+     * @param responseObserver The observer to send a response with
+     */
+    @Override
+    public void getJobStatus(
+        final GetJobStatusRequest request,
+        final StreamObserver<GetJobStatusResponse> responseObserver
+    ) {
+        final String id = request.getId();
+        try {
+            final JobStatus status = this.agentJobService.getJobStatus(id);
+            responseObserver.onNext(GetJobStatusResponse.newBuilder().setStatus(status.name()).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error retrieving job {} status: {}", id, e.getMessage());
+            responseObserver.onError(e);
+        }
     }
 }

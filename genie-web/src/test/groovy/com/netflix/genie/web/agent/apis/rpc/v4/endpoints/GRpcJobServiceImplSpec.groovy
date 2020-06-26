@@ -18,6 +18,7 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.google.common.collect.Maps
+import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
@@ -35,6 +36,8 @@ import com.netflix.genie.proto.ClaimJobResponse
 import com.netflix.genie.proto.ConfigureRequest
 import com.netflix.genie.proto.ConfigureResponse
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
+import com.netflix.genie.proto.GetJobStatusRequest
+import com.netflix.genie.proto.GetJobStatusResponse
 import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.HandshakeResponse
 import com.netflix.genie.proto.JobSpecificationRequest
@@ -63,6 +66,7 @@ class GRpcJobServiceImplSpec extends Specification {
     StreamObserver<JobSpecificationResponse> jobSpecificationResponseObserver
     StreamObserver<ClaimJobResponse> claimJobResponseObserver
     StreamObserver<ChangeJobStatusResponse> changeJobStatusResponseObserver
+    StreamObserver<GetJobStatusResponse> getJobStatusResponseObserver
     JobServiceProtoConverter jobServiceProtoConverter
 
     def setup() {
@@ -77,6 +81,7 @@ class GRpcJobServiceImplSpec extends Specification {
         this.jobSpecificationResponseObserver = Mock(StreamObserver)
         this.claimJobResponseObserver = Mock(StreamObserver)
         this.changeJobStatusResponseObserver = Mock(StreamObserver)
+        this.getJobStatusResponseObserver = Mock(StreamObserver)
     }
 
     def "Handshake -- successful"() {
@@ -404,5 +409,44 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * errorMessageComposer.toProtoChangeJobStatusResponse(_ as IllegalArgumentException) >> response
         1 * changeJobStatusResponseObserver.onNext(response)
         1 * changeJobStatusResponseObserver.onCompleted()
+    }
+
+    def "Get job status -- successful"() {
+        JobStatus currentStatus = JobStatus.INIT
+        GetJobStatusRequest request = GetJobStatusRequest.newBuilder()
+            .setId(id)
+            .build()
+        GetJobStatusResponse responseCapture
+
+        when:
+        gRpcJobService.getJobStatus(request, getJobStatusResponseObserver)
+
+        then:
+        1 * agentJobService.getJobStatus(id) >> currentStatus
+        1 * getJobStatusResponseObserver.onNext(_ as GetJobStatusResponse) >> {
+            GetJobStatusResponse response ->
+                responseCapture = response
+        }
+        1 * getJobStatusResponseObserver.onCompleted()
+        responseCapture != null
+
+        expect:
+        responseCapture.getStatus() == currentStatus.name()
+    }
+
+    def "Get job status -- service exception"() {
+        Exception e = new GenieJobNotFoundException("...")
+        GetJobStatusRequest request = GetJobStatusRequest.newBuilder()
+            .setId(id)
+            .build()
+
+        when:
+        gRpcJobService.getJobStatus(request, getJobStatusResponseObserver)
+
+        then:
+        1 * agentJobService.getJobStatus(id) >> {
+            throw e
+        }
+        1 * getJobStatusResponseObserver.onError(e)
     }
 }

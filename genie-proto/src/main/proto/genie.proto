@@ -51,6 +51,7 @@ service JobService {
     rpc resolveJobSpecificationDryRun (DryRunJobSpecificationRequest) returns (JobSpecificationResponse);
     rpc claimJob (ClaimJobRequest) returns (ClaimJobResponse);
     rpc changeJobStatus (ChangeJobStatusRequest) returns (ChangeJobStatusResponse);
+    rpc getJobStatus (GetJobStatusRequest) returns (GetJobStatusResponse);
 }
 
 message JobMetadata {
@@ -243,6 +244,14 @@ message ChangeJobStatusError {
 message ChangeJobStatusResponse {
     bool successful = 1;
     ChangeJobStatusError error = 2;
+}
+
+message GetJobStatusRequest {
+    string id = 1;
+}
+
+message GetJobStatusResponse {
+    string status = 1;
 }
 
 message ConfigureRequest {

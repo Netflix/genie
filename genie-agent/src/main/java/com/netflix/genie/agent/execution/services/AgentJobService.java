@@ -19,6 +19,7 @@ package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.ConfigureException;
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
@@ -57,8 +58,8 @@ public interface AgentJobService {
      * Obtain server-provided configuration properties.
      *
      * @param agentClientMetadata metadata about the client making this request
-     * @throws ConfigureException if the server properties cannot be obtained
      * @return a map of properties
+     * @throws ConfigureException if the server properties cannot be obtained
      */
     Map<String, String> configure(
         @Valid AgentClientMetadata agentClientMetadata
@@ -140,4 +141,15 @@ public interface AgentJobService {
         JobStatus newJobStatus,
         String message
     ) throws ChangeJobStatusException;
+
+    /**
+     * Retrieve the current job status for the given job id.
+     *
+     * @param jobId the id of the job
+     * @return the job status seen by the server
+     * @throws GetJobStatusException when the agent fails to retrieve the job status
+     */
+    JobStatus getJobStatus(
+        @NotBlank String jobId
+    ) throws GetJobStatusException;
 }
