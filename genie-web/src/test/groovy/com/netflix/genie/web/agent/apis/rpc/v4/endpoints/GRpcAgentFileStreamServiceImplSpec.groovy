@@ -182,7 +182,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         streamTerminationClosure.call(controlStreamRequestObserver)
 
         then:
-        noExceptionThrown()
+        1 * controlStreamResponseObserver.onCompleted()
 
         when: "Request file transfer"
         Optional<Resource> resource = service.getResource(jobId, relativePath, uri, null)
@@ -211,7 +211,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         streamTerminationClosure.call(controlStreamRequestObserver)
 
         then:
-        noExceptionThrown()
+        1 * controlStreamResponseObserver.onCompleted()
 
         where:
         description         | streamTerminationClosure
@@ -257,7 +257,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         controlStreamRequestObserver1.onError(new RuntimeException("..."))
 
         then:
-        0 * controlStreamResponseObserver._
+        1 * controlStreamResponseObserver1.onCompleted()
 
         when: "Another Control stream established and error after sending a manifest"
         controlStreamRequestObserver2 = this.service.sync(controlStreamResponseObserver2)
@@ -347,6 +347,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         bytesRead = inputStream.read(new byte[512])
 
         then:
+        1 * transferStreamResponseObserver.onCompleted()
         bytesRead == -1
 
         where:
@@ -401,6 +402,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         StreamObserver<AgentFileMessage> transferStreamRequestObserver
         int bytesRead
         Optional<Resource> resource
+        Runnable streamTimeoutTask
 
         when: "Control stream established"
         controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
@@ -441,8 +443,14 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
 
         then:
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                streamTimeoutTask = r
+                return null
+        }
         transferStreamRequestObserver != null
         resource.isPresent()
+        streamTimeoutTask != null
 
         when: "Timeout transfer before the stream sends its first message"
         stalledTransfersTask.run()
@@ -450,6 +458,12 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         then:
         1 * serviceProperties.getStalledTransferTimeout() >> Duration.ofSeconds(-1)
         0 * transferStreamResponseObserver.onError(_ as TimeoutException)
+
+        when:
+        streamTimeoutTask.run()
+
+        then:
+        1 * transferStreamResponseObserver.onError(_ as TimeoutException)
 
         when: "Read data"
         resource.get().getInputStream().read(new byte[512])
@@ -503,13 +517,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         transferStreamRequestObserver.onError(new RuntimeException("..."));
 
         then:
-        0 * transferStreamResponseObserver.onError(_ as TimeoutException)
+        1 * transferStreamResponseObserver.onCompleted()
 
         when: "Unclaimed stream timeout after error"
         streamTimeoutTask.run()
 
         then:
-        0 * transferStreamResponseObserver.onError(_ as TimeoutException)
+        0 * transferStreamResponseObserver._
     }
 
     def "In progress stream error"() {
@@ -563,7 +577,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         transferStreamRequestObserver.onError(new RuntimeException("..."))
 
         then:
-        noExceptionThrown()
+        1 * transferStreamResponseObserver.onCompleted()
 
         when: "Read data"
         inputStream = resource.get().getInputStream()
