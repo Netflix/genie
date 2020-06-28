@@ -17,19 +17,15 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.converters;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.netflix.genie.common.dto.CommonDTO;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.UserResourcesSummary;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.BaseProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
@@ -80,7 +76,7 @@ public final class EntityV3DtoConverters {
         jobProjection.getCommandName().ifPresent(builder::withCommandName);
         jobProjection.getGrouping().ifPresent(builder::withGrouping);
         jobProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
-        setDtoMetadata(builder, jobProjection);
+        jobProjection.getMetadata().ifPresent(builder::withMetadata);
 
         return builder.build();
     }
@@ -139,7 +135,7 @@ public final class EntityV3DtoConverters {
             .ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
         jobRequestProjection.getGrouping().ifPresent(builder::withGrouping);
         jobRequestProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
-        setDtoMetadata(builder, jobRequestProjection);
+        jobRequestProjection.getMetadata().ifPresent(builder::withMetadata);
 
         return builder.build();
     }
@@ -209,21 +205,5 @@ public final class EntityV3DtoConverters {
             jobCount == null ? 0 : jobCount,
             memory == null ? 0 : memory
         );
-    }
-
-    private static <B extends CommonDTO.Builder, E extends BaseProjection> void setDtoMetadata(
-        final B builder,
-        final E entity
-    ) {
-        if (entity.getMetadata().isPresent()) {
-            try {
-                final String metadata = entity.getMetadata().get();
-                builder.withMetadata(metadata);
-            } catch (final GeniePreconditionException gpe) {
-                // Since the DTO can't be constructed on input with invalid JSON this should never even happen
-                log.error("Invalid JSON metadata. Should never happen.", gpe);
-                builder.withMetadata((JsonNode) null);
-            }
-        }
     }
 }

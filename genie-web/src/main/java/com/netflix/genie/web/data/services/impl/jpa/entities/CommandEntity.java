@@ -17,7 +17,9 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,11 +30,13 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -128,6 +132,7 @@ import java.util.Set;
             name = CommandEntity.DTO_ENTITY_GRAPH,
             attributeNodes = {
                 @NamedAttributeNode("executable"),
+                @NamedAttributeNode("launcherExt"),
                 @NamedAttributeNode("setupFile"),
                 @NamedAttributeNode("configs"),
                 @NamedAttributeNode("dependencies"),
@@ -198,6 +203,13 @@ public class CommandEntity extends BaseEntity {
     @Column(name = "memory")
     @Min(1)
     private Integer memory;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "launcher_ext", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
+    @ToString.Exclude
+    private JsonNode launcherExt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -325,6 +337,24 @@ public class CommandEntity extends BaseEntity {
      */
     public Optional<Integer> getMemory() {
         return Optional.ofNullable(this.memory);
+    }
+
+    /**
+     * Get any metadata associated with this command pertaining to specifying details for various agent launchers.
+     *
+     * @return The metadata or {@link Optional#empty()} if there isn't any
+     */
+    public Optional<JsonNode> getLauncherExt() {
+        return Optional.ofNullable(this.launcherExt);
+    }
+
+    /**
+     * Set any metadata pertaining to additional instructions for various launchers if this command is used.
+     *
+     * @param launcherExt The metadata
+     */
+    public void setLauncherExt(@Nullable final JsonNode launcherExt) {
+        this.launcherExt = launcherExt;
     }
 
     /**

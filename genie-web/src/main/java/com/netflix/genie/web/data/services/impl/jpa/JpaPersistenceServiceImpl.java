@@ -1294,7 +1294,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         );
 
         final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
-        final JobEntity jobEntity = this.v3DtosToJobEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
+        final JobEntity jobEntity = this.v3ObjectsToJobEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
         try {
             this.jobRepository.save(jobEntity);
         } catch (final DataIntegrityViolationException e) {
@@ -2629,7 +2629,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         entity.setUser(metadata.getUser());
         entity.setVersion(metadata.getVersion());
         entity.setDescription(metadata.getDescription().orElse(null));
-        EntityV4DtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
+        entity.setMetadata(metadata.getMetadata().orElse(null));
         entity.setSetupFile(setupFile == null ? null : this.createOrGetFileEntity(setupFile));
     }
 
@@ -2712,7 +2712,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         }
     }
 
-    private JobEntity v3DtosToJobEntity(
+    private JobEntity v3ObjectsToJobEntity(
         final String id,
         final com.netflix.genie.common.dto.JobRequest jobRequest,
         final com.netflix.genie.common.dto.JobMetadata jobMetadata,
@@ -2729,9 +2729,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         jobEntity.setVersion(jobRequest.getVersion());
         jobEntity.setStatus(JobStatus.INIT.name());
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
-        jobRequest
-            .getMetadata()
-            .ifPresent(metadata -> EntityV4DtoConverters.setJsonField(metadata, jobEntity::setMetadata));
+        jobRequest.getMetadata().ifPresent(jobEntity::setMetadata);
         jobRequest.getCommandArgs().ifPresent(commandArgs -> jobEntity.setCommandArgs(Lists.newArrayList(commandArgs)));
         jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
         jobRequest.getSetupFile().ifPresent(setupFile -> jobEntity.setSetupFile(this.createOrGetFileEntity(setupFile)));
@@ -2861,9 +2859,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         jobEntity.setRequestedEnvironmentVariables(requestedJobEnvironment.getRequestedEnvironmentVariables());
         requestedJobEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
         requestedJobEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
-        requestedJobEnvironment.getExt().ifPresent(
-            jsonNode -> EntityV4DtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentEnvironmentExt)
-        );
+        requestedJobEnvironment.getExt().ifPresent(jobEntity::setRequestedAgentEnvironmentExt);
     }
 
     private void setRequestedAgentConfigFields(
@@ -2876,9 +2872,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             .getRequestedJobDirectoryLocation()
             .ifPresent(location -> jobEntity.setRequestedJobDirectoryLocation(location.getAbsolutePath()));
         requestedAgentConfig.getTimeoutRequested().ifPresent(jobEntity::setRequestedTimeout);
-        requestedAgentConfig.getExt().ifPresent(
-            jsonNode -> EntityV4DtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentConfigExt)
-        );
+        requestedAgentConfig.getExt().ifPresent(jobEntity::setRequestedAgentConfigExt);
     }
 
     private void setRequestMetadataFields(

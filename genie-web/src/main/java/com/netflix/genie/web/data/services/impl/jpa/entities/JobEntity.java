@@ -17,7 +17,9 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.data.services.impl.jpa.listeners.JobEntityListener;
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.PredicateUtils;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApiProjection;
@@ -32,7 +34,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobReque
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobSearchProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.StatusProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
 import lombok.AccessLevel;
@@ -45,6 +46,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -166,6 +168,7 @@ import java.util.Set;
                 @NamedAttributeNode("dependencies"),
                 @NamedAttributeNode("configs"),
                 @NamedAttributeNode("requestedApplications"),
+                @NamedAttributeNode("requestedLauncherExt"),
             },
             subgraphs = {
                 @NamedSubgraph(
@@ -307,7 +310,6 @@ public class JobEntity extends BaseEntity implements
     V4JobRequestProjection,
     JobSpecificationProjection,
     JobArchiveLocationProjection,
-    IsV4JobProjection,
     JobApiProjection,
     StatusProjection {
 
@@ -536,14 +538,16 @@ public class JobEntity extends BaseEntity implements
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "requested_agent_config_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
     @ToString.Exclude
-    private String requestedAgentConfigExt;
+    private JsonNode requestedAgentConfigExt;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "requested_agent_environment_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
     @ToString.Exclude
-    private String requestedAgentEnvironmentExt;
+    private JsonNode requestedAgentEnvironmentExt;
 
     @Basic
     @Column(name = "timeout_used")
@@ -552,6 +556,24 @@ public class JobEntity extends BaseEntity implements
     @Basic(optional = false)
     @Column(name = "api", nullable = false)
     private boolean api = true;
+
+    @Basic
+    @Column(name = "archive_status", length = 20)
+    private String archiveStatus;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "requested_launcher_ext", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
+    @ToString.Exclude
+    private JsonNode requestedLauncherExt;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "launcher_ext", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
+    @ToString.Exclude
+    private JsonNode launcherExt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id")
@@ -1143,7 +1165,7 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getRequestedAgentEnvironmentExt() {
+    public Optional<JsonNode> getRequestedAgentEnvironmentExt() {
         return Optional.ofNullable(this.requestedAgentEnvironmentExt);
     }
 
@@ -1151,7 +1173,7 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getRequestedAgentConfigExt() {
+    public Optional<JsonNode> getRequestedAgentConfigExt() {
         return Optional.ofNullable(this.requestedAgentConfigExt);
     }
 
@@ -1194,6 +1216,60 @@ public class JobEntity extends BaseEntity implements
      */
     public Optional<String> getNotifiedJobStatus() {
         return Optional.ofNullable(this.notifiedJobStatus);
+    }
+
+    /**
+     * Get the archive status for the job if there is one.
+     *
+     * @return The archive status or {@link Optional#empty()} if there is none
+     */
+    public Optional<String> getArchiveStatus() {
+        return Optional.ofNullable(this.archiveStatus);
+    }
+
+    /**
+     * Set the archive status for this job.
+     *
+     * @param archiveStatus The new archive status
+     */
+    public void setArchiveStatus(@Nullable final String archiveStatus) {
+        this.archiveStatus = archiveStatus;
+    }
+
+    /**
+     * Get any metadata the user provided with respect to the launcher.
+     *
+     * @return The metadata or {@link Optional#empty()} if there isn't any
+     */
+    public Optional<JsonNode> getRequestedLauncherExt() {
+        return Optional.ofNullable(this.requestedLauncherExt);
+    }
+
+    /**
+     * Set any metadata pertaining to the launcher that was provided by the user.
+     *
+     * @param requestedLauncherExt The metadata
+     */
+    public void setRequestedLauncherExt(@Nullable final JsonNode requestedLauncherExt) {
+        this.requestedLauncherExt = requestedLauncherExt;
+    }
+
+    /**
+     * Get any metadata associated with this job pertaining to the launcher that launched it.
+     *
+     * @return The metadata or {@link Optional#empty()} if there isn't any
+     */
+    public Optional<JsonNode> getLauncherExt() {
+        return Optional.ofNullable(this.launcherExt);
+    }
+
+    /**
+     * Set any metadata pertaining to the launcher that launched this job.
+     *
+     * @param launcherExt The metadata
+     */
+    public void setLauncherExt(@Nullable final JsonNode launcherExt) {
+        this.launcherExt = launcherExt;
     }
 
     /**

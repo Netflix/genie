@@ -48,7 +48,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobAppli
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobCommandProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
@@ -763,10 +762,6 @@ class JpaPersistenceServiceImplJobsTest {
 
     @Test
     void noJobUnableToGetV4() {
-        Mockito
-            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
-            .thenReturn(Optional.empty());
-
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.persistenceService.isV4(UUID.randomUUID().toString()));
