@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.validation.ConstraintViolationException;
 import java.util.UUID;
@@ -34,7 +36,7 @@ class BaseEntityTest extends EntityTestBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
-    private static final String METADATA = "{\"key\": \"value\"}";
+    private static final JsonNode METADATA = Mockito.mock(JsonNode.class);
 
     private BaseEntity b;
 

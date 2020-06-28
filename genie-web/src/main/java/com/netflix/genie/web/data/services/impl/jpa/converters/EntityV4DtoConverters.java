@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.converters;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.Application;
@@ -34,7 +32,6 @@ import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
-import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
@@ -53,10 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -91,7 +86,7 @@ public final class EntityV4DtoConverters {
 
         applicationEntity.getType().ifPresent(metadataBuilder::withType);
         applicationEntity.getDescription().ifPresent(metadataBuilder::withDescription);
-        applicationEntity.getMetadata().ifPresent(metadata -> setJsonField(metadata, metadataBuilder::withMetadata));
+        applicationEntity.getMetadata().ifPresent(metadataBuilder::withMetadata);
 
         return new Application(
             applicationEntity.getUniqueId(),
@@ -123,7 +118,7 @@ public final class EntityV4DtoConverters {
             .withTags(clusterEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
         clusterEntity.getDescription().ifPresent(metadataBuilder::withDescription);
-        clusterEntity.getMetadata().ifPresent(metadata -> setJsonField(metadata, metadataBuilder::withMetadata));
+        clusterEntity.getMetadata().ifPresent(metadataBuilder::withMetadata);
 
         return new Cluster(
             clusterEntity.getUniqueId(),
@@ -155,7 +150,7 @@ public final class EntityV4DtoConverters {
             .withTags(commandEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
         commandEntity.getDescription().ifPresent(metadataBuilder::withDescription);
-        commandEntity.getMetadata().ifPresent(metadata -> setJsonField(metadata, metadataBuilder::withMetadata));
+        commandEntity.getMetadata().ifPresent(metadataBuilder::withMetadata);
 
         return new Command(
             commandEntity.getUniqueId(),
@@ -202,9 +197,7 @@ public final class EntityV4DtoConverters {
         jobMetadataBuilder.withTags(
             jobRequestProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet())
         );
-        jobRequestProjection
-            .getMetadata()
-            .ifPresent(metadata -> setJsonField(metadata, jobMetadataBuilder::withMetadata));
+        jobRequestProjection.getMetadata().ifPresent(jobMetadataBuilder::withMetadata);
 
         // Rebuild the execution resource criteria
         final ImmutableList.Builder<Criterion> clusterCriteria = ImmutableList.builder();
@@ -227,9 +220,7 @@ public final class EntityV4DtoConverters {
 
         // Rebuild the Agent Config Request
         final AgentConfigRequest.Builder agentConfigRequestBuilder = new AgentConfigRequest.Builder();
-        jobRequestProjection
-            .getRequestedAgentConfigExt()
-            .ifPresent(ext -> setJsonField(ext, agentConfigRequestBuilder::withExt));
+        jobRequestProjection.getRequestedAgentConfigExt().ifPresent(agentConfigRequestBuilder::withExt);
         jobRequestProjection
             .getRequestedJobDirectoryLocation()
             .ifPresent(agentConfigRequestBuilder::withRequestedJobDirectoryLocation);
@@ -239,9 +230,7 @@ public final class EntityV4DtoConverters {
 
         // Rebuild the Agent Environment Request
         final JobEnvironmentRequest.Builder jobEnvironmentRequestBuilder = new JobEnvironmentRequest.Builder();
-        jobRequestProjection
-            .getRequestedAgentEnvironmentExt()
-            .ifPresent(ext -> setJsonField(ext, jobEnvironmentRequestBuilder::withExt));
+        jobRequestProjection.getRequestedAgentEnvironmentExt().ifPresent(jobEnvironmentRequestBuilder::withExt);
         jobEnvironmentRequestBuilder
             .withRequestedEnvironmentVariables(jobRequestProjection.getRequestedEnvironmentVariables());
         jobRequestProjection.getRequestedCpu().ifPresent(jobEnvironmentRequestBuilder::withRequestedJobCpu);
@@ -331,10 +320,7 @@ public final class EntityV4DtoConverters {
                 .collect(Collectors.toSet())
         );
 
-        finishedJobProjection.getMetadata().ifPresent(
-            metadata ->
-                setJsonField(metadata, builder::withMetadata)
-        );
+        finishedJobProjection.getMetadata().ifPresent(builder::withMetadata);
 
         finishedJobProjection.getCommand().ifPresent(
             commandEntity ->
@@ -354,45 +340,6 @@ public final class EntityV4DtoConverters {
         );
 
         return builder.build();
-    }
-
-    /**
-     * Write a JSON string into the consumer function as a JSON node.
-     *
-     * @param json     The JSON string to serialize into a JSON node.
-     * @param consumer The consuming function of the JSON node.
-     */
-    static void setJsonField(final String json, final Consumer<JsonNode> consumer) {
-        try {
-            consumer.accept(GenieObjectMapper.getMapper().readTree(json));
-        } catch (final IOException ioe) {
-            // Should never happen as preconditions for all inputs would have been checked before persistence happened
-            log.error("Reading JSON string {} into JSON node failed with error {}", json, ioe.getMessage(), ioe);
-            // Could recurse here and pass error json back through this method but don't want infinite loop
-            consumer.accept(null);
-        }
-    }
-
-    /**
-     * Given a JSON node convert it to a string representation and hand it to the consumer.
-     *
-     * @param json     The JSON node to convert. If null {@literal null} will be passed to the consumer
-     * @param consumer The consumer function to call with the string representation
-     */
-    public static void setJsonField(@Nullable final JsonNode json, final Consumer<String> consumer) {
-        if (json != null) {
-            try {
-                consumer.accept(GenieObjectMapper.getMapper().writeValueAsString(json));
-            } catch (final JsonProcessingException jpe) {
-                // Should never happen as the JSON was valid to get to a JSON node in the first place
-                log.error("Unable to write JSON node {} as string due to {}", json, jpe.getMessage(), jpe);
-                consumer.accept("{\"jsonProcessingException\": \"" + jpe.getMessage() + "\"}");
-            }
-        } else {
-            // Here this method is used to update entities so sometimes we'll want to set the value to null if a user
-            // is requesting we clear out a value via an update call
-            consumer.accept(null);
-        }
     }
 
     /**

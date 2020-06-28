@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.projections;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Optional;
 
 /**
@@ -65,7 +67,7 @@ public interface BaseProjection extends UniqueIdProjection {
     /**
      * Get the metadata of this entity which is unstructured JSON.
      *
-     * @return Optional of the metadata json node represented as a string
+     * @return Optional of the metadata json node
      */
-    Optional<String> getMetadata();
+    Optional<JsonNode> getMetadata();
 }

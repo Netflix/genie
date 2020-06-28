@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.BaseProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.SetupFileProjection;
 import lombok.Getter;
@@ -26,6 +28,7 @@ import lombok.ToString;
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
@@ -83,8 +86,9 @@ public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupF
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "metadata", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
     @ToString.Exclude
-    private String metadata;
+    private JsonNode metadata;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "setup_file")
@@ -119,16 +123,16 @@ public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupF
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getMetadata() {
+    public Optional<JsonNode> getMetadata() {
         return Optional.ofNullable(this.metadata);
     }
 
     /**
      * Set the JSON metadata of this entity.
      *
-     * @param metadata The metadata of this
+     * @param metadata The metadata of this entity
      */
-    public void setMetadata(@Nullable final String metadata) {
+    public void setMetadata(@Nullable final JsonNode metadata) {
         this.metadata = metadata;
     }
 

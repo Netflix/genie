@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
@@ -99,6 +100,7 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(entity.getTags()).isEmpty();
         Assertions.assertThat(entity.getApplications()).isEmpty();
         Assertions.assertThat(entity.getMemory()).isNotPresent();
+        Assertions.assertThat(entity.getLauncherExt()).isNotPresent();
     }
 
     @Test
@@ -446,6 +448,14 @@ class CommandEntityTest extends EntityTestBase {
             .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
             .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
             .isEqualTo(clusterCriteria);
+    }
+
+    @Test
+    void canSetLauncherExt() {
+        Assertions.assertThat(this.c.getLauncherExt()).isNotPresent();
+        final JsonNode launcherMetadata = Mockito.mock(JsonNode.class);
+        this.c.setLauncherExt(launcherMetadata);
+        Assertions.assertThat(this.c.getLauncherExt()).isPresent().contains(launcherMetadata);
     }
 
     private CriterionEntity createTestCriterion() {

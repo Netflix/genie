@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
@@ -82,9 +83,9 @@ public interface FinishedJobProjection extends BaseProjection {
     /**
      * Get the metadata of this entity which is unstructured JSON.
      *
-     * @return Optional of the metadata json node represented as a string
+     * @return Optional of the metadata json node
      */
-    Optional<String> getMetadata();
+    Optional<JsonNode> getMetadata();
 
     /**
      * Get the command arguments the user supplied for this job.

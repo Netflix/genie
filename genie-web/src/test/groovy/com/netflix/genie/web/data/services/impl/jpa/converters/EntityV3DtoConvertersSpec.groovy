@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.converters
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.UserResourcesSummary
-import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity
@@ -59,7 +59,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         def updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
-        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
@@ -100,7 +100,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         job.getStatus() == JobStatus.SUCCEEDED
         job.getStatusMsg().orElseGet(RandomSuppliers.STRING) == statusMessage
         job.getMetadata().isPresent()
-        GenieObjectMapper.getMapper().writeValueAsString(job.getMetadata().get()) == metadata
+        job.getMetadata().get() == metadata
     }
 
     def "Can convert Job Execution Projection to Job Execution DTO"() {
@@ -181,7 +181,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         final Instant updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
-        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
@@ -317,7 +317,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         request.getApplications() == applications
         request.getTimeout().orElseGet(RandomSuppliers.INT) == timeout
         request.getMetadata().isPresent()
-        GenieObjectMapper.getMapper().writeValueAsString(request.getMetadata().get()) == metadata
+        request.getMetadata().get() == metadata
     }
 
     def "Can convert user resources aggregate to a summary DTO"() {

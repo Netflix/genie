@@ -33,7 +33,6 @@ import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
-import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
@@ -51,7 +50,7 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSp
 import spock.lang.Specification
 
 import java.time.Instant
-import java.util.function.Consumer
+
 /**
  * Specifications for {@link EntityV4DtoConverters}.
  *
@@ -73,7 +72,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         def updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
-        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
@@ -119,7 +118,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         application.getResources().getDependencies() == dependencies
         application.getMetadata().getStatus() == ApplicationStatus.ACTIVE
         application.getMetadata().getMetadata().isPresent()
-        GenieObjectMapper.getMapper().writeValueAsString(application.getMetadata().getMetadata().get()) == metadata
+        application.getMetadata().getMetadata().get() == metadata
     }
 
     def "Can convert cluster entity to v4 cluster dto"() {
@@ -137,7 +136,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         def updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
-        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
@@ -186,7 +185,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         cluster.getResources().getDependencies() == dependencies
         cluster.getResources().getSetupFile().orElseGet(RandomSuppliers.STRING) == setupFile
         cluster.getMetadata().getMetadata().isPresent()
-        GenieObjectMapper.getMapper().writeValueAsString(cluster.getMetadata().getMetadata().get()) == metadata
+        cluster.getMetadata().getMetadata().get() == metadata
     }
 
     def "Can convert command entity to v4 command dto"() {
@@ -204,7 +203,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         def created = entity.getCreated()
         def updated = entity.getUpdated()
         entity.setStatus(CommandStatus.DEPRECATED.name())
-        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
@@ -280,7 +279,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         command.getResources().getDependencies() == dependencies
         command.getMemory().orElseGet(RandomSuppliers.INT) == memory
         command.getMetadata().getMetadata().isPresent()
-        GenieObjectMapper.getMapper().writeValueAsString(command.getMetadata().getMetadata().get()) == metadata
+        command.getMetadata().getMetadata().get() == metadata
         command.getCheckDelay() == checkDelay
         command.getClusterCriteria() == clusterCriteria
     }
@@ -291,10 +290,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         def user = UUID.randomUUID().toString()
         def description = UUID.randomUUID().toString()
         def version = UUID.randomUUID().toString()
-        def metadataString = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
-        def metadata = GenieObjectMapper
-            .getMapper()
-            .readTree(metadataString)
+        def metadata = Mock(JsonNode)
         def tags = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -464,11 +460,11 @@ class EntityV4DtoConvertersSpec extends Specification {
         jobEntity.setName(name)
         jobEntity.setUser(user)
         jobEntity.setTags(tags.collect({ tag -> new TagEntity(tag) }).toSet())
-        jobEntity.setMetadata(metadataString)
+        jobEntity.setMetadata(metadata)
         jobEntity.setSetupFile(new FileEntity(setupFile))
-        jobEntity.setRequestedAgentConfigExt(metadataString)
+        jobEntity.setRequestedAgentConfigExt(metadata)
         jobEntity.setRequestedEnvironmentVariables(requestedEnvironmentVariables)
-        jobEntity.setRequestedAgentEnvironmentExt(metadataString)
+        jobEntity.setRequestedAgentEnvironmentExt(metadata)
         jobEntity.setRequestedJobDirectoryLocation(jobDirectoryLocation)
         jobEntity.setCommandArgs(commandArgs)
         jobEntity.setDescription(description)
@@ -524,42 +520,6 @@ class EntityV4DtoConvertersSpec extends Specification {
 
         then:
         jobRequestResult == jobRequest1
-    }
-
-    def "Can set JSON field from string"() {
-        def json = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}"
-        Consumer<JsonNode> consumer = Mock(Consumer)
-
-        when:
-        EntityV4DtoConverters.setJsonField(json, consumer)
-
-        then:
-        1 * consumer.accept(_ as JsonNode)
-
-        when:
-        EntityV4DtoConverters.setJsonField("I'm not valid json", consumer)
-
-        then:
-        1 * consumer.accept(null)
-    }
-
-    def "Can set string field from json"() {
-        def json = GenieObjectMapper
-            .getMapper()
-            .readTree("{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}")
-        Consumer<String> consumer = Mock(Consumer)
-
-        when:
-        EntityV4DtoConverters.setJsonField(json, consumer)
-
-        then:
-        1 * consumer.accept(_ as String)
-
-        when:
-        EntityV4DtoConverters.setJsonField((JsonNode) null, consumer)
-
-        then:
-        1 * consumer.accept(null)
     }
 
     def "Can JobSpecificationProjection to JobSpecification DTO"() {
@@ -948,7 +908,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getExitCode() >> Optional.of(127)
             getArchiveLocation() >> Optional.of("s3://bucket/prefix/job")
             getMemoryUsed() >> Optional.of(1024)
-            getMetadata() >> Optional.of("{ \"foo\" : \"bar\" }")
+            getMetadata() >> Optional.of(Mock(JsonNode))
             getCommand() >> Optional.of(commandEntity)
             getCluster() >> Optional.of(clusterEntity)
             getApplications() >> Lists.newArrayList(applicationEntity)

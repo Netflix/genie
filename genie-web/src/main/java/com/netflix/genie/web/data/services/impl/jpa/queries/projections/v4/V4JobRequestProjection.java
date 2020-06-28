@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
@@ -81,9 +82,9 @@ public interface V4JobRequestProjection {
     /**
      * Get the metadata of this entity which is unstructured JSON.
      *
-     * @return Optional of the metadata json node represented as a string
+     * @return Optional of the metadata json node
      */
-    Optional<String> getMetadata();
+    Optional<JsonNode> getMetadata();
 
     /**
      * Get the command arguments the user supplied for this job.
@@ -131,16 +132,16 @@ public interface V4JobRequestProjection {
     /**
      * Get the extension configuration of a job agent environment.
      *
-     * @return The extension configuration (as valid JSON string) if it exists wrapped in an {@link Optional}
+     * @return The extension configuration if it exists wrapped in an {@link Optional}
      */
-    Optional<String> getRequestedAgentEnvironmentExt();
+    Optional<JsonNode> getRequestedAgentEnvironmentExt();
 
     /**
      * Get the extension configuration of a job agent configuration.
      *
-     * @return The extension configuration (as valid JSON string) if it exists wrapped in an {@link Optional}
+     * @return The extension configuration if it exists wrapped in an {@link Optional}
      */
-    Optional<String> getRequestedAgentConfigExt();
+    Optional<JsonNode> getRequestedAgentConfigExt();
 
     /**
      * Get whether the job was an interactive job or not when launched.
