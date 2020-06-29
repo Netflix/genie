@@ -33,17 +33,20 @@ class JobMonitorServicePropertiesSpec extends Specification {
         p.getMaxFiles() == 64_000
         p.getMaxTotalSize() == DataSize.ofGigabytes(16)
         p.getMaxFileSize() == DataSize.ofGigabytes(8)
+        p.getCheckRemoteJobStatus()
 
         when:
         p.setCheckInterval(Duration.ofSeconds(30))
         p.setMaxFiles(32_000)
         p.setMaxTotalSize(DataSize.ofGigabytes(8))
         p.setMaxFileSize(DataSize.ofGigabytes(4))
+        p.setCheckRemoteJobStatus(false)
 
         then:
         p.getCheckInterval() == Duration.ofSeconds(30)
         p.getMaxFiles() == 32_000
         p.getMaxTotalSize() == DataSize.ofGigabytes(8)
         p.getMaxFileSize() == DataSize.ofGigabytes(4)
+        !p.getCheckRemoteJobStatus()
     }
 }

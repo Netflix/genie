@@ -33,18 +33,20 @@ class WaitJobCompletionStageSpec extends Specification {
     ExecutionContext executionContext
     JobProcessManager jobProcessManager
     JobProcessResult jobProcessResult
-    JobMonitorService jobDirectoryLimitsService
+    JobMonitorService jobMonitorService
     File jobDirectory
     Path jobDirectoryPath
+    String jobId
 
     void setup() {
         this.jobProcessResult = Mock(JobProcessResult)
         this.jobProcessManager = Mock(JobProcessManager)
         this.executionContext = Mock(ExecutionContext)
-        this.jobDirectoryLimitsService = Mock(JobMonitorService)
+        this.jobMonitorService = Mock(JobMonitorService)
         this.jobDirectory = Mock(File)
         this.jobDirectoryPath = Mock(Path)
-        this.stage = new WaitJobCompletionStage(jobProcessManager, jobDirectoryLimitsService)
+        this.jobId = UUID.randomUUID().toString()
+        this.stage = new WaitJobCompletionStage(jobProcessManager, jobMonitorService)
     }
 
     def "AttemptTransition -- not launched"() {
@@ -53,10 +55,11 @@ class WaitJobCompletionStageSpec extends Specification {
 
         then:
         1 * executionContext.isJobLaunched() >> false
+        0 * executionContext.getClaimedJobId() >> jobId
         0 * jobProcessManager.waitFor()
         0 * executionContext.getJobDirectory()
-        0 * jobDirectoryLimitsService.start(_)
-        0 * jobDirectoryLimitsService.stop()
+        0 * jobMonitorService.start(_, _)
+        0 * jobMonitorService.stop()
     }
 
     def "AttemptTransition -- success"() {
@@ -66,10 +69,11 @@ class WaitJobCompletionStageSpec extends Specification {
         then:
         1 * executionContext.isJobLaunched() >> true
         1 * executionContext.getJobDirectory() >> jobDirectory
+        1 * executionContext.getClaimedJobId() >> jobId
         1 * jobDirectory.toPath() >> jobDirectoryPath
-        1 * jobDirectoryLimitsService.start(jobDirectory)
+        1 * jobMonitorService.start(jobId, jobDirectory)
         1 * jobProcessManager.waitFor() >> jobProcessResult
-        1 * jobDirectoryLimitsService.stop()
+        1 * jobMonitorService.stop()
         1 * executionContext.setJobProcessResult(jobProcessResult)
         1 * jobProcessResult.getFinalStatus() >> JobStatus.KILLED
     }
@@ -84,14 +88,14 @@ class WaitJobCompletionStageSpec extends Specification {
         then:
         1 * executionContext.isJobLaunched() >> true
         1 * executionContext.getJobDirectory() >> jobDirectory
+        1 * executionContext.getClaimedJobId() >> jobId
         1 * jobDirectory.toPath() >> jobDirectoryPath
-        1 * jobDirectoryLimitsService.start(jobDirectory)
+        1 * jobMonitorService.start(jobId, jobDirectory)
         1 * jobProcessManager.waitFor() >> { throw interruptedException }
-        1 * jobDirectoryLimitsService.stop()
+        1 * jobMonitorService.stop()
         def e = thrown(FatalJobExecutionException)
         e.getCause() == interruptedException
         0 * executionContext.setJobProcessResult(jobProcessResult)
         0 * jobProcessResult.getFinalStatus() >> JobStatus.KILLED
     }
-
 }

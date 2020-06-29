@@ -17,9 +17,12 @@
  */
 package com.netflix.genie.agent.execution.services.impl
 
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.JobMonitorService
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.properties.AgentProperties
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import org.springframework.scheduling.TaskScheduler
@@ -35,18 +38,57 @@ class JobMonitorServiceImplSpec extends Specification {
 
     KillService killService
     JobDirectoryManifestCreatorService manifestCreatorService
+    AgentJobService agentJobService
     TaskScheduler taskScheduler
     AgentProperties agentProperties
     ScheduledFuture scheduledFuture
     JobMonitorService service
+    String jobId
 
     void setup() {
         this.killService = Mock(KillService)
         this.manifestCreatorService = Mock(JobDirectoryManifestCreatorService)
+        this.agentJobService = Mock(AgentJobService)
         this.taskScheduler = Mock(TaskScheduler)
         this.agentProperties = new AgentProperties()
         this.scheduledFuture = Mock(ScheduledFuture)
-        this.service = new JobMonitorServiceImpl(killService, manifestCreatorService, taskScheduler, agentProperties)
+        this.jobId = UUID.randomUUID().toString()
+        this.service = new JobMonitorServiceImpl(killService, manifestCreatorService, agentJobService, taskScheduler, agentProperties)
+    }
+
+
+    def "Do not kill"() {
+        Path jobDirectoryPath = Mock(Path)
+        DirectoryManifest directoryManifest = Mock(DirectoryManifest)
+        Runnable task
+
+        when:
+        service.start(jobId, jobDirectoryPath)
+
+        then:
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, agentProperties.getJobMonitorService().getCheckInterval()) >> {
+            Runnable r, Duration d ->
+                task = r
+                return scheduledFuture
+        }
+        task != null
+
+        when:
+        task.run()
+
+        then:
+        1 * manifestCreatorService.getDirectoryManifest(jobDirectoryPath) >> directoryManifest
+        1 * directoryManifest.getNumFiles() >> 10
+        1 * directoryManifest.getTotalSizeOfFiles() >> 1024
+        1 * directoryManifest.getFiles() >> []
+        1 * agentJobService.getJobStatus(jobId) >> JobStatus.RUNNING
+        0 * killService.kill(KillService.KillSource.REMOTE_STATUS_MONITOR)
+
+        when:
+        service.stop()
+
+        then:
+        1 * scheduledFuture.cancel(true)
     }
 
     @Unroll
@@ -56,7 +98,7 @@ class JobMonitorServiceImplSpec extends Specification {
         Runnable task
 
         when:
-        service.start(jobDirectoryPath)
+        service.start(jobId, jobDirectoryPath)
 
         then:
         1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, agentProperties.getJobMonitorService().getCheckInterval()) >> {
@@ -88,6 +130,7 @@ class JobMonitorServiceImplSpec extends Specification {
             }
         ]
         1 * killService.kill(KillService.KillSource.FILES_LIMIT)
+        0 * this.agentJobService.getJobStatus(_)
 
         when:
         service.stop()
@@ -101,5 +144,109 @@ class JobMonitorServiceImplSpec extends Specification {
         "total files size"  | 1024      | DataSize.ofGigabytes(100).toBytes() | DataSize.ofMegabytes(1).toBytes()
         "large file"        | 1024      | DataSize.ofMegabytes(1).toBytes()   | DataSize.ofGigabytes(100).toBytes()
         "all"               | 1_000_000 | DataSize.ofGigabytes(100).toBytes() | DataSize.ofGigabytes(100).toBytes()
+    }
+
+    def "Job marked failed"() {
+        Path jobDirectoryPath = Mock(Path)
+        DirectoryManifest directoryManifest = Mock(DirectoryManifest)
+        Runnable task
+
+        when:
+        service.start(jobId, jobDirectoryPath)
+
+        then:
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, agentProperties.getJobMonitorService().getCheckInterval()) >> {
+            Runnable r, Duration d ->
+                task = r
+                return scheduledFuture
+        }
+        task != null
+
+        when:
+        task.run()
+
+        then:
+        1 * manifestCreatorService.getDirectoryManifest(jobDirectoryPath) >> directoryManifest
+        1 * directoryManifest.getNumFiles() >> 10
+        1 * directoryManifest.getTotalSizeOfFiles() >> 1024
+        1 * directoryManifest.getFiles() >> []
+        1 * agentJobService.getJobStatus(jobId) >> JobStatus.FAILED
+        1 * killService.kill(KillService.KillSource.REMOTE_STATUS_MONITOR)
+
+        when:
+        service.stop()
+
+        then:
+        1 * scheduledFuture.cancel(true)
+    }
+
+
+    def "Job status check disabled failed"() {
+        Path jobDirectoryPath = Mock(Path)
+        DirectoryManifest directoryManifest = Mock(DirectoryManifest)
+        Runnable task
+        this.agentProperties.getJobMonitorService().setCheckRemoteJobStatus(false)
+
+        when:
+        service.start(jobId, jobDirectoryPath)
+
+        then:
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, agentProperties.getJobMonitorService().getCheckInterval()) >> {
+            Runnable r, Duration d ->
+                task = r
+                return scheduledFuture
+        }
+        task != null
+
+        when:
+        task.run()
+
+        then:
+        1 * manifestCreatorService.getDirectoryManifest(jobDirectoryPath) >> directoryManifest
+        1 * directoryManifest.getNumFiles() >> 10
+        1 * directoryManifest.getTotalSizeOfFiles() >> 1024
+        1 * directoryManifest.getFiles() >> []
+        0 * agentJobService.getJobStatus(jobId)
+        0 * killService.kill(KillService.KillSource.REMOTE_STATUS_MONITOR)
+
+        when:
+        service.stop()
+
+        then:
+        1 * scheduledFuture.cancel(true)
+    }
+
+    def "Handle service error"() {
+        Path jobDirectoryPath = Mock(Path)
+        Runnable task
+
+        when:
+        service.start(jobId, jobDirectoryPath)
+
+        then:
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, agentProperties.getJobMonitorService().getCheckInterval()) >> {
+            Runnable r, Duration d ->
+                task = r
+                return scheduledFuture
+        }
+        task != null
+
+        when:
+        task.run()
+
+        then:
+        1 * manifestCreatorService.getDirectoryManifest(jobDirectoryPath) >> {
+            throw new IOException("...")
+        }
+        1 * agentJobService.getJobStatus(jobId) >> {
+            throw new GetJobStatusException("...")
+        }
+        0 * killService.kill(KillService.KillSource.REMOTE_STATUS_MONITOR)
+
+        when:
+        service.stop()
+
+        then:
+        1 * scheduledFuture.cancel(true)
     }
 }

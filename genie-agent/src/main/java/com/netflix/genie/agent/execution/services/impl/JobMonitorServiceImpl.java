@@ -17,11 +17,15 @@
  */
 package com.netflix.genie.agent.execution.services.impl;
 
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.properties.JobMonitorServiceProperties;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
@@ -45,6 +49,7 @@ import java.util.concurrent.ScheduledFuture;
 class JobMonitorServiceImpl implements JobMonitorService {
     private final KillService killService;
     private final JobDirectoryManifestCreatorService manifestCreatorService;
+    private final AgentJobService agentJobService;
     private final TaskScheduler taskScheduler;
     private final JobMonitorServiceProperties properties;
     private ScheduledFuture<?> scheduledCheck;
@@ -52,18 +57,21 @@ class JobMonitorServiceImpl implements JobMonitorService {
     JobMonitorServiceImpl(
         final KillService killService,
         final JobDirectoryManifestCreatorService manifestCreatorService,
+        final AgentJobService agentJobService,
         final TaskScheduler taskScheduler,
-        final AgentProperties agentProperties) {
+        final AgentProperties agentProperties
+    ) {
         this.killService = killService;
         this.manifestCreatorService = manifestCreatorService;
+        this.agentJobService = agentJobService;
         this.taskScheduler = taskScheduler;
         this.properties = agentProperties.getJobMonitorService();
     }
 
     @Override
-    public void start(final Path jobDirectory) {
+    public void start(final String jobId, final Path jobDirectory) {
         this.scheduledCheck = this.taskScheduler.scheduleAtFixedRate(
-            () -> this.check(jobDirectory),
+            () -> this.check(jobId, jobDirectory),
             this.properties.getCheckInterval()
         );
 
@@ -76,13 +84,15 @@ class JobMonitorServiceImpl implements JobMonitorService {
         }
     }
 
-    private void check(final Path jobDirectory) {
-        if (isExceedingFileLimit(jobDirectory)) {
+    private void check(final String jobId, final Path jobDirectory) {
+        if (this.checkFileLimits(jobDirectory)) {
             this.killService.kill(KillService.KillSource.FILES_LIMIT);
+        } else if (this.checkRemoteJobStatus(jobId)) {
+            this.killService.kill(KillService.KillSource.REMOTE_STATUS_MONITOR);
         }
     }
 
-    private boolean isExceedingFileLimit(final Path jobDirectory) {
+    private boolean checkFileLimits(final Path jobDirectory) {
         final DirectoryManifest manifest;
         try {
             manifest = this.manifestCreatorService.getDirectoryManifest(jobDirectory);
@@ -124,6 +134,32 @@ class JobMonitorServiceImpl implements JobMonitorService {
         }
 
         log.debug("No files limit exceeded");
+        return false;
+    }
+
+    private boolean checkRemoteJobStatus(final String jobId) {
+        if (!this.properties.getCheckRemoteJobStatus()) {
+            // Ignore remote status. Can be useful for session-type jobs that should be kept alive even if leader
+            // marked them failed
+            return false;
+        }
+
+        final JobStatus jobStatus;
+        try {
+            jobStatus = this.agentJobService.getJobStatus(jobId);
+        } catch (GetJobStatusException | GenieRuntimeException e) {
+            log.error("Failed to retrieve job status: {}", e.getMessage(), e);
+            return false;
+        }
+
+        // While this service is running, the job status should be RUNNING.
+        // Any other status implies a server-side update (probably the leader marking the job failed).
+        if (jobStatus != JobStatus.RUNNING) {
+            log.error("Remote job status changed to: {}", jobStatus);
+            return true;
+        }
+
+        log.debug("Job status is still RUNNING");
         return false;
     }
 }

@@ -216,6 +216,10 @@ public class JobProcessManagerImpl implements JobProcessManager {
                     return new JobProcessResult
                         .Builder(JobStatus.KILLED, JobStatusMessages.JOB_EXCEEDED_FILES_LIMIT, exitCode)
                         .build();
+                case REMOTE_STATUS_MONITOR:
+                    return new JobProcessResult
+                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_MARKED_FAILED, exitCode)
+                        .build();
                 case API_KILL_REQUEST:
                 case SYSTEM_SIGNAL:
                 default:

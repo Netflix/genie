@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.JobMonitorService;
@@ -130,6 +131,7 @@ public class ServicesAutoConfiguration {
      *
      * @param killService            the kill service
      * @param manifestCreatorService the manifest creator service
+     * @param agentJobService        the agent job service
      * @param taskScheduler          the task scheduler
      * @param agentProperties        the agent properties
      * @return A {@link JobMonitorServiceImpl} instance
@@ -140,9 +142,16 @@ public class ServicesAutoConfiguration {
     public JobMonitorServiceImpl jobMonitorService(
         final KillService killService,
         final JobDirectoryManifestCreatorService manifestCreatorService,
+        final AgentJobService agentJobService,
         @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
         final AgentProperties agentProperties
     ) {
-        return new JobMonitorServiceImpl(killService, manifestCreatorService, taskScheduler, agentProperties);
+        return new JobMonitorServiceImpl(
+            killService,
+            manifestCreatorService,
+            agentJobService,
+            taskScheduler,
+            agentProperties
+        );
     }
 }

@@ -37,4 +37,5 @@ public class JobMonitorServiceProperties {
     private int maxFiles = 64_000;
     private DataSize maxTotalSize = DataSize.ofGigabytes(16);
     private DataSize maxFileSize = DataSize.ofGigabytes(8);
+    private Boolean checkRemoteJobStatus = true;
 }
