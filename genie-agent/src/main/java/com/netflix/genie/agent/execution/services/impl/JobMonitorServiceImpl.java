@@ -63,7 +63,7 @@ class JobMonitorServiceImpl implements JobMonitorService {
     @Override
     public void start(final Path jobDirectory) {
         this.scheduledCheck = this.taskScheduler.scheduleAtFixedRate(
-            () -> this.checkFilesSize(jobDirectory),
+            () -> this.check(jobDirectory),
             this.properties.getCheckInterval()
         );
 
@@ -76,29 +76,33 @@ class JobMonitorServiceImpl implements JobMonitorService {
         }
     }
 
-    private void checkFilesSize(final Path jobDirectory) {
+    private void check(final Path jobDirectory) {
+        if (isExceedingFileLimit(jobDirectory)) {
+            this.killService.kill(KillService.KillSource.FILES_LIMIT);
+        }
+    }
+
+    private boolean isExceedingFileLimit(final Path jobDirectory) {
         final DirectoryManifest manifest;
         try {
             manifest = this.manifestCreatorService.getDirectoryManifest(jobDirectory);
         } catch (IOException e) {
             log.warn("Failed to obtain manifest: {}" + e.getMessage());
-            return;
+            return false;
         }
 
         final int files = manifest.getNumFiles();
         final int maxFiles = this.properties.getMaxFiles();
         if (files > maxFiles) {
             log.error("Limit exceeded, too many files: {}/{}", files, maxFiles);
-            this.killService.kill(KillService.KillSource.FILES_LIMIT);
-            return;
+            return true;
         }
 
         final DataSize totalSize = DataSize.ofBytes(manifest.getTotalSizeOfFiles());
         final DataSize maxTotalSize = this.properties.getMaxTotalSize();
         if (totalSize.toBytes() > maxTotalSize.toBytes()) {
             log.error("Limit exceeded, job directory too large: {}/{}", totalSize, maxTotalSize);
-            this.killService.kill(KillService.KillSource.FILES_LIMIT);
-            return;
+            return true;
         }
 
         final Optional<DirectoryManifest.ManifestEntry> largestFile = manifest.getFiles()
@@ -115,11 +119,11 @@ class JobMonitorServiceImpl implements JobMonitorService {
                     maxFileSize,
                     largestFile.get().getPath()
                 );
-                this.killService.kill(KillService.KillSource.FILES_LIMIT);
-                return;
+                return true;
             }
         }
 
         log.debug("No files limit exceeded");
+        return false;
     }
 }
