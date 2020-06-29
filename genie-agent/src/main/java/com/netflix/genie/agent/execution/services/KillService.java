@@ -56,6 +56,10 @@ public interface KillService {
          * The job has exceeded one of the files limit (files count, file size, etc.).
          */
         FILES_LIMIT,
+        /**
+         * The job status was changed server-side while the job was running.
+         */
+        REMOTE_STATUS_MONITOR,
     }
 
     /**

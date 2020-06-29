@@ -931,6 +931,11 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | 1s
 |
 
+| `genie.agent.runtime.job-monitor-service.check-remote-job-status`
+| Whether to periodically poll the running job status from the server, and to shut down in case the job is marked failed
+| true
+|
+
 | `genie.agent.runtime.job-monitor-service.check-interval`
 | How often to check for files limits
 | 1m

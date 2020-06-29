@@ -376,11 +376,12 @@ class JobProcessManagerImplSpec extends Specification {
         !this.stdOut.exists()
 
         where:
-        killSource                              | expectedStatusMessage
-        KillService.KillSource.TIMEOUT          | JobStatusMessages.JOB_EXCEEDED_TIMEOUT
-        KillService.KillSource.FILES_LIMIT      | JobStatusMessages.JOB_EXCEEDED_FILES_LIMIT
-        KillService.KillSource.API_KILL_REQUEST | JobStatusMessages.JOB_KILLED_BY_USER
-        KillService.KillSource.SYSTEM_SIGNAL    | JobStatusMessages.JOB_KILLED_BY_USER
+        killSource                                   | expectedStatusMessage
+        KillService.KillSource.TIMEOUT               | JobStatusMessages.JOB_EXCEEDED_TIMEOUT
+        KillService.KillSource.FILES_LIMIT           | JobStatusMessages.JOB_EXCEEDED_FILES_LIMIT
+        KillService.KillSource.API_KILL_REQUEST      | JobStatusMessages.JOB_KILLED_BY_USER
+        KillService.KillSource.SYSTEM_SIGNAL         | JobStatusMessages.JOB_KILLED_BY_USER
+        KillService.KillSource.REMOTE_STATUS_MONITOR | JobStatusMessages.JOB_MARKED_FAILED
     }
 
     // TODO: This test seems to verify incorrect behavior

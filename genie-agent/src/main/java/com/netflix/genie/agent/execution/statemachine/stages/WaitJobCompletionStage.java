@@ -64,7 +64,10 @@ public class WaitJobCompletionStage extends ExecutionStage {
         // In case of abort, this state may be reached even if there was no attempt to launch the process.
         if (executionContext.isJobLaunched()) {
             log.info("Monitoring job process");
-            this.jobMonitorService.start(executionContext.getJobDirectory().toPath());
+            this.jobMonitorService.start(
+                executionContext.getClaimedJobId(),
+                executionContext.getJobDirectory().toPath()
+            );
             final JobProcessResult jobProcessResult;
             try {
                 jobProcessResult = this.jobProcessManager.waitFor();

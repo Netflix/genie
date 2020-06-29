@@ -64,6 +64,7 @@ genie:
         max-files: 64000
         max-file-size: 8GB
         max-total-size: 16GB
+        check-remote-job-status: true
 
 spring:
   banner:

@@ -31,9 +31,10 @@ public interface JobMonitorService {
     /**
      * Starts the service.
      *
+     * @param jobId        the job id
      * @param jobDirectory the job directory
      */
-    void start(Path jobDirectory);
+    void start(String jobId, Path jobDirectory);
 
     /**
      * Stop the service.

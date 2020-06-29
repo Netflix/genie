@@ -199,6 +199,12 @@ public final class JobStatusMessages {
         = "Failed to resolve job given original request and available resources";
 
     /**
+     * While job was running, server status was set to something else (probably marked failed by the leader after
+     * the agent was disconnected for too long).
+     */
+    public static final String JOB_MARKED_FAILED = "The job status changed server-side while the job was running";
+
+    /**
      * Private constructor, this class is not meant to be instantiated.
      */
     private JobStatusMessages() {
