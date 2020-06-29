@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages
 
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException
 import com.netflix.genie.agent.execution.exceptions.JobReservationException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
@@ -53,8 +54,31 @@ class ReserveJobIdStageSpec extends Specification {
         then:
         1 * executionContext.isPreResolved() >> true
         1 * executionContext.getRequestedJobId() >> jobId
+        1 * agentJobService.getJobStatus(jobId) >> JobStatus.ACCEPTED
         1 * executionContext.setCurrentJobStatus(JobStatus.ACCEPTED)
         1 * executionContext.setReservedJobId(jobId)
+    }
+
+    def "AttemptTransition -- pre-reserved job, retriable error"() {
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.isPreResolved() >> true
+        1 * executionContext.getRequestedJobId() >> jobId
+        1 * agentJobService.getJobStatus(jobId) >> { throw new GetJobStatusException("...") }
+        thrown(RetryableJobExecutionException)
+    }
+
+    def "AttemptTransition -- pre-reserved job, fatal error"() {
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.isPreResolved() >> true
+        1 * executionContext.getRequestedJobId() >> jobId
+        1 * agentJobService.getJobStatus(jobId) >> JobStatus.RUNNING
+        thrown(FatalJobExecutionException)
     }
 
     def "AttemptTransition -- new job"() {

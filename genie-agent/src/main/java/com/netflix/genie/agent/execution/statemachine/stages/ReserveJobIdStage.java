@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.statemachine.stages;
 
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
+import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -64,7 +65,19 @@ public class ReserveJobIdStage extends ExecutionStage {
             assert requestedJobId != null;
             log.info("Confirming job reservation");
 
-            // TODO create protocol to verify server-side status is indeed ACCEPTED
+            final JobStatus jobStatus;
+            try {
+                jobStatus = this.agentJobService.getJobStatus(requestedJobId);
+            } catch (GetJobStatusException | GenieRuntimeException e) {
+                throw new RetryableJobExecutionException("Failed to retrieve job status", e);
+            }
+
+            if (jobStatus != JobStatus.ACCEPTED) {
+                throw createFatalException(
+                    new IllegalStateException("Unexpected job status: " + jobStatus + " job cannot be claimed")
+                );
+            }
+
             executionContext.setCurrentJobStatus(JobStatus.ACCEPTED);
             reservedJobId = requestedJobId;
 
