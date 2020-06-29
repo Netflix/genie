@@ -11,7 +11,7 @@ export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeS
 
 SPARK_DEPS=${SPARK_BASE}/dependencies
 
-export SPARK_VERSION="2.0.1"
+export SPARK_VERSION="2.4.6"
 
 tar xzf ${SPARK_DEPS}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz -C ${SPARK_DEPS}
 

@@ -1,0 +1,13 @@
+name: presto
+user: genieDemo
+status: ACTIVE
+description: Presto CLI
+setupFile: http://genie-apache/applications/presto/337/setup.sh
+configs: []
+version: 337
+type: presto
+tags:
+  - type:presto
+  - ver:337
+dependencies:
+  - http://genie-apache/applications/presto/337/presto-cli-337-executable.jar

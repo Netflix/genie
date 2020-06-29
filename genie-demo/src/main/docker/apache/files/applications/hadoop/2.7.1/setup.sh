@@ -2,9 +2,14 @@
 
 set -o errexit -o nounset -o pipefail
 
-APP_ID=hadoop271
-APP_NAME=hadoop-2.7.1
-export HADOOP_DEPENDENCIES_DIR=${GENIE_APPLICATION_DIR}/${APP_ID}/dependencies
+START_DIR=`pwd`
+cd `dirname ${BASH_SOURCE[0]}`
+HADOOP_BASE=`pwd`
+cd ${START_DIR}
+
+HADOOP_VERSION=2.7.1
+APP_NAME=hadoop-${HADOOP_VERSION}
+export HADOOP_DEPENDENCIES_DIR=${HADOOP_BASE}/dependencies
 export HADOOP_HOME=${HADOOP_DEPENDENCIES_DIR}/${APP_NAME}
 
 tar -xf ${HADOOP_DEPENDENCIES_DIR}/${APP_NAME}.tar.gz -C ${HADOOP_DEPENDENCIES_DIR}

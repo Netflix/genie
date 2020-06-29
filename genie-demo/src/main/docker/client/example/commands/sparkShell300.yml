@@ -2,14 +2,14 @@ name: Spark Shell
 user: genieDemo
 description: Spark Shell Command
 status: ACTIVE
-setupFile: http://genie-apache/commands/spark/2.0.1/setupShell.sh
+setupFile: http://genie-apache/commands/spark/3.0.0/setupShell.sh
 configs: []
 executable: ${SPARK_HOME}/bin/spark-shell
-version: 2.0.1
+version: 3.0.0
 tags:
   - type:spark-shell
-  - ver:2.0.1
-  - ver:2.0
+  - ver:3.0.0
+  - ver:3.0
 checkDelay: 5000
 clusterCriteria:
   - tags:

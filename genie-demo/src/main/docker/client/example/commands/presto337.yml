@@ -1,0 +1,15 @@
+name: presto
+user: genieDemo
+description: Presto CLI
+status: ACTIVE
+setupFile:
+configs: []
+executable: ${PRESTO_CLI} --server genie-presto:8080
+version: 337
+tags:
+  - type:presto
+  - ver:337
+checkDelay: 500
+clusterCriteria:
+  - tags:
+      - type:presto

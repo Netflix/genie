@@ -1,4 +1,3 @@
-id: hadoop271
 name: hadoop
 user: genieDemo
 description: Hadoop Command
@@ -11,3 +10,6 @@ tags:
   - type:hadoop
   - ver:2.7.0
 checkDelay: 5000
+clusterCriteria:
+  - tags:
+      - type:yarn

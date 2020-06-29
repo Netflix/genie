@@ -1,0 +1,13 @@
+name: spark
+user: genieDemo
+status: ACTIVE
+description: Spark Application
+setupFile: http://genie-apache/applications/spark/3.0.0/setup.sh
+version: 3.0.0
+type: spark
+tags:
+  - type:spark
+  - ver:3.0.0
+  - ver:3.0
+dependencies:
+  - http://genie-apache/applications/spark/3.0.0/spark-3.0.0-bin-hadoop2.7.tgz

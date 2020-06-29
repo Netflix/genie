@@ -1,4 +1,3 @@
-id: hdfs271
 name: hdfs
 user: genieDemo
 description: HDFS Command
@@ -11,3 +10,6 @@ tags:
   - type:hdfs
   - ver:2.7.1
 checkDelay: 5000
+clusterCriteria:
+  - tags:
+      - type:yarn
