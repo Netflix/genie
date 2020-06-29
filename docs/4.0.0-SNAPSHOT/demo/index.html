@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-06-26</span>
+<span id="revdate">2020-06-29</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -743,9 +743,9 @@ b.conum * { color: inherit !important; }
 <h2 id="_introduction"><a class="anchor" href="#_introduction"></a><a class="link" href="#_introduction">1. Introduction</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Genie is a complicated service. It can be hard to understand the value it brings to a data platform without seeing it
-in action. For this reason this set of demo steps was developed to show how Genie fits into a data platform and how it
-can help both administrators and users.</p>
+<p>Genie is a complicated service.
+It can be hard to understand the value it brings to a data platform without seeing it in action.
+For this reason this set of demo steps exists to show how Genie fits into a data platform and how it can help both administrators and users.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -795,7 +795,7 @@ For documentation of the REST API for this version of Genie please see the
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.docker.com/engine/installation/">Docker</a></p>
+<p><a href="https://docs.docker.com/get-docker/">Docker</a></p>
 </li>
 <li>
 <p><a href="https://docs.docker.com/compose/install/">Docker Compose</a></p>
@@ -805,7 +805,7 @@ For documentation of the REST API for this version of Genie please see the
 <div class="ulist">
 <ul>
 <li>
-<p>Probably at least 8 GB. Wouldn&#8217;t start on machine with 6 GB</p>
+<p>Probably at least 6 GB</p>
 </li>
 </ul>
 </div>
@@ -815,17 +815,26 @@ For documentation of the REST API for this version of Genie please see the
 <div class="ulist">
 <ul>
 <li>
-<p>About 3.82 GB for 4 images</p>
+<p>About ~5.5 GB for 5 images</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Available Ports on local machine</p>
+<p>Available Ports on your local machine</p>
 <div class="ulist">
 <ul>
 <li>
-<p>8080, 8088, 19888, 50070, 50075, 8089, 19889, 50071, 50076</p>
+<p>8080 (Genie)</p>
+</li>
+<li>
+<p>8088, 19888, 50070, 50075, 8042 (YARN Prod Cluster)</p>
+</li>
+<li>
+<p>8089, 19889, 50071, 50076, 8043 (YARN Test Cluster)</p>
+</li>
+<li>
+<p>9090 (Presto Cluster)</p>
 </li>
 </ul>
 </div>
@@ -836,31 +845,54 @@ For documentation of the REST API for this version of Genie please see the
 <div class="sect2">
 <h3 id="_development_environment"><a class="anchor" href="#_development_environment"></a><a class="link" href="#_development_environment">2.2. Development Environment</a></h3>
 <div class="paragraph">
-<p>For reference here is the machine specs that this demo was developed and tested on</p>
+<p>For reference here are the machine specs that this demo has been tested on</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Mid-2015 MacBook Pro</p>
+<p>Mid-2018 MacBook Pro</p>
 <div class="ulist">
 <ul>
 <li>
-<p>MacOS Sierra 10.12.1</p>
+<p>MacOS Catalina 10.15.5</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>2.5 GHz Intel Core i7</p>
+<p>2.9 GHz 6-Core Intel Core i9</p>
 </li>
 <li>
-<p>16 GB 1600 MHz DDR3</p>
+<p>32 GB 2400 MHz DDR4</p>
 </li>
 <li>
-<p>Docker 17.03.1-ce-mac5</p>
+<p>Docker Desktop 2.3.0.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Docker Engine 19.03.8</p>
 </li>
 <li>
-<p>Docker Compose 1.11.2</p>
+<p>Docker Compose 1.25.5</p>
+</li>
+<li>
+<p>Preferences</p>
+<div class="ulist">
+<ul>
+<li>
+<p>6 CPUs</p>
+</li>
+<li>
+<p>6 GB RAM</p>
+</li>
+<li>
+<p>1 GB swap</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
@@ -870,12 +902,11 @@ For documentation of the REST API for this version of Genie please see the
 <div class="ulist">
 <ul>
 <li>
-<p>Since all this is running locally on one machine it can be slow, much slower than you&#8217;d expect production level
-systems to run</p>
+<p>Since all this is running locally on one machine it can be slow, much slower than you&#8217;d expect production level systems to run</p>
 </li>
 <li>
-<p>Networking is kind of funky within the Hadoop UI due to how DNS is working between the containers. Sometimes if you
-click a link in the UI and it doesn&#8217;t work try swapping in localhost for the hostname instead.</p>
+<p>Networking is kind of funky within the Hadoop UI due to how DNS is working between the containers.
+Sometimes if you click a link in the UI and it doesn&#8217;t work try swapping in localhost for the hostname instead.</p>
 </li>
 </ul>
 </div>
@@ -905,7 +936,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Actuator</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8080/actuator" class="bare">http://localhost:8080/actuator</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8080/admin" class="bare">http://localhost:8080/admin</a></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -944,13 +975,38 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:50075" class="bare">http://localhost:50075</a></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:50076" class="bare">http://localhost:50076</a></code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container Logs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8042" class="bare">http://localhost:8042</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8043" class="bare">http://localhost:8043</a></code></p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Presto Interfaces</caption>
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Endpoint</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web UI</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:9090" class="bare">http://localhost:9090</a></code></p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="sect2">
 <h3 id="_scripts"><a class="anchor" href="#_scripts"></a><a class="link" href="#_scripts">2.5. Scripts</a></h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. Admin Scripts</caption>
+<caption class="title">Table 4. Admin Scripts</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -982,7 +1038,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Job Scripts</caption>
+<caption class="title">Table 5. Job Scripts</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -1007,19 +1063,25 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <td class="tableblock halign-left valign-top"><p class="tableblock">Runs a <code>dfs -ls</code> on the input directory on HDFS and stores results in stdout</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Presto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_presto_job.py</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sends query (<code>select * from tpcds.sf1.item limit 100;</code>) as attachment file to Presto cluster and dumps results to
+stdout</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Spark Shell</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_shell_job.py {sla|test}</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Simply prints the Spark Shell help output to stdout</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 1.6.x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runs the SparkPi example for Spark 1.6.x with input of 10. Results stored in stdout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 2.4.x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test} 2.4.6</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs the SparkPi example for Spark 2.4.x with input of 10. Results stored in stdout</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 2.0.x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test} 2.0.1</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Overrides default Spark with Spark 2.0.x and runs SparkPi example with input of 10. Results stored in stdout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 3.0.x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test} 3.0.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs the SparkPi example for Spark 3.0.x with input of 10. Results stored in stdout</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">YARN</p></td>
@@ -1209,8 +1271,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs,
-yarn, spark-submit, spark-shell) and two application (hadoop, spark)</p>
+<p>Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs, yarn, spark-submit, spark-shell) and two application (hadoop, spark)</p>
 </li>
 <li>
 <p><code>./init_demo.py</code></p>
@@ -1226,8 +1287,7 @@ yarn, spark-submit, spark-shell) and two application (hadoop, spark)</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>In the browser browse the Genie UI again and verify that now <code>Clusters</code>, <code>Commands</code> and <code>Applications</code> have data in
-them</p>
+<p>In the browser browse the Genie UI again and verify that now <code>Clusters</code>, <code>Commands</code> and <code>Applications</code> have data in them</p>
 </li>
 </ol>
 </div>
@@ -1259,7 +1319,10 @@ them</p>
 <p>Replace <code>test</code> with, <code>sla</code> to run the jobs against the Prod cluster</p>
 </li>
 <li>
-<p>If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences. The current default for a fresh install is 2GB, which is not sufficient for this demo. Use <code>docker stats</code> to verify the limit is 4GB or higher.</p>
+<p>If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences.
+The current default for a fresh install is 2GB, which is not sufficient for this demo.
+Use <code>docker stats</code>
+to verify the limit is 4GB or higher.</p>
 </li>
 </ol>
 </div>
@@ -1292,8 +1355,9 @@ them</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Lets say there is something wrong with the production cluster. You don&#8217;t want to interfere with users but you need
-to fix the prod cluster. Lets switch the load over to the test cluster temporarily using Genie</p>
+<p>Lets say there is something wrong with the production cluster.
+You don&#8217;t want to interfere with users but you need to fix the prod cluster.
+Let&#8217;s switch the load over to the test cluster temporarily using Genie</p>
 </li>
 <li>
 <p>In terminal switch the prod tag <code>sched:sla</code> from Prod to Test cluster</p>
@@ -1316,8 +1380,7 @@ to fix the prod cluster. Lets switch the load over to the test cluster temporari
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Verify that all jobs went to the <code>GenieDemoTest</code> cluster and none went to the <code>GenieDemoProd</code> cluster regardless  of
-which <code>env</code> you passed into the Gradle commands above</p>
+<p>Verify that all jobs went to the <code>GenieDemoTest</code> cluster and none went to the <code>GenieDemoProd</code> cluster regardless of which <code>env</code> you passed into the Gradle commands above</p>
 </li>
 </ol>
 </div>
@@ -1327,7 +1390,8 @@ which <code>env</code> you passed into the Gradle commands above</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>You&#8217;ve resolved the issues with your production cluster. Move the <code>sched:sla</code> tag back</p>
+<p>You&#8217;ve resolved the issues with your production cluster.
+Move the <code>sched:sla</code> tag back</p>
 </li>
 <li>
 <p><code>./reset_tags.py</code></p>
@@ -1379,8 +1443,8 @@ which <code>env</code> you passed into the Gradle commands above</p>
 <p><code>docker-compose down</code></p>
 </li>
 <li>
-<p>This will stop and remove all the containers from the demo. The images will remain on disk and if you run the demo
-again it will startup much faster since nothing needs to be downloaded or built</p>
+<p>This will stop and remove all the containers from the demo.
+The images will remain on disk and if you run the demo again it will startup much faster since nothing needs to be downloaded or built.</p>
 </li>
 </ol>
 </div>
@@ -1393,8 +1457,7 @@ again it will startup much faster since nothing needs to be downloaded or built<
 <h2 id="_feedback"><a class="anchor" href="#_feedback"></a><a class="link" href="#_feedback">4. Feedback</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>If you have any feedback about this demo feel free to reach out to the Genie team via any of the communication
-methods listed in the <a href="https://netflix.github.io/genie/contact/">Contact</a> page.</p>
+<p>If you have any feedback about this demo feel free to reach out to the Genie team via any of the communication methods listed in the <a href="https://netflix.github.io/genie/contact/">Contact</a> page.</p>
 </div>
 </div>
 </div>
@@ -1402,7 +1465,7 @@ methods listed in the <a href="https://netflix.github.io/genie/contact/">Contact
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-06-26 16:27:42 UTC
+Last updated 2020-06-29 23:20:31 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
