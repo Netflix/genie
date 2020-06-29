@@ -97,8 +97,9 @@ class JobMonitorServiceImplSpec extends Specification {
 
         where:
         description         | numFiles  | totalFilesSize                      | largestFileSize
-        "total files count" | 1_000_000 | DataSize.ofMegabytes(1).toBytes() | DataSize.ofMegabytes(1).toBytes()
+        "total files count" | 1_000_000 | DataSize.ofMegabytes(1).toBytes()   | DataSize.ofMegabytes(1).toBytes()
         "total files size"  | 1024      | DataSize.ofGigabytes(100).toBytes() | DataSize.ofMegabytes(1).toBytes()
         "large file"        | 1024      | DataSize.ofMegabytes(1).toBytes()   | DataSize.ofGigabytes(100).toBytes()
+        "all"               | 1_000_000 | DataSize.ofGigabytes(100).toBytes() | DataSize.ofGigabytes(100).toBytes()
     }
 }
