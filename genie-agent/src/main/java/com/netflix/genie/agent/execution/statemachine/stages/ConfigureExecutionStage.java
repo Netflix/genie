@@ -85,8 +85,7 @@ public class ConfigureExecutionStage extends ExecutionStage {
             log.info("Configuring execution for pre-resolved job");
 
             if (StringUtils.isBlank(requestedJobId)) {
-                throw createFatalException(new IllegalArgumentException("Missing required argument job id")
-                );
+                throw createFatalException(new IllegalArgumentException("Missing required argument job id"));
             }
 
         } else {
