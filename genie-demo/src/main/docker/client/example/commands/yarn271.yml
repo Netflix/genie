@@ -1,4 +1,3 @@
-id: yarn271
 name: yarn
 user: genieDemo
 description: Yarn Command
@@ -11,3 +10,6 @@ tags:
   - type:yarn
   - ver:2.7.1
 checkDelay: 5000
+clusterCriteria:
+  - tags:
+      - type:yarn

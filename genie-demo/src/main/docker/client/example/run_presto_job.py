@@ -19,7 +19,6 @@
 ###################################################################################
 
 import logging
-import sys
 
 import pygenie
 
@@ -30,24 +29,25 @@ LOGGER = logging.getLogger(__name__)
 pygenie.conf.DEFAULT_GENIE_URL = "http://genie:8080"
 
 # Create a job instance and fill in the required parameters
-job = pygenie.jobs.HadoopJob() \
-    .job_name("Genie Demo Hadoop Job") \
+# TODO: The Presto executable ends up executing in a different working directory and can't find the script file
+#       too tired to fix it right now so just go back to using the --execute for now
+# job = pygenie.jobs.PrestoJob() \
+#     .job_name("Genie Demo Presto Job") \
+#     .genie_username("root") \
+#     .job_version("3.0.0") \
+#     .script("select * from tpcds.sf1.item limit 100;")
+
+job = pygenie.jobs.PrestoJob() \
+    .job_name("Genie Demo Presto Job") \
     .genie_username("root") \
-    .job_version("3.0.0")
+    .job_version("3.0.0") \
+    .command_arguments("--execute \"select * from tpcds.sf1.item limit 100;\"")
 
 # Set cluster criteria which determine the cluster to run the job on
-job.cluster_tags([f"sched:{str(sys.argv[1])}", "type:yarn"])
+job.cluster_tags(["sched:adhoc", "type:presto"])
 
 # Set command criteria which will determine what command Genie executes for the job
-job.command_tags(["type:hadoop"])
-
-# Any command line arguments to run along with the command. In this case it holds
-# the actual query but this could also be done via an attachment or file dependency.
-# This jar location is where it is installed on the Genie node but could also pass
-# the jar as attachment and use it locally
-job.command(
-    "jar ${HADOOP_HOME}/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar grep input output 'dfs[a-z.]+'"
-)
+job.command_tags(["type:presto"])
 
 # Submit the job to Genie
 running_job = job.execute()

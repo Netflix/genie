@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-# Copyright 2016 Netflix, Inc.
+# Copyright 2016-2020 Netflix, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,25 +28,25 @@ genie_conf.genie.url = "http://genie:8080"
 
 genie = Genie(genie_conf)
 
-LOGGER.warn("This script will simulate resetting production tags to the prod cluster after issue is resolved")
-LOGGER.warn("Beginning process of moving production load back to prod cluster")
+LOGGER.warning("This script will simulate resetting production tags to the prod cluster after issue is resolved")
+LOGGER.warning("Beginning process of moving production load back to prod cluster")
 
 # Add the sched:sla tag to the prod cluster
 clusters = genie.get_clusters(filters={"name": "GenieDemoProd"})
 for cluster in clusters:
     cluster_id = cluster["id"]
-    LOGGER.warn("Adding sched:sla tag to the GenieDemoProd cluster with id = [%s]" % cluster_id)
-    LOGGER.warn("Tags before = [%s]" % cluster["tags"])
+    LOGGER.warning(f"Adding sched:sla tag to the GenieDemoProd cluster with id = {cluster_id}")
+    LOGGER.warning(f"Tags before = {cluster['tags']}")
     genie.add_tags_for_cluster(cluster_id, ["sched:sla"])
-    LOGGER.warn("Tags after = [%s]" % genie.get_cluster(cluster_id)["tags"])
+    LOGGER.warning(f"Tags after = {genie.get_cluster(cluster_id)['tags']}")
 
 # Remove the sched:sla tag from the test cluster
 clusters = genie.get_clusters(filters={"name": "GenieDemoTest"})
 for cluster in clusters:
     cluster_id = cluster["id"]
-    LOGGER.warn("Removing sched:sla tag from GenieDemoTest cluster with id = [%s]" % cluster_id)
-    LOGGER.warn("Tags before = [%s]" % cluster["tags"])
+    LOGGER.warning(f"Removing sched:sla tag from GenieDemoTest cluster with id = {cluster_id}")
+    LOGGER.warning(f"Tags before = {cluster['tags']}")
     genie.remove_tag_for_cluster(cluster_id, "sched:sla")
-    LOGGER.warn("Tags after = [%s]" % genie.get_cluster(cluster_id)["tags"])
+    LOGGER.warning(f"Tags after = {genie.get_cluster(cluster_id)['tags']}")
 
-LOGGER.warn("Finished moving production tags to the prod cluster. All production jobs should now go to prod again")
+LOGGER.warning("Finished moving production tags to the prod cluster. All production jobs should now go to prod again")

@@ -17,9 +17,9 @@ v{revnumber}, {localdate}
 
 == Introduction
 
-Genie is a complicated service. It can be hard to understand the value it brings to a data platform without seeing it
-in action. For this reason this set of demo steps was developed to show how Genie fits into a data platform and how it
-can help both administrators and users.
+Genie is a complicated service.
+It can be hard to understand the value it brings to a data platform without seeing it in action.
+For this reason this set of demo steps exists to show how Genie fits into a data platform and how it can help both administrators and users.
 
 NOTE: For high level concept documentation please see the https://netflix.github.io/genie[website].
 
@@ -33,32 +33,39 @@ https://netflix.github.io/genie/docs/{revnumber}/rest[API Guide].
 
 === Prerequisites
 
-* https://docs.docker.com/engine/installation/[Docker]
+* https://docs.docker.com/get-docker/[Docker]
 * https://docs.docker.com/compose/install/[Docker Compose]
 * Memory
-** Probably at least 8 GB. Wouldn't start on machine with 6 GB
+** Probably at least 6 GB
 * Disk Space
-** About 3.82 GB for 4 images
-* Available Ports on local machine
-** 8080, 8088, 19888, 50070, 50075, 8089, 19889, 50071, 50076
+** About ~5.5 GB for 5 images
+* Available Ports on your local machine
+** 8080 (Genie)
+** 8088, 19888, 50070, 50075, 8042 (YARN Prod Cluster)
+** 8089, 19889, 50071, 50076, 8043 (YARN Test Cluster)
+** 9090 (Presto Cluster)
 
 === Development Environment
 
-For reference here is the machine specs that this demo was developed and tested on
+For reference here are the machine specs that this demo has been tested on
 
-* Mid-2015 MacBook Pro
-** MacOS Sierra 10.12.1
-* 2.5 GHz Intel Core i7
-* 16 GB 1600 MHz DDR3
-* Docker 17.03.1-ce-mac5
-* Docker Compose 1.11.2
+* Mid-2018 MacBook Pro
+** MacOS Catalina 10.15.5
+* 2.9 GHz 6-Core Intel Core i9
+* 32 GB 2400 MHz DDR4
+* Docker Desktop 2.3.0.3
+** Docker Engine 19.03.8
+** Docker Compose 1.25.5
+** Preferences
+*** 6 CPUs
+*** 6 GB RAM
+*** 1 GB swap
 
 === Caveats
 
-* Since all this is running locally on one machine it can be slow, much slower than you'd expect production level
-systems to run
-* Networking is kind of funky within the Hadoop UI due to how DNS is working between the containers. Sometimes if you
-click a link in the UI and it doesn't work try swapping in localhost for the hostname instead.
+* Since all this is running locally on one machine it can be slow, much slower than you'd expect production level systems to run
+* Networking is kind of funky within the Hadoop UI due to how DNS is working between the containers.
+Sometimes if you click a link in the UI and it doesn't work try swapping in localhost for the hostname instead.
 
 === Port Usages
 
@@ -73,7 +80,7 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 | `http://localhost:8080/api/v3/`
 
 | Actuator
-| `http://localhost:8080/actuator`
+| `http://localhost:8080/admin`
 |===
 
 .Hadoop Interfaces
@@ -95,6 +102,19 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 | DataNode
 | `http://localhost:50075`
 | `http://localhost:50076`
+
+| Container Logs
+| `http://localhost:8042`
+| `http://localhost:8043`
+|===
+
+.Presto Interfaces
+|===
+|Endpoint
+|URL
+
+|Web UI
+|`http://localhost:9090`
 |===
 
 === Scripts
@@ -128,17 +148,22 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 |`./run_hdfs_job.py {sla\|test}`
 |Runs a `dfs -ls` on the input directory on HDFS and stores results in stdout
 
+|Presto
+|`./run_presto_job.py`
+|Sends query (`select * from tpcds.sf1.item limit 100;`) as attachment file to Presto cluster and dumps results to
+stdout
+
 |Spark Shell
 |`./run_spark_shell_job.py {sla\|test}`
 |Simply prints the Spark Shell help output to stdout
 
-|Spark Submit 1.6.x
-|`./run_spark_submit_job.py {sla\|test}`
-|Runs the SparkPi example for Spark 1.6.x with input of 10. Results stored in stdout
+|Spark Submit 2.4.x
+|`./run_spark_submit_job.py {sla\|test} 2.4.6`
+|Runs the SparkPi example for Spark 2.4.x with input of 10. Results stored in stdout
 
-|Spark Submit 2.0.x
-|`./run_spark_submit_job.py {sla\|test} 2.0.1`
-|Overrides default Spark with Spark 2.0.x and runs SparkPi example with input of 10. Results stored in stdout
+|Spark Submit 3.0.x
+|`./run_spark_submit_job.py {sla\|test} 3.0.0`
+|Runs the SparkPi example for Spark 3.0.x with input of 10. Results stored in stdout
 
 |YARN
 |`./run_yarn_job.py {sla\|test}`
@@ -146,6 +171,7 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 |===
 
 == Demo Steps
+
 . Open a terminal
 . Download the Docker Compose file
 .. Save the below file as `docker-compose.yml` somewhere on your machine
@@ -185,13 +211,11 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 .. From terminal `docker exec -it genie_demo_client_{project-version} /bin/bash`
 ... This should put you into a bash shell in `/apps/genie/example` within the running container
 . Initialize the System
-.. Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs,
-yarn, spark-submit, spark-shell) and two application (hadoop, spark)
+.. Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs, yarn, spark-submit, spark-shell) and two application (hadoop, spark)
 .. `./init_demo.py`
 .. Feel free to `cat` the contents of this script to see what is happening
 . Verify Configurations Loaded
-.. In the browser browse the Genie UI again and verify that now `Clusters`, `Commands` and `Applications` have data in
-them
+.. In the browser browse the Genie UI again and verify that now `Clusters`, `Commands` and `Applications` have data in them
 . Run some jobs
 .. See the `Job Scripts` table for available commands
 .. For example:
@@ -199,23 +223,27 @@ them
 ... `./run_yarn_job.py test`
 ... `./run_hdfs_job.py test`
 .. Replace `test` with, `sla` to run the jobs against the Prod cluster
-.. If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences. The current default for a fresh install is 2GB, which is not sufficient for this demo. Use `docker stats` to verify the limit is 4GB or higher.
+.. If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences.
+The current default for a fresh install is 2GB, which is not sufficient for this demo.
+Use `docker stats`
+to verify the limit is 4GB or higher.
 . For each of these jobs you can see their status, output and other information via the UI's
 .. In the `Jobs` tab of the Genie UI you can see all the job history
 ... Clicking any row will expand that job information and provide more links
 ... Clicking the folder icon will bring you to the working directory for that job
 .. Go to the respective cluster Resource Manager UI's and verify the jobs ran on their respective cluster
 . Move load from prod to test
-.. Lets say there is something wrong with the production cluster. You don't want to interfere with users but you need
-to fix the prod cluster. Lets switch the load over to the test cluster temporarily using Genie
+.. Lets say there is something wrong with the production cluster.
+You don't want to interfere with users but you need to fix the prod cluster.
+Let's switch the load over to the test cluster temporarily using Genie
 .. In terminal switch the prod tag `sched:sla` from Prod to Test cluster
 ... `./move_tags.py`
 .. Verify in Genie UI `Clusters` tab that the `sched:sla` tag only appears on the `GenieDemoTest` cluster
 . Run more of the available jobs
-.. Verify that all jobs went to the `GenieDemoTest` cluster and none went to the `GenieDemoProd` cluster regardless  of
-which `env` you passed into the Gradle commands above
+.. Verify that all jobs went to the `GenieDemoTest` cluster and none went to the `GenieDemoProd` cluster regardless of which `env` you passed into the Gradle commands above
 . Reset the system
-.. You've resolved the issues with your production cluster. Move the `sched:sla` tag back
+.. You've resolved the issues with your production cluster.
+Move the `sched:sla` tag back
 .. `./reset_tags.py`
 .. Verify in Genie UI `Clusters` tab that `sched:sla` tag only appears on `GenieDemoProd` cluster
 . Run some jobs
@@ -227,10 +255,9 @@ which `env` you passed into the Gradle commands above
 . Shut the demo down
 .. Once you're done trying everything out you can shut down the demo
 .. `docker-compose down`
-.. This will stop and remove all the containers from the demo. The images will remain on disk and if you run the demo
-again it will startup much faster since nothing needs to be downloaded or built
+.. This will stop and remove all the containers from the demo.
+The images will remain on disk and if you run the demo again it will startup much faster since nothing needs to be downloaded or built.
 
 == Feedback
 
-If you have any feedback about this demo feel free to reach out to the Genie team via any of the communication
-methods listed in the https://netflix.github.io/genie/contact/[Contact] page.
+If you have any feedback about this demo feel free to reach out to the Genie team via any of the communication methods listed in the https://netflix.github.io/genie/contact/[Contact] page.

@@ -1,4 +1,4 @@
-version: "2"
+version: "3.8"
 services:
   genie:
     image: netflixoss/genie-app:${GENIE_VERSION}
@@ -28,6 +28,7 @@ services:
       - "50070:50070"
       - "50075:50075"
       - "8088:8088"
+      - "8042:8042"
     tty: true
     container_name: genie_demo_hadoop_prod_${GENIE_VERSION}
   genie-hadoop-test:
@@ -38,5 +39,12 @@ services:
       - "50071:50070"
       - "50076:50075"
       - "8089:8088"
+      - "8043:8042"
     tty: true
     container_name: genie_demo_hadoop_test_${GENIE_VERSION}
+  genie-presto:
+    image: prestosql/presto:337
+    ports:
+      - "9090:8080"
+    tty: true
+    container_name: genie_demo_presto_${GENIE_VERSION}

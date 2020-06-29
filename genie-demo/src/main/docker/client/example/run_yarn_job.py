@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-# Copyright 2016 Netflix, Inc.
+# Copyright 2016-2020 Netflix, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,8 @@
 # limitations under the License.
 
 ##################################################################################
-# This script assumes setup.py has already been run to configure Genie and that
-# this script is executed on the host where Genie is running. If it's executed on
-# another host change the localhost line below.
+# This script assumes init_demo.py has already been run to configure Genie.
 ##################################################################################
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 import sys
@@ -35,15 +31,15 @@ pygenie.conf.DEFAULT_GENIE_URL = "http://genie:8080"
 
 # Create a job instance and fill in the required parameters
 job = pygenie.jobs.HadoopJob() \
-    .job_name('Genie Demo YARN Job') \
-    .genie_username('root') \
-    .job_version('3.0.0')
+    .job_name("Genie Demo YARN Job") \
+    .genie_username("root") \
+    .job_version("3.0.0")
 
 # Set cluster criteria which determine the cluster to run the job on
-job.cluster_tags(['sched:' + str(sys.argv[1]), 'type:yarn'])
+job.cluster_tags([f"sched:{str(sys.argv[1])}", "type:yarn"])
 
 # Set command criteria which will determine what command Genie executes for the job
-job.command_tags(['type:yarn'])
+job.command_tags(["type:yarn"])
 
 # Any command line arguments to run along with the command. In this case it holds
 # the actual query but this could also be done via an attachment or file dependency.
@@ -52,10 +48,10 @@ job.command("application -list --appStates ALL")
 # Submit the job to Genie
 running_job = job.execute()
 
-print('Job {} is {}'.format(running_job.job_id, running_job.status))
+print(f"Job {running_job.job_id} is {running_job.status}")
 print(running_job.job_link)
 
 # Block and wait until job is done
 running_job.wait()
 
-print('Job {} finished with status {}'.format(running_job.job_id, running_job.status))
+print(f"Job {running_job.job_id} finished with status {running_job.status}")

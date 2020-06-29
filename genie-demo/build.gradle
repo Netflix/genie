@@ -20,7 +20,8 @@ task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build doc
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
-    workingDir new File(project.projectDir, "/src/main/docker/apache")
+    inputs.dir "${project.projectDir}/src/main/docker/apache"
+    workingDir "${project.projectDir}/src/main/docker/apache"
 
     def commandArgs = new ArrayList<>()
     commandArgs.add("docker")
@@ -39,7 +40,8 @@ task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build doc
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
-    workingDir new File(project.projectDir, "/src/main/docker/client")
+    inputs.dir "${project.projectDir}/src/main/docker/client"
+    workingDir "${project.projectDir}/src/main/docker/client"
 
     def commandArgs = new ArrayList<>()
     commandArgs.add("docker")
