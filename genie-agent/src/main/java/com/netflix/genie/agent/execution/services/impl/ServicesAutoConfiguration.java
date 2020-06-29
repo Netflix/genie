@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,8 +49,12 @@ import java.io.IOException;
  * @author tgianos
  * @since 4.0.0
  */
-//TODO this class lacks a test
 @Configuration
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 @AutoConfigureAfter(AwsAutoConfiguration.class)
 @Slf4j
 public class ServicesAutoConfiguration {
