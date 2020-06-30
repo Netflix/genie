@@ -182,7 +182,8 @@ abstract class RestControllerIntegrationTestBase {
             .addFilter(
                 RestAssuredRestDocumentation
                     .documentationConfiguration(documentationContextProvider)
-                    .snippets().withAdditionalDefaults(new WireMockSnippet())
+                    .snippets()
+                    .withAdditionalDefaults(new WireMockSnippet())
                     .and()
                     .operationPreprocessors()
                     .withRequestDefaults(
