@@ -75,6 +75,7 @@ dependencies {
     implementation("jakarta.xml.bind:jakarta.xml.bind-api")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.glassfish.jaxb:jaxb-runtime")
+    implementation("org.hibernate.validator:hibernate-validator")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -86,6 +87,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-hateoas")
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-aws")
     implementation("org.springframework.cloud:spring-cloud-starter-aws-messaging")
@@ -107,7 +109,6 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.flywaydb:flyway-core")
     runtimeOnly("io.springfox:springfox-swagger-ui")
-    runtimeOnly("org.hibernate.validator:hibernate-validator")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.postgresql:postgresql")
 
