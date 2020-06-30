@@ -19,7 +19,7 @@ package com.netflix.genie.agent.utils.locks.impl;
 
 import com.netflix.genie.agent.execution.exceptions.LockException;
 import com.netflix.genie.agent.utils.locks.CloseableLock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.io.IOException;
  * @author standon
  * @since 4.0.0
  */
-public class FileLockTests {
+class FileLockTests {
 
     /**
      * Make sure close method for a FileLock gets called .
@@ -39,15 +39,13 @@ public class FileLockTests {
      * @throws LockException when there is a problem getting lock on the file
      */
     @Test
-    public void fileLockClosed() throws IOException, LockException {
+    void fileLockClosed() throws IOException, LockException {
         final FileLock mockLock = Mockito.mock(FileLock.class);
         try (CloseableLock lock = mockLock) {
             lock.lock();
         }
 
-        Mockito.verify(
-            mockLock, Mockito.times(1)
-        ).close();
+        Mockito.verify(mockLock, Mockito.times(1)).close();
     }
 
     /**
@@ -56,16 +54,14 @@ public class FileLockTests {
      * @throws IOException when the file is bad
      */
     @Test
-    public void fileLockClosedOnException() throws IOException {
+    void fileLockClosedOnException() throws IOException {
         final FileLock mockLock = Mockito.mock(FileLock.class);
         try (CloseableLock lock = mockLock) {
             lock.lock();
             throw new LockException("dummy exception");
-        } catch (LockException e) {
+        } catch (LockException ignored) {
         }
 
-        Mockito.verify(
-            mockLock, Mockito.times(1)
-        ).close();
+        Mockito.verify(mockLock, Mockito.times(1)).close();
     }
 }

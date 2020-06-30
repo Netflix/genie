@@ -19,9 +19,9 @@ package com.netflix.genie.web.util;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -31,30 +31,21 @@ import java.util.List;
 
 /**
  * Unit Tests for {@link UNIXUtils} class.
- * (this test class was once named JobKickoffTaskTest, but was only testing methods that now belong in UNIXUserHelper).
  *
  * @author mprimi
  * @since 4.0.0
  */
-public class UNIXUtilsTest {
+class UNIXUtilsTest {
 
     private Executor executor;
 
-    /**
-     * Set up the tests.
-     */
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.executor = Mockito.mock(Executor.class);
     }
 
-    /**
-     * Test the change ownership method for success.
-     *
-     * @throws IOException If there is any problem.
-     */
     @Test
-    public void testChangeOwnershipOfDirectoryMethodSuccess() throws IOException {
+    void testChangeOwnershipOfDirectoryMethodSuccess() throws IOException {
         final String user = "user";
         final String dir = "dir";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
@@ -62,30 +53,20 @@ public class UNIXUtilsTest {
 
         UNIXUtils.changeOwnershipOfDirectory(dir, user, executor);
         Mockito.verify(this.executor).execute(argumentCaptor.capture());
-        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getValue().toStrings());
+        Assertions.assertThat(argumentCaptor.getValue().toStrings()).containsExactlyElementsOf(command);
     }
 
-    /**
-     * Test the change ownership method for success.
-     *
-     * @throws IOException If there is any problem.
-     */
-    @Test(expected = IOException.class)
-    public void testChangeOwnershipOfDirectoryMethodFailure() throws IOException {
+    @Test
+    void testChangeOwnershipOfDirectoryMethodFailure() throws IOException {
         final String user = "user";
         final String dir = "dir";
 
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
-        UNIXUtils.changeOwnershipOfDirectory(dir, user, executor);
+        Assertions.assertThatIOException().isThrownBy(() -> UNIXUtils.changeOwnershipOfDirectory(dir, user, executor));
     }
 
-    /**
-     * Test the create user method for user already exists.
-     *
-     * @throws IOException If there is any problem.
-     */
     @Test
-    public void testCreateUserMethodSuccessAlreadyExists() throws IOException {
+    void testCreateUserMethodSuccessAlreadyExists() throws IOException {
         final String user = "user";
         final String group = "group";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
@@ -93,16 +74,11 @@ public class UNIXUtilsTest {
 
         UNIXUtils.createUser(user, group, executor);
         Mockito.verify(this.executor).execute(argumentCaptor.capture());
-        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getValue().toStrings());
+        Assertions.assertThat(argumentCaptor.getValue().toStrings()).containsExactlyElementsOf(command);
     }
 
-    /**
-     * Test the create user method for user already exists.
-     *
-     * @throws IOException If there is any problem.
-     */
     @Test
-    public void testCreateUserMethodSuccessDoesNotExist1() throws IOException {
+    void testCreateUserMethodSuccessDoesNotExist1() throws IOException {
         final String user = "user";
         final String group = "group";
 
@@ -117,25 +93,19 @@ public class UNIXUtilsTest {
 
         try {
             UNIXUtils.createUser(user, group, executor);
-        } catch (IOException ge) {
-            // ignore
+        } catch (IOException ignored) {
         }
 
         Mockito.verify(this.executor, Mockito.times(3)).execute(argumentCaptor.capture());
-        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getAllValues().get(2).toStrings());
+        Assertions.assertThat(argumentCaptor.getAllValues().get(2).toStrings()).containsExactlyElementsOf(command);
     }
 
-    /**
-     * Test the create user method for user already exists but swallow genie exception.
-     *
-     * @throws IOException If there is any problem.
-     */
-    @Test(expected = IOException.class)
-    public void testCreateUserMethodSuccessDoesNotExist2() throws IOException {
+    @Test
+    void testCreateUserMethodSuccessDoesNotExist2() throws IOException {
         final String user = "user";
         final String group = "group";
 
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
-        UNIXUtils.createUser(user, group, executor);
+        Assertions.assertThatIOException().isThrownBy(() -> UNIXUtils.createUser(user, group, executor));
     }
 }

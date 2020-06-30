@@ -19,53 +19,42 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 /**
- * Unit tests for the RootResourceAssembler.
+ * Unit tests for the {@link RootModelAssembler}.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class RootModelAssemblerTest {
+class RootModelAssemblerTest {
 
     private RootModelAssembler assembler;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.assembler = new RootModelAssembler();
     }
 
-    /**
-     * Make sure we can construct the assembler.
-     */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(this.assembler);
+    void canConstruct() {
+        Assertions.assertThat(this.assembler).isNotNull();
     }
 
-    /**
-     * Make sure we can convert the DTO to a resource with links.
-     */
     @Test
-    @Ignore
-    public void canConvertToResource() {
+    void canConvertToResource() {
         final JsonNode node
             = JsonNodeFactory.instance.objectNode().set("description", JsonNodeFactory.instance.textNode("blah"));
         final EntityModel<JsonNode> model = this.assembler.toModel(node);
-        Assert.assertTrue(model.getLinks().hasSize(5));
-        Assert.assertNotNull(model.getContent());
-        Assert.assertNotNull(model.getLink("self"));
-        Assert.assertNotNull(model.getLink("applications"));
-        Assert.assertNotNull(model.getLink("commands"));
-        Assert.assertNotNull(model.getLink("clusters"));
-        Assert.assertNotNull(model.getLink("jobs"));
+        Assertions.assertThat(model.getLinks()).hasSize(5);
+        Assertions.assertThat(model.getContent()).isNotNull();
+        Assertions.assertThat(model.getLink("self")).isNotNull();
+        Assertions.assertThat(model.getLink("applications")).isNotNull();
+        Assertions.assertThat(model.getLink("commands")).isNotNull();
+        Assertions.assertThat(model.getLink("clusters")).isNotNull();
+        Assertions.assertThat(model.getLink("jobs")).isNotNull();
     }
 }

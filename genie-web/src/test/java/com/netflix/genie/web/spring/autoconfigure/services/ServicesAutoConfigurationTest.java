@@ -49,17 +49,16 @@ import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -70,116 +69,91 @@ import java.util.UUID;
  * @author amsharma
  * @since 3.0.0
  */
-// TODO: Switch to JUnit 5 once version of JUnit 5 >= 5.4 and @TempDir is supported
-public class ServicesAutoConfigurationTest {
-
-    /**
-     * Temporary folder for tests.
-     */
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+class ServicesAutoConfigurationTest {
 
     private ServicesAutoConfiguration servicesAutoConfiguration;
 
-    /**
-     * Setup to run before each test.
-     */
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.servicesAutoConfiguration = new ServicesAutoConfiguration();
     }
 
-    /**
-     * Can get jobs properties bean.
-     */
     @Test
-    public void canGetJobPropertiesBean() {
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.jobsProperties(
-                Mockito.mock(JobsCleanupProperties.class),
-                Mockito.mock(JobsForwardingProperties.class),
-                Mockito.mock(JobsLocationsProperties.class),
-                Mockito.mock(JobsMaxProperties.class),
-                Mockito.mock(JobsMemoryProperties.class),
-                Mockito.mock(JobsUsersProperties.class),
-                Mockito.mock(ExponentialBackOffTriggerProperties.class),
-                Mockito.mock(JobsActiveLimitProperties.class)
+    void canGetJobPropertiesBean() {
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.jobsProperties(
+                    Mockito.mock(JobsCleanupProperties.class),
+                    Mockito.mock(JobsForwardingProperties.class),
+                    Mockito.mock(JobsLocationsProperties.class),
+                    Mockito.mock(JobsMaxProperties.class),
+                    Mockito.mock(JobsMemoryProperties.class),
+                    Mockito.mock(JobsUsersProperties.class),
+                    Mockito.mock(ExponentialBackOffTriggerProperties.class),
+                    Mockito.mock(JobsActiveLimitProperties.class)
+                )
             )
-        );
+            .isNotNull();
     }
 
-    /**
-     * Can get a bean for killing V3 jobs.
-     */
     @Test
-    public void canGetJobKillServiceV3Bean() {
+    void canGetJobKillServiceV3Bean() {
         final DataServices dataServices = Mockito.mock(DataServices.class);
         Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.jobKillServiceV3(
-                new GenieHostInfo("localhost"),
-                dataServices,
-                Mockito.mock(Executor.class),
-                JobsProperties.getJobsPropertiesDefaults(),
-                Mockito.mock(GenieEventBus.class),
-                Mockito.mock(FileSystemResource.class),
-                GenieObjectMapper.getMapper(),
-                Mockito.mock(ProcessChecker.Factory.class)
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.jobKillServiceV3(
+                    new GenieHostInfo("localhost"),
+                    dataServices,
+                    Mockito.mock(Executor.class),
+                    JobsProperties.getJobsPropertiesDefaults(),
+                    Mockito.mock(GenieEventBus.class),
+                    Mockito.mock(FileSystemResource.class),
+                    GenieObjectMapper.getMapper(),
+                    Mockito.mock(ProcessChecker.Factory.class)
+                )
             )
-        );
+            .isNotNull();
     }
 
-    /**
-     * Can get a bean for Job Kill Service.
-     */
     @Test
-    public void canGetJobKillServiceBean() {
+    void canGetJobKillServiceBean() {
         final DataServices dataServices = Mockito.mock(DataServices.class);
         Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.jobKillService(
-                Mockito.mock(JobKillServiceV3.class),
-                Mockito.mock(JobKillServiceV4.class),
-                dataServices
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.jobKillService(
+                    Mockito.mock(JobKillServiceV3.class),
+                    Mockito.mock(JobKillServiceV4.class),
+                    dataServices
+                )
             )
-        );
+            .isNotNull();
     }
 
-    /**
-     * Confirm we can get a GenieFileTransfer instance.
-     *
-     * @throws GenieException If there is any problem.
-     */
     @Test
-    public void canGetGenieFileTransferServiceBean() throws GenieException {
-        Assert.assertNotNull(this.servicesAutoConfiguration.genieFileTransferService(scheme -> null));
+    void canGetGenieFileTransferServiceBean() throws GenieException {
+        Assertions.assertThat(this.servicesAutoConfiguration.genieFileTransferService(scheme -> null)).isNotNull();
     }
 
-    /**
-     * Confirm we can get a GenieFileTransfer instance.
-     *
-     * @throws GenieException If there is any problem.
-     * @throws IOException    On error creating temporary folder
-     */
     @Test
-    public void canGetCacheGenieFileTransferServiceBean() throws GenieException, IOException {
+    void canGetCacheGenieFileTransferServiceBean(@TempDir final Path tmpDir) throws GenieException {
         final FileCacheProperties cacheProperties = Mockito.mock(FileCacheProperties.class);
-        Mockito.when(cacheProperties.getLocation()).thenReturn(this.temporaryFolder.newFolder().toURI());
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.cacheGenieFileTransferService(
-                Mockito.mock(FileTransferFactory.class),
-                cacheProperties,
-                Mockito.mock(LocalFileTransferImpl.class),
-                Mockito.mock(MeterRegistry.class)
+        Mockito.when(cacheProperties.getLocation()).thenReturn(tmpDir.toFile().toURI());
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.cacheGenieFileTransferService(
+                    Mockito.mock(FileTransferFactory.class),
+                    cacheProperties,
+                    Mockito.mock(LocalFileTransferImpl.class),
+                    Mockito.mock(MeterRegistry.class)
+                )
             )
-        );
+            .isNotNull();
     }
 
-    /**
-     * Can get a bean for Job Submitter Service.
-     */
     @Test
-    public void canGetJobSubmitterServiceBean() {
+    void canGetJobSubmitterServiceBean() {
         final PersistenceService persistenceService = Mockito.mock(PersistenceService.class);
         final DataServices dataServices = Mockito.mock(DataServices.class);
         Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
@@ -187,51 +161,51 @@ public class ServicesAutoConfigurationTest {
         final Resource resource = Mockito.mock(Resource.class);
         final List<WorkflowTask> workflowTasks = new ArrayList<>();
 
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.jobSubmitterService(
-                dataServices,
-                genieEventBus,
-                workflowTasks,
-                resource,
-                Mockito.mock(MeterRegistry.class)
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.jobSubmitterService(
+                    dataServices,
+                    genieEventBus,
+                    workflowTasks,
+                    resource,
+                    Mockito.mock(MeterRegistry.class)
+                )
             )
-        );
+            .isNotNull();
     }
 
-    /**
-     * Can get a bean for Job Coordinator Service.
-     */
     @Test
-    public void canGetJobCoordinatorServiceBean() {
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.jobCoordinatorService(
-                Mockito.mock(DataServices.class),
-                Mockito.mock(JobKillService.class),
-                Mockito.mock(JobStateService.class),
-                JobsProperties.getJobsPropertiesDefaults(),
-                Mockito.mock(JobResolverService.class),
-                Mockito.mock(MeterRegistry.class),
-                new GenieHostInfo(UUID.randomUUID().toString())
+    void canGetJobCoordinatorServiceBean() {
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.jobCoordinatorService(
+                    Mockito.mock(DataServices.class),
+                    Mockito.mock(JobKillService.class),
+                    Mockito.mock(JobStateService.class),
+                    JobsProperties.getJobsPropertiesDefaults(),
+                    Mockito.mock(JobResolverService.class),
+                    Mockito.mock(MeterRegistry.class),
+                    new GenieHostInfo(UUID.randomUUID().toString())
+                )
             )
-        );
+            .isNotNull();
     }
 
-    /**
-     * Can get the bean for Job Directory Server Service.
-     */
     @Test
-    public void canGetJobDirectoryServerServiceBean() {
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.jobDirectoryServerService(
-                Mockito.mock(ResourceLoader.class),
-                Mockito.mock(DataServices.class),
-                Mockito.mock(AgentFileStreamService.class),
-                Mockito.mock(ArchivedJobService.class),
-                Mockito.mock(MeterRegistry.class),
-                Mockito.mock(JobFileService.class),
-                Mockito.mock(JobDirectoryManifestCreatorService.class),
-                Mockito.mock(AgentRoutingService.class)
+    void canGetJobDirectoryServerServiceBean() {
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.jobDirectoryServerService(
+                    Mockito.mock(ResourceLoader.class),
+                    Mockito.mock(DataServices.class),
+                    Mockito.mock(AgentFileStreamService.class),
+                    Mockito.mock(ArchivedJobService.class),
+                    Mockito.mock(MeterRegistry.class),
+                    Mockito.mock(JobFileService.class),
+                    Mockito.mock(JobDirectoryManifestCreatorService.class),
+                    Mockito.mock(AgentRoutingService.class)
+                )
             )
-        );
+            .isNotNull();
     }
 }

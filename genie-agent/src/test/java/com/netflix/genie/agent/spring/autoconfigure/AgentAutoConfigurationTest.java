@@ -22,7 +22,7 @@ import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -34,7 +34,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  * @author standon
  * @since 4.0.0
  */
-public class AgentAutoConfigurationTest {
+class AgentAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
@@ -42,11 +42,8 @@ public class AgentAutoConfigurationTest {
             )
         );
 
-    /**
-     * Make sure all the expected beans exist.
-     */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(GenieHostInfo.class);

@@ -18,8 +18,8 @@
 package com.netflix.genie.web.jobs;
 
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -29,27 +29,21 @@ import java.io.IOException;
  * @author mprimi
  * @since 3.0.8
  */
-public class JobKillReasonFileTest {
+class JobKillReasonFileTest {
 
     private static final String KILL_REASON_STRING = "Test";
 
-    /**
-     * Test serialization and deserialization of JobKillReasonFile.
-     *
-     * @throws IOException in case of serialization error
-     */
     @Test
-    public void serializeThenLoad() throws IOException {
-
+    void serializeThenLoad() throws IOException {
         final JobKillReasonFile originalJobKillReasonFile = new JobKillReasonFile(KILL_REASON_STRING);
 
-        Assert.assertEquals(KILL_REASON_STRING, originalJobKillReasonFile.getKillReason());
+        Assertions.assertThat(originalJobKillReasonFile.getKillReason()).isEqualTo(KILL_REASON_STRING);
 
         final byte[] bytes = GenieObjectMapper.getMapper().writeValueAsBytes(originalJobKillReasonFile);
 
         final JobKillReasonFile loadedJobKillReasonFile
             = GenieObjectMapper.getMapper().readValue(bytes, JobKillReasonFile.class);
 
-        Assert.assertEquals(KILL_REASON_STRING, loadedJobKillReasonFile.getKillReason());
+        Assertions.assertThat(loadedJobKillReasonFile.getKillReason()).isEqualTo(KILL_REASON_STRING);
     }
 }

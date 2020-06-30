@@ -20,10 +20,9 @@ package com.netflix.genie.web.services.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.services.MailService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.mail.MailSendException;
@@ -38,29 +37,21 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class MailServiceImplTest {
+class MailServiceImplTest {
 
     private MailService mailService;
     private JavaMailSender mailSender;
     private String fromAddress;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.mailSender = Mockito.mock(JavaMailSender.class);
         this.fromAddress = UUID.randomUUID().toString();
         this.mailService = new MailServiceImpl(this.mailSender, this.fromAddress);
     }
 
-    /**
-     * Make sure we can successfully send an email.
-     *
-     * @throws GenieException On error
-     */
     @Test
-    public void canSendEmailWithBody() throws GenieException {
+    void canSendEmailWithBody() throws GenieException {
         final ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         final String to = UUID.randomUUID().toString();
         final String subject = UUID.randomUUID().toString();
@@ -68,43 +59,45 @@ public class MailServiceImplTest {
 
         this.mailService.sendEmail(to, subject, body);
         Mockito.verify(this.mailSender, Mockito.times(1)).send(captor.capture());
-        Assert.assertThat(captor.getValue().getTo()[0], Matchers.is(to));
-        Assert.assertThat(captor.getValue().getFrom(), Matchers.is(this.fromAddress));
-        Assert.assertThat(captor.getValue().getSubject(), Matchers.is(subject));
-        Assert.assertThat(captor.getValue().getText(), Matchers.is(body));
+        Assertions
+            .assertThat(captor.getValue())
+            .isNotNull()
+            .extracting(SimpleMailMessage::getTo)
+            .isNotNull()
+            .isEqualTo(new String[]{to});
+        Assertions.assertThat(captor.getValue().getFrom()).isEqualTo(this.fromAddress);
+        Assertions.assertThat(captor.getValue().getSubject()).isEqualTo(subject);
+        Assertions.assertThat(captor.getValue().getText()).isEqualTo(body);
     }
 
-    /**
-     * Make sure we can successfully send an email.
-     *
-     * @throws GenieException On error
-     */
     @Test
-    public void canSendEmailWithoutBody() throws GenieException {
+    void canSendEmailWithoutBody() throws GenieException {
         final ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         final String to = UUID.randomUUID().toString();
         final String subject = UUID.randomUUID().toString();
 
         this.mailService.sendEmail(to, subject, null);
         Mockito.verify(this.mailSender, Mockito.times(1)).send(captor.capture());
-        Assert.assertThat(captor.getValue().getTo()[0], Matchers.is(to));
-        Assert.assertThat(captor.getValue().getFrom(), Matchers.is(this.fromAddress));
-        Assert.assertThat(captor.getValue().getSubject(), Matchers.is(subject));
-        Assert.assertThat(captor.getValue().getText(), Matchers.nullValue());
+        Assertions
+            .assertThat(captor.getValue())
+            .isNotNull()
+            .extracting(SimpleMailMessage::getTo)
+            .isNotNull()
+            .isEqualTo(new String[]{to});
+        Assertions.assertThat(captor.getValue().getFrom()).isEqualTo(this.fromAddress);
+        Assertions.assertThat(captor.getValue().getSubject()).isEqualTo(subject);
+        Assertions.assertThat(captor.getValue().getText()).isNull();
     }
 
-    /**
-     * Make sure if we can't send an email an exception is thrown.
-     *
-     * @throws GenieException On error
-     */
-    @Test(expected = GenieServerException.class)
-    public void cantSendEmail() throws GenieException {
+    @Test
+    void cantSendEmail() {
         final String to = UUID.randomUUID().toString();
         final String subject = UUID.randomUUID().toString();
         final String body = UUID.randomUUID().toString();
 
         Mockito.doThrow(new MailSendException("a")).when(this.mailSender).send(Mockito.any(SimpleMailMessage.class));
-        this.mailService.sendEmail(to, subject, body);
+        Assertions
+            .assertThatExceptionOfType(GenieServerException.class)
+            .isThrownBy(() -> this.mailService.sendEmail(to, subject, body));
     }
 }

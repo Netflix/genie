@@ -18,7 +18,6 @@
 package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.JCommander;
-import com.google.common.collect.Sets;
 import com.netflix.genie.agent.execution.ExecutionAutoConfiguration;
 import com.netflix.genie.agent.execution.services.impl.ServicesAutoConfiguration;
 import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration;
@@ -27,14 +26,14 @@ import com.netflix.genie.agent.spring.autoconfigure.AgentAutoConfiguration;
 import com.netflix.genie.agent.spring.autoconfigure.ProcessAutoConfiguration;
 import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import com.netflix.genie.common.internal.configs.ProtoConvertersAutoConfiguration;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
 /**
  * Test CLI beans in context.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {
         JCommanderAutoConfiguration.class,
@@ -62,34 +61,25 @@ import java.util.stream.Collectors;
     }
 )
 // TODO: Do we want this to just use the application context runner and be a unit test or full blown integration test?
-public class JCommanderAutoConfigurationIntegrationTest {
+class JCommanderAutoConfigurationIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
 
-    /**
-     * Test creation of AgentArguments bean.
-     */
     @Test
-    public void globalAgentArguments() {
-        Assert.assertNotNull(applicationContext.getBean(GlobalAgentArguments.class));
+    void globalAgentArguments() {
+        Assertions.assertThat(this.applicationContext.getBean(GlobalAgentArguments.class)).isNotNull();
     }
 
-    /**
-     * Test creation of JCommander bean.
-     */
     @Test
-    public void jCommander() {
-        Assert.assertNotNull(applicationContext.getBean(JCommander.class));
+    void jCommander() {
+        Assertions.assertThat(applicationContext.getBean(JCommander.class)).isNotNull();
     }
 
-    /**
-     * Test creation of CommandFactory bean.
-     */
     @Test
-    public void commandFactory() {
+    void commandFactory() {
         final CommandFactory factory = applicationContext.getBean(CommandFactory.class);
-        Assert.assertNotNull(factory);
+        Assertions.assertThat(factory).isNotNull();
 
         final List<String> commandNames = Arrays.stream(CommandNames.class.getDeclaredFields())
             .filter(f -> Modifier.isStatic(f.getModifiers()))
@@ -103,22 +93,16 @@ public class JCommanderAutoConfigurationIntegrationTest {
             })
             .collect(Collectors.toList());
 
-        Assert.assertEquals(
-            Sets.newHashSet(commandNames),
-            Sets.newHashSet(factory.getCommandNames())
-        );
+        Assertions.assertThat(factory.getCommandNames()).containsExactlyInAnyOrderElementsOf(commandNames);
 
         for (String commandName : commandNames) {
             final AgentCommand command = factory.get(commandName);
-            Assert.assertNotNull(command);
+            Assertions.assertThat(command).isNotNull();
         }
     }
 
-    /**
-     * Test creation of ArgumentParser bean.
-     */
     @Test
-    public void argumentParser() {
-        Assert.assertNotNull(applicationContext.getBean(ArgumentParser.class));
+    void argumentParser() {
+        Assertions.assertThat(applicationContext.getBean(ArgumentParser.class)).isNotNull();
     }
 }
