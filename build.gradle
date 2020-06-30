@@ -132,9 +132,9 @@ configure(javaProjects) {
             dependency("org.apache.maven:maven-artifact:3.6.1")
             // For some reason 3.5.3-beta was throwing error with 3.4.x server
             // https://issues.apache.org/jira/browse/ZOOKEEPER-2775
-            // https://curator.apache.org/zk-compatibility.html
-            dependency("org.apache.zookeeper:zookeeper:3.4.12")
-            dependency("org.codehaus.groovy:groovy-all:2.5.9")
+            // https://curator.apache.org/zk-compatibility-34.html
+            dependency("org.apache.zookeeper:zookeeper:3.4.14")
+            dependency("org.codehaus.groovy:groovy-all:2.5.13")
             dependency("org.codehaus.janino:janino:3.0.14")
             dependency("org.dbunit:dbunit:2.6.0")
         }
