@@ -175,40 +175,45 @@ stdout
 . Open a terminal
 . Download the Docker Compose file
 .. Save the below file as `docker-compose.yml` somewhere on your machine
-.. https://netflix.github.io/genie/docs/{project-version}/demo/docker-compose.yml[docker-compose.yml]
+.. https://netflix.github.io/genie/docs/{revnumber}/demo/docker-compose.yml[docker-compose.yml]
 . Go to your working directory
 .. Wherever you downloaded the `docker-compose.yml` to
 .. `cd YourWorkDir`
 . Start the demo containers
 .. `docker-compose up -d`
-... The first time you run this it could take quite a while as it has to download 4 large images
-.... netflixoss/genie-app:{project-version}
-.... netflixoss/genie-demo-apache:{project-version}
-.... netflixoss/genie-demo-client:{project-version}
-.... sequenceiq/hadoop-docker:2.7.1
-... This will use docker compose to bring up 5 containers
-.... genie_demo_app_{project-version}
-..... Instantiation of netflixoss/genie-app:{project-version} image
+... The first time you run this it could take quite a while as it has to download 5 large images
+.... https://hub.docker.com/r/netflixoss/genie-app[netflixoss/genie-app:{revnumber}]
+.... https://hub.docker.com/r/netflixoss/genie-demo-apache[netflixoss/genie-demo-apache:{revnumber}]
+.... https://hub.docker.com/r/netflixoss/genie-client[netflixoss/genie-demo-client:{revnumber}]
+.... https://hub.docker.com/r/sequenceiq/hadoop-docker[sequenceiq/hadoop-docker:2.7.1]
+.... https://hub.docker.com/r/prestosql/presto[prestosql/presto:337]
+... This will use docker compose to bring up 6 containers
+.... `genie_demo_app_{revnumber}`
+..... Instantiation of `netflixoss/genie-app:{revnumber}`
 ..... Image from official Genie build which runs Genie app server
 ..... Maps port 8080 for Genie UI
-.... genie_demo_apache_{project-version}
-..... Instantiation of netflixoss/genie-demo-apache:{project-version}
+.... `genie_demo_apache_{revnumber}`
+..... Instantiation of `netflixoss/genie-demo-apache:{revnumber}`
 ..... Extension of apache image which includes files used during demo that Genie will download
-.... genie_demo_client_{project-version}
-..... Instantiation of netflixoss/genie-demo-client:{project-version}
+.... `genie_demo_client_{revnumber}`
+..... Instantiation of `netflixoss/genie-demo-client:{revnumber}`
 ..... Simulates a client node for Genie which includes several python scripts to configure and run jobs on Genie
-.... genie_demo_hadoop_prod_{project-version} and genie_demo_hadoop_test_{project-version}
-..... Instantiations of sequenceiq/hadoop-docker:2.7.1
+.... `genie_demo_hadoop_prod_{revnumber}` and `genie_demo_hadoop_test_{revnumber}`
+..... Instantiations of `sequenceiq/hadoop-docker:2.7.1`
 ..... Simulates having two clusters available and registered with Genie with roles as a production and a test cluster
 ..... See `Hadoop Interfaces` table for list of available ports
+.... `genie_demo_presto_{revnumber}`
+..... Instantiation of `prestosql/presto:337`
+..... Single node Presto cluster
+..... Web UI bound to `localhost` port `9090`
 . Wait for all services to start
 .. Verify Genie UI and both Resource Manager UI's are available via your browser
 . Check out the Genie UI
-.. In a browser navigate to the Genie UI (`http://localhost:8080`) and notice there are no `Jobs`, `Clusters`,
+.. In a browser navigate to the http://localhost:8080[Genie UI] and notice there are no `Jobs`, `Clusters`,
 `Commands` or `applications` currently
 .. These are available by clicking on the tabs in the top left of the UI
 . Login to the client container
-.. From terminal `docker exec -it genie_demo_client_{project-version} /bin/bash`
+.. From terminal `docker exec -it genie_demo_client_{revnumber} /bin/bash`
 ... This should put you into a bash shell in `/apps/genie/example` within the running container
 . Initialize the System
 .. Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs, yarn, spark-submit, spark-shell) and two application (hadoop, spark)
@@ -222,6 +227,8 @@ stdout
 ... `./run_hadoop_job.py test`
 ... `./run_yarn_job.py test`
 ... `./run_hdfs_job.py test`
+... `./run_spark_submit_job sla 2.1.3`
+... `./run_presto_job`
 .. Replace `test` with, `sla` to run the jobs against the Prod cluster
 .. If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences.
 The current default for a fresh install is 2GB, which is not sufficient for this demo.

@@ -8,6 +8,7 @@ services:
       - genie-hadoop-prod
       - genie-hadoop-test
       - genie-apache
+      - genie-presto
     tty: true
     container_name: genie_demo_app_${GENIE_VERSION}
   genie-apache:
