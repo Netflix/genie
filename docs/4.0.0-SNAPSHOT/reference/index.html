@@ -4874,6 +4874,12 @@ Whereas static properties values are bound during application startup and do not
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.heart-beat.send-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for sending heartbeats to all connected clients.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.additional-environment</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Environment variables to set when spawning an agent (in addition to the inherited server environment)</p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -5953,6 +5959,12 @@ The server also has a chance to override them during the 'Agent Configuration' e
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.check-remote-job-status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to periodically poll the running job status from the server, and to shut down in case the job is marked failed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.check-interval</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How often to check for files limits</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1m</p></td>
@@ -6779,7 +6791,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-06-30 01:04:23 UTC
+Last updated 2020-06-30 23:35:47 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

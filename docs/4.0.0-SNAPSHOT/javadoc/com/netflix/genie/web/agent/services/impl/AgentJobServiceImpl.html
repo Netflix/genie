@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -188,25 +188,31 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#getJobStatus-java.lang.String-">getJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
+<div class="block">Retrieve the status of the job identified with <code>id</code>.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#handshake-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">handshake</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Shake hands and allow a client or reject it based on the supplied <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>AgentClientMetadata</code></a>.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#reserveJobId-com.netflix.genie.common.external.dtos.v4.JobRequest-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">reserveJobId</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
             @Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code>
 <div class="block">Reserve a job id and persist job details in the database based on the supplied <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#resolveJobSpecification-java.lang.String-">resolveJobSpecification</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Resolve the job specification for job identified by the given id.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
                <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
@@ -419,7 +425,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos
 <a name="updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>updateJobStatus</h4>
 <pre>public&nbsp;void&nbsp;updateJobStatus(@NotBlank
@@ -441,6 +447,25 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos
 <dd><code>currentStatus</code> - The status the caller to this API thinks the job currently has</dd>
 <dd><code>newStatus</code> - The new status the caller would like to update the status to</dd>
 <dd><code>newStatusMessage</code> - An optional status message to associate with this change</dd>
+</dl>
+</li>
+</ul>
+<a name="getJobStatus-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getJobStatus</h4>
+<pre>public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus(@NotBlank
+                              @NotBlank java.lang.String&nbsp;id)</pre>
+<div class="block">Retrieve the status of the job identified with <code>id</code>.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html#getJobStatus-java.lang.String-">getJobStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to look up.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the current status of the job, as seen by this node</dd>
 </dl>
 </li>
 </ul>

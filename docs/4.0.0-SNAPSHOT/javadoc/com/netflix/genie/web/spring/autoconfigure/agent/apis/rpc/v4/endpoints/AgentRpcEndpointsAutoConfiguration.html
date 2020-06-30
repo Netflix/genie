@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value=<a href="../../../../../../../../../../../com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties.class</a>)
+ @EnableConfigurationProperties(value={<a href="../../../../../../../../../../../com/netflix/genie/web/properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties.class</a>,<a href="../../../../../../../../../../../com/netflix/genie/web/properties/HeartBeatProperties.html" title="class in com.netflix.genie.web.properties">HeartBeatProperties.class</a>})
 public class <span class="typeNameLabel">AgentRpcEndpointsAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Configures various gRPC services and related beans if gRPC functionality is enabled.</div>
@@ -163,7 +163,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcHeartBeatService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-com.netflix.genie.web.properties.HeartBeatProperties-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcHeartBeatService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService,
+                    <a href="../../../../../../../../../../../com/netflix/genie/web/properties/HeartBeatProperties.html" title="class in com.netflix.genie.web.properties">HeartBeatProperties</a>&nbsp;properties,
                     org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide an implementation of <code>HeartBeatServiceGrpc.HeartBeatServiceImplBase</code>
@@ -302,7 +303,7 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
 </dl>
 </li>
 </ul>
-<a name="gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
+<a name="gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-com.netflix.genie.web.properties.HeartBeatProperties-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -311,6 +312,7 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
 <pre>@Bean
  @ConditionalOnMissingBean(value=com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase.class)
 public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a>&nbsp;gRpcHeartBeatService(<a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService,
+                                                                                                                                                                         <a href="../../../../../../../../../../../com/netflix/genie/web/properties/HeartBeatProperties.html" title="class in com.netflix.genie.web.properties">HeartBeatProperties</a>&nbsp;properties,
                                                                                                                                                                          @Qualifier(value="heartBeatServiceTaskScheduler")
                                                                                                                                                                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                                                                                                                                                                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
@@ -319,6 +321,7 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentConnectionTrackingService</code> - The <a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConnectionTrackingService</code></a> implementation to use</dd>
+<dd><code>properties</code> - The service properties</dd>
 <dd><code>taskScheduler</code> - The <code>TaskScheduler</code> instance to use</dd>
 <dd><code>registry</code> - The meter registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

@@ -126,7 +126,8 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html#start-java.nio.file.Path-">start</a></span>(java.nio.file.Path&nbsp;jobDirectory)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html#start-java.lang.String-java.nio.file.Path-">start</a></span>(java.lang.String&nbsp;jobId,
+     java.nio.file.Path&nbsp;jobDirectory)</code>
 <div class="block">Starts the service.</div>
 </td>
 </tr>
@@ -151,16 +152,18 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="start-java.nio.file.Path-">
+<a name="start-java.lang.String-java.nio.file.Path-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>start</h4>
-<pre>void&nbsp;start(java.nio.file.Path&nbsp;jobDirectory)</pre>
+<pre>void&nbsp;start(java.lang.String&nbsp;jobId,
+           java.nio.file.Path&nbsp;jobDirectory)</pre>
 <div class="block">Starts the service.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobId</code> - the job id</dd>
 <dd><code>jobDirectory</code> - the job directory</dd>
 </dl>
 </li>

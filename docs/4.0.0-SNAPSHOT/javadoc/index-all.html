@@ -6424,6 +6424,10 @@
 <dd>
 <div class="block">Create a JobsProperties initialized with default values (for use in tests).</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/AgentJobService.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a></dt>
+<dd>
+<div class="block">Retrieve the current job status for the given job id.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
 <dd>
 <div class="block">Method to get Job status.</div>
@@ -6431,6 +6435,18 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
 <dd>
 <div class="block">Method to fetch the status of a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#getJobStatus-com.netflix.genie.proto.GetJobStatusRequest-io.grpc.stub.StreamObserver-">getJobStatus(GetJobStatusRequest, StreamObserver&lt;GetJobStatusResponse&gt;)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobServiceImpl</a></dt>
+<dd>
+<div class="block">When the agent wants to confirm it's status is still the expected one (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/AgentJobService.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in interface com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></dt>
+<dd>
+<div class="block">Retrieve the status of the job identified with <code>id</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></dt>
+<dd>
+<div class="block">Retrieve the status of the job identified with <code>id</code>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
@@ -6447,6 +6463,18 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the status for a job with the given <code>id</code>.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/exceptions/GetJobStatusException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">GetJobStatusException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/exceptions/package-summary.html">com.netflix.genie.agent.execution.exceptions</a></dt>
+<dd>
+<div class="block">Failure to retrieve job status from the server.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/exceptions/GetJobStatusException.html#GetJobStatusException-java.lang.String-">GetJobStatusException(String)</a></span> - Constructor for exception com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/GetJobStatusException.html" title="class in com.netflix.genie.agent.execution.exceptions">GetJobStatusException</a></dt>
+<dd>
+<div class="block">Constructor with message.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/exceptions/GetJobStatusException.html#GetJobStatusException-java.lang.String-java.lang.Throwable-">GetJobStatusException(String, Throwable)</a></span> - Constructor for exception com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/GetJobStatusException.html" title="class in com.netflix.genie.agent.execution.exceptions">GetJobStatusException</a></dt>
+<dd>
+<div class="block">Constructor with message and cause.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#getJobStderr-java.lang.String-">getJobStderr(String)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
 <dd>
@@ -7510,7 +7538,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html#GRpcAutoConfiguration--">GRpcAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.agent.rpc.<a href="com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html" title="class in com.netflix.genie.agent.rpc">GRpcAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcHeartBeatService(AgentConnectionTrackingService, TaskScheduler, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-com.netflix.genie.web.properties.HeartBeatProperties-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcHeartBeatService(AgentConnectionTrackingService, HeartBeatProperties, TaskScheduler, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide an implementation of <code>HeartBeatServiceGrpc.HeartBeatServiceImplBase</code>
  if no other is provided.</div>
@@ -7519,7 +7547,7 @@
 <dd>
 <div class="block">An edge gRPC service that uses bi-directional streaming.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html#GRpcHeartBeatServiceImpl-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">GRpcHeartBeatServiceImpl(AgentConnectionTrackingService, TaskScheduler, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html#GRpcHeartBeatServiceImpl-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-com.netflix.genie.web.properties.HeartBeatProperties-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">GRpcHeartBeatServiceImpl(AgentConnectionTrackingService, HeartBeatProperties, TaskScheduler, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -7763,6 +7791,12 @@
 <dd>
 <div class="block">Provide a bean for <code>HeartBeatCommand.HeartBeatCommandArguments</code>.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/properties/HeartBeatProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">HeartBeatProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to Heart Beat gRPC Service.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/HeartBeatProperties.html#HeartBeatProperties--">HeartBeatProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HeartBeatProperties.html" title="class in com.netflix.genie.web.properties">HeartBeatProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/properties/HeartBeatServiceProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">HeartBeatServiceProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
 <dd>
 <div class="block">Properties for <a href="com/netflix/genie/agent/execution/services/AgentHeartBeatService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentHeartBeatService</code></a>.</div>
@@ -8300,6 +8334,11 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_KILLED_BY_USER">JOB_KILLED_BY_USER</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
 <div class="block">Job killed by user.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_MARKED_FAILED">JOB_MARKED_FAILED</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
+<dd>
+<div class="block">While job was running, server status was set to something else (probably marked failed by the leader after
+ the agent was disconnected for too long).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_PROCESS_NOT_FOUND">JOB_PROCESS_NOT_FOUND</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
@@ -8937,7 +8976,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">jobMonitorService(KillService, JobDirectoryManifestCreatorService, TaskScheduler, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.agent.execution.services.AgentJobService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">jobMonitorService(KillService, JobDirectoryManifestCreatorService, AgentJobService, TaskScheduler, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobMonitorService</code></a> bean if one hasn't already been defined.</div>
 </dd>
@@ -10354,6 +10393,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/HealthProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HealthProperties.html" title="class in com.netflix.genie.web.properties">HealthProperties</a></dt>
 <dd>
 <div class="block">The property prefix for all properties in this group.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/HeartBeatProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HeartBeatProperties.html" title="class in com.netflix.genie.web.properties">HeartBeatProperties</a></dt>
+<dd>
+<div class="block">Prefix for all properties related to the agent heart beat service.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/HttpProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HttpProperties.html" title="class in com.netflix.genie.web.properties">HttpProperties</a></dt>
 <dd>
@@ -12028,7 +12071,7 @@
 <dd>
 <div class="block">Start listening for job termination notification.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/JobMonitorService.html#start-java.nio.file.Path-">start(Path)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/JobMonitorService.html#start-java.lang.String-java.nio.file.Path-">start(String, Path)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService</a></dt>
 <dd>
 <div class="block">Starts the service.</div>
 </dd>
@@ -12493,6 +12536,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toFinishedJobDto-com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection-">toFinishedJobDto(FinishedJobProjection)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">EntityV4DtoConverters</a></dt>
 <dd>
 <div class="block">Convert a given <a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><code>FinishedJobProjection</code></a> to the equivalent <a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4"><code>FinishedJob</code></a> DTO representation.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toGetJobStatusRequestProto-java.lang.String-">toGetJobStatusRequestProto(String)</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a></dt>
+<dd>
+<div class="block">Creates a request to fetch the job status currently seen by the server.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html#toHandshakeRequestProto-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">toHandshakeRequestProto(AgentClientMetadata)</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a></dt>
 <dd>

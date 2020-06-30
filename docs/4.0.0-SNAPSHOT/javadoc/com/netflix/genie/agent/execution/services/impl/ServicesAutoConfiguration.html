@@ -108,6 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
+ @EnableConfigurationProperties(value=<a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties.class</a>)
  @AutoConfigureAfter(value=<a href="../../../../../../../com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration.class</a>)
 public class <span class="typeNameLabel">ServicesAutoConfiguration</span>
 extends java.lang.Object</pre>
@@ -168,8 +169,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.execution.services.impl.JobMonitorServiceImpl</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">jobMonitorService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.agent.execution.services.AgentJobService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">jobMonitorService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
                  <a href="../../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;manifestCreatorService,
+                 <a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService,
                  org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                  <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobMonitorService</code></a> bean if one hasn't already been defined.</div>
@@ -315,7 +317,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 </dl>
 </li>
 </ul>
-<a name="jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">
+<a name="jobMonitorService-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.agent.execution.services.AgentJobService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -326,6 +328,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/agent/execution/services/JobMonitorService.html" title="interface in com.netflix.genie.agent.execution.services">JobMonitorService.class</a>)
 public&nbsp;com.netflix.genie.agent.execution.services.impl.JobMonitorServiceImpl&nbsp;jobMonitorService(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
                                                                                                                                                                       <a href="../../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;manifestCreatorService,
+                                                                                                                                                                      <a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService,
                                                                                                                                                                       @Qualifier(value="sharedAgentTaskScheduler")
                                                                                                                                                                       org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                                                                                                                                                                       <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
@@ -334,6 +337,7 @@ public&nbsp;com.netflix.genie.agent.execution.services.impl.JobMonitorServiceImp
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>killService</code> - the kill service</dd>
 <dd><code>manifestCreatorService</code> - the manifest creator service</dd>
+<dd><code>agentJobService</code> - the agent job service</dd>
 <dd><code>taskScheduler</code> - the task scheduler</dd>
 <dd><code>agentProperties</code> - the agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
