@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-06-29</span>
+<span id="revdate">2020-06-30</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1109,7 +1109,7 @@ stdout</p></td>
 <p>Save the below file as <code>docker-compose.yml</code> somewhere on your machine</p>
 </li>
 <li>
-<p><a href="https://netflix.github.io/genie/docs/{project-version}/demo/docker-compose.yml">docker-compose.yml</a></p>
+<p><a href="https://netflix.github.io/genie/docs/4.0.0-SNAPSHOT/demo/docker-compose.yml">docker-compose.yml</a></p>
 </li>
 </ol>
 </div>
@@ -1136,34 +1136,37 @@ stdout</p></td>
 <div class="olist lowerroman">
 <ol class="lowerroman" type="i">
 <li>
-<p>The first time you run this it could take quite a while as it has to download 4 large images</p>
+<p>The first time you run this it could take quite a while as it has to download 5 large images</p>
 <div class="olist upperalpha">
 <ol class="upperalpha" type="A">
 <li>
-<p>netflixoss/genie-app:{project-version}</p>
+<p><a href="https://hub.docker.com/r/netflixoss/genie-app">netflixoss/genie-app:4.0.0-SNAPSHOT</a></p>
 </li>
 <li>
-<p>netflixoss/genie-demo-apache:{project-version}</p>
+<p><a href="https://hub.docker.com/r/netflixoss/genie-demo-apache">netflixoss/genie-demo-apache:4.0.0-SNAPSHOT</a></p>
 </li>
 <li>
-<p>netflixoss/genie-demo-client:{project-version}</p>
+<p><a href="https://hub.docker.com/r/netflixoss/genie-client">netflixoss/genie-demo-client:4.0.0-SNAPSHOT</a></p>
 </li>
 <li>
-<p>sequenceiq/hadoop-docker:2.7.1</p>
+<p><a href="https://hub.docker.com/r/sequenceiq/hadoop-docker">sequenceiq/hadoop-docker:2.7.1</a></p>
+</li>
+<li>
+<p><a href="https://hub.docker.com/r/prestosql/presto">prestosql/presto:337</a></p>
 </li>
 </ol>
 </div>
 </li>
 <li>
-<p>This will use docker compose to bring up 5 containers</p>
+<p>This will use docker compose to bring up 6 containers</p>
 <div class="olist upperalpha">
 <ol class="upperalpha" type="A">
 <li>
-<p>genie_demo_app_{project-version}</p>
+<p><code>genie_demo_app_4.0.0-SNAPSHOT</code></p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of netflixoss/genie-app:{project-version} image</p>
+<p>Instantiation of <code>netflixoss/genie-app:4.0.0-SNAPSHOT</code></p>
 </li>
 <li>
 <p>Image from official Genie build which runs Genie app server</p>
@@ -1175,11 +1178,11 @@ stdout</p></td>
 </div>
 </li>
 <li>
-<p>genie_demo_apache_{project-version}</p>
+<p><code>genie_demo_apache_4.0.0-SNAPSHOT</code></p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of netflixoss/genie-demo-apache:{project-version}</p>
+<p>Instantiation of <code>netflixoss/genie-demo-apache:4.0.0-SNAPSHOT</code></p>
 </li>
 <li>
 <p>Extension of apache image which includes files used during demo that Genie will download</p>
@@ -1188,11 +1191,11 @@ stdout</p></td>
 </div>
 </li>
 <li>
-<p>genie_demo_client_{project-version}</p>
+<p><code>genie_demo_client_4.0.0-SNAPSHOT</code></p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of netflixoss/genie-demo-client:{project-version}</p>
+<p>Instantiation of <code>netflixoss/genie-demo-client:4.0.0-SNAPSHOT</code></p>
 </li>
 <li>
 <p>Simulates a client node for Genie which includes several python scripts to configure and run jobs on Genie</p>
@@ -1201,17 +1204,33 @@ stdout</p></td>
 </div>
 </li>
 <li>
-<p>genie_demo_hadoop_prod_{project-version} and genie_demo_hadoop_test_{project-version}</p>
+<p><code>genie_demo_hadoop_prod_4.0.0-SNAPSHOT</code> and <code>genie_demo_hadoop_test_4.0.0-SNAPSHOT</code></p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiations of sequenceiq/hadoop-docker:2.7.1</p>
+<p>Instantiations of <code>sequenceiq/hadoop-docker:2.7.1</code></p>
 </li>
 <li>
 <p>Simulates having two clusters available and registered with Genie with roles as a production and a test cluster</p>
 </li>
 <li>
 <p>See <code>Hadoop Interfaces</code> table for list of available ports</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><code>genie_demo_presto_4.0.0-SNAPSHOT</code></p>
+<div class="olist upperroman">
+<ol class="upperroman" type="I">
+<li>
+<p>Instantiation of <code>prestosql/presto:337</code></p>
+</li>
+<li>
+<p>Single node Presto cluster</p>
+</li>
+<li>
+<p>Web UI bound to <code>localhost</code> port <code>9090</code></p>
 </li>
 </ol>
 </div>
@@ -1240,7 +1259,7 @@ stdout</p></td>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>In a browser navigate to the Genie UI (<code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code>) and notice there are no <code>Jobs</code>, <code>Clusters</code>,
+<p>In a browser navigate to the <a href="http://localhost:8080">Genie UI</a> and notice there are no <code>Jobs</code>, <code>Clusters</code>,
 <code>Commands</code> or <code>applications</code> currently</p>
 </li>
 <li>
@@ -1254,7 +1273,7 @@ stdout</p></td>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>From terminal <code>docker exec -it genie_demo_client_{project-version} /bin/bash</code></p>
+<p>From terminal <code>docker exec -it genie_demo_client_4.0.0-SNAPSHOT /bin/bash</code></p>
 <div class="olist lowerroman">
 <ol class="lowerroman" type="i">
 <li>
@@ -1311,6 +1330,12 @@ stdout</p></td>
 </li>
 <li>
 <p><code>./run_hdfs_job.py test</code></p>
+</li>
+<li>
+<p><code>./run_spark_submit_job sla 2.1.3</code></p>
+</li>
+<li>
+<p><code>./run_presto_job</code></p>
 </li>
 </ol>
 </div>
@@ -1465,7 +1490,7 @@ The images will remain on disk and if you run the demo again it will startup muc
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-06-29 23:20:31 UTC
+Last updated 2020-06-30 01:04:23 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
