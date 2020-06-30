@@ -18,13 +18,15 @@
 package com.netflix.genie.agent.utils.locks.impl;
 
 import com.netflix.genie.agent.execution.exceptions.LockException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
 
 /**
  * Tests for {@link FileLockFactory}.
@@ -32,33 +34,21 @@ import java.io.IOException;
  * @author standon
  * @since 4.0.0
  */
-public class FileLockFactoryTest {
+class FileLockFactoryTest {
 
-    /**
-     * Temporary folder.
-     */
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private FileLockFactory fileLockFactory;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.fileLockFactory = new FileLockFactory();
     }
 
-    /**
-     * Make sure getLock returns a lock of the right type.
-     *
-     * @throws IOException   when the file is bad
-     * @throws LockException when there is a problem getting lock on the file
-     */
     @Test
-    public void canGetTaskExecutor() throws IOException, LockException {
-        Assert.assertTrue(
-            fileLockFactory.getLock(temporaryFolder.newFile()) instanceof FileLock
-        );
+    void canGetTaskExecutor(@TempDir final Path tmpDir) throws IOException, LockException {
+        Assertions
+            .assertThat(
+                this.fileLockFactory.getLock(Files.createFile(tmpDir.resolve(UUID.randomUUID().toString())).toFile())
+            )
+            .isInstanceOf(FileLock.class);
     }
 }

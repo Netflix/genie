@@ -21,12 +21,11 @@ import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.utils.locks.CloseableLock;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.springframework.core.io.Resource;
@@ -37,7 +36,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,58 +47,43 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Tests for fetching cache service implementation.
+ * Tests for {@link FetchingCacheServiceImpl}.
  */
-public class FetchingCacheServiceImplTest {
+class FetchingCacheServiceImplTest {
 
-    /**
-     * Temporary folder.
-     */
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private static final byte[] EMPTY_STRING_BYTES = "".getBytes(StandardCharsets.UTF_8);
 
-    private URI uri;
-
-    private ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     //Boolean flag representing that a downloadCompleted
-    private AtomicBoolean downloadCompleted = new AtomicBoolean(false);
+    private final AtomicBoolean downloadCompleted = new AtomicBoolean(false);
 
     //CloseableLock used for the downloadComplete condition while simulating a download
-    private ReentrantLock simulateDownloadLock = new ReentrantLock();
+    private final ReentrantLock simulateDownloadLock = new ReentrantLock();
 
     //Condition used during download simulation for waiting
-    private Condition downloadComplete = simulateDownloadLock.newCondition();
+    private final Condition downloadComplete = simulateDownloadLock.newCondition();
 
+    private URI uri;
     private ArgumentDelegates.CacheArguments cacheArguments;
-
     private File targetFile;
-
     private ThreadPoolTaskExecutor cleanUpTaskExecutor;
 
-    /**
-     * Set up.
-     *
-     * @throws Exception the exception
-     */
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp(@TempDir final Path temporaryFolder) throws Exception {
         uri = new URI("https://my-server.com/path/to/config/config.xml");
         cacheArguments = Mockito.mock(ArgumentDelegates.CacheArguments.class);
         Mockito.when(
             cacheArguments.getCacheDirectory()
-        ).thenReturn(temporaryFolder.getRoot());
-        targetFile = new File(temporaryFolder.getRoot(), "target");
+        ).thenReturn(temporaryFolder.toFile());
+        targetFile = temporaryFolder.resolve("target").toFile();
         cleanUpTaskExecutor = new ThreadPoolTaskExecutor();
         cleanUpTaskExecutor.setCorePoolSize(1);
         cleanUpTaskExecutor.initialize();
     }
 
-    /**
-     * Clean up.
-     */
-    @After
-    public void cleanUp() {
+    @AfterEach
+    void cleanUp() {
         cleanUpTaskExecutor.shutdown();
     }
 
@@ -109,7 +94,7 @@ public class FetchingCacheServiceImplTest {
      * @throws Exception the exception
      */
     @Test
-    public void cacheConcurrentFetches() throws Exception {
+    void cacheConcurrentFetches() throws Exception {
         final AtomicInteger numOfCacheMisses = new AtomicInteger(0);
 
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
@@ -118,12 +103,12 @@ public class FetchingCacheServiceImplTest {
         final ReentrantLock lockBackingMock = new ReentrantLock();
 
         //Latch to represent that lock acquisition was attempted
-        final CountDownLatch lockAquisitionAttempted = new CountDownLatch(2);
+        final CountDownLatch lockAcquisitionsAttempted = new CountDownLatch(2);
 
         //A mock lock backed by a reentrant lock guarding the resource
         final CloseableLock resourceLock = Mockito.mock(CloseableLock.class);
         Mockito.doAnswer(invocation -> {
-            lockAquisitionAttempted.countDown();
+            lockAcquisitionsAttempted.countDown();
             lockBackingMock.lock();
             return null;
         }).when(resourceLock).lock();
@@ -215,11 +200,11 @@ public class FetchingCacheServiceImplTest {
         });
 
         //Wait for both threads to try to lock
-        lockAquisitionAttempted.await();
+        lockAcquisitionsAttempted.await();
 
         //Either one thread would have tried a download or would try shortly.
         //So, either one thread is waiting on a download or will try to download.
-        //Regardless since both threads have atleast tried to lock once,
+        //Regardless since both threads have at least tried to lock once,
         //signal download completed
         downloadCompleted.set(true);
         simulateDownloadLock.lock();
@@ -233,7 +218,7 @@ public class FetchingCacheServiceImplTest {
         allFetchesDone.await();
 
         //Only one thread reached the critical section
-        Assert.assertEquals(numOfCacheMisses.get(), 1);
+        Assertions.assertThat(numOfCacheMisses.get()).isEqualTo(1);
     }
 
     /**
@@ -244,18 +229,18 @@ public class FetchingCacheServiceImplTest {
      * @throws Exception the exception
      */
     @Test
-    public void cacheConcurrentFetchFailOne() throws Exception {
+    void cacheConcurrentFetchFailOne() throws Exception {
         final AtomicInteger numOfCacheMisses = new AtomicInteger(0);
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final Resource resource = Mockito.mock(Resource.class);
 
-        final CountDownLatch lockAquisitionAttempted = new CountDownLatch(2);
+        final CountDownLatch lockAcquisitionsAttempted = new CountDownLatch(2);
 
         final ReentrantLock lockBackingMock = new ReentrantLock();
-        //A mock lock backed by a reentant lock guarding the resource
+        //A mock lock backed by a reentrant lock guarding the resource
         final CloseableLock resourceLock = Mockito.mock(CloseableLock.class);
         Mockito.doAnswer(invocation -> {
-            lockAquisitionAttempted.countDown();
+            lockAcquisitionsAttempted.countDown();
             lockBackingMock.lock();
             return null;
         }).when(resourceLock).lock();
@@ -265,7 +250,7 @@ public class FetchingCacheServiceImplTest {
             return null;
         }).when(resourceLock).close();
 
-        //Mock locking facrory to use the reentrant lock backed lock
+        //Mock locking factory to use the reentrant lock backed lock
         final FileLockFactory fileLockFactory = Mockito.mock(FileLockFactory.class);
 
         Mockito.when(
@@ -289,7 +274,7 @@ public class FetchingCacheServiceImplTest {
                     return simulateDownloadFailureWithWait();
                 } else { // second thread doing the download
                     return Mockito.spy(
-                        new ByteArrayInputStream("".getBytes(Charset.forName("UTF-8")))
+                        new ByteArrayInputStream(EMPTY_STRING_BYTES)
                     );
                 }
             }
@@ -307,9 +292,7 @@ public class FetchingCacheServiceImplTest {
         );
 
         //Set up the second cache
-        Mockito.when(
-            resourceLoader2.getResource(Mockito.anyString())
-        ).thenReturn(resource2);
+        Mockito.when(resourceLoader2.getResource(Mockito.anyString())).thenReturn(resource2);
 
         Mockito.when(
             resource2.getInputStream()
@@ -320,7 +303,7 @@ public class FetchingCacheServiceImplTest {
                     return simulateDownloadFailureWithWait();
                 } else { // second thread doing the download
                     return Mockito.spy(
-                        new ByteArrayInputStream("".getBytes(Charset.forName("UTF-8")))
+                        new ByteArrayInputStream(EMPTY_STRING_BYTES)
                     );
                 }
             }
@@ -363,11 +346,11 @@ public class FetchingCacheServiceImplTest {
         });
 
         //Wait for both threads to try to lock
-        lockAquisitionAttempted.await();
+        lockAcquisitionsAttempted.await();
 
         //Either one thread would have tried a download or would try shortly.
         //So, either one thread is waiting on a download or will try to download.
-        //Regardless since both threads have atleast tried to lock once,
+        //Regardless since both threads have at least tried to lock once,
         //signal download completed
         downloadCompleted.set(true);
         simulateDownloadLock.lock();
@@ -381,15 +364,11 @@ public class FetchingCacheServiceImplTest {
         allFetchesDone.await();
 
         //Both threads reached the critical section
-        Assert.assertEquals(numOfCacheMisses.get(), 2);
+        Assertions.assertThat(numOfCacheMisses.get()).isEqualTo(2);
         //Proper directory structure and files exist for the resource
-        Assert.assertTrue(
-            directoryStructureExists(
-                cache1.getResourceCacheId(uri),
-                lastModifiedTimeStamp,
-                cache1
-            )
-        );
+        Assertions
+            .assertThat(directoryStructureExists(cache1.getResourceCacheId(uri), lastModifiedTimeStamp, cache1))
+            .isTrue();
     }
 
     /**
@@ -401,8 +380,7 @@ public class FetchingCacheServiceImplTest {
      * @throws Exception the exception
      */
     @Test
-    public void fetchAndDeleteResourceConcurrently() throws Exception {
-
+    void fetchAndDeleteResourceConcurrently() throws Exception {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final Resource resource = Mockito.mock(Resource.class);
 
@@ -410,7 +388,7 @@ public class FetchingCacheServiceImplTest {
 
         final ReentrantLock lockBackingMock = new ReentrantLock();
 
-        //A mock lock backed by a reentant lock guarding the resource
+        //A mock lock backed by a reentrant lock guarding the resource
         final CloseableLock resourceLock = Mockito.mock(CloseableLock.class);
         Mockito.doAnswer(invocation -> {
             lockAcquisitionAttempted.countDown();
@@ -445,7 +423,7 @@ public class FetchingCacheServiceImplTest {
                 downloadBegin.countDown();
                 simulateDownloadWithWait();
                 return Mockito.spy(
-                    new ByteArrayInputStream("".getBytes(Charset.forName("UTF-8")))
+                    new ByteArrayInputStream(EMPTY_STRING_BYTES)
                 );
             }
         );
@@ -489,7 +467,7 @@ public class FetchingCacheServiceImplTest {
         //Download was started, first thread in critical section
         downloadBegin.await();
 
-        //Start deletetion.
+        //Start deletion.
         executorService.submit(() -> {
             try {
                 //Pass in lastDownloadedVersion = lastModifiedTimeStamp + 1 to trigger
@@ -531,8 +509,7 @@ public class FetchingCacheServiceImplTest {
      * @throws Exception the exception
      */
     @Test
-    public void deleteAndFetchResourceConcurrently() throws Exception {
-
+    void deleteAndFetchResourceConcurrently() throws Exception {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final Resource resource = Mockito.mock(Resource.class);
 
@@ -548,7 +525,7 @@ public class FetchingCacheServiceImplTest {
 
         final CountDownLatch deletionSuccessVerified = new CountDownLatch(1);
 
-        //A mock lock backed by a reentant lock guarding the resource
+        //A mock lock backed by a reentrant lock guarding the resource
         final CloseableLock resourceLock = Mockito.mock(CloseableLock.class);
         Mockito.doAnswer(invocation -> {
 
@@ -587,11 +564,9 @@ public class FetchingCacheServiceImplTest {
         Mockito.when(
             resource.getInputStream()
         ).thenAnswer(
-            (Answer<InputStream>) invocation -> {
-                return Mockito.spy(
-                    new ByteArrayInputStream("".getBytes(Charset.forName("UTF-8")))
-                );
-            }
+            (Answer<InputStream>) invocation -> Mockito.spy(
+                new ByteArrayInputStream(EMPTY_STRING_BYTES)
+            )
         );
 
         final long lastModifiedTimeStamp = System.currentTimeMillis();
@@ -627,11 +602,9 @@ public class FetchingCacheServiceImplTest {
         Mockito.when(
             resource3.getInputStream()
         ).thenAnswer(
-            (Answer<InputStream>) invocation -> {
-                return Mockito.spy(
-                    new ByteArrayInputStream("".getBytes(Charset.forName("UTF-8")))
-                );
-            }
+            (Answer<InputStream>) invocation -> Mockito.spy(
+                new ByteArrayInputStream(EMPTY_STRING_BYTES)
+            )
         );
 
         Mockito.when(
@@ -707,15 +680,15 @@ public class FetchingCacheServiceImplTest {
         final String resourceCacheId,
         final long lastModifiedTimeStamp
     ) {
-        Assert.assertFalse(
-            cacheService.getCacheResourceVersionDataFile(resourceCacheId, lastModifiedTimeStamp).exists()
-        );
-        Assert.assertFalse(
-            cacheService.getCacheResourceVersionDownloadFile(resourceCacheId, lastModifiedTimeStamp).exists()
-        );
-        Assert.assertTrue(
-            cacheService.getCacheResourceVersionLockFile(resourceCacheId, lastModifiedTimeStamp).exists()
-        );
+        Assertions
+            .assertThat(cacheService.getCacheResourceVersionDataFile(resourceCacheId, lastModifiedTimeStamp))
+            .doesNotExist();
+        Assertions
+            .assertThat(cacheService.getCacheResourceVersionDownloadFile(resourceCacheId, lastModifiedTimeStamp))
+            .doesNotExist();
+        Assertions
+            .assertThat(cacheService.getCacheResourceVersionLockFile(resourceCacheId, lastModifiedTimeStamp))
+            .exists();
     }
 
     private void assertResourceDownloaded(
@@ -723,21 +696,21 @@ public class FetchingCacheServiceImplTest {
         final String resourceCacheId,
         final long lastModifiedTimeStamp
     ) {
-        Assert.assertTrue(
-            cacheService.getCacheResourceVersionDataFile(resourceCacheId, lastModifiedTimeStamp).exists()
-        );
-        Assert.assertFalse(
-            cacheService.getCacheResourceVersionDownloadFile(resourceCacheId, lastModifiedTimeStamp).exists()
-        );
-        Assert.assertTrue(
-            cacheService.getCacheResourceVersionLockFile(resourceCacheId, lastModifiedTimeStamp).exists()
-        );
+        Assertions
+            .assertThat(cacheService.getCacheResourceVersionDataFile(resourceCacheId, lastModifiedTimeStamp))
+            .exists();
+        Assertions
+            .assertThat(cacheService.getCacheResourceVersionDownloadFile(resourceCacheId, lastModifiedTimeStamp))
+            .doesNotExist();
+        Assertions
+            .assertThat(cacheService.getCacheResourceVersionLockFile(resourceCacheId, lastModifiedTimeStamp))
+            .exists();
     }
 
     /**
      * Simulate a download while waiting until notified.
      *
-     * @return inputstream from download
+     * @return input stream from download
      */
     private InputStream simulateDownloadWithWait() {
         simulateDownloadLock.lock();
@@ -750,16 +723,13 @@ public class FetchingCacheServiceImplTest {
         } finally {
             simulateDownloadLock.unlock();
         }
-        return Mockito.spy(
-            new ByteArrayInputStream("".getBytes(Charset.forName("UTF-8")))
-        );
-
+        return Mockito.spy(new ByteArrayInputStream(EMPTY_STRING_BYTES));
     }
 
     /**
      * Simulate a download failure while waiting until notified.
      *
-     * @return inputstream from download
+     * @return input stream from download
      * @throws DownloadException simulated error
      */
     private InputStream simulateDownloadFailureWithWait() throws DownloadException {

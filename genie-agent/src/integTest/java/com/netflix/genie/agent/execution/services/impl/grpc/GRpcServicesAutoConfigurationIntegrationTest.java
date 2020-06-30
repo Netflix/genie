@@ -27,23 +27,22 @@ import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
 import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for {@link GRpcAutoConfiguration}.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {
         CommonServicesAutoConfiguration.class,
@@ -54,17 +53,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 )
 // TODO: Perhaps this should be using the context runner?
 // TODO: Use mockbean instead of the whole configuration?
-public class GRpcServicesAutoConfigurationIntegrationTest {
+class GRpcServicesAutoConfigurationIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
 
-    /**
-     * Create services.
-     */
     @Test
-    public void getServicesBeans() {
-
+    void getServicesBeans() {
         final Class<?>[] serviceClasses = {
             AgentHeartBeatService.class,
             AgentJobKillService.class,
@@ -73,11 +68,10 @@ public class GRpcServicesAutoConfigurationIntegrationTest {
         };
 
         for (final Class<?> serviceClass : serviceClasses) {
-            Assert.assertNotNull(applicationContext.getBean(serviceClass));
+            Assertions.assertThat(this.applicationContext.getBean(serviceClass)).isNotNull();
         }
     }
 
-    @Configuration
     static class MockConfig {
         @Bean
         ArgumentDelegates.ServerArguments serverArguments() {

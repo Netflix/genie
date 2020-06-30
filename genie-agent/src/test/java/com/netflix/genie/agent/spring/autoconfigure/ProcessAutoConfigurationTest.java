@@ -20,7 +20,7 @@ package com.netflix.genie.agent.spring.autoconfigure;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.impl.JobProcessManagerImpl;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -30,7 +30,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author tgianos
  * @since 4.0.0
  */
-public class ProcessAutoConfigurationTest {
+class ProcessAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
@@ -39,11 +39,8 @@ public class ProcessAutoConfigurationTest {
             )
         );
 
-    /**
-     * Make sure when the auto configuration is applied it creates the expected beans.
-     */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(JobProcessManagerImpl.class);

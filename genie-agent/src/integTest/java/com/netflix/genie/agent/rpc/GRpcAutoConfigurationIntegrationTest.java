@@ -27,21 +27,20 @@ import com.netflix.genie.proto.PingServiceGrpc;
 import io.grpc.ClientInterceptor;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.AbstractStub;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for {@link GRpcServicesAutoConfiguration}.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {
         GRpcAutoConfiguration.class,
@@ -50,32 +49,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 )
 // TODO: Perhaps this should be using the context runner?
 // TODO: Use mockbean instead of the whole configuration?
-public class GRpcAutoConfigurationIntegrationTest {
+class GRpcAutoConfigurationIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
 
-    /**
-     * Check that channel is a singleton.
-     */
     @Test
-    public void channelBean() {
-        final ManagedChannel channel1 = applicationContext.getBean(ManagedChannel.class);
-        final ManagedChannel channel2 = applicationContext.getBean(ManagedChannel.class);
-        Assert.assertNotNull(channel1);
-        Assert.assertNotNull(channel2);
-        Assert.assertSame(channel1, channel2);
+    void channelBean() {
+        final ManagedChannel channel1 = this.applicationContext.getBean(ManagedChannel.class);
+        final ManagedChannel channel2 = this.applicationContext.getBean(ManagedChannel.class);
+        Assertions.assertThat(channel1).isNotNull();
+        Assertions.assertThat(channel2).isNotNull();
+        Assertions.assertThat(channel1).isEqualTo(channel2);
     }
 
-    /**
-     * Check that all gRPC client stubs are available in context, that they are prototype and not singletons and that
-     * they all share a single channel singleton.
-     */
     @Test
-    public void clientsBeans() {
-
-        Assert.assertNotNull(applicationContext);
-
+    void clientsBeans() {
         final Class<?>[] clientStubClasses = {
             PingServiceGrpc.PingServiceFutureStub.class,
             JobServiceGrpc.JobServiceFutureStub.class,
@@ -85,32 +74,27 @@ public class GRpcAutoConfigurationIntegrationTest {
         };
 
         for (final Class<?> clientStubClass : clientStubClasses) {
-            final AbstractStub stub1 = (AbstractStub) applicationContext.getBean(clientStubClass);
-            final AbstractStub stub2 = (AbstractStub) applicationContext.getBean(clientStubClass);
-            Assert.assertNotNull(stub1);
-            Assert.assertNotNull(stub2);
-            Assert.assertNotSame(stub1, stub2);
-            Assert.assertSame(stub1.getChannel(), stub2.getChannel());
+            final AbstractStub<?> stub1 = (AbstractStub<?>) this.applicationContext.getBean(clientStubClass);
+            final AbstractStub<?> stub2 = (AbstractStub<?>) this.applicationContext.getBean(clientStubClass);
+            Assertions.assertThat(stub1).isNotNull();
+            Assertions.assertThat(stub2).isNotNull();
+            Assertions.assertThat(stub1).isNotEqualTo(stub2);
+            Assertions.assertThat(stub1.getChannel()).isEqualTo(stub2.getChannel());
         }
     }
 
-    /**
-     * Check that interceptor beans are resolved.
-     */
     @Test
-    public void interceptorBeans() {
-
+    void interceptorBeans() {
         final Class<?>[] interceptorClasses = {
             ChannelLoggingInterceptor.class,
         };
 
         for (final Class<?> interceptorClass : interceptorClasses) {
-            final ClientInterceptor interceptor = (ClientInterceptor) applicationContext.getBean(interceptorClass);
-            Assert.assertNotNull(interceptor);
+            final ClientInterceptor interceptor = (ClientInterceptor) this.applicationContext.getBean(interceptorClass);
+            Assertions.assertThat(interceptor).isNotNull();
         }
     }
 
-    @Configuration
     static class MockConfig {
         @Bean
         ArgumentDelegates.ServerArguments serverArguments() {

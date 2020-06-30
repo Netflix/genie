@@ -19,22 +19,21 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Unit tests for the JobSearchResultResourceAssembler.
+ * Unit tests for the {@link JobSearchResultModelAssembler}.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class JobSearchResultModelAssemblerTest {
+class JobSearchResultModelAssemblerTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
@@ -47,32 +46,22 @@ public class JobSearchResultModelAssemblerTest {
     private JobSearchResult jobSearchResult;
     private JobSearchResultModelAssembler assembler;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.jobSearchResult
             = new JobSearchResult(ID, NAME, USER, JobStatus.SUCCEEDED, STARTED, FINISHED, CLUSTER_NAME, COMMAND_NAME);
         this.assembler = new JobSearchResultModelAssembler();
     }
 
-    /**
-     * Make sure we can construct the assembler.
-     */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(this.assembler);
+    void canConstruct() {
+        Assertions.assertThat(this.assembler).isNotNull();
     }
 
-    /**
-     * Make sure we can convert the DTO to a resource with links.
-     */
     @Test
-    @Ignore
-    public void canConvertToResource() {
+    void canConvertToResource() {
         final EntityModel<JobSearchResult> model = this.assembler.toModel(this.jobSearchResult);
-        Assert.assertTrue(model.getLinks().hasSize(1));
-        Assert.assertNotNull(model.getLink("self"));
+        Assertions.assertThat(model.getLinks()).hasSize(1);
+        Assertions.assertThat(model.getLink("self")).isNotNull();
     }
 }

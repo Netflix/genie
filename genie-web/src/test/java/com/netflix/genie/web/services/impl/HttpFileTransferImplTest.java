@@ -22,12 +22,10 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,10 +36,10 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -52,16 +50,16 @@ import java.util.concurrent.TimeUnit;
  * @author tgianos
  * @since 3.0.0
  */
-// TODO: Upgrade to Junit 5 after JUnit >= 5.4
-public class HttpFileTransferImplTest {
+class HttpFileTransferImplTest {
 
     private static final String TEST_URL = "http://localhost/myFile.txt";
 
     /**
      * Used for reading and writing files during tests. Cleaned up at end.
      */
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @SuppressWarnings("checkstyle:VisibilityModifier")
+    @TempDir
+    Path temporaryFolder;
 
     private MockRestServiceServer server;
     private HttpFileTransferImpl httpFileTransfer;
@@ -71,11 +69,8 @@ public class HttpFileTransferImplTest {
     private Timer uploadTimer;
     private Timer metadataTimer;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         final RestTemplate restTemplate = new RestTemplate();
         this.server = MockRestServiceServer.createServer(restTemplate);
         this.downloadTimer = Mockito.mock(Timer.class);
@@ -94,30 +89,19 @@ public class HttpFileTransferImplTest {
         this.httpFileTransfer = new HttpFileTransferImpl(restTemplate, this.registry);
     }
 
-    /**
-     * Make sure valid url's return true.
-     *
-     * @throws GenieException On error
-     */
     @Test
-    public void canValidate() throws GenieException {
-        Assert.assertTrue(this.httpFileTransfer.isValid("http://netflix.github.io/genie"));
-        Assert.assertTrue(this.httpFileTransfer.isValid("https://netflix.github.io/genie"));
-        Assert.assertFalse(this.httpFileTransfer.isValid("ftp://netflix.github.io/genie"));
-        Assert.assertFalse(this.httpFileTransfer.isValid("file:///tmp/blah"));
-        Assert.assertTrue(this.httpFileTransfer.isValid("http://localhost/someFile.txt"));
-        Assert.assertTrue(this.httpFileTransfer.isValid("https://localhost:8080/someFile.txt"));
+    void canValidate() throws GenieException {
+        Assertions.assertThat(this.httpFileTransfer.isValid("http://netflix.github.io/genie")).isTrue();
+        Assertions.assertThat(this.httpFileTransfer.isValid("https://netflix.github.io/genie")).isTrue();
+        Assertions.assertThat(this.httpFileTransfer.isValid("ftp://netflix.github.io/genie")).isFalse();
+        Assertions.assertThat(this.httpFileTransfer.isValid("file:///tmp/blah")).isFalse();
+        Assertions.assertThat(this.httpFileTransfer.isValid("http://localhost/someFile.txt")).isTrue();
+        Assertions.assertThat(this.httpFileTransfer.isValid("https://localhost:8080/someFile.txt")).isTrue();
     }
 
-    /**
-     * Make sure we can actually get a file.
-     *
-     * @throws GenieException On error
-     * @throws IOException    On error
-     */
     @Test
-    public void canGet() throws GenieException, IOException {
-        final File output = this.temporaryFolder.newFile();
+    void canGet() throws GenieException, IOException {
+        final Path output = this.temporaryFolder.resolve(UUID.randomUUID().toString());
         final String contents = UUID.randomUUID().toString();
 
         this.server
@@ -125,10 +109,10 @@ public class HttpFileTransferImplTest {
             .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
             .andRespond(
                 MockRestResponseCreators
-                    .withSuccess(contents.getBytes(Charset.forName("UTF-8")), MediaType.APPLICATION_OCTET_STREAM)
+                    .withSuccess(contents.getBytes(StandardCharsets.UTF_8), MediaType.APPLICATION_OCTET_STREAM)
             );
 
-        this.httpFileTransfer.getFile(TEST_URL, output.getCanonicalPath());
+        this.httpFileTransfer.getFile(TEST_URL, output.toFile().getCanonicalPath());
 
         this.server.verify();
         Mockito
@@ -139,92 +123,71 @@ public class HttpFileTransferImplTest {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
-    /**
-     * Make sure can't get a file if the intput isn't a valid url.
-     *
-     * @throws GenieException On Error
-     * @throws IOException    On Error
-     */
-    @Test(expected = GenieServerException.class)
-    public void cantGetWithInvalidUrl() throws GenieException, IOException {
-        try {
-            this.httpFileTransfer.getFile(
-                UUID.randomUUID().toString(),
-                this.temporaryFolder.getRoot().getCanonicalPath()
+    @Test
+    void cantGetWithInvalidUrl() {
+        Assertions
+            .assertThatExceptionOfType(GenieServerException.class)
+            .isThrownBy(
+                () -> this.httpFileTransfer.getFile(
+                    UUID.randomUUID().toString(),
+                    this.temporaryFolder.toFile().getCanonicalPath()
+                )
             );
-        } finally {
-            Mockito
-                .verify(this.registry, Mockito.times(1))
-                .timer(
-                    HttpFileTransferImpl.DOWNLOAD_TIMER_NAME,
-                    MetricsUtils.newFailureTagsSetForException(new GenieServerException("test"))
-                );
-            Mockito
-                .verify(this.downloadTimer, Mockito.times(1))
-                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
-        }
+        Mockito
+            .verify(this.registry, Mockito.times(1))
+            .timer(
+                HttpFileTransferImpl.DOWNLOAD_TIMER_NAME,
+                MetricsUtils.newFailureTagsSetForException(new GenieServerException("test"))
+            );
+        Mockito
+            .verify(this.downloadTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
-    /**
-     * Make sure can't get a file if the output location is a directory.
-     *
-     * @throws GenieException On Error
-     * @throws IOException    On Error
-     */
-    @Test(expected = ResourceAccessException.class)
-    public void cantGetWithDirectoryAsOutput() throws GenieException, IOException {
+    @Test
+    void cantGetWithDirectoryAsOutput() {
         this.server
             .expect(MockRestRequestMatchers.requestTo(TEST_URL))
             .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
             .andRespond(
                 MockRestResponseCreators
-                    .withSuccess("junk".getBytes(Charset.forName("UTF-8")), MediaType.APPLICATION_OCTET_STREAM)
+                    .withSuccess("junk".getBytes(StandardCharsets.UTF_8), MediaType.APPLICATION_OCTET_STREAM)
             );
-        try {
-            this.httpFileTransfer.getFile(TEST_URL, this.temporaryFolder.getRoot().getCanonicalPath());
-        } finally {
-            Mockito
-                .verify(this.registry, Mockito.times(1))
-                .timer(
-                    HttpFileTransferImpl.DOWNLOAD_TIMER_NAME,
-                    MetricsUtils.newFailureTagsSetForException(new ResourceAccessException("test"))
-                );
-            Mockito
-                .verify(this.downloadTimer, Mockito.times(1))
-                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
-        }
+        Assertions
+            .assertThatExceptionOfType(ResourceAccessException.class)
+            .isThrownBy(
+                () -> this.httpFileTransfer.getFile(TEST_URL, this.temporaryFolder.toFile().getCanonicalPath())
+            );
+        Mockito
+            .verify(this.registry, Mockito.times(1))
+            .timer(
+                HttpFileTransferImpl.DOWNLOAD_TIMER_NAME,
+                MetricsUtils.newFailureTagsSetForException(new ResourceAccessException("test"))
+            );
+        Mockito
+            .verify(this.downloadTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
-    /**
-     * Make sure that there is no implementation of the putFile method.
-     *
-     * @throws GenieException on error
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void cantPutFile() throws GenieException {
-        try {
-            final String file = UUID.randomUUID().toString();
-            this.httpFileTransfer.putFile(file, file);
-        } finally {
-            Mockito
-                .verify(this.registry, Mockito.times(1))
-                .timer(
-                    HttpFileTransferImpl.UPLOAD_TIMER_NAME,
-                    MetricsUtils.newFailureTagsSetForException(new UnsupportedOperationException("test"))
-                );
-            Mockito
-                .verify(this.uploadTimer, Mockito.times(1))
-                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
-        }
-    }
-
-    /**
-     * Make sure can get the last update time of a file.
-     *
-     * @throws GenieException On error
-     */
     @Test
-    public void canGetLastModifiedTime() throws GenieException {
+    void cantPutFile() {
+        final String file = UUID.randomUUID().toString();
+        Assertions
+            .assertThatExceptionOfType(UnsupportedOperationException.class)
+            .isThrownBy(() -> this.httpFileTransfer.putFile(file, file));
+        Mockito
+            .verify(this.registry, Mockito.times(1))
+            .timer(
+                HttpFileTransferImpl.UPLOAD_TIMER_NAME,
+                MetricsUtils.newFailureTagsSetForException(new UnsupportedOperationException("test"))
+            );
+        Mockito
+            .verify(this.uploadTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+    }
+
+    @Test
+    void canGetLastModifiedTime() throws GenieException {
         final long lastModified = 28424323000L;
         final HttpHeaders headers = new HttpHeaders();
         headers.setLastModified(lastModified);
@@ -233,7 +196,7 @@ public class HttpFileTransferImplTest {
             .andExpect(MockRestRequestMatchers.method(HttpMethod.HEAD))
             .andRespond(MockRestResponseCreators.withSuccess().headers(headers));
 
-        Assert.assertThat(this.httpFileTransfer.getLastModifiedTime(TEST_URL), Matchers.is(lastModified));
+        Assertions.assertThat(this.httpFileTransfer.getLastModifiedTime(TEST_URL)).isEqualTo(lastModified);
         this.server.verify();
         Mockito
             .verify(this.registry, Mockito.times(1))
@@ -243,19 +206,14 @@ public class HttpFileTransferImplTest {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
-    /**
-     * Make sure can get the last update time of a file.
-     *
-     * @throws GenieException On error
-     */
     @Test
-    public void canGetLastModifiedTimeIfNoHeader() throws GenieException {
+    void canGetLastModifiedTimeIfNoHeader() throws GenieException {
         final long time = Instant.now().toEpochMilli() - 1;
         this.server
             .expect(MockRestRequestMatchers.requestTo(TEST_URL))
             .andExpect(MockRestRequestMatchers.method(HttpMethod.HEAD))
             .andRespond(MockRestResponseCreators.withSuccess());
-        Assert.assertTrue(this.httpFileTransfer.getLastModifiedTime(TEST_URL) > time);
+        Assertions.assertThat(this.httpFileTransfer.getLastModifiedTime(TEST_URL)).isGreaterThan(time);
         Mockito
             .verify(this.registry, Mockito.times(1))
             .timer(HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME, MetricsUtils.newSuccessTagsSet());
@@ -264,28 +222,20 @@ public class HttpFileTransferImplTest {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
-    /**
-     * Make sure can get the last update time of a file.
-     *
-     * @throws GenieException On error
-     */
-    @Test(expected = GenieServerException.class)
-    public void cantGetLastModifiedTimeIfNotURL() throws GenieException {
-        try {
-            this.httpFileTransfer.getLastModifiedTime(UUID.randomUUID().toString());
-        } catch (final GenieServerException e) {
-            Assert.assertTrue(e.getCause() instanceof MalformedURLException);
-            throw e;
-        } finally {
-            Mockito
-                .verify(this.registry, Mockito.times(1))
-                .timer(
-                    HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME,
-                    MetricsUtils.newFailureTagsSetForException(new MalformedURLException("test"))
-                );
-            Mockito
-                .verify(this.metadataTimer, Mockito.times(1))
-                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
-        }
+    @Test
+    void cantGetLastModifiedTimeIfNotURL() {
+        Assertions
+            .assertThatExceptionOfType(GenieServerException.class)
+            .isThrownBy(() -> this.httpFileTransfer.getLastModifiedTime(UUID.randomUUID().toString()))
+            .withCauseInstanceOf(MalformedURLException.class);
+        Mockito
+            .verify(this.registry, Mockito.times(1))
+            .timer(
+                HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME,
+                MetricsUtils.newFailureTagsSetForException(new MalformedURLException("test"))
+            );
+        Mockito
+            .verify(this.metadataTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 }
