@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -243,59 +243,71 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#equals-java.lang.Object-">equals</a></span>(java.lang.Object&nbsp;o)</code></td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#getLauncherExt--">getLauncherExt</a></span>()</code>
+<div class="block">Get any metadata associated with this command pertaining to specifying details for various agent launchers.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#getMemory--">getMemory</a></span>()</code>
 <div class="block">Get the default memory for a job using this command.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#hashCode--">hashCode</a></span>()</code></td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#removeApplication-com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity-">removeApplication</a></span>(@NotNull <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&nbsp;application)</code>
 <div class="block">Remove an application from this command.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#removeClusterCriterion-int-">removeClusterCriterion</a></span>(int&nbsp;priority)</code>
 <div class="block">Remove the criterion with the given priority from the list of available criterion for this command.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setApplications-java.util.List-">setApplications</a></span>(java.util.List&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt;&nbsp;applications)</code>
 <div class="block">Sets the applications for this command.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setClusterCriteria-java.util.List-">setClusterCriteria</a></span>(java.util.List&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt;&nbsp;clusterCriteria)</code>
 <div class="block">Set the criteria, in priority order, that this command has for determining which available clusters to use
  for a job.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setConfigs-java.util.Set-">setConfigs</a></span>(java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;&nbsp;configs)</code>
 <div class="block">Set all the files associated as configuration files for this cluster.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setDependencies-java.util.Set-">setDependencies</a></span>(java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;&nbsp;dependencies)</code>
 <div class="block">Set all the files associated as dependency files for this cluster.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setExecutable-java.util.List-">setExecutable</a></span>(@NotEmpty java.util.List&lt;java.lang.String&gt;&nbsp;executable)</code>
 <div class="block">Set the executable and any default arguments for this command.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">setLauncherExt</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExt)</code>
+<div class="block">Set any metadata pertaining to additional instructions for various launchers if this command is used.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setTags-java.util.Set-">setTags</a></span>(java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt;&nbsp;tags)</code>
 <div class="block">Set all the tags associated to this cluster.</div>
@@ -307,7 +319,7 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.netflix.genie.web.data.services.impl.jpa.entities.<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity</a></h3>
-<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getDescription--">getDescription</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getMetadata--">getMetadata</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getSetupFile--">getSetupFile</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setDescription-java.lang.String-">setDescription</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-java.lang.String-">setMetadata</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setSetupFile-com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity-">setSetupFile</a></code></li>
+<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getDescription--">getDescription</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getMetadata--">getMetadata</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getSetupFile--">getSetupFile</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setDescription-java.lang.String-">setDescription</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-com.fasterxml.jackson.databind.JsonNode-">setMetadata</a>, <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setSetupFile-com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity-">setSetupFile</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.com.netflix.genie.web.data.services.impl.jpa.entities.AuditEntity">
@@ -522,6 +534,35 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Optional of Integer as it could be null</dd>
+</dl>
+</li>
+</ul>
+<a name="getLauncherExt--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLauncherExt</h4>
+<pre>public&nbsp;java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getLauncherExt()</pre>
+<div class="block">Get any metadata associated with this command pertaining to specifying details for various agent launchers.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The metadata or <code>Optional.empty()</code> if there isn't any</dd>
+</dl>
+</li>
+</ul>
+<a name="setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setLauncherExt</h4>
+<pre>public&nbsp;void&nbsp;setLauncherExt(@Nullable
+                           com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExt)</pre>
+<div class="block">Set any metadata pertaining to additional instructions for various launchers if this command is used.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>launcherExt</code> - The metadata</dd>
 </dl>
 </li>
 </ul>

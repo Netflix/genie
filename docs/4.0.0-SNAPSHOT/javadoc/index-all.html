@@ -908,6 +908,8 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#ARCHIVE_LOCATION">ARCHIVE_LOCATION</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#ARCHIVE_STATUS">ARCHIVE_STATUS</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/services/impl/FileSystemJobArchiverImpl.html#archiveDirectory-java.nio.file.Path-java.util.List-java.net.URI-">archiveDirectory(Path, List&lt;File&gt;, URI)</a></span> - Method in class com.netflix.genie.common.internal.services.impl.<a href="com/netflix/genie/common/internal/services/impl/FileSystemJobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">FileSystemJobArchiverImpl</a></dt>
 <dd>
 <div class="block">Attempt to archive a directory located at <code>directory</code> to the <code>target</code>.</div>
@@ -959,6 +961,8 @@
 <div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#archiveLocation">archiveLocation</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#archiveStatus">archiveStatus</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#ARCHIVING_DISABLED">ARCHIVING_DISABLED</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -2685,6 +2689,8 @@
 <div class="block">Utility methods re-used in various controllers.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/converters/URIPropertyConverter.html#convert-java.lang.String-">convert(String)</a></span> - Method in class com.netflix.genie.web.properties.converters.<a href="com/netflix/genie/web/properties/converters/URIPropertyConverter.html" title="class in com.netflix.genie.web.properties.converters">URIPropertyConverter</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html#convertToDatabaseColumn-com.fasterxml.jackson.databind.JsonNode-">convertToDatabaseColumn(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html#convertToEntityAttribute-java.lang.String-">convertToEntityAttribute(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html#coordinateJob-com.netflix.genie.common.dto.JobRequest-com.netflix.genie.common.dto.JobMetadata-">coordinateJob(JobRequest, JobMetadata)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobCoordinatorServiceImpl</a></dt>
 <dd>
 <div class="block">Takes in a Job Request object and does necessary preparation for execution.</div>
@@ -5179,6 +5185,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getArchiveLocationPrefix--">getArchiveLocationPrefix()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#getArchiveStatus--">getArchiveStatus()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">Get the archive status for the job if there is one.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentFilterProperties.html#getBlacklistedVersions--">getBlacklistedVersions()</a></span> - Method in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentFilterProperties.html" title="class in com.netflix.genie.web.properties">AgentFilterProperties</a></dt>
 <dd>
 <div class="block">Get the (dynamic) property value containing a regular expression used to blacklist agent versions.</div>
@@ -6510,6 +6520,14 @@
 <dd>
 <div class="block">Returns the last modified time of the file with the given path.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#getLauncherExt--">getLauncherExt()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a></dt>
+<dd>
+<div class="block">Get any metadata associated with this command pertaining to specifying details for various agent launchers.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#getLauncherExt--">getLauncherExt()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">Get any metadata associated with this job pertaining to the launcher that launched it.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/locks/impl/FileLockFactory.html#getLock-java.io.File-">getLock(File)</a></span> - Method in class com.netflix.genie.agent.utils.locks.impl.<a href="com/netflix/genie/agent/utils/locks/impl/FileLockFactory.html" title="class in com.netflix.genie.agent.utils.locks.impl">FileLockFactory</a></dt>
 <dd>
 <div class="block">Get a lock locking the provided File object.</div>
@@ -6880,6 +6898,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobEnvironmentRequest.html#getRequestedJobMemory--">getRequestedJobMemory()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobEnvironmentRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobEnvironmentRequest</a></dt>
 <dd>
 <div class="block">Get the amount of memory requested by the user to launch the job process with.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#getRequestedLauncherExt--">getRequestedLauncherExt()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">Get any metadata the user provided with respect to the launcher.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html#getRequestedMemory--">getRequestedMemory()</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.<a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a></dt>
 <dd>
@@ -8192,11 +8214,6 @@
 <dd>
 <div class="block">Get whether the job is a V4 job (Run with agent).</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/IsV4JobProjection.html#isV4--">isV4()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/IsV4JobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">IsV4JobProjection</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
-<div class="block">Job was launched using Genie v4.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#isV4-java.lang.String-">isV4(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>
@@ -8206,10 +8223,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#isV4-java.lang.String-">isV4(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get whether the job is a V4 job (Run with agent).</div>
-</dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/IsV4JobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><span class="typeNameLink">IsV4JobProjection</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/FileTransfer.html#isValid-java.lang.String-">isValid(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/FileTransfer.html" title="interface in com.netflix.genie.web.services">FileTransfer</a></dt>
 <dd>
@@ -9515,6 +9528,13 @@
 <dd>
 <div class="block">Repository for tags.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters"><span class="typeNameLink">JsonAttributeConverter</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/converters/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.converters</a></dt>
+<dd>
+<div class="block">An <code>AttributeConverter</code> to convert <code>JsonNode</code> objects into their String representations for storage
+ and vice versa.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html#JsonAttributeConverter--">JsonAttributeConverter()</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/util/JsonUtils.html" title="class in com.netflix.genie.common.util"><span class="typeNameLink">JsonUtils</span></a> - Class in <a href="com/netflix/genie/common/util/package-summary.html">com.netflix.genie.common.util</a></dt>
 <dd>
 <div class="block">Utility methods for interacting with JSON.</div>
@@ -9636,6 +9656,14 @@
 <dd>
 <div class="block">Launch an agent to execute the given <a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#LAUNCHER_EXT">LAUNCHER_EXT</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#LAUNCHER_EXT">LAUNCHER_EXT</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#launcherExt">launcherExt</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#launcherExt">launcherExt</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#launchJob-com.netflix.genie.web.dtos.JobSubmission-">launchJob(JobSubmission)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a></dt>
 <dd>
 <div class="block">Launches a job on behalf of the user.</div>
@@ -10981,6 +11009,8 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_JOB_DIRECTORY_LOCATION">REQUESTED_JOB_DIRECTORY_LOCATION</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_LAUNCHER_EXT">REQUESTED_LAUNCHER_EXT</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_MEMORY">REQUESTED_MEMORY</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_TIMEOUT">REQUESTED_TIMEOUT</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
@@ -10998,6 +11028,8 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/UniqueIdEntity_.html#requestedId">requestedId</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/UniqueIdEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#requestedJobDirectoryLocation">requestedJobDirectoryLocation</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#requestedLauncherExt">requestedLauncherExt</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#requestedMemory">requestedMemory</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -11695,6 +11727,10 @@
 <dd>
 <div class="block">Set the applications for the command.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setArchiveStatus-java.lang.String-">setArchiveStatus(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">Set the archive status for this job.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/GenieEventBusImpl.html#setBeanClassLoader-java.lang.ClassLoader-">setBeanClassLoader(ClassLoader)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBusImpl.html" title="class in com.netflix.genie.web.events">GenieEventBusImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/GenieEventBusImpl.html#setBeanFactory-org.springframework.beans.factory.BeanFactory-">setBeanFactory(BeanFactory)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBusImpl.html" title="class in com.netflix.genie.web.events">GenieEventBusImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setCluster-com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity-">setCluster(ClusterEntity)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
@@ -11838,13 +11874,17 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#setJsonField-com.fasterxml.jackson.databind.JsonNode-java.util.function.Consumer-">setJsonField(JsonNode, Consumer&lt;String&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">EntityV4DtoConverters</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">setLauncherExt(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a></dt>
 <dd>
-<div class="block">Given a JSON node convert it to a string representation and hand it to the consumer.</div>
+<div class="block">Set any metadata pertaining to additional instructions for various launchers if this command is used.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">setLauncherExt(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">Set any metadata pertaining to the launcher that launched this job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobStateServiceImpl.html#setMemoryAndTask-java.lang.String-int-java.util.concurrent.Future-">setMemoryAndTask(String, int, Future&lt;?&gt;)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobStateServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobStateServiceImpl</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-java.lang.String-">setMetadata(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-com.fasterxml.jackson.databind.JsonNode-">setMetadata(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity</a></dt>
 <dd>
 <div class="block">Set the JSON metadata of this entity.</div>
 </dd>
@@ -11859,6 +11899,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setRequestedEnvironmentVariables-java.util.Map-">setRequestedEnvironmentVariables(Map&lt;String, String&gt;)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
 <div class="block">Set the requested environment variables.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setRequestedLauncherExt-com.fasterxml.jackson.databind.JsonNode-">setRequestedLauncherExt(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">Set any metadata pertaining to the launcher that was provided by the user.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/aspects/DataServiceRetryAspect.html#setRetryListeners-org.springframework.retry.RetryListener:A-">setRetryListeners(RetryListener[])</a></span> - Method in class com.netflix.genie.web.aspects.<a href="com/netflix/genie/web/aspects/DataServiceRetryAspect.html" title="class in com.netflix.genie.web.aspects">DataServiceRetryAspect</a></dt>
 <dd>

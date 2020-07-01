@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV3DtoConverters.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li>Next&nbsp;Class</li>
+<li><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../../../index.html?com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html" target="_top">Frames</a></li>
@@ -133,50 +133,43 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#setJsonField-com.fasterxml.jackson.databind.JsonNode-java.util.function.Consumer-">setJsonField</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;json,
-            java.util.function.Consumer&lt;java.lang.String&gt;&nbsp;consumer)</code>
-<div class="block">Given a JSON node convert it to a string representation and hand it to the consumer.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toCriterionDto-com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity-">toCriterionDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&nbsp;criterionEntity)</code>
 <div class="block">Convert a given <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CriterionEntity</code></a> to the equivalent <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> DTO representation.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toFinishedJobDto-com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection-">toFinishedJobDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">FinishedJobProjection</a>&nbsp;finishedJobProjection)</code>
 <div class="block">Convert a given <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><code>FinishedJobProjection</code></a> to the equivalent <a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4"><code>FinishedJob</code></a> DTO representation.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toJobSpecificationDto-com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection-">toJobSpecificationDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobSpecificationProjection</a>&nbsp;jobSpecificationProjection)</code>
 <div class="block">Convert the values contained in the <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><code>JobSpecificationProjection</code></a> to an immutable <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobSpecification</code></a>
  DTO.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toV4ApplicationDto-com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity-">toV4ApplicationDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&nbsp;applicationEntity)</code>
 <div class="block">Convert an application entity to a DTO for external exposure.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toV4ClusterDto-com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity-">toV4ClusterDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&nbsp;clusterEntity)</code>
 <div class="block">Convert a cluster entity to a DTO for external exposure.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toV4CommandDto-com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity-">toV4CommandDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&nbsp;commandEntity)</code>
 <div class="block">Convert a command entity to a DTO for external exposure.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html#toV4JobRequestDto-com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection-">toV4JobRequestDto</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">V4JobRequestProjection</a>&nbsp;jobRequestProjection)</code>
 <div class="block">Convert a job request entity to a DTO.</div>
@@ -314,23 +307,6 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="setJsonField-com.fasterxml.jackson.databind.JsonNode-java.util.function.Consumer-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setJsonField</h4>
-<pre>public static&nbsp;void&nbsp;setJsonField(@Nullable
-                                com.fasterxml.jackson.databind.JsonNode&nbsp;json,
-                                java.util.function.Consumer&lt;java.lang.String&gt;&nbsp;consumer)</pre>
-<div class="block">Given a JSON node convert it to a string representation and hand it to the consumer.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>json</code> - The JSON node to convert. If null null will be passed to the consumer</dd>
-<dd><code>consumer</code> - The consumer function to call with the string representation</dd>
-</dl>
-</li>
-</ul>
 <a name="toJobSpecificationDto-com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection-">
 <!--   -->
 </a>
@@ -383,7 +359,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/EntityV3DtoConverters.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li>Next&nbsp;Class</li>
+<li><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../../../index.html?com/netflix/genie/web/data/services/impl/jpa/converters/EntityV4DtoConverters.html" target="_top">Frames</a></li>

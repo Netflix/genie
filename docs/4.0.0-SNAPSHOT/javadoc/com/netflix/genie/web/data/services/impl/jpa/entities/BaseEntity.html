@@ -170,7 +170,7 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
+<td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#getMetadata--">getMetadata</a></span>()</code>
 <div class="block">Get the metadata of this entity which is unstructured JSON.</div>
 </td>
@@ -193,7 +193,7 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-java.lang.String-">setMetadata</a></span>(java.lang.String&nbsp;metadata)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-com.fasterxml.jackson.databind.JsonNode-">setMetadata</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;metadata)</code>
 <div class="block">Set the JSON metadata of this entity.</div>
 </td>
 </tr>
@@ -297,28 +297,28 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 <ul class="blockList">
 <li class="blockList">
 <h4>getMetadata</h4>
-<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getMetadata()</pre>
+<pre>public&nbsp;java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getMetadata()</pre>
 <div class="block">Get the metadata of this entity which is unstructured JSON.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/BaseProjection.html#getMetadata--">getMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/BaseProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">BaseProjection</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>Optional of the metadata json node represented as a string</dd>
+<dd>Optional of the metadata json node</dd>
 </dl>
 </li>
 </ul>
-<a name="setMetadata-java.lang.String-">
+<a name="setMetadata-com.fasterxml.jackson.databind.JsonNode-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setMetadata</h4>
 <pre>public&nbsp;void&nbsp;setMetadata(@Nullable
-                        java.lang.String&nbsp;metadata)</pre>
+                        com.fasterxml.jackson.databind.JsonNode&nbsp;metadata)</pre>
 <div class="block">Set the JSON metadata of this entity.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>metadata</code> - The metadata of this</dd>
+<dd><code>metadata</code> - The metadata of this entity</dd>
 </dl>
 </li>
 </ul>
