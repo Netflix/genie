@@ -32,6 +32,7 @@ import org.apache.curator.framework.state.ConnectionStateListener
 import org.apache.curator.x.discovery.ServiceDiscovery
 import org.apache.curator.x.discovery.ServiceInstance
 import org.apache.curator.x.discovery.ServiceType
+import org.apache.zookeeper.KeeperException
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.Trigger
 import spock.lang.Specification
@@ -254,6 +255,34 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
         1 * timer.record(_, TimeUnit.NANOSECONDS)
         serviceInstanceJob != null
         1 * serviceDiscovery.updateService(_)
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+
+        when:
+        reconciliationTask.run()
+
+        then:
+        0 * serviceDiscovery.registerService(_ as ServiceInstance)
+        0 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
+            throw new KeeperException.NoNodeException("...")
+        }
+        1 * serviceDiscovery.registerService(_ as ServiceInstance)
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+
+        when:
+        reconciliationTask.run()
+
+        then:
+        0 * serviceDiscovery.registerService(_ as ServiceInstance)
+        0 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
+            throw new KeeperException.NoNodeException("...")
+        }
+        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
+            throw new RuntimeException("...")
+        }
         1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
         1 * timer.record(_, TimeUnit.NANOSECONDS)
 

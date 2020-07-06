@@ -37,6 +37,7 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceType;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.validation.constraints.NotBlank;
@@ -220,6 +221,17 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
                 final long start = System.nanoTime();
                 try {
                     this.serviceDiscovery.updateService(serviceInstance);
+                } catch (KeeperException.NoNodeException e) {
+                    log.warn("Failed to update registration of agent executing job id: {}", jobId);
+
+                    // Expecting to update, but failed because existing node is not there. Create it.
+                    try {
+                        this.serviceDiscovery.registerService(serviceInstance);
+                    } catch (Exception exception) {
+                        log.error("Failed to re-create registration for agent executing job id: {}", jobId);
+                        tags = MetricsUtils.newFailureTagsSetForException(e);
+                    }
+
                 } catch (Exception e) {
                     log.error("Failed to refresh agent executing job id: {}", jobId);
                     tags = MetricsUtils.newFailureTagsSetForException(e);
