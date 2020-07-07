@@ -44,4 +44,5 @@ public class AgentProperties {
     private HeartBeatServiceProperties heartBeatService = new HeartBeatServiceProperties();
     private JobKillServiceProperties jobKillService = new JobKillServiceProperties();
     private JobMonitorServiceProperties jobMonitorService = new JobMonitorServiceProperties();
+    private ShutdownProperties shutdown = new ShutdownProperties();
 }

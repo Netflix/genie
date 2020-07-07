@@ -37,12 +37,14 @@ class AgentPropertiesSpec extends Specification {
         agentProperties.getHeartBeatService() != null
         agentProperties.getJobKillService() != null
         agentProperties.getJobMonitorService() != null
+        agentProperties.getShutdown() != null
 
         when:
         def fileStreamServiceProps = Mock(FileStreamServiceProperties)
         def heartBeatServiceProps = Mock(HeartBeatServiceProperties)
         def jobKillServiceProps = Mock(JobKillServiceProperties)
         def jobLimitsProps = Mock(JobMonitorServiceProperties)
+        def shutdownProps = Mock(ShutdownProperties)
 
         agentProperties.setEmergencyShutdownDelay(Duration.ofMinutes(10))
         agentProperties.setForceManifestRefreshTimeout(Duration.ofSeconds(10))
@@ -50,6 +52,7 @@ class AgentPropertiesSpec extends Specification {
         agentProperties.setHeartBeatService(heartBeatServiceProps)
         agentProperties.setJobKillService(jobKillServiceProps)
         agentProperties.setJobMonitorService(jobLimitsProps)
+        agentProperties.setShutdown(shutdownProps)
 
         then:
         agentProperties.getEmergencyShutdownDelay() == Duration.ofMinutes(10)
@@ -58,5 +61,6 @@ class AgentPropertiesSpec extends Specification {
         agentProperties.getHeartBeatService() == heartBeatServiceProps
         agentProperties.getJobKillService() == jobKillServiceProps
         agentProperties.getJobMonitorService() == jobLimitsProps
+        agentProperties.getShutdown() == shutdownProps
     }
 }
