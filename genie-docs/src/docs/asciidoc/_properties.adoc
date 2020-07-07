@@ -976,4 +976,24 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | 1.2
 |
 
+| `genie.agent.runtime.shutdown.internal-executors-leeway`
+| Time allowed on task running on internal task executors to complete before the agent terminates
+| 30s
+| This property is bound during initialization and cannot be modified at runtime by the server.
+
+| `genie.agent.runtime.shutdown.internal-schedulers-leeway`
+| Time allowed on task running on internal task schedulers to complete before the agent terminates
+| 30s
+| This property is bound during initialization and cannot be modified at runtime by the server.
+
+| `genie.agent.runtime.shutdown.system-executor-leeway`
+| Time allowed on task running on Spring's system task executor to complete before the agent terminates
+| 60s
+| This property is bound during initialization and cannot be modified at runtime by the server.
+
+| `genie.agent.runtime.shutdown.system-scheduler-leeway`
+| Time allowed on task running on Spring's system task scheduler to complete before the agent terminates
+| 60s
+| This property is bound during initialization and cannot be modified at runtime by the server.
+
 |===

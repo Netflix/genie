@@ -65,6 +65,11 @@ genie:
         max-file-size: 8GB
         max-total-size: 16GB
         check-remote-job-status: true
+      shutdown:
+        internal-executors-leeway: 30s
+        internal-schedulers-leeway: 30s
+        system-executor-leeway: 60s
+        system-scheduler-leeway: 60s
 
 spring:
   banner:
