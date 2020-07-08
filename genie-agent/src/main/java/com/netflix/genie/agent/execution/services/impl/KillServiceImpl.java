@@ -17,12 +17,17 @@
  */
 package com.netflix.genie.agent.execution.services.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.properties.AgentProperties;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implementation of {@link KillService}.
@@ -33,40 +38,28 @@ import org.springframework.context.ApplicationEventPublisher;
 @Slf4j
 class KillServiceImpl implements KillService {
 
-    private static final Runnable DEFAULT_ACTION = () -> System.exit(ExitCode.EXEC_ABORTED.getCode());
-    private static final String EMERGENCY_TERMINATION_THREAD_NAME = "emergency-shutdown";
-
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private final Thread emergencyTerminationThread;
+    private final ExecutionContext executionContext;
     private final AgentProperties agentProperties;
+    private final ThreadFactory threadFactory;
+    private final AtomicBoolean killed = new AtomicBoolean(false);
 
-    KillServiceImpl(final ApplicationEventPublisher applicationEventPublisher, final AgentProperties agentProperties) {
+    KillServiceImpl(final ExecutionContext executionContext, final AgentProperties agentProperties) {
         this(
-            applicationEventPublisher,
-            agentProperties, DEFAULT_ACTION
+            executionContext,
+            agentProperties,
+            Thread::new
         );
     }
 
+    @VisibleForTesting
     KillServiceImpl(
-        final ApplicationEventPublisher applicationEventPublisher,
+        final ExecutionContext executionContext,
         final AgentProperties agentProperties,
-        final Runnable emergencyTerminationAction
+        final ThreadFactory threadFactory
     ) {
-        this.applicationEventPublisher = applicationEventPublisher;
+        this.executionContext = executionContext;
         this.agentProperties = agentProperties;
-        this.emergencyTerminationThread = new Thread(
-            () -> {
-                log.debug("Emergency shutdown countdown started");
-                try {
-                    Thread.sleep(this.agentProperties.getEmergencyShutdownDelay().toMillis());
-                } catch (InterruptedException e) {
-                    log.warn("Interrupted during delayed emergency countdown");
-                }
-                log.warn("Emergency shutdown now");
-                emergencyTerminationAction.run();
-            },
-            EMERGENCY_TERMINATION_THREAD_NAME
-        );
+        this.threadFactory = threadFactory;
     }
 
     /**
@@ -74,13 +67,25 @@ class KillServiceImpl implements KillService {
      */
     @Override
     public void kill(final KillSource killSource) {
-        ConsoleLog.getLogger().info("Job kill requested (source: {})", killSource.name());
-        log.debug("Publishing kill event");
-        this.applicationEventPublisher.publishEvent(new KillEvent(killSource));
-
-        // Start emergency termination thread, if not already running
-        if (!this.emergencyTerminationThread.isAlive()) {
-            this.emergencyTerminationThread.start();
+        if (this.killed.compareAndSet(false, true)) {
+            ConsoleLog.getLogger().info("Job kill requested (source: {})", killSource.name());
+            this.executionContext.getStateMachine().kill(killSource);
+            this.threadFactory.newThread(this::emergencyStop).start();
         }
+    }
+
+    /**
+     * This task is launched when a call to kill() is received.
+     * It's extra insurance that the JVM eventually will shut down.
+     * Hopefully, execution terminates due to regular shutdown procedures before this mechanism kicks-in.
+     */
+    @SuppressFBWarnings("DM_EXIT") // For calling System.exit
+    private void emergencyStop() {
+        try {
+            Thread.sleep(this.agentProperties.getEmergencyShutdownDelay().toMillis());
+        } catch (InterruptedException e) {
+            log.warn("Emergency shutdown thread interrupted");
+        }
+        System.exit(ExitCode.EXEC_ABORTED.getCode());
     }
 }

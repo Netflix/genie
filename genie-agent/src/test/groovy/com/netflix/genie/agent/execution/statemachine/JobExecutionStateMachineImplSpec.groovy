@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine
 
+import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener
@@ -33,13 +34,15 @@ class JobExecutionStateMachineImplSpec extends Specification {
     Collection<JobExecutionListener> listeners
     JobExecutionStateMachineImpl sm
     ExecutionStage mockExecutionStage
+    JobProcessManager jobProcessManager
 
     void setup() {
         this.started = new AtomicBoolean(false)
         this.stages = []
         this.context = Mock(ExecutionContext)
         this.listeners = [loggingListener, mockListener]
-        this.sm = new JobExecutionStateMachineImpl(stages, context, listeners)
+        this.jobProcessManager = Mock(JobProcessManager)
+        this.sm = new JobExecutionStateMachineImpl(stages, context, listeners, jobProcessManager)
 
         this.mockExecutionStage = Mock(ExecutionStage)
     }
@@ -334,10 +337,11 @@ class JobExecutionStateMachineImplSpec extends Specification {
         stages.addAll([mockExecutionStage, otherMockExecutionStage])
 
         when:
-        sm.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.TIMEOUT))
+        sm.kill(KillService.KillSource.TIMEOUT)
         sm.run()
 
         then:
+        1 * jobProcessManager.kill(KillService.KillSource.TIMEOUT)
         state1.isSkippedDuringAbortedExecution()
         !state2.isSkippedDuringAbortedExecution()
 

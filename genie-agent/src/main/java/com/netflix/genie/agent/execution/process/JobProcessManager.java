@@ -19,7 +19,6 @@ package com.netflix.genie.agent.execution.process;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.KillService;
-import org.springframework.context.ApplicationListener;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -31,7 +30,7 @@ import java.io.File;
  * @author tgianos
  * @since 4.0.0
  */
-public interface JobProcessManager extends ApplicationListener<KillService.KillEvent> {
+public interface JobProcessManager {
 
     /**
      * Launch the job process (unless launch was aborted by previous a {@code kill} call).

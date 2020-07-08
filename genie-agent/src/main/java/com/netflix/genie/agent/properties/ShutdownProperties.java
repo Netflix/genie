@@ -31,6 +31,7 @@ import java.time.Duration;
 @Getter
 @Setter
 public class ShutdownProperties {
+    private Duration executionCompletionLeeway = Duration.ofSeconds(60);
     private Duration internalExecutorsLeeway = Duration.ofSeconds(30);
     private Duration internalSchedulersLeeway = Duration.ofSeconds(30);
     private Duration systemExecutorLeeway = Duration.ofSeconds(60);

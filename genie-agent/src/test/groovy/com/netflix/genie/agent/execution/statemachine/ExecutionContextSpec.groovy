@@ -42,6 +42,7 @@ class ExecutionContextSpec extends Specification {
         Exception retryableException = new RetryableJobExecutionException("...", null)
         Exception fatalException = new FatalJobExecutionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
         AgentProperties agentProperties = Mock(AgentProperties)
+        JobExecutionStateMachine stateMachine = Mock(JobExecutionStateMachine)
         ExecutionContext executionContext = new ExecutionContext(agentProperties)
 
         expect:
@@ -68,6 +69,7 @@ class ExecutionContextSpec extends Specification {
         executionContext.getNextJobStatus() == JobStatus.INVALID
         executionContext.getNextJobStatusMessage() == null
         executionContext.getAgentProperties() != null
+        executionContext.getStateMachine() == null
 
         when:
         executionContext.setAgentClientMetadata(agentClientMetadata)
@@ -91,6 +93,7 @@ class ExecutionContextSpec extends Specification {
         executionContext.setCleanupStrategy(CleanupStrategy.FULL_CLEANUP)
         executionContext.setNextJobStatus(JobStatus.RUNNING)
         executionContext.setNextJobStatusMessage("Job running")
+        executionContext.setStateMachine(stateMachine)
 
         then:
         executionContext.getAgentClientMetadata() == agentClientMetadata
@@ -118,5 +121,6 @@ class ExecutionContextSpec extends Specification {
         executionContext.getCleanupStrategy() == CleanupStrategy.FULL_CLEANUP
         executionContext.getNextJobStatus() == JobStatus.RUNNING
         executionContext.getNextJobStatusMessage() == "Job running"
+        executionContext.getStateMachine() == stateMachine
     }
 }

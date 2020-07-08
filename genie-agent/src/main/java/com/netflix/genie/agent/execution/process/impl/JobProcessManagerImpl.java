@@ -149,6 +149,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public void kill(final KillService.KillSource source) {
+        log.info("Killing job process (kill event source: {})", source);
         // TODO: These may need to be done atomically as a tandem
         if (!this.killed.compareAndSet(false, true)) {
             // this job was already killed by something else
@@ -242,16 +243,6 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
             return new JobProcessResult.Builder(JobStatus.FAILED, statusMessage, exitCode).build();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onApplicationEvent(final KillService.KillEvent event) {
-        final KillService.KillSource source = event.getKillSource();
-        log.info("Killing job process (kill event source: {})", source);
-        this.kill(source);
     }
 
     /* TODO: HACK, Process does not expose PID in Java 8 API */

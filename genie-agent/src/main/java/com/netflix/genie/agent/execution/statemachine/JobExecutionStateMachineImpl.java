@@ -18,15 +18,14 @@
 package com.netflix.genie.agent.execution.statemachine;
 
 import com.google.common.collect.ImmutableSet;
+import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.TriggerContext;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,22 +42,26 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
     @Getter
     private final ExecutionContext executionContext;
     private final JobExecutionListener listener;
+    private final JobProcessManager jobProcessManager;
 
     /**
      * Constructor.
      *
-     * @param executionStages  the (ordered) list of execution stages
-     * @param executionContext the execution context passed across stages during execution
-     * @param listeners        the list of listeners
+     * @param executionStages   the (ordered) list of execution stages
+     * @param executionContext  the execution context passed across stages during execution
+     * @param listeners         the list of listeners
+     * @param jobProcessManager
      */
     public JobExecutionStateMachineImpl(
         final List<ExecutionStage> executionStages,
         final ExecutionContext executionContext,
-        final Collection<JobExecutionListener> listeners
+        final Collection<JobExecutionListener> listeners,
+        final JobProcessManager jobProcessManager
     ) {
         this.executionStages = executionStages;
         this.executionContext = executionContext;
         this.listener = new CompositeListener(ImmutableSet.copyOf(listeners));
+        this.jobProcessManager = jobProcessManager;
     }
 
     /**
@@ -69,6 +72,8 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         if (!this.executionContext.getStarted().compareAndSet(false, true)) {
             throw new IllegalStateException("Called run on an already started state machine");
         }
+
+        this.executionContext.setStateMachine(this);
 
         this.listener.stateMachineStarted();
 
@@ -183,13 +188,11 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void onApplicationEvent(final KillService.KillEvent event) {
-        log.info("Shutting down job execution (kill event source: {}", event.getKillSource());
+    public void kill(final KillService.KillSource killSource) {
+        log.info("Shutting down job execution (kill event source: {}", killSource);
         this.executionContext.setJobKilled(true);
+        this.jobProcessManager.kill(killSource);
     }
 
     private static final class CompositeListener implements JobExecutionListener {
@@ -247,41 +250,6 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         @Override
         public void delayedStateActionRetry(final States state, final long retryDelay) {
             listeners.forEach(listener -> listener.delayedStateActionRetry(state, retryDelay));
-        }
-    }
-
-    private static final class StateActionRetryTracker implements TriggerContext, JobExecutionListener {
-
-        private Date lastActualExecutionTime = new Date();
-        private Date lastCompletionTime = new Date();
-
-        StateActionRetryTracker() {
-            super();
-        }
-
-        @Override
-        public Date lastScheduledExecutionTime() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Date lastActualExecutionTime() {
-            return this.lastActualExecutionTime;
-        }
-
-        @Override
-        public Date lastCompletionTime() {
-            return this.lastCompletionTime;
-        }
-
-        @Override
-        public void beforeStateActionAttempt(final States state) {
-            this.lastActualExecutionTime = new Date();
-        }
-
-        @Override
-        public void afterStateActionAttempt(final States state, @Nullable final Exception exception) {
-            this.lastCompletionTime = new Date();
         }
     }
 }

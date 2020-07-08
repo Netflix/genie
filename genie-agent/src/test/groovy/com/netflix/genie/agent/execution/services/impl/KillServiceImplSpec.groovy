@@ -18,65 +18,44 @@
 package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.services.KillService
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.properties.AgentProperties
-import org.springframework.context.ApplicationEventPublisher
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.Duration
+import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicBoolean
 
 class KillServiceImplSpec extends Specification {
-    ApplicationEventPublisher applicationEventPublisher
-    AgentProperties agentProperties
+    ExecutionContext executionContext
+    JobExecutionStateMachine stateMachine
     KillService service
+    AgentProperties agentProperties
+    ThreadFactory threadFactory
 
     void setup() {
-        agentProperties = new AgentProperties()
-        applicationEventPublisher = Mock(ApplicationEventPublisher)
-        service = new KillServiceImpl(applicationEventPublisher, agentProperties)
+        this.executionContext = Mock(ExecutionContext)
+        this.stateMachine = Mock(JobExecutionStateMachine)
+        this.agentProperties = new AgentProperties()
+        this.threadFactory = Mock(ThreadFactory)
+        this.service = new KillServiceImpl(executionContext, agentProperties, threadFactory)
     }
 
     @Unroll
     def "Kill via #source"() {
-        setup:
-
         when:
         service.kill(source)
 
         then:
-        1 * applicationEventPublisher.publishEvent(_ as KillService.KillEvent) >> {
-            args ->
-                assert args[0] != null
-                assert (args[0] as KillService.KillEvent).getKillSource() == source
-        }
+        1 * executionContext.getStateMachine() >> stateMachine
+        1 * stateMachine.kill(source)
+        1 * threadFactory.newThread(_ as Runnable) >> Mock(Thread)
 
         where:
         source                                  | _
         KillService.KillSource.SYSTEM_SIGNAL    | _
         KillService.KillSource.API_KILL_REQUEST | _
-    }
-
-    def "Emergency termination"() {
-        setup:
-        AtomicBoolean emergencyTerminationExecuted = new AtomicBoolean(false)
-        service = new KillServiceImpl(
-            applicationEventPublisher,
-            agentProperties,
-            { -> emergencyTerminationExecuted.set(true) }
-        )
-        agentProperties.setEmergencyShutdownDelay(Duration.ofMillis(1))
-
-        when:
-        service.kill(KillService.KillSource.SYSTEM_SIGNAL)
-
-        then:
-        1 * applicationEventPublisher.publishEvent(_ as KillService.KillEvent)
-
-        when:
-        sleep(100)
-
-        then:
-        emergencyTerminationExecuted.get()
     }
 }

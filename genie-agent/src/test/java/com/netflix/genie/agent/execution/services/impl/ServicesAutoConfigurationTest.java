@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
@@ -33,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -108,11 +108,6 @@ class ServicesAutoConfigurationTest {
             return Mockito.mock(AgentJobService.class);
         }
 
-        @Bean
-        ApplicationEventPublisher applicationEventPublisher() {
-            return Mockito.mock(ApplicationEventPublisher.class);
-        }
-
         @Bean(name = "sharedAgentTaskExecutor")
         TaskExecutor taskExecutor() {
             return Mockito.mock(TaskExecutor.class);
@@ -121,6 +116,11 @@ class ServicesAutoConfigurationTest {
         @Bean(name = "sharedAgentTaskScheduler")
         TaskScheduler taskScheduler() {
             return Mockito.mock(TaskScheduler.class);
+        }
+
+        @Bean
+        ExecutionContext executionContext() {
+            return Mockito.mock(ExecutionContext.class);
         }
     }
 }

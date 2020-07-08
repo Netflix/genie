@@ -132,9 +132,10 @@ public class ExecutionAutoConfiguration {
     JobExecutionStateMachine jobExecutionStateMachine(
         @NotEmpty final List<ExecutionStage> executionStages,
         final ExecutionContext executionContext,
-        final Collection<JobExecutionListener> listeners
+        final Collection<JobExecutionListener> listeners,
+        final JobProcessManager jobProcessManager
     ) {
-        return new JobExecutionStateMachineImpl(executionStages, executionContext, listeners);
+        return new JobExecutionStateMachineImpl(executionStages, executionContext, listeners, jobProcessManager);
     }
 
     /**
