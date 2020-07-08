@@ -21,7 +21,9 @@ import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerPro
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
 /**
@@ -32,7 +34,12 @@ import java.time.Duration;
  */
 @Getter
 @Setter
+@Validated
 public class JobKillServiceProperties {
+    /**
+     * Backoff for checking for a server response.
+     */
+    @NotNull
     private ExponentialBackOffTriggerProperties responseCheckBackOff = new ExponentialBackOffTriggerProperties(
         ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_COMPLETION,
         Duration.ofMillis(500),

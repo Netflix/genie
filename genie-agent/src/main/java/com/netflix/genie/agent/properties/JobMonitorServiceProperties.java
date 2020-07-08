@@ -20,8 +20,12 @@ package com.netflix.genie.agent.properties;
 import com.netflix.genie.agent.execution.services.JobMonitorService;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.time.DurationMin;
 import org.springframework.util.unit.DataSize;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
 /**
@@ -32,10 +36,35 @@ import java.time.Duration;
  */
 @Getter
 @Setter
+@Validated
 public class JobMonitorServiceProperties {
+    /**
+     * Interval for checking the job status seen by the server.
+     */
+    @DurationMin(seconds = 10)
     private Duration checkInterval = Duration.ofMinutes(1);
+
+    /**
+     * Maximum number of files in the job directory (files not included in the manifest are exempt).
+     */
+    @Min(100)
     private int maxFiles = 64_000;
+
+    /**
+     * Maximum size of the job directory (files not included in the manifest are exempt).
+     */
+    @NotNull
     private DataSize maxTotalSize = DataSize.ofGigabytes(16);
+
+    /**
+     * Maximum size of any one file in the job directory (files not included in the manifest are exempt).
+     */
+    @NotNull
     private DataSize maxFileSize = DataSize.ofGigabytes(8);
+
+    /**
+     * Whether to monitor the job status seen by the server.
+     */
+    @NotNull
     private Boolean checkRemoteJobStatus = true;
 }
