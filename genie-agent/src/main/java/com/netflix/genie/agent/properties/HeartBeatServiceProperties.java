@@ -19,6 +19,8 @@ package com.netflix.genie.agent.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.time.DurationMin;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 
@@ -30,7 +32,17 @@ import java.time.Duration;
  */
 @Getter
 @Setter
+@Validated
 public class HeartBeatServiceProperties {
+    /**
+     * Period between heartbeats.
+     */
+    @DurationMin(seconds = 1)
     private Duration interval = Duration.ofSeconds(2);
+
+    /**
+     * Delay before retrying after an error.
+     */
+    @DurationMin(millis = 50)
     private Duration errorRetryDelay = Duration.ofSeconds(1);
 }

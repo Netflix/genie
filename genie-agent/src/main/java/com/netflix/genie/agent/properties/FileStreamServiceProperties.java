@@ -22,8 +22,12 @@ import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerPro
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.time.DurationMin;
 import org.springframework.util.unit.DataSize;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
 /**
@@ -34,15 +38,38 @@ import java.time.Duration;
  */
 @Getter
 @Setter
+@Validated
 public class FileStreamServiceProperties {
+    /**
+     * Exponential backoff for errors in control stream.
+     */
+    @NotNull
     private ExponentialBackOffTriggerProperties errorBackOff = new ExponentialBackOffTriggerProperties(
         ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_BEGIN,
         Duration.ofSeconds(1),
         Duration.ofSeconds(10),
         1.1f
     );
+
+    /**
+     * Enable compression of data.
+     */
     private boolean enableCompression = true;
+
+    /**
+     * Maximum size of file chunk transmitted.
+     */
     private DataSize dataChunkMaxSize = DataSize.ofMegabytes(1);
+
+    /**
+     * Maximum number of files transmitted concurrently.
+     */
+    @Min(1)
     private int maxConcurrentStreams = 5;
+
+    /**
+     * Time allowed to the service to complete ongoing transfers before shutting down.
+     */
+    @DurationMin(seconds = 1)
     private Duration drainTimeout = Duration.ofSeconds(15);
 }
