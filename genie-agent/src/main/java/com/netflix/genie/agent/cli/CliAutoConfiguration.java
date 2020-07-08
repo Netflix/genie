@@ -25,10 +25,12 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.proto.PingServiceGrpc;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +46,9 @@ import javax.validation.Validator;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties({
+    AgentProperties.class
+})
 public class CliAutoConfiguration {
     /**
      * Provide a bean for cache command line arguments.
@@ -117,6 +122,7 @@ public class CliAutoConfiguration {
      * @param execCommandArguments     The exec command arguments to use
      * @param jobExecutionStateMachine The job execution state machine instance to use
      * @param killService              The kill service to use
+     * @param agentProperties          The agent properties
      * @return A bean definition for an {@link ExecCommand} if one hasn't already been defined
      */
     @Bean
@@ -124,9 +130,10 @@ public class CliAutoConfiguration {
     public ExecCommand execCommand(
         final ExecCommand.ExecCommandArguments execCommandArguments,
         final JobExecutionStateMachine jobExecutionStateMachine,
-        final KillService killService
+        final KillService killService,
+        final AgentProperties agentProperties
     ) {
-        return new ExecCommand(execCommandArguments, jobExecutionStateMachine, killService);
+        return new ExecCommand(execCommandArguments, jobExecutionStateMachine, killService, agentProperties);
     }
 
     /**

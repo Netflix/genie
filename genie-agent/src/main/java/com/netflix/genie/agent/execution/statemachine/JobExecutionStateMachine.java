@@ -18,7 +18,6 @@
 package com.netflix.genie.agent.execution.statemachine;
 
 import com.netflix.genie.agent.execution.services.KillService;
-import org.springframework.context.ApplicationListener;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ import java.util.List;
  * @author mprimi
  * @since 4.0.0
  */
-public interface JobExecutionStateMachine extends ApplicationListener<KillService.KillEvent> {
+public interface JobExecutionStateMachine {
 
     /**
      * Runs the state machine until completion.
@@ -49,4 +48,12 @@ public interface JobExecutionStateMachine extends ApplicationListener<KillServic
      * @return the execution context used by the state machine.
      */
     ExecutionContext getExecutionContext();
+
+    /**
+     * Abort execution, if necessary by stopping the running job process.
+     * The state machine still runs to termination, but may skip steps as appropriate.
+     *
+     * @param killSource a representation of who/what requested the kill
+     */
+    void kill(KillService.KillSource killSource);
 }

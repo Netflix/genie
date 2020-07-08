@@ -66,6 +66,7 @@ genie:
         max-total-size: 16GB
         check-remote-job-status: true
       shutdown:
+        execution-completion-leeway: 60s
         internal-executors-leeway: 30s
         internal-schedulers-leeway: 30s
         system-executor-leeway: 60s

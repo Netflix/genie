@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
@@ -33,7 +34,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -102,18 +102,18 @@ public class ServicesAutoConfiguration {
     /**
      * Provide a lazy {@link KillService} bean if one hasn't already been defined.
      *
-     * @param applicationEventPublisher The Spring event publisher to use
-     * @param agentProperties           The agent properties
+     * @param executionContext the execution context
+     * @param agentProperties  the agent properties
      * @return A {@link KillServiceImpl} instance
      */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(KillService.class)
     public KillService killService(
-        final ApplicationEventPublisher applicationEventPublisher,
+        final ExecutionContext executionContext,
         final AgentProperties agentProperties
     ) {
-        return new KillServiceImpl(applicationEventPublisher, agentProperties);
+        return new KillServiceImpl(executionContext, agentProperties);
     }
 
     /**

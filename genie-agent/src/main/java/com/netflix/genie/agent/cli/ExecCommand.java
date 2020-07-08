@@ -25,13 +25,17 @@ import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
+import com.netflix.genie.agent.properties.AgentProperties;
+import com.netflix.genie.agent.properties.ShutdownProperties;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.Instant;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Command to execute a Genie job.
@@ -45,26 +49,52 @@ class ExecCommand implements AgentCommand {
     private final ExecCommandArguments execCommandArguments;
     private final JobExecutionStateMachine stateMachine;
     private final KillService killService;
-    private final List<sun.misc.Signal> signalsToIntercept = Collections.unmodifiableList(Arrays.asList(
-        new sun.misc.Signal("INT"),
-        new sun.misc.Signal("TERM")
-    ));
+    private final ThreadFactory threadFactory;
+    private final ShutdownProperties shutdownProperties;
+
+    private boolean isRunning;
+    private final ReentrantLock isRunningLock = new ReentrantLock();
+    private final Condition isRunningCondition = this.isRunningLock.newCondition();
 
     ExecCommand(
         final ExecCommandArguments execCommandArguments,
         final JobExecutionStateMachine stateMachine,
-        final KillService killService
+        final KillService killService,
+        final AgentProperties agentProperties
+    ) {
+        this(
+            execCommandArguments,
+            stateMachine,
+            killService,
+            agentProperties,
+            Thread::new
+        );
+    }
+
+    @VisibleForTesting
+    ExecCommand(
+        final ExecCommandArguments execCommandArguments,
+        final JobExecutionStateMachine stateMachine,
+        final KillService killService,
+        final AgentProperties agentProperties,
+        final ThreadFactory threadFactory // For testing shutdown hooks
     ) {
         this.execCommandArguments = execCommandArguments;
         this.stateMachine = stateMachine;
         this.killService = killService;
+        this.shutdownProperties = agentProperties.getShutdown();
+        this.threadFactory = threadFactory;
     }
 
     @Override
     public ExitCode run() {
-        for (final sun.misc.Signal s : signalsToIntercept) {
-            sun.misc.Signal.handle(s, signal -> handleTerminationSignal());
-        }
+
+        // Lock-free since the only other thread accessing this has not been registered yet
+        this.isRunning = true;
+
+        // Before execution starts, add shutdown hooks
+        Runtime.getRuntime().addShutdownHook(this.threadFactory.newThread(this::waitForCleanShutdown));
+        Runtime.getRuntime().addShutdownHook(this.threadFactory.newThread(this::handleSystemSignal));
 
         log.info("Starting job execution");
         try {
@@ -117,14 +147,67 @@ class ExecCommand implements AgentCommand {
                 throw new RuntimeException("Unexpected final job status: " + finalJobStatus.name());
         }
 
+        this.isRunningLock.lock();
+        try {
+            this.isRunning = false;
+            this.isRunningCondition.signalAll();
+        } finally {
+            this.isRunningLock.unlock();
+        }
+
         return exitCode;
     }
 
-    @VisibleForTesting
-    void handleTerminationSignal() {
-        ConsoleLog.getLogger().info("Kill requested, terminating job");
-        log.warn("Received kill signal");
-        this.killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
+    /**
+     * This code runs when the JVM is about to shut down.
+     * There are 2 different scenarios:
+     * 1) Execution is completed -- Nothing to do in this case.
+     * 2) A signal (TERM/HUP/INT) was received -- Job execution should be stopped in this case.
+     */
+    private void handleSystemSignal() {
+        final boolean shouldAbortExecution;
+        this.isRunningLock.lock();
+        try {
+            shouldAbortExecution = this.isRunning;
+        } finally {
+            this.isRunningLock.unlock();
+        }
+
+        if (shouldAbortExecution) {
+            ConsoleLog.getLogger().info("Aborting job execution");
+            killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
+        }
+    }
+
+    /**
+     * This code runs when the JVM is about to shut down.
+     * It keeps the process alive until the agent has had a chance to shut down cleanly (whatever that means, i.e.
+     * success, failure, kill, ...) in order to for example archive logs, update job status, etc.
+     */
+    private void waitForCleanShutdown() {
+        // Don't hold off shutdown indefinitely
+        final long maxWaitSeconds = shutdownProperties.getExecutionCompletionLeeway().getSeconds();
+        final Instant waitDeadline = Instant.now().plusSeconds(maxWaitSeconds);
+
+        this.isRunningLock.lock();
+        try {
+            while (this.isRunning) {
+                ConsoleLog.getLogger().info("Waiting for shutdown...");
+                if (Instant.now().isAfter(waitDeadline)) {
+                    log.error("Execution did not complete in the allocated time");
+                    return;
+                }
+
+                try {
+                    this.isRunningCondition.await(1, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    log.warn("Interrupted while waiting execution completion");
+                }
+            }
+        } finally {
+            this.isRunningLock.unlock();
+            log.info("Unblocking shutdown ({})", this.isRunning ? "still running" : "completed");
+        }
     }
 
     @Parameters(commandNames = CommandNames.EXEC, commandDescription = "Execute a Genie job")

@@ -976,6 +976,11 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | 1.2
 |
 
+| `genie.agent.runtime.shutdown.execution-completion-leeway`
+| Time allowed to the job execution state machine to shut down cleanly before the JVM is shut down
+| 60s
+|
+
 | `genie.agent.runtime.shutdown.internal-executors-leeway`
 | Time allowed on task running on internal task executors to complete before the agent terminates
 | 30s

@@ -17,10 +17,6 @@
  */
 package com.netflix.genie.agent.execution.services;
 
-import org.springframework.context.ApplicationEvent;
-
-import javax.validation.constraints.NotNull;
-
 /**
  * Service responsible for killing the job.
  *
@@ -60,25 +56,5 @@ public interface KillService {
          * The job status was changed server-side while the job was running.
          */
         REMOTE_STATUS_MONITOR,
-    }
-
-    /**
-     * Event to notify components an early shutdown.
-     */
-    class KillEvent extends ApplicationEvent {
-
-        /**
-         * Constructor.
-         *
-         * @param killSource the source of the kill
-         */
-        public KillEvent(final KillSource killSource) {
-            super(killSource);
-        }
-
-        @NotNull
-        public KillSource getKillSource() {
-            return (KillSource) this.getSource();
-        }
     }
 }

@@ -32,19 +32,21 @@ class ShutdownPropertiesSpec extends Specification {
 
     def "defaults, getters setters"() {
         expect:
+        shutdownProperties.getExecutionCompletionLeeway() == Duration.ofSeconds(60)
         shutdownProperties.getInternalExecutorsLeeway() == Duration.ofSeconds(30)
         shutdownProperties.getInternalSchedulersLeeway() == Duration.ofSeconds(30)
         shutdownProperties.getSystemExecutorLeeway() == Duration.ofSeconds(60)
         shutdownProperties.getSystemSchedulerLeeway() == Duration.ofSeconds(60)
 
         when:
-
+        shutdownProperties.setExecutionCompletionLeeway(Duration.ofSeconds(0))
         shutdownProperties.setInternalExecutorsLeeway(Duration.ofSeconds(1))
         shutdownProperties.setInternalSchedulersLeeway(Duration.ofSeconds(2))
         shutdownProperties.setSystemExecutorLeeway(Duration.ofSeconds(3))
         shutdownProperties.setSystemSchedulerLeeway(Duration.ofSeconds(4))
 
         then:
+        shutdownProperties.getExecutionCompletionLeeway() == Duration.ofSeconds(0)
         shutdownProperties.getInternalExecutorsLeeway() == Duration.ofSeconds(1)
         shutdownProperties.getInternalSchedulersLeeway() == Duration.ofSeconds(2)
         shutdownProperties.getSystemExecutorLeeway() == Duration.ofSeconds(3)

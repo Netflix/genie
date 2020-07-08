@@ -176,6 +176,11 @@ public class ExecutionContext {
     private String nextJobStatusMessage;
 
     /**
+     * The state machine that executes the job.
+     */
+    private JobExecutionStateMachine stateMachine;
+
+    /**
      * Constructor.
      *
      * @param agentProperties The agent properties

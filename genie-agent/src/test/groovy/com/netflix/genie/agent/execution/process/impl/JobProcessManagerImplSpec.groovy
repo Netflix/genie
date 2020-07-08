@@ -358,7 +358,7 @@ class JobProcessManagerImplSpec extends Specification {
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
-        this.manager.onApplicationEvent(new KillService.KillEvent(killSource))
+        this.manager.kill(killSource)
 
         then:
         noExceptionThrown()
