@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-07-01</span>
+<span id="revdate">2020-07-09</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -6012,6 +6012,36 @@ The server also has a chance to override them during the 'Agent Configuration' e
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.shutdown.execution-completion-leeway</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time allowed to the job execution state machine to shut down cleanly before the JVM is shut down</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.shutdown.internal-executors-leeway</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time allowed on task running on internal task executors to complete before the agent terminates</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property is bound during initialization and cannot be modified at runtime by the server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.shutdown.internal-schedulers-leeway</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time allowed on task running on internal task schedulers to complete before the agent terminates</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property is bound during initialization and cannot be modified at runtime by the server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.shutdown.system-executor-leeway</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time allowed on task running on Spring&#8217;s system task executor to complete before the agent terminates</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property is bound during initialization and cannot be modified at runtime by the server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.shutdown.system-scheduler-leeway</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time allowed on task running on Spring&#8217;s system task scheduler to complete before the agent terminates</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property is bound during initialization and cannot be modified at runtime by the server.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -6791,7 +6821,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-07-01 19:00:11 UTC
+Last updated 2020-07-09 16:01:57 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

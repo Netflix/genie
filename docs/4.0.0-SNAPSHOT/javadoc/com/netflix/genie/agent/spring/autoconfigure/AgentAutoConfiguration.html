@@ -171,21 +171,21 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>org.springframework.scheduling.TaskScheduler</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#heartBeatServiceTaskScheduler--">heartBeatServiceTaskScheduler</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#heartBeatServiceTaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">heartBeatServiceTaskScheduler</a></span>(<a href="../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Provide a lazy <code>TaskScheduler</code> bean for use by the heart beat service is none has already been
  defined in the context.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>org.springframework.core.task.AsyncTaskExecutor</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskExecutor--">sharedAgentTaskExecutor</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskExecutor-com.netflix.genie.agent.properties.AgentProperties-">sharedAgentTaskExecutor</a></span>(<a href="../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Get a lazy <code>AsyncTaskExecutor</code> bean which may be shared by different components if one isn't already
  defined.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>org.springframework.scheduling.TaskScheduler</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskScheduler--">sharedAgentTaskScheduler</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">sharedAgentTaskScheduler</a></span>(<a href="../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Provide a lazy <code>TaskScheduler</code> to be used by the Agent process if one isn't already defined.</div>
 </td>
 </tr>
@@ -282,7 +282,7 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/agent/utils/locks/impl/
 </dl>
 </li>
 </ul>
-<a name="sharedAgentTaskExecutor--">
+<a name="sharedAgentTaskExecutor-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -292,16 +292,18 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/agent/utils/locks/impl/
  @Lazy
  @ConditionalOnMissingBean(name="sharedAgentTaskExecutor",
                           value=org.springframework.core.task.AsyncTaskExecutor.class)
-public&nbsp;org.springframework.core.task.AsyncTaskExecutor&nbsp;sharedAgentTaskExecutor()</pre>
+public&nbsp;org.springframework.core.task.AsyncTaskExecutor&nbsp;sharedAgentTaskExecutor(<a href="../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Get a lazy <code>AsyncTaskExecutor</code> bean which may be shared by different components if one isn't already
  defined.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentProperties</code> - the agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>ThreadPoolTaskExecutor</code> instance</dd>
 </dl>
 </li>
 </ul>
-<a name="sharedAgentTaskScheduler--">
+<a name="sharedAgentTaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -310,15 +312,17 @@ public&nbsp;org.springframework.core.task.AsyncTaskExecutor&nbsp;sharedAgentTask
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(name="sharedAgentTaskScheduler")
-public&nbsp;org.springframework.scheduling.TaskScheduler&nbsp;sharedAgentTaskScheduler()</pre>
+public&nbsp;org.springframework.scheduling.TaskScheduler&nbsp;sharedAgentTaskScheduler(<a href="../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy <code>TaskScheduler</code> to be used by the Agent process if one isn't already defined.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentProperties</code> - the agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>ThreadPoolTaskScheduler</code> instance</dd>
 </dl>
 </li>
 </ul>
-<a name="heartBeatServiceTaskScheduler--">
+<a name="heartBeatServiceTaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -327,10 +331,12 @@ public&nbsp;org.springframework.scheduling.TaskScheduler&nbsp;sharedAgentTaskSch
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(name="heartBeatServiceTaskScheduler")
-public&nbsp;org.springframework.scheduling.TaskScheduler&nbsp;heartBeatServiceTaskScheduler()</pre>
+public&nbsp;org.springframework.scheduling.TaskScheduler&nbsp;heartBeatServiceTaskScheduler(<a href="../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy <code>TaskScheduler</code> bean for use by the heart beat service is none has already been
  defined in the context.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentProperties</code> - the agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>TaskScheduler</code> that the heart beat service should use</dd>
 </dl>

@@ -108,6 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
+ @EnableConfigurationProperties(value=<a href="../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties.class</a>)
 public class <span class="typeNameLabel">CliAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Spring auto configuration class to contain all beans involved in the CLI for the Agent.</div>
@@ -183,9 +184,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.ExecCommand</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-">execCommand</a></span>(com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments&nbsp;execCommandArguments,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.agent.properties.AgentProperties-">execCommand</a></span>(com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments&nbsp;execCommandArguments,
            <a href="../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a>&nbsp;jobExecutionStateMachine,
-           <a href="../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService)</code>
+           <a href="../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
+           <a href="../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Provide a lazy bean definition for an <code>ExecCommand</code>.</div>
 </td>
 </tr>
@@ -422,7 +424,7 @@ public&nbsp;com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments&nbsp;ex
 </dl>
 </li>
 </ul>
-<a name="execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-">
+<a name="execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -432,13 +434,15 @@ public&nbsp;com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments&nbsp;ex
  @Lazy
 public&nbsp;com.netflix.genie.agent.cli.ExecCommand&nbsp;execCommand(com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments&nbsp;execCommandArguments,
                                                                         <a href="../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a>&nbsp;jobExecutionStateMachine,
-                                                                        <a href="../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService)</pre>
+                                                                        <a href="../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
+                                                                        <a href="../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy bean definition for an <code>ExecCommand</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>execCommandArguments</code> - The exec command arguments to use</dd>
 <dd><code>jobExecutionStateMachine</code> - The job execution state machine instance to use</dd>
 <dd><code>killService</code> - The kill service to use</dd>
+<dd><code>agentProperties</code> - The agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A bean definition for an <code>ExecCommand</code> if one hasn't already been defined</dd>
 </dl>

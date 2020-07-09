@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -98,17 +98,12 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <dl>
-<dt>All Superinterfaces:</dt>
-<dd>org.springframework.context.ApplicationListener&lt;<a href="../../../../../../com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a>&gt;, java.util.EventListener</dd>
-</dl>
-<dl>
 <dt>All Known Implementing Classes:</dt>
 <dd><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dd>
 </dl>
 <hr>
 <br>
-<pre>public interface <span class="typeNameLabel">JobExecutionStateMachine</span>
-extends org.springframework.context.ApplicationListener&lt;<a href="../../../../../../com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a>&gt;</pre>
+<pre>public interface <span class="typeNameLabel">JobExecutionStateMachine</span></pre>
 <div class="block">Interface JobExecutionStateMachine hides the actual state machine details.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -146,18 +141,17 @@ extends org.springframework.context.ApplicationListener&lt;<a href="../../../../
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#kill-com.netflix.genie.agent.execution.services.KillService.KillSource-">kill</a></span>(<a href="../../../../../../com/netflix/genie/agent/execution/services/KillService.KillSource.html" title="enum in com.netflix.genie.agent.execution.services">KillService.KillSource</a>&nbsp;killSource)</code>
+<div class="block">Abort execution, if necessary by stopping the running job process.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#run--">run</a></span>()</code>
 <div class="block">Runs the state machine until completion.</div>
 </td>
 </tr>
 </table>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.org.springframework.context.ApplicationListener">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;org.springframework.context.ApplicationListener</h3>
-<code>onApplicationEvent</code></li>
-</ul>
 </li>
 </ul>
 </li>
@@ -199,7 +193,7 @@ extends org.springframework.context.ApplicationListener&lt;<a href="../../../../
 <a name="getExecutionContext--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getExecutionContext</h4>
 <pre><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;getExecutionContext()</pre>
@@ -208,6 +202,21 @@ extends org.springframework.context.ApplicationListener&lt;<a href="../../../../
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the execution context used by the state machine.</dd>
+</dl>
+</li>
+</ul>
+<a name="kill-com.netflix.genie.agent.execution.services.KillService.KillSource-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>kill</h4>
+<pre>void&nbsp;kill(<a href="../../../../../../com/netflix/genie/agent/execution/services/KillService.KillSource.html" title="enum in com.netflix.genie.agent.execution.services">KillService.KillSource</a>&nbsp;killSource)</pre>
+<div class="block">Abort execution, if necessary by stopping the running job process.
+ The state machine still runs to termination, but may skip steps as appropriate.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>killSource</code> - a representation of who/what requested the kill</dd>
 </dl>
 </li>
 </ul>

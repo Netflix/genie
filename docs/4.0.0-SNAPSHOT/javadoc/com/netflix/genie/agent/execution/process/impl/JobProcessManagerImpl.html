@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -107,7 +107,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a>, java.util.EventListener, org.springframework.context.ApplicationListener&lt;<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a>&gt;</dd>
+<dd><a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a></dd>
 </dl>
 <hr>
 <br>
@@ -173,10 +173,6 @@ implements <a href="../../../../../../../com/netflix/genie/agent/execution/proce
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#onApplicationEvent-com.netflix.genie.agent.execution.services.KillService.KillEvent-">onApplicationEvent</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a>&nbsp;event)</code></td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessResult.html" title="class in com.netflix.genie.agent.execution.process">JobProcessResult</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#waitFor--">waitFor</a></span>()</code>
 <div class="block">Wait indefinitely for the job process to terminate.</div>
@@ -276,7 +272,7 @@ implements <a href="../../../../../../../com/netflix/genie/agent/execution/proce
 <a name="waitFor--">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>waitFor</h4>
 <pre>public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/process/JobProcessResult.html" title="class in com.netflix.genie.agent.execution.process">JobProcessResult</a>&nbsp;waitFor()
@@ -289,19 +285,6 @@ implements <a href="../../../../../../../com/netflix/genie/agent/execution/proce
 <dd>KILLED, SUCCESSFUL, or FAILED</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.lang.InterruptedException</code> - if the calling thread is interrupted while waiting</dd>
-</dl>
-</li>
-</ul>
-<a name="onApplicationEvent-com.netflix.genie.agent.execution.services.KillService.KillEvent-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>onApplicationEvent</h4>
-<pre>public&nbsp;void&nbsp;onApplicationEvent(<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a>&nbsp;event)</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>onApplicationEvent</code>&nbsp;in interface&nbsp;<code>org.springframework.context.ApplicationListener&lt;<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

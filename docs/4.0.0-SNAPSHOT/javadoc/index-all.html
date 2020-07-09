@@ -3552,7 +3552,7 @@
 <dd>
 <div class="block">The name of the <code>PropertyFilter</code> used to serialize Genie exceptions.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-">execCommand(ExecCommand.ExecCommandArguments, JobExecutionStateMachine, KillService)</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-com.netflix.genie.agent.properties.AgentProperties-">execCommand(ExecCommand.ExecCommandArguments, JobExecutionStateMachine, KillService, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy bean definition for an <code>ExecCommand</code>.</div>
 </dd>
@@ -6502,8 +6502,6 @@
 <dd>
 <div class="block">Returns the appropriate flag to append to kill command based on the OS.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/KillService.KillEvent.html#getKillSource--">getKillSource()</a></span> - Method in class com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/FileTransfer.html#getLastModifiedTime-java.lang.String-">getLastModifiedTime(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/FileTransfer.html" title="interface in com.netflix.genie.web.services">FileTransfer</a></dt>
 <dd>
 <div class="block">Returns the last modified time of the file with the given path.</div>
@@ -7825,7 +7823,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/HeartBeatServiceProperties.html#HeartBeatServiceProperties--">HeartBeatServiceProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/HeartBeatServiceProperties.html" title="class in com.netflix.genie.agent.properties">HeartBeatServiceProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#heartBeatServiceTaskScheduler--">heartBeatServiceTaskScheduler()</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#heartBeatServiceTaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">heartBeatServiceTaskScheduler(AgentProperties)</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <code>TaskScheduler</code> bean for use by the heart beat service is none has already been
  defined in the context.</div>
@@ -8729,7 +8727,7 @@
 <dd>
 <div class="block">Implementation of the job execution state machine.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#JobExecutionStateMachineImpl-java.util.List-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.Collection-">JobExecutionStateMachineImpl(List&lt;ExecutionStage&gt;, ExecutionContext, Collection&lt;JobExecutionListener&gt;)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#JobExecutionStateMachineImpl-java.util.List-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.Collection-com.netflix.genie.agent.execution.process.JobProcessManager-">JobExecutionStateMachineImpl(List&lt;ExecutionStage&gt;, ExecutionContext, Collection&lt;JobExecutionListener&gt;, JobProcessManager)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9561,6 +9559,12 @@
 <dd>
 <div class="block">Perform all operations associated with killing the job.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#kill-com.netflix.genie.agent.execution.services.KillService.KillSource-">kill(KillService.KillSource)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
+<dd>
+<div class="block">Abort execution, if necessary by stopping the running job process.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#kill-com.netflix.genie.agent.execution.services.KillService.KillSource-">kill(KillService.KillSource)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#KILL_PARENT_PID_FLAG">KILL_PARENT_PID_FLAG</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">Flag to send with the pkill command using the parent pid.</div>
@@ -9572,10 +9576,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobExecution.html#KILLED_EXIT_CODE">KILLED_EXIT_CODE</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a></dt>
 <dd>
 <div class="block">The exit code that will be set to indicate a job is killed.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/KillService.KillEvent.html#KillEvent-com.netflix.genie.agent.execution.services.KillService.KillSource-">KillEvent(KillService.KillSource)</a></span> - Constructor for class com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services">KillService.KillEvent</a></dt>
-<dd>
-<div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#killJob-java.lang.String-">killJob(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
 <dd>
@@ -9625,17 +9625,13 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-org.springframework.context.ApplicationEventPublisher-com.netflix.genie.agent.properties.AgentProperties-">killService(ApplicationEventPublisher, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-com.netflix.genie.agent.execution.statemachine.ExecutionContext-com.netflix.genie.agent.properties.AgentProperties-">killService(ExecutionContext, AgentProperties)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>KillService</code></a> bean if one hasn't already been defined.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services"><span class="typeNameLink">KillService</span></a> - Interface in <a href="com/netflix/genie/agent/execution/services/package-summary.html">com.netflix.genie.agent.execution.services</a></dt>
 <dd>
 <div class="block">Service responsible for killing the job.</div>
-</dd>
-<dt><a href="com/netflix/genie/agent/execution/services/KillService.KillEvent.html" title="class in com.netflix.genie.agent.execution.services"><span class="typeNameLink">KillService.KillEvent</span></a> - Class in <a href="com/netflix/genie/agent/execution/services/package-summary.html">com.netflix.genie.agent.execution.services</a></dt>
-<dd>
-<div class="block">Event to notify components an early shutdown.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/services/KillService.KillSource.html" title="enum in com.netflix.genie.agent.execution.services"><span class="typeNameLink">KillService.KillSource</span></a> - Enum in <a href="com/netflix/genie/agent/execution/services/package-summary.html">com.netflix.genie.agent.execution.services</a></dt>
 <dd>
@@ -10141,8 +10137,6 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#onApplicationEvent-com.netflix.genie.agent.execution.services.KillService.KillEvent-">onApplicationEvent(KillService.KillEvent)</a></span> - Method in class com.netflix.genie.agent.execution.process.impl.<a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html" title="class in com.netflix.genie.agent.execution.process.impl">JobProcessManagerImpl</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#onApplicationEvent-com.netflix.genie.agent.execution.services.KillService.KillEvent-">onApplicationEvent(KillService.KillEvent)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#onApplicationEvent-com.netflix.genie.web.events.JobStateChangeEvent-">onApplicationEvent(JobStateChangeEvent)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/JobNotificationMetricPublisher.html#onApplicationEvent-com.netflix.genie.web.events.JobStateChangeEvent-">onApplicationEvent(JobStateChangeEvent)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobNotificationMetricPublisher.html" title="class in com.netflix.genie.web.events">JobNotificationMetricPublisher</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#onApplicationEvent-com.netflix.genie.web.events.JobStateChangeEvent-">onApplicationEvent(JobStateChangeEvent)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
@@ -11992,12 +11986,12 @@
 <dd>
 <div class="block">Set the version this criterion used.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskExecutor--">sharedAgentTaskExecutor()</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskExecutor-com.netflix.genie.agent.properties.AgentProperties-">sharedAgentTaskExecutor(AgentProperties)</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get a lazy <code>AsyncTaskExecutor</code> bean which may be shared by different components if one isn't already
  defined.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskScheduler--">sharedAgentTaskScheduler()</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">sharedAgentTaskScheduler(AgentProperties)</a></span> - Method in class com.netflix.genie.agent.spring.autoconfigure.<a href="com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">AgentAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <code>TaskScheduler</code> to be used by the Agent process if one isn't already defined.</div>
 </dd>
@@ -12005,6 +11999,12 @@
 <dd>
 <div class="block">Shutdown this service.</div>
 </dd>
+<dt><a href="com/netflix/genie/agent/properties/ShutdownProperties.html" title="class in com.netflix.genie.agent.properties"><span class="typeNameLink">ShutdownProperties</span></a> - Class in <a href="com/netflix/genie/agent/properties/package-summary.html">com.netflix.genie.agent.properties</a></dt>
+<dd>
+<div class="block">Properties to configure the Agent shutdown process.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/properties/ShutdownProperties.html#ShutdownProperties--">ShutdownProperties()</a></span> - Constructor for class com.netflix.genie.agent.properties.<a href="com/netflix/genie/agent/properties/ShutdownProperties.html" title="class in com.netflix.genie.agent.properties">ShutdownProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">ShutdownStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>
 <div class="block">Performs final shutdown.</div>

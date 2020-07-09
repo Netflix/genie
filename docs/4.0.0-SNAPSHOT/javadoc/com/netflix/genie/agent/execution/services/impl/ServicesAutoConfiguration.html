@@ -185,7 +185,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-org.springframework.context.ApplicationEventPublisher-com.netflix.genie.agent.properties.AgentProperties-">killService</a></span>(org.springframework.context.ApplicationEventPublisher&nbsp;applicationEventPublisher,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#killService-com.netflix.genie.agent.execution.statemachine.ExecutionContext-com.netflix.genie.agent.properties.AgentProperties-">killService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext,
            <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>KillService</code></a> bean if one hasn't already been defined.</div>
 </td>
@@ -277,7 +277,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 </dl>
 </li>
 </ul>
-<a name="killService-org.springframework.context.ApplicationEventPublisher-com.netflix.genie.agent.properties.AgentProperties-">
+<a name="killService-com.netflix.genie.agent.execution.statemachine.ExecutionContext-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -286,13 +286,13 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService(org.springframework.context.ApplicationEventPublisher&nbsp;applicationEventPublisher,
+public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService(<a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext,
                                                                                                 <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>KillService</code></a> bean if one hasn't already been defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>applicationEventPublisher</code> - The Spring event publisher to use</dd>
-<dd><code>agentProperties</code> - The agent properties</dd>
+<dd><code>executionContext</code> - the execution context</dd>
+<dd><code>agentProperties</code> - the agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>KillServiceImpl</code> instance</dd>
 </dl>
