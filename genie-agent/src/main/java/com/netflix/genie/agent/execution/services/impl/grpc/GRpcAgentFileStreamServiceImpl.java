@@ -31,6 +31,7 @@ import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.ServerAckMessage;
 import com.netflix.genie.proto.ServerControlMessage;
 import com.netflix.genie.proto.ServerFileRequestMessage;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.Context;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.StreamObserver;
@@ -414,6 +415,10 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
 
+        @SuppressFBWarnings(
+            value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE",
+            justification = "https://github.com/spotbugs/spotbugs/issues/756"
+        )
         private void sendChunk() throws IOException {
 
             if (this.watermark < this.endOffset - 1) {
