@@ -20,6 +20,7 @@ package com.netflix.genie.web.services.impl;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dtos.v4.files.JobFileState;
 import com.netflix.genie.web.services.JobFileService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -115,6 +116,10 @@ public class DiskJobFileServiceImpl implements JobFileService {
      * {@inheritDoc}
      */
     @Override
+    @SuppressFBWarnings(
+        value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE",
+        justification = "https://github.com/spotbugs/spotbugs/issues/756"
+    )
     // TODO: We should be careful about how large the byte[] is. Perhaps we should have precondition to protect memory
     //       or we should wrap calls to this in something that chunks it off an input stream or just take this in as
     //       input stream
