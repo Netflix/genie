@@ -1425,4 +1425,54 @@ class DtoConvertersSpec extends Specification {
         " "                          | _
         UUID.randomUUID().toString() | _
     }
+
+    @Unroll
+    def "Can convert command cluster criterion #v3 to #v4"() {
+        expect:
+        DtoConverters.toV4CommandClusterCriterion(v3) == v4
+
+        where:
+        v3           | v4
+        new Criterion.Builder()
+            .withId("hi")
+            .withName("bye")
+            .withVersion("1.2.3")
+            .withStatus(ClusterStatus.OUT_OF_SERVICE.name())
+            .withTags(["one", "two", "three"] as Set)
+            .build() | new Criterion.Builder()
+            .withId("hi")
+            .withName("bye")
+            .withVersion("1.2.3")
+            .withStatus(ClusterStatus.OUT_OF_SERVICE.name())
+            .withTags(["one", "two", "three"] as Set)
+            .build()
+
+        new Criterion.Builder()
+            .withId(UUID.randomUUID().toString())
+            .withName(UUID.randomUUID().toString())
+            .withVersion("1.2.3")
+            .withStatus(ClusterStatus.UP.name())
+            .withTags(
+                [
+                    "one",
+                    "two",
+                    "three",
+                    DtoConverters.GENIE_ID_PREFIX + "456",
+                    DtoConverters.GENIE_NAME_PREFIX + "prod"
+                ] as Set
+            )
+            .build() | new Criterion.Builder()
+            .withId("456")
+            .withName("prod")
+            .withVersion("1.2.3")
+            .withStatus(ClusterStatus.UP.name())
+            .withTags(
+                [
+                    "one",
+                    "two",
+                    "three"
+                ] as Set
+            )
+            .build()
+    }
 }

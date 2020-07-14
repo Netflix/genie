@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.dtos.v4.converters;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -307,7 +308,13 @@ public final class DtoConverters {
                 v3Command.getSetupFile().orElse(null)
             )
         );
-        builder.withClusterCriteria(v3Command.getClusterCriteria());
+        builder.withClusterCriteria(
+            v3Command
+                .getClusterCriteria()
+                .stream()
+                .map(DtoConverters::toV4CommandClusterCriterion)
+                .collect(Collectors.toList())
+        );
 
         return builder.build();
     }
@@ -348,7 +355,11 @@ public final class DtoConverters {
             v3Command.getExecutableAndArguments(),
             v3Command.getMemory().orElse(null),
             v3Command.getCheckDelay(),
-            v3Command.getClusterCriteria()
+            v3Command
+                .getClusterCriteria()
+                .stream()
+                .map(DtoConverters::toV4CommandClusterCriterion)
+                .collect(Collectors.toList())
         );
     }
 
@@ -866,6 +877,40 @@ public final class DtoConverters {
             // Since it may be a remnant of V3 try the older one and map
             return toV4JobStatus(com.netflix.genie.common.dto.JobStatus.valueOf(upperCaseStatus));
         }
+    }
+
+    /**
+     * This utility takes a pre-existing {@link Criterion} that would have been submitted by a call to the V3
+     * command APIs (create/update/patch) and makes sure it doesn't contain any {@code genie.id} or {@code genie.name}
+     * tags. If it does it puts their values in the proper place within the new {@link Criterion} which is returned.
+     * This exists in case people take the tags returned in a V3 resource call (from a cluster) and just copy them
+     * into their tags for a {@link Command} cluster criterion. If we don't check this the criterion will never match.
+     *
+     * @param criterion The originally {@link Criterion} from the user in the V3 command API
+     * @return A new correct V4 {@link Criterion} which should be used for subsequent processing
+     * @throws IllegalArgumentException If the resulting criterion is invalid
+     */
+    @VisibleForTesting
+    static Criterion toV4CommandClusterCriterion(final Criterion criterion) throws IllegalArgumentException {
+        final Criterion.Builder builder = new Criterion.Builder();
+        criterion.getId().ifPresent(builder::withId);
+        criterion.getName().ifPresent(builder::withName);
+        criterion.getStatus().ifPresent(builder::withStatus);
+        criterion.getVersion().ifPresent(builder::withVersion);
+        // Note: We will override the above id or name with the value of genie.id or genie.name if they exist
+        //       due to assumption this is what user intended when using those specific tags
+        final ImmutableSet.Builder<String> tagBuilder = ImmutableSet.builder();
+        for (final String tag : criterion.getTags()) {
+            if (tag.startsWith(GENIE_ID_PREFIX)) {
+                builder.withId(StringUtils.removeStart(tag, GENIE_ID_PREFIX));
+            } else if (tag.startsWith(GENIE_NAME_PREFIX)) {
+                builder.withName(StringUtils.removeStart(tag, GENIE_NAME_PREFIX));
+            } else {
+                tagBuilder.add(tag);
+            }
+        }
+        builder.withTags(tagBuilder.build());
+        return builder.build();
     }
 
     private static Set<String> toV4Tags(final Set<String> tags) {
