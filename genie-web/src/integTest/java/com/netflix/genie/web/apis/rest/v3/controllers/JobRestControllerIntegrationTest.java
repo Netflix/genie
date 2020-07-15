@@ -1407,7 +1407,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     void testSubmitJobMethodFailure() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs;
-        commandArgs = Lists.newArrayList("-c", "'exit 1'");
+        commandArgs = Lists.newArrayList("-c", "sleep 3 && exit 1");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);

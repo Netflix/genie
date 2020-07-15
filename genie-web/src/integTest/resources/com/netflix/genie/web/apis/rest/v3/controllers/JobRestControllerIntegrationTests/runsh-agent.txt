@@ -15,6 +15,32 @@ exec 6>&1
 exec 7>&2
 
 
+# Trap exit signals to ensure children processes are dead before returning
+function handle_kill_request {
+    echo "Handling $1 signal" >&2
+    # Update trap
+    trap wait SIGTERM SIGINT SIGHUP
+    # Send SIGTERM to all children
+    pkill -P $$ || true
+    for ((iteration=1; iteration < 30; iteration++))
+    {
+        if pkill -0 -P $$ &> /dev/null;
+        then
+            echo "Waiting for children to terminate" >&2
+            sleep 1
+        else
+            echo "All children terminated" >&2
+            exit 1
+        fi
+    }
+    # Reaching this point means the children did not die. Kill with SIGKILL
+    echo "Terminating all children with SIGKILL" >&2
+    pkill -9 -P $$
+}
+trap 'handle_kill_request SIGTERM' SIGTERM
+trap 'handle_kill_request SIGINT' SIGINT
+trap 'handle_kill_request SIGHUP' SIGHUP
+
 # Locally-generated environment variables
 
 export GENIE_JOB_DIR="TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER"
@@ -109,4 +135,7 @@ exec 2>&7 7>&-
 env | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}
 
 # Launch the command
-/bin/bash -c 'sleep 1 && echo hello world'
+/bin/bash -c 'sleep 1 && echo hello world' &
+wait %1
+exit $?
+
