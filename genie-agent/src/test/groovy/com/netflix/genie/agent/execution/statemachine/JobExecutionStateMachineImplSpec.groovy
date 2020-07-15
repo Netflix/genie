@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -352,6 +353,29 @@ class JobExecutionStateMachineImplSpec extends Specification {
         1 * otherMockExecutionStage.getState() >> state2
         1 * context.isExecutionAborted() >> true
         1 * otherMockExecutionStage.attemptStageAction(context)
+    }
+
+    @Unroll
+    def "Handle kill (#source)"() {
+        when:
+        sm.kill(source)
+
+        then:
+        1 * context.setJobKilled(true)
+        1 * jobProcessManager.kill(source)
+        if (source == KillService.KillSource.REMOTE_STATUS_MONITOR) {
+            1 * context.setSkipFinalStatusUpdate(true)
+        } else {
+            0 * context.setSkipFinalStatusUpdate(_)
+        }
+
+        where:
+        source                                       | _
+        KillService.KillSource.SYSTEM_SIGNAL         | _
+        KillService.KillSource.API_KILL_REQUEST      | _
+        KillService.KillSource.TIMEOUT               | _
+        KillService.KillSource.FILES_LIMIT           | _
+        KillService.KillSource.REMOTE_STATUS_MONITOR | _
     }
 
     // A stage that takes a certain amount of time to complete its action.

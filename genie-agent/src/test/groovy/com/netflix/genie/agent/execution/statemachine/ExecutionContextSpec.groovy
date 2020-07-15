@@ -70,6 +70,7 @@ class ExecutionContextSpec extends Specification {
         executionContext.getNextJobStatusMessage() == null
         executionContext.getAgentProperties() != null
         executionContext.getStateMachine() == null
+        !executionContext.isSkipFinalStatusUpdate()
 
         when:
         executionContext.setAgentClientMetadata(agentClientMetadata)
@@ -94,6 +95,7 @@ class ExecutionContextSpec extends Specification {
         executionContext.setNextJobStatus(JobStatus.RUNNING)
         executionContext.setNextJobStatusMessage("Job running")
         executionContext.setStateMachine(stateMachine)
+        executionContext.setSkipFinalStatusUpdate(true)
 
         then:
         executionContext.getAgentClientMetadata() == agentClientMetadata
@@ -122,5 +124,6 @@ class ExecutionContextSpec extends Specification {
         executionContext.getNextJobStatus() == JobStatus.RUNNING
         executionContext.getNextJobStatusMessage() == "Job running"
         executionContext.getStateMachine() == stateMachine
+        executionContext.isSkipFinalStatusUpdate()
     }
 }

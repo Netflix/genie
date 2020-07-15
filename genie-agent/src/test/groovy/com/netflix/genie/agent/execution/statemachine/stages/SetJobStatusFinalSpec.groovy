@@ -24,4 +24,18 @@ class SetJobStatusFinalSpec extends UpdateJobStatusStageSpec {
     void setup() {
         super._setup(SetJobStatusFinal, Mock(AgentJobService), JobStatus.RUNNING, JobStatus.SUCCEEDED)
     }
+
+    def "Skip final status update"() {
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.isSkipFinalStatusUpdate() >> true
+        0 * executionContext.getReservedJobId() >> jobId
+        0 * executionContext.getCurrentJobStatus() >> currentStatus
+        0 * executionContext.getNextJobStatus() >> nextStatus
+        0 * executionContext.getNextJobStatusMessage() >> nextStatusMessage
+        0 * agentJobService.changeJobStatus(jobId, currentStatus, nextStatus, nextStatusMessage)
+        1 * executionContext.setCurrentJobStatus(JobStatus.FAILED)
+    }
 }
