@@ -380,6 +380,8 @@ class JobSetupServiceImpl implements JobSetupService {
         private static final String SETUP_LOG_ENV_VAR = "__GENIE_SETUP_LOG_FILE";
         private static final String ENVIRONMENT_LOG_ENV_VAR = "__GENIE_ENVIRONMENT_DUMP_FILE";
         private static final String SETUP_ERROR_FILE_ENV_VAR = "__GENIE_SETUP_ERROR_MARKER_FILE";
+        private static final String TO_STD_ERR = " >&2";
+        private static final List<String> TRAPPED_SIGNALS = Lists.newArrayList("SIGTERM", "SIGINT", "SIGHUP");
 
         private final String jobId;
         private final List<Pair<String, String>> setupFileReferences;
@@ -540,6 +542,37 @@ class JobSetupServiceImpl implements JobSetupService {
 
             sb.append(NEWLINE);
 
+            // Script Signal Handling Section
+            sb
+                .append("# Trap exit signals to ensure children processes are dead before returning").append(NEWLINE)
+                .append("function handle_kill_request {").append(NEWLINE)
+                .append("    echo \"Handling $1 signal\"").append(TO_STD_ERR).append(NEWLINE)
+                .append("    # Update trap").append(NEWLINE)
+                .append("    trap wait ").append(String.join(" ", TRAPPED_SIGNALS)).append(NEWLINE)
+                .append("    # Send SIGTERM to all children").append(NEWLINE)
+                .append("    pkill -P $$ || true").append(NEWLINE)
+                .append("    for ((iteration=1; iteration < 30; iteration++))").append(NEWLINE)
+                .append("    {").append(NEWLINE)
+                .append("        if pkill -0 -P $$ &> /dev/null;").append(NEWLINE)
+                .append("        then").append(NEWLINE)
+                .append("            echo \"Waiting for children to terminate\"").append(TO_STD_ERR).append(NEWLINE)
+                .append("            sleep 1").append(NEWLINE)
+                .append("        else").append(NEWLINE)
+                .append("            echo \"All children terminated\"").append(TO_STD_ERR).append(NEWLINE)
+                .append("            exit 1").append(NEWLINE)
+                .append("        fi").append(NEWLINE)
+                .append("    }").append(NEWLINE)
+                .append("    # Reaching this point means the children did not die. Kill with SIGKILL").append(NEWLINE)
+                .append("    echo \"Terminating all children with SIGKILL\"").append(TO_STD_ERR).append(NEWLINE)
+                .append("    pkill -9 -P $$").append(NEWLINE)
+                .append("}").append(NEWLINE);
+
+            for (final String signal : TRAPPED_SIGNALS) {
+                sb.append("trap 'handle_kill_request ").append(signal).append("' ").append(signal).append(NEWLINE);
+            }
+
+            sb.append(NEWLINE);
+
             // Script Local environment Section
 
             sb.append("# Locally-generated environment variables").append(NEWLINE);
@@ -662,7 +695,9 @@ class JobSetupServiceImpl implements JobSetupService {
             sb
                 .append("# Launch the command")
                 .append(NEWLINE)
-                .append(this.commandLine)
+                .append(this.commandLine).append(" &").append(NEWLINE)
+                .append("wait %1").append(NEWLINE)
+                .append("exit $?").append(NEWLINE)
                 .append(NEWLINE);
 
             return sb.toString();
