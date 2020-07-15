@@ -24,9 +24,7 @@ import com.netflix.genie.agent.properties.AgentProperties
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.time.Duration
 import java.util.concurrent.ThreadFactory
-import java.util.concurrent.atomic.AtomicBoolean
 
 class KillServiceImplSpec extends Specification {
     ExecutionContext executionContext
@@ -54,8 +52,11 @@ class KillServiceImplSpec extends Specification {
         1 * threadFactory.newThread(_ as Runnable) >> Mock(Thread)
 
         where:
-        source                                  | _
-        KillService.KillSource.SYSTEM_SIGNAL    | _
-        KillService.KillSource.API_KILL_REQUEST | _
+        source                                       | _
+        KillService.KillSource.SYSTEM_SIGNAL         | _
+        KillService.KillSource.API_KILL_REQUEST      | _
+        KillService.KillSource.TIMEOUT               | _
+        KillService.KillSource.FILES_LIMIT           | _
+        KillService.KillSource.REMOTE_STATUS_MONITOR | _
     }
 }

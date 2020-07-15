@@ -181,6 +181,12 @@ public class ExecutionContext {
     private JobExecutionStateMachine stateMachine;
 
     /**
+     * Whether to skip sending the final job status to the server.
+     * Used when the job is shut down because the remote status was already set to FAILED by the leader.
+     */
+    private boolean skipFinalStatusUpdate;
+
+    /**
      * Constructor.
      *
      * @param agentProperties The agent properties

@@ -50,7 +50,7 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
      * @param executionStages   the (ordered) list of execution stages
      * @param executionContext  the execution context passed across stages during execution
      * @param listeners         the list of listeners
-     * @param jobProcessManager
+     * @param jobProcessManager the job process manager
      */
     public JobExecutionStateMachineImpl(
         final List<ExecutionStage> executionStages,
@@ -191,6 +191,9 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
     @Override
     public void kill(final KillService.KillSource killSource) {
         log.info("Shutting down job execution (kill event source: {}", killSource);
+        if (killSource == KillService.KillSource.REMOTE_STATUS_MONITOR) {
+            this.executionContext.setSkipFinalStatusUpdate(true);
+        }
         this.executionContext.setJobKilled(true);
         this.jobProcessManager.kill(killSource);
     }

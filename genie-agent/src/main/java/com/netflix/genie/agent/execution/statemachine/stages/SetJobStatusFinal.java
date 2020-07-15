@@ -18,7 +18,11 @@
 package com.netflix.genie.agent.execution.statemachine.stages;
 
 import com.netflix.genie.agent.execution.services.AgentJobService;
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 
 /**
  * Sets the final job status (success/fail/kill).
@@ -37,5 +41,17 @@ public class SetJobStatusFinal extends UpdateJobStatusStage {
         final AgentJobService agentJobService
     ) {
         super(agentJobService, States.SET_STATUS_FINAL);
+    }
+
+    @Override
+    protected void attemptStageAction(
+        final ExecutionContext executionContext
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
+        if (executionContext.isSkipFinalStatusUpdate()) {
+            // Final status update should be skipped in case of job remotely marked FAILED
+            executionContext.setCurrentJobStatus(JobStatus.FAILED);
+        } else {
+            super.attemptStageAction(executionContext);
+        }
     }
 }
