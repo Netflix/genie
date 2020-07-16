@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -52,6 +53,7 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getId().isPresent()).isFalse();
         Assertions.assertThat(execution.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(execution.getMemory().isPresent()).isFalse();
+        Assertions.assertThat(execution.getArchiveStatus().isPresent()).isFalse();
     }
 
     /**
@@ -65,6 +67,7 @@ class JobExecutionTest {
         builder.withProcessId(PROCESS_ID);
         builder.withTimeout(TIMEOUT);
         builder.withMemory(MEMORY);
+        builder.withArchiveStatus(ArchiveStatus.ARCHIVED);
 
         final int exitCode = 0;
         builder.withExitCode(exitCode);
@@ -92,6 +95,8 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getId().orElseThrow(IllegalArgumentException::new)).isEqualTo(id);
         Assertions.assertThat(execution.getUpdated().orElseThrow(IllegalArgumentException::new)).isEqualTo(updated);
         Assertions.assertThat(execution.getMemory().orElseThrow(IllegalArgumentException::new)).isEqualTo(MEMORY);
+        Assertions.assertThat(execution.getArchiveStatus().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(ArchiveStatus.ARCHIVED);
     }
 
     /**
@@ -108,6 +113,7 @@ class JobExecutionTest {
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
+        builder.withArchiveStatus(null);
 
         final JobExecution execution = builder.build();
         Assertions.assertThat(execution.getHostName()).isEqualTo(HOST_NAME);
@@ -119,6 +125,7 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getId().isPresent()).isFalse();
         Assertions.assertThat(execution.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(execution.getMemory().isPresent()).isFalse();
+        Assertions.assertThat(execution.getArchiveStatus().isPresent()).isFalse();
     }
 
     /**

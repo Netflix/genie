@@ -1052,6 +1052,12 @@ final class Snippets {
                 .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "memory"))
                 .description("The amount of memory (in MB) allocated to the job client")
                 .type(JsonFieldType.NUMBER)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("archiveStatus")
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "archiveStatus"))
+                .description("The archival status of the job directory")
+                .type(JsonFieldType.STRING)
                 .optional()
         );
     }

@@ -76,4 +76,11 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
      * @return The timeout value wrapped in an {@link Optional}
      */
     Optional<Integer> getTimeoutUsed();
+
+    /**
+     * Get the archive status for this job.
+     *
+     * @return An Optional wrapping the string representation of the archive status, if is present.
+     */
+    Optional<String> getArchiveStatus();
 }

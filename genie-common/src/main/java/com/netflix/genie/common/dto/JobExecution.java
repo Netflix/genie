@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
@@ -69,6 +70,7 @@ public class JobExecution extends BaseDTO {
         message = "The amount of memory this job is set to use on the system"
     )
     private final Integer memory;
+    private final ArchiveStatus archiveStatus;
 
     /**
      * Constructor used by the builder build() method.
@@ -83,6 +85,7 @@ public class JobExecution extends BaseDTO {
         this.exitCode = builder.bExitCode;
         this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
+        this.archiveStatus = builder.bArchiveStatus;
     }
 
     /**
@@ -131,6 +134,15 @@ public class JobExecution extends BaseDTO {
     }
 
     /**
+     * Get the archival status of job files.
+     *
+     * @return the archival status as Optional as it could be null
+     */
+    public Optional<ArchiveStatus> getArchiveStatus() {
+        return Optional.ofNullable(this.archiveStatus);
+    }
+
+    /**
      * A builder to create job requests.
      *
      * @author tgianos
@@ -144,6 +156,7 @@ public class JobExecution extends BaseDTO {
         private Instant bTimeout;
         private Integer bExitCode;
         private Integer bMemory;
+        private ArchiveStatus bArchiveStatus;
 
         /**
          * Constructor which has required fields.
@@ -209,6 +222,17 @@ public class JobExecution extends BaseDTO {
          */
         public Builder withMemory(@Nullable final Integer memory) {
             this.bMemory = memory;
+            return this;
+        }
+
+        /**
+         * Set the archive status for this job.
+         *
+         * @param archiveStatus The archive status
+         * @return The builder
+         */
+        public Builder withArchiveStatus(final ArchiveStatus archiveStatus) {
+            this.bArchiveStatus = archiveStatus;
             return this;
         }
 

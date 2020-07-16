@@ -31,6 +31,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
@@ -122,6 +123,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
     private static final String GROUPING_PATH = "grouping";
     private static final String GROUPING_INSTANCE_PATH = "groupingInstance";
+    private static final String ARCHIVE_STATUS_PATH = "archiveStatus";
     private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
@@ -809,7 +811,8 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .body(ID_PATH, Matchers.is(id))
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
-            .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()));
+            .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
+            .body(ARCHIVE_STATUS_PATH, Matchers.is(ArchiveStatus.UNKNOWN.toString()));
 
         // TODO: Fix the difference here
         if (this.agentExecution) {
