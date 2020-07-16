@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.UserResourcesSummary;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
@@ -162,6 +163,16 @@ public final class EntityV3DtoConverters {
         }
         jobExecutionProjection.getExitCode().ifPresent(builder::withExitCode);
         jobExecutionProjection.getMemoryUsed().ifPresent(builder::withMemory);
+        try {
+            builder.withArchiveStatus(
+                ArchiveStatus.valueOf(
+                    jobExecutionProjection.getArchiveStatus().orElseThrow(IllegalArgumentException::new)
+                )
+            );
+        } catch (IllegalArgumentException e) {
+            // If NULL or set to an invalid enum value
+            builder.withArchiveStatus(ArchiveStatus.UNKNOWN);
+        }
 
         return builder.build();
     }

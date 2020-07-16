@@ -23,6 +23,7 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.UserResourcesSummary
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity
@@ -121,6 +122,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         entity.setTimeoutUsed(50)
         def memory = 10_265
         entity.setMemoryUsed(memory)
+        entity.setArchiveStatus(ArchiveStatus.ARCHIVED.toString())
 
         when:
         def execution = EntityV3DtoConverters.toJobExecutionDto(entity)
@@ -135,6 +137,18 @@ class EntityV3DtoConvertersSpec extends Specification {
         execution.getCheckDelay().orElseGet(RandomSuppliers.LONG) == checkDelay
         execution.getTimeout().orElseGet(RandomSuppliers.INSTANT) == timeout
         execution.getMemory().orElseGet(RandomSuppliers.INT) == memory
+        execution.getArchiveStatus().orElse(null) == ArchiveStatus.ARCHIVED
+    }
+
+    def "Can convert Job Execution Projection with null archiveStatus to Job Execution DTO"() {
+        def entity = new JobEntity()
+        entity.setUniqueId(UUID.randomUUID().toString())
+
+        when:
+        def execution = EntityV3DtoConverters.toJobExecutionDto(entity)
+
+        then:
+        execution.getArchiveStatus().orElse(null) == ArchiveStatus.UNKNOWN
     }
 
     def "Can convert Job Metadata Projection to Job Metadata DTO"() {
