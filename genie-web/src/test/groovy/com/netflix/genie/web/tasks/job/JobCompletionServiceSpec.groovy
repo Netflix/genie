@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.external.dtos.v4.Application
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.Command
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
@@ -147,11 +148,16 @@ class JobCompletionServiceSpec extends Specification {
 
         when:
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
+
         then:
         noExceptionThrown()
         1 * persistenceService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
-            .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
+            .withId(jobId)
+            .withStatus(JobStatus.RUNNING)
+            .withCommandArgs(COMMAND_ARGS)
+            .build()
         1 * persistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
+        1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.DISABLED)
         1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableSet.of(
             Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),

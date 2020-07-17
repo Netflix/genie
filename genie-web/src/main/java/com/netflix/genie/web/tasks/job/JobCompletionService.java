@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
@@ -175,14 +176,28 @@ public class JobCompletionService {
                 // TODO: Need to archive the directory now before we set the job status because of how log serving
                 //       is handled. E.g. once job is in a finished state it will try to serve from archive location
                 //       not from disk. This may slow down job timing. Probably a use case for different states.
+                boolean success = false;
                 try {
-                    this.retryTemplate.execute(context -> this.processJobDir(job));
+                    success = this.retryTemplate.execute(context -> this.processJobDir(job));
                 } catch (final Exception e) {
                     log.error("Failed archiving directory for job: {}", jobId, e);
                     this.incrementErrorCounter("JOB_DIRECTORY_FAILURE", e);
                 }
+
+                // This ignores 'disableLogArchival' [GENIE-657]
+                final ArchiveStatus archiveStatus;
+                if (job.getArchiveLocation().isPresent()) {
+                    if (success) {
+                        archiveStatus = ArchiveStatus.ARCHIVED;
+                    } else {
+                        archiveStatus = ArchiveStatus.FAILED;
+                    }
+                } else {
+                    archiveStatus = ArchiveStatus.DISABLED;
+                }
+
                 try {
-                    this.retryTemplate.execute(context -> this.updateJob(job, event, tags));
+                    this.retryTemplate.execute(context -> this.updateJob(job, event, tags, archiveStatus));
                 } catch (final Exception e) {
                     log.error("Failed updating for job: {}", jobId, e);
                 }
@@ -213,7 +228,8 @@ public class JobCompletionService {
     private Void updateJob(
         final Job job,
         final JobFinishedEvent event,
-        final Set<Tag> tags
+        final Set<Tag> tags,
+        final ArchiveStatus archiveStatus
     ) throws GenieException {
         try {
             final String jobId = event.getId();
@@ -260,6 +276,12 @@ public class JobCompletionService {
             if (eventStatus != null) {
                 tags.add(Tag.of(JOB_FINAL_STATE, status.toString()));
                 this.persistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
+            }
+
+            try {
+                this.persistenceService.updateJobArchiveStatus(jobId, archiveStatus);
+            } catch (NotFoundException e) {
+                throw new GenieNotFoundException("Failed to update job archive status, job not found", e);
             }
         } catch (Throwable t) {
             incrementErrorCounter("JOB_UPDATE_FAILURE", t);
@@ -537,6 +559,7 @@ public class JobCompletionService {
                     }
 
                     final Optional<String> archiveLocation = job.getArchiveLocation();
+                    // This ignores 'disableLogArchival', see https://jira.netflix.net/browse/GENIE-657
                     if (archiveLocation.isPresent() && !Strings.isNullOrEmpty(archiveLocation.get())) {
                         log.debug("Archiving job directory");
 

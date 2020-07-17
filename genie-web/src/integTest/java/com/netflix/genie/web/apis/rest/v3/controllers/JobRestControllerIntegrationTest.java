@@ -812,7 +812,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
             .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
-            .body(ARCHIVE_STATUS_PATH, Matchers.is(ArchiveStatus.UNKNOWN.toString()));
+            .body(ARCHIVE_STATUS_PATH, Matchers.is(ArchiveStatus.ARCHIVED.toString()));
 
         // TODO: Fix the difference here
         if (this.agentExecution) {
