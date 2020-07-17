@@ -222,6 +222,15 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Optional<String> getJobHostname(@Param("id") String id);
 
     /**
+     * Get only the archive status of a job.
+     *
+     * @param id The id of the job to get the archive status for
+     * @return The job archive status or {@link Optional#empty()} if no job with the given id exists
+     */
+    @Query("SELECT COALESCE(j.archiveStatus, 'UNKNOWN') FROM JobEntity j WHERE j.uniqueId = :id")
+    Optional<String> getArchiveStatus(@Param("id") String id);
+
+    /**
      * Get the data needed to create a V3 Job DTO.
      *
      * @param id The unique id of the job
