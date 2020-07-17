@@ -36,6 +36,7 @@ import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata;
 import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
@@ -1697,6 +1698,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         // Flag to signal to rest of system that this job is V4. Temporary until everything moved to v4
         jobEntity.setV4(true);
 
+        // Set archive status
+        jobEntity.setArchiveStatus(
+            jobRequest.getRequestedAgentConfig().isArchivingDisabled()
+                ? ArchiveStatus.DISABLED.name()
+                : ArchiveStatus.PENDING.name()
+        );
+
         // Persist. Catch exception if the ID is reused
         try {
             final String id = this.jobRepository.save(jobEntity).getUniqueId();
@@ -1916,6 +1924,32 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
+    public void updateJobArchiveStatus(
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final ArchiveStatus archiveStatus
+    ) throws NotFoundException {
+        log.debug(
+            "[updateJobArchiveStatus] Requested to change the archive status of job {} to {}",
+            id,
+            archiveStatus
+        );
+
+        this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No job exists for the id specified"))
+            .setArchiveStatus(archiveStatus.name());
+
+        log.debug(
+            "[updateJobArchiveStatus] Changed the archive status of job {} to {}",
+            id,
+            archiveStatus
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @Transactional(readOnly = true)
     public boolean isV4(@NotBlank final String id) throws NotFoundException {
         log.debug("[isV4] Read v4 flag from db for job {} ", id);
@@ -1935,6 +1969,23 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 .getJobStatus(id)
                 .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get status."))
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ArchiveStatus getJobArchiveStatus(@NotBlank final String id) throws NotFoundException {
+        try {
+            return ArchiveStatus.valueOf(
+                this.jobRepository
+                    .getArchiveStatus(id)
+                    .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
+            );
+        } catch (IllegalArgumentException e) {
+            return ArchiveStatus.UNKNOWN;
+        }
     }
 
     /**
@@ -2801,9 +2852,18 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             jobEntity.setTimeoutUsed(this.toTimeoutUsed(job.getStarted().get(), jobExecution.getTimeout().get()));
         }
         jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
+        jobExecution.getArchiveStatus().ifPresent(s -> jobEntity.setArchiveStatus(s.name()));
 
         // Flag to signal to rest of system that this job is V3. Temporary until everything moved to v4
         jobEntity.setV4(false);
+//
+//        // Archival status
+//        // Currently ignores 'disableLogArchival' [GENIE-657]
+//        if (!job.getArchiveLocation().isPresent()) {
+//            jobEntity.setArchiveStatus(ArchiveStatus.DISABLED.name());
+//        } else {
+//            jobEntity.setArchiveStatus(ArchiveStatus.PENDING.name());
+//        }
 
         return jobEntity;
     }

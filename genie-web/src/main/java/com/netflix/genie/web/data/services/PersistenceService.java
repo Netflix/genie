@@ -27,6 +27,7 @@ import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
@@ -802,6 +803,18 @@ public interface PersistenceService {
     ) throws NotFoundException, GenieInvalidStatusException;
 
     /**
+     * Update the status and status message of the job.
+     *
+     * @param id            The id of the job to update the status for.
+     * @param archiveStatus The updated archive status for the job.
+     * @throws NotFoundException If no job with the given {@code id} exists
+     */
+    void updateJobArchiveStatus(
+        @NotBlank(message = "No job id entered. Unable to update.") String id,
+        @NotNull(message = "Status cannot be null.") ArchiveStatus archiveStatus
+    ) throws NotFoundException;
+
+    /**
      * Get whether the job is a V4 job (Run with agent).
      *
      * @param id The id of the job
@@ -818,6 +831,15 @@ public interface PersistenceService {
      * @throws NotFoundException If no job with the given {@code id} exists
      */
     JobStatus getJobStatus(@NotBlank String id) throws NotFoundException;
+
+    /**
+     * Get the archive status for a job with the given {@code id}.
+     *
+     * @param id The id of the job to get status for
+     * @return The job archive status
+     * @throws NotFoundException If no job with the given {@code id} exists
+     */
+    ArchiveStatus getJobArchiveStatus(@NotBlank String id) throws NotFoundException;
 
     /**
      * Get the location a job directory was archived to if at all.

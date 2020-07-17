@@ -36,6 +36,7 @@ import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.ApiClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
@@ -267,6 +268,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .withTimeout(TIMEOUT)
             .withMemory(MEMORY)
             .withProcessId(PROCESS_ID)
+            .withArchiveStatus(ArchiveStatus.DISABLED)
             .build();
 
         Assertions.assertThat(this.jobRepository.count()).isEqualTo(3L);
@@ -707,6 +709,25 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(this.service.isApiJob(JOB_1_ID)).isFalse();
         Assertions.assertThat(this.service.isApiJob(JOB_2_ID)).isTrue();
         Assertions.assertThat(this.service.isApiJob(JOB_3_ID)).isTrue();
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/init.xml")
+    void canGetJobArchiveStatus() throws GenieCheckedException {
+        Assertions
+            .assertThatExceptionOfType(NotFoundException.class)
+            .isThrownBy(() -> this.service.getJobArchiveStatus(UUID.randomUUID().toString()));
+        Assertions.assertThat(this.service.getJobArchiveStatus(JOB_1_ID)).isEqualTo(ArchiveStatus.ARCHIVED);
+        Assertions.assertThat(this.service.getJobArchiveStatus(JOB_2_ID)).isEqualTo(ArchiveStatus.PENDING);
+        Assertions.assertThat(this.service.getJobArchiveStatus(JOB_3_ID)).isEqualTo(ArchiveStatus.UNKNOWN);
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/init.xml")
+    void canSetJobArchiveStatus() throws GenieCheckedException, GenieException {
+        Assertions.assertThat(this.service.getJobArchiveStatus(JOB_2_ID)).isEqualTo(ArchiveStatus.PENDING);
+        this.service.updateJobArchiveStatus(JOB_2_ID, ArchiveStatus.ARCHIVED);
+        Assertions.assertThat(this.service.getJobArchiveStatus(JOB_2_ID)).isEqualTo(ArchiveStatus.ARCHIVED);
     }
 
     @Test
@@ -1273,6 +1294,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(savedJobExecution.getCheckDelay()).contains(CHECK_DELAY);
         Assertions.assertThat(savedJobExecution.getTimeout()).contains(TIMEOUT);
         Assertions.assertThat(savedJobExecution.getMemory()).contains(MEMORY);
+        Assertions.assertThat(savedJobExecution.getArchiveStatus()).isEqualTo(Optional.of(ArchiveStatus.DISABLED));
     }
 
     private void validateJobMetadata(final JobMetadataProjection savedMetadata) {
