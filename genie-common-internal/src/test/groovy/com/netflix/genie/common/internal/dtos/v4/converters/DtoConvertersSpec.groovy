@@ -987,6 +987,7 @@ class DtoConvertersSpec extends Specification {
             .withTimeout(timeout)
             .withCpu(cpu)
             .withMemory(memory)
+            .withDisableLogArchival(true)
             .build()
 
         when:
@@ -1009,6 +1010,7 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getMetadata().getDescription().orElse(null) == description
         v4JobRequest.getRequestedJobEnvironment().getRequestedJobCpu().orElse(null) == cpu
         !v4JobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().isPresent()
+        !v4JobRequest.getRequestedAgentConfig().isArchivingDisabled() // TODO: [GENIE-657]
         !v4JobRequest.getRequestedJobEnvironment().getExt().isPresent()
         v4JobRequest.getResources().getDependencies() == dependencies
         v4JobRequest.getResources().getConfigs() == configs

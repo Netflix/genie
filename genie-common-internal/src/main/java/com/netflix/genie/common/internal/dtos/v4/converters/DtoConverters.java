@@ -447,7 +447,7 @@ public final class DtoConverters {
 
         final AgentConfigRequest.Builder agentConfigBuilder = new AgentConfigRequest
             .Builder()
-            .withArchivingDisabled(v3JobRequest.isDisableLogArchival())
+            .withArchivingDisabled(/*v3JobRequest.isDisableLogArchival()*/ false) //TODO: Stop ignoring flag [GENIE-657]
             .withInteractive(false);
         v3JobRequest.getTimeout().ifPresent(agentConfigBuilder::withTimeoutRequested);
 

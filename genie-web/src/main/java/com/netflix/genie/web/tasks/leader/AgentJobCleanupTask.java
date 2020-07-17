@@ -21,9 +21,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -135,8 +138,23 @@ public class AgentJobCleanupTask extends LeaderTask {
                         null,
                         null
                     );
+
+                    // Update job archive status
+                    try {
+                        final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(awolJobId);
+                        if (archiveStatus == ArchiveStatus.PENDING) {
+                            this.persistenceService.updateJobArchiveStatus(
+                                awolJobId,
+                                jobWasClaimed ? ArchiveStatus.UNKNOWN : ArchiveStatus.FAILED
+                            );
+                        }
+                    } catch (NotFoundException e) {
+                        throw new GenieNotFoundException("Not found: " + awolJobId, e);
+                    }
+
                     // If marking as failed succeeded, remove it from the map
                     this.awolJobsMap.remove(awolJobId);
+
                     // Increment counter, tag as successful
                     this.registry.counter(
                         TERMINATED_COUNTER_METRIC_NAME,

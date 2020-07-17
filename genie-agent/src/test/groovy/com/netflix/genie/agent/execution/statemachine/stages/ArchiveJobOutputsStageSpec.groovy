@@ -17,8 +17,11 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages
 
+import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusException
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
@@ -30,19 +33,23 @@ class ArchiveJobOutputsStageSpec extends Specification {
     ExecutionStage stage
     ExecutionContext executionContext
     JobArchiveService jobArchiveService
+    AgentJobService agentJobService
     JobSpecification jobSpec
     File jobDir
     String archiveLocation
     Path jobDirPath
+    String jobId
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
         this.jobArchiveService = Mock(JobArchiveService)
+        this.agentJobService = Mock(AgentJobService)
         this.jobSpec = Mock(JobSpecification)
         this.jobDir = Mock(File)
         this.archiveLocation = "s3://genie-logs/foo/bar"
         this.jobDirPath = Mock(Path)
-        this.stage = new ArchiveJobOutputsStage(jobArchiveService)
+        this.jobId = UUID.randomUUID().toString()
+        this.stage = new ArchiveJobOutputsStage(jobArchiveService, agentJobService)
     }
 
     def "AttemptTransition - success"() {
@@ -52,9 +59,11 @@ class ArchiveJobOutputsStageSpec extends Specification {
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
         1 * executionContext.getJobDirectory() >> jobDir
+        1 * executionContext.getClaimedJobId() >> jobId
         1 * jobSpec.getArchiveLocation() >> Optional.of(archiveLocation)
         1 * jobDir.toPath() >> jobDirPath
         1 * jobArchiveService.archiveDirectory(jobDirPath, _ as URI)
+        1 * agentJobService.changeJobArchiveStatus(jobId, ArchiveStatus.ARCHIVED)
     }
 
     def "AttemptTransition - no spec"() {
@@ -83,9 +92,27 @@ class ArchiveJobOutputsStageSpec extends Specification {
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
         1 * executionContext.getJobDirectory() >> jobDir
+        1 * executionContext.getClaimedJobId() >> jobId
         1 * jobSpec.getArchiveLocation() >> Optional.of(archiveLocation)
         1 * jobDir.toPath() >> jobDirPath
         1 * jobArchiveService.archiveDirectory(jobDirPath, _ as URI) >> { throw new JobArchiveException() }
+        1 * agentJobService.changeJobArchiveStatus(jobId, ArchiveStatus.FAILED)
         noExceptionThrown()
     }
+
+    def "AttemptTransition - status update error"() {
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.getJobSpecification() >> jobSpec
+        1 * executionContext.getJobDirectory() >> jobDir
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * jobSpec.getArchiveLocation() >> Optional.of(archiveLocation)
+        1 * jobDir.toPath() >> jobDirPath
+        1 * jobArchiveService.archiveDirectory(jobDirPath, _ as URI)
+        1 * agentJobService.changeJobArchiveStatus(jobId, ArchiveStatus.ARCHIVED) >> { throw new ChangeJobArchiveStatusException("...") }
+        noExceptionThrown()
+    }
+
 }
