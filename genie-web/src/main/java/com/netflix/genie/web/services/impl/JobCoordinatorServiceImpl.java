@@ -32,6 +32,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
@@ -154,18 +155,20 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             //       Will allow us to reach out to clients who may set this variable but still expect output after
             //       job completion due to it being served off the node after completion in V3 but now it won't.
             //       Put this back in once all use cases have been hunted down and users are sure of their expected
-            //       behavior
+            //       behavior. [GENIE-657]
 //            if (!jobRequest.isDisableLogArchival()) {
             String archiveRoot = this.jobsProperties.getLocations().getArchives().toString();
             if (!archiveRoot.endsWith(JobConstants.FILE_PATH_DELIMITER)) {
                 archiveRoot += JobConstants.FILE_PATH_DELIMITER;
             }
             jobBuilder.withArchiveLocation(archiveRoot + jobId);
+            final ArchiveStatus archiveStatus = ArchiveStatus.PENDING;
 //            }
 
             final JobExecution jobExecution = new JobExecution
                 .Builder(this.hostname)
                 .withId(jobId)
+                .withArchiveStatus(archiveStatus)
                 .build();
 
             // Log all the job initial job information

@@ -23,10 +23,12 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -155,16 +157,22 @@ public class ClusterCheckerTask extends LeaderTask {
             job -> {
                 final Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
                 tags.add(Tag.of(MetricsConstants.TagKeys.HOST, host));
+                final String jobId = job.getId().orElseThrow(IllegalArgumentException::new);
                 try {
+                    // Update status and other details
                     this.persistenceService.setJobCompletionInformation(
-                        job.getId().orElseThrow(IllegalArgumentException::new),
+                        jobId,
                         JobExecution.LOST_EXIT_CODE,
                         JobStatus.FAILED,
                         "Genie leader can't reach node running job. Assuming node and job are lost.",
                         null,
                         null
                     );
-                } catch (final GenieException ge) {
+                    // Update archive status
+                    if (this.persistenceService.getJobArchiveStatus(jobId) == ArchiveStatus.PENDING) {
+                        this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.UNKNOWN);
+                    }
+                } catch (final NotFoundException | GenieException ge) {
                     MetricsUtils.addFailureTagsWithException(tags, ge);
                     log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
                     throw new RuntimeException("Failed to update job", ge);

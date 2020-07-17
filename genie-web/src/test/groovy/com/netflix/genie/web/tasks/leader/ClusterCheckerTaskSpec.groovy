@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Job
 import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -241,6 +242,8 @@ class ClusterCheckerTaskSpec extends Specification {
             null,
             null
         )
+        1 * this.persistenceService.getJobArchiveStatus(job1.getId().get()) >> ArchiveStatus.PENDING
+        1 * this.persistenceService.updateJobArchiveStatus(job1.getId().get(), ArchiveStatus.UNKNOWN)
         1 * this.meterRegistry.counter(
             ClusterCheckerTask.FAILED_JOBS_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2,
@@ -255,6 +258,8 @@ class ClusterCheckerTaskSpec extends Specification {
             null,
             null
         ) >> { throw jobPersistenceServiceException }
+        0 * this.persistenceService.getJobArchiveStatus(job2.getId().get())
+        0 * this.persistenceService.updateJobArchiveStatus(job2.getId().get(), _)
         1 * this.meterRegistry.counter(
             ClusterCheckerTask.FAILED_JOBS_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2,
@@ -296,6 +301,8 @@ class ClusterCheckerTaskSpec extends Specification {
             null,
             null
         )
+        1 * this.persistenceService.getJobArchiveStatus(job2.getId().get()) >> ArchiveStatus.DISABLED
+        0 * this.persistenceService.updateJobArchiveStatus(job2.getId().get(), _)
         1 * this.meterRegistry.counter(
             ClusterCheckerTask.FAILED_JOBS_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2,
