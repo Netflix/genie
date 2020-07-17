@@ -17,11 +17,14 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
+import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
@@ -41,15 +44,18 @@ import java.net.URISyntaxException;
 @Slf4j
 public class ArchiveJobOutputsStage extends ExecutionStage {
     private final JobArchiveService jobArchiveService;
+    private final AgentJobService agentJobService;
 
     /**
      * Constructor.
      *
      * @param jobArchiveService job archive service
+     * @param agentJobService   agent job service
      */
-    public ArchiveJobOutputsStage(final JobArchiveService jobArchiveService) {
+    public ArchiveJobOutputsStage(final JobArchiveService jobArchiveService, final AgentJobService agentJobService) {
         super(States.ARCHIVE);
         this.jobArchiveService = jobArchiveService;
+        this.agentJobService = agentJobService;
     }
 
     @Override
@@ -63,15 +69,27 @@ public class ArchiveJobOutputsStage extends ExecutionStage {
         if (jobSpecification != null && jobDirectory != null) {
             final String archiveLocation = jobSpecification.getArchiveLocation().orElse(null);
             if (StringUtils.isNotBlank(archiveLocation)) {
+
+                boolean success = false;
                 try {
                     log.info("Archive job folder to: " + archiveLocation);
                     this.jobArchiveService.archiveDirectory(
                         jobDirectory.toPath(),
                         new URI(archiveLocation)
                     );
+                    success = true;
                 } catch (JobArchiveException | URISyntaxException e) {
                     // Swallow the error and move on.
                     log.error("Error archiving job folder", e);
+                }
+
+                final String jobId = executionContext.getClaimedJobId();
+                final ArchiveStatus archiveStatus = success ? ArchiveStatus.ARCHIVED : ArchiveStatus.FAILED;
+                try {
+                    this.agentJobService.changeJobArchiveStatus(jobId, archiveStatus);
+                } catch (ChangeJobArchiveStatusException e) {
+                    // Swallow the error and move on.
+                    log.error("Error updating the archive status", e);
                 }
             }
         }

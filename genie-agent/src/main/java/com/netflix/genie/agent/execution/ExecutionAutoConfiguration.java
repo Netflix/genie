@@ -484,13 +484,17 @@ public class ExecutionAutoConfiguration {
      * Create a {@link ArchiveJobOutputsStage} bean if one is not already defined.
      *
      * @param jobArchiveService the job archive service
+     * @param agentJobService   the agent job service
      */
     @Bean
     @Lazy
     @Order(220)
     @ConditionalOnMissingBean(ArchiveJobOutputsStage.class)
-    ArchiveJobOutputsStage archiveJobOutputsStage(final JobArchiveService jobArchiveService) {
-        return new ArchiveJobOutputsStage(jobArchiveService);
+    ArchiveJobOutputsStage archiveJobOutputsStage(
+        final JobArchiveService jobArchiveService,
+        final AgentJobService agentJobService
+    ) {
+        return new ArchiveJobOutputsStage(jobArchiveService, agentJobService);
     }
 
     /**
