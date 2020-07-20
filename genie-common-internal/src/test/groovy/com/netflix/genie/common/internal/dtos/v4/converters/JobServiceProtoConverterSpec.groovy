@@ -24,6 +24,7 @@ import com.google.protobuf.Int32Value
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
@@ -33,6 +34,7 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest
 import com.netflix.genie.proto.ConfigureRequest
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
@@ -474,6 +476,16 @@ class JobServiceProtoConverterSpec extends Specification {
         then:
         proto != null
         proto.getId() == id
+    }
+
+    def "Can create ChangeJobArchiveStatusRequest"() {
+        when:
+        ChangeJobArchiveStatusRequest proto = converter.toChangeJobStatusArchiveRequestProto(id, ArchiveStatus.ARCHIVED)
+
+        then:
+        proto != null
+        proto.getId() == id
+        proto.getNewStatus() == ArchiveStatus.ARCHIVED.name()
     }
 
     AgentJobRequest createJobRequest(String id) {

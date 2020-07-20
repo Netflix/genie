@@ -25,6 +25,7 @@ import com.google.protobuf.Int32Value;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
@@ -36,6 +37,7 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.proto.AgentConfig;
 import com.netflix.genie.proto.AgentMetadata;
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ConfigureRequest;
@@ -354,6 +356,23 @@ public class JobServiceProtoConverter {
      */
     public GetJobStatusRequest toGetJobStatusRequestProto(final String jobId) {
         return GetJobStatusRequest.newBuilder().setId(jobId).build();
+    }
+
+    /**
+     * Creates a request to change the remote job archive status.
+     *
+     * @param jobId         the job id
+     * @param archiveStatus the new archive status
+     * @return a {@link ChangeJobArchiveStatusRequest} message instance
+     */
+    public ChangeJobArchiveStatusRequest toChangeJobStatusArchiveRequestProto(
+        final String jobId,
+        final ArchiveStatus archiveStatus
+    ) {
+        return ChangeJobArchiveStatusRequest.newBuilder()
+            .setId(jobId)
+            .setNewStatus(archiveStatus.name())
+            .build();
     }
 
     private JobSpecification.ExecutionResource toExecutionResourceDto(final ExecutionResource protoResource) {

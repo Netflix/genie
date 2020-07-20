@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.services.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -329,5 +330,27 @@ class AgentJobServiceImplSpec extends Specification {
         then:
         1 * persistenceService.getJobStatus(id) >> { throw new NotFoundException("...") }
         thrown(GenieJobNotFoundException)
+    }
+
+    def "Can update job archive status"() {
+        def id = UUID.randomUUID().toString()
+
+        when:
+        service.updateJobArchiveStatus(id, status)
+
+        then:
+        1 * persistenceService.updateJobArchiveStatus(id, status)
+
+        when:
+        service.updateJobArchiveStatus(id, status)
+
+        then:
+        1 * persistenceService.updateJobArchiveStatus(id, status) >> { throw new NotFoundException("...") }
+        thrown(GenieJobNotFoundException)
+
+        where:
+        status                 | _
+        ArchiveStatus.ARCHIVED | _
+        ArchiveStatus.FAILED   | _
     }
 }

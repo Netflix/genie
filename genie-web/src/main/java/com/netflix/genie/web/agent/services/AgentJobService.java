@@ -18,6 +18,7 @@
 package com.netflix.genie.web.agent.services;
 
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
@@ -154,4 +155,18 @@ public interface AgentJobService {
      * @throws ConstraintViolationException If the arguments fail validation
      */
     JobStatus getJobStatus(@NotBlank String id);
+
+    /**
+     * Update the archive status status of the job identified with {@code id} to be {@code newStatus}.
+     * Notice this is a 'blind write', the currently persisted value will always be overwritten.
+     *
+     * @param id               The id of the job to update status for. Must exist in the system.
+     * @param newArchiveStatus The new archive status the caller would like to update the status to
+     * @throws GenieJobNotFoundException    if no job with the given {@code id} exists
+     * @throws ConstraintViolationException If the arguments fail validation
+     */
+    void updateJobArchiveStatus(
+        @NotBlank String id,
+        ArchiveStatus newArchiveStatus
+    );
 }

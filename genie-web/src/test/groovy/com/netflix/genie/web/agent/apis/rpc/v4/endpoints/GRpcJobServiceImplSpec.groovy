@@ -18,8 +18,8 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.google.common.collect.Maps
-import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -29,6 +29,8 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyCla
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.proto.AgentMetadata
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest
+import com.netflix.genie.proto.ChangeJobArchiveStatusResponse
 import com.netflix.genie.proto.ChangeJobStatusRequest
 import com.netflix.genie.proto.ChangeJobStatusResponse
 import com.netflix.genie.proto.ClaimJobRequest
@@ -47,7 +49,11 @@ import com.netflix.genie.proto.ReserveJobIdResponse
 import com.netflix.genie.web.agent.services.AgentJobService
 import io.grpc.stub.StreamObserver
 import org.apache.commons.lang3.StringUtils
+import org.assertj.core.util.Sets
 import spock.lang.Specification
+import spock.lang.Unroll
+
+import javax.validation.ConstraintViolationException
 
 /**
  * Specifications for the {@link GRpcJobServiceImpl} class.
@@ -67,6 +73,7 @@ class GRpcJobServiceImplSpec extends Specification {
     StreamObserver<ClaimJobResponse> claimJobResponseObserver
     StreamObserver<ChangeJobStatusResponse> changeJobStatusResponseObserver
     StreamObserver<GetJobStatusResponse> getJobStatusResponseObserver
+    StreamObserver<ChangeJobArchiveStatusResponse> changeJobArchiveStatusObserver
     JobServiceProtoConverter jobServiceProtoConverter
 
     def setup() {
@@ -82,6 +89,7 @@ class GRpcJobServiceImplSpec extends Specification {
         this.claimJobResponseObserver = Mock(StreamObserver)
         this.changeJobStatusResponseObserver = Mock(StreamObserver)
         this.getJobStatusResponseObserver = Mock(StreamObserver)
+        this.changeJobArchiveStatusObserver = Mock(StreamObserver)
     }
 
     def "Handshake -- successful"() {
@@ -448,5 +456,44 @@ class GRpcJobServiceImplSpec extends Specification {
             throw e
         }
         1 * getJobStatusResponseObserver.onError(e)
+    }
+
+    def "Update archive status -- successful"() {
+        ArchiveStatus archiveStatus = ArchiveStatus.ARCHIVED
+        ChangeJobArchiveStatusRequest request = ChangeJobArchiveStatusRequest.newBuilder()
+            .setId(id)
+            .setNewStatus(archiveStatus.name())
+            .build()
+
+        when:
+        gRpcJobService.changeJobArchiveStatus(request, changeJobArchiveStatusObserver)
+
+        then:
+        1 * agentJobService.updateJobArchiveStatus(id, archiveStatus)
+        1 * changeJobArchiveStatusObserver.onNext(_ as ChangeJobArchiveStatusResponse)
+        1 * changeJobArchiveStatusObserver.onCompleted()
+    }
+
+    @Unroll
+    def "Update archive status -- service exception #exception"() {
+        ArchiveStatus archiveStatus = ArchiveStatus.ARCHIVED
+        ChangeJobArchiveStatusRequest request = ChangeJobArchiveStatusRequest.newBuilder()
+            .setId(id)
+            .setNewStatus(archiveStatus.name())
+            .build()
+
+        when:
+        gRpcJobService.changeJobArchiveStatus(request, changeJobArchiveStatusObserver)
+
+        then:
+        1 * agentJobService.updateJobArchiveStatus(id, archiveStatus) >> {
+            throw exception
+        }
+        1 * changeJobArchiveStatusObserver.onError(_ as Exception)
+
+        where:
+        exception                                                  | _
+        new GenieJobNotFoundException("...")                       | _
+        new ConstraintViolationException("...", Sets.newHashSet()) | _
     }
 }

@@ -52,6 +52,7 @@ service JobService {
     rpc claimJob (ClaimJobRequest) returns (ClaimJobResponse);
     rpc changeJobStatus (ChangeJobStatusRequest) returns (ChangeJobStatusResponse);
     rpc getJobStatus (GetJobStatusRequest) returns (GetJobStatusResponse);
+    rpc changeJobArchiveStatus (ChangeJobArchiveStatusRequest) returns (ChangeJobArchiveStatusResponse);
 }
 
 message JobMetadata {
@@ -260,6 +261,14 @@ message ConfigureRequest {
 
 message ConfigureResponse {
     map<string, string> properties = 1;
+}
+
+message ChangeJobArchiveStatusRequest {
+    string id = 1;
+    string new_status = 2;
+}
+
+message ChangeJobArchiveStatusResponse {
 }
 
 //--------------------------------------------------------------------

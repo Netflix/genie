@@ -18,10 +18,14 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest;
+import com.netflix.genie.proto.ChangeJobArchiveStatusResponse;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobRequest;
@@ -39,6 +43,7 @@ import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
 import com.netflix.genie.web.agent.services.AgentJobService;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 
@@ -301,6 +306,34 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             final JobStatus status = this.agentJobService.getJobStatus(id);
             responseObserver.onNext(GetJobStatusResponse.newBuilder().setStatus(status.name()).build());
             responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error retrieving job {} status: {}", id, e.getMessage());
+            responseObserver.onError(e);
+        }
+    }
+
+    /**
+     * When the agent wants to set the archival status of a job post-execution (i.e. archived successfully, or failed
+     * to archive).
+     *
+     * @param request          The request containing the job id to look up
+     * @param responseObserver The observer to send a response with
+     */
+    @Override
+    public void changeJobArchiveStatus(
+        final ChangeJobArchiveStatusRequest request,
+        final StreamObserver<ChangeJobArchiveStatusResponse> responseObserver
+    ) {
+
+        final String id = request.getId();
+        final ArchiveStatus newArchiveStatus = ArchiveStatus.valueOf(request.getNewStatus());
+        try {
+            this.agentJobService.updateJobArchiveStatus(id, newArchiveStatus);
+            responseObserver.onNext(ChangeJobArchiveStatusResponse.newBuilder().build());
+            responseObserver.onCompleted();
+        } catch (GenieJobNotFoundException e) {
+            log.error("Cannot update archive status of job {}, job not found", id);
+            responseObserver.onError(Status.NOT_FOUND.withCause(e).asException());
         } catch (Exception e) {
             log.error("Error retrieving job {} status: {}", id, e.getMessage());
             responseObserver.onError(e);

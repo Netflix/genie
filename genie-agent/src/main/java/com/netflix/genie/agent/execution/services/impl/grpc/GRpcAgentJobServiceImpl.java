@@ -19,6 +19,7 @@ package com.netflix.genie.agent.execution.services.impl.grpc;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusException;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.ConfigureException;
 import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
@@ -29,11 +30,13 @@ import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionEx
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
@@ -247,6 +250,9 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void changeJobStatus(
         final @NotBlank String jobId,
@@ -269,6 +275,9 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JobStatus getJobStatus(@NotBlank final String jobId) throws GetJobStatusException {
         final GetJobStatusRequest request = this.jobServiceProtoConverter.toGetJobStatusRequestProto(jobId);
@@ -281,6 +290,28 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
             return JobStatus.valueOf(statusString);
         } catch (IllegalArgumentException e) {
             throw new GetJobStatusException("Invalid job status in response: " + statusString);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void changeJobArchiveStatus(
+        @NotBlank final String jobId,
+        final ArchiveStatus archiveStatus
+    ) throws ChangeJobArchiveStatusException {
+
+        final ChangeJobArchiveStatusRequest request =
+            this.jobServiceProtoConverter.toChangeJobStatusArchiveRequestProto(
+                jobId,
+                archiveStatus
+            );
+
+        try {
+            handleResponseFuture(this.client.changeJobArchiveStatus(request));
+        } catch (GenieRuntimeException e) {
+            throw new ChangeJobArchiveStatusException("Failed to update job archive status", e);
         }
     }
 
