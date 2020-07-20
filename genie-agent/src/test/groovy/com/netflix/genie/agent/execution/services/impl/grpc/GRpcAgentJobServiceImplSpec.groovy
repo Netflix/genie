@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc
 
+import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusException
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.ConfigureException
 import com.netflix.genie.agent.execution.exceptions.GetJobStatusException
@@ -27,11 +28,14 @@ import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionEx
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest
+import com.netflix.genie.proto.ChangeJobArchiveStatusResponse
 import com.netflix.genie.proto.ChangeJobStatusError
 import com.netflix.genie.proto.ChangeJobStatusRequest
 import com.netflix.genie.proto.ChangeJobStatusResponse
@@ -52,6 +56,7 @@ import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdError
 import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.proto.ReserveJobIdResponse
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.junit.Rule
@@ -75,8 +80,11 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     ClaimJobResponse claimJobResponse
     ChangeJobStatusResponse changeJobStatusResponse
     GetJobStatusResponse getJobStatusResponse
+    ChangeJobArchiveStatusResponse changeJobArchiveStatusResponse
+    Throwable serverError
 
     void setup() {
+        this.serverError = null
         this.grpcServerRule.getServiceRegistry().addService(new TestService())
         this.id = UUID.randomUUID().toString()
         this.protoConverter = Mock(JobServiceProtoConverter)
@@ -560,7 +568,6 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         1 * protoConverter.toGetJobStatusRequestProto(id) >> request
     }
 
-
     def "Get job status -- invalid response"() {
         this.getJobStatusResponse = GetJobStatusResponse.getDefaultInstance()
         GetJobStatusRequest request = GetJobStatusRequest.getDefaultInstance()
@@ -572,6 +579,29 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         1 * protoConverter.toGetJobStatusRequestProto(id) >> request
 
         thrown(GetJobStatusException)
+    }
+
+    def "Update job archive status -- successful"() {
+        this.changeJobArchiveStatusResponse = ChangeJobArchiveStatusResponse.getDefaultInstance()
+        ChangeJobArchiveStatusRequest request = ChangeJobArchiveStatusRequest.getDefaultInstance()
+
+        when:
+        service.changeJobArchiveStatus(id, ArchiveStatus.ARCHIVED)
+
+        then:
+        1 * protoConverter.toChangeJobStatusArchiveRequestProto(id, ArchiveStatus.ARCHIVED) >> request
+    }
+
+    def "Update job archive status -- invalid response"() {
+        this.serverError = Status.NOT_FOUND.asException()
+        ChangeJobArchiveStatusRequest request = ChangeJobArchiveStatusRequest.getDefaultInstance()
+
+        when:
+        service.changeJobArchiveStatus(id, ArchiveStatus.ARCHIVED)
+
+        then:
+        1 * protoConverter.toChangeJobStatusArchiveRequestProto(id, ArchiveStatus.ARCHIVED) >> request
+        thrown(ChangeJobArchiveStatusException)
     }
 
     private class TestService extends JobServiceGrpc.JobServiceImplBase {
@@ -641,13 +671,25 @@ class GRpcAgentJobServiceImplSpec extends Specification {
             sendResponse(responseObserver, getJobStatusResponse)
         }
 
+        @Override
+        void changeJobArchiveStatus(
+            final ChangeJobArchiveStatusRequest request,
+            final StreamObserver<ChangeJobArchiveStatusResponse> responseObserver
+        ) {
+            sendResponse(responseObserver, changeJobArchiveStatusResponse)
+        }
+
         private <ResponseType> void sendResponse(
             StreamObserver<ResponseType> observer,
             ResponseType response
         ) {
-            assert response != null
-            observer.onNext(response)
-            observer.onCompleted()
+            if (serverError != null) {
+                observer.onError(serverError)
+            } else {
+                assert response != null
+                observer.onNext(response)
+                observer.onCompleted()
+            }
         }
     }
 }

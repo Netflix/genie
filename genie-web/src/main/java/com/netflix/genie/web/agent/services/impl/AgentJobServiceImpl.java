@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.services.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
@@ -260,6 +261,18 @@ public class AgentJobServiceImpl implements AgentJobService {
         try {
             return this.persistenceService.getJobStatus(id);
         } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateJobArchiveStatus(@NotBlank final String id, final ArchiveStatus newArchiveStatus) {
+        try {
+            this.persistenceService.updateJobArchiveStatus(id, newArchiveStatus);
+        } catch (NotFoundException e) {
             throw new GenieJobNotFoundException(e);
         }
     }

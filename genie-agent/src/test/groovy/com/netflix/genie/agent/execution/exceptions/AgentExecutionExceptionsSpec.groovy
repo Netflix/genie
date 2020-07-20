@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.exceptions
 
+import com.netflix.genie.proto.ChangeJobArchiveStatusRequest
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -54,6 +55,7 @@ class AgentExecutionExceptionsSpec extends Specification {
         GetJobStatusException.class               | true
         HandshakeException.class                  | true
         ConfigureException.class                  | true
+        ChangeJobArchiveStatusException.class     | true
         InvalidStateException.class               | false
     }
 }

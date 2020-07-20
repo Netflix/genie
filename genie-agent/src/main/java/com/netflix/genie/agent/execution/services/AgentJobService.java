@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.services;
 
+import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusException;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.ConfigureException;
 import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
@@ -26,6 +27,7 @@ import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import org.springframework.validation.annotation.Validated;
@@ -152,4 +154,17 @@ public interface AgentJobService {
     JobStatus getJobStatus(
         @NotBlank String jobId
     ) throws GetJobStatusException;
+
+
+    /**
+     * Notify the server of a change of job files archive status.
+     *
+     * @param jobId         the id of the job
+     * @param archiveStatus the new archive status of the job
+     * @throws ChangeJobArchiveStatusException when the agent fails to update the job archive status
+     */
+    void changeJobArchiveStatus(
+        @NotBlank String jobId,
+        ArchiveStatus archiveStatus
+    ) throws ChangeJobArchiveStatusException;
 }
