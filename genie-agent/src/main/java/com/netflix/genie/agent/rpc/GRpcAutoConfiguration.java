@@ -69,7 +69,7 @@ public class GRpcAutoConfiguration {
                 serverArguments.getServerHost(),
                 serverArguments.getServerPort()
             )
-            .usePlaintext(true)
+            .usePlaintext()
             .build();
     }
 
