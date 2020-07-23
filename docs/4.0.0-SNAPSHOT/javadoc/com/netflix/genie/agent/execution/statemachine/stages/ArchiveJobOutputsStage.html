@@ -137,7 +137,8 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ArchiveJobOutputsStage.html#ArchiveJobOutputsStage-com.netflix.genie.common.internal.services.JobArchiveService-">ArchiveJobOutputsStage</a></span>(<a href="../../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services">JobArchiveService</a>&nbsp;jobArchiveService)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ArchiveJobOutputsStage.html#ArchiveJobOutputsStage-com.netflix.genie.common.internal.services.JobArchiveService-com.netflix.genie.agent.execution.services.AgentJobService-">ArchiveJobOutputsStage</a></span>(<a href="../../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services">JobArchiveService</a>&nbsp;jobArchiveService,
+                      <a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -191,17 +192,19 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="ArchiveJobOutputsStage-com.netflix.genie.common.internal.services.JobArchiveService-">
+<a name="ArchiveJobOutputsStage-com.netflix.genie.common.internal.services.JobArchiveService-com.netflix.genie.agent.execution.services.AgentJobService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ArchiveJobOutputsStage</h4>
-<pre>public&nbsp;ArchiveJobOutputsStage(<a href="../../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services">JobArchiveService</a>&nbsp;jobArchiveService)</pre>
+<pre>public&nbsp;ArchiveJobOutputsStage(<a href="../../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services">JobArchiveService</a>&nbsp;jobArchiveService,
+                              <a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobArchiveService</code> - job archive service</dd>
+<dd><code>agentJobService</code> - agent job service</dd>
 </dl>
 </li>
 </ul>

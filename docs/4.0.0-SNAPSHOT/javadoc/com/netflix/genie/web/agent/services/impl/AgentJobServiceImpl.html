@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -213,6 +213,13 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 </td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#updateJobArchiveStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">updateJobArchiveStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
+                      <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;newArchiveStatus)</code>
+<div class="block">Update the archive status status of the job identified with <code>id</code> to be <code>newStatus</code>.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
                <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
@@ -453,7 +460,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos
 <a name="getJobStatus-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getJobStatus</h4>
 <pre>public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus(@NotBlank
@@ -466,6 +473,26 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos
 <dd><code>id</code> - The id of the job to look up.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the current status of the job, as seen by this node</dd>
+</dl>
+</li>
+</ul>
+<a name="updateJobArchiveStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>updateJobArchiveStatus</h4>
+<pre>public&nbsp;void&nbsp;updateJobArchiveStatus(@NotBlank
+                                   @NotBlank java.lang.String&nbsp;id,
+                                   <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;newArchiveStatus)</pre>
+<div class="block">Update the archive status status of the job identified with <code>id</code> to be <code>newStatus</code>.
+ Notice this is a 'blind write', the currently persisted value will always be overwritten.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html#updateJobArchiveStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">updateJobArchiveStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to update status for. Must exist in the system.</dd>
+<dd><code>newArchiveStatus</code> - The new archive status the caller would like to update the status to</dd>
 </dl>
 </li>
 </ul>

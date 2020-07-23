@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -133,42 +133,48 @@ extends <a href="../../../../../../../../../../com/netflix/genie/web/data/servic
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getArchiveStatus--">getArchiveStatus</a></span>()</code>
+<div class="block">Get the archive status for this job.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getCheckDelay--">getCheckDelay</a></span>()</code>
 <div class="block">Get the amount of time (in milliseconds) to delay the check for the job status.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getExitCode--">getExitCode</a></span>()</code>
 <div class="block">Get the exit code from the process that ran the job.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getMemoryUsed--">getMemoryUsed</a></span>()</code>
 <div class="block">Get the amount of memory (in MB) that this job is/was run with.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getProcessId--">getProcessId</a></span>()</code>
 <div class="block">Get the process id of the job.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.time.Instant&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getStarted--">getStarted</a></span>()</code>
 <div class="block">Get when the job was started.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getTimeoutUsed--">getTimeoutUsed</a></span>()</code>
 <div class="block">Get the final resolved timeout duration (in seconds) if there was one for this job.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getUniqueId--">getUniqueId</a></span>()</code>
 <div class="block">Get the unique identifier of this job execution.</div>
@@ -297,7 +303,7 @@ extends <a href="../../../../../../../../../../com/netflix/genie/web/data/servic
 <a name="getTimeoutUsed--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getTimeoutUsed</h4>
 <pre>java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getTimeoutUsed()</pre>
@@ -305,6 +311,20 @@ extends <a href="../../../../../../../../../../com/netflix/genie/web/data/servic
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The timeout value wrapped in an <code>Optional</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getArchiveStatus--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getArchiveStatus</h4>
+<pre>java.util.Optional&lt;java.lang.String&gt;&nbsp;getArchiveStatus()</pre>
+<div class="block">Get the archive status for this job.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>An Optional wrapping the string representation of the archive status, if is present.</dd>
 </dl>
 </li>
 </ul>

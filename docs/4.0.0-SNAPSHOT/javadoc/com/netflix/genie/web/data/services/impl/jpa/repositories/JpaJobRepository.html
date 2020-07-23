@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":38,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":38};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":38,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":38};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -174,6 +174,12 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getArchiveStatus-java.lang.String-">getArchiveStatus</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Get only the archive status of a job.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getHostJobInfo-java.lang.String-java.util.Set-java.util.Set-">getHostJobInfo</a></span>(java.lang.String&nbsp;agentHostname,
               java.util.Set&lt;java.lang.String&gt;&nbsp;activeStatuses,
@@ -182,51 +188,51 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
  host.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobApplicationsProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobApplicationsProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobApplications-java.lang.String-">getJobApplications</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the applications for a job.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobClusterProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobClusterProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobCluster-java.lang.String-">getJobCluster</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the cluster for a job.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobCommandProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobCommandProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobCommand-java.lang.String-">getJobCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the command for a job.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobHostname-java.lang.String-">getJobHostname</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get only the hostname of a job.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobStatus-java.lang.String-">getJobStatus</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get only the status of a job.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getTotalMemoryUsedOnHost-java.lang.String-java.util.Set-">getTotalMemoryUsedOnHost</a></span>(java.lang.String&nbsp;agentHostname,
                         java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Given the hostname that agents are running on return the total memory their jobs are currently using.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">UserJobResourcesAggregate</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getUserJobResourcesAggregates-java.util.Set-boolean-">getUserJobResourcesAggregates</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
                              boolean&nbsp;api)</code>
 <div class="block">Returns resources usage for each user that has a running job.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3Hosts-java.util.Set-">getV3Hosts</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -234,37 +240,37 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3Job-java.lang.String-">getV3Job</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the data needed to create a V3 Job DTO.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobRequestProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3JobRequest-java.lang.String-">getV3JobRequest</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the data needed to create a V3 Job Request DTO.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">V4JobRequestProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobRequest-java.lang.String-">getV4JobRequest</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the data needed to create a V4 Job Request DTO.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobSpecificationProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobSpecification-java.lang.String-">getV4JobSpecification</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Boolean&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#isAPI-java.lang.String-">isAPI</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Return whether the job was submitted via the API or the Agent CLI.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Boolean&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#isV4-java.lang.String-">isV4</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -594,6 +600,24 @@ java.util.Optional&lt;java.lang.String&gt;&nbsp;getJobHostname(@Param(value="id"
 <dd><code>id</code> - The id of the job to get the hostname for</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The job hostname or <code>Optional.empty()</code> if no job with the given id exists</dd>
+</dl>
+</li>
+</ul>
+<a name="getArchiveStatus-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getArchiveStatus</h4>
+<pre>@Query(value="SELECT COALESCE(j.archiveStatus, \'UNKNOWN\') FROM JobEntity j WHERE j.uniqueId = :id")
+java.util.Optional&lt;java.lang.String&gt;&nbsp;getArchiveStatus(@Param(value="id")
+                                                                                                                                                            java.lang.String&nbsp;id)</pre>
+<div class="block">Get only the archive status of a job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to get the archive status for</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The job archive status or <code>Optional.empty()</code> if no job with the given id exists</dd>
 </dl>
 </li>
 </ul>

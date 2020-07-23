@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -179,6 +179,13 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 </td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html#updateJobArchiveStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">updateJobArchiveStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
+                      <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;newArchiveStatus)</code>
+<div class="block">Update the archive status status of the job identified with <code>id</code> to be <code>newStatus</code>.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html#updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
                <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
@@ -388,7 +395,7 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 <a name="getJobStatus-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getJobStatus</h4>
 <pre><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus(@NotBlank
@@ -399,6 +406,27 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 <dd><code>id</code> - The id of the job to look up.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the current status of the job, as seen by this node</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a></code> - if no job with the given <code>id</code> exists</dd>
+<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+</dl>
+</li>
+</ul>
+<a name="updateJobArchiveStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>updateJobArchiveStatus</h4>
+<pre>void&nbsp;updateJobArchiveStatus(@NotBlank
+                            @NotBlank java.lang.String&nbsp;id,
+                            <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;newArchiveStatus)</pre>
+<div class="block">Update the archive status status of the job identified with <code>id</code> to be <code>newStatus</code>.
+ Notice this is a 'blind write', the currently persisted value will always be overwritten.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to update status for. Must exist in the system.</dd>
+<dd><code>newArchiveStatus</code> - The new archive status the caller would like to update the status to</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a></code> - if no job with the given <code>id</code> exists</dd>
 <dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>

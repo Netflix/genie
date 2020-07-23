@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -168,29 +168,35 @@ extends <a href="../../../../../com/netflix/genie/common/dto/BaseDTO.Builder.htm
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html#withArchiveStatus-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">withArchiveStatus</a></span>(<a href="../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)</code>
+<div class="block">Set the archive status for this job.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html#withCheckDelay-java.lang.Long-">withCheckDelay</a></span>(java.lang.Long&nbsp;checkDelay)</code>
 <div class="block">Set the amount of time (in milliseconds) to delay between checks of the process.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html#withExitCode-java.lang.Integer-">withExitCode</a></span>(java.lang.Integer&nbsp;exitCode)</code>
 <div class="block">Set the exit code for the jobs' execution.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html#withMemory-java.lang.Integer-">withMemory</a></span>(java.lang.Integer&nbsp;memory)</code>
 <div class="block">Set the amount of memory (in MB) to use for this job execution.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html#withProcessId-java.lang.Integer-">withProcessId</a></span>(java.lang.Integer&nbsp;processId)</code>
 <div class="block">Set the process id for the jobs' execution.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html#withTimeout-java.time.Instant-">withTimeout</a></span>(java.time.Instant&nbsp;timeout)</code>
 <div class="block">Set the timeout date when the job will be failed if it hasn't completed by.</div>
@@ -327,6 +333,22 @@ extends <a href="../../../../../com/netflix/genie/common/dto/BaseDTO.Builder.htm
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>memory</code> - The amount of memory in megabytes</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The builder</dd>
+</dl>
+</li>
+</ul>
+<a name="withArchiveStatus-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withArchiveStatus</h4>
+<pre>public&nbsp;<a href="../../../../../com/netflix/genie/common/dto/JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a>&nbsp;withArchiveStatus(<a href="../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)</pre>
+<div class="block">Set the archive status for this job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>archiveStatus</code> - The archive status</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The builder</dd>
 </dl>

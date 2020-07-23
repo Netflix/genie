@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -165,26 +165,33 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#changeJobArchiveStatus-com.netflix.genie.proto.ChangeJobArchiveStatusRequest-io.grpc.stub.StreamObserver-">changeJobArchiveStatus</a></span>(com.netflix.genie.proto.ChangeJobArchiveStatusRequest&nbsp;request,
+                      io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ChangeJobArchiveStatusResponse&gt;&nbsp;responseObserver)</code>
+<div class="block">When the agent wants to set the archival status of a job post-execution (i.e.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#changeJobStatus-com.netflix.genie.proto.ChangeJobStatusRequest-io.grpc.stub.StreamObserver-">changeJobStatus</a></span>(com.netflix.genie.proto.ChangeJobStatusRequest&nbsp;request,
                io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ChangeJobStatusResponse&gt;&nbsp;responseObserver)</code>
 <div class="block">When the agent wants to tell the system that the status of a job is changed this API is called.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#claimJob-com.netflix.genie.proto.ClaimJobRequest-io.grpc.stub.StreamObserver-">claimJob</a></span>(com.netflix.genie.proto.ClaimJobRequest&nbsp;request,
         io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ClaimJobResponse&gt;&nbsp;responseObserver)</code>
 <div class="block">When an agent is claiming responsibility and ownership for a job this API is called.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#configure-com.netflix.genie.proto.ConfigureRequest-io.grpc.stub.StreamObserver-">configure</a></span>(com.netflix.genie.proto.ConfigureRequest&nbsp;request,
          io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ConfigureResponse&gt;&nbsp;responseObserver)</code>
 <div class="block">This API provides runtime configuration to the agent (example: timeouts, parallelism, etc.).</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#getJobSpecification-com.netflix.genie.proto.JobSpecificationRequest-io.grpc.stub.StreamObserver-">getJobSpecification</a></span>(com.netflix.genie.proto.JobSpecificationRequest&nbsp;request,
                    io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobSpecificationResponse&gt;&nbsp;responseObserver)</code>
@@ -192,28 +199,28 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
  specification.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#getJobStatus-com.netflix.genie.proto.GetJobStatusRequest-io.grpc.stub.StreamObserver-">getJobStatus</a></span>(com.netflix.genie.proto.GetJobStatusRequest&nbsp;request,
             io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.GetJobStatusResponse&gt;&nbsp;responseObserver)</code>
 <div class="block">When the agent wants to confirm it's status is still the expected one (i.e.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#handshake-com.netflix.genie.proto.HandshakeRequest-io.grpc.stub.StreamObserver-">handshake</a></span>(com.netflix.genie.proto.HandshakeRequest&nbsp;request,
          io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.HandshakeResponse&gt;&nbsp;responseObserver)</code>
 <div class="block">This API gives the server a chance to reject a client/agent based on its metadata (version, location, ...).</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#reserveJobId-com.netflix.genie.proto.ReserveJobIdRequest-io.grpc.stub.StreamObserver-">reserveJobId</a></span>(com.netflix.genie.proto.ReserveJobIdRequest&nbsp;request,
             io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ReserveJobIdResponse&gt;&nbsp;responseObserver)</code>
 <div class="block">This API will reserve a job id using the supplied metadata in the request and return the reserved job id.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#resolveJobSpecification-com.netflix.genie.proto.JobSpecificationRequest-io.grpc.stub.StreamObserver-">resolveJobSpecification</a></span>(com.netflix.genie.proto.JobSpecificationRequest&nbsp;request,
                        io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobSpecificationResponse&gt;&nbsp;responseObserver)</code>
@@ -221,7 +228,7 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
  needed to flesh out a job specification for the Agent to run.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#resolveJobSpecificationDryRun-com.netflix.genie.proto.DryRunJobSpecificationRequest-io.grpc.stub.StreamObserver-">resolveJobSpecificationDryRun</a></span>(com.netflix.genie.proto.DryRunJobSpecificationRequest&nbsp;request,
                              io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobSpecificationResponse&gt;&nbsp;responseObserver)</code>
@@ -435,7 +442,7 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
 <a name="getJobStatus-com.netflix.genie.proto.GetJobStatusRequest-io.grpc.stub.StreamObserver-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getJobStatus</h4>
 <pre>public&nbsp;void&nbsp;getJobStatus(com.netflix.genie.proto.GetJobStatusRequest&nbsp;request,
@@ -445,6 +452,25 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code>getJobStatus</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>request</code> - The request containing the job id to look up</dd>
+<dd><code>responseObserver</code> - The observer to send a response with</dd>
+</dl>
+</li>
+</ul>
+<a name="changeJobArchiveStatus-com.netflix.genie.proto.ChangeJobArchiveStatusRequest-io.grpc.stub.StreamObserver-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>changeJobArchiveStatus</h4>
+<pre>public&nbsp;void&nbsp;changeJobArchiveStatus(com.netflix.genie.proto.ChangeJobArchiveStatusRequest&nbsp;request,
+                                   io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ChangeJobArchiveStatusResponse&gt;&nbsp;responseObserver)</pre>
+<div class="block">When the agent wants to set the archival status of a job post-execution (i.e. archived successfully, or failed
+ to archive).</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>changeJobArchiveStatus</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>request</code> - The request containing the job id to look up</dd>
 <dd><code>responseObserver</code> - The observer to send a response with</dd>

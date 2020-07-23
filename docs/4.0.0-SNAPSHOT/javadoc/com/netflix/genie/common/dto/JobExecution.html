@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -219,30 +219,36 @@ extends <a href="../../../../../com/netflix/genie/common/dto/BaseDTO.html" title
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.html#getArchiveStatus--">getArchiveStatus</a></span>()</code>
+<div class="block">Get the archival status of job files.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.html#getCheckDelay--">getCheckDelay</a></span>()</code>
 <div class="block">Get the amount of time (in milliseconds) to delay between checks of status of the job process.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.html#getExitCode--">getExitCode</a></span>()</code>
 <div class="block">Get the exit code of the process.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.html#getMemory--">getMemory</a></span>()</code>
 <div class="block">Get the amount of memory (in MB) of the job.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.html#getProcessId--">getProcessId</a></span>()</code>
 <div class="block">Get the process id for this job execution as Optional.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.time.Instant&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobExecution.html#getTimeout--">getTimeout</a></span>()</code>
 <div class="block">Get the timeout date for this job after which if it is still running the system will attempt to kill it.</div>
@@ -408,7 +414,7 @@ extends <a href="../../../../../com/netflix/genie/common/dto/BaseDTO.html" title
 <a name="getMemory--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getMemory</h4>
 <pre>public&nbsp;java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getMemory()</pre>
@@ -416,6 +422,20 @@ extends <a href="../../../../../com/netflix/genie/common/dto/BaseDTO.html" title
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The amount of memory the job is set to use as an Optional as it could be null</dd>
+</dl>
+</li>
+</ul>
+<a name="getArchiveStatus--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getArchiveStatus</h4>
+<pre>public&nbsp;java.util.Optional&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&gt;&nbsp;getArchiveStatus()</pre>
+<div class="block">Get the archival status of job files.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the archival status as Optional as it could be null</dd>
 </dl>
 </li>
 </ul>
