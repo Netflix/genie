@@ -35,6 +35,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.external.dtos.v4.ApiClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
@@ -679,10 +680,10 @@ public class JobRestController {
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws GenieException, NotFoundException {
-        final boolean isV4 = this.persistenceService.isV4(id);
-        final com.netflix.genie.common.external.dtos.v4.JobStatus jobStatus
-            = this.persistenceService.getJobStatus(id);
+
         final String path = ControllerUtils.getRemainingPath(request);
+        log.info("[getJobOutput] Called to get output path \"{}\" for job with id \"{}\"", path, id);
+
         final URL baseUrl;
         try {
             baseUrl = forwardedFrom == null
@@ -692,52 +693,67 @@ public class JobRestController {
             throw new GenieServerException("Unable to parse base request url", e);
         }
 
-        log.info("[getJobOutput] Called to get output path \"{}\" for job with id \"{}\"", path, id);
+        final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(id);
 
-        // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        // if the job is finished all file serving is done from the archive it doesn't need to be forwarded anywhere
-        final boolean activeV3job = !isV4 && jobStatus.isActive();
-        final boolean activeV4job = isV4 && agentRoutingService.isAgentConnected(id);
-        final boolean shouldForward = activeV3job || activeV4job;
-        if (shouldForward && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
-            final String jobHostname = this.getJobOwnerHostname(id, isV4);
-            if (!this.hostname.equals(jobHostname)) {
-                log.info("Job {} is not run on this node. Forwarding to {}", id, jobHostname);
-                final String forwardHost = this.buildForwardHost(jobHostname);
-                try {
-                    this.restTemplate.execute(
-                        forwardHost + JOB_API_BASE_PATH + id + "/output/" + path,
-                        HttpMethod.GET,
-                        forwardRequest -> copyRequestHeaders(request, forwardRequest),
-                        (ResponseExtractor<Void>) forwardResponse -> {
-                            response.setStatus(forwardResponse.getStatusCode().value());
-                            copyResponseHeaders(response, forwardResponse);
-                            // Documentation I could find pointed to the HttpEntity reading the bytes off
-                            // the stream so this should resolve memory problems if the file returned is large
-                            ByteStreams.copy(forwardResponse.getBody(), response.getOutputStream());
-                            return null;
-                        }
-                    );
-                } catch (final HttpClientErrorException.NotFound e) {
-                    throw new GenieNotFoundException("Not Found (via: " + forwardHost + ")", e);
-                } catch (final HttpStatusCodeException e) {
-                    throw new GenieException(
-                        e.getStatusCode().value(),
-                        "Proxied request failed: " + e.getMessage(),
-                        e
-                    );
-                } catch (final Exception e) {
-                    log.error("Failed getting the remote job output from {}. Error: {}", forwardHost, e.getMessage());
-                    throw new GenieServerException("Proxied request error:" + e.getMessage(), e);
-                }
+        if (archiveStatus == ArchiveStatus.PENDING) {
+            final boolean isV4 = this.persistenceService.isV4(id);
+            final String jobHostname;
+            try {
+                jobHostname = this.getJobOwnerHostname(id, isV4);
+            } catch (NotFoundException e) {
+                throw new GenieServerException("Failed to route request", e);
+            }
 
-                //No need to search on this node
+            final boolean shouldForward = !this.hostname.equals(jobHostname);
+            final boolean canForward = forwardedFrom == null && this.jobsProperties.getForwarding().isEnabled();
+
+            if (shouldForward && canForward) {
+                // Forward request to another node
+                forwardRequest(id, path, jobHostname, request, response);
                 return;
+            } else if (!canForward && shouldForward) {
+                // Should forward but can't
+                throw new GenieServerException("Job files are not local, but forwarding is disabled");
             }
         }
 
+        // In any other case, delegate the request to the service
         log.debug("Fetching requested resource \"{}\" for job \"{}\"", path, id);
         this.jobDirectoryServerService.serveResource(id, baseUrl, path, request, response);
+    }
+
+    private void forwardRequest(
+        final String id,
+        final String path,
+        final String jobHostname,
+        final HttpServletRequest request,
+        final HttpServletResponse response
+    ) throws GenieException {
+        log.info("Job {} is not run on this node. Forwarding to {}", id, jobHostname);
+        final String forwardHost = this.buildForwardHost(jobHostname);
+
+        try {
+            this.restTemplate.execute(
+                forwardHost + JOB_API_BASE_PATH + id + "/output/" + path,
+                HttpMethod.GET,
+                forwardRequest -> copyRequestHeaders(request, forwardRequest),
+                (ResponseExtractor<Void>) forwardResponse -> {
+                    response.setStatus(forwardResponse.getStatusCode().value());
+                    copyResponseHeaders(response, forwardResponse);
+                    // Documentation I could find pointed to the HttpEntity reading the bytes off
+                    // the stream so this should resolve memory problems if the file returned is large
+                    ByteStreams.copy(forwardResponse.getBody(), response.getOutputStream());
+                    return null;
+                }
+            );
+        } catch (final HttpClientErrorException.NotFound e) {
+            throw new GenieNotFoundException("Not Found (via: " + forwardHost + ")", e);
+        } catch (final HttpStatusCodeException e) {
+            throw new GenieException(e.getStatusCode().value(), "Proxied request failed: " + e.getMessage(), e);
+        } catch (final Exception e) {
+            log.error("Failed getting the remote job output from {}. Error: {}", forwardHost, e.getMessage());
+            throw new GenieServerException("Proxied request error:" + e.getMessage(), e);
+        }
     }
 
     private String buildForwardHost(final String jobHostname) {

@@ -155,6 +155,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |S3FileTransferImpl
 |status, exceptionClass
 
+|genie.files.serve.timer
+|Time taken to serve a file
+|nanoseconds
+|JobDirectoryServerServiceImpl
+|status, exceptionClass, executionMode, archiveStatus
+
 |genie.health.indicator.timer
 |Time taken for each health indicator to report its status
 |nanoseconds
