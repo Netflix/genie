@@ -19,12 +19,13 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
@@ -42,7 +43,9 @@ import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
+import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.core.io.Resource;
@@ -65,6 +68,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default implementation of {@link JobDirectoryServerService}.
@@ -76,6 +81,11 @@ import java.util.List;
 public class JobDirectoryServerServiceImpl implements JobDirectoryServerService {
 
     private static final String SLASH = "/";
+    private static final String SERVE_RESOURCE_TIMER = "genie.files.serve.timer";
+    private static final String EXECUTION_MODE_TAG = "executionMode";
+    private static final String ARCHIVE_STATUS_TAG = "archiveStatus";
+    private static final String AGENT_EXECUTION_MODE_NAME = "agent";
+    private static final String EMBEDDED_EXECUTION_MODE = "embedded";
 
     private final ResourceLoader resourceLoader;
     private final PersistenceService persistenceService;
@@ -154,95 +164,122 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
      */
     @Override
     public void serveResource(
-        final String jobId,
+        final String id,
         final URL baseUrl,
         final String relativePath,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws GenieException {
-        // TODO: Metrics
-        final JobStatus jobStatus;
-        final boolean isV4;
+        final long start = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
-            // Is the job running or not?
-            jobStatus = this.persistenceService.getJobStatus(jobId);
-            // Is it V3 or V4?
-            isV4 = this.persistenceService.isV4(jobId);
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage(), e);
-        }
+            // Normalize the base url. Make sure it ends in /.
+            final URI baseUri = new URI(baseUrl.toString() + SLASH).normalize();
 
-        log.debug(
-            "Serving file: {} for job: {} (status: {}, type: {})",
-            relativePath,
-            jobId,
-            jobStatus.name(),
-            isV4 ? "agent" : "embedded"
-        );
+            // Lookup archive status and job execution type
+            final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(id);
+            final boolean isV4 = this.persistenceService.isV4(id);
+            final String executionModeName = isV4 ? AGENT_EXECUTION_MODE_NAME : EMBEDDED_EXECUTION_MODE;
 
-        // Normalize the base url. Make sure it ends in /.
-        final URI baseUri;
-        try {
-            baseUri = new URI(baseUrl.toString() + SLASH).normalize();
-        } catch (final URISyntaxException e) {
-            throw new GenieServerException("Unable to convert " + baseUrl + " to valid URI", e);
-        }
+            tags.add(Tag.of(EXECUTION_MODE_TAG, executionModeName));
+            tags.add(Tag.of(ARCHIVE_STATUS_TAG, archiveStatus.name()));
 
-        final DirectoryManifest manifest;
-        final URI jobDirRoot;
+            final DirectoryManifest manifest;
+            final URI jobDirRoot;
 
-        if (isV4 && this.agentRoutingService.isAgentConnectionLocal(jobId)) { // Active V4 job
-            log.debug("Routing request to a live agent");
-            manifest = this.agentFileStreamService.getManifest(jobId).orElseThrow(
-                () -> new GenieServerUnavailableException("Manifest not found for job " + jobId)
+            switch (archiveStatus) {
+                case NO_FILES:
+                    // Job failed before any files were created. Nothing to serve.
+                    throw new GenieNotFoundException("Job failed before any file was created: " + id);
+
+                case FAILED:
+                    // Archive failed (also implies job is done). Return 404 without further processing
+                    throw new GenieNotFoundException("Job failed to archive files: " + id);
+
+                case DISABLED:
+                    // Not a possible state in database as of now [GENIE-657]
+                    throw new GeniePreconditionException("Archive disabled for job " + id);
+
+                case UNKNOWN:
+                    // 2 possible cases:
+                    // - Job was marked failed by leader and archive status is truly unknown
+                    // - Old job with NULL archive status
+                    // In both cases, fall through to attempting to serve from archive
+                case ARCHIVED:
+                    // Serve file from archive
+                    log.debug("Routing request to archive");
+                    final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(id);
+                    final String rangeHeader = request.getHeader(HttpHeaders.RANGE);
+                    manifest = archivedJobMetadata.getManifest();
+                    final URI baseJobDirRoot = archivedJobMetadata.getArchiveBaseUri();
+                    jobDirRoot = new URIBuilder(baseJobDirRoot).setFragment(rangeHeader).build();
+                    break;
+
+                case PENDING:
+                    // Serve file from live job
+                    if (isV4) {
+                        log.debug("Routing request to connected agent");
+                        if (!this.agentRoutingService.isAgentConnectionLocal(id)) {
+                            throw new GenieServerUnavailableException("Agent connection has moved or was terminated");
+                        }
+                        manifest = this.agentFileStreamService.getManifest(id).orElseThrow(
+                            () -> new GenieServerUnavailableException("Manifest not found for job " + id)
+                        );
+                        jobDirRoot = AgentFileProtocolResolver.createUri(
+                            id,
+                            SLASH,
+                            request.getHeader(HttpHeaders.RANGE)
+                        );
+                    } else {
+                        log.debug("Routing request to a local file");
+                        final Resource jobDir = this.jobFileService.getJobFileAsResource(id, "");
+                        if (!jobDir.exists()) {
+                            throw new GenieNotFoundException("Job directory does not exist: " + jobDir);
+                        }
+                        // Make sure the directory ends in a slash. Normalize will ensure only single slash
+                        jobDirRoot = new URI(jobDir.getURI().toString() + SLASH).normalize();
+                        final Path jobDirPath = Paths.get(jobDirRoot);
+                        manifest = this.jobDirectoryManifestCreatorService.getDirectoryManifest(jobDirPath);
+                    }
+                    break;
+
+                default:
+                    throw new GenieServerException("Unknown archive status " + archiveStatus + "(" + id + ")");
+            }
+
+            log.debug(
+                "Serving file: {} for job: {} (status: {}, type: {})",
+                relativePath,
+                id,
+                archiveStatus,
+                executionModeName
             );
-            final String rangeHeader = request.getHeader(HttpHeaders.RANGE);
-            try {
-                jobDirRoot = AgentFileProtocolResolver.createUri(jobId, SLASH, rangeHeader);
-            } catch (final URISyntaxException e) {
-                throw new GenieServerException("Failed to construct job directory path", e);
-            }
-        } else if (jobStatus.isActive() && !isV4) { // Active V3 job
-            log.debug("Routing request to a local file");
-            final Resource jobDir = this.jobFileService.getJobFileAsResource(jobId, "");
-            if (!jobDir.exists()) {
-                throw new GenieNotFoundException("Job directory does not exist: " + jobDir);
-            }
-            try {
-                // Make sure the directory ends in a slash. Normalize will ensure only single slash
-                jobDirRoot = new URI(jobDir.getURI().toString() + SLASH).normalize();
-            } catch (final URISyntaxException | IOException e) {
-                throw new GenieServerException("Failed to normalize job directory path", e);
-            }
-            final Path jobDirPath = Paths.get(jobDirRoot);
 
-            try {
-                manifest = this.jobDirectoryManifestCreatorService.getDirectoryManifest(jobDirPath);
-            } catch (IOException e) {
-                throw new GenieServerException("Failed to construct manifest: " + e.getMessage(), e);
-            }
-        } else { // Archived job
-            log.debug("Routing request to archive");
-            try {
-                final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(jobId);
-                final String rangeHeader = request.getHeader(HttpHeaders.RANGE);
-                manifest = archivedJobMetadata.getManifest();
-                final URI baseJobDirRoot = archivedJobMetadata.getArchiveBaseUri();
-                jobDirRoot = new URIBuilder(baseJobDirRoot).setFragment(rangeHeader).build();
-            } catch (final JobNotArchivedException e) {
-                throw new GeniePreconditionException("Job outputs were not archived", e);
-            } catch (final JobNotFoundException | JobDirectoryManifestNotFoundException e) {
-                throw new GenieNotFoundException("Failed to retrieve job archived files metadata", e);
-            } catch (final Exception e) {
-                throw new GenieServerException("Error job metadata: " + e.getMessage(), e);
-            }
-        }
-
-        // Common handling of
-        try {
+            // Common handling of archived, locally running v3 job or locally connected v4 job
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
+            MetricsUtils.addSuccessTags(tags);
+
+        } catch (NotFoundException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw new GenieNotFoundException(e.getMessage(), e);
         } catch (IOException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
             throw new GenieServerException("Error serving response: " + e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw new GenieServerException(e.getMessage(), e);
+        } catch (final JobNotArchivedException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw new GeniePreconditionException("Job outputs were not archived", e);
+        } catch (final JobNotFoundException | JobDirectoryManifestNotFoundException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw new GenieNotFoundException("Failed to retrieve job archived files metadata", e);
+        } catch (GenieException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
+        } finally {
+            final long elapsed = System.nanoTime() - start;
+            this.meterRegistry.timer(SERVE_RESOURCE_TIMER, tags).record(elapsed, TimeUnit.NANOSECONDS);
         }
     }
 
