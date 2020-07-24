@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
@@ -41,6 +42,7 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionEx
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobCoordinatorService;
@@ -278,10 +280,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
             //
-            if (this.jobStateService.jobExists(jobId)) {
-                this.jobStateService.done(jobId);
-                this.persistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
-            }
+            this.markJobFailed(jobId, jobStatus, e.getMessage(), ArchiveStatus.NO_FILES);
             throw e;
         } catch (final GenieJobResolutionException e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
@@ -289,14 +288,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
             //
-            if (this.jobStateService.jobExists(jobId)) {
-                this.jobStateService.done(jobId);
-                this.persistenceService.updateJobStatus(
-                    jobId,
-                    jobStatus,
-                    JobStatusMessages.FAILED_TO_RESOLVE_JOB
-                );
-            }
+            this.markJobFailed(jobId, jobStatus, JobStatusMessages.FAILED_TO_RESOLVE_JOB, ArchiveStatus.NO_FILES);
             // Remap to existing contract
             throw new GeniePreconditionException(e.getMessage(), e);
         } catch (final Exception e) {
@@ -305,10 +297,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
             //
-            if (this.jobStateService.jobExists(jobId)) {
-                this.jobStateService.done(jobId);
-                this.persistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
-            }
+            this.markJobFailed(jobId, jobStatus, e.getMessage(), ArchiveStatus.NO_FILES);
             throw new GenieServerException("Failed to coordinate job launch", e);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
@@ -317,6 +306,23 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             this.registry
                 .timer(OVERALL_COORDINATION_TIMER_NAME, tags)
                 .record(System.nanoTime() - coordinationStart, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void markJobFailed(
+        final String jobId,
+        final JobStatus jobStatus,
+        final String message,
+        final ArchiveStatus archiveStatus
+    ) throws GenieException {
+        if (this.jobStateService.jobExists(jobId)) {
+            this.jobStateService.done(jobId);
+            this.persistenceService.updateJobStatus(jobId, jobStatus, message);
+            try {
+                this.persistenceService.updateJobArchiveStatus(jobId, archiveStatus);
+            } catch (NotFoundException e) {
+                throw new GenieNotFoundException(e.getMessage(), e);
+            }
         }
     }
 

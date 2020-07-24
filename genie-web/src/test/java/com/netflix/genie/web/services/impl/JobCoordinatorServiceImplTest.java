@@ -31,6 +31,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
@@ -534,6 +535,10 @@ public class JobCoordinatorServiceImplTest {
                 .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
 
             Mockito
+                .verify(this.persistenceService, Mockito.times(1))
+                .updateJobArchiveStatus(Mockito.eq(JOB_1_ID), Mockito.eq(ArchiveStatus.NO_FILES));
+
+            Mockito
                 .verify(this.coordinationTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
@@ -901,7 +906,9 @@ public class JobCoordinatorServiceImplTest {
             Mockito
                 .verify(this.persistenceService, Mockito.times(1))
                 .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.any());
-
+            Mockito
+                .verify(this.persistenceService, Mockito.times(1))
+                .updateJobArchiveStatus(Mockito.eq(JOB_1_ID), Mockito.eq(ArchiveStatus.NO_FILES));
             Mockito
                 .verify(this.coordinationTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));

@@ -46,6 +46,12 @@ public enum ArchiveStatus {
     DISABLED,
 
     /**
+     * No files were archived because no files were created.
+     * i.e., job never reached the point where a directory is created.
+     */
+    NO_FILES,
+
+    /**
      * Archive status is unknown.
      */
     UNKNOWN,

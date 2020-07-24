@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl
 
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.web.agent.launchers.AgentLauncher
@@ -87,6 +88,7 @@ class JobLaunchServiceImplSpec extends Specification {
         }
         0 * jobResolverService.resolveJob(_ as String)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * persistenceService.updateJobArchiveStatus(_, _)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
         thrown(IllegalStateException)
 
@@ -99,6 +101,7 @@ class JobLaunchServiceImplSpec extends Specification {
         }
         0 * jobResolverService.resolveJob(_ as String)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * persistenceService.updateJobArchiveStatus(_, _)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
         thrown(IdAlreadyExistsException)
 
@@ -111,6 +114,7 @@ class JobLaunchServiceImplSpec extends Specification {
         }
         0 * jobResolverService.resolveJob(_ as String)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * persistenceService.updateJobArchiveStatus(_, _)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
         thrown(SaveAttachmentException)
 
@@ -123,6 +127,7 @@ class JobLaunchServiceImplSpec extends Specification {
             throw new GenieJobResolutionException("fail")
         }
         1 * persistenceService.updateJobStatus(jobId, JobStatus.RESERVED, JobStatus.FAILED, _ as String)
+        1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
         thrown(GenieJobResolutionException)
@@ -136,6 +141,7 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String) >> {
             throw new RuntimeException("fail")
         }
+        0 * persistenceService.updateJobArchiveStatus(_, _)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
         thrown(AgentLaunchException)
 
@@ -150,6 +156,7 @@ class JobLaunchServiceImplSpec extends Specification {
             throw new AgentLaunchException("that didn't work")
         }
         1 * persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
+        1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         thrown(AgentLaunchException)
 
         when:
@@ -159,6 +166,7 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
         1 * jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String) >> { throw new NotFoundException() }
+        0 * persistenceService.updateJobArchiveStatus(_, _)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
         thrown(AgentLaunchException)
