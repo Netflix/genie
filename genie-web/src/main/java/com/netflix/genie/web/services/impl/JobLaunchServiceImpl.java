@@ -19,6 +19,7 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
@@ -116,6 +117,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                     JobStatus.FAILED,
                     JobStatusMessages.FAILED_TO_RESOLVE_JOB // TODO: Move somewhere not in genie-common
                 );
+                this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
                 throw t; // Caught below for metrics gathering
             }
 
@@ -140,6 +142,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             } catch (final AgentLaunchException e) {
                 // TODO: this could fail as well
                 this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());
+                this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
                 // TODO: How will we get the ID back to the user? Should we add it to an exception? We don't get
                 //       We don't get the ID until after saveJobSubmission so if that fails we'd still return nothing
                 //       Probably need multiple exceptions to be thrown from this API (if we go with checked)
