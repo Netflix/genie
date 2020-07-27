@@ -156,11 +156,16 @@ extends java.lang.Enum&lt;<a href="../../../../../../../com/netflix/genie/common
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html#NO_FILES">NO_FILES</a></span></code>
+<div class="block">No files were archived because no files were created.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html#PENDING">PENDING</a></span></code>
 <div class="block">Files will be uploaded after the job finishes.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html#UNKNOWN">UNKNOWN</a></span></code>
 <div class="block">Archive status is unknown.</div>
 </td>
@@ -260,6 +265,17 @@ the order they are declared.</div>
 <h4>DISABLED</h4>
 <pre>public static final&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a> DISABLED</pre>
 <div class="block">Archiving was disabled, files are not archived.</div>
+</li>
+</ul>
+<a name="NO_FILES">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>NO_FILES</h4>
+<pre>public static final&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a> NO_FILES</pre>
+<div class="block">No files were archived because no files were created.
+ i.e., job never reached the point where a directory is created.</div>
 </li>
 </ul>
 <a name="UNKNOWN">
