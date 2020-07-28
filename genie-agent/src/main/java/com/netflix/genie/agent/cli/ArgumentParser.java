@@ -66,7 +66,7 @@ class ArgumentParser {
      */
     String getUsageMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
-        jCommander.usage(stringBuilder);
+        jCommander.getUsageFormatter().usage(stringBuilder);
 
         stringBuilder
             .append("\n\n")
