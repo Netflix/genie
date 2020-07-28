@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.cli
 
+import com.beust.jcommander.IUsageFormatter
 import com.beust.jcommander.JCommander
 import spock.lang.Specification
 
@@ -53,12 +54,14 @@ class ArgumentParserSpec extends Specification {
     def "GetUsageMessage"() {
         setup:
         def parser = new ArgumentParser(mockJCommander, mockCommandFactory, mockMainCommandArguments)
+        def usageFormatter = Mock(IUsageFormatter)
 
         when:
         parser.getUsageMessage()
 
         then:
-        1 * mockJCommander.usage(_)
+        1 * mockJCommander.getUsageFormatter() >> usageFormatter
+        1 * usageFormatter.usage(_ as StringBuilder)
     }
 
     def "GetSelectedCommand"() {
