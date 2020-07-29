@@ -165,7 +165,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#serveResource-java.lang.String-java.net.URL-java.lang.String-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-">serveResource</a></span>(java.lang.String&nbsp;jobId,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#serveResource-java.lang.String-java.net.URL-java.lang.String-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-">serveResource</a></span>(java.lang.String&nbsp;id,
              java.net.URL&nbsp;baseUrl,
              java.lang.String&nbsp;relativePath,
              javax.servlet.http.HttpServletRequest&nbsp;request,
@@ -238,7 +238,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <ul class="blockListLast">
 <li class="blockList">
 <h4>serveResource</h4>
-<pre>public&nbsp;void&nbsp;serveResource(java.lang.String&nbsp;jobId,
+<pre>public&nbsp;void&nbsp;serveResource(java.lang.String&nbsp;id,
                           java.net.URL&nbsp;baseUrl,
                           java.lang.String&nbsp;relativePath,
                           javax.servlet.http.HttpServletRequest&nbsp;request,
@@ -251,7 +251,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../com/netflix/genie/web/services/JobDirectoryServerService.html#serveResource-java.lang.String-java.net.URL-java.lang.String-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-">serveResource</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobId</code> - The id of the job this request is for</dd>
+<dd><code>id</code> - The id of the job this request is for</dd>
 <dd><code>baseUrl</code> - The base URL used to generate all URLs for resources</dd>
 <dd><code>relativePath</code> - The relative path from the root of the job directory of the expected resource</dd>
 <dd><code>request</code> - The HTTP request containing all information about the request</dd>
