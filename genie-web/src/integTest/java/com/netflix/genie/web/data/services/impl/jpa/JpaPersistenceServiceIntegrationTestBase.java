@@ -65,6 +65,13 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
         PersistedJobStatusObserver.class //TODO: Needed for JobEntityListener but should be in DataAutoConfiguration
     }
 )
+//@TestPropertySource(
+//    properties = {
+//        "logging.level.com.netflix.genie.web.data.services.impl.jpa=DEBUG", // Genie JPA package
+//        "logging.level.org.hibernate.SQL=DEBUG",                            // Show SQL queries
+//        "logging.level.org.hibernate.type.descriptor.sql=TRACE",            // Parameters, extracted values and more
+//    }
+//)
 class JpaPersistenceServiceIntegrationTestBase {
 
     @Autowired
