@@ -244,6 +244,20 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
     }
 
     @Test
+    @DatabaseSetup("persistence/applications/init.xml")
+    void testGetApplicationsWithTags() {
+        final Set<ApplicationStatus> inactiveStatuses = Sets.newHashSet(ApplicationStatus.INACTIVE);
+        final Set<ApplicationStatus> activeStatuses = Sets.newHashSet(ApplicationStatus.ACTIVE);
+        final Set<String> tags = Sets.newHashSet("prod", "yarn");
+        Page<Application> apps;
+        apps = this.service.findApplications(null, null, activeStatuses, tags, null, PAGEABLE);
+        Assertions.assertThat(apps.getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
+        apps = this.service.findApplications(null, null, inactiveStatuses, tags, null, PAGEABLE);
+        Assertions.assertThat(apps.getTotalElements()).isEqualTo(0);
+    }
+
+    @Test
     void testCreateApplication() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final ApplicationRequest app = new ApplicationRequest.Builder(

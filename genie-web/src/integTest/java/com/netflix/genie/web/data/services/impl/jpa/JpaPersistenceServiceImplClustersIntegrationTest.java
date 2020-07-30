@@ -196,6 +196,21 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
+    @DatabaseSetup("persistence/clusters/init.xml")
+    void testGetClustersWithTags() {
+        final Set<ClusterStatus> activeStatuses = Sets.newHashSet(ClusterStatus.UP);
+        final Set<ClusterStatus> inactiveStatuses = Sets.newHashSet(ClusterStatus.TERMINATED);
+        final Set<String> tags = Sets.newHashSet("pig", "prod");
+        Page<Cluster> clusters;
+        clusters = this.service.findClusters(null, activeStatuses, tags, null, null, PAGE);
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_1_ID);
+        clusters = this.service.findClusters(null, inactiveStatuses, tags, null, null, PAGE);
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(0);
+        Assertions.assertThat(clusters.getContent()).isEmpty();
+    }
+
+    @Test
     void testCreateCluster() throws GenieCheckedException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
