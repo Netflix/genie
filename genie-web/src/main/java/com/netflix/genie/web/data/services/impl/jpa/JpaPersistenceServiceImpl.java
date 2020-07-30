@@ -330,7 +330,14 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 type
             )
         );
-        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+
+        final List<Long> applicationsCount = this.entityManager.createQuery(countQuery).getResultList();
+        if (applicationsCount.isEmpty()) {
+            // SELECT COUNT ... GROUP BY ... HAVING ... may return NULL
+            return new PageImpl<>(new ArrayList<>(0));
+        }
+
+        final Long totalCount = applicationsCount.get(0);
         if (totalCount == 0) {
             // short circuit for no results
             return new PageImpl<>(new ArrayList<>(0));
@@ -564,7 +571,14 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 maxUpdateTime
             )
         );
-        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+
+        final List<Long> clustersCount = this.entityManager.createQuery(countQuery).getResultList();
+        if (clustersCount.isEmpty()) {
+            // SELECT COUNT ... GROUP BY ... HAVING ... may return NULL
+            return new PageImpl<>(new ArrayList<>(0));
+        }
+
+        final Long totalCount = clustersCount.get(0);
         if (totalCount == 0) {
             // short circuit for no results
             return new PageImpl<>(new ArrayList<>(0));
@@ -860,7 +874,15 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 tagEntities
             )
         );
-        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+
+        final List<Long> commandsCount = this.entityManager.createQuery(countQuery).getResultList();
+
+        if (commandsCount.isEmpty()) {
+            // SELECT COUNT ... GROUP BY ... HAVING ... may return NULL
+            return new PageImpl<>(new ArrayList<>(0));
+        }
+
+        final Long totalCount = commandsCount.get(0);
         if (totalCount == 0) {
             // short circuit for no results
             return new PageImpl<>(new ArrayList<>(0));

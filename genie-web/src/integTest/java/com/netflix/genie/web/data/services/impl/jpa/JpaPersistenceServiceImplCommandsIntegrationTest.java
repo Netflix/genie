@@ -224,6 +224,20 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
+    @DatabaseSetup("persistence/commands/init.xml")
+    void testGetCommandsWithTags() {
+        final Set<CommandStatus> activeStatuses = Sets.newHashSet(CommandStatus.ACTIVE);
+        final Set<CommandStatus> inactiveStatuses = Sets.newHashSet(CommandStatus.INACTIVE);
+        final Set<String> tags = Sets.newHashSet("prod", "hive");
+        Page<Command> commands;
+        commands = this.service.findCommands(null, null, activeStatuses, tags, PAGE);
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(0);
+        commands = this.service.findCommands(null, null, inactiveStatuses, tags, PAGE);
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
+    }
+
+    @Test
     void testSaveCommand() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final CommandRequest command = new CommandRequest.Builder(

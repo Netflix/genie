@@ -735,7 +735,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     void canFindJobs() {
         //TODO: add more cases
         final Pageable page = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
-        Page<JobSearchResult> jobs = this.service.findJobs(
+        Page<JobSearchResult> jobs;
+        jobs = this.service.findJobs(
             null,
             null,
             null,
@@ -860,6 +861,94 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(jobs.getTotalElements()).isEqualTo(0L);
         Assertions.assertThat(jobs.getContent()).isEmpty();
     }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/search.xml")
+    void canFindJobsWithTags() {
+        final Pageable page = PageRequest.of(0, 10);
+        Page<JobSearchResult> jobs;
+        jobs = this.service.findJobs(
+            null,
+            null,
+            null,
+            null,
+            Sets.newHashSet("SparkJob"),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            page
+        );
+        Assertions.assertThat(jobs.getTotalElements()).isEqualTo(5L);
+
+        jobs = this.service.findJobs(
+            null,
+            null,
+            null,
+            null,
+            Sets.newHashSet("smoke-test", "SparkJob"),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            page
+        );
+        Assertions.assertThat(jobs.getTotalElements()).isEqualTo(1L);
+        Assertions.assertThat(jobs.getContent()).hasSize(1).extracting(BaseSearchResult::getId).containsOnly(JOB_1_ID);
+
+        jobs = this.service.findJobs(
+            null,
+            null,
+            null,
+            null,
+            Sets.newHashSet("smoke-test", "SparkJob", "blah"),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            page
+        );
+        Assertions.assertThat(jobs.getTotalElements()).isEqualTo(0L);
+        Assertions.assertThat(jobs.getContent()).isEmpty();
+
+        jobs = this.service.findJobs(
+            null,
+            null,
+            null,
+            Sets.newHashSet(com.netflix.genie.common.dto.JobStatus.FAILED),
+            Sets.newHashSet("smoke-test", "SparkJob"),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            page
+        );
+        Assertions.assertThat(jobs.getTotalElements()).isEqualTo(0L);
+        Assertions.assertThat(jobs.getContent()).isEmpty();    }
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")

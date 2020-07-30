@@ -212,6 +212,27 @@
         entity_version="0"
         tag="sched:sla"
     />
+    <tags
+        id="18"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="smoke-test"
+    />
+    <tags
+        id="19"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="SparkJob"
+    />
+    <tags
+        id="20"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="test"
+    />
 
     <applications
         id="1"
@@ -420,6 +441,7 @@
         cluster_name="h2query"
         command_name="spark"
         api="true"
+        tags="|smoke-test||SparkJob||test"
     />
     <job_command_arguments
         job_id="1"
@@ -479,12 +501,25 @@
     <jobs_applications job_id="1" application_id="1" application_order="0"/>
     <jobs_applications job_id="1" application_id="3" application_order="1"/>
 
+    <jobs_tags
+        job_id="1"
+        tag_id="18"
+    />
+    <jobs_tags
+        job_id="1"
+        tag_id="19"
+    />
+    <jobs_tags
+        job_id="1"
+        tag_id="20"
+    />
+
     <criteria
         id="3"
     />
     <criteria_tags
         criterion_id="3"
-        tag_id="6"
+        tag_id="18"
     />
     <jobs
         id="2"
@@ -520,6 +555,7 @@
         cluster_name="h2query"
         command_name="spark"
         api="true"
+        tags="|SparkJob|"
     />
     <job_command_arguments
         job_id="2"
@@ -567,6 +603,11 @@
     <jobs_applications job_id="2" application_id="1" application_order="0"/>
     <jobs_applications job_id="2" application_id="2" application_order="1"/>
 
+    <jobs_tags
+        job_id="2"
+        tag_id="19"
+    />
+
     <criteria
         id="6"
     />
@@ -608,6 +649,7 @@
         cluster_name="h2query"
         command_name="spark"
         api="true"
+        tags="|SparkJob|"
     />
     <job_command_arguments
         job_id="3"
@@ -655,6 +697,11 @@
     <jobs_applications job_id="3" application_id="1" application_order="0"/>
     <jobs_applications job_id="3" application_id="2" application_order="1"/>
 
+    <jobs_tags
+        job_id="3"
+        tag_id="19"
+    />
+
     <criteria
         id="9"
     />
@@ -696,6 +743,7 @@
         cluster_name="h2query"
         command_name="spark"
         api="false"
+        tags="|SparkJob|"
     />
     <job_command_arguments
         job_id="4"
@@ -743,6 +791,11 @@
     <jobs_applications job_id="4" application_id="1" application_order="0"/>
     <jobs_applications job_id="4" application_id="2" application_order="1"/>
 
+    <jobs_tags
+        job_id="4"
+        tag_id="19"
+    />
+
     <criteria
         id="12"
     />
@@ -784,6 +837,7 @@
         cluster_name="h2query"
         command_name="spark"
         api="false"
+        tags="|SparkJob|"
     />
     <job_command_arguments
         job_id="5"
@@ -830,6 +884,11 @@
 
     <jobs_applications job_id="5" application_id="1" application_order="0"/>
     <jobs_applications job_id="5" application_id="2" application_order="1"/>
+
+    <jobs_tags
+        job_id="5"
+        tag_id="19"
+    />
 
     <agent_connections
         created="2016-02-24 01:48:00"
