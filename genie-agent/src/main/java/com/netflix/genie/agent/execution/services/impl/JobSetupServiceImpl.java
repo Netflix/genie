@@ -695,7 +695,7 @@ class JobSetupServiceImpl implements JobSetupService {
             sb
                 .append("# Launch the command")
                 .append(NEWLINE)
-                .append(this.commandLine).append(" &").append(NEWLINE)
+                .append(this.commandLine).append(" <&0 &").append(NEWLINE)
                 .append("wait %1").append(NEWLINE)
                 .append("exit $?").append(NEWLINE)
                 .append(NEWLINE);

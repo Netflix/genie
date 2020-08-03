@@ -105,7 +105,7 @@ exec 2>&7 7>&-
 env | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}
 
 # Launch the command
-presto -v --exec 'select * from table limit 1' &
+presto -v --exec 'select * from table limit 1' <&0 &
 wait %1
 exit $?
 
