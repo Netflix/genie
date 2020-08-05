@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
+import com.netflix.genie.client.apis.SortAttribute;
+import com.netflix.genie.client.apis.SortDirection;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.common.dto.Application;
@@ -44,6 +46,7 @@ import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -289,6 +292,8 @@ public class JobClient {
      * @return A list of jobs.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
+     * @deprecated Use {@link #getJobs(String, String, String, Set, Set, String, String, String, String, Long, Long,
+     * Long, Long, String, String, Integer, SortAttribute, SortDirection, Integer)}
      */
     public List<JobSearchResult> getJobs(
         @Nullable final String id,
@@ -307,6 +312,78 @@ public class JobClient {
         @Nullable final String grouping,
         @Nullable final String groupingInstance
     ) throws IOException, GenieClientException {
+        return this.getJobs(
+            id,
+            name,
+            user,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
+            grouping,
+            groupingInstance,
+            null,
+            null,
+            null,
+            null
+        );
+    }
+
+
+    /**
+     * Method to get a list of all the jobs from Genie for the query parameters specified.
+     *
+     * @param id               id for job
+     * @param name             name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user             user who submitted job
+     * @param statuses         statuses of jobs to find
+     * @param tags             tags for the job
+     * @param clusterName      the name of the cluster
+     * @param clusterId        the id of the cluster
+     * @param commandName      the name of the command run by the job
+     * @param commandId        the id of the command run by the job
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The grouping the job should be a member of
+     * @param groupingInstance The grouping instance the job should be a member of
+     * @param pageSize         The maximum number of results returned
+     * @param sortAttribute    The entity attribute used to sort
+     * @param sortDirection    The sort direction
+     * @param pageIndex        The page index
+     * @return A list of jobs.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public List<JobSearchResult> getJobs(
+        @Nullable final String id,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<String> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String clusterName,
+        @Nullable final String clusterId,
+        @Nullable final String commandName,
+        @Nullable final String commandId,
+        @Nullable final Long minStarted,
+        @Nullable final Long maxStarted,
+        @Nullable final Long minFinished,
+        @Nullable final Long maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance,
+        @Nullable @Min(1) final Integer pageSize,
+        @Nullable final SortAttribute sortAttribute,
+        @Nullable final SortDirection sortDirection,
+        @Nullable @Min(0) final Integer pageIndex
+    ) throws IOException, GenieClientException {
         return GenieClientUtils.parseSearchResultsResponse(
             this.jobService.getJobs(
                 id,
@@ -323,7 +400,10 @@ public class JobClient {
                 minFinished,
                 maxFinished,
                 grouping,
-                groupingInstance
+                groupingInstance,
+                pageSize,
+                GenieClientUtils.getSortParameter(sortAttribute, sortDirection),
+                pageIndex
             ).execute(),
             "jobSearchResultList",
             JobSearchResult.class
@@ -481,7 +561,7 @@ public class JobClient {
      * manifest is returned.
      * </p>
      *
-     * @param jobId The id of the job whose output file is desired.
+     * @param jobId          The id of the job whose output file is desired.
      * @param outputFilePath The path to the file within output directory.
      * @return An input stream to the output file contents.
      * @throws GenieClientException If the response received is not 2xx.

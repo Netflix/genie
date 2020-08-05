@@ -94,8 +94,12 @@ public interface JobService {
      * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
      * @param grouping         The grouping the job should be a member of
      * @param groupingInstance The grouping instance the job should be a member of
+     * @param size             The maximum number of results in the page
+     * @param sort             The sort order
+     * @param page             The page index
      * @return A callable object.
      */
+    @SuppressWarnings("checkstyle:parameternumber")
     @GET(JOBS_URL_SUFFIX)
     Call<JsonNode> getJobs(
         @Query("id") String id,
@@ -112,7 +116,10 @@ public interface JobService {
         @Query("minFinished") Long minFinished,
         @Query("maxFinished") Long maxFinished,
         @Query("grouping") String grouping,
-        @Query("groupingInstance") String groupingInstance
+        @Query("groupingInstance") String groupingInstance,
+        @Query("size") Integer size,
+        @Query("sort") String sort,
+        @Query("page") Integer page
     );
 
     /**
@@ -132,7 +139,7 @@ public interface JobService {
      * manifest is returned.
      * </p>
      *
-     * @param jobId The id of the job whose output file is desired.
+     * @param jobId          The id of the job whose output file is desired.
      * @param outputFilePath The path to the file within output directory.
      * @return A callable object.
      */
