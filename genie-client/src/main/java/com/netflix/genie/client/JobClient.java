@@ -191,7 +191,9 @@ public class JobClient {
      * @throws IOException          For Network and other IO issues.
      */
     public List<JobSearchResult> getJobs() throws IOException, GenieClientException {
-        return this.getJobs(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return this.getJobs(null, null, null, null, null, null,
+            null, null, null, null, null, null,
+            null, null, null, null, null, null, null);
     }
 
     /**
@@ -230,6 +232,10 @@ public class JobClient {
      * Long,
      * Long,
      * String,
+     * String,
+     * Long,
+     * Long,
+     * String,
      * String
      *)
      */
@@ -264,6 +270,10 @@ public class JobClient {
             minFinished,
             maxFinished,
             null,
+            null,
+            null,
+            null,
+            null,
             null
         );
     }
@@ -286,10 +296,15 @@ public class JobClient {
      * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
      * @param grouping         The grouping the job should be a member of
      * @param groupingInstance The grouping instance the job should be a member of
+     * @param page             The page offset of the results
+     * @param size             The size of page results
+     * @param sort             The column to sort the results on
+     * @param direction        The sorting direction, ASC or DESC
      * @return A list of jobs.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public List<JobSearchResult> getJobs(
         @Nullable final String id,
         @Nullable final String name,
@@ -305,7 +320,11 @@ public class JobClient {
         @Nullable final Long minFinished,
         @Nullable final Long maxFinished,
         @Nullable final String grouping,
-        @Nullable final String groupingInstance
+        @Nullable final String groupingInstance,
+        @Nullable final Long page,
+        @Nullable final Long size,
+        @Nullable final String sort,
+        @Nullable final String direction
     ) throws IOException, GenieClientException {
         return GenieClientUtils.parseSearchResultsResponse(
             this.jobService.getJobs(
@@ -323,7 +342,11 @@ public class JobClient {
                 minFinished,
                 maxFinished,
                 grouping,
-                groupingInstance
+                groupingInstance,
+                page,
+                size,
+                sort,
+                direction
             ).execute(),
             "jobSearchResultList",
             JobSearchResult.class

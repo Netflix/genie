@@ -94,8 +94,13 @@ public interface JobService {
      * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
      * @param grouping         The grouping the job should be a member of
      * @param groupingInstance The grouping instance the job should be a member of
+     * @param page             The page offset of the results
+     * @param size             The size of page results
+     * @param sort             The column to sort the results on
+     * @param direction        The sorting direction, ASC or DESC
      * @return A callable object.
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @GET(JOBS_URL_SUFFIX)
     Call<JsonNode> getJobs(
         @Query("id") String id,
@@ -112,7 +117,11 @@ public interface JobService {
         @Query("minFinished") Long minFinished,
         @Query("maxFinished") Long maxFinished,
         @Query("grouping") String grouping,
-        @Query("groupingInstance") String groupingInstance
+        @Query("groupingInstance") String groupingInstance,
+        @Query("page") Long page,
+        @Query("size") Long size,
+        @Query("sort") String sort,
+        @Query("direction") String direction
     );
 
     /**
