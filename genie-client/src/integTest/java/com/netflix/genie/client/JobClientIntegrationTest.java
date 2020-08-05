@@ -20,6 +20,8 @@ package com.netflix.genie.client;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.client.apis.SortAttribute;
+import com.netflix.genie.client.apis.SortDirection;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -255,6 +258,89 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
             )
             .extracting(JobSearchResult::getId)
             .containsExactlyInAnyOrder(killJobId, timeoutJobId);
+
+        final List<String> ids = Lists.newArrayList(sleepJobId, killJobId, timeoutJobId, dateJobId, echoJobId);
+        // Paginate, 1 result per page
+        for (int i = 0; i < ids.size(); i++) {
+            final List<JobSearchResult> page = this.jobClient.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1,
+                SortAttribute.CREATED,
+                SortDirection.ASC,
+                i
+            );
+
+            Assertions.assertThat(page.size()).isEqualTo(1);
+            Assertions.assertThat(page.get(0).getId()).isEqualTo(ids.get(i));
+        }
+
+        // Paginate, 1 result per page, reverse order
+        Collections.reverse(ids);
+        for (int i = 0; i < ids.size(); i++) {
+            final List<JobSearchResult> page = this.jobClient.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1,
+                SortAttribute.CREATED,
+                SortDirection.DESC,
+                i
+            );
+
+            Assertions.assertThat(page.size()).isEqualTo(1);
+            Assertions.assertThat(page.get(0).getId()).isEqualTo(ids.get(i));
+        }
+
+        // Ask for page beyond end of results
+        Assertions.assertThat(
+            this.jobClient.getJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                10,
+                SortAttribute.CREATED,
+                SortDirection.DESC,
+                1
+            )
+        ).isEmpty();
     }
 
     private String createDummyCluster() throws Exception {
