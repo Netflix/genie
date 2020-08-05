@@ -219,9 +219,6 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
                     null,
                     null,
                     null,
-                    null,
-                    null,
-                    null,
                     null
                 )
             )

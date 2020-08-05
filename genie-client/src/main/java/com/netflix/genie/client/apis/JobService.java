@@ -95,9 +95,6 @@ public interface JobService {
      * @param grouping         The grouping the job should be a member of
      * @param groupingInstance The grouping instance the job should be a member of
      * @param page             The page offset of the results
-     * @param size             The size of page results
-     * @param sort             The column to sort the results on
-     * @param direction        The sorting direction, ASC or DESC
      * @return A callable object.
      */
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -118,10 +115,7 @@ public interface JobService {
         @Query("maxFinished") Long maxFinished,
         @Query("grouping") String grouping,
         @Query("groupingInstance") String groupingInstance,
-        @Query("page") Long page,
-        @Query("size") Long size,
-        @Query("sort") String sort,
-        @Query("direction") String direction
+        @Query("page") Long page
     );
 
     /**

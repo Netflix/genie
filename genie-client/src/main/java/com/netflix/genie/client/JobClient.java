@@ -193,7 +193,7 @@ public class JobClient {
     public List<JobSearchResult> getJobs() throws IOException, GenieClientException {
         return this.getJobs(null, null, null, null, null, null,
             null, null, null, null, null, null,
-            null, null, null, null, null, null, null);
+            null, null, null, null);
     }
 
     /**
@@ -233,10 +233,7 @@ public class JobClient {
      * Long,
      * String,
      * String,
-     * Long,
-     * Long,
-     * String,
-     * String
+     * Long
      *)
      */
     @Deprecated
@@ -271,9 +268,6 @@ public class JobClient {
             maxFinished,
             null,
             null,
-            null,
-            null,
-            null,
             null
         );
     }
@@ -297,9 +291,6 @@ public class JobClient {
      * @param grouping         The grouping the job should be a member of
      * @param groupingInstance The grouping instance the job should be a member of
      * @param page             The page offset of the results
-     * @param size             The size of page results
-     * @param sort             The column to sort the results on
-     * @param direction        The sorting direction, ASC or DESC
      * @return A list of jobs.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
@@ -321,10 +312,7 @@ public class JobClient {
         @Nullable final Long maxFinished,
         @Nullable final String grouping,
         @Nullable final String groupingInstance,
-        @Nullable final Long page,
-        @Nullable final Long size,
-        @Nullable final String sort,
-        @Nullable final String direction
+        @Nullable final Long page
     ) throws IOException, GenieClientException {
         return GenieClientUtils.parseSearchResultsResponse(
             this.jobService.getJobs(
@@ -343,10 +331,7 @@ public class JobClient {
                 maxFinished,
                 grouping,
                 groupingInstance,
-                page,
-                size,
-                sort,
-                direction
+                page
             ).execute(),
             "jobSearchResultList",
             JobSearchResult.class
