@@ -233,8 +233,8 @@ public class JobClient {
      * Long,
      * String,
      * String,
-     * Long,
-     * Long
+     * Integer,
+     * Integer
      *)
      */
     @Deprecated
@@ -315,8 +315,8 @@ public class JobClient {
         @Nullable final Long maxFinished,
         @Nullable final String grouping,
         @Nullable final String groupingInstance,
-        @Nullable final Long page,
-        @Nullable final Long size
+        @Nullable final Integer page,
+        @Nullable final Integer size
     ) throws IOException, GenieClientException {
         return GenieClientUtils.parseSearchResultsResponse(
             this.jobService.getJobs(

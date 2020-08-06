@@ -116,8 +116,8 @@ public interface JobService {
         @Query("maxFinished") Long maxFinished,
         @Query("grouping") String grouping,
         @Query("groupingInstance") String groupingInstance,
-        @Query("page") Long page,
-        @Query("size") Long size
+        @Query("page") Integer page,
+        @Query("size") Integer size
     );
 
     /**
