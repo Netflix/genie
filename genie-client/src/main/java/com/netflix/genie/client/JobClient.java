@@ -292,8 +292,8 @@ public class JobClient {
      * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
      * @param grouping         The grouping the job should be a member of
      * @param groupingInstance The grouping instance the job should be a member of
-     * @param page             The page offset of the results
-     * @param size             The size of page results
+     * @param page             The page offset of the search results
+     * @param size             The number of search results per page
      * @return A list of jobs.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
