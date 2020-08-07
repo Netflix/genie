@@ -155,7 +155,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * Only jobs running on Genie servers are considered (i.e. no Agent jobs)
      *
      * @param statuses The set of statuses a job has to be in to be considered
-     * @param api Whether the job was submitted through the api ({@literal true}) or agent cli ({@literal false})
+     * @param api      Whether the job was submitted through the api ({@literal true}) or agent cli ({@literal false})
      * @return The user resource aggregates
      */
     @Query(
@@ -182,6 +182,28 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
             + " AND j.v4 = TRUE"
     )
     Set<String> getAgentJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
+
+    /**
+     * Find agent jobs in the given set of job and archive states that were marked finished before a given threshold.
+     *
+     * @param statuses        the job statuses filter
+     * @param archiveStatuses the job archive statuses filter
+     * @param updateThreshold select jobs last updated before this threshold
+     * @return a set of job ids
+     */
+    @Query(
+        "SELECT j.uniqueId"
+            + " FROM JobEntity j"
+            + " WHERE j.status IN (:statuses)"
+            + " AND j.archiveStatus IN (:archiveStatuses)"
+            + " AND j.updated < :updatedThreshold"
+            + " AND j.v4 = TRUE"
+    )
+    Set<String> getJobsWithStatusAndArchiveStatusUpdatedBefore(
+        @Param("statuses") @NotEmpty Set<String> statuses,
+        @Param("archiveStatuses") @NotEmpty Set<String> archiveStatuses,
+        @Param("updatedThreshold") Instant updateThreshold
+    );
 
     /**
      * Get only the status of a job.

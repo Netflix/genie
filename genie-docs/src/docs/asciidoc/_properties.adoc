@@ -507,6 +507,21 @@ of 2.0
 |120000
 |no
 
+|genie.tasks.archive-status-cleanup.enabled
+|Whether to enable the task that detects jobs whose archive status was left in PENDING state
+|true
+|no
+
+|genie.tasks.archive-status-cleanup.check-interval
+|How often the archive status tasks executed
+|10s
+|no
+
+|genie.tasks.archive-status-cleanup.gracePeriod
+|How much time since the final status update to give to jobs before marking the status as UNKNOWN
+|2m
+|no
+
 |genie.tasks.cluster-checker.healthIndicatorsToIgnore
 |The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list

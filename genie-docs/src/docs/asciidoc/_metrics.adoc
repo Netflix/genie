@@ -185,6 +185,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentJobCleanupTask
 |status, exceptionClass
 
+|genie.jobs.archiveStatus.cleanup.counter
+|Counter of jobs whose archive status was left in PENDING state after execution completed
+|count
+|ArchiveStatusCleanupTask
+|status, exceptionClass
+
 |genie.jobs.clusters.selectors.script.select.timer
 |Time taken by the loaded script to select a cluster among the one passed as input
 |nanoseconds
@@ -473,6 +479,12 @@ for multiple errors.
 |The time taken to fetch the metadata of an archived job if it isn't already cached
 |nanoseconds
 |ArchivedJobServiceImpl
+|status, exceptionClass
+
+|genie.tasks.archiveStatusCleanup.timer
+|Time taken to execute the cleanup task
+|nanoseconds
+|ArchiveStatusCleanupTask
 |status, exceptionClass
 
 |genie.tasks.clusterChecker.connectionsReaped.counter

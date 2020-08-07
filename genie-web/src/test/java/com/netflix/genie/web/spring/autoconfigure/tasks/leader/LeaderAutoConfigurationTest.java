@@ -23,6 +23,7 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
+import com.netflix.genie.web.properties.ArchiveStatusCleanupProperties;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -32,6 +33,7 @@ import com.netflix.genie.web.services.ClusterLeaderService;
 import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
+import com.netflix.genie.web.tasks.leader.ArchiveStatusCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
 import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
@@ -75,6 +77,7 @@ class LeaderAutoConfigurationTest {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(AgentCleanupProperties.class);
+                Assertions.assertThat(context).hasSingleBean(ArchiveStatusCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterCheckerProperties.class);
                 Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
@@ -90,6 +93,7 @@ class LeaderAutoConfigurationTest {
                 Assertions.assertThat(context).doesNotHaveBean(DatabaseCleanupTask.class);
                 Assertions.assertThat(context).doesNotHaveBean(UserMetricsTask.class);
                 Assertions.assertThat(context).doesNotHaveBean(AgentJobCleanupTask.class);
+                Assertions.assertThat(context).doesNotHaveBean(ArchiveStatusCleanupTask.class);
             }
         );
     }
@@ -103,11 +107,13 @@ class LeaderAutoConfigurationTest {
             .withPropertyValues(
                 "genie.tasks.database-cleanup.enabled=true",
                 "genie.tasks.user-metrics.enabled=true",
-                "genie.tasks.agent-cleanup.enabled=true"
+                "genie.tasks.agent-cleanup.enabled=true",
+                "genie.tasks.archive-status-cleanup.enabled=true"
             )
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(AgentCleanupProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(ArchiveStatusCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(ClusterCheckerProperties.class);
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
@@ -124,6 +130,7 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupTask.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsTask.class);
                     Assertions.assertThat(context).hasSingleBean(AgentJobCleanupTask.class);
+                    Assertions.assertThat(context).hasSingleBean(ArchiveStatusCleanupTask.class);
                 }
             );
     }
