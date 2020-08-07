@@ -85,6 +85,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -948,7 +949,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             page
         );
         Assertions.assertThat(jobs.getTotalElements()).isEqualTo(0L);
-        Assertions.assertThat(jobs.getContent()).isEmpty();    }
+        Assertions.assertThat(jobs.getContent()).isEmpty();
+    }
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
@@ -1332,6 +1334,48 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(randomInfo.getNumberOfActiveJobs()).isEqualTo(0L);
         Assertions.assertThat(randomInfo.getTotalMemoryAllocated()).isEqualTo(0L);
         Assertions.assertThat(randomInfo.getTotalMemoryUsed()).isEqualTo(0L);
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/archive_status.xml")
+    void canGetFinishedJobsWithPendingArchiveStatus() {
+        // This is the update timestamp of all jobs in the dataset
+        final Instant lastJobUpdate = Instant.parse("2020-01-01T00:00:00.000Z");
+
+        final Set<JobStatus> finishedJobStatuses = JobStatus.getFinishedStatuses();
+
+        final HashSet<ArchiveStatus> pendingJobArchiveStatuses = Sets.newHashSet(ArchiveStatus.PENDING);
+
+        final Instant notMatchingThreshold = lastJobUpdate.minus(1, ChronoUnit.SECONDS);
+        final Instant matchingThreshold = lastJobUpdate.plus(1, ChronoUnit.SECONDS);
+
+        Assertions
+            .assertThat(
+                this.service.getJobsWithStatusAndArchiveStatusUpdatedBefore(
+                    finishedJobStatuses,
+                    pendingJobArchiveStatuses,
+                    lastJobUpdate
+                )
+            ).isEmpty();
+
+        Assertions
+            .assertThat(
+                this.service.getJobsWithStatusAndArchiveStatusUpdatedBefore(
+                    finishedJobStatuses,
+                    pendingJobArchiveStatuses,
+                    notMatchingThreshold
+                )
+            ).isEmpty();
+
+        Assertions
+            .assertThat(
+                this.service.getJobsWithStatusAndArchiveStatusUpdatedBefore(
+                    finishedJobStatuses,
+                    pendingJobArchiveStatuses,
+                    matchingThreshold
+                )
+            ).hasSize(2)
+            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {

@@ -97,6 +97,8 @@ genie:
   tasks:
     agent-cleanup:
       enabled: true
+    archive-status-cleanup:
+      enabled: true
     cluster-checker:
       scheme: http
       port: 8080

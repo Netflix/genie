@@ -22,6 +22,7 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
+import com.netflix.genie.web.properties.ArchiveStatusCleanupProperties;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
@@ -33,6 +34,7 @@ import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.ZookeeperAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
+import com.netflix.genie.web.tasks.leader.ArchiveStatusCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
 import com.netflix.genie.web.tasks.leader.LeaderTask;
@@ -66,6 +68,7 @@ import java.util.Set;
 @EnableConfigurationProperties(
     {
         AgentCleanupProperties.class,
+        ArchiveStatusCleanupProperties.class,
         ClusterCheckerProperties.class,
         DatabaseCleanupProperties.class,
         LeadershipProperties.class,
@@ -200,6 +203,32 @@ public class LeaderAutoConfiguration {
             agentCleanupProperties,
             registry,
             agentRoutingService
+        );
+    }
+
+    /**
+     * If required, get a {@link ArchiveStatusCleanupTask} instance for use.
+     *
+     * @param dataServices                   The {@link DataServices} encapsulation instance to use
+     * @param agentRoutingService            the agent routing service
+     * @param archiveStatusCleanupProperties the archive status cleanup properties
+     * @param registry                       the metrics registry
+     * @return a {@link AgentJobCleanupTask}
+     */
+    @Bean
+    @ConditionalOnProperty(value = ArchiveStatusCleanupProperties.ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnMissingBean(ArchiveStatusCleanupTask.class)
+    public ArchiveStatusCleanupTask archiveStatusCleanupTask(
+        final DataServices dataServices,
+        final AgentRoutingService agentRoutingService,
+        final ArchiveStatusCleanupProperties archiveStatusCleanupProperties,
+        final MeterRegistry registry
+    ) {
+        return new ArchiveStatusCleanupTask(
+            dataServices,
+            agentRoutingService,
+            archiveStatusCleanupProperties,
+            registry
         );
     }
 

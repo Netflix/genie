@@ -2212,6 +2212,29 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         log.debug("[getHostJobInformation] Called for hostname {}", hostname);
         return this.jobRepository.getHostJobInfo(hostname, ACTIVE_STATUS_SET, USING_MEMORY_JOB_SET);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getJobsWithStatusAndArchiveStatusUpdatedBefore(
+        @NotEmpty final Set<JobStatus> statuses,
+        @NotEmpty final Set<ArchiveStatus> archiveStatuses,
+        @NotNull final Instant updated
+    ) {
+        log.debug(
+            "[getJobsWithStatusAndArchiveStatusUpdatedBefore] Called with statuses {}, archiveStatuses {}, updated {}",
+            statuses,
+            archiveStatuses,
+            updated
+        );
+        return this.jobRepository.getJobsWithStatusAndArchiveStatusUpdatedBefore(
+            statuses.stream().map(JobStatus::name).collect(Collectors.toSet()),
+            archiveStatuses.stream().map(ArchiveStatus::name).collect(Collectors.toSet()),
+            updated
+        );
+    }
     //endregion
     //endregion
 

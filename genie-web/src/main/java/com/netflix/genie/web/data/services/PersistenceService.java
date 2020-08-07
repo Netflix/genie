@@ -970,6 +970,21 @@ public interface PersistenceService {
      * @return A {@link JobInfoAggregate} containing the metadata information
      */
     JobInfoAggregate getHostJobInformation(@NotBlank String hostname);
+
+    /**
+     * Get the set of jobs (agent only) whose state is in {@code statuses} and archive status is in
+     * {@code archiveStatuses} and last updated before {@code updated}.
+     *
+     * @param statuses        the set of job statuses
+     * @param archiveStatuses the set of job archive statuses
+     * @param updated         the threshold of last update
+     * @return a set of job ids
+     */
+    Set<String> getJobsWithStatusAndArchiveStatusUpdatedBefore(
+        @NotEmpty Set<JobStatus> statuses,
+        @NotEmpty Set<ArchiveStatus> archiveStatuses,
+        @NotNull Instant updated
+    );
     //endregion
     //endregion
 

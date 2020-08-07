@@ -31,6 +31,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
@@ -1185,5 +1186,22 @@ class JpaPersistenceServiceImplJobsTest {
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.RUNNING.name());
         Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(StringUtils.truncate(tooLong, 255));
+    }
+
+    @Test
+    void testGetJobsWithStatusAndArchiveStatusUpdatedBefore() {
+        Mockito
+            .when(
+                this.jobRepository.getJobsWithStatusAndArchiveStatusUpdatedBefore(
+                    Mockito.anySet(),
+                    Mockito.anySet(),
+                    Mockito.any(Instant.class)
+                ))
+            .thenReturn(Sets.newHashSet());
+        this.persistenceService.getJobsWithStatusAndArchiveStatusUpdatedBefore(
+            Sets.newHashSet(JobStatus.FAILED, JobStatus.KILLED),
+            Sets.newHashSet(ArchiveStatus.FAILED),
+            Instant.now()
+        );
     }
 }
