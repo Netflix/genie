@@ -29,6 +29,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Integration tests for {@link JobClient}.
@@ -46,6 +48,7 @@ import java.util.UUID;
  * @author amsharma
  * @since 3.0.0
  */
+@Slf4j
 abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
 
     private static final String DATE_TAG = "type:date";
@@ -53,6 +56,7 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
     private static final String SLEEP_TAG = "type:sleep";
     private static final String DUMMY_TAG = "type:dummy";
 
+    @SuppressWarnings("MethodLength")
     @Test
     void canSubmitJob() throws Exception {
         final String dummyClusterId = this.createDummyCluster();
@@ -143,25 +147,33 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
         final String dateJobId = this.jobClient.submitJob(dateJob);
         final String echoJobId = this.jobClient.submitJob(echoJob);
 
-        Assertions
-            .assertThat(this.jobClient.waitForCompletion(sleepJobId, 60000, 100))
-            .isEqualByComparingTo(JobStatus.SUCCEEDED);
+        final Map<String, JobStatus> expectedStatuses = ImmutableMap.<String, JobStatus>builder()
+            .put(sleepJobId, JobStatus.SUCCEEDED)
+            .put(killJobId, JobStatus.KILLED)
+            .put(timeoutJobId, JobStatus.KILLED)
+            .put(dateJobId, JobStatus.SUCCEEDED)
+            .put(echoJobId, JobStatus.SUCCEEDED)
+            .build();
 
-        Assertions
-            .assertThat(this.jobClient.waitForCompletion(killJobId, 60000, 100))
-            .isEqualByComparingTo(JobStatus.KILLED);
+        final long waitStart = System.currentTimeMillis();
+        final long maxTotalWait = 120000;
 
-        Assertions
-            .assertThat(this.jobClient.waitForCompletion(timeoutJobId, 60000, 100))
-            .isEqualByComparingTo(JobStatus.KILLED);
+        for (final Map.Entry<String, JobStatus> entry : expectedStatuses.entrySet()) {
+            final String jobId = entry.getKey();
+            final JobStatus status = entry.getValue();
 
-        Assertions
-            .assertThat(this.jobClient.waitForCompletion(dateJobId, 60000, 100))
-            .isEqualByComparingTo(JobStatus.SUCCEEDED);
+            log.info("Waiting for job: {} (expected final status: {})", jobId, status.name());
 
-        Assertions
-            .assertThat(this.jobClient.waitForCompletion(echoJobId, 60000, 100))
-            .isEqualByComparingTo(JobStatus.SUCCEEDED);
+            final long timeElapsed = System.currentTimeMillis() - waitStart;
+            final long timeLeft = maxTotalWait - timeElapsed;
+            if (timeLeft <= 0) {
+                throw new TimeoutException("Timed out waiting for jobs to complete");
+            }
+
+            Assertions
+                .assertThat(this.jobClient.waitForCompletion(jobId, timeLeft, 100))
+                .isEqualByComparingTo(entry.getValue());
+        }
 
         // Some basic checking of fields
         Assertions.assertThat(this.jobClient.getJob(sleepJobId).getName()).isEqualTo(sleepJob.getName());
