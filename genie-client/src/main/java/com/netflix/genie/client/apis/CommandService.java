@@ -76,6 +76,9 @@ public interface CommandService {
      * @param user       The user who created the command.
      * @param statusList The list of Command statuses.
      * @param tagList    The list of tags.
+     * @param size       The maximum number of results in the page
+     * @param sort       The sort order
+     * @param page       The page index
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX)
@@ -83,7 +86,10 @@ public interface CommandService {
         @Query("name") String name,
         @Query("user") String user,
         @Query("status") List<String> statusList,
-        @Query("tag") List<String> tagList
+        @Query("tag") List<String> tagList,
+        @Query("size") Integer size,
+        @Query("sort") String sort,
+        @Query("page") Integer page
     );
 
     /**

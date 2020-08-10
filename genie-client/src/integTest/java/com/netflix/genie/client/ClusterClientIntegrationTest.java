@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.client.apis.SortAttribute;
+import com.netflix.genie.client.apis.SortDirection;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -29,7 +31,9 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,6 +43,100 @@ import java.util.UUID;
  * @author amsharma
  */
 abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest {
+
+
+    @Test
+    void testGetClustersUsingPagination() throws Exception {
+        final String id1 = UUID.randomUUID().toString() + "_1";
+        final String id2 = UUID.randomUUID().toString() + "_2";
+        final String id3 = UUID.randomUUID().toString() + "_3";
+
+        final List<String> ids = Lists.newArrayList(id1, id2, id3);
+
+        for (final String id : ids) {
+            final Cluster cluster = new Cluster.Builder(
+                "ClusterName",
+                "cluster-user",
+                "1.0",
+                ClusterStatus.UP
+            )
+                .withId(id)
+                .build();
+
+            this.clusterClient.createCluster(cluster);
+        }
+
+        final List<Cluster> results = this.clusterClient.getClusters(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+
+        Assertions.assertThat(results).hasSize(3);
+        Assertions.assertThat(
+            results.stream()
+                .map(Cluster::getId)
+                .map(Optional::get)
+        ).containsExactlyInAnyOrder(id1, id2, id3);
+
+        // Paginate, 1 result per page
+        for (int i = 0; i < ids.size(); i++) {
+            final List<Cluster> page = this.clusterClient.getClusters(
+                null,
+                null,
+                null,
+                null,
+                null,
+                1,
+                SortAttribute.UPDATED,
+                SortDirection.ASC,
+                i
+            );
+
+            Assertions.assertThat(page.size()).isEqualTo(1);
+            Assertions.assertThat(page.get(0).getId().orElse(null)).isEqualTo(ids.get(i));
+        }
+
+        // Paginate, 1 result per page, reverse order
+        Collections.reverse(ids);
+        for (int i = 0; i < ids.size(); i++) {
+            final List<Cluster> page = this.clusterClient.getClusters(
+                null,
+                null,
+                null,
+                null,
+                null,
+                1,
+                SortAttribute.UPDATED,
+                SortDirection.DESC,
+                i
+            );
+
+            Assertions.assertThat(page.size()).isEqualTo(1);
+            Assertions.assertThat(page.get(0).getId().orElse(null)).isEqualTo(ids.get(i));
+        }
+
+        // Ask for page beyond end of results
+        Assertions.assertThat(
+            this.clusterClient.getClusters(
+                null,
+                null,
+                null,
+                null,
+                null,
+                3,
+                null,
+                null,
+                1
+            )
+        ).isEmpty();
+    }
 
     @Test
     void testUpdateCluster() throws Exception {

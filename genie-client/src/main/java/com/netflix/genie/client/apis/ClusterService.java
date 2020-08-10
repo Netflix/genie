@@ -76,6 +76,9 @@ public interface ClusterService {
      * @param tagList       The list of tags.
      * @param minUpdateTime Minimum Time after which cluster was updated.
      * @param maxUpdateTime Maximum Time before which cluster was updated.
+     * @param size       The maximum number of results in the page
+     * @param sort       The sort order
+     * @param page       The page index
      * @return A callable object.
      */
     @GET(CLUSTER_URL_SUFFIX)
@@ -84,7 +87,10 @@ public interface ClusterService {
         @Query("status") List<String> statusList,
         @Query("tag") List<String> tagList,
         @Query("minUpdateTime") Long minUpdateTime,
-        @Query("maxUpdateTime") Long maxUpdateTime
+        @Query("maxUpdateTime") Long maxUpdateTime,
+        @Query("size") Integer size,
+        @Query("sort") String sort,
+        @Query("page") Integer page
     );
 
     /**

@@ -19,6 +19,8 @@ package com.netflix.genie.client;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.CommandService;
+import com.netflix.genie.client.apis.SortAttribute;
+import com.netflix.genie.client.apis.SortDirection;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.common.dto.Application;
@@ -30,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -123,6 +126,7 @@ public class CommandClient {
      * @return A list of commands.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
+     * @deprecated Use {@link #getCommands(String, String, List, List, Integer, SortAttribute, SortDirection, Integer)}
      */
     public List<Command> getCommands(
         final String name,
@@ -130,12 +134,53 @@ public class CommandClient {
         final List<String> statusList,
         final List<String> tagList
     ) throws IOException, GenieClientException {
+        return this.getCommands(
+            name,
+            user,
+            statusList,
+            tagList,
+            null,
+            null,
+            null,
+            null
+        );
+    }
+
+
+    /**
+     * Method to get a list of all the commands from Genie for the query parameters specified.
+     *
+     * @param name          The name of the commands.
+     * @param user          The user who created the command.
+     * @param statusList    The list of Command statuses.
+     * @param tagList       The list of tags.
+     * @param pageSize      The maximum number of results returned
+     * @param sortAttribute The entity attribute used to sort
+     * @param sortDirection The sort direction
+     * @param pageIndex     The page index
+     * @return A list of commands.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public List<Command> getCommands(
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final List<String> statusList,
+        @Nullable final List<String> tagList,
+        @Nullable @Min(1) final Integer pageSize,
+        @Nullable final SortAttribute sortAttribute,
+        @Nullable final SortDirection sortDirection,
+        @Nullable @Min(0) final Integer pageIndex
+    ) throws IOException, GenieClientException {
         return GenieClientUtils.parseSearchResultsResponse(
             this.commandService.getCommands(
                 name,
                 user,
                 statusList,
-                tagList
+                tagList,
+                pageSize,
+                GenieClientUtils.getSortParameter(sortAttribute, sortDirection),
+                pageIndex
             ).execute(),
             "commandList",
             Command.class
