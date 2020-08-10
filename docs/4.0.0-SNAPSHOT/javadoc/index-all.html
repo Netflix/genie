@@ -968,6 +968,24 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#archiveStatus">archiveStatus</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">ArchiveStatusCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up jobs archive status.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html#ArchiveStatusCleanupProperties--">ArchiveStatusCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#archiveStatusCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.properties.ArchiveStatusCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">archiveStatusCleanupTask(DataServices, AgentRoutingService, ArchiveStatusCleanupProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dd>
+<div class="block">If required, get a <a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>ArchiveStatusCleanupTask</code></a> instance for use.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><span class="typeNameLink">ArchiveStatusCleanupTask</span></a> - Class in <a href="com/netflix/genie/web/tasks/leader/package-summary.html">com.netflix.genie.web.tasks.leader</a></dt>
+<dd>
+<div class="block">Leader task that find jobs whose archival status was left in 'PENDING' state.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html#ArchiveStatusCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.properties.ArchiveStatusCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">ArchiveStatusCleanupTask(DataServices, AgentRoutingService, ArchiveStatusCleanupProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#ARCHIVING_DISABLED">ARCHIVING_DISABLED</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#archivingDisabled">archivingDisabled</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
@@ -3482,6 +3500,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentCleanupProperties.html#ENABLED_PROPERTY">ENABLED_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentCleanupProperties.html" title="class in com.netflix.genie.web.properties">AgentCleanupProperties</a></dt>
 <dd>
 <div class="block">The property that determines if the <a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>AgentJobCleanupTask</code></a> is enabled.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html#ENABLED_PROPERTY">ENABLED_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties</a></dt>
+<dd>
+<div class="block">Determines whether the <a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>ArchiveStatusCleanupTask</code></a> is active.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#ENABLED_PROPERTY">ENABLED_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a></dt>
 <dd>
@@ -6024,6 +6046,10 @@
 <dd>
 <div class="block">Get how long the system should wait between invoking the run() method of this task in milliseconds.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html#getFixedRate--">getFixedRate()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask</a></dt>
+<dd>
+<div class="block">Get how long the system should wait between invoking the run() method of this task in milliseconds.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html#getFixedRate--">getFixedRate()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader">ClusterCheckerTask</a></dt>
 <dd>
 <div class="block">Get how long the system should wait between invoking the run() method of this task in milliseconds.</div>
@@ -6540,6 +6566,20 @@
 <dd>
 <div class="block">Method to fetch the stdout of a job from Genie.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getJobsWithStatusAndArchiveStatusUpdatedBefore-java.util.Set-java.util.Set-java.time.Instant-">getJobsWithStatusAndArchiveStatusUpdatedBefore(Set&lt;JobStatus&gt;, Set&lt;ArchiveStatus&gt;, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Get the set of jobs (agent only) whose state is in <code>statuses</code> and archive status is in
+ <code>archiveStatuses</code> and last updated before <code>updated</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobsWithStatusAndArchiveStatusUpdatedBefore-java.util.Set-java.util.Set-java.time.Instant-">getJobsWithStatusAndArchiveStatusUpdatedBefore(Set&lt;String&gt;, Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Find agent jobs in the given set of job and archive states that were marked finished before a given threshold.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobsWithStatusAndArchiveStatusUpdatedBefore-java.util.Set-java.util.Set-java.time.Instant-">getJobsWithStatusAndArchiveStatusUpdatedBefore(Set&lt;JobStatus&gt;, Set&lt;ArchiveStatus&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Get the set of jobs (agent only) whose state is in <code>statuses</code> and archive status is in
+ <code>archiveStatuses</code> and last updated before <code>updated</code>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobTags--">getJobTags()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobVersion--">getJobVersion()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
@@ -7042,6 +7082,10 @@
 <div class="block">Get the type of scheduling mechanism which should be used to schedule this task.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html#getScheduleType--">getScheduleType()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">AgentJobCleanupTask</a></dt>
+<dd>
+<div class="block">Get the type of scheduling mechanism which should be used to schedule this task.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html#getScheduleType--">getScheduleType()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask</a></dt>
 <dd>
 <div class="block">Get the type of scheduling mechanism which should be used to schedule this task.</div>
 </dd>
@@ -10426,6 +10470,10 @@
 <dd>
 <div class="block">Prefix for all properties related to the agent file transfer service.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties</a></dt>
+<dd>
+<div class="block">The property prefix for all properties in this group.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AwsCredentialsProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AwsCredentialsProperties.html" title="class in com.netflix.genie.web.properties">AwsCredentialsProperties</a></dt>
 <dd>
 <div class="block">The property prefix for Genie AWS Credentials.</div>
@@ -11321,6 +11369,7 @@
 <div class="block">This will check the process identified by the pid supplied to the constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html#run--">run()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">AgentJobCleanupTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html#run--">run()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html#run--">run()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader">ClusterCheckerTask</a></dt>
 <dd>
 <div class="block">Ping the health check endpoint of all other nodes which have running jobs.</div>

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/AgentCleanupProperties.html" title="class in com.netflix.genie.web.properties">AgentCleanupProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/ClusterCheckerProperties.html" title="class in com.netflix.genie.web.properties">ClusterCheckerProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/LeadershipProperties.html" title="class in com.netflix.genie.web.properties">LeadershipProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/UserMetricsProperties.html" title="class in com.netflix.genie.web.properties">UserMetricsProperties.class</a>})
+ @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/AgentCleanupProperties.html" title="class in com.netflix.genie.web.properties">AgentCleanupProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/ClusterCheckerProperties.html" title="class in com.netflix.genie.web.properties">ClusterCheckerProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/LeadershipProperties.html" title="class in com.netflix.genie.web.properties">LeadershipProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/UserMetricsProperties.html" title="class in com.netflix.genie.web.properties">UserMetricsProperties.class</a>})
  @AutoConfigureAfter(value={<a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/TasksAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks">TasksAutoConfiguration.class</a>,<a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/ZookeeperAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure">ZookeeperAutoConfiguration.class</a>})
 public class <span class="typeNameLabel">LeaderAutoConfiguration</span>
 extends java.lang.Object</pre>
@@ -162,6 +162,15 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#archiveStatusCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.properties.ArchiveStatusCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">archiveStatusCleanupTask</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+                        <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                        <a href="../../../../../../../../com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties</a>&nbsp;archiveStatusCleanupProperties,
+                        io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+<div class="block">If required, get a <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>ArchiveStatusCleanupTask</code></a> instance for use.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader">ClusterCheckerTask</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#clusterCheckerTask-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.ClusterCheckerProperties-com.netflix.genie.web.data.services.DataServices-org.springframework.web.client.RestTemplate-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties-io.micrometer.core.instrument.MeterRegistry-">clusterCheckerTask</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                   <a href="../../../../../../../../com/netflix/genie/web/properties/ClusterCheckerProperties.html" title="class in com.netflix.genie.web.properties">ClusterCheckerProperties</a>&nbsp;properties,
@@ -172,14 +181,14 @@ extends java.lang.Object</pre>
 <div class="block">Create a <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>ClusterCheckerTask</code></a> if one hasn't been supplied.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#curatorClusterLeaderService-org.springframework.integration.zookeeper.leader.LeaderInitiator-">curatorClusterLeaderService</a></span>(org.springframework.integration.zookeeper.leader.LeaderInitiator&nbsp;leaderInitiator)</code>
 <div class="block">Create a <a href="../../../../../../../../com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> based on Zookeeper/Curator if <code>LeaderInitiator</code> is
  available and the bean does not already exist.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">DatabaseCleanupTask</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#databaseCleanupTask-com.netflix.genie.web.properties.DatabaseCleanupProperties-org.springframework.core.env.Environment-com.netflix.genie.web.data.services.DataServices-io.micrometer.core.instrument.MeterRegistry-">databaseCleanupTask</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a>&nbsp;cleanupProperties,
                    org.springframework.core.env.Environment&nbsp;environment,
@@ -188,14 +197,14 @@ extends java.lang.Object</pre>
 <div class="block">Create a <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>DatabaseCleanupTask</code></a> if one is required.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderElectionActuator-com.netflix.genie.web.services.ClusterLeaderService-">leaderElectionActuator</a></span>(<a href="../../../../../../../../com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a>&nbsp;clusterLeaderService)</code>
 <div class="block">Create a <a href="../../../../../../../../com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators"><code>LeaderElectionActuator</code></a> bean if one is not already defined and if
  <a href="../../../../../../../../com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> is available.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTasksCoordinator</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderTasksCoordinator-org.springframework.scheduling.TaskScheduler-java.util.Set-">leaderTasksCoordinator</a></span>(org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                       java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTask</a>&gt;&nbsp;tasks)</code>
@@ -203,14 +212,14 @@ extends java.lang.Object</pre>
  whether leadership is granted or revoked.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#localClusterLeaderService-com.netflix.genie.web.tasks.leader.LocalLeader-">localClusterLeaderService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a>&nbsp;localLeader)</code>
 <div class="block">Create a <a href="../../../../../../../../com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> based on static configuration if <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader"><code>LocalLeader</code></a> is
  available and the bean does not already exist.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#localLeader-com.netflix.genie.web.events.GenieEventBus-com.netflix.genie.web.properties.LeadershipProperties-">localLeader</a></span>(<a href="../../../../../../../../com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a>&nbsp;genieEventBus,
            <a href="../../../../../../../../com/netflix/genie/web/properties/LeadershipProperties.html" title="class in com.netflix.genie.web.properties">LeadershipProperties</a>&nbsp;leadershipProperties)</code>
@@ -218,7 +227,7 @@ extends java.lang.Object</pre>
  bean which will fire appropriate events.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/leader/UserMetricsTask.html" title="class in com.netflix.genie.web.tasks.leader">UserMetricsTask</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#userMetricsTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.UserMetricsProperties-">userMetricsTask</a></span>(io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
@@ -387,6 +396,32 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/tasks/leader/
 <dd><code>agentCleanupProperties</code> - the agent cleanup properties</dd>
 <dd><code>registry</code> - the metrics registry</dd>
 <dd><code>agentRoutingService</code> - the agent routing service</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>AgentJobCleanupTask</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="archiveStatusCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.properties.ArchiveStatusCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>archiveStatusCleanupTask</h4>
+<pre>@Bean
+ @ConditionalOnProperty(value="genie.tasks.archive-status-cleanup.enabled",
+                       havingValue="true")
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask.class</a>)
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">ArchiveStatusCleanupTask</a>&nbsp;archiveStatusCleanupTask(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+                                                                                                                                                                                                                                                       <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                                                                                                                                                                                                                                                       <a href="../../../../../../../../com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties</a>&nbsp;archiveStatusCleanupProperties,
+                                                                                                                                                                                                                                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+<div class="block">If required, get a <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/ArchiveStatusCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>ArchiveStatusCleanupTask</code></a> instance for use.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> encapsulation instance to use</dd>
+<dd><code>agentRoutingService</code> - the agent routing service</dd>
+<dd><code>archiveStatusCleanupProperties</code> - the archive status cleanup properties</dd>
+<dd><code>registry</code> - the metrics registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <a href="../../../../../../../../com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>AgentJobCleanupTask</code></a></dd>
 </dl>

@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-08-04</span>
+<span id="revdate">2020-08-10</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5386,6 +5386,24 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.archive-status-cleanup.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable the task that detects jobs whose archive status was left in PENDING state</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.archive-status-cleanup.check-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How often the archive status tasks executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.archive-status-cleanup.gracePeriod</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How much time since the final status update to give to jobs before marking the status as UNKNOWN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.healthIndicatorsToIgnore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list</p></td>
@@ -6282,6 +6300,13 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.archiveStatus.cleanup.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter of jobs whose archive status was left in PENDING state after execution completed</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ArchiveStatusCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.clusters.selectors.script.select.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken by the loaded script to select a cluster among the one passed as input</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
@@ -6620,6 +6645,13 @@ for multiple errors.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.archiveStatusCleanup.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to execute the cleanup task</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ArchiveStatusCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.connectionsReaped.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of agent connections the leader reaped due to the host being unhealthy</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6828,7 +6860,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-08-04 00:39:56 UTC
+Last updated 2020-08-10 23:14:43 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
