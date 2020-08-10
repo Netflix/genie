@@ -20,6 +20,8 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Lists;
+import com.netflix.genie.client.apis.SortAttribute;
+import com.netflix.genie.client.apis.SortDirection;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.interceptors.ResponseMappingInterceptor;
@@ -173,5 +175,20 @@ final class GenieClientUtils {
             searchList.add(searchResult);
         }
         return searchList;
+    }
+
+    @Nullable
+    public static String getSortParameter(
+        @Nullable final SortAttribute sortAttribute,
+        @Nullable final SortDirection sortDirection
+    ) {
+        if (sortAttribute != null || sortDirection != null) {
+            return ""
+                + StringUtils.lowerCase((sortAttribute != null ? sortAttribute : SortAttribute.DEFAULT).name())
+                + ","
+                + (sortDirection != null ? sortDirection : SortDirection.DEFAULT);
+        } else {
+            return null;
+        }
     }
 }

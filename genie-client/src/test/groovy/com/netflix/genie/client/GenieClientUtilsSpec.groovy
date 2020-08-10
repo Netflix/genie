@@ -18,6 +18,8 @@
 package com.netflix.genie.client
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.netflix.genie.client.apis.SortAttribute
+import com.netflix.genie.client.apis.SortDirection
 import com.netflix.genie.client.exceptions.GenieClientException
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.search.JobSearchResult
@@ -65,5 +67,20 @@ class GenieClientUtilsSpec extends Specification {
 
         then:
         thrown(GenieClientException)
+    }
+
+    @Unroll
+    def "Sort parameter #sortAttribute + #sortDirection => #expected"(SortAttribute sortAttribute, SortDirection sortDirection, String expected) {
+
+        expect:
+        GenieClientUtils.getSortParameter(sortAttribute, sortDirection) == expected
+
+        where:
+        sortAttribute         | sortDirection         | expected
+        SortAttribute.DEFAULT | SortDirection.DEFAULT | "created,ASC"
+        SortAttribute.VERSION | SortDirection.DESC    | "version,DESC"
+        null                  | SortDirection.DESC    | "created,DESC"
+        SortAttribute.VERSION | null                  | "version,ASC"
+        null                  | null                  | null
     }
 }
