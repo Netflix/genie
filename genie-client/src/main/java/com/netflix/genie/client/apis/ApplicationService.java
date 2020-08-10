@@ -76,6 +76,9 @@ public interface ApplicationService {
      * @param statusList The list of Command statuses.
      * @param tagList    The list of tags.
      * @param type       The type of the application.
+     * @param size       The maximum number of results in the page
+     * @param sort       The sort order
+     * @param page       The page index
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX)
@@ -84,7 +87,10 @@ public interface ApplicationService {
         @Query("user") String user,
         @Query("status") List<String> statusList,
         @Query("tag") List<String> tagList,
-        @Query("type") String type
+        @Query("type") String type,
+        @Query("size") Integer size,
+        @Query("sort") String sort,
+        @Query("page") Integer page
     );
 
     /**

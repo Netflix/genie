@@ -19,6 +19,8 @@ package com.netflix.genie.client;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ClusterService;
+import com.netflix.genie.client.apis.SortAttribute;
+import com.netflix.genie.client.apis.SortDirection;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.common.dto.Cluster;
@@ -29,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -129,6 +132,8 @@ public class ClusterClient {
      * @return A list of clusters.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
+     * @deprecated Use {@link #getClusters(String, List, List, Long, Long, Integer, SortAttribute, SortDirection,
+     * Integer)}
      */
     public List<Cluster> getClusters(
         final String name,
@@ -137,13 +142,56 @@ public class ClusterClient {
         final Long minUpdateTime,
         final Long maxUpdateTime
     ) throws IOException, GenieClientException {
+        return this.getClusters(
+            name,
+            statusList,
+            tagList,
+            minUpdateTime,
+            maxUpdateTime,
+            null,
+            null,
+            null,
+            null
+        );
+    }
+
+    /**
+     * Method to get a list of all the clusters from Genie for the query parameters specified.
+     *
+     * @param name          The name of the cluster.
+     * @param statusList    The list of statuses.
+     * @param tagList       The list of tags.
+     * @param minUpdateTime Minimum Time after which cluster was updated.
+     * @param maxUpdateTime Maximum Time before which cluster was updated.
+     * @param pageSize      The maximum number of results returned
+     * @param sortAttribute The entity attribute used to sort
+     * @param sortDirection The sort direction
+     * @param pageIndex     The page index
+     * @return A list of clusters.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public List<Cluster> getClusters(
+        @Nullable final String name,
+        @Nullable final List<String> statusList,
+        @Nullable final List<String> tagList,
+        @Nullable final Long minUpdateTime,
+        @Nullable final Long maxUpdateTime,
+        @Nullable @Min(1) final Integer pageSize,
+        @Nullable final SortAttribute sortAttribute,
+        @Nullable final SortDirection sortDirection,
+        @Nullable @Min(0) final Integer pageIndex
+    ) throws IOException, GenieClientException {
         return GenieClientUtils.parseSearchResultsResponse(
             this.clusterService.getClusters(
                 name,
                 statusList,
                 tagList,
                 minUpdateTime,
-                maxUpdateTime
+                maxUpdateTime,
+                pageSize,
+                GenieClientUtils.getSortParameter(sortAttribute, sortDirection),
+                pageIndex
             ).execute(),
             "clusterList",
             Cluster.class
