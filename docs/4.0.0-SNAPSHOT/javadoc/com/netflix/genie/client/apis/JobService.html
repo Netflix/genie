@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../com/netflix/genie/client/apis/CommandService.html" title="interface in com.netflix.genie.client.apis"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../com/netflix/genie/client/apis/TokenService.html" title="interface in com.netflix.genie.client.apis"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../com/netflix/genie/client/apis/SortAttribute.html" title="enum in com.netflix.genie.client.apis"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?com/netflix/genie/client/apis/JobService.html" target="_top">Frames</a></li>
@@ -195,7 +195,7 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/JobService.html#getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-">getJobs</a></span>(java.lang.String&nbsp;id,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/JobService.html#getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-java.lang.Integer-java.lang.String-java.lang.Integer-">getJobs</a></span>(java.lang.String&nbsp;id,
        java.lang.String&nbsp;name,
        java.lang.String&nbsp;user,
        java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
@@ -209,7 +209,10 @@ var activeTableTab = "activeTableTab";
        java.lang.Long&nbsp;minFinished,
        java.lang.Long&nbsp;maxFinished,
        java.lang.String&nbsp;grouping,
-       java.lang.String&nbsp;groupingInstance)</code>
+       java.lang.String&nbsp;groupingInstance,
+       java.lang.Integer&nbsp;size,
+       java.lang.String&nbsp;sort,
+       java.lang.Integer&nbsp;page)</code>
 <div class="block">Method to get all jobs from Genie.</div>
 </td>
 </tr>
@@ -315,7 +318,7 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;submitJobWithAttachments(@Part(value="
 </dl>
 </li>
 </ul>
-<a name="getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-">
+<a name="getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-java.lang.Integer-java.lang.String-java.lang.Integer-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -351,7 +354,13 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getJobs(@Quer
                                                                                            @Query(value="grouping")
                                                                                            java.lang.String&nbsp;grouping,
                                                                                            @Query(value="groupingInstance")
-                                                                                           java.lang.String&nbsp;groupingInstance)</pre>
+                                                                                           java.lang.String&nbsp;groupingInstance,
+                                                                                           @Query(value="size")
+                                                                                           java.lang.Integer&nbsp;size,
+                                                                                           @Query(value="sort")
+                                                                                           java.lang.String&nbsp;sort,
+                                                                                           @Query(value="page")
+                                                                                           java.lang.Integer&nbsp;page)</pre>
 <div class="block">Method to get all jobs from Genie.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -370,6 +379,9 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getJobs(@Quer
 <dd><code>maxFinished</code> - The time which the job had to finish before in order to be returned (exclusive)</dd>
 <dd><code>grouping</code> - The grouping the job should be a member of</dd>
 <dd><code>groupingInstance</code> - The grouping instance the job should be a member of</dd>
+<dd><code>size</code> - The maximum number of results in the page</dd>
+<dd><code>sort</code> - The sort order</dd>
+<dd><code>page</code> - The page index</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A callable object.</dd>
 </dl>
@@ -592,7 +604,7 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;killJob(@Path(value="id")
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../com/netflix/genie/client/apis/CommandService.html" title="interface in com.netflix.genie.client.apis"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../com/netflix/genie/client/apis/TokenService.html" title="interface in com.netflix.genie.client.apis"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../com/netflix/genie/client/apis/SortAttribute.html" title="enum in com.netflix.genie.client.apis"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?com/netflix/genie/client/apis/JobService.html" target="_top">Frames</a></li>

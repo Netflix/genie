@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":42,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -155,7 +155,7 @@ extends java.lang.Object</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
@@ -225,107 +225,124 @@ extends java.lang.Object</pre>
            java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
            java.lang.Long&nbsp;minUpdateTime,
            java.lang.Long&nbsp;maxUpdateTime)</code>
-<div class="block">Method to get a list of all the clusters from Genie for the query parameters specified.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
+<div class="block"><span class="deprecationComment">Use <a href="../../../../com/netflix/genie/client/ClusterClient.html#getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-java.lang.Integer-com.netflix.genie.client.apis.SortAttribute-com.netflix.genie.client.apis.SortDirection-java.lang.Integer-"><code>getClusters(String, List, List, Long, Long, Integer, SortAttribute, SortDirection,
+ Integer)</code></a></span></div>
+</div>
 </td>
 </tr>
 <tr id="i10" class="altColor">
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-java.lang.Integer-com.netflix.genie.client.apis.SortAttribute-com.netflix.genie.client.apis.SortDirection-java.lang.Integer-">getClusters</a></span>(java.lang.String&nbsp;name,
+           java.util.List&lt;java.lang.String&gt;&nbsp;statusList,
+           java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
+           java.lang.Long&nbsp;minUpdateTime,
+           java.lang.Long&nbsp;maxUpdateTime,
+           @Min(value=1L) java.lang.Integer&nbsp;pageSize,
+           <a href="../../../../com/netflix/genie/client/apis/SortAttribute.html" title="enum in com.netflix.genie.client.apis">SortAttribute</a>&nbsp;sortAttribute,
+           <a href="../../../../com/netflix/genie/client/apis/SortDirection.html" title="enum in com.netflix.genie.client.apis">SortDirection</a>&nbsp;sortDirection,
+           @Min(value=0L) java.lang.Integer&nbsp;pageIndex)</code>
+<div class="block">Method to get a list of all the clusters from Genie for the query parameters specified.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#getCommandsForCluster-java.lang.String-">getCommandsForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Method to get all the commands for a cluster.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#getConfigsForCluster-java.lang.String-">getConfigsForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Method to get all the configs for a cluster.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#getDependenciesForCluster-java.lang.String-">getDependenciesForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Method to get all the dependency files for an cluster.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#getTagsForCluster-java.lang.String-">getTagsForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Method to get all the tags for a cluster.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#patchCluster-java.lang.String-com.github.fge.jsonpatch.JsonPatch-">patchCluster</a></span>(java.lang.String&nbsp;clusterId,
             com.github.fge.jsonpatch.JsonPatch&nbsp;patch)</code>
 <div class="block">Method to patch a cluster using json patch instructions.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#removeAllCommandsForCluster-java.lang.String-">removeAllCommandsForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Remove all commands for this cluster.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#removeAllConfigsForCluster-java.lang.String-">removeAllConfigsForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Remove all configs for this cluster.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#removeAllDependenciesForCluster-java.lang.String-">removeAllDependenciesForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Remove all dependencies for this cluster.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#removeAllTagsForCluster-java.lang.String-">removeAllTagsForCluster</a></span>(java.lang.String&nbsp;clusterId)</code>
 <div class="block">Remove all tags for this cluster.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#removeCommandFromCluster-java.lang.String-java.lang.String-">removeCommandFromCluster</a></span>(java.lang.String&nbsp;clusterId,
                         java.lang.String&nbsp;commandId)</code>
 <div class="block">Remove a command from a cluster.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#removeTagFromCluster-java.lang.String-java.lang.String-">removeTagFromCluster</a></span>(java.lang.String&nbsp;clusterId,
                     java.lang.String&nbsp;tag)</code>
 <div class="block">Remove a tag from a cluster.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#updateCluster-java.lang.String-com.netflix.genie.common.dto.Cluster-">updateCluster</a></span>(java.lang.String&nbsp;clusterId,
              <a href="../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&nbsp;cluster)</code>
 <div class="block">Method to updated a cluster.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#updateCommandsForCluster-java.lang.String-java.util.List-">updateCommandsForCluster</a></span>(java.lang.String&nbsp;clusterId,
                         java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)</code>
 <div class="block">Method to update commands for a cluster.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#updateConfigsForCluster-java.lang.String-java.util.Set-">updateConfigsForCluster</a></span>(java.lang.String&nbsp;clusterId,
                        java.util.Set&lt;java.lang.String&gt;&nbsp;configs)</code>
 <div class="block">Method to update configs for a cluster.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#updateDependenciesForCluster-java.lang.String-java.util.Set-">updateDependenciesForCluster</a></span>(java.lang.String&nbsp;clusterId,
                             java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)</code>
 <div class="block">Method to update dependencies for a cluster.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/netflix/genie/client/ClusterClient.html#updateTagsForCluster-java.lang.String-java.util.Set-">updateTagsForCluster</a></span>(java.lang.String&nbsp;clusterId,
                     java.util.Set&lt;java.lang.String&gt;&nbsp;tags)</code>
@@ -456,6 +473,8 @@ public&nbsp;ClusterClient(@NotEmpty
                                            java.lang.Long&nbsp;maxUpdateTime)
                                     throws java.io.IOException,
                                            <a href="../../../../com/netflix/genie/client/exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></pre>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <a href="../../../../com/netflix/genie/client/ClusterClient.html#getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-java.lang.Integer-com.netflix.genie.client.apis.SortAttribute-com.netflix.genie.client.apis.SortDirection-java.lang.Integer-"><code>getClusters(String, List, List, Long, Long, Integer, SortAttribute, SortDirection,
+ Integer)</code></a></span></div>
 <div class="block">Method to get a list of all the clusters from Genie for the query parameters specified.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -464,6 +483,52 @@ public&nbsp;ClusterClient(@NotEmpty
 <dd><code>tagList</code> - The list of tags.</dd>
 <dd><code>minUpdateTime</code> - Minimum Time after which cluster was updated.</dd>
 <dd><code>maxUpdateTime</code> - Maximum Time before which cluster was updated.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A list of clusters.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../com/netflix/genie/client/exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></code> - If the response received is not 2xx.</dd>
+<dd><code>java.io.IOException</code> - For Network and other IO issues.</dd>
+</dl>
+</li>
+</ul>
+<a name="getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-java.lang.Integer-com.netflix.genie.client.apis.SortAttribute-com.netflix.genie.client.apis.SortDirection-java.lang.Integer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getClusters</h4>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&nbsp;getClusters(@Nullable
+                                           java.lang.String&nbsp;name,
+                                           @Nullable
+                                           java.util.List&lt;java.lang.String&gt;&nbsp;statusList,
+                                           @Nullable
+                                           java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
+                                           @Nullable
+                                           java.lang.Long&nbsp;minUpdateTime,
+                                           @Nullable
+                                           java.lang.Long&nbsp;maxUpdateTime,
+                                           @Nullable @Min(value=1L)
+                                           @Min(value=1L) java.lang.Integer&nbsp;pageSize,
+                                           @Nullable
+                                           <a href="../../../../com/netflix/genie/client/apis/SortAttribute.html" title="enum in com.netflix.genie.client.apis">SortAttribute</a>&nbsp;sortAttribute,
+                                           @Nullable
+                                           <a href="../../../../com/netflix/genie/client/apis/SortDirection.html" title="enum in com.netflix.genie.client.apis">SortDirection</a>&nbsp;sortDirection,
+                                           @Nullable @Min(value=0L)
+                                           @Min(value=0L) java.lang.Integer&nbsp;pageIndex)
+                                    throws java.io.IOException,
+                                           <a href="../../../../com/netflix/genie/client/exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></pre>
+<div class="block">Method to get a list of all the clusters from Genie for the query parameters specified.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - The name of the cluster.</dd>
+<dd><code>statusList</code> - The list of statuses.</dd>
+<dd><code>tagList</code> - The list of tags.</dd>
+<dd><code>minUpdateTime</code> - Minimum Time after which cluster was updated.</dd>
+<dd><code>maxUpdateTime</code> - Maximum Time before which cluster was updated.</dd>
+<dd><code>pageSize</code> - The maximum number of results returned</dd>
+<dd><code>sortAttribute</code> - The entity attribute used to sort</dd>
+<dd><code>sortDirection</code> - The sort direction</dd>
+<dd><code>pageIndex</code> - The page index</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A list of clusters.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>

@@ -198,11 +198,14 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/ClusterService.html#getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-">getClusters</a></span>(java.lang.String&nbsp;name,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/ClusterService.html#getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-java.lang.Integer-java.lang.String-java.lang.Integer-">getClusters</a></span>(java.lang.String&nbsp;name,
            java.util.List&lt;java.lang.String&gt;&nbsp;statusList,
            java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
            java.lang.Long&nbsp;minUpdateTime,
-           java.lang.Long&nbsp;maxUpdateTime)</code>
+           java.lang.Long&nbsp;maxUpdateTime,
+           java.lang.Integer&nbsp;size,
+           java.lang.String&nbsp;sort,
+           java.lang.Integer&nbsp;page)</code>
 <div class="block">Method to get clusters from Genie based on filters specified.</div>
 </td>
 </tr>
@@ -386,7 +389,7 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;updateCluster(@Path(value="id")
 </dl>
 </li>
 </ul>
-<a name="getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-">
+<a name="getClusters-java.lang.String-java.util.List-java.util.List-java.lang.Long-java.lang.Long-java.lang.Integer-java.lang.String-java.lang.Integer-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -402,7 +405,13 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getClusters(@
                                                                                                    @Query(value="minUpdateTime")
                                                                                                    java.lang.Long&nbsp;minUpdateTime,
                                                                                                    @Query(value="maxUpdateTime")
-                                                                                                   java.lang.Long&nbsp;maxUpdateTime)</pre>
+                                                                                                   java.lang.Long&nbsp;maxUpdateTime,
+                                                                                                   @Query(value="size")
+                                                                                                   java.lang.Integer&nbsp;size,
+                                                                                                   @Query(value="sort")
+                                                                                                   java.lang.String&nbsp;sort,
+                                                                                                   @Query(value="page")
+                                                                                                   java.lang.Integer&nbsp;page)</pre>
 <div class="block">Method to get clusters from Genie based on filters specified.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -411,6 +420,9 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getClusters(@
 <dd><code>tagList</code> - The list of tags.</dd>
 <dd><code>minUpdateTime</code> - Minimum Time after which cluster was updated.</dd>
 <dd><code>maxUpdateTime</code> - Maximum Time before which cluster was updated.</dd>
+<dd><code>size</code> - The maximum number of results in the page</dd>
+<dd><code>sort</code> - The sort order</dd>
+<dd><code>page</code> - The page index</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A callable object.</dd>
 </dl>

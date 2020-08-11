@@ -191,11 +191,14 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/ApplicationService.html#getApplications-java.lang.String-java.lang.String-java.util.List-java.util.List-java.lang.String-">getApplications</a></span>(java.lang.String&nbsp;name,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/ApplicationService.html#getApplications-java.lang.String-java.lang.String-java.util.List-java.util.List-java.lang.String-java.lang.Integer-java.lang.String-java.lang.Integer-">getApplications</a></span>(java.lang.String&nbsp;name,
                java.lang.String&nbsp;user,
                java.util.List&lt;java.lang.String&gt;&nbsp;statusList,
                java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
-               java.lang.String&nbsp;type)</code>
+               java.lang.String&nbsp;type,
+               java.lang.Integer&nbsp;size,
+               java.lang.String&nbsp;sort,
+               java.lang.Integer&nbsp;page)</code>
 <div class="block">Method to get all applications from Genie.</div>
 </td>
 </tr>
@@ -359,7 +362,7 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;updateApplication(@Path(value="id")
 </dl>
 </li>
 </ul>
-<a name="getApplications-java.lang.String-java.lang.String-java.util.List-java.util.List-java.lang.String-">
+<a name="getApplications-java.lang.String-java.lang.String-java.util.List-java.util.List-java.lang.String-java.lang.Integer-java.lang.String-java.lang.Integer-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -375,7 +378,13 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getApplicatio
                                                                                                            @Query(value="tag")
                                                                                                            java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
                                                                                                            @Query(value="type")
-                                                                                                           java.lang.String&nbsp;type)</pre>
+                                                                                                           java.lang.String&nbsp;type,
+                                                                                                           @Query(value="size")
+                                                                                                           java.lang.Integer&nbsp;size,
+                                                                                                           @Query(value="sort")
+                                                                                                           java.lang.String&nbsp;sort,
+                                                                                                           @Query(value="page")
+                                                                                                           java.lang.Integer&nbsp;page)</pre>
 <div class="block">Method to get all applications from Genie.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -384,6 +393,9 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getApplicatio
 <dd><code>statusList</code> - The list of Command statuses.</dd>
 <dd><code>tagList</code> - The list of tags.</dd>
 <dd><code>type</code> - The type of the application.</dd>
+<dd><code>size</code> - The maximum number of results in the page</dd>
+<dd><code>sort</code> - The sort order</dd>
+<dd><code>page</code> - The page index</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A callable object.</dd>
 </dl>

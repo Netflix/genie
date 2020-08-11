@@ -210,10 +210,13 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/CommandService.html#getCommands-java.lang.String-java.lang.String-java.util.List-java.util.List-">getCommands</a></span>(java.lang.String&nbsp;name,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/client/apis/CommandService.html#getCommands-java.lang.String-java.lang.String-java.util.List-java.util.List-java.lang.Integer-java.lang.String-java.lang.Integer-">getCommands</a></span>(java.lang.String&nbsp;name,
            java.lang.String&nbsp;user,
            java.util.List&lt;java.lang.String&gt;&nbsp;statusList,
-           java.util.List&lt;java.lang.String&gt;&nbsp;tagList)</code>
+           java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
+           java.lang.Integer&nbsp;size,
+           java.lang.String&nbsp;sort,
+           java.lang.Integer&nbsp;page)</code>
 <div class="block">Method to get all commands from Genie filtered based on query params.</div>
 </td>
 </tr>
@@ -391,7 +394,7 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;updateCommand(@Path(value="id")
 </dl>
 </li>
 </ul>
-<a name="getCommands-java.lang.String-java.lang.String-java.util.List-java.util.List-">
+<a name="getCommands-java.lang.String-java.lang.String-java.util.List-java.util.List-java.lang.Integer-java.lang.String-java.lang.Integer-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -405,7 +408,13 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getCommands(@
                                                                                                    @Query(value="status")
                                                                                                    java.util.List&lt;java.lang.String&gt;&nbsp;statusList,
                                                                                                    @Query(value="tag")
-                                                                                                   java.util.List&lt;java.lang.String&gt;&nbsp;tagList)</pre>
+                                                                                                   java.util.List&lt;java.lang.String&gt;&nbsp;tagList,
+                                                                                                   @Query(value="size")
+                                                                                                   java.lang.Integer&nbsp;size,
+                                                                                                   @Query(value="sort")
+                                                                                                   java.lang.String&nbsp;sort,
+                                                                                                   @Query(value="page")
+                                                                                                   java.lang.Integer&nbsp;page)</pre>
 <div class="block">Method to get all commands from Genie filtered based on query params.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -413,6 +422,9 @@ retrofit2.Call&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getCommands(@
 <dd><code>user</code> - The user who created the command.</dd>
 <dd><code>statusList</code> - The list of Command statuses.</dd>
 <dd><code>tagList</code> - The list of tags.</dd>
+<dd><code>size</code> - The maximum number of results in the page</dd>
+<dd><code>sort</code> - The sort order</dd>
+<dd><code>page</code> - The page index</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A callable object.</dd>
 </dl>
