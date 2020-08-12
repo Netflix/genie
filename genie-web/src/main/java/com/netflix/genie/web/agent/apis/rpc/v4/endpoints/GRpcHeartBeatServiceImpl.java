@@ -92,7 +92,9 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
                 final String streamId = agentStreamRecordEntry.getKey();
                 final AgentStreamRecord agentStreamRecord = agentStreamRecordEntry.getValue();
                 if (agentStreamRecord.hasJobId()) {
-                    this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
+                    final String jobId = agentStreamRecord.getJobId();
+                    log.debug("Unregistering stream of job: {} (stream id: {})", jobId, streamId);
+                    this.agentConnectionTrackingService.notifyDisconnected(streamId, jobId);
                 }
             }
             for (final AgentStreamRecord agentStreamRecord : activeStreamsMap.values()) {

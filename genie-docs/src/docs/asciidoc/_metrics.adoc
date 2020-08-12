@@ -17,6 +17,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentRoutingServiceCuratorDiscoveryImpl
 |-
 
+|genie.agents.connections.lookup.timer
+|Timing and count of lookup in Curator's discovery service
+|nanoseconds
+|AgentRoutingServiceCuratorDiscoveryImpl
+|status, exceptionClass, found
+
 |genie.agents.connections.registered.gauge
 |Number of agents connected to the node and registered in discovery
 |count
@@ -31,13 +37,13 @@ It will have to be added if one is desired otherwise metrics are just published 
 
 |genie.agents.connections.registered.timer
 |Timing and count of registrations of local agent with discovery service
-|count
+|nanoseconds
 |AgentRoutingServiceCuratorDiscoveryImpl
 |status, exceptionClass
 
 |genie.agents.connections.unregistered.timer
 |Timing and count of unregistrations of local agent with discovery service
-|count
+|nanoseconds
 |AgentRoutingServiceCuratorDiscoveryImpl
 |status, exceptionClass
 

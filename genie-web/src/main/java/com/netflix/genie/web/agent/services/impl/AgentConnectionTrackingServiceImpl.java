@@ -134,6 +134,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
             jobStreamsRecord.removeActiveStream(streamId);
 
             if (!jobStreamsRecord.hasActiveStreams()) {
+                log.debug("Job {} last stream disconnected, notifying routing service", claimedJobId);
                 this.jobStreamRecordsMap.remove(claimedJobId);
                 this.agentRoutingService.handleClientDisconnected(claimedJobId);
             }
@@ -172,6 +173,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
 
         // Notify routing service
         for (final String jobId : removedJobIds) {
+            log.debug("Job {} last stream expired, notifying routing service", jobId);
             this.agentRoutingService.handleClientDisconnected(jobId);
         }
     }

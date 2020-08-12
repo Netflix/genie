@@ -68,7 +68,9 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
     private static final String AGENT_REFRESH_TIMER_NAME = METRICS_PREFIX + "refreshed.timer";
     private static final String AGENT_CONNECTED_COUNTER_NAME = METRICS_PREFIX + "connected.counter";
     private static final String AGENT_DISCONNECTED_COUNTER_NAME = METRICS_PREFIX + "disconnected.counter";
+    private static final String AGENT_LOOKUP_TIMER_NAME = METRICS_PREFIX + "lookup.timer";
     private static final String ZK_CONNECTION_STATE_TAG_NAME = "connectionState";
+    private static final String ROUTE_FOUND_TAG_NAME = "found";
     private static final Set<Tag> EMPTY_TAG_SET = ImmutableSet.of();
     private final String localHostname;
     private final ServiceDiscovery<Agent> serviceDiscovery;
@@ -166,6 +168,8 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
                     null
                 );
 
+                log.debug("Registering route for job: {}", jobId);
+
                 Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
                 final long start = System.nanoTime();
                 try {
@@ -190,6 +194,8 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
 
                 final String jobId = entry.getKey();
                 final ServiceInstance<Agent> serviceInstance = entry.getValue();
+
+                log.debug("Unregistering route for job: {}", jobId);
 
                 Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
                 final long start = System.nanoTime();
@@ -216,6 +222,8 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
 
                 final String jobId = entry.getKey();
                 final ServiceInstance<Agent> serviceInstance = entry.getValue();
+
+                log.debug("Updating route for job: {}", jobId);
 
                 Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
                 final long start = System.nanoTime();
@@ -261,7 +269,11 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
         ).increment();
 
         // Add to connected set
-        this.connectedAgentsSet.add(jobId);
+        final boolean isNew = this.connectedAgentsSet.add(jobId);
+
+        if (isNew) {
+            log.debug("New agent connected, job: {} (not yet registered)", jobId);
+        }
     }
 
     /**
@@ -275,7 +287,11 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
         ).increment();
 
         // Remove from connected set
-        this.connectedAgentsSet.remove(jobId);
+        final boolean removed = this.connectedAgentsSet.remove(jobId);
+
+        if (removed) {
+            log.debug("Known agent disconnected, job: {} (not yet unregistered)", jobId);
+        }
     }
 
     /**
@@ -288,20 +304,31 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
             return Optional.of(localHostname);
         }
 
-        final ServiceInstance<Agent> instance;
+        final long start = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        String address = null;
+
         try {
-            instance = serviceDiscovery.queryForInstance(SERVICE_NAME, jobId);
+            final ServiceInstance<Agent> instance = serviceDiscovery.queryForInstance(SERVICE_NAME, jobId);
+            if (instance == null) {
+                log.debug("Could not find agent connection for job {}", jobId);
+            } else {
+                address = instance.getAddress();
+            }
+            MetricsUtils.addSuccessTags(tags);
         } catch (Exception e) {
             log.error("Error looking up agent connection for job {}", jobId, e);
-            return Optional.empty();
+            address = null;
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            tags.add(Tag.of(ROUTE_FOUND_TAG_NAME, String.valueOf(address != null)));
+            this.registry.timer(
+                AGENT_LOOKUP_TIMER_NAME,
+                tags
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
 
-        if (instance == null) {
-            log.debug("Could not find agent connection for job {}", jobId);
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(instance.getAddress());
+        return Optional.ofNullable(address);
     }
 
     /**
