@@ -416,6 +416,8 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
         agentRoutingService.isAgentConnected(jobId3)
 
         then:
+        3 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
+        3 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId1) >> null
         1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId2) >> null
         1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId3) >> null
@@ -452,12 +454,14 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
         String hostnameJob3 = agentRoutingService.getHostnameForAgentConnection(jobId3).orElse(null)
 
         then:
+        3 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
         1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId1) >> serviceInstanceJob1
         1 * serviceInstanceJob1.getAddress() >> remoteHostname
         1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId2) >> null
         1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId3) >> {
             throw new RuntimeException("...")
         }
+        3 * timer.record(_, TimeUnit.NANOSECONDS)
         hostnameJob1 == remoteHostname
         hostnameJob2 == null
         hostnameJob3 == null
