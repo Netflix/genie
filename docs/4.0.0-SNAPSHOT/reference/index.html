@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-08-11</span>
+<span id="revdate">2020-08-12</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1411,14 +1411,14 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 2.2.5.RELEASE</p>
+<p>Upgrade Spring Boot to 2.3.2.RELEASE</p>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Hoxton.SR3 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Hoxton.SR7 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR3/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR7/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1711,7 +1711,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -4489,7 +4489,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -4506,7 +4506,7 @@ docs for an example of how to do this.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4514,7 +4514,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -4774,7 +4774,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR3/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR7/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5578,7 +5578,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">10.1.2. Spring Properties</a></h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -5720,7 +5720,7 @@ returned</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.3.2.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
@@ -6104,6 +6104,13 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.lookup.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timing and count of lookup in Curator&#8217;s discovery service</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, found</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.registered.gauge</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of agents connected to the node and registered in discovery</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6120,14 +6127,14 @@ It will have to be added if one is desired otherwise metrics are just published 
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.registered.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Timing and count of registrations of local agent with discovery service</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.unregistered.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Timing and count of unregistrations of local agent with discovery service</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
@@ -6860,7 +6867,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-08-11 23:06:35 UTC
+Last updated 2020-08-12 06:24:46 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
