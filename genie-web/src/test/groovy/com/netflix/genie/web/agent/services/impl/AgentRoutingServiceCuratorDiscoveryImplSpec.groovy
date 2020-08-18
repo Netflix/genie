@@ -21,9 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.agent.services.AgentRoutingService
+import com.netflix.genie.web.properties.AgentRoutingServiceProperties
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Timer
 import org.apache.curator.framework.CuratorFramework
 import org.apache.curator.framework.listen.Listenable
@@ -31,15 +31,14 @@ import org.apache.curator.framework.state.ConnectionState
 import org.apache.curator.framework.state.ConnectionStateListener
 import org.apache.curator.x.discovery.ServiceDiscovery
 import org.apache.curator.x.discovery.ServiceInstance
-import org.apache.curator.x.discovery.ServiceType
 import org.apache.zookeeper.KeeperException
 import org.springframework.scheduling.TaskScheduler
-import org.springframework.scheduling.Trigger
 import spock.lang.Specification
 
 import java.time.Instant
+import java.util.concurrent.PriorityBlockingQueue
 import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.ThreadFactory
 
 class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
     GenieHostInfo genieHostInfo
@@ -51,6 +50,10 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
     String localHostname
     Counter counter
     Timer timer
+    ThreadFactory threadFactory
+    CuratorFramework curatorClient
+    AgentRoutingServiceProperties serviceProperties = new AgentRoutingServiceProperties()
+    Thread registrationThread
 
     void setup() {
         this.genieHostInfo = Mock(GenieHostInfo)
@@ -62,6 +65,452 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
         this.localHostname = UUID.randomUUID().toString()
         this.counter = Mock(Counter)
         this.timer = Mock(Timer)
+        this.threadFactory = Mock(ThreadFactory)
+        this.curatorClient = Mock(CuratorFramework)
+        this.registrationThread = Mock(Thread)
+    }
+
+    def "Handle Zookeeper connection state changes"() {
+        setup:
+        Thread t1 = Mock(Thread)
+        Thread t2 = Mock(Thread)
+        ConnectionStateListener listener
+
+        when:
+        new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableConnectionState,
+            meterRegistry,
+            serviceProperties,
+            threadFactory
+        )
+
+        then:
+        1 * genieHostInfo.getHostname() >> this.localHostname
+        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
+            ConnectionStateListener l ->
+                listener = l;
+        }
+        1 * threadFactory.newThread(_ as Runnable) >> registrationThread
+        listener != null
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.CONNECTED)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        1 * registrationThread.interrupt()
+        1 * threadFactory.newThread(_) >> t1
+        1 * t1.start()
+        0 * curatorClient._
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.SUSPENDED)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        1 * t1.interrupt()
+        0 * curatorClient._
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.LOST)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        0 * t1._
+        0 * curatorClient._
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.CONNECTED)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        1 * threadFactory.newThread(_) >> t2
+        1 * t2.start()
+        0 * curatorClient._
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.LOST)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        1 * t2.interrupt()
+        0 * curatorClient._
+    }
+
+    def "Handle agent connections when not connected to Zookeeper"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        ConnectionStateListener listener
+
+        when:
+        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableConnectionState,
+            meterRegistry,
+            serviceProperties,
+            threadFactory
+        )
+
+        then:
+        1 * genieHostInfo.getHostname() >> this.localHostname
+        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
+            ConnectionStateListener l ->
+                listener = l
+        }
+        1 * threadFactory.newThread(_ as Runnable) >> registrationThread
+        listener != null
+
+        when:
+        agentRoutingService.handleClientConnected(jobId)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME) >> counter
+        agentRoutingService.isAgentConnectionLocal(jobId)
+        agentRoutingService.isAgentConnected(jobId)
+        agentRoutingService.getHostnameForAgentConnection(jobId).get() == localHostname
+
+
+    }
+
+    def "Lookups"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        Optional<String> hostname
+        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstance = Mock(ServiceInstance)
+
+        when:
+        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableConnectionState,
+            meterRegistry,
+            serviceProperties,
+            threadFactory
+        )
+
+        then:
+        1 * genieHostInfo.getHostname() >> this.localHostname
+        1 * listenableConnectionState.addListener(_ as ConnectionStateListener)
+        1 * threadFactory.newThread(_ as Runnable) >> registrationThread
+
+        when:
+        hostname = agentRoutingService.getHostnameForAgentConnection(jobId)
+
+        then:
+        1 * serviceDiscovery.queryForInstance(_, jobId) >> serviceInstance
+        1 * serviceInstance.getAddress() >> "xyz.genie.com"
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
+        hostname.orElse(null) == "xyz.genie.com"
+
+        when:
+        hostname = agentRoutingService.getHostnameForAgentConnection(jobId)
+
+        then:
+        1 * serviceDiscovery.queryForInstance(_, jobId) >> null
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
+        !hostname.isPresent()
+
+        when:
+        hostname = agentRoutingService.getHostnameForAgentConnection(jobId)
+
+        then:
+        1 * serviceDiscovery.queryForInstance(_, jobId) >> { throw new KeeperException.SessionMovedException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
+        !hostname.isPresent()
+    }
+
+    def "Expected connection lifecycle without errors"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        Runnable refreshTask
+        ConnectionStateListener listener
+        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstance
+
+        when:
+        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableConnectionState,
+            meterRegistry,
+            serviceProperties,
+            threadFactory
+        )
+
+        then:
+        1 * genieHostInfo.getHostname() >> this.localHostname
+        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
+            ConnectionStateListener l ->
+                listener = l
+        }
+        1 * threadFactory.newThread(_ as Runnable) >> registrationThread
+        listener != null
+
+        when:
+        agentRoutingService.handleClientConnected(jobId)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME) >> counter
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then:
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                refreshTask = r
+                return null
+        }
+        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
+            ServiceInstance si ->
+                serviceInstance = si
+        }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        refreshTask != null
+        serviceInstance != null
+        serviceInstance.getAddress() == localHostname
+        serviceInstance.getId() == jobId
+
+        when:
+        refreshTask.run()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then:
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant)
+        1 * serviceDiscovery.updateService(serviceInstance)
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
+
+        when:
+        agentRoutingService.handleClientDisconnected(jobId)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_DISCONNECTED_COUNTER_NAME) >> counter
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then:
+        1 * serviceDiscovery.unregisterService(serviceInstance)
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
+    }
+
+
+    def "Registration errors"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        Runnable refreshTask
+
+        when:
+        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableConnectionState,
+            meterRegistry,
+            serviceProperties,
+            threadFactory
+        )
+
+        then:
+        1 * genieHostInfo.getHostname() >> this.localHostname
+        1 * listenableConnectionState.addListener(_ as ConnectionStateListener)
+        1 * threadFactory.newThread(_ as Runnable) >> registrationThread
+
+        when: "Agent connects"
+        agentRoutingService.handleClientConnected(jobId)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME) >> counter
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Registration is attempted, but thread is interrupted, mutation is back in the queue"
+        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> { throw new InterruptedException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        thrown(InterruptedException)
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Registration is attempted again, error is encountered. Registration is scheduled for refresh"
+        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> { throw new RuntimeException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                refreshTask = r
+                return null
+        }
+
+        when:
+        refreshTask.run()
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Registration refresh is attempted, but service was never registered"
+        1 * serviceDiscovery.registerService(_ as ServiceInstance)
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                refreshTask = r
+                return null
+        }
+
+        when:
+        refreshTask.run()
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Registration refresh is attempted, but node does not exist"
+        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> { throw new KeeperException.NoNodeException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
+        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> { throw new RuntimeException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                refreshTask = r
+                return null
+        }
+
+        when:
+        refreshTask.run()
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Registration refresh is attempted, but thread is interrupted, mutation goes back in queue"
+        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> { throw new InterruptedException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
+        thrown(InterruptedException)
+
+        when:
+        refreshTask.run()
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Registration refresh is attempted, but node does not exist"
+        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> { throw new RuntimeException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
+            Runnable r, Instant i ->
+                refreshTask = r
+                return null
+        }
+
+        when:
+        refreshTask.run()
+        agentRoutingService.handleClientDisconnected(jobId)
+
+        then: "Disconnection and refresh are queued, the former is processed first"
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_DISCONNECTED_COUNTER_NAME) >> counter
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Unregistration is attempted, but thread is interrupted"
+        1 * serviceDiscovery.unregisterService(_ as ServiceInstance) >> { throw new InterruptedException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
+        thrown(InterruptedException)
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Unregistration is attempted, but an error is encountered"
+        1 * serviceDiscovery.unregisterService(_ as ServiceInstance) >> { throw new RuntimeException() }
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Unregistration is attempted, but an error is encountered"
+        1 * serviceDiscovery.unregisterService(_ as ServiceInstance)
+        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
+
+        when:
+        agentRoutingService.processNextRegistrationMutation()
+
+        then: "Previous refresh does nothing"
+        0 * serviceDiscovery._
+        0 * taskScheduler.schedule(_, _)
+    }
+
+    def "???"() {
+        ConnectionStateListener listener
+        when:
+        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableConnectionState,
+            meterRegistry,
+            serviceProperties,
+            threadFactory
+        )
+
+        then:
+        1 * genieHostInfo.getHostname() >> this.localHostname
+        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
+            ConnectionStateListener l ->
+                listener = l
+        }
+        1 * threadFactory.newThread(_ as Runnable) >> registrationThread
+        listener != null
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.CONNECTED)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        1 * threadFactory.newThread(_ as Runnable ) >> new Thread(
+            {
+                println("running")
+            }
+        )
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.SUSPENDED)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.RECONNECTED)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+        1 * threadFactory.newThread(_ as Runnable ) >> new Thread(
+            {
+                println("running")
+            }
+        )
+
+        when:
+        listener.stateChanged(curatorClient, ConnectionState.LOST)
+
+        then:
+        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
+
+    }
+
+    def "Mutations order prioritizes creation and deletions"() {
+
+        Queue<AgentRoutingServiceCuratorDiscoveryImpl.RegisterMutation> queue = new PriorityBlockingQueue<>()
+        queue.add(AgentRoutingServiceCuratorDiscoveryImpl.RegisterMutation.update("j1"),)
+        queue.add(AgentRoutingServiceCuratorDiscoveryImpl.RegisterMutation.refresh("j2"),)
+        queue.add(AgentRoutingServiceCuratorDiscoveryImpl.RegisterMutation.update("j3"),)
+        queue.add(AgentRoutingServiceCuratorDiscoveryImpl.RegisterMutation.refresh("j4"))
+
+        expect:
+        queue.take().getJobId() == "j1"
+        queue.take().getJobId() == "j3"
+        queue.take().getJobId() == "j2"
+        queue.take().getJobId() == "j4"
     }
 
     def "Agent service instance POJO can serialize and deserialize"() {
@@ -80,476 +529,5 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
 
         then:
         agent == agent2
-    }
-
-    def "Connect and disconnect without errors"() {
-        setup:
-        String jobId1 = UUID.randomUUID().toString()
-        String jobId2 = UUID.randomUUID().toString()
-
-        ConnectionStateListener listener
-        Runnable reconciliationTask
-        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstanceJob1
-        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstanceJob2
-
-        when:
-        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
-            genieHostInfo,
-            serviceDiscovery,
-            taskScheduler,
-            listenableConnectionState,
-            meterRegistry
-        )
-
-        then:
-        1 * genieHostInfo.getHostname() >> localHostname
-        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
-            args ->
-                listener = args[0] as ConnectionStateListener
-        }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                reconciliationTask = args[0] as Runnable
-                return scheduledFuture
-        }
-        1 * meterRegistry.gauge(AgentRoutingServiceCuratorDiscoveryImpl.CONNECTED_AGENTS_GAUGE_NAME, _, _, _)
-        1 * meterRegistry.gaugeMapSize(AgentRoutingServiceCuratorDiscoveryImpl.REGISTERED_AGENTS_GAUGE_NAME, _, _)
-        listener != null
-        reconciliationTask != null
-
-        when:
-        agentRoutingService.handleClientConnected(jobId1)
-        agentRoutingService.handleClientConnected(jobId2)
-        agentRoutingService.handleClientDisconnected(jobId2)
-
-        then:
-        2 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME, _) >> counter
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_DISCONNECTED_COUNTER_NAME, _) >> counter
-        3 * counter.increment()
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            args ->
-                serviceInstanceJob1 = args[0] as ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent>
-                return
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        serviceInstanceJob1 != null
-        serviceInstanceJob1.getServiceType() == ServiceType.DYNAMIC
-        serviceInstanceJob1.getId() == jobId1
-        serviceInstanceJob1.getAddress() == localHostname
-        serviceInstanceJob1.getPayload().getJobId() == jobId1
-        serviceInstanceJob1.getName() == AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME
-        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
-            args ->
-                assert serviceInstanceJob1 == args[0]
-                return
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-
-        when:
-        agentRoutingService.handleClientDisconnected(jobId1)
-        agentRoutingService.handleClientConnected(jobId2)
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME, _) >> counter
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_DISCONNECTED_COUNTER_NAME, _) >> counter
-        2 * counter.increment()
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            args ->
-                serviceInstanceJob2 = args[0] as ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent>
-                return
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        1 * serviceDiscovery.unregisterService(serviceInstanceJob1)
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        serviceInstanceJob2 != null
-        serviceInstanceJob2.getServiceType() == ServiceType.DYNAMIC
-        serviceInstanceJob2.getId() == jobId2
-        serviceInstanceJob2.getAddress() == localHostname
-        serviceInstanceJob2.getPayload().getJobId() == jobId2
-        serviceInstanceJob2.getName() == AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME
-        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
-            args ->
-                assert serviceInstanceJob2 == args[0]
-                return
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-    }
-
-
-    def "Registration and un-registration errors"() {
-        setup:
-        String jobId = UUID.randomUUID().toString()
-
-        ConnectionStateListener listener
-        Runnable reconciliationTask
-        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstanceJob
-
-        when:
-        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
-            genieHostInfo,
-            serviceDiscovery,
-            taskScheduler,
-            listenableConnectionState,
-            meterRegistry
-        )
-
-        then:
-        1 * genieHostInfo.getHostname() >> localHostname
-        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
-            args ->
-                listener = args[0] as ConnectionStateListener
-        }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                reconciliationTask = args[0] as Runnable
-                return scheduledFuture
-        }
-        1 * meterRegistry.gauge(AgentRoutingServiceCuratorDiscoveryImpl.CONNECTED_AGENTS_GAUGE_NAME, _, _, _)
-        1 * meterRegistry.gaugeMapSize(AgentRoutingServiceCuratorDiscoveryImpl.REGISTERED_AGENTS_GAUGE_NAME, _, _)
-        listener != null
-        reconciliationTask != null
-
-        when:
-        agentRoutingService.handleClientConnected(jobId)
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME, _) >> counter
-        1 * counter.increment()
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            throw new RuntimeException("...")
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        0 * serviceDiscovery.updateService(_ as ServiceInstance)
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            args ->
-                serviceInstanceJob = args[0] as ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent>
-                return
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        serviceInstanceJob != null
-        1 * serviceDiscovery.updateService(_)
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        0 * serviceDiscovery.registerService(_ as ServiceInstance)
-        0 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
-            throw new KeeperException.NoNodeException("...")
-        }
-        1 * serviceDiscovery.registerService(_ as ServiceInstance)
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        0 * serviceDiscovery.registerService(_ as ServiceInstance)
-        0 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
-            throw new KeeperException.NoNodeException("...")
-        }
-        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            throw new RuntimeException("...")
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        0 * serviceDiscovery.registerService(_ as ServiceInstance)
-        0 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * serviceDiscovery.updateService(_ as ServiceInstance) >> {
-            throw new RuntimeException("...")
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REFRESH_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-
-        when:
-        agentRoutingService.handleClientDisconnected(jobId)
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_DISCONNECTED_COUNTER_NAME, _) >> counter
-        1 * counter.increment()
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        1 * serviceDiscovery.unregisterService(serviceInstanceJob) >> {
-            throw new RuntimeException("...")
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        0 * serviceDiscovery.updateService(_ as ServiceInstance)
-
-        when:
-        reconciliationTask.run()
-
-        then:
-        1 * serviceDiscovery.unregisterService(serviceInstanceJob)
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_UNREGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        0 * serviceDiscovery.updateService(_)
-    }
-
-    def "Query locally connected agents"() {
-        setup:
-        String jobId1 = UUID.randomUUID().toString() // Connected locally and registered
-        String jobId2 = UUID.randomUUID().toString() // Connected locally and failed registration
-        String jobId3 = UUID.randomUUID().toString() // Connected locally and not registered yet
-
-        ConnectionStateListener listener
-        Runnable reconciliationTask
-
-        when:
-        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
-            genieHostInfo,
-            serviceDiscovery,
-            taskScheduler,
-            listenableConnectionState,
-            meterRegistry
-        )
-
-        then:
-        1 * genieHostInfo.getHostname() >> localHostname
-        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
-            args ->
-                listener = args[0] as ConnectionStateListener
-        }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                reconciliationTask = args[0] as Runnable
-                return scheduledFuture
-        }
-        1 * meterRegistry.gauge(AgentRoutingServiceCuratorDiscoveryImpl.CONNECTED_AGENTS_GAUGE_NAME, _, _, _)
-        1 * meterRegistry.gaugeMapSize(AgentRoutingServiceCuratorDiscoveryImpl.REGISTERED_AGENTS_GAUGE_NAME, _, _)
-        listener != null
-        reconciliationTask != null
-
-        when:
-        agentRoutingService.handleClientConnected(jobId1)
-        agentRoutingService.handleClientConnected(jobId2)
-        reconciliationTask.run()
-
-        then:
-        2 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME, _) >> counter
-        2 * counter.increment()
-        2 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            args ->
-                ServiceInstance serviceInstanceJob = args[0] as ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent>
-                if (jobId2 == serviceInstanceJob.getId()) {
-                    throw new RuntimeException("...")
-                }
-                return
-        }
-        2 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        2 * timer.record(_, TimeUnit.NANOSECONDS)
-
-
-        when:
-        agentRoutingService.handleClientConnected(jobId3)
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME, _) >> counter
-        1 * counter.increment()
-
-        agentRoutingService.isAgentConnected(jobId1)
-        agentRoutingService.isAgentConnected(jobId2)
-        agentRoutingService.isAgentConnected(jobId3)
-        agentRoutingService.isAgentConnectionLocal(jobId1)
-        agentRoutingService.isAgentConnectionLocal(jobId2)
-        agentRoutingService.isAgentConnectionLocal(jobId3)
-        agentRoutingService.getHostnameForAgentConnection(jobId1).orElse(null) == localHostname
-        agentRoutingService.getHostnameForAgentConnection(jobId2).orElse(null) == localHostname
-        agentRoutingService.getHostnameForAgentConnection(jobId3).orElse(null) == localHostname
-
-        when:
-        agentRoutingService.handleClientDisconnected(jobId1)
-        agentRoutingService.handleClientDisconnected(jobId2)
-        agentRoutingService.handleClientDisconnected(jobId3)
-
-        then:
-        3 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_DISCONNECTED_COUNTER_NAME, _) >> counter
-        3 * counter.increment()
-
-        !agentRoutingService.isAgentConnectionLocal(jobId1)
-        !agentRoutingService.isAgentConnectionLocal(jobId2)
-        !agentRoutingService.isAgentConnectionLocal(jobId3)
-
-        when:
-        agentRoutingService.isAgentConnected(jobId1)
-        agentRoutingService.isAgentConnected(jobId2)
-        agentRoutingService.isAgentConnected(jobId3)
-
-        then:
-        3 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
-        3 * timer.record(_, TimeUnit.NANOSECONDS)
-        1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId1) >> null
-        1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId2) >> null
-        1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId3) >> null
-    }
-
-    def "Query remote connected agents"() {
-        setup:
-        String remoteHostname = UUID.randomUUID().toString()
-        String jobId1 = UUID.randomUUID().toString() // Connected to remote node
-        String jobId2 = UUID.randomUUID().toString() // Not connected
-        String jobId3 = UUID.randomUUID().toString() // Throw error during lookup
-
-        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstanceJob1 = Mock(ServiceInstance)
-
-        when:
-        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
-            genieHostInfo,
-            serviceDiscovery,
-            taskScheduler,
-            listenableConnectionState,
-            meterRegistry
-        )
-
-        then:
-        1 * genieHostInfo.getHostname() >> localHostname
-        1 * listenableConnectionState.addListener(_ as ConnectionStateListener)
-        1 * taskScheduler.schedule(_ as Runnable, _ as Trigger)
-        1 * meterRegistry.gauge(AgentRoutingServiceCuratorDiscoveryImpl.CONNECTED_AGENTS_GAUGE_NAME, _, _, _)
-        1 * meterRegistry.gaugeMapSize(AgentRoutingServiceCuratorDiscoveryImpl.REGISTERED_AGENTS_GAUGE_NAME, _, _)
-
-        when:
-        String hostnameJob1 = agentRoutingService.getHostnameForAgentConnection(jobId1).orElse(null)
-        String hostnameJob2 = agentRoutingService.getHostnameForAgentConnection(jobId2).orElse(null)
-        String hostnameJob3 = agentRoutingService.getHostnameForAgentConnection(jobId3).orElse(null)
-
-        then:
-        3 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_LOOKUP_TIMER_NAME, _) >> timer
-        1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId1) >> serviceInstanceJob1
-        1 * serviceInstanceJob1.getAddress() >> remoteHostname
-        1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId2) >> null
-        1 * serviceDiscovery.queryForInstance(AgentRoutingServiceCuratorDiscoveryImpl.SERVICE_NAME, jobId3) >> {
-            throw new RuntimeException("...")
-        }
-        3 * timer.record(_, TimeUnit.NANOSECONDS)
-        hostnameJob1 == remoteHostname
-        hostnameJob2 == null
-        hostnameJob3 == null
-    }
-
-    def "React to Zookeeper connection state"() {
-        setup:
-        CuratorFramework client = Mock(CuratorFramework)
-        Runnable reconciliationTask
-        ConnectionStateListener listener
-        String jobId = UUID.randomUUID().toString()
-        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstance1
-        ServiceInstance<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceInstance2
-
-        when:
-        AgentRoutingService agentRoutingService = new AgentRoutingServiceCuratorDiscoveryImpl(
-            genieHostInfo,
-            serviceDiscovery,
-            taskScheduler,
-            listenableConnectionState,
-            meterRegistry
-        )
-
-        then:
-        1 * genieHostInfo.getHostname() >> localHostname
-        1 * listenableConnectionState.addListener(_ as ConnectionStateListener) >> {
-            args ->
-                listener = args[0] as ConnectionStateListener
-        }
-        1 * taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                reconciliationTask = args[0] as Runnable
-                return scheduledFuture
-        }
-        1 * meterRegistry.gauge(AgentRoutingServiceCuratorDiscoveryImpl.CONNECTED_AGENTS_GAUGE_NAME, _, _, _)
-        1 * meterRegistry.gaugeMapSize(AgentRoutingServiceCuratorDiscoveryImpl.REGISTERED_AGENTS_GAUGE_NAME, _, _)
-        listener != null
-        reconciliationTask != null
-
-        when:
-        listener.stateChanged(client, ConnectionState.SUSPENDED)
-        listener.stateChanged(client, ConnectionState.RECONNECTED)
-
-        then:
-        2 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _ as Set<Tag>) >> counter
-        2 * counter.increment()
-
-        when:
-        listener.stateChanged(client, ConnectionState.CONNECTED)
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _ as Set<Tag>) >> counter
-        1 * counter.increment()
-        1 * taskScheduler.schedule(_ as Runnable, _ as Instant)
-
-        when:
-        agentRoutingService.handleClientConnected(jobId)
-        reconciliationTask.run()
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_CONNECTED_COUNTER_NAME, _) >> counter
-        1 * counter.increment()
-        serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            args ->
-                serviceInstance1 = args[0] as ServiceInstance
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        serviceInstance1 != null
-        serviceInstance1.getId() == jobId
-        serviceInstance1.getAddress() == localHostname
-
-        when:
-        listener.stateChanged(client, ConnectionState.LOST)
-        reconciliationTask.run()
-
-        then:
-        1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _ as Set<Tag>) >> counter
-        1 * counter.increment()
-        1 * serviceDiscovery.registerService(_ as ServiceInstance) >> {
-            args ->
-                serviceInstance2 = args[0] as ServiceInstance
-        }
-        1 * meterRegistry.timer(AgentRoutingServiceCuratorDiscoveryImpl.AGENT_REGISTERED_TIMER_NAME, _) >> timer
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        serviceInstance2 != null
-        serviceInstance2.getId() == jobId
-        serviceInstance2.getAddress() == localHostname
-        serviceInstance2.getPayload() == serviceInstance1.getPayload()
     }
 }

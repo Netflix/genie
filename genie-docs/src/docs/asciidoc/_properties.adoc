@@ -132,6 +132,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |false
 |no
 
+|genie.agent.routing.refresh-interval
+|Interval at which individual connections are refreshed
+|3s
+|no
+
 |genie.agent.runtime.*
 |Properties with this prefix are forwarded to each agent during startup
 |

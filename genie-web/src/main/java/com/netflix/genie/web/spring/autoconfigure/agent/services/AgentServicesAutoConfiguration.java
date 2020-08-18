@@ -33,6 +33,7 @@ import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentConfigurationProperties;
+import com.netflix.genie.web.properties.AgentRoutingServiceProperties;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.curator.framework.listen.Listenable;
@@ -58,7 +59,8 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(
     {
-        AgentConfigurationProperties.class
+        AgentConfigurationProperties.class,
+        AgentRoutingServiceProperties.class
     }
 )
 public class AgentServicesAutoConfiguration {
@@ -140,6 +142,7 @@ public class AgentServicesAutoConfiguration {
      * @param taskScheduler                    The task scheduler
      * @param listenableCuratorConnectionState the connection state listenable
      * @param registry                         The metrics registry
+     * @param properties                       The service properties
      * @return A {@link AgentRoutingServiceImpl} instance
      */
     @Bean
@@ -150,14 +153,16 @@ public class AgentServicesAutoConfiguration {
         final ServiceDiscovery<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceDiscovery,
         @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
         final Listenable<ConnectionStateListener> listenableCuratorConnectionState,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final AgentRoutingServiceProperties properties
     ) {
         return new AgentRoutingServiceCuratorDiscoveryImpl(
             genieHostInfo,
             serviceDiscovery,
             taskScheduler,
             listenableCuratorConnectionState,
-            registry
+            registry,
+            properties
         );
     }
 

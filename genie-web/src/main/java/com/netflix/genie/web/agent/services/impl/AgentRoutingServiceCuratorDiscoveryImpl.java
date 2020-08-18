@@ -18,12 +18,13 @@
 package com.netflix.genie.web.agent.services.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.properties.AgentRoutingServiceProperties;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -45,7 +46,11 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of {@link AgentRoutingService} that relies on Curator's Discovery extension.
@@ -76,14 +81,12 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
     private final ServiceDiscovery<Agent> serviceDiscovery;
     private final TaskScheduler taskScheduler;
     private final MeterRegistry registry;
-    private final Set<String> connectedAgentsSet = Sets.newConcurrentHashSet();
-    private final Map<String, ServiceInstance<Agent>> registeredAgentsMap = Maps.newConcurrentMap();
-    private final ExponentialBackOffTrigger trigger = new ExponentialBackOffTrigger(
-        ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_COMPLETION,
-        100, // TODO make configurable
-        5_000, // TODO make configurable
-        1.2f // TODO make configurable
-    );
+    private final AgentRoutingServiceProperties properties;
+    private final Set<String> connectedAgentsSet;
+    private final Map<String, ServiceInstance<Agent>> registeredAgentsMap;
+    private final PriorityBlockingQueue<RegisterMutation> registrationQueue;
+    private final AtomicReference<Thread> registrationTaskThread;
+    private final ThreadFactory threadFactory;
 
     /**
      * Constructor.
@@ -93,28 +96,240 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
      * @param taskScheduler                    The task scheduler
      * @param listenableCuratorConnectionState The listenable curator client connection status
      * @param registry                         The metrics registry
+     * @param properties                       The service properties
      */
     public AgentRoutingServiceCuratorDiscoveryImpl(
         final GenieHostInfo genieHostInfo,
         final ServiceDiscovery<Agent> serviceDiscovery,
         final TaskScheduler taskScheduler,
         final Listenable<ConnectionStateListener> listenableCuratorConnectionState,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final AgentRoutingServiceProperties properties
+    ) {
+        this(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableCuratorConnectionState,
+            registry,
+            properties,
+            new ThreadFactory() {
+                private final AtomicLong threadCounter = new AtomicLong();
+
+                @Override
+                public Thread newThread(final Runnable r) {
+                    return new Thread(
+                        r,
+                        this.getClass().getSimpleName() + "-registration-" + threadCounter.incrementAndGet()
+                    );
+                }
+            }
+        );
+    }
+
+    @VisibleForTesting
+    AgentRoutingServiceCuratorDiscoveryImpl(
+        final GenieHostInfo genieHostInfo,
+        final ServiceDiscovery<Agent> serviceDiscovery,
+        final TaskScheduler taskScheduler,
+        final Listenable<ConnectionStateListener> listenableCuratorConnectionState,
+        final MeterRegistry registry,
+        final AgentRoutingServiceProperties properties,
+        final ThreadFactory threadFactory
     ) {
         this.localHostname = genieHostInfo.getHostname();
         this.serviceDiscovery = serviceDiscovery;
         this.taskScheduler = taskScheduler;
         this.registry = registry;
-
-        // Schedule periodic reconciliation between in-memory connected set and Service Discovery state
-        this.taskScheduler.schedule(this::reconcileRegistrationsTask, trigger);
-
-        // Listen for Curator session state changes
-        listenableCuratorConnectionState.addListener(this::handleConnectionStateChange);
+        this.threadFactory = threadFactory;
+        this.properties = properties;
+        this.registeredAgentsMap = Maps.newConcurrentMap();
+        this.connectedAgentsSet = Sets.newConcurrentHashSet();
+        this.registrationQueue = new PriorityBlockingQueue<>();
+        this.registrationTaskThread = new AtomicReference<>();
 
         // Create gauge metric for agents connected and registered
         registry.gauge(CONNECTED_AGENTS_GAUGE_NAME, EMPTY_TAG_SET, this.connectedAgentsSet, Set::size);
         registry.gaugeMapSize(REGISTERED_AGENTS_GAUGE_NAME, EMPTY_TAG_SET, this.registeredAgentsMap);
+
+        // Listen for Curator session state changes
+        listenableCuratorConnectionState.addListener(this::handleConnectionStateChange);
+
+        // The curator client is passed already connected.
+        // See: org.springframework.cloud.zookeeper.ZookeeperAutoConfiguration
+        this.startRegistrationThread();
+    }
+
+    private void startRegistrationThread() {
+        final Thread newThread = this.threadFactory.newThread(this::registrationTask);
+        final Thread oldThread = this.registrationTaskThread.getAndSet(newThread);
+        if (oldThread != null) {
+            oldThread.interrupt();
+        }
+        newThread.start();
+    }
+
+    private void stopRegistrationThread() {
+        final Thread thread = this.registrationTaskThread.getAndSet(null);
+        if (thread != null) {
+            thread.interrupt();
+        }
+    }
+
+    // Thread task that consumes registration queue items and applies the corresponding mutation with Curator client.
+    // This thread is stopped with an interrupt if the client is disconnected.
+    private void registrationTask() {
+        while (true) {
+            try {
+                processNextRegistrationMutation();
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
+        log.debug("Registration thread terminating");
+    }
+
+    private void processNextRegistrationMutation() throws InterruptedException {
+        RegisterMutation mutation = null;
+        try {
+            // Blocking
+            mutation = this.registrationQueue.take();
+
+            final String jobId = mutation.getJobId();
+            // Check if agent is still connected by the time this mutation is taken from the queue to
+            // be processed.
+            final boolean agentIsConnected = this.connectedAgentsSet.contains(mutation.getJobId());
+
+            if (agentIsConnected) {
+                // Register or re-register agent connection
+                if (mutation.isRefresh()) {
+                    refreshAgentConnection(jobId);
+                } else {
+                    registerAgentConnection(jobId);
+                }
+
+                // Schedule a future refresh for this agent connection
+                this.taskScheduler.schedule(
+                    () -> this.registrationQueue.add(RegisterMutation.refresh(jobId)),
+                    Instant.now().plus(this.properties.getRefreshInterval())
+                );
+
+            } else {
+                // Unregister agent connection
+                unregisterAgentConnection(jobId);
+            }
+
+        } catch (InterruptedException e) {
+            log.warn("Registration task interrupted", e);
+            if (mutation != null) {
+                // Re-enqueue mutation that was in-progress when interrupted
+                this.registrationQueue.add(mutation);
+            }
+            throw e;
+        }
+    }
+
+    private void registerAgentConnection(final String jobId) throws InterruptedException {
+        log.debug("Registering route for job: {}", jobId);
+
+        final ServiceInstance<Agent> serviceInstance = new ServiceInstance<>(
+            SERVICE_NAME,
+            jobId,
+            localHostname,
+            null,
+            null,
+            new Agent(jobId),
+            Instant.now().getEpochSecond(),
+            ServiceType.DYNAMIC,
+            null
+        );
+
+        Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
+        final long start = System.nanoTime();
+        try {
+            this.serviceDiscovery.registerService(serviceInstance);
+            this.registeredAgentsMap.put(jobId, serviceInstance);
+        } catch (InterruptedException e) {
+            // Ensure interrupt is not swallowed by the generic catch
+            log.debug("Interrupted while registering {}", jobId);
+            tags = MetricsUtils.newFailureTagsSetForException(e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to register agent executing job: {}", jobId, e);
+            tags = MetricsUtils.newFailureTagsSetForException(e);
+        } finally {
+            this.registry.timer(
+                AGENT_REGISTERED_TIMER_NAME,
+                tags
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void refreshAgentConnection(final String jobId) throws InterruptedException {
+        log.debug("Refreshing route for job: {}", jobId);
+
+        final ServiceInstance<Agent> serviceInstance = this.registeredAgentsMap.get(jobId);
+
+        if (serviceInstance == null) {
+            log.warn("Instance record not found for job {}", jobId);
+            this.registerAgentConnection(jobId);
+            return;
+        }
+
+        Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
+        final long start = System.nanoTime();
+        try {
+            this.serviceDiscovery.updateService(serviceInstance);
+        } catch (KeeperException.NoNodeException e) {
+            log.warn("Failed to update registration of agent executing job id: {}", jobId);
+            // Failed because expected existing node is not present. Create it.
+            this.registerAgentConnection(jobId);
+        } catch (InterruptedException e) {
+            // Ensure interrupt is not swallowed by the generic catch
+            log.debug("Interrupted while refreshing {}", jobId);
+            tags = MetricsUtils.newFailureTagsSetForException(e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to refresh agent executing job id: {}", jobId);
+            tags = MetricsUtils.newFailureTagsSetForException(e);
+        } finally {
+            this.registry.timer(
+                AGENT_REFRESH_TIMER_NAME,
+                tags
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void unregisterAgentConnection(final String jobId) throws InterruptedException {
+        final ServiceInstance<Agent> serviceInstance = this.registeredAgentsMap.get(jobId);
+
+        if (serviceInstance == null) {
+            log.debug("Skipping unregistration, already removed");
+            return;
+        }
+
+        log.debug("Unregistering route for job: {}", jobId);
+
+        Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
+        final long start = System.nanoTime();
+        try {
+            this.serviceDiscovery.unregisterService(serviceInstance);
+            this.registeredAgentsMap.remove(jobId);
+        } catch (InterruptedException e) {
+            // Ensure interrupt is not swallowed by the generic catch
+            log.debug("Interrupted while unregistering {}", jobId);
+            tags = MetricsUtils.newFailureTagsSetForException(e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to unregister agent executing job id: {}", jobId);
+            tags = MetricsUtils.newFailureTagsSetForException(e);
+        } finally {
+            this.registry.timer(
+                AGENT_UNREGISTERED_TIMER_NAME,
+                tags
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
     }
 
     private void handleConnectionStateChange(final CuratorFramework client, final ConnectionState newState) {
@@ -124,173 +339,45 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
             Sets.newHashSet(Tag.of(ZK_CONNECTION_STATE_TAG_NAME, newState.name()))
         ).increment();
 
+        log.info("Zookeeper/Curator client: {}", newState);
+
         switch (newState) {
             case CONNECTED:
-                // Immediately schedule a reconciliation
-                log.info("Zookeeper/Curator connected (or re-connected)");
-                this.taskScheduler.schedule(this::reconcileRegistrationsTask, Instant.now());
+            case RECONNECTED:
+                startRegistrationThread();
                 break;
 
             case LOST:
-                // When session expires, all ephemeral nodes disappear
-                log.info("Zookeeper/Curator session expired, all instances will need to re-register");
-                this.registeredAgentsMap.clear();
+            case SUSPENDED:
+                stopRegistrationThread();
                 break;
 
             default:
-                log.debug("Zookeeper/Curator connection state changed to: {}", newState);
+                log.warn("Zookeeper/Curator unhandled connection state: {}", newState);
         }
     }
 
-    private synchronized void reconcileRegistrationsTask() {
-        try {
-            this.reconcileRegistrations();
-        } catch (Exception e) {
-            log.error("Unexpected exception in reconciliation task", e);
-        }
-    }
-
-    private void reconcileRegistrations() {
-        boolean anyChange = false;
-
-        // Register all agent connections that are not already registered
-        for (final String jobId : this.connectedAgentsSet) {
-            if (!this.registeredAgentsMap.containsKey(jobId)) {
-                final ServiceInstance<Agent> serviceInstance = new ServiceInstance<>(
-                    SERVICE_NAME,
-                    jobId,
-                    localHostname,
-                    null,
-                    null,
-                    new Agent(jobId),
-                    Instant.now().getEpochSecond(),
-                    ServiceType.DYNAMIC,
-                    null
-                );
-
-                log.debug("Registering route for job: {}", jobId);
-
-                Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
-                final long start = System.nanoTime();
-                try {
-                    this.serviceDiscovery.registerService(serviceInstance);
-                    this.registeredAgentsMap.put(jobId, serviceInstance);
-                    anyChange = true;
-                } catch (Exception e) {
-                    log.error("Failed to register agent executing job: {}", jobId, e);
-                    tags = MetricsUtils.newFailureTagsSetForException(e);
-                } finally {
-                    this.registry.timer(
-                        AGENT_REGISTERED_TIMER_NAME,
-                        tags
-                    ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-                }
-            }
-        }
-
-        // Unregister all agent connections that are no longer active
-        for (final Map.Entry<String, ServiceInstance<Agent>> entry : this.registeredAgentsMap.entrySet()) {
-            if (!this.connectedAgentsSet.contains(entry.getKey())) {
-
-                final String jobId = entry.getKey();
-                final ServiceInstance<Agent> serviceInstance = entry.getValue();
-
-                log.debug("Unregistering route for job: {}", jobId);
-
-                Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
-                final long start = System.nanoTime();
-                try {
-                    this.serviceDiscovery.unregisterService(serviceInstance);
-                    this.registeredAgentsMap.remove(jobId);
-                    anyChange = true;
-                } catch (Exception e) {
-                    log.error("Failed to unregister agent executing job id: {}", jobId);
-                    tags = MetricsUtils.newFailureTagsSetForException(e);
-                } finally {
-                    this.registry.timer(
-                        AGENT_UNREGISTERED_TIMER_NAME,
-                        tags
-                    ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-                }
-            }
-        }
-
-        // Update all agent connections that are expected to exist.
-        // This in necessary in case an entry was removed by a different node where the agent was previously connected.
-        for (final Map.Entry<String, ServiceInstance<Agent>> entry : this.registeredAgentsMap.entrySet()) {
-            if (this.connectedAgentsSet.contains(entry.getKey())) {
-
-                final String jobId = entry.getKey();
-                final ServiceInstance<Agent> serviceInstance = entry.getValue();
-
-                log.debug("Updating route for job: {}", jobId);
-
-                Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
-                final long start = System.nanoTime();
-                try {
-                    this.serviceDiscovery.updateService(serviceInstance);
-                } catch (KeeperException.NoNodeException e) {
-                    log.warn("Failed to update registration of agent executing job id: {}", jobId);
-
-                    // Expecting to update, but failed because existing node is not there. Create it.
-                    try {
-                        this.serviceDiscovery.registerService(serviceInstance);
-                    } catch (Exception exception) {
-                        log.error("Failed to re-create registration for agent executing job id: {}", jobId);
-                        tags = MetricsUtils.newFailureTagsSetForException(e);
-                    }
-
-                } catch (Exception e) {
-                    log.error("Failed to refresh agent executing job id: {}", jobId);
-                    tags = MetricsUtils.newFailureTagsSetForException(e);
-                } finally {
-                    this.registry.timer(
-                        AGENT_REFRESH_TIMER_NAME,
-                        tags
-                    ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-                }
-            }
-        }
-
-        // If anything changed, reset the backoff so this task runs again soon.
-        if (anyChange) {
-            this.trigger.reset();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleClientConnected(@NotBlank final String jobId) {
-        this.registry.counter(
-            AGENT_CONNECTED_COUNTER_NAME,
-            EMPTY_TAG_SET
-        ).increment();
+        log.debug("Adding to routing table (pending registration): {}", jobId);
 
-        // Add to connected set
         final boolean isNew = this.connectedAgentsSet.add(jobId);
+        this.registrationQueue.add(RegisterMutation.update(jobId));
 
         if (isNew) {
-            log.debug("New agent connected, job: {} (not yet registered)", jobId);
+            this.registry.counter(AGENT_CONNECTED_COUNTER_NAME).increment();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleClientDisconnected(@NotBlank final String jobId) {
-        this.registry.counter(
-            AGENT_DISCONNECTED_COUNTER_NAME,
-            EMPTY_TAG_SET
-        ).increment();
+        log.debug("Removing from routing table (pending un-registration): {}", jobId);
 
-        // Remove from connected set
         final boolean removed = this.connectedAgentsSet.remove(jobId);
+        this.registrationQueue.add(RegisterMutation.update(jobId));
 
         if (removed) {
-            log.debug("Known agent disconnected, job: {} (not yet unregistered)", jobId);
+            this.registry.counter(AGENT_DISCONNECTED_COUNTER_NAME).increment();
         }
     }
 
@@ -368,6 +455,45 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
          */
         public Agent(@JsonProperty(value = "jobId", required = true) final String jobId) {
             this.jobId = jobId;
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode
+    private static final class RegisterMutation implements Comparable<RegisterMutation> {
+        private final String jobId;
+        private final boolean refresh;
+        private final long timestamp;
+
+        private RegisterMutation(final String jobId, final boolean refresh) {
+            this.jobId = jobId;
+            this.refresh = refresh;
+            this.timestamp = System.nanoTime();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int compareTo(final RegisterMutation other) {
+            if (this.isRefresh() == other.isRefresh()) {
+                final long timestampDifference = this.getTimestamp() - other.getTimestamp();
+                if (timestampDifference == 0) {
+                    return this.getJobId().compareTo(other.getJobId());
+                } else {
+                    return timestamp > 0 ? 1 : -1;
+                }
+            } else {
+                return this.isRefresh() ? 1 : -1;
+            }
+        }
+
+        static RegisterMutation refresh(final String jobId) {
+            return new RegisterMutation(jobId, true);
+        }
+
+        static RegisterMutation update(final String jobId) {
+            return new RegisterMutation(jobId, false);
         }
     }
 }
