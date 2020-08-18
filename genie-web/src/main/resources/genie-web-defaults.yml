@@ -40,6 +40,8 @@ genie:
       write-retry-delay: 300ms
     heart-beat:
       send-interval: 5s
+    routing:
+      refresh-interval: 3s
   file:
     cache:
       location: file://${java.io.tmpdir:/tmp}/genie/cache
