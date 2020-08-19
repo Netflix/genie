@@ -237,7 +237,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 final int maxSystemMemory = this.jobsProperties.getMemory().getMaxSystemMemory();
                 final int usedMemory = this.jobStateService.getUsedMemory();
                 if (usedMemory + memory <= maxSystemMemory) {
-                    log.info(
+                    log.debug(
                         "Job {} can run on this node as only {}/{} MB are used and requested {} MB",
                         jobId,
                         usedMemory,

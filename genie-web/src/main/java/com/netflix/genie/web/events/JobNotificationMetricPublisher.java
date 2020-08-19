@@ -55,7 +55,7 @@ public class JobNotificationMetricPublisher implements ApplicationListener<JobSt
         final String toStateString = event.getNewStatus().name();
         final boolean isFinalState = event.getNewStatus().isFinished();
 
-        log.info(
+        log.debug(
             "Job '{}' changed state from {} to {} {}",
             event.getJobId(),
             fromStateString,

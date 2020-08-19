@@ -50,8 +50,9 @@ public class PersistedJobStatusObserverImpl implements PersistedJobStatusObserve
     @Override
     public void notify(final String jobId, @Nullable final JobStatus previousStatus, final JobStatus currentStatus) {
         final JobStateChangeEvent event = new JobStateChangeEvent(jobId, previousStatus, currentStatus, this);
-        log.warn("Publishing event: {}", event);
+        log.debug("Publishing event: {}", event);
         this.genieEventBus.publishAsynchronousEvent(event);
+        log.info("Job {} status changed from: {} to: {}", jobId, previousStatus, currentStatus);
     }
 
 }

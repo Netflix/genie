@@ -108,7 +108,7 @@ public class JobArchiveServiceImpl implements JobArchiveService {
         for (final JobArchiver archiver : this.jobArchivers) {
             // TODO: Perhaps we should pass the manifest down to the archive implementations if they want to use it?
             if (archiver.archiveDirectory(directory, filesList, target)) {
-                log.info(
+                log.debug(
                     "Successfully archived job directory {} to {} using {} ({} files)",
                     directory.toString(),
                     uriString,
