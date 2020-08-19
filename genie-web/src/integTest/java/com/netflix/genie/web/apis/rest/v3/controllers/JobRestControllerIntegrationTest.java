@@ -163,7 +163,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
     private static final List<String> SLEEP_AND_ECHO_COMMAND_ARGS =
-        Lists.newArrayList("-c", "'sleep 1 && echo hello world'");
+        Lists.newArrayList("-c", "'sleep 5 && echo hello world'");
     private static final ArrayList<String> SLEEP_60_COMMAND_ARGS = Lists.newArrayList("-c", "'sleep 60'");
     private static final String EXPECTED_STDOUT_CONTENT = "hello world\n";
     private static final int EXPECTED_STDOUT_LENGTH = EXPECTED_STDOUT_CONTENT.length();
@@ -1491,60 +1491,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
                 .header(HttpHeaders.LOCATION)
         );
 
-        this.waitForDone(jobId);
-
-        RestAssured
-            .given(this.getRequestSpecification())
-            .when()
-            .port(this.port)
-            .get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log")
-            .then()
-            .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString(utf8));
-
-        if (this.agentExecution) {
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/logs/agent.log")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-                .contentType(Matchers.containsString(utf8));
-
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/logs/setup.log")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-                .contentType(Matchers.containsString(utf8));
-
-        } else {
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-                .contentType(Matchers.containsString(utf8));
-
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/genie.done")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-                .contentType(Matchers.containsString(utf8));
-        }
+        this.waitForRunning(jobId);
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1652,7 +1599,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
                 .header(HttpHeaders.LOCATION)
         );
 
-        this.waitForDone(jobId);
+        this.waitForRunning(jobId);
 
         RestAssured
             .given(this.getRequestSpecification())
