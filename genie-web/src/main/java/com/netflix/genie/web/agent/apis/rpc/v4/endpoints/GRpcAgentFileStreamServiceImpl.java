@@ -344,7 +344,6 @@ public class GRpcAgentFileStreamServiceImpl
         public void onError(final Throwable t) {
             // Drop the stream, no other actions necessary
             this.controlStreamManager.removeControlStream(this, t);
-            this.responseObserver.onCompleted();
         }
 
         /**
@@ -735,7 +734,6 @@ public class GRpcAgentFileStreamServiceImpl
         @Override
         public void onError(final Throwable t) {
             this.transferManager.removeTransferStream(this, t);
-            this.responseObserver.onCompleted();
         }
 
         /**
