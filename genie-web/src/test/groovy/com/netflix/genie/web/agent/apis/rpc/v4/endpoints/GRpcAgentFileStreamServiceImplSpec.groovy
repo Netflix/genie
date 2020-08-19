@@ -179,10 +179,14 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 * converter.toManifest(manifestMessage) >> directoryManifest
 
         when: "Manifest stream is shut down"
-        streamTerminationClosure.call(controlStreamRequestObserver)
+        if (error) {
+            controlStreamRequestObserver.onError(new GenieRuntimeException("..."))
+        } else {
+            controlStreamRequestObserver.onCompleted()
+        }
 
         then:
-        1 * controlStreamResponseObserver.onCompleted()
+        (error ? 0 : 1) * controlStreamResponseObserver.onCompleted()
 
         when: "Request file transfer"
         Optional<Resource> resource = service.getResource(jobId, relativePath, uri, null)
@@ -192,9 +196,9 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         !resource.isPresent()
 
         where:
-        description         | streamTerminationClosure
-        "stream error"      | { observer -> observer.onError(new GenieRuntimeException("...")) }
-        "stream completion" | { observer -> observer.onCompleted() }
+        description         | error
+        "stream error"      | true
+        "stream completion" | false
     }
 
     @Unroll
@@ -208,15 +212,19 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when: "Manifest stream termination"
-        streamTerminationClosure.call(controlStreamRequestObserver)
+        if (error) {
+            controlStreamRequestObserver.onError(new GenieRuntimeException("..."))
+        } else {
+            controlStreamRequestObserver.onCompleted()
+        }
 
         then:
-        1 * controlStreamResponseObserver.onCompleted()
+        (error ? 0 : 1) * controlStreamResponseObserver.onCompleted()
 
         where:
-        description         | streamTerminationClosure
-        "stream error"      | { observer -> observer.onError(new GenieRuntimeException("...")) }
-        "stream completion" | { observer -> observer.onCompleted() }
+        description         |error
+        "stream error"      |true
+        "stream completion" |false
     }
 
     def "Newer control stream replaces and closes a previous one"() {
@@ -257,7 +265,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         controlStreamRequestObserver1.onError(new RuntimeException("..."))
 
         then:
-        1 * controlStreamResponseObserver1.onCompleted()
+        0 * controlStreamResponseObserver1.onCompleted()
 
         when: "Another Control stream established and error after sending a manifest"
         controlStreamRequestObserver2 = this.service.sync(controlStreamResponseObserver2)
@@ -517,7 +525,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         transferStreamRequestObserver.onError(new RuntimeException("..."));
 
         then:
-        1 * transferStreamResponseObserver.onCompleted()
+        0 * transferStreamResponseObserver.onCompleted()
 
         when: "Unclaimed stream timeout after error"
         streamTimeoutTask.run()
@@ -577,7 +585,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         transferStreamRequestObserver.onError(new RuntimeException("..."))
 
         then:
-        1 * transferStreamResponseObserver.onCompleted()
+        0 * transferStreamResponseObserver.onCompleted()
 
         when: "Read data"
         inputStream = resource.get().getInputStream()

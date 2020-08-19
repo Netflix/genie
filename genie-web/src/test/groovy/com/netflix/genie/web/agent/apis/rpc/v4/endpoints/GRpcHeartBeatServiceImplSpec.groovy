@@ -160,7 +160,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
 
         then:
         1 * agentConnectionTrackingService.notifyDisconnected(streamId, jobId)
-        1 * responseObserver.onCompleted()
+        0 * responseObserver.onCompleted()
     }
 
 
@@ -237,7 +237,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
 
         then:
         0 * agentConnectionTrackingService._
-        1 * responseObserver.onCompleted()
+        0 * responseObserver.onCompleted()
     }
 
     def "Send server heartbeats and close streams on shutdown"() {

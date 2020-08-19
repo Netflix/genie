@@ -215,7 +215,6 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
             if (agentStreamRecord.hasJobId()) {
                 this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
             }
-            agentStreamRecord.responseObserver.onCompleted();
         }
     }
 
