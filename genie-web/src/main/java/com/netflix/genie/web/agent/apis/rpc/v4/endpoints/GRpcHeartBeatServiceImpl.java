@@ -25,6 +25,7 @@ import com.netflix.genie.proto.ServerHeartBeat;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.properties.HeartBeatProperties;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.PreDestroy;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
@@ -109,9 +111,31 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
      * Using the connection ensures server-side eventually detects a broken connection.
      */
     private void sendHeartbeats() {
+        final Set<String> brokenStreams = Sets.newHashSet();
         synchronized (activeStreamsMap) {
-            for (final AgentStreamRecord agentStreamRecord : activeStreamsMap.values()) {
-                agentStreamRecord.responseObserver.onNext(ServerHeartBeat.getDefaultInstance());
+            for (final Map.Entry<String, AgentStreamRecord> entry : this.activeStreamsMap.entrySet()) {
+                final String streamId = entry.getKey();
+                final AgentStreamRecord agentStreamRecord = entry.getValue();
+
+                try {
+                    agentStreamRecord.responseObserver.onNext(ServerHeartBeat.getDefaultInstance());
+                } catch (StatusRuntimeException | IllegalStateException e) {
+                    log.warn("Stream {} of job {} is broken", streamId, agentStreamRecord.getJobId());
+                    log.debug("Error probing job {} stream {}", agentStreamRecord.getJobId(), streamId, e);
+                    brokenStreams.add(streamId);
+                }
+            }
+        }
+
+        for (final String streamId : brokenStreams) {
+            synchronized (activeStreamsMap) {
+                final AgentStreamRecord agentStreamRecord = this.activeStreamsMap.remove(streamId);
+                if (agentStreamRecord != null) {
+                    log.debug("Removed broken stream {} of job {}", streamId, agentStreamRecord.getJobId());
+                    if (agentStreamRecord.hasJobId()) {
+                        this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
+                    }
+                }
             }
         }
     }
@@ -191,7 +215,7 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
             if (agentStreamRecord.hasJobId()) {
                 this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
             }
-            agentStreamRecord.responseObserver.onError(t);
+            agentStreamRecord.responseObserver.onCompleted();
         }
     }
 

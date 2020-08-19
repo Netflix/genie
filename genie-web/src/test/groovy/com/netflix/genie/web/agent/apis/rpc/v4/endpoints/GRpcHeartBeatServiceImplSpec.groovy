@@ -21,6 +21,8 @@ import com.netflix.genie.proto.AgentHeartBeat
 import com.netflix.genie.proto.ServerHeartBeat
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService
 import com.netflix.genie.web.properties.HeartBeatProperties
+import io.grpc.Status
+import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.springframework.scheduling.TaskScheduler
@@ -158,7 +160,46 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
 
         then:
         1 * agentConnectionTrackingService.notifyDisconnected(streamId, jobId)
-        1 * responseObserver.onError(e)
+        1 * responseObserver.onCompleted()
+    }
+
+
+    def "Connect, heartbeat, server-side error"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        StreamObserver<ServerHeartBeat> responseObserver1 = Mock(StreamObserver)
+        StreamObserver<ServerHeartBeat> responseObserver2 = Mock(StreamObserver)
+
+
+        String streamId1
+        String streamId2
+
+        when:
+        StreamObserver<AgentHeartBeat> requestObserver1 = service.heartbeat(responseObserver1)
+        StreamObserver<AgentHeartBeat> requestObserver2 = service.heartbeat(responseObserver2)
+
+        then:
+        requestObserver1 != null
+        requestObserver2 != null
+
+        when:
+        requestObserver1.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId).build())
+        requestObserver2.onNext(AgentHeartBeat.newBuilder().build())
+
+        then:
+        1 * agentConnectionTrackingService.notifyHeartbeat(_ as String, jobId) >> {
+            args ->
+                streamId1 = args[0] as String
+        }
+        streamId1 != null
+
+        when:
+        task.run()
+
+        then:
+        1 * responseObserver1.onNext(_) >> { throw new StatusRuntimeException(Status.CANCELLED) }
+        1 * responseObserver2.onNext(_) >> { throw new IllegalStateException() }
+        1 * agentConnectionTrackingService.notifyDisconnected(streamId1, jobId)
     }
 
     def "Connect, disconnect"() {
@@ -196,7 +237,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
 
         then:
         0 * agentConnectionTrackingService._
-        1 * responseObserver.onError(e)
+        1 * responseObserver.onCompleted()
     }
 
     def "Send server heartbeats and close streams on shutdown"() {
