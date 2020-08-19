@@ -150,10 +150,10 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
         } else if (StringUtils.isBlank(claimedJobId)) {
             log.warn("Ignoring heartbeat lacking job id");
         } else {
-            log.debug("Received heartbeat for job: {} (stream id: {})", claimedJobId, streamId);
+            log.debug("Received heartbeat from job: {} (stream id: {})", claimedJobId, streamId);
             final boolean isFirstHeartBeat = agentStreamRecord.updateRecord(claimedJobId);
             if (isFirstHeartBeat) {
-                log.info("Received first heartbeat for job: {} (stream id: {})", claimedJobId, streamId);
+                log.info("Received first heartbeat from job: {}", claimedJobId);
             }
             this.agentConnectionTrackingService.notifyHeartbeat(streamId, claimedJobId);
         }

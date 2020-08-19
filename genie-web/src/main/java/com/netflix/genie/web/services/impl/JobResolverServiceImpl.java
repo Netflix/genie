@@ -517,7 +517,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .getCommand()
                 .orElseThrow(() -> new IllegalStateException("Command hasn't been resolved before applications"))
                 .getId();
-            log.info("Selecting applications for job {} and command {}", id, commandId);
+            log.debug("Selecting applications for job {} and command {}", id, commandId);
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = Lists.newArrayList();
             if (jobRequest.getCriteria().getApplicationIds().isEmpty()) {
@@ -527,7 +527,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     applications.add(this.persistenceService.getApplication(applicationId));
                 }
             }
-            log.info(
+            log.debug(
                 "Resolved applications {} for job {}",
                 applications
                     .stream()

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -81,6 +82,10 @@ public class ArchiveJobOutputsStage extends ExecutionStage {
                 } catch (JobArchiveException | URISyntaxException e) {
                     // Swallow the error and move on.
                     log.error("Error archiving job folder", e);
+                    ConsoleLog.getLogger().error(
+                        "Job file archive error: {}",
+                        e.getCause() != null ? e.getCause().getMessage() : e.getMessage()
+                    );
                 }
 
                 final String jobId = executionContext.getClaimedJobId();

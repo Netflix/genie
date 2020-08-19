@@ -144,7 +144,7 @@ public class JobFinishedSNSPublisher
             return;
         }
 
-        log.info("Publishing SNS notification for completed job {}", jobId);
+        log.debug("Publishing SNS notification for completed job {}", jobId);
 
         final HashMap<String, Object> eventDetailsMap = Maps.newHashMap();
 

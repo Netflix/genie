@@ -328,7 +328,7 @@ public class ScriptManager {
                 throw new ScriptLoadingException("Failed to compile script: " + scriptUriString, e);
             }
 
-            log.info("Successfully compiled: " + scriptUriString);
+            log.debug("Successfully compiled: " + scriptUriString);
             return compiledScript;
         }
     }

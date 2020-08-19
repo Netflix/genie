@@ -258,7 +258,7 @@ public class GRpcAgentFileStreamServiceImpl
         private StreamObserver<AgentManifestMessage> handleNewControlStream(
             final StreamObserver<ServerControlMessage> responseObserver
         ) {
-            log.info("New agent control stream established");
+            log.debug("New agent control stream established");
             return new ControlStreamObserver(this, responseObserver);
         }
 

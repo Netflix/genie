@@ -148,7 +148,7 @@ public class ClusterCheckerTask extends LeaderTask {
                 return result;
             }
         );
-        log.info("Finished checking for cluster node health.");
+        log.debug("Finished checking for cluster node health.");
     }
 
     private void updateJobsToFailedOnHost(final String host) {
