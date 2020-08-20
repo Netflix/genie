@@ -98,8 +98,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                runnableCapture = args[0] as Runnable
+            Runnable r, Trigger t ->
+                runnableCapture = r
                 return scheduledTask
         }
         runnableCapture != null
@@ -134,8 +134,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                runnableCapture = args[0] as Runnable
+            Runnable r, Trigger t ->
+                runnableCapture = r
                 return scheduledTask
         }
         runnableCapture != null
@@ -214,8 +214,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                runnableCapture = args[0] as Runnable
+            Runnable r, Trigger t ->
+                runnableCapture = r
                 return scheduledTask
         }
         runnableCapture != null
@@ -265,8 +265,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                runnableCapture = args[0] as Runnable
+            Runnable r, Trigger t ->
+                runnableCapture = r
                 return scheduledTask
         }
         runnableCapture != null
@@ -289,6 +289,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                     ServerFileRequestMessage.newBuilder()
                         .setRelativePath("file.txt")
                         .setStreamId(UUID.randomUUID().toString())
+                        .setDeprecatedStartOffset(0)
+                        .setDeprecatedEndOffset(0)
                         .setStartOffset(0)
                         .setEndOffset(0)
                         .build()
@@ -308,6 +310,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                     ServerFileRequestMessage.newBuilder()
                         .setRelativePath("no-such-file.txt")
                         .setStreamId(UUID.randomUUID().toString())
+                        .setDeprecatedStartOffset(0)
+                        .setDeprecatedEndOffset(1000)
                         .setStartOffset(0)
                         .setEndOffset(1000)
                         .build()
@@ -327,6 +331,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                     ServerFileRequestMessage.newBuilder()
                         .setRelativePath("small-file.txt")
                         .setStreamId(UUID.randomUUID().toString())
+                        .setDeprecatedStartOffset(0)
+                        .setDeprecatedEndOffset(10)
                         .setStartOffset(0)
                         .setEndOffset(10)
                         .build()
@@ -357,6 +363,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                         ServerFileRequestMessage.newBuilder()
                             .setRelativePath("small-file.txt")
                             .setStreamId(UUID.randomUUID().toString())
+                            .setDeprecatedStartOffset(0)
+                            .setDeprecatedEndOffset(10)
                             .setStartOffset(0)
                             .setEndOffset(10)
                             .build()
@@ -377,9 +385,10 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                     ServerFileRequestMessage.newBuilder()
                         .setRelativePath("small-file.txt")
                         .setStreamId(UUID.randomUUID().toString())
+                        .setDeprecatedStartOffset(0)
+                        .setDeprecatedEndOffset(20)
                         .setStartOffset(0)
-                        .setEndOffset(20)
-                        .build()
+                        .setEndOffset(20)                        .build()
                 )
                 .build()
         )
@@ -406,6 +415,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                     ServerFileRequestMessage.newBuilder()
                         .setRelativePath("small-file.txt")
                         .setStreamId(UUID.randomUUID().toString())
+                        .setDeprecatedStartOffset(0)
+                        .setDeprecatedEndOffset(20)
                         .setStartOffset(0)
                         .setEndOffset(20)
                         .build()
@@ -423,8 +434,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            args ->
-                drainRunnableCapture = args[0] as Runnable
+            Runnable r, Instant i ->
+                drainRunnableCapture = r
                 return drainTaskFuture
         }
         1 * drainTaskFuture.get(fileStreamServiceProperties.getDrainTimeout().toMillis(), TimeUnit.MILLISECONDS) >> {
@@ -445,32 +456,30 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         noExceptionThrown()
     }
 
-    def "Transmit large file"() {
+    def "Transmit multi-chunk file"() {
 
         setup:
-        Random r = new Random()
+        Random rnd = new Random()
         int fileSize = 0
         File largeFile = temporaryFolder.newFile("large-file.txt")
         while(fileSize <= fileStreamServiceProperties.getDataChunkMaxSize().toBytes() * 2) {
             byte[] buf = new byte[512]
-            r.nextBytes(buf)
+            rnd.nextBytes(buf)
             largeFile.append(buf)
             fileSize += buf.size()
         }
         File largeFileReceived = temporaryFolder.newFile("large-file-received.txt")
 
         Runnable runnableCapture
-        Runnable drainRunnableCapture
         AgentManifestMessage manifestMessage = AgentManifestMessage.getDefaultInstance()
-        ScheduledFuture<?> drainTaskFuture = Mock(ScheduledFuture)
 
         when:
         agentFileStreamService.start(jobId, temporaryFolder.getRoot().toPath())
 
         then:
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
-            args ->
-                runnableCapture = args[0] as Runnable
+            Runnable r, Trigger t ->
+                runnableCapture = r
                 return scheduledTask
         }
         runnableCapture != null

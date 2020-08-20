@@ -36,6 +36,7 @@ import org.junit.platform.commons.util.StringUtils
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpRange
 import org.springframework.scheduling.TaskScheduler
+import org.springframework.util.unit.DataSize
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -88,7 +89,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         this.controlStreamResponseObserver = Mock(StreamObserver)
         this.transferStreamResponseObserver = Mock(StreamObserver)
         this.directoryManifest = Mock(DirectoryManifest)
-        this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
+        this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).setLargeFilesSupported(true).build()
         this.manifestEntry = Mock(DirectoryManifest.ManifestEntry) {
             getLastModifiedTime() >> Instant.now()
             getSize() >> FILE_SIZE
@@ -277,7 +278,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     }
 
     @Unroll
-    def "Successful transfer with range: #range"() {
+    def "Successful transfer with range: #range (legacy agent: #legacy)"() {
+        this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).setLargeFilesSupported(!legacy).build()
         StreamObserver<AgentManifestMessage> controlStreamRequestObserver
         StreamObserver<AgentFileMessage> transferStreamRequestObserver
         String streamId
@@ -300,12 +302,14 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         then:
         1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
         1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage) >> {
-            args ->
-                fileRequestCapture = (args[0] as ServerControlMessage).getServerFileRequest()
+            ServerControlMessage msg ->
+                fileRequestCapture = msg.getServerFileRequest()
                 streamId = fileRequestCapture.getStreamId()
         }
         resource.isPresent()
         fileRequestCapture != null
+        fileRequestCapture.getDeprecatedStartOffset() == offsetStart
+        fileRequestCapture.getDeprecatedEndOffset() == offsetEnd
         fileRequestCapture.getStartOffset() == offsetStart
         fileRequestCapture.getEndOffset() == offsetEnd
         streamId != null
@@ -359,12 +363,167 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         bytesRead == -1
 
         where:
-        range                              | offsetStart | offsetEnd | chunkSize
-        null                               | 0           | FILE_SIZE | FILE_SIZE
-        HttpRange.createByteRange(50)      | 50          | FILE_SIZE | 50
-        HttpRange.createSuffixRange(50)    | 50          | FILE_SIZE | 50
-        HttpRange.createByteRange(10, 20)  | 10          | 21        | 10
-        HttpRange.createByteRange(50, 300) | 50          | FILE_SIZE | 50
+        range                              | offsetStart | offsetEnd | chunkSize | legacy
+        null                               | 0           | FILE_SIZE | FILE_SIZE | true
+        HttpRange.createByteRange(50)      | 50          | FILE_SIZE | 50        | true
+        HttpRange.createSuffixRange(50)    | 50          | FILE_SIZE | 50        | true
+        HttpRange.createByteRange(10, 20)  | 10          | 21        | 10        | true
+        HttpRange.createByteRange(50, 300) | 50          | FILE_SIZE | 50        | true
+        null                               | 0           | FILE_SIZE | FILE_SIZE | false
+        HttpRange.createByteRange(50)      | 50          | FILE_SIZE | 50        | false
+        HttpRange.createSuffixRange(50)    | 50          | FILE_SIZE | 50        | false
+        HttpRange.createByteRange(10, 20)  | 10          | 21        | 10        | false
+        HttpRange.createByteRange(50, 300) | 50          | FILE_SIZE | 50        | false
+    }
+
+    def "Request large file from legacy agent"() {
+        this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).setLargeFilesSupported(false).build()
+        int chunkSize = 512
+        DataSize largeFileSize = DataSize.ofGigabytes(10)
+        DataSize suffixSize = DataSize.ofBytes(chunkSize * 3)
+        HttpRange range = HttpRange.createSuffixRange(suffixSize.toBytes())
+        DirectoryManifest.ManifestEntry largeFileManifestEntry = Mock(DirectoryManifest.ManifestEntry) {
+            getLastModifiedTime() >> Instant.now()
+            getSize() >> largeFileSize.toBytes()
+        }
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, range)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(largeFileManifestEntry)
+        0 * controlStreamResponseObserver.onNext(_ as ServerControlMessage)
+        !resource.isPresent()
+    }
+
+    def "Request tail of very large file"() {
+        int chunkSize = 512
+        DataSize largeFileSize = DataSize.ofGigabytes(10)
+        DataSize suffixSize = DataSize.ofBytes(chunkSize * 3)
+        HttpRange range = HttpRange.createSuffixRange(suffixSize.toBytes())
+        DirectoryManifest.ManifestEntry largeFileManifestEntry = Mock(DirectoryManifest.ManifestEntry) {
+            getLastModifiedTime() >> Instant.now()
+            getSize() >> largeFileSize.toBytes()
+        }
+
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+        String streamId
+        InputStream inputStream
+        int bytesRead
+
+        ServerFileRequestMessage fileRequestCapture
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        Optional<Resource> resource = service.getResource(jobId, relativePath, uri, range)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(largeFileManifestEntry)
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage) >> {
+            ServerControlMessage msg ->
+                fileRequestCapture = msg.getServerFileRequest()
+                streamId = fileRequestCapture.getStreamId()
+        }
+        resource.isPresent()
+        fileRequestCapture != null
+        fileRequestCapture.getStartOffset() == largeFileSize.toBytes() - suffixSize.toBytes()
+        fileRequestCapture.getEndOffset() == largeFileSize.toBytes()
+        streamId != null
+        StringUtils.isNotBlank(streamId)
+        fileRequestCapture.getRelativePath() == relativePath.toString()
+
+        when: "File transfer begins, send chunk 1/3"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+        transferStreamRequestObserver.onNext(
+            AgentFileMessage.newBuilder()
+                .setStreamId(streamId)
+                .setData(ByteString.copyFrom(new byte[chunkSize]))
+                .build()
+        )
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Instant)
+        1 * taskScheduler.schedule(_ as Runnable, _ as Date) >> {
+            runnable, date ->
+                runnable.run()
+        }
+        1 * transferStreamResponseObserver.onNext(_ as ServerAckMessage)
+
+        when: "Read data (chunk 1/3)"
+        inputStream = resource.get().getInputStream()
+        inputStream.skip(largeFileSize.toBytes() - suffixSize.toBytes())
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        bytesRead == chunkSize
+
+        when: "send chunk 2/3"
+        transferStreamRequestObserver.onNext(
+            AgentFileMessage.newBuilder()
+                .setStreamId(streamId)
+                .setData(ByteString.copyFrom(new byte[chunkSize]))
+                .build()
+        )
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Date) >> {
+            runnable, date ->
+                runnable.run()
+        }
+        1 * transferStreamResponseObserver.onNext(_ as ServerAckMessage)
+
+        when: "Read data (chunk 2/3)"
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        bytesRead == chunkSize
+
+        when: "send chunk 3/3"
+        transferStreamRequestObserver.onNext(
+            AgentFileMessage.newBuilder()
+                .setStreamId(streamId)
+                .setData(ByteString.copyFrom(new byte[chunkSize]))
+                .build()
+        )
+
+        then:
+        transferStreamRequestObserver != null
+        1 * taskScheduler.schedule(_ as Runnable, _ as Date) >> {
+            runnable, date ->
+                runnable.run()
+        }
+        1 * transferStreamResponseObserver.onNext(_ as ServerAckMessage)
+
+        when: "Read data (chunk 3/3)"
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        bytesRead == chunkSize
+
+        when: "Complete reading"
+        transferStreamRequestObserver.onCompleted()
+        bytesRead = inputStream.read(new byte[512])
+
+        then:
+        1 * transferStreamResponseObserver.onCompleted()
+        bytesRead == -1
     }
 
     @Unroll
@@ -408,7 +567,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     def "Transfer start timeout"() {
         StreamObserver<AgentManifestMessage> controlStreamRequestObserver
         StreamObserver<AgentFileMessage> transferStreamRequestObserver
-        int bytesRead
         Optional<Resource> resource
         Runnable streamTimeoutTask
 
@@ -491,8 +649,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         then:
         transferStreamRequestObserver != null
         1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            args ->
-                streamTimeoutTask = args[0] as Runnable
+            Runnable r, Instant i ->
+                streamTimeoutTask = r
                 return null
         }
         streamTimeoutTask != null
@@ -515,14 +673,14 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         then:
         transferStreamRequestObserver != null
         1 * taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            args ->
-                streamTimeoutTask = args[0] as Runnable
+            Runnable r, Instant i ->
+                streamTimeoutTask = r
                 return null
         }
         streamTimeoutTask != null
 
         when: "Unclaimed stream error"
-        transferStreamRequestObserver.onError(new RuntimeException("..."));
+        transferStreamRequestObserver.onError(new RuntimeException("..."))
 
         then:
         0 * transferStreamResponseObserver.onCompleted()
@@ -556,8 +714,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         then:
         1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
         1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage) >> {
-            args ->
-                fileRequestCapture = (args[0] as ServerControlMessage).getServerFileRequest()
+            ServerControlMessage msg ->
+                fileRequestCapture = msg.getServerFileRequest()
                 streamId = fileRequestCapture.getStreamId()
         }
         resource.isPresent()
