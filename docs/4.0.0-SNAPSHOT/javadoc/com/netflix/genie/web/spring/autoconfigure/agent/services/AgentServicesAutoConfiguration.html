@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value=<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties.class</a>)
+ @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties.class</a>})
 public class <span class="typeNameLabel">AgentServicesAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Auto configuration for services needed in the agent module.</div>
@@ -184,11 +184,12 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">agentRoutingServiceCurator</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.AgentRoutingServiceProperties-">agentRoutingServiceCurator</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                           org.apache.curator.x.discovery.ServiceDiscovery&lt;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.Agent.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl.Agent</a>&gt;&nbsp;serviceDiscovery,
                           org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                           org.apache.curator.framework.listen.Listenable&lt;org.apache.curator.framework.state.ConnectionStateListener&gt;&nbsp;listenableCuratorConnectionState,
-                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                          <a href="../../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties</a>&nbsp;properties)</code>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
@@ -306,7 +307,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">
+<a name="agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.AgentRoutingServiceProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -320,7 +321,8 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
                                                                                                                                                                                                          @Qualifier(value="genieTaskScheduler")
                                                                                                                                                                                                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                                                                                                                                                                                                          org.apache.curator.framework.listen.Listenable&lt;org.apache.curator.framework.state.ConnectionStateListener&gt;&nbsp;listenableCuratorConnectionState,
-                                                                                                                                                                                                         io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+                                                                                                                                                                                                         io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                                                                                                                                                                                                         <a href="../../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties</a>&nbsp;properties)</pre>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.
  This bean is created if Zookeeper is enabled, it uses Curator's <code>ServiceDiscovery</code>.</div>
 <dl>
@@ -330,6 +332,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <dd><code>taskScheduler</code> - The task scheduler</dd>
 <dd><code>listenableCuratorConnectionState</code> - the connection state listenable</dd>
 <dd><code>registry</code> - The metrics registry</dd>
+<dd><code>properties</code> - The service properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentRoutingServiceImpl</code></a> instance</dd>
 </dl>

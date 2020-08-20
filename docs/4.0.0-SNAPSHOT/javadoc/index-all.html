@@ -670,7 +670,7 @@
 <div class="block">Service that tracks agent connections on the local Genie node and provides routing information for
  agent connected to other nodes.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">agentRoutingServiceCurator(GenieHostInfo, ServiceDiscovery&lt;AgentRoutingServiceCuratorDiscoveryImpl.Agent&gt;, TaskScheduler, Listenable&lt;ConnectionStateListener&gt;, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.AgentRoutingServiceProperties-">agentRoutingServiceCurator(GenieHostInfo, ServiceDiscovery&lt;AgentRoutingServiceCuratorDiscoveryImpl.Agent&gt;, TaskScheduler, Listenable&lt;ConnectionStateListener&gt;, MeterRegistry, AgentRoutingServiceProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </dd>
@@ -678,7 +678,7 @@
 <dd>
 <div class="block">Implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> that relies on Curator's Discovery extension.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#AgentRoutingServiceCuratorDiscoveryImpl-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">AgentRoutingServiceCuratorDiscoveryImpl(GenieHostInfo, ServiceDiscovery&lt;AgentRoutingServiceCuratorDiscoveryImpl.Agent&gt;, TaskScheduler, Listenable&lt;ConnectionStateListener&gt;, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#AgentRoutingServiceCuratorDiscoveryImpl-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.AgentRoutingServiceProperties-">AgentRoutingServiceCuratorDiscoveryImpl(GenieHostInfo, ServiceDiscovery&lt;AgentRoutingServiceCuratorDiscoveryImpl.Agent&gt;, TaskScheduler, Listenable&lt;ConnectionStateListener&gt;, MeterRegistry, AgentRoutingServiceProperties)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -698,6 +698,12 @@
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AgentRoutingServiceProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentRoutingServiceProperties.html#AgentRoutingServiceProperties--">AgentRoutingServiceProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints"><span class="typeNameLink">AgentRpcEndpointsAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/package-summary.html">com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints</a></dt>
 <dd>
 <div class="block">Configures various gRPC services and related beans if gRPC functionality is enabled.</div>
@@ -7785,9 +7791,7 @@
 <div class="block">Handle a new agent connection.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#handleClientConnected-java.lang.String-">handleClientConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
-<dd>
-<div class="block">Handle a new agent connection.</div>
-</dd>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#handleClientConnected-java.lang.String-">handleClientConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
 <dd>
 <div class="block">Handle a new agent connection.</div>
@@ -7797,9 +7801,7 @@
 <div class="block">Handle connected agent disconnection.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
-<dd>
-<div class="block">Handle connected agent disconnection.</div>
-</dd>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
 <dd>
 <div class="block">Handle connected agent disconnection.</div>

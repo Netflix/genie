@@ -160,11 +160,12 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#AgentRoutingServiceCuratorDiscoveryImpl-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">AgentRoutingServiceCuratorDiscoveryImpl</a></span>(<a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#AgentRoutingServiceCuratorDiscoveryImpl-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.AgentRoutingServiceProperties-">AgentRoutingServiceCuratorDiscoveryImpl</a></span>(<a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                                        org.apache.curator.x.discovery.ServiceDiscovery&lt;<a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.Agent.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl.Agent</a>&gt;&nbsp;serviceDiscovery,
                                        org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                                        org.apache.curator.framework.listen.Listenable&lt;org.apache.curator.framework.state.ConnectionStateListener&gt;&nbsp;listenableCuratorConnectionState,
-                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                                       <a href="../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties</a>&nbsp;properties)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -235,7 +236,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="AgentRoutingServiceCuratorDiscoveryImpl-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">
+<a name="AgentRoutingServiceCuratorDiscoveryImpl-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.AgentRoutingServiceProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -245,7 +246,8 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
                                                org.apache.curator.x.discovery.ServiceDiscovery&lt;<a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.Agent.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl.Agent</a>&gt;&nbsp;serviceDiscovery,
                                                org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                                                org.apache.curator.framework.listen.Listenable&lt;org.apache.curator.framework.state.ConnectionStateListener&gt;&nbsp;listenableCuratorConnectionState,
-                                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+                                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                                               <a href="../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties</a>&nbsp;properties)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -254,6 +256,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <dd><code>taskScheduler</code> - The task scheduler</dd>
 <dd><code>listenableCuratorConnectionState</code> - The listenable curator client connection status</dd>
 <dd><code>registry</code> - The metrics registry</dd>
+<dd><code>properties</code> - The service properties</dd>
 </dl>
 </li>
 </ul>
@@ -273,6 +276,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <h4>handleClientConnected</h4>
 <pre>public&nbsp;void&nbsp;handleClientConnected(@NotBlank
                                   @NotBlank java.lang.String&nbsp;jobId)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#handleClientConnected-java.lang.String-">AgentRoutingService</a></code></span></div>
 <div class="block">Handle a new agent connection.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -290,6 +294,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <h4>handleClientDisconnected</h4>
 <pre>public&nbsp;void&nbsp;handleClientDisconnected(@NotBlank
                                      @NotBlank java.lang.String&nbsp;jobId)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#handleClientDisconnected-java.lang.String-">AgentRoutingService</a></code></span></div>
 <div class="block">Handle connected agent disconnection.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
