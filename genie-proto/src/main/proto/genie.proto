@@ -324,6 +324,7 @@ service FileStreamService {
 message AgentManifestMessage {
     string job_id = 1;
     string manifest_json = 2;
+    bool large_files_supported = 3; // To be removed once all agents are running a recent version
 }
 
 message ServerControlMessage {
@@ -335,8 +336,10 @@ message ServerControlMessage {
 message ServerFileRequestMessage {
     string stream_id = 1;
     string relative_path = 2;
-    int32 start_offset = 3;
-    int32 end_offset = 4;
+    int32 deprecated_start_offset = 3 [deprecated = true];
+    int32 deprecated_end_offset = 4   [deprecated = true];
+    int64 start_offset = 5;
+    int64 end_offset = 6;
 }
 
 message AgentFileMessage {

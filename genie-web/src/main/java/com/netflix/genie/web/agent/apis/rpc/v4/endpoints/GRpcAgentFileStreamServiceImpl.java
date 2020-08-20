@@ -57,6 +57,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -164,6 +165,9 @@ public class GRpcAgentFileStreamServiceImpl
             log.warn("No available slots to request file {} from agent running job: {}", relativePath, jobId);
             this.fileTransferLimitExceededCounter.increment();
             return Optional.empty();
+        } catch (IndexOutOfBoundsException e) {
+            log.warn("Cannot serve large file {} from agent running job: {}", relativePath, jobId);
+            return Optional.empty();
         }
 
         // Return the resource
@@ -229,9 +233,9 @@ public class GRpcAgentFileStreamServiceImpl
             final String jobId,
             final String fileTransferId,
             final String relativePath,
-            final int startOffset,
-            final int endOffset
-        ) throws NotFoundException {
+            final long startOffset,
+            final long endOffset
+        ) throws NotFoundException, IndexOutOfBoundsException {
 
             final ControlStreamObserver controlStreamObserver = this.controlStreamMap.get(jobId);
             if (controlStreamObserver == null) {
@@ -240,6 +244,16 @@ public class GRpcAgentFileStreamServiceImpl
 
             this.fileTansferCounter.increment();
 
+
+            if (!controlStreamObserver.allowLargeFiles.get()
+                && (startOffset > Integer.MAX_VALUE || endOffset > Integer.MAX_VALUE)) {
+                // Agents that are not marked with 'allowLargeFiles' use a version of the protocol that uses
+                // int32. They cannot serve file if the range goes beyond the 2GB mark.
+                // The two casts to int below can potentially overflow, but that is ok because such request will only
+                // be sent to an agent that ignores those fields.
+                throw new IndexOutOfBoundsException("Outdated agent does not support ranges beyond the 2GB mark");
+            }
+
             // Send the file request
             controlStreamObserver.responseObserver.onNext(
                 ServerControlMessage.newBuilder()
@@ -247,6 +261,8 @@ public class GRpcAgentFileStreamServiceImpl
                         ServerFileRequestMessage.newBuilder()
                             .setStreamId(fileTransferId)
                             .setRelativePath(relativePath)
+                            .setDeprecatedStartOffset((int) startOffset) // Possible integer overflow
+                            .setDeprecatedEndOffset((int) endOffset) // Possible integer overflow
                             .setStartOffset(startOffset)
                             .setEndOffset(endOffset)
                             .build()
@@ -309,6 +325,7 @@ public class GRpcAgentFileStreamServiceImpl
     private static final class ControlStreamObserver implements StreamObserver<AgentManifestMessage> {
         private final ControlStreamManager controlStreamManager;
         private final StreamObserver<ServerControlMessage> responseObserver;
+        private final AtomicBoolean allowLargeFiles = new AtomicBoolean(false);
 
         private ControlStreamObserver(
             final ControlStreamManager controlStreamManager,
@@ -324,6 +341,7 @@ public class GRpcAgentFileStreamServiceImpl
         @Override
         public void onNext(final AgentManifestMessage value) {
             final String jobId = value.getJobId();
+            this.allowLargeFiles.set(value.getLargeFilesSupported());
 
             DirectoryManifest manifest = null;
             try {
@@ -448,22 +466,22 @@ public class GRpcAgentFileStreamServiceImpl
                 throw new LimitExceededException("Too many concurrent downloads");
             }
 
-            final int fileSize = Math.toIntExact(manifestEntry.getSize());
+            final long fileSize = manifestEntry.getSize();
 
             // Http range is inclusive, agent protocol is not.
             // Convert from one to the other.
-            final int startOffset;
-            final int endOffset;
+            final long startOffset;
+            final long endOffset;
 
             if (range == null) {
                 startOffset = 0;
                 endOffset = fileSize;
             } else if (range.getClass() == this.suffixRangeClass) {
-                startOffset = Math.toIntExact(range.getRangeStart(fileSize));
+                startOffset = range.getRangeStart(fileSize);
                 endOffset = fileSize;
             } else {
-                startOffset = Math.min(fileSize, Math.toIntExact(range.getRangeStart(fileSize)));
-                endOffset = 1 + Math.toIntExact(range.getRangeEnd(fileSize));
+                startOffset = Math.min(fileSize, range.getRangeStart(fileSize));
+                endOffset = 1 + range.getRangeEnd(fileSize);
             }
 
             log.debug("Transfer {} effective range {}-{}: ", fileTransferId, startOffset, endOffset);
@@ -504,7 +522,7 @@ public class GRpcAgentFileStreamServiceImpl
                         startOffset,
                         endOffset
                     );
-                } catch (NotFoundException e) {
+                } catch (IndexOutOfBoundsException | NotFoundException e) {
                     log.error(
                         "Failed to request file {}:{}, terminating transfer {}: {}",
                         jobId,
@@ -656,9 +674,9 @@ public class GRpcAgentFileStreamServiceImpl
             final String transferId,
             final String jobId,
             final Path relativePath,
-            final int startOffset,
-            final int endOffset,
-            final int fileSize,
+            final long startOffset,
+            final long endOffset,
+            final long fileSize,
             final StreamBuffer buffer
         ) {
             this.transferId = transferId;

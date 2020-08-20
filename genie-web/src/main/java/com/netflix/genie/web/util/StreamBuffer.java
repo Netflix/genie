@@ -56,7 +56,7 @@ public class StreamBuffer {
      * Constructor.
      * @param skipOffset index of the first actual byte to return (
      */
-    public StreamBuffer(final int skipOffset) {
+    public StreamBuffer(final long skipOffset) {
         this.inputStreamRef.set(new StreamBufferInputStream(this, skipOffset));
     }
 
@@ -190,9 +190,9 @@ public class StreamBuffer {
 
     private static class StreamBufferInputStream extends InputStream {
         private final StreamBuffer streamBuffer;
-        private int skipBytesLeft;
+        private long skipBytesLeft;
 
-        StreamBufferInputStream(final StreamBuffer streamBuffer, final int skipOffset) {
+        StreamBufferInputStream(final StreamBuffer streamBuffer, final long skipOffset) {
             this.streamBuffer = streamBuffer;
             this.skipBytesLeft = skipOffset;
         }
@@ -218,7 +218,9 @@ public class StreamBuffer {
 
             // Efficiently skip over range of bytes that should be ignored
             if (this.skipBytesLeft > 0) {
-                final int skippedBytesRead = Math.min(this.skipBytesLeft, len);
+                final int maxSkipBytes =
+                    this.skipBytesLeft <= Integer.MAX_VALUE ? (int) this.skipBytesLeft : Integer.MAX_VALUE;
+                final int skippedBytesRead = Math.min(len, maxSkipBytes);
                 System.arraycopy(new byte[skippedBytesRead], 0, b, off, skippedBytesRead);
                 this.skipBytesLeft -= skippedBytesRead;
                 return skippedBytesRead;

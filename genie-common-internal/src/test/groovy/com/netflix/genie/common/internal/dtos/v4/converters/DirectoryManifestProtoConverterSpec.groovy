@@ -46,6 +46,7 @@ class DirectoryManifestProtoConverterSpec extends Specification {
         1 * objectMapper.writeValueAsString(manifest) >> JSON_MANIFEST
         message.getJobId() == jobId
         message.getManifestJson() == JSON_MANIFEST
+        message.getLargeFilesSupported()
 
         when:
         DirectoryManifest loadedManifest = converter.toManifest(message)

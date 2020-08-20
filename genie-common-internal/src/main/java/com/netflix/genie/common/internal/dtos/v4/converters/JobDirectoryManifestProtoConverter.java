@@ -71,6 +71,7 @@ public class JobDirectoryManifestProtoConverter {
         return AgentManifestMessage.newBuilder()
             .setJobId(claimedJobId)
             .setManifestJson(manifestJsonString)
+            .setLargeFilesSupported(true)
             .build();
     }
 

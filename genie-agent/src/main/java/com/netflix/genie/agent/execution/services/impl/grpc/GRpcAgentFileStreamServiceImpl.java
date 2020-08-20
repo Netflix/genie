@@ -255,8 +255,8 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     private synchronized void handleFileRequest(
         final String streamId,
         final String relativePath,
-        final int startOffset,
-        final int endOffset
+        final long startOffset,
+        final long endOffset
     ) {
         log.info(
             "Server is requesting file {} (range: [{}, {}), streamId: {})",
@@ -350,19 +350,19 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
         private final String streamId;
         private final Path absolutePath;
-        private final int startOffset;
-        private final int endOffset;
+        private final long startOffset;
+        private final long endOffset;
         private final StreamObserver<AgentFileMessage> outboundStreamObserver;
         private final ByteBuffer readBuffer;
         private final AtomicBoolean completed = new AtomicBoolean();
-        private int watermark;
+        private long watermark;
 
         FileTransfer(
             final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService,
             final String streamId,
             final Path absolutePath,
-            final int startOffset,
-            final int endOffset,
+            final long startOffset,
+            final long endOffset,
             final long maxChunkSize
         ) {
             this.gRpcAgentFileStreamService = gRpcAgentFileStreamService;
