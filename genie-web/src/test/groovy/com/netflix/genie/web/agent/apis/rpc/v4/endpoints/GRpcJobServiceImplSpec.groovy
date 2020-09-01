@@ -48,12 +48,15 @@ import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.proto.ReserveJobIdResponse
 import com.netflix.genie.web.agent.services.AgentJobService
 import io.grpc.stub.StreamObserver
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Timer
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.util.Sets
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import javax.validation.ConstraintViolationException
+import java.util.concurrent.TimeUnit
 
 /**
  * Specifications for the {@link GRpcJobServiceImpl} class.
@@ -75,13 +78,17 @@ class GRpcJobServiceImplSpec extends Specification {
     StreamObserver<GetJobStatusResponse> getJobStatusResponseObserver
     StreamObserver<ChangeJobArchiveStatusResponse> changeJobArchiveStatusObserver
     JobServiceProtoConverter jobServiceProtoConverter
+    MeterRegistry meterRegistry
+    Timer timer
+    AgentClientMetadata agentClientMetadata
 
     def setup() {
         this.id = UUID.randomUUID().toString()
         this.errorMessageComposer = Mock(JobServiceProtoErrorComposer)
         this.jobServiceProtoConverter = Mock(JobServiceProtoConverter)
         this.agentJobService = Mock(AgentJobService)
-        this.gRpcJobService = new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, errorMessageComposer)
+        this.meterRegistry = Mock(MeterRegistry)
+        this.gRpcJobService = new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, errorMessageComposer, meterRegistry)
         this.handshakeResponseObserver = Mock(StreamObserver)
         this.configureResponseObserver = Mock(StreamObserver)
         this.reserveJobIdResponseObserver = Mock(StreamObserver)
@@ -90,6 +97,10 @@ class GRpcJobServiceImplSpec extends Specification {
         this.changeJobStatusResponseObserver = Mock(StreamObserver)
         this.getJobStatusResponseObserver = Mock(StreamObserver)
         this.changeJobArchiveStatusObserver = Mock(StreamObserver)
+        this.timer = Mock(Timer)
+        this.agentClientMetadata = Mock(AgentClientMetadata) {
+            getVersion() >> Optional.of("1.2.3")
+        }
     }
 
     def "Handshake -- successful"() {
@@ -97,7 +108,6 @@ class GRpcJobServiceImplSpec extends Specification {
         HandshakeRequest request = HandshakeRequest.newBuilder()
             .setAgentMetadata(agentMetadata)
             .build()
-        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
         HandshakeResponse responseCapture
 
         when:
@@ -109,6 +119,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * handshakeResponseObserver.onNext(_ as HandshakeResponse) >> {
             args -> responseCapture = args[0]
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * handshakeResponseObserver.onCompleted()
         responseCapture != null
         StringUtils.isNotBlank(responseCapture.getMessage())
@@ -120,7 +132,6 @@ class GRpcJobServiceImplSpec extends Specification {
         HandshakeRequest request = HandshakeRequest.newBuilder()
             .setAgentMetadata(agentMetadata)
             .build()
-        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
         Exception e = new RuntimeException("Some error")
         HandshakeResponse response = HandshakeResponse.newBuilder().build()
 
@@ -134,12 +145,13 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * handshakeResponseObserver.onNext(_ as HandshakeResponse) >> {
             args -> assert response == args[0]
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * handshakeResponseObserver.onCompleted()
     }
 
     def "Configure -- successful"() {
         AgentMetadata agentMetadata = AgentMetadata.newBuilder().build()
-        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
         ConfigureRequest request = ConfigureRequest.newBuilder().build()
         Map<String, String> agentProperties = Maps.newHashMap()
         agentProperties.put("foo", "bar")
@@ -154,6 +166,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * configureResponseObserver.onNext(_ as ConfigureResponse) >> {
             args -> responseCapture = args[0]
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * configureResponseObserver.onCompleted()
         responseCapture != null
         responseCapture.getPropertiesMap().get("foo") == "bar"
@@ -162,7 +176,6 @@ class GRpcJobServiceImplSpec extends Specification {
     def "Reserve job id -- successful"() {
         ReserveJobIdRequest request = ReserveJobIdRequest.newBuilder().build()
         JobRequest jobRequest = Mock(JobRequest)
-        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
         ReserveJobIdResponse expectedResponse = ReserveJobIdResponse.newBuilder().setId(id).build()
 
         when:
@@ -173,13 +186,14 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
         1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> id
         1 * reserveJobIdResponseObserver.onNext(expectedResponse)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * reserveJobIdResponseObserver.onCompleted()
     }
 
     def "Reserve job id -- service exception"() {
         ReserveJobIdRequest request = ReserveJobIdRequest.newBuilder().build()
         JobRequest jobRequest = Mock(JobRequest)
-        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
         Exception e = new RuntimeException()
         ReserveJobIdResponse errorResponse = ReserveJobIdResponse.newBuilder().build()
 
@@ -194,6 +208,8 @@ class GRpcJobServiceImplSpec extends Specification {
         }
         1 * errorMessageComposer.toProtoReserveJobIdResponse(e) >> errorResponse
         1 * reserveJobIdResponseObserver.onNext(errorResponse)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * reserveJobIdResponseObserver.onCompleted()
     }
 
@@ -209,6 +225,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
         1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> specificationResponse
         1 * jobSpecificationResponseObserver.onNext(specificationResponse)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
@@ -224,6 +242,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
         1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
@@ -239,6 +259,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.resolveJobSpecification(id) >> { throw exception }
         1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
@@ -254,6 +276,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.getJobSpecification(id) >> jobSpecification
         1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
@@ -269,6 +293,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.getJobSpecification(id) >> { throw exception }
         1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
@@ -286,6 +312,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.dryRunJobSpecificationResolution(jobRequest) >> jobSpecification
         1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
@@ -303,24 +331,27 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.dryRunJobSpecificationResolution(jobRequest) >> { throw exception }
         1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
     def "Claim job -- successful"() {
         ClaimJobRequest request = ClaimJobRequest.newBuilder().setId(id).build()
-        AgentClientMetadata clientMetadata = Mock(AgentClientMetadata)
         ClaimJobResponse responseCapture
 
         when:
         gRpcJobService.claimJob(request, claimJobResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> clientMetadata
-        1 * agentJobService.claimJob(id, clientMetadata)
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
+        1 * agentJobService.claimJob(id, agentClientMetadata)
         1 * claimJobResponseObserver.onNext(_ as ClaimJobResponse) >> {
             args ->
                 responseCapture = args[0] as ClaimJobResponse
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * claimJobResponseObserver.onCompleted()
 
         expect:
@@ -330,7 +361,6 @@ class GRpcJobServiceImplSpec extends Specification {
 
     def "Claim job -- service exception"() {
         ClaimJobRequest request = ClaimJobRequest.newBuilder().setId(id).build()
-        AgentClientMetadata clientMetadata = Mock(AgentClientMetadata)
         Exception exception = new GenieJobAlreadyClaimedException()
         ClaimJobResponse response = ClaimJobResponse.newBuilder().build()
 
@@ -338,10 +368,12 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.claimJob(request, claimJobResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> clientMetadata
-        1 * agentJobService.claimJob(id, clientMetadata) >> { throw exception }
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
+        1 * agentJobService.claimJob(id, agentClientMetadata) >> { throw exception }
         1 * errorMessageComposer.toProtoClaimJobResponse(exception) >> response
         1 * claimJobResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * claimJobResponseObserver.onCompleted()
     }
 
@@ -365,6 +397,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * changeJobStatusResponseObserver.onNext(_ as ChangeJobStatusResponse) >> {
             args -> responseCapture = args[0] as ChangeJobStatusResponse
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * changeJobStatusResponseObserver.onCompleted()
 
         expect:
@@ -394,6 +428,8 @@ class GRpcJobServiceImplSpec extends Specification {
         }
         1 * errorMessageComposer.toProtoChangeJobStatusResponse(exception) >> response
         1 * changeJobStatusResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * changeJobStatusResponseObserver.onCompleted()
     }
 
@@ -416,6 +452,8 @@ class GRpcJobServiceImplSpec extends Specification {
         0 * agentJobService.updateJobStatus(_, _, _, _)
         1 * errorMessageComposer.toProtoChangeJobStatusResponse(_ as IllegalArgumentException) >> response
         1 * changeJobStatusResponseObserver.onNext(response)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * changeJobStatusResponseObserver.onCompleted()
     }
 
@@ -435,6 +473,8 @@ class GRpcJobServiceImplSpec extends Specification {
             GetJobStatusResponse response ->
                 responseCapture = response
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * getJobStatusResponseObserver.onCompleted()
         responseCapture != null
 
@@ -455,6 +495,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.getJobStatus(id) >> {
             throw e
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * getJobStatusResponseObserver.onError(e)
     }
 
@@ -471,6 +513,8 @@ class GRpcJobServiceImplSpec extends Specification {
         then:
         1 * agentJobService.updateJobArchiveStatus(id, archiveStatus)
         1 * changeJobArchiveStatusObserver.onNext(_ as ChangeJobArchiveStatusResponse)
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * changeJobArchiveStatusObserver.onCompleted()
     }
 
@@ -489,6 +533,8 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.updateJobArchiveStatus(id, archiveStatus) >> {
             throw exception
         }
+        1 * meterRegistry.timer(_, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         1 * changeJobArchiveStatusObserver.onError(_ as Exception)
 
         where:

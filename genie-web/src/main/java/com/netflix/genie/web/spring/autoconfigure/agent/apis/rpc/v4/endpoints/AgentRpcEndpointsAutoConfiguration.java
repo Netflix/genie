@@ -150,6 +150,7 @@ public class AgentRpcEndpointsAutoConfiguration {
      * @param agentJobService          The {@link AgentJobService} instance to use
      * @param jobServiceProtoConverter The {@link JobServiceProtoConverter} instance to use
      * @param protoErrorComposer       The {@link JobServiceProtoErrorComposer} instance to use
+     * @param meterRegistry            The meter registry
      * @return A {@link GRpcJobServiceImpl} instance
      */
     @Bean
@@ -157,9 +158,10 @@ public class AgentRpcEndpointsAutoConfiguration {
     public GRpcJobServiceImpl gRpcJobService(
         final AgentJobService agentJobService,
         final JobServiceProtoConverter jobServiceProtoConverter,
-        final JobServiceProtoErrorComposer protoErrorComposer
+        final JobServiceProtoErrorComposer protoErrorComposer,
+        final MeterRegistry meterRegistry
     ) {
-        return new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, protoErrorComposer);
+        return new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, protoErrorComposer, meterRegistry);
     }
 
     /**

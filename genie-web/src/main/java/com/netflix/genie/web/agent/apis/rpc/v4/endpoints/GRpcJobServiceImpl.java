@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -43,11 +44,16 @@ import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
 import com.netflix.genie.web.agent.services.AgentJobService;
+import com.netflix.genie.web.util.MetricsUtils;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
@@ -58,11 +64,25 @@ import java.util.Map;
  */
 @Slf4j
 public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
+    private static final String AGENT_VERSION_TAG = "agentVersion";
+    private static final String STATUS_FROM_TAG = "statusFrom";
+    private static final String STATUS_TO_TAG = "statusTo";
+    private static final String UNKNOWN_VERSION = "unknown";
+    private static final String TIMERS_PREFIX = "genie.rpc.job";
+    private static final String HANDSHAKE_TIMER = TIMERS_PREFIX + ".handshake.timer";
+    private static final String CONFIGURE_TIMER = TIMERS_PREFIX + ".configure.timer";
+    private static final String RESERVE_TIMER = TIMERS_PREFIX + ".reserve.timer";
+    private static final String RESOLVE_TIMER = TIMERS_PREFIX + ".resolve.timer";
+    private static final String GET_SPECIFICATION_TIMER = TIMERS_PREFIX + ".getSpecification.timer";
+    private static final String DRY_RUN_RESOLVE_TIMER = TIMERS_PREFIX + ".dryRunResolve.timer";
+    private static final String CLAIM_TIMER = TIMERS_PREFIX + ".claim.timer";
+    private static final String CHANGE_STATUS_TIMER = TIMERS_PREFIX + ".changeStatus.timer";
+    private static final String GET_STATUS_TIMER = TIMERS_PREFIX + ".getStatus.timer";
+    private static final String CHANGE_ARCHIVE_STATUS_TIMER = TIMERS_PREFIX + ".changeArchiveStatus.timer";
     private final AgentJobService agentJobService;
     private final JobServiceProtoConverter jobServiceProtoConverter;
     private final JobServiceProtoErrorComposer protoErrorComposer;
-
-    // TODO: Metrics which I believe can be captured by an interceptor
+    private final MeterRegistry meterRegistry;
 
     /**
      * Constructor.
@@ -70,15 +90,18 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
      * @param agentJobService          The implementation of the {@link AgentJobService} to use
      * @param jobServiceProtoConverter DTO/Proto converter
      * @param protoErrorComposer       proto error message composer
+     * @param meterRegistry            meter registry
      */
     public GRpcJobServiceImpl(
         final AgentJobService agentJobService,
         final JobServiceProtoConverter jobServiceProtoConverter,
-        final JobServiceProtoErrorComposer protoErrorComposer
+        final JobServiceProtoErrorComposer protoErrorComposer,
+        final MeterRegistry meterRegistry
     ) {
         this.agentJobService = agentJobService;
         this.jobServiceProtoConverter = jobServiceProtoConverter;
         this.protoErrorComposer = protoErrorComposer;
+        this.meterRegistry = meterRegistry;
     }
 
     /**
@@ -92,9 +115,13 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final HandshakeRequest request,
         final StreamObserver<HandshakeResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final AgentClientMetadata agentMetadata =
                 jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
+
+            tags.add(Tag.of(AGENT_VERSION_TAG, agentMetadata.getVersion().orElse(UNKNOWN_VERSION)));
 
             agentJobService.handshake(agentMetadata);
 
@@ -105,8 +132,15 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
                     .build()
             );
 
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoHandshakeResponse(e));
+        } finally {
+            meterRegistry
+                .timer(HANDSHAKE_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
 
         responseObserver.onCompleted();
@@ -123,9 +157,13 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ConfigureRequest request,
         final StreamObserver<ConfigureResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final AgentClientMetadata agentMetadata =
                 jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
+
+            tags.add(Tag.of(AGENT_VERSION_TAG, agentMetadata.getVersion().orElse(UNKNOWN_VERSION)));
 
             final Map<String, String> agentProperties = agentJobService.getAgentProperties(agentMetadata);
 
@@ -135,8 +173,15 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
                     .build()
             );
 
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoConfigureResponse(e));
+        } finally {
+            meterRegistry
+                .timer(CONFIGURE_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
 
         responseObserver.onCompleted();
@@ -153,18 +198,30 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ReserveJobIdRequest request,
         final StreamObserver<ReserveJobIdResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDto(request);
             final AgentClientMetadata agentClientMetadata
                 = jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
+
+            tags.add(Tag.of(AGENT_VERSION_TAG, agentClientMetadata.getVersion().orElse(UNKNOWN_VERSION)));
+
             final String jobId = this.agentJobService.reserveJobId(jobRequest, agentClientMetadata);
             responseObserver.onNext(
                 ReserveJobIdResponse.newBuilder()
                     .setId(jobId)
                     .build()
             );
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoReserveJobIdResponse(e));
+        } finally {
+            meterRegistry
+                .timer(RESERVE_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         responseObserver.onCompleted();
     }
@@ -182,13 +239,21 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final String id = request.getId();
             final JobSpecification jobSpec = this.agentJobService.resolveJobSpecification(id);
             responseObserver.onNext(jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpec));
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
             log.error(e.getMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
+        } finally {
+            meterRegistry
+                .timer(RESOLVE_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         responseObserver.onCompleted();
     }
@@ -205,13 +270,21 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final String id = request.getId();
             final JobSpecification jobSpecification = this.agentJobService.getJobSpecification(id);
             responseObserver.onNext(jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification));
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
             log.error(e.getMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
+        } finally {
+            meterRegistry
+                .timer(GET_SPECIFICATION_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         responseObserver.onCompleted();
     }
@@ -229,13 +302,21 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final DryRunJobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDto(request);
             final JobSpecification jobSpecification = this.agentJobService.dryRunJobSpecificationResolution(jobRequest);
             responseObserver.onNext(jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification));
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
             log.error("Error resolving job specification for request " + request, e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
+        } finally {
+            meterRegistry
+                .timer(DRY_RUN_RESOLVE_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         responseObserver.onCompleted();
     }
@@ -251,15 +332,26 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ClaimJobRequest request,
         final StreamObserver<ClaimJobResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final String id = request.getId();
             final AgentClientMetadata clientMetadata
                 = jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
+
+            tags.add(Tag.of(AGENT_VERSION_TAG, clientMetadata.getVersion().orElse(UNKNOWN_VERSION)));
+
             this.agentJobService.claimJob(id, clientMetadata);
             responseObserver.onNext(ClaimJobResponse.newBuilder().setSuccessful(true).build());
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
             log.error("Error claiming job for request " + request, e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(this.protoErrorComposer.toProtoClaimJobResponse(e));
+        } finally {
+            meterRegistry
+                .timer(CLAIM_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         responseObserver.onCompleted();
     }
@@ -275,16 +367,28 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ChangeJobStatusRequest request,
         final StreamObserver<ChangeJobStatusResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         try {
             final String id = request.getId();
             final JobStatus currentStatus = JobStatus.valueOf(request.getCurrentStatus().toUpperCase());
             final JobStatus newStatus = JobStatus.valueOf(request.getNewStatus().toUpperCase());
             final String newStatusMessage = request.getNewStatusMessage();
+
+            tags.add(Tag.of(STATUS_FROM_TAG, currentStatus.name()));
+            tags.add(Tag.of(STATUS_TO_TAG, newStatus.name()));
+
             this.agentJobService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
             responseObserver.onNext(ChangeJobStatusResponse.newBuilder().setSuccessful(true).build());
+            MetricsUtils.addSuccessTags(tags);
         } catch (Exception e) {
             log.error("Error changing job status for request " + request, e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onNext(protoErrorComposer.toProtoChangeJobStatusResponse(e));
+        } finally {
+            meterRegistry
+                .timer(CHANGE_STATUS_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         responseObserver.onCompleted();
     }
@@ -301,14 +405,22 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final GetJobStatusRequest request,
         final StreamObserver<GetJobStatusResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
         final String id = request.getId();
         try {
             final JobStatus status = this.agentJobService.getJobStatus(id);
             responseObserver.onNext(GetJobStatusResponse.newBuilder().setStatus(status.name()).build());
             responseObserver.onCompleted();
+            MetricsUtils.addSuccessTags(tags);
         } catch (Exception e) {
             log.error("Error retrieving job {} status: {}", id, e.getMessage());
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onError(e);
+        } finally {
+            meterRegistry
+                .timer(GET_STATUS_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -324,19 +436,30 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ChangeJobArchiveStatusRequest request,
         final StreamObserver<ChangeJobArchiveStatusResponse> responseObserver
     ) {
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
 
         final String id = request.getId();
         final ArchiveStatus newArchiveStatus = ArchiveStatus.valueOf(request.getNewStatus());
+        tags.add(Tag.of(STATUS_TO_TAG, newArchiveStatus.name()));
+
         try {
             this.agentJobService.updateJobArchiveStatus(id, newArchiveStatus);
             responseObserver.onNext(ChangeJobArchiveStatusResponse.newBuilder().build());
             responseObserver.onCompleted();
+            MetricsUtils.addSuccessTags(tags);
         } catch (GenieJobNotFoundException e) {
             log.error("Cannot update archive status of job {}, job not found", id);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onError(Status.NOT_FOUND.withCause(e).asException());
         } catch (Exception e) {
             log.error("Error retrieving job {} status: {}", id, e.getMessage());
+            MetricsUtils.addFailureTagsWithException(tags, e);
             responseObserver.onError(e);
+        } finally {
+            meterRegistry
+                .timer(CHANGE_ARCHIVE_STATUS_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }
