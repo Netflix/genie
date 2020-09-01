@@ -427,6 +427,66 @@ for multiple errors.
 |AbstractSNSPublisher
 |status, type
 
+|genie.rpc.job.handshake.timer
+|Time taken to serve an agent request to handshake
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass, agentVersion
+
+|genie.rpc.job.configure.timer
+|Time taken to serve an agent request to obtain runtime configuration
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass, agentVersion
+
+|genie.rpc.job.reserve.timer
+|Time taken to serve an agent request to reserve a job
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass, agentVersion
+
+|genie.rpc.job.resolve.timer
+|Time taken to serve an agent request to resolve a job request into a job specification
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass
+
+|genie.rpc.job.getSpecification.timer
+|Time taken to serve an agent request to obtain a job specification
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass
+
+|genie.rpc.job.dryRunResolve.timer
+|Time taken to serve an agent request to resolve a job request into a job specification (dry run mode)
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass
+
+|genie.rpc.job.claim.timer
+|Time taken to serve an agent request to claim a job for execution
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass, agentVersion
+
+|genie.rpc.job.changeStatus.timer
+|Time taken to serve an agent request to update a job status
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass, statusFrom, statusTo
+
+|genie.rpc.job.getStatus.timer
+|Time taken to serve an agent request to obtain a job's status
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass
+
+|genie.rpc.job.changeArchiveStatus.timer
+|Time taken to serve an agent request to update a job archive status
+|nanoseconds
+|GRpcJobServiceImpl
+|status, exceptionClass, statusTo
+
 |genie.scripts.load.timer
 |Time taken to load (download, read, compile) a given script
 |nanoseconds
