@@ -41,7 +41,7 @@ import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
@@ -314,8 +314,8 @@ public class ServicesAutoConfiguration {
      * @return The attachment service to use
      */
     @Bean
-    @ConditionalOnMissingBean(AttachmentService.class)
-    public FileSystemAttachmentService attachmentService(final JobsProperties jobsProperties) {
+    @ConditionalOnMissingBean(LegacyAttachmentService.class)
+    public FileSystemAttachmentService legacyAttachmentService(final JobsProperties jobsProperties) {
         return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments().toString());
     }
 

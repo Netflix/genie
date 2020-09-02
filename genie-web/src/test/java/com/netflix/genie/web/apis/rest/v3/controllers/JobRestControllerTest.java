@@ -43,7 +43,7 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
@@ -158,7 +158,7 @@ class JobRestControllerTest {
             registry,
             this.agentRoutingService,
             this.environment,
-            Mockito.mock(AttachmentService.class),
+            Mockito.mock(LegacyAttachmentService.class),
             jobExecutionModeSelector
         );
     }
@@ -843,7 +843,7 @@ class JobRestControllerTest {
             registry,
             this.agentRoutingService,
             this.environment,
-            Mockito.mock(AttachmentService.class),
+            Mockito.mock(LegacyAttachmentService.class),
             this.jobExecutionModeSelector
         );
         jobController.getJobOutput(jobId, null, request, response);

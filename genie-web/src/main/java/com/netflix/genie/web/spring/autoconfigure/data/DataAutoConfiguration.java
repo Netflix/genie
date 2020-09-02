@@ -29,7 +29,7 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileReposito
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -101,9 +101,9 @@ public class DataAutoConfiguration {
     /**
      * Provide a default implementation of {@link PersistenceService} if no other has been defined.
      *
-     * @param entityManager     The {@link EntityManager} for this application
-     * @param jpaRepositories   The {@link JpaRepositories} for Genie
-     * @param attachmentService The {@link AttachmentService} implementation to use
+     * @param entityManager           The {@link EntityManager} for this application
+     * @param jpaRepositories         The {@link JpaRepositories} for Genie
+     * @param legacyAttachmentService The {@link LegacyAttachmentService} implementation to use
      * @return A {@link JpaPersistenceServiceImpl} instance which implements {@link PersistenceService} backed by
      * JPA and a relational database
      */
@@ -112,8 +112,8 @@ public class DataAutoConfiguration {
     public JpaPersistenceServiceImpl geniePersistenceService(
         final EntityManager entityManager,
         final JpaRepositories jpaRepositories,
-        final AttachmentService attachmentService
+        final LegacyAttachmentService legacyAttachmentService
     ) {
-        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories, attachmentService);
+        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories, legacyAttachmentService);
     }
 }

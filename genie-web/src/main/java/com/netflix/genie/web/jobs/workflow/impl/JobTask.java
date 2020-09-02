@@ -22,7 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -50,23 +50,23 @@ public class JobTask extends GenieBaseTask {
 
     private static final String JOB_TASK_TIMER_NAME = "genie.jobs.tasks.jobTask.timer";
     private static final String EMPTY_STRING = "";
-    private final AttachmentService attachmentService;
+    private final LegacyAttachmentService legacyAttachmentService;
     private final GenieFileTransferService fts;
 
     /**
      * Constructor.
      *
-     * @param attachmentService An implementation of the Attachment Service
-     * @param registry          The metrics registry to use
-     * @param fts               File transfer service
+     * @param legacyAttachmentService An implementation of the Attachment Service
+     * @param registry                The metrics registry to use
+     * @param fts                     File transfer service
      */
     public JobTask(
-        @NotNull final AttachmentService attachmentService,
+        @NotNull final LegacyAttachmentService legacyAttachmentService,
         @NotNull final MeterRegistry registry,
         @NotNull final GenieFileTransferService fts
     ) {
         super(registry);
-        this.attachmentService = attachmentService;
+        this.legacyAttachmentService = legacyAttachmentService;
         this.fts = fts;
     }
 
@@ -125,11 +125,11 @@ public class JobTask extends GenieBaseTask {
             }
 
             // Copy down the attachments if any to the current working directory
-            this.attachmentService.copy(
+            this.legacyAttachmentService.copy(
                 jobId,
                 jobExecEnv.getJobWorkingDir());
             // Delete the files from the attachment service to save space on disk
-            this.attachmentService.delete(jobId);
+            this.legacyAttachmentService.delete(jobId);
 
             // Print out the current Envrionment to a env file before running the command.
             writer.write("# Dump the environment to a env.log file" + System.lineSeparator());

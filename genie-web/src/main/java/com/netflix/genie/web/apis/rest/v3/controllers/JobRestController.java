@@ -57,7 +57,7 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
@@ -159,7 +159,7 @@ public class JobRestController {
     private final Environment environment;
 
     // TODO: V3 Execution only
-    private final AttachmentService attachmentService;
+    private final LegacyAttachmentService legacyAttachmentService;
     private final JobExecutionModeSelector jobExecutionModeSelector;
 
     // Metrics
@@ -180,7 +180,7 @@ public class JobRestController {
      * @param registry                  The metrics registry to use
      * @param agentRoutingService       Agent routing service
      * @param environment               The application environment to pull dynamic properties from
-     * @param attachmentService         The attachment service to use to save attachments.
+     * @param legacyAttachmentService   The attachment service to use to save attachments.
      * @param jobExecutionModeSelector  The execution mode (agent vs. embedded) mode selector
      */
     @Autowired
@@ -197,7 +197,7 @@ public class JobRestController {
         final MeterRegistry registry,
         final AgentRoutingService agentRoutingService,
         final Environment environment,
-        final AttachmentService attachmentService,
+        final LegacyAttachmentService legacyAttachmentService,
         final JobExecutionModeSelector jobExecutionModeSelector
     ) {
         this.jobLaunchService = jobLaunchService;
@@ -219,7 +219,7 @@ public class JobRestController {
         this.environment = environment;
 
         // TODO: V3 Only. Remove.
-        this.attachmentService = attachmentService;
+        this.legacyAttachmentService = legacyAttachmentService;
         this.jobExecutionModeSelector = jobExecutionModeSelector;
 
         // Set up the metrics
@@ -897,7 +897,7 @@ public class JobRestController {
                     if (originalFilename == null) {
                         originalFilename = UUID.randomUUID().toString();
                     }
-                    this.attachmentService.save(jobId, originalFilename, attachment.getInputStream());
+                    this.legacyAttachmentService.save(jobId, originalFilename, attachment.getInputStream());
                 } catch (final IOException ioe) {
                     throw new GenieServerException("Failed to save job attachment", ioe);
                 }
