@@ -32,7 +32,6 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
-import com.netflix.genie.web.services.LegacyAttachmentService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,8 +75,7 @@ class JpaPersistenceServiceImplCommandsTest {
         Mockito.when(jpaRepositories.getCriterionRepository()).thenReturn(Mockito.mock(JpaCriterionRepository.class));
         this.service = new JpaPersistenceServiceImpl(
             Mockito.mock(EntityManager.class),
-            jpaRepositories,
-            Mockito.mock(LegacyAttachmentService.class)
+            jpaRepositories
         );
     }
 

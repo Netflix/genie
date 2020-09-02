@@ -24,11 +24,11 @@ import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.core.io.Resource;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -40,22 +40,8 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Getter
-@EqualsAndHashCode(
-    doNotUseGetters = true,
-    of = {
-        // Exclude the attachments to save on scanning bytes
-        "jobRequest",
-        "jobRequestMetadata"
-    }
-)
-@ToString(
-    doNotUseGetters = true,
-    of = {
-        // Exclude the attachments to save on scanning bytes
-        "jobRequest",
-        "jobRequestMetadata"
-    }
-)
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
 @SuppressWarnings("FinalClass")
 public class JobSubmission {
 
@@ -66,7 +52,7 @@ public class JobSubmission {
     @Valid
     private final JobRequestMetadata jobRequestMetadata;
     @NotNull
-    private final Set<Resource> attachments;
+    private final Set<URI> attachments;
 
     private JobSubmission(final Builder builder) {
         this.jobRequest = builder.bJobRequest;
@@ -83,7 +69,7 @@ public class JobSubmission {
     public static class Builder {
         private final JobRequest bJobRequest;
         private final JobRequestMetadata bJobRequestMetadata;
-        private final Set<Resource> bAttachments;
+        private final Set<URI> bAttachments;
 
         /**
          * Constructor with required parameters.
@@ -100,10 +86,10 @@ public class JobSubmission {
         /**
          * Set the attachments associated with this submission if there were any.
          *
-         * @param attachments The attachments as {@link Resource} instances
+         * @param attachments The attachments {@link URI}s
          * @return the builder
          */
-        public Builder withAttachments(@Nullable final Set<Resource> attachments) {
+        public Builder withAttachments(@Nullable final Set<URI> attachments) {
             this.setAttachments(attachments);
             return this;
         }
@@ -111,10 +97,10 @@ public class JobSubmission {
         /**
          * Set the attachments associated with this submission.
          *
-         * @param attachments The attachments as {@link Resource} instances
+         * @param attachments The attachments as {@link URI}s
          * @return the builder
          */
-        public Builder withAttachments(final Resource... attachments) {
+        public Builder withAttachments(final URI... attachments) {
             this.setAttachments(Arrays.asList(attachments));
             return this;
         }
@@ -128,7 +114,7 @@ public class JobSubmission {
             return new JobSubmission(this);
         }
 
-        private void setAttachments(@Nullable final Collection<Resource> attachments) {
+        private void setAttachments(@Nullable final Collection<URI> attachments) {
             this.bAttachments.clear();
             if (attachments != null) {
                 this.bAttachments.addAll(attachments);

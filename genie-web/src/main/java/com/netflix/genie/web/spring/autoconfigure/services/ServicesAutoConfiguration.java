@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
@@ -28,6 +29,7 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -41,7 +43,7 @@ import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
-import com.netflix.genie.web.services.LegacyAttachmentService;
+import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
@@ -52,6 +54,7 @@ import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
@@ -64,8 +67,10 @@ import com.netflix.genie.web.services.impl.JobKillServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
+import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
+import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -83,7 +88,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.support.RetryTemplate;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -104,6 +111,7 @@ import java.util.List;
         JobsUsersProperties.class,
         ExponentialBackOffTriggerProperties.class,
         JobsActiveLimitProperties.class,
+        AttachmentServiceProperties.class
     }
 )
 @Slf4j
@@ -317,6 +325,35 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(LegacyAttachmentService.class)
     public FileSystemAttachmentService legacyAttachmentService(final JobsProperties jobsProperties) {
         return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments().toString());
+    }
+
+    /**
+     * The attachment service to use.
+     *
+     * @param s3ClientFactory             the S3 client factory
+     * @param attachmentServiceProperties the service properties
+     * @param meterRegistry               the meter registry
+     * @return The attachment service to use
+     * @throws IOException if the local filesystem implmentation is used and it fails to initialize
+     */
+    @Bean
+    @ConditionalOnMissingBean(AttachmentService.class)
+    public AttachmentService attachmentService(
+        final S3ClientFactory s3ClientFactory,
+        final AttachmentServiceProperties attachmentServiceProperties,
+        final MeterRegistry meterRegistry
+    ) throws IOException {
+        final @NotNull URI location = attachmentServiceProperties.getLocationPrefix();
+        final String scheme = location.getScheme();
+        if ("s3".equals(scheme)) {
+            return new S3AttachmentServiceImpl(s3ClientFactory, attachmentServiceProperties, meterRegistry);
+        } else if ("file".equals(scheme)) {
+            return new LocalFileSystemAttachmentServiceImpl(attachmentServiceProperties);
+        } else {
+            throw new IllegalStateException(
+                "Unknown attachment service implementation to use for location: " + location
+            );
+        }
     }
 
     /**

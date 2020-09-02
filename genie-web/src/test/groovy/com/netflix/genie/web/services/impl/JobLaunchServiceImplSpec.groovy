@@ -109,19 +109,6 @@ class JobLaunchServiceImplSpec extends Specification {
         service.launchJob(jobSubmission)
 
         then:
-        1 * persistenceService.saveJobSubmission(jobSubmission) >> {
-            throw new SaveAttachmentException("hmm that's not good")
-        }
-        0 * jobResolverService.resolveJob(_ as String)
-        0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
-        0 * persistenceService.updateJobArchiveStatus(_, _)
-        0 * agentLauncher.launchAgent(_ as ResolvedJob)
-        thrown(SaveAttachmentException)
-
-        when:
-        service.launchJob(jobSubmission)
-
-        then:
         1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
         1 * jobResolverService.resolveJob(jobId) >> {
             throw new GenieJobResolutionException("fail")

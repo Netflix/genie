@@ -105,8 +105,6 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
-import com.netflix.genie.web.services.LegacyAttachmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -208,21 +206,14 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     private final JpaJobRepository jobRepository;
     private final JpaTagRepository tagRepository;
 
-    // TODO: Maybe this should be moved to a higher place, job resolver? Not sure persistence tier is proper place for
-    //       saving attachments?
-    private final LegacyAttachmentService legacyAttachmentService;
-
     /**
      * Constructor.
-     *
-     * @param entityManager           The {@link EntityManager} to use
+     *  @param entityManager           The {@link EntityManager} to use
      * @param jpaRepositories         All the repositories in the Genie application
-     * @param legacyAttachmentService The {@link LegacyAttachmentService} implementation to use
      */
     public JpaPersistenceServiceImpl(
         final EntityManager entityManager,
-        final JpaRepositories jpaRepositories,
-        final LegacyAttachmentService legacyAttachmentService
+        final JpaRepositories jpaRepositories
     ) {
         this.entityManager = entityManager;
         this.agentConnectionRepository = jpaRepositories.getAgentConnectionRepository();
@@ -233,7 +224,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         this.fileRepository = jpaRepositories.getFileRepository();
         this.jobRepository = jpaRepositories.getJobRepository();
         this.tagRepository = jpaRepositories.getTagRepository();
-        this.legacyAttachmentService = legacyAttachmentService;
     }
 
     //region Application APIs
@@ -1686,7 +1676,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Nonnull
     public String saveJobSubmission(
         @Valid final JobSubmission jobSubmission
-    ) throws IdAlreadyExistsException, SaveAttachmentException {
+    ) throws IdAlreadyExistsException {
         log.debug("[saveJobSubmission] Attempting to save job submission {}", jobSubmission);
         // TODO: Metrics
         final JobEntity jobEntity = new JobEntity();
@@ -1698,12 +1688,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         // Create the unique id if one doesn't already exist
         this.setUniqueId(jobEntity, jobRequest.getRequestedId().orElse(null));
 
-        // Do we have attachments? Save them so the agent can access them later.
-        final Set<URI> attachmentURIs = this.legacyAttachmentService.saveAttachments(
-            jobEntity.getUniqueId(),
-            jobSubmission.getAttachments()
-        );
-
         jobEntity.setCommandArgs(jobRequest.getCommandArgs());
 
         this.setJobMetadataFields(
@@ -1711,7 +1695,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             jobRequest.getMetadata(),
             jobRequest.getResources().getSetupFile().orElse(null)
         );
-        this.setJobExecutionEnvironmentFields(jobEntity, jobRequest.getResources(), attachmentURIs);
+        this.setJobExecutionEnvironmentFields(jobEntity, jobRequest.getResources(), jobSubmission.getAttachments());
         this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
         this.setRequestedJobEnvironmentFields(jobEntity, jobRequest.getRequestedJobEnvironment());
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());

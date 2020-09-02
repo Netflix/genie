@@ -230,6 +230,21 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |null
 |yes
 
+|genie.jobs.attachments.location-prefix
+|Common prefix where attachments are stored
+|s3://genie/attachments
+|no
+
+|genie.jobs.attachments.max-size
+|Maximum size of an attachment
+|100MB
+|no
+
+|genie.jobs.attachments.max-total-size
+|Maximum size of all attachments combined (Spring and Tomcat may also independently limit the size of upload)
+|150MB
+|no
+
 |genie.jobs.cleanup.deleteDependencies
 |Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
 |true
@@ -293,7 +308,7 @@ cases is specified as part of the `Command` entity for a particular job.
 
 |genie.jobs.locations.attachments
 |The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
-doesn't exist.
+doesn't exist (deprecated, see genie.jobs.attachments.* properties)
 |file://${java.io.tmpdir}genie/attachments/
 |no
 

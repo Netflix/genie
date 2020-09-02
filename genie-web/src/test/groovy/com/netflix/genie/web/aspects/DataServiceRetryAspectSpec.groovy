@@ -162,12 +162,5 @@ class DataServiceRetryAspectSpec extends Specification {
         then:
         thrown(IdAlreadyExistsException.class)
         1 * dataService.saveJobSubmission(jobSubmission) >> { throw new IdAlreadyExistsException("conflict") }
-
-        when:
-        dataServiceProxy.saveJobSubmission(jobSubmission)
-
-        then:
-        thrown(SaveAttachmentException.class)
-        1 * dataService.saveJobSubmission(jobSubmission) >> { throw new SaveAttachmentException("bad") }
     }
 }
