@@ -32,8 +32,8 @@ class JobSubmissionSpec extends Specification {
     def "Can build"() {
         def jobRequest = Mock(JobRequest)
         def jobRequestMetadata = Mock(JobRequestMetadata)
-        def attachment1 = Mock(Resource)
-        def attachment2 = Mock(Resource)
+        def attachment1 = URI.create("s3://some-bucket/scripts/script1.sql")
+        def attachment2 = URI.create("s3://some-bucket/scripts/script2.sql")
 
         def builder = new JobSubmission.Builder(jobRequest, jobRequestMetadata)
 
@@ -53,10 +53,9 @@ class JobSubmissionSpec extends Specification {
         submission2.getJobRequestMetadata() == jobRequestMetadata
         submission2.getAttachments().size() == 2
         submission2.getAttachments().containsAll([attachment1, attachment2])
-        // note the attachments are ignored
-        submission1.toString() == submission2.toString()
-        submission1.hashCode() == submission2.hashCode()
-        submission1 == submission2
+        submission1.toString() != submission2.toString()
+        submission1.hashCode() != submission2.hashCode()
+        submission1 != submission2
         submission1.getAttachments() != submission2.getAttachments()
 
         when:
@@ -68,10 +67,9 @@ class JobSubmissionSpec extends Specification {
         submission3.getAttachments().size() == 2
         submission3.getAttachments().containsAll([attachment1, attachment2])
         // note the attachments are ignored
-        submission1.toString() == submission3.toString()
-        submission1.hashCode() == submission3.hashCode()
-        submission1 == submission3
-        submission1.getAttachments() != submission3.getAttachments()
+        submission2.toString() == submission3.toString()
+        submission2.hashCode() == submission3.hashCode()
+        submission2 == submission3
         submission2.getAttachments() == submission3.getAttachments()
 
         when:

@@ -57,10 +57,11 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.LegacyAttachmentService;
+import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.util.JobExecutionModeSelector;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -157,6 +158,7 @@ public class JobRestController {
     private final AgentRoutingService agentRoutingService;
     private final PersistenceService persistenceService;
     private final Environment environment;
+    private final AttachmentService attachmentService;
 
     // TODO: V3 Execution only
     private final LegacyAttachmentService legacyAttachmentService;
@@ -168,7 +170,6 @@ public class JobRestController {
 
     /**
      * Constructor.
-     *
      * @param jobLaunchService          The {@link JobLaunchService} implementation to use
      * @param dataServices              The {@link DataServices} instance to use
      * @param jobCoordinatorService     The job coordinator service to use.
@@ -180,6 +181,7 @@ public class JobRestController {
      * @param registry                  The metrics registry to use
      * @param agentRoutingService       Agent routing service
      * @param environment               The application environment to pull dynamic properties from
+     * @param attachmentService         The attachment service to use to save attachments.
      * @param legacyAttachmentService   The attachment service to use to save attachments.
      * @param jobExecutionModeSelector  The execution mode (agent vs. embedded) mode selector
      */
@@ -197,6 +199,7 @@ public class JobRestController {
         final MeterRegistry registry,
         final AgentRoutingService agentRoutingService,
         final Environment environment,
+        final AttachmentService attachmentService,
         final LegacyAttachmentService legacyAttachmentService,
         final JobExecutionModeSelector jobExecutionModeSelector
     ) {
@@ -217,6 +220,7 @@ public class JobRestController {
         this.agentRoutingService = agentRoutingService;
         this.persistenceService = dataServices.getPersistenceService();
         this.environment = environment;
+        this.attachmentService = attachmentService;
 
         // TODO: V3 Only. Remove.
         this.legacyAttachmentService = legacyAttachmentService;
@@ -946,10 +950,13 @@ public class JobRestController {
 
         if (attachments != null) {
             jobSubmissionBuilder.withAttachments(
-                Arrays
-                    .stream(attachments)
-                    .map(MultipartFile::getResource)
-                    .collect(Collectors.toSet())
+                this.attachmentService.saveAttachments(
+                    jobRequest.getId().orElse(null),
+                    Arrays
+                        .stream(attachments)
+                        .map(MultipartFile::getResource)
+                        .collect(Collectors.toSet())
+                )
             );
         }
 

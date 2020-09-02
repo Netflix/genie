@@ -48,7 +48,6 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.LegacyAttachmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -726,14 +725,9 @@ public interface PersistenceService {
      *                      either via the API or via the agent CLI
      * @return The unique id of the job within the Genie ecosystem
      * @throws IdAlreadyExistsException If the id the user requested already exists in the system for another job
-     * @throws SaveAttachmentException  If attachments were sent in with the job submission and they were unable to be
-     *                                  persisted to an underlying storage mechanism meant to share the data with an
-     *                                  agent process
      */
     @Nonnull
-    String saveJobSubmission(@Valid JobSubmission jobSubmission) throws
-        IdAlreadyExistsException,
-        SaveAttachmentException;
+    String saveJobSubmission(@Valid JobSubmission jobSubmission) throws IdAlreadyExistsException;
 
     /**
      * Get the original request for a job.

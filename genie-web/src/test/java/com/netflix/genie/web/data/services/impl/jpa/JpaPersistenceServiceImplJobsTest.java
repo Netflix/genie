@@ -60,7 +60,6 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
-import com.netflix.genie.web.services.LegacyAttachmentService;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,8 +122,7 @@ class JpaPersistenceServiceImplJobsTest {
 
         this.persistenceService = new JpaPersistenceServiceImpl(
             Mockito.mock(EntityManager.class),
-            jpaRepositories,
-            Mockito.mock(LegacyAttachmentService.class)
+            jpaRepositories
         );
     }
 

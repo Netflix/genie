@@ -29,7 +29,6 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejected
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
@@ -40,7 +39,6 @@ import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -169,9 +167,6 @@ public class AgentJobServiceImpl implements AgentJobService {
         } catch (final IdAlreadyExistsException e) {
             // TODO: How to handle this?
             throw new GenieIdAlreadyExistsException(e);
-        } catch (final SaveAttachmentException e) {
-            // this really shouldn't happen as there are no attachments with an agent cli job
-            throw new GenieRuntimeException(e);
         }
     }
 

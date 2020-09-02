@@ -30,6 +30,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExis
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
@@ -135,6 +136,8 @@ public class GenieExceptionMapper {
             return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
         } else if (e instanceof PreconditionFailedException) {
             return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } else if (e instanceof AttachmentTooLargeException) {
+            return new ResponseEntity<>(e, HttpStatus.PAYLOAD_TOO_LARGE);
         } else {
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }

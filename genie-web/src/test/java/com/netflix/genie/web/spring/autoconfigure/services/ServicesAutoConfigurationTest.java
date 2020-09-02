@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
@@ -27,6 +28,7 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -45,7 +47,9 @@ import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
+import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
+import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
@@ -58,6 +62,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
+import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +76,7 @@ import java.util.UUID;
  * @since 3.0.0
  */
 class ServicesAutoConfigurationTest {
+    //TODO update this test class to use ContextRunner, like the rest of configuration tests
 
     private ServicesAutoConfiguration servicesAutoConfiguration;
 
@@ -207,5 +214,33 @@ class ServicesAutoConfigurationTest {
                 )
             )
             .isNotNull();
+    }
+
+    @Test
+    void canGetS3AttachmentServiceServiceBean() throws IOException {
+
+        final AttachmentServiceProperties properties = new AttachmentServiceProperties();
+
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.attachmentService(
+                    Mockito.mock(S3ClientFactory.class),
+                    properties,
+                    Mockito.mock(MeterRegistry.class)
+                )
+            )
+            .isInstanceOf(LocalFileSystemAttachmentServiceImpl.class);
+
+        properties.setLocationPrefix(URI.create("s3://foo/bar/genie/attachments"));
+
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.attachmentService(
+                    Mockito.mock(S3ClientFactory.class),
+                    properties,
+                    Mockito.mock(MeterRegistry.class)
+                )
+            )
+            .isInstanceOf(S3AttachmentServiceImpl.class);
     }
 }
