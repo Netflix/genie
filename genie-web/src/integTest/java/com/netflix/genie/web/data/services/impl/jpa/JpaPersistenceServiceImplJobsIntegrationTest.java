@@ -374,7 +374,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         );
 
         Mockito
-            .when(this.attachmentService.saveAttachments(Mockito.anyString(), Mockito.anySet()))
+            .when(this.legacyAttachmentService.saveAttachments(Mockito.anyString(), Mockito.anySet()))
             .thenReturn(attachmentURIs);
 
         // Save the job submission

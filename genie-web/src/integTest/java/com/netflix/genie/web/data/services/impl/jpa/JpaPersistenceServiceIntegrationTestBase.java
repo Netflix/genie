@@ -27,7 +27,7 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCriterionRep
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration;
 import org.junit.jupiter.api.AfterEach;
@@ -61,7 +61,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 )
 @MockBean(
     {
-        AttachmentService.class,
+        LegacyAttachmentService.class,
         PersistedJobStatusObserver.class //TODO: Needed for JobEntityListener but should be in DataAutoConfiguration
     }
 )
@@ -105,7 +105,7 @@ class JpaPersistenceServiceIntegrationTestBase {
     protected PersistedJobStatusObserver persistedJobStatusObserver;
 
     @Autowired
-    protected AttachmentService attachmentService;
+    protected LegacyAttachmentService legacyAttachmentService;
 
     @Autowired
     protected TestEntityManager entityManager;
@@ -113,6 +113,6 @@ class JpaPersistenceServiceIntegrationTestBase {
     @AfterEach
     void resetMocks() {
         // Could use @DirtiesContext but seems excessive
-        Mockito.reset(this.persistedJobStatusObserver, this.attachmentService);
+        Mockito.reset(this.persistedJobStatusObserver, this.legacyAttachmentService);
     }
 }

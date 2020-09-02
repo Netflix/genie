@@ -22,7 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.AbstractResource;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * @since 3.0.0
  */
 @Slf4j
-public class FileSystemAttachmentService implements AttachmentService {
+public class FileSystemAttachmentService implements LegacyAttachmentService {
 
     private final Path attachmentDirectory;
 

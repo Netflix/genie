@@ -30,7 +30,7 @@ import com.netflix.genie.web.jobs.workflow.impl.JobTask;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
-import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
@@ -194,20 +194,20 @@ public class JobsAutoConfiguration {
     /**
      * Create an Job Task bean that processes Job information provided by user.
      *
-     * @param attachmentService An implementation of the attachment service
-     * @param registry          The metrics registry to use
-     * @param fts               File transfer implementation
+     * @param legacyAttachmentService An implementation of the attachment service
+     * @param registry                The metrics registry to use
+     * @param fts                     File transfer implementation
      * @return An job task object
      */
     @Bean
     @Order(value = 5)
     @ConditionalOnMissingBean(JobTask.class)
     public JobTask jobProcessorTask(
-        final AttachmentService attachmentService,
+        final LegacyAttachmentService legacyAttachmentService,
         final MeterRegistry registry,
         @Qualifier("genieFileTransferService") final GenieFileTransferService fts
     ) {
-        return new JobTask(attachmentService, registry, fts);
+        return new JobTask(legacyAttachmentService, registry, fts);
     }
 
     /**
