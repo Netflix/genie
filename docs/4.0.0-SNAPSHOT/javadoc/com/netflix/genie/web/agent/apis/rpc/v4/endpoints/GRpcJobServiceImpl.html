@@ -142,9 +142,10 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#GRpcJobServiceImpl-com.netflix.genie.web.agent.services.AgentJobService-com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter-com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer-">GRpcJobServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a>&nbsp;agentJobService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html#GRpcJobServiceImpl-com.netflix.genie.web.agent.services.AgentJobService-com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter-com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer-io.micrometer.core.instrument.MeterRegistry-">GRpcJobServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a>&nbsp;agentJobService,
                   <a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter,
-                  <a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">JobServiceProtoErrorComposer</a>&nbsp;protoErrorComposer)</code>
+                  <a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">JobServiceProtoErrorComposer</a>&nbsp;protoErrorComposer,
+                  io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -264,7 +265,7 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GRpcJobServiceImpl-com.netflix.genie.web.agent.services.AgentJobService-com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter-com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer-">
+<a name="GRpcJobServiceImpl-com.netflix.genie.web.agent.services.AgentJobService-com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter-com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -272,13 +273,15 @@ extends com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</pre>
 <h4>GRpcJobServiceImpl</h4>
 <pre>public&nbsp;GRpcJobServiceImpl(<a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a>&nbsp;agentJobService,
                           <a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter,
-                          <a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">JobServiceProtoErrorComposer</a>&nbsp;protoErrorComposer)</pre>
+                          <a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">JobServiceProtoErrorComposer</a>&nbsp;protoErrorComposer,
+                          io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentJobService</code> - The implementation of the <a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> to use</dd>
 <dd><code>jobServiceProtoConverter</code> - DTO/Proto converter</dd>
 <dd><code>protoErrorComposer</code> - proto error message composer</dd>
+<dd><code>meterRegistry</code> - meter registry</dd>
 </dl>
 </li>
 </ul>
