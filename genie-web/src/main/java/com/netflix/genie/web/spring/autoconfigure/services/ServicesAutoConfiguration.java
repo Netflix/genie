@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
@@ -28,6 +29,7 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -41,7 +43,7 @@ import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
-import com.netflix.genie.web.services.LegacyAttachmentService;
+import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
@@ -52,6 +54,7 @@ import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
+import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
@@ -66,6 +69,7 @@ import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
+import com.netflix.genie.web.services.impl.S3AttachmentService;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -104,6 +108,7 @@ import java.util.List;
         JobsUsersProperties.class,
         ExponentialBackOffTriggerProperties.class,
         JobsActiveLimitProperties.class,
+        AttachmentServiceProperties.class
     }
 )
 @Slf4j
@@ -317,6 +322,24 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(LegacyAttachmentService.class)
     public FileSystemAttachmentService legacyAttachmentService(final JobsProperties jobsProperties) {
         return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments().toString());
+    }
+
+    /**
+     * The attachment service to use.
+     *
+     * @param s3ClientFactory             the S3 client factory
+     * @param attachmentServiceProperties the service properties
+     * @param meterRegistry               the meter registry
+     * @return The attachment service to use
+     */
+    @Bean
+    @ConditionalOnMissingBean(AttachmentService.class)
+    public S3AttachmentService s3AttachmentService(
+        final S3ClientFactory s3ClientFactory,
+        final AttachmentServiceProperties attachmentServiceProperties,
+        final MeterRegistry meterRegistry
+    ) {
+        return new S3AttachmentService(s3ClientFactory, attachmentServiceProperties, meterRegistry);
     }
 
     /**

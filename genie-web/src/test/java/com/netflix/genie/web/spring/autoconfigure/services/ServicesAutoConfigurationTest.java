@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
@@ -27,6 +28,7 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -70,6 +72,7 @@ import java.util.UUID;
  * @since 3.0.0
  */
 class ServicesAutoConfigurationTest {
+    //TODO update this test class to use ContextRunner, like the rest of configuration tests
 
     private ServicesAutoConfiguration servicesAutoConfiguration;
 
@@ -204,6 +207,20 @@ class ServicesAutoConfigurationTest {
                     Mockito.mock(JobFileService.class),
                     Mockito.mock(JobDirectoryManifestCreatorService.class),
                     Mockito.mock(AgentRoutingService.class)
+                )
+            )
+            .isNotNull();
+    }
+
+    @Test
+    void canGetS3AttachmentServiceServiceBean() {
+        Assertions
+            .assertThat(
+                this.servicesAutoConfiguration.s3AttachmentService(
+
+                    Mockito.mock(S3ClientFactory.class),
+                    new AttachmentServiceProperties(),
+                    Mockito.mock(MeterRegistry.class)
                 )
             )
             .isNotNull();

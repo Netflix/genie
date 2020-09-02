@@ -20,37 +20,36 @@ package com.netflix.genie.web.properties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 
 /**
- * Properties for various job related locations.
+ * Properties for the {@link com.netflix.genie.web.services.AttachmentService}.
  *
- * @author tgianos
- * @since 3.0.0
+ * @author mprimi
+ * @since 4.0.0
  */
-@ConfigurationProperties(prefix = JobsLocationsProperties.PROPERTY_PREFIX)
+@ConfigurationProperties(prefix = AttachmentServiceProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
-public class JobsLocationsProperties {
+public class AttachmentServiceProperties {
 
     /**
-     * The property prefix for all properties in this group.
+     * The property prefix for job user limiting.
      */
-    public static final String PROPERTY_PREFIX = "genie.jobs.locations";
+    public static final String PROPERTY_PREFIX = "genie.jobs.attachments";
 
-    private static final String SYSTEM_TMP_DIR = System.getProperty("java.io.tmpdir", "/tmp/");
+    @NotNull(message = "Attachment location prefix is required")
+    private URI locationPrefix = URI.create("s3://genie/attachments");
 
-    @NotNull(message = "Archives storage location is required")
-    private URI archives = URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/");
+    @NotNull(message = "Maximum attachment size is required")
+    private DataSize maxSize = DataSize.ofMegabytes(100);
 
-    @NotNull(message = "Attachment storage location is required")
-    private URI attachments = URI.create("file://" + SYSTEM_TMP_DIR + "genie/attachments/");
+    @NotNull(message = "Maximum attachments total size is required")
+    private DataSize maxTotalSize = DataSize.ofMegabytes(150);
 
-    @Deprecated
-    @NotNull(message = "Default job working directory is required")
-    private URI jobs = URI.create("file://" + SYSTEM_TMP_DIR + "genie/jobs/");
 }

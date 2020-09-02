@@ -64,7 +64,6 @@ import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -373,13 +372,9 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             totalAttachmentSize
         );
 
-        Mockito
-            .when(this.legacyAttachmentService.saveAttachments(Mockito.anyString(), Mockito.anySet()))
-            .thenReturn(attachmentURIs);
-
         // Save the job submission
         final String id = this.service.saveJobSubmission(
-            new JobSubmission.Builder(jobRequest, jobRequestMetadata).withAttachments(attachments).build()
+            new JobSubmission.Builder(jobRequest, jobRequestMetadata).withAttachments(attachmentURIs).build()
         );
 
         // Going to assume that most other verification of parameters other than attachments is done in

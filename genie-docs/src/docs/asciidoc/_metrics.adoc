@@ -197,6 +197,30 @@ It will have to be added if one is desired otherwise metrics are just published 
 |ArchiveStatusCleanupTask
 |status, exceptionClass
 
+|genie.jobs.attachments.s3.count.distribution
+|Distribution summary of for the number of files attached
+|count
+|S3AttachmentService
+|
+
+|genie.jobs.attachments.s3.largestSize.distribution
+|Distribution summary of for the size of the largest file attached
+|bytes
+|S3AttachmentService
+|
+
+|genie.jobs.attachments.s3.totalSize.distribution
+|Distribution summary of for the total size of the files attached
+|bytes
+|S3AttachmentService
+|
+
+|genie.jobs.attachments.s3.upload.timer
+|Time taken to upload job attachments to S3 (only measured for jobs with attachments)
+|nanoseconds
+|S3AttachmentService
+|status, exceptionClass
+
 |genie.jobs.clusters.selectors.script.select.timer
 |Time taken by the loaded script to select a cluster among the one passed as input
 |nanoseconds

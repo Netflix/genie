@@ -29,7 +29,6 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileReposito
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.LegacyAttachmentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -103,7 +102,6 @@ public class DataAutoConfiguration {
      *
      * @param entityManager           The {@link EntityManager} for this application
      * @param jpaRepositories         The {@link JpaRepositories} for Genie
-     * @param legacyAttachmentService The {@link LegacyAttachmentService} implementation to use
      * @return A {@link JpaPersistenceServiceImpl} instance which implements {@link PersistenceService} backed by
      * JPA and a relational database
      */
@@ -111,9 +109,8 @@ public class DataAutoConfiguration {
     @ConditionalOnMissingBean(PersistenceService.class)
     public JpaPersistenceServiceImpl geniePersistenceService(
         final EntityManager entityManager,
-        final JpaRepositories jpaRepositories,
-        final LegacyAttachmentService legacyAttachmentService
+        final JpaRepositories jpaRepositories
     ) {
-        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories, legacyAttachmentService);
+        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories);
     }
 }

@@ -48,6 +48,10 @@ genie:
   health:
     maxCpuLoadPercent: 80
   jobs:
+    attachments:
+      location-prefix: s3://genie/attachments
+      max-size: 100MB
+      max-total-size: 150MB
     cleanup:
       deleteDependencies: true
     forwarding:

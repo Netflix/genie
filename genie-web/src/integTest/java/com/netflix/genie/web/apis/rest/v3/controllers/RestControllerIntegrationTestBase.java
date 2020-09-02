@@ -32,6 +32,8 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCriterionRep
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
+import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -42,9 +44,12 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockSnippet;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -55,10 +60,14 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.unit.DataSize;
 
 import javax.annotation.Nullable;
+import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -78,6 +87,7 @@ import java.util.stream.Collectors;
 )
 @SpringBootTest(classes = GenieTestApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
+@ContextConfiguration(classes = {RestControllerIntegrationTestBase.TestConfiguration.class})
 abstract class RestControllerIntegrationTestBase {
 
     static final String APPLICATIONS_API = "/api/v3/applications";
@@ -648,6 +658,31 @@ abstract class RestControllerIntegrationTestBase {
         @Override
         public void describeTo(final Description description) {
             description.appendText(this.mismatchDescription);
+        }
+    }
+
+    @Configuration
+    static class TestConfiguration {
+
+        private final TemporaryFolder attachmentsDirectory;
+
+        TestConfiguration() throws IOException {
+            this.attachmentsDirectory = new TemporaryFolder();
+            this.attachmentsDirectory.create();
+        }
+
+        @Bean
+        AttachmentService attachmentService() {
+            return new LocalFileSystemAttachmentService(
+                DataSize.ofMegabytes(10),
+                DataSize.ofMegabytes(30),
+                this.attachmentsDirectory.getRoot()
+            );
+        }
+
+        @PreDestroy
+        void cleanup() {
+            this.attachmentsDirectory.delete();
         }
     }
 }
