@@ -258,7 +258,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         final long startOffset,
         final long endOffset
     ) {
-        log.info(
+        log.debug(
             "Server is requesting file {} (range: [{}, {}), streamId: {})",
             relativePath,
             startOffset,
