@@ -951,6 +951,26 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | 1s
 |
 
+| `genie.agent.runtime.job-kill-service.response-check-back-off.delay-type`
+| Scheduling policy for backoff in case of error during kill request
+| FROM_PREVIOUS_EXECUTION_COMPLETION
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.min-delay`
+| Minimum delay before another attempt during kill request
+| 500ms
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.max-delay`
+| Maximium delay before another attempt during kill request
+| 5s
+|
+
+| `genie.agent.runtime.job-kill-service.response-check-back-off.factor`
+| Multiplication factor for retry delay before another attempt during kill request
+| 1.2
+|
+
 | `genie.agent.runtime.job-monitor-service.check-remote-job-status`
 | Whether to periodically poll the running job status from the server, and to shut down in case the job is marked failed
 | true
@@ -974,26 +994,6 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | `genie.agent.runtime.job-monitor-service.max-total-size`
 | Maximum total size of the job directory
 | 16GB
-|
-
-| `genie.agent.runtime.job-kill-service.response-check-back-off.delay-type`
-| Scheduling policy for backoff in case of error during kill request
-| FROM_PREVIOUS_EXECUTION_COMPLETION
-|
-
-| `genie.agent.runtime.job-kill-service.response-check-back-off.min-delay`
-| Minimum delay before another attempt during kill request
-| 500ms
-|
-
-| `genie.agent.runtime.job-kill-service.response-check-back-off.max-delay`
-| Maximium delay before another attempt during kill request
-| 5s
-|
-
-| `genie.agent.runtime.job-kill-service.response-check-back-off.factor`
-| Multiplication factor for retry delay before another attempt during kill request
-| 1.2
 |
 
 | `genie.agent.runtime.job-setup-service.environment-dump-filter-expression`
