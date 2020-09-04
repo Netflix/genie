@@ -179,7 +179,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-">jobSetupService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/DownloadService.html" title="interface in com.netflix.genie.agent.execution.services">DownloadService</a>&nbsp;downloadService)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-com.netflix.genie.agent.properties.AgentProperties-">jobSetupService</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/DownloadService.html" title="interface in com.netflix.genie.agent.execution.services">DownloadService</a>&nbsp;downloadService,
+               <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
 <div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobSetupService</code></a> bean if one hasn't already been defined.</div>
 </td>
 </tr>
@@ -298,7 +299,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 </dl>
 </li>
 </ul>
-<a name="jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-">
+<a name="jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-com.netflix.genie.agent.properties.AgentProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -307,11 +308,13 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/serv
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService</a>&nbsp;jobSetupService(<a href="../../../../../../../com/netflix/genie/agent/execution/services/DownloadService.html" title="interface in com.netflix.genie.agent.execution.services">DownloadService</a>&nbsp;downloadService)</pre>
+public&nbsp;<a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService</a>&nbsp;jobSetupService(<a href="../../../../../../../com/netflix/genie/agent/execution/services/DownloadService.html" title="interface in com.netflix.genie.agent.execution.services">DownloadService</a>&nbsp;downloadService,
+                                                                                                            <a href="../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy <a href="../../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services"><code>JobSetupService</code></a> bean if one hasn't already been defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>downloadService</code> - the download service</dd>
+<dd><code>agentProperties</code> - the agent properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>JobSetupServiceImpl</code> instance</dd>
 </dl>

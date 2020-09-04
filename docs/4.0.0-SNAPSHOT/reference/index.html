@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-09-02</span>
+<span id="revdate">2020-09-04</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5983,6 +5983,30 @@ The server also has a chance to override them during the 'Agent Configuration' e
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.delay-type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scheduling policy for backoff in case of error during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FROM_PREVIOUS_EXECUTION_COMPLETION</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.min-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum delay before another attempt during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">500ms</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.max-delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximium delay before another attempt during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5s</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.factor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor for retry delay before another attempt during kill request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-monitor-service.check-remote-job-status</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to periodically poll the running job status from the server, and to shut down in case the job is marked failed</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -6013,27 +6037,15 @@ The server also has a chance to override them during the 'Agent Configuration' e
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.delay-type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Scheduling policy for backoff in case of error during kill request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FROM_PREVIOUS_EXECUTION_COMPLETION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-setup-service.environment-dump-filter-expression</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Grep regular expression (ERE syntax) filter applied to environment variable dumped into env.log before job execution</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">.*</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.min-delay</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum delay before another attempt during kill request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">500ms</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.max-delay</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximium delay before another attempt during kill request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5s</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-kill-service.response-check-back-off.factor</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor for retry delay before another attempt during kill request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>genie.agent.runtime.job-setup-service.environment-dump-filter-inverted</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to invert environment-dump-filter-expression such that environment entries NOT matching the expression are logged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -6943,7 +6955,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-09-02 00:24:32 UTC
+Last updated 2020-09-04 18:02:47 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
