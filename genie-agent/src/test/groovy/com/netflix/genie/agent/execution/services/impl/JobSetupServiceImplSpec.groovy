@@ -19,12 +19,13 @@ package com.netflix.genie.agent.execution.services.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.agent.execution.CleanupStrategy
-
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
+import com.netflix.genie.agent.properties.AgentProperties
+import com.netflix.genie.agent.properties.JobSetupServiceProperties
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
@@ -33,6 +34,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.ClassPathResource
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -92,6 +94,8 @@ class JobSetupServiceImplSpec extends Specification {
     Set<String> jobDeps = []
 
     Map<String, String> jobServerEnvMap
+    JobSetupServiceProperties jobSetupProperties
+    AgentProperties agentProperties
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
@@ -202,7 +206,11 @@ class JobSetupServiceImplSpec extends Specification {
 
         this.downloadService = Mock(DownloadService)
 
-        this.service = new JobSetupServiceImpl(downloadService)
+        this.agentProperties = new AgentProperties()
+        this.jobSetupProperties = new JobSetupServiceProperties()
+        this.agentProperties.setJobSetupService(jobSetupProperties)
+
+        this.service = new JobSetupServiceImpl(downloadService, agentProperties)
     }
 
     void cleanup() {
@@ -373,7 +381,6 @@ class JobSetupServiceImplSpec extends Specification {
         actualScript == expectedScript
     }
 
-
     def "Setup w/o dependencies"() {
         setup:
         jobServerEnvMap.put("SERVER_ENVIRONMENT_Z", "VALUE_Z")
@@ -414,6 +421,66 @@ class JobSetupServiceImplSpec extends Specification {
             .replaceAll("<APPLICATION_2_PLACEHOLDER>", app2.getId())
         def actualScript = jobScript.getText(StandardCharsets.UTF_8.name())
         actualScript == expectedScript
+    }
+
+    @Unroll
+    def "Setup w/ environment filter: #expectedFilter"() {
+        setup:
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_Z", "VALUE_Z")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_X", "VALUE_X")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_Y", "VALUE_Y")
+
+        if (expression != null) {
+            this.jobSetupProperties.setEnvironmentDumpFilterExpression(expression)
+        }
+
+        if (inverted != null) {
+            this.jobSetupProperties.setEnvironmentDumpFilterInverted((Boolean) inverted)
+        }
+
+        when:
+        File jobDirectory = service.createJobDirectory(spec)
+        List<File> downloadedFiles = service.downloadJobResources(spec, jobDirectory)
+        File jobScript = service.createJobScript(spec, jobDirectory)
+
+        then:
+        jobDir == jobDirectory
+        1 * downloadService.newManifestBuilder() >> manifestBuilder
+        0 * manifestBuilder.addFileWithTargetFile(_, _)
+        0 * manifestBuilder.addFileWithTargetDirectory(_, _)
+        1 * manifestBuilder.build() >> manifest
+        1 * downloadService.download(manifest)
+        1 * manifest.getTargetFiles()
+        1 * spec.getExecutableArgs() >> ["presto", "-v"]
+        1 * spec.getJobArgs() >> ["--exec", "'select * from table limit 10'"]
+
+        expect:
+        jobDir.exists()
+        app1Dir.exists()
+        app2Dir.exists()
+        clusterDir.exists()
+        commandDir.exists()
+        jobScript.exists()
+        jobScript.canExecute()
+        def expectedScript = new ClassPathResource("JobSetupServiceImplSpec_run3.test.sh").getInputStream().getText()
+            .replaceAll("<JOB_ID_PLACEHOLDER>", jobId)
+            .replaceAll("<JOB_DIR_PLACEHOLDER>", jobDirectory.toPath().toAbsolutePath().toString())
+            .replaceAll("<COMMAND_ID_PLACEHOLDER>", command.getId())
+            .replaceAll("<CLUSTER_ID_PLACEHOLDER>", cluster.getId())
+            .replaceAll("<JOB_ID_PLACEHOLDER>", job.getId())
+            .replaceAll("<APPLICATION_1_PLACEHOLDER>", app1.getId())
+            .replaceAll("<APPLICATION_2_PLACEHOLDER>", app2.getId())
+            .replaceAll("<ENVIRONMENT_FILTER_PLACEHOLDER>", expectedFilter)
+        def actualScript = jobScript.getText(StandardCharsets.UTF_8.name())
+        actualScript == expectedScript
+
+        where:
+        expression             | inverted | expectedFilter
+        null                   | null     | "grep -E --regex='.*'" // null -> use default properties value
+        ".*"                   | false    | "grep -E --regex='.*'" // Dump everything
+        ".*"                   | true     | "grep -E --invert-match --regex='.*'" // Dump nothing
+        "(FOO|BAR).*"          | false    | "grep -E --regex='(FOO|BAR).*'"
+        "[Ff]oo\\.[Bb]ar\\..*" | true     | "grep -E --invert-match --regex='[Ff]oo\\\\.[Bb]ar\\\\..*'"
     }
 
     def "Malformed dependency URI"() {
