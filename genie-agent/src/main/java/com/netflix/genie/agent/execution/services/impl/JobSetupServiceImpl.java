@@ -25,6 +25,8 @@ import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
+import com.netflix.genie.agent.properties.AgentProperties;
+import com.netflix.genie.agent.properties.JobSetupServiceProperties;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
@@ -57,11 +59,14 @@ class JobSetupServiceImpl implements JobSetupService {
 
     private static final String NEWLINE = System.lineSeparator();
     private final DownloadService downloadService;
+    private final JobSetupServiceProperties jobSetupProperties;
 
     JobSetupServiceImpl(
-        final DownloadService downloadService
+        final DownloadService downloadService,
+        final AgentProperties agentProperties
     ) {
         this.downloadService = downloadService;
+        this.jobSetupProperties = agentProperties.getJobSetupService();
     }
 
     /**
@@ -165,7 +170,6 @@ class JobSetupServiceImpl implements JobSetupService {
         final File jobDirectory
     ) throws SetUpJobException {
 
-        final String scriptContent = new JobScriptComposer(jobSpecification, jobDirectory).composeScript();
         final Path scriptPath = PathUtils.jobScriptPath(jobDirectory);
         final File scriptFile = scriptPath.toFile();
 
@@ -181,7 +185,10 @@ class JobSetupServiceImpl implements JobSetupService {
                     StandardOpenOption.DSYNC
                 )
             ) {
-                fileWriter.write(scriptContent);
+                fileWriter.write(
+                    new JobScriptComposer(jobSpecification, jobDirectory)
+                        .composeScript(this.jobSetupProperties)
+                );
                 fileWriter.flush();
             }
 
@@ -382,6 +389,7 @@ class JobSetupServiceImpl implements JobSetupService {
         private static final String SETUP_ERROR_FILE_ENV_VAR = "__GENIE_SETUP_ERROR_MARKER_FILE";
         private static final String TO_STD_ERR = " >&2";
         private static final List<String> TRAPPED_SIGNALS = Lists.newArrayList("SIGTERM", "SIGINT", "SIGHUP");
+        private static final String GREP_INVERT_MATCH = "--invert-match ";
 
         private final String jobId;
         private final List<Pair<String, String>> setupFileReferences;
@@ -389,7 +397,10 @@ class JobSetupServiceImpl implements JobSetupService {
         private final List<Pair<String, String>> localEnvironmentVariables;
         private final List<Pair<String, String>> serverEnvironmentVariables;
 
-        JobScriptComposer(final JobSpecification jobSpecification, final File jobDirectory) {
+        JobScriptComposer(
+            final JobSpecification jobSpecification,
+            final File jobDirectory
+            ) {
 
             this.jobId = jobSpecification.getJob().getId();
 
@@ -511,7 +522,7 @@ class JobSetupServiceImpl implements JobSetupService {
             return "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + relativePath;
         }
 
-        String composeScript() {
+        String composeScript(final JobSetupServiceProperties jobSetupProperties) {
 
             // Assemble the content of the script
 
@@ -684,7 +695,10 @@ class JobSetupServiceImpl implements JobSetupService {
             sb
                 .append("# Dump environment post-setup")
                 .append(NEWLINE)
-                .append("env | sort > ")
+                .append("env | grep -E ")
+                .append(jobSetupProperties.isEnvironmentDumpFilterInverted() ? GREP_INVERT_MATCH : "")
+                .append("--regex='").append(jobSetupProperties.getEnvironmentDumpFilterExpression()).append("'")
+                .append(" | sort > ")
                 .append("${").append(ENVIRONMENT_LOG_ENV_VAR).append("}")
                 .append(NEWLINE);
 

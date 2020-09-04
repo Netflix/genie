@@ -97,7 +97,7 @@ exec 1>&6 6>&-
 exec 2>&7 7>&-
 
 # Dump environment post-setup
-env | grep -E --regex='.*' | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}
+env | <ENVIRONMENT_FILTER_PLACEHOLDER> | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}
 
 # Launch the command
 presto -v --exec 'select * from table limit 10' <&0 &

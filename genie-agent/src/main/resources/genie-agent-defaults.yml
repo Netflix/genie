@@ -65,6 +65,9 @@ genie:
         max-file-size: 8GB
         max-total-size: 16GB
         check-remote-job-status: true
+      job-setup-service:
+        environment-dump-filter-expression: '.*'
+        environment-dump-filter-inverted: false
       shutdown:
         execution-completion-leeway: 60s
         internal-executors-leeway: 30s

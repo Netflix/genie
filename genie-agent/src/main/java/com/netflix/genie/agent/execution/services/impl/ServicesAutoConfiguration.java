@@ -120,15 +120,17 @@ public class ServicesAutoConfiguration {
      * Provide a lazy {@link JobSetupService} bean if one hasn't already been defined.
      *
      * @param downloadService the download service
+     * @param agentProperties the agent properties
      * @return A {@link JobSetupServiceImpl} instance
      */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(JobSetupService.class)
     public JobSetupService jobSetupService(
-        final DownloadService downloadService
+        final DownloadService downloadService,
+        final AgentProperties agentProperties
     ) {
-        return new JobSetupServiceImpl(downloadService);
+        return new JobSetupServiceImpl(downloadService, agentProperties);
     }
 
     /**

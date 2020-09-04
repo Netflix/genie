@@ -83,4 +83,10 @@ public class AgentProperties {
      */
     @Valid
     private ShutdownProperties shutdown = new ShutdownProperties();
+
+    /**
+     * JobSetupService properties.
+     */
+    @Valid
+    private JobSetupServiceProperties jobSetupService = new JobSetupServiceProperties();
 }

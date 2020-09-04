@@ -996,6 +996,16 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | 1.2
 |
 
+| `genie.agent.runtime.job-setup-service.environment-dump-filter-expression`
+| Grep regular expression (ERE syntax) filter applied to environment variable dumped into env.log before job execution
+| .*
+|
+
+| `genie.agent.runtime.job-setup-service.environment-dump-filter-inverted`
+| Wether to invert environment-dump-filter-expression such that environment entries NOT matching the expression are logged
+| false
+|
+
 | `genie.agent.runtime.shutdown.execution-completion-leeway`
 | Time allowed to the job execution state machine to shut down cleanly before the JVM is shut down
 | 60s
