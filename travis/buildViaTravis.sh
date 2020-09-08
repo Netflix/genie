@@ -17,6 +17,9 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   INTEGRATION_TEST_DB=postgresql ${GRADLE} ${GRADLE_OPTIONS} genie-web:integrationTest
   # Build Docker images and compile documentation
   ${GRADLE} ${GRADLE_OPTIONS} javadoc asciidoc dockerBuildAllImages
+elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_BRANCH" == "dev-snapshot" ]; then
+  echo -e 'Build Development Snapshot'
+  ${GRADLE} ${GRADLE_OPTIONS} -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot dockerPush -x check
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then
   echo -e 'Build Branch with Snapshot => Branch ['$TRAVIS_BRANCH']'
   ${GRADLE} ${GRADLE_OPTIONS} -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot codeCoverageReport coveralls gitPublishPush dockerPush
