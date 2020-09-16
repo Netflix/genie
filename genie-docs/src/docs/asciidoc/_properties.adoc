@@ -17,6 +17,16 @@ Whereas static properties values are bound during application startup and do not
 |===
 |Property |Description |Default Value |Dynamic
 
+|genie.agent.connection-tracking.cleanup-interval
+|Interval at which the cleanup task runs
+|2s
+|no
+
+|genie.agent.connection-tracking.connection-expiration-period
+|How long after the last heartbeat an agent connection is marked expired
+|10s
+|no
+
 |genie.agent.configuration.agent-properties-filter-pattern
 |Regular expression applied to filter server properties that are forwarded to the agent
 |^genie\.agent\.runtime\..*

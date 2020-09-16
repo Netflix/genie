@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
@@ -46,12 +47,10 @@ import java.util.function.Supplier;
 @Slf4j
 public class AgentConnectionTrackingServiceImpl implements AgentConnectionTrackingService, InfoContributor {
 
-    // Minimum time from the last heartbeat before a stream is considered expired
-    protected static final int STREAM_EXPIRATION_PERIOD = 10_000; // TODO: Make configurable
-    protected static final int CLEANUP_TASK_PERIOD = 2_000; // TODO: Make configurable
     private final AgentRoutingService agentRoutingService;
     private final TaskScheduler taskScheduler;
     private final ConcurrentMap<String, JobStreamsRecord> jobStreamRecordsMap = Maps.newConcurrentMap();
+    private final AgentConnectionTrackingServiceProperties serviceProperties;
     private final Supplier<Instant> timeSupplier;
 
     /**
@@ -59,25 +58,29 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
      *
      * @param agentRoutingService the agent routing service
      * @param taskScheduler       the task scheduler
+     * @param serviceProperties   the service properties
      */
     public AgentConnectionTrackingServiceImpl(
         final AgentRoutingService agentRoutingService,
-        final TaskScheduler taskScheduler
+        final TaskScheduler taskScheduler,
+        final AgentConnectionTrackingServiceProperties serviceProperties
     ) {
-        this(agentRoutingService, taskScheduler, Instant::now);
+        this(agentRoutingService, taskScheduler, serviceProperties, Instant::now);
     }
 
     @VisibleForTesting
     AgentConnectionTrackingServiceImpl(
         final AgentRoutingService agentRoutingService,
         final TaskScheduler taskScheduler,
+        final AgentConnectionTrackingServiceProperties serviceProperties,
         final Supplier<Instant> timeSupplier
     ) {
         this.agentRoutingService = agentRoutingService;
         this.taskScheduler = taskScheduler;
+        this.serviceProperties = serviceProperties;
         this.timeSupplier = timeSupplier;
 
-        this.taskScheduler.scheduleAtFixedRate(this::cleanupTask, CLEANUP_TASK_PERIOD);
+        this.taskScheduler.scheduleAtFixedRate(this::cleanupTask, this.serviceProperties.getCleanupInterval());
     }
 
     /**
@@ -179,7 +182,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
     }
 
     private void removeExpiredStreams() {
-        final Instant cutoff = this.timeSupplier.get().minusMillis(STREAM_EXPIRATION_PERIOD);
+        final Instant cutoff = this.timeSupplier.get().minus(serviceProperties.getConnectionExpirationPeriod());
         // Purge streams that did not send a heartbeat more recently than cutoff
         this.jobStreamRecordsMap.forEach(
             (jobId, record) -> record.expungeExpiredStreams(cutoff)

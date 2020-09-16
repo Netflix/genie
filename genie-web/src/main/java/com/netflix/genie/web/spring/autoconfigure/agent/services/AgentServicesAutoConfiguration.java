@@ -33,6 +33,7 @@ import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentConfigurationProperties;
+import com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties;
 import com.netflix.genie.web.properties.AgentRoutingServiceProperties;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -60,7 +61,8 @@ import java.util.List;
 @EnableConfigurationProperties(
     {
         AgentConfigurationProperties.class,
-        AgentRoutingServiceProperties.class
+        AgentRoutingServiceProperties.class,
+        AgentConnectionTrackingServiceProperties.class
     }
 )
 public class AgentServicesAutoConfiguration {
@@ -97,17 +99,20 @@ public class AgentServicesAutoConfiguration {
      *
      * @param agentRoutingService the agent routing service
      * @param taskScheduler       the task scheduler
+     * @param serviceProperties   the service properties
      * @return A {@link AgentConnectionTrackingServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(AgentConnectionTrackingService.class)
     public AgentConnectionTrackingService agentConnectionTrackingService(
         final AgentRoutingService agentRoutingService,
-        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
+        final AgentConnectionTrackingServiceProperties serviceProperties
     ) {
         return new AgentConnectionTrackingServiceImpl(
             agentRoutingService,
-            taskScheduler
+            taskScheduler,
+            serviceProperties
         );
     }
 

@@ -18,10 +18,12 @@
 package com.netflix.genie.web.agent.services.impl
 
 import com.netflix.genie.web.agent.services.AgentRoutingService
+import com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties
 import org.springframework.boot.actuate.info.Info
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
 import java.util.function.Supplier
@@ -32,8 +34,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
     AgentRoutingService agentRoutingService
     TaskScheduler taskScheduler
     Supplier<Instant> timeSupplier
+    AgentConnectionTrackingServiceProperties serviceProperties
 
     void setup() {
+        this.serviceProperties = new AgentConnectionTrackingServiceProperties()
         this.agentRoutingService = Mock(AgentRoutingService)
         this.taskScheduler = Mock(TaskScheduler)
         this.timeSupplier = Mock(Supplier)
@@ -44,10 +48,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         Runnable cleanupTask
 
         when:
-        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, timeSupplier)
+        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, serviceProperties)
 
         then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> {
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
             args ->
                 cleanupTask = args[0] as Runnable
                 return Mock(ScheduledFuture)
@@ -58,7 +62,6 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         cleanupTask.run()
 
         then:
-        1 * timeSupplier.get() >> Instant.now()
         0 * agentRoutingService._
     }
 
@@ -72,10 +75,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         Instant currentTime
 
         when:
-        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, timeSupplier)
+        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, serviceProperties, timeSupplier)
 
         then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> {
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
             args ->
                 cleanupTask = args[0] as Runnable
                 return Mock(ScheduledFuture)
@@ -108,7 +111,7 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         1 * timeSupplier.get() >> { return currentTime }
 
         when: "Cleanup runs"
-        currentTime = currentTime.plusMillis(AgentConnectionTrackingServiceImpl.STREAM_EXPIRATION_PERIOD)
+        currentTime = currentTime.plusMillis(10_000)
         cleanupTask.run()
 
         then: "Routing service notified: agent 2 is gone"
@@ -140,10 +143,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         Instant currentTime = Instant.now()
 
         when:
-        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, timeSupplier)
+        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, serviceProperties, timeSupplier)
 
         then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> {
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
             args ->
                 cleanupTask = args[0] as Runnable
                 return Mock(ScheduledFuture)
@@ -175,7 +178,7 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         0 * agentRoutingService._
 
         when: "Cleanup runs after stream 1 is expired"
-        currentTime = currentTime.plusMillis(AgentConnectionTrackingServiceImpl.STREAM_EXPIRATION_PERIOD)
+        currentTime = currentTime.plusMillis(10_000)
         cleanupTask.run()
 
         then: "Agent not removed from routing"
@@ -201,10 +204,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         Runnable cleanupTask
 
         when:
-        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, timeSupplier)
+        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, serviceProperties, timeSupplier)
 
         then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> {
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
             args ->
                 cleanupTask = args[0] as Runnable
                 return Mock(ScheduledFuture)
@@ -221,7 +224,6 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
 
     def "Contribute info detail"() {
         setup:
-        Runnable cleanupTask
         String agent1streamId = UUID.randomUUID().toString()
         String agent2streamId = UUID.randomUUID().toString()
         String agent1jobId = UUID.randomUUID().toString()
@@ -231,10 +233,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         Info.Builder infoBuilder = Mock(Info.Builder)
 
         when:
-        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, timeSupplier)
+        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, serviceProperties)
 
         then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> Mock(ScheduledFuture)
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> Mock(ScheduledFuture)
 
         when:
         connectedAgents = null
@@ -250,12 +252,11 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         connectedAgents.size() == 0
 
         when:
-        currentTime = Instant.now()
         service.notifyHeartbeat(agent1streamId, agent1jobId)
         service.notifyHeartbeat(agent2streamId, agent2jobId)
 
         then:
-        2 * timeSupplier.get() >> { return currentTime }
+        noExceptionThrown()
 
         when:
         connectedAgents = null
