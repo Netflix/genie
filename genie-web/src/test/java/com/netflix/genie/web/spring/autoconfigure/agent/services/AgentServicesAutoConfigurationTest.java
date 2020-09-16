@@ -28,6 +28,7 @@ import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDisco
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentConfigurationProperties;
+import com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties;
 import com.netflix.genie.web.properties.AgentRoutingServiceProperties;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.AgentRpcEndpointsAutoConfiguration;
@@ -77,6 +78,7 @@ class AgentServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(AgentConfigurationProperties.class);
                     Assertions.assertThat(context).hasSingleBean(AgentConfigurationService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentRoutingServiceProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingServiceProperties.class);
                 }
             );
     }
@@ -98,6 +100,7 @@ class AgentServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(AgentConfigurationProperties.class);
                     Assertions.assertThat(context).hasSingleBean(AgentConfigurationService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentRoutingServiceProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingServiceProperties.class);
                 }
             );
     }
