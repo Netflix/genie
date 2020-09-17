@@ -107,13 +107,13 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dd>
+<dd><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dd>
 </dl>
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">FileSystemAttachmentService</span>
 extends java.lang.Object
-implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></pre>
+implements <a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></pre>
 <div class="block">Implementation of the AttachmentService interface which saves and retrieves attachments from the local filesystem.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -267,7 +267,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Save a given attachment for a job for later retrieval.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#save-java.lang.String-java.lang.String-java.io.InputStream-">save</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#save-java.lang.String-java.lang.String-java.io.InputStream-">save</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - The id of the job to save the attachment for</dd>
 <dd><code>filename</code> - The name of the attachment</dd>
@@ -289,7 +289,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Copy all the attachments for a job into the specified directory.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#copy-java.lang.String-java.io.File-">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#copy-java.lang.String-java.io.File-">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - The id of the job to get the attachments for.</dd>
 <dd><code>destination</code> - The directory to copy the attachments into</dd>
@@ -309,7 +309,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Delete the attachments for the given job.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#delete-java.lang.String-">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#delete-java.lang.String-">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - The id of the job to delete the attachments for</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -328,7 +328,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Save all attachments for a given request.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#saveAll-java.util.Map-">saveAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#saveAll-java.util.Map-">saveAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>attachments</code> - The map of filename to contents for all attachments. All input streams will be closed after
                     this method returns</dd>
@@ -351,9 +351,9 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Copy all attachments associated with the given id into the provided destination.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-">copyAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-">copyAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id that was returned from the original call to <a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#saveAll-java.util.Map-"><code>AttachmentService.saveAll(Map)</code></a></dd>
+<dd><code>id</code> - The id that was returned from the original call to <a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#saveAll-java.util.Map-"><code>LegacyAttachmentService.saveAll(Map)</code></a></dd>
 <dd><code>destination</code> - The destination where the attachments should be copied. Must be a directory if it already
                     exists. If it doesn't exist it will be created.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -372,9 +372,9 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Delete all the attachments that were associated with the given id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#deleteAll-java.lang.String-">deleteAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#deleteAll-java.lang.String-">deleteAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id that was returned from the original call to <a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#saveAll-java.util.Map-"><code>AttachmentService.saveAll(Map)</code></a></dd>
+<dd><code>id</code> - The id that was returned from the original call to <a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#saveAll-java.util.Map-"><code>LegacyAttachmentService.saveAll(Map)</code></a></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code> - On error during deletion</dd>
 </dl>
@@ -393,7 +393,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
  somewhere that the agent can access as job dependencies once the job runs.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - The id of the job these attachments are for</dd>
 <dd><code>attachments</code> - The attachments sent by the user</dd>
@@ -415,7 +415,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/AttachmentS
 <div class="block">Given the id of a job delete all the attachments that were saved for it.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html#deleteAttachments-java.lang.String-">deleteAttachments</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html#deleteAttachments-java.lang.String-">deleteAttachments</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - The id of the job to delete attachments for</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>

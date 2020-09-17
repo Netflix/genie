@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties.class</a>})
+ @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentConnectionTrackingServiceProperties.class</a>})
 public class <span class="typeNameLabel">AgentServicesAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Auto configuration for services needed in the agent module.</div>
@@ -160,8 +160,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">agentConnectionTrackingService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
-                              org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties-">agentConnectionTrackingService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                              org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                              <a href="../../../../../../../../com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentConnectionTrackingServiceProperties</a>&nbsp;serviceProperties)</code>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConnectionTrackingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
@@ -265,7 +266,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">
+<a name="agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -275,12 +276,14 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService.class</a>)
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService(<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
                                                                                                                                                   @Qualifier(value="genieTaskScheduler")
-                                                                                                                                                  org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+                                                                                                                                                  org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                                  <a href="../../../../../../../../com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentConnectionTrackingServiceProperties</a>&nbsp;serviceProperties)</pre>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConnectionTrackingService</code></a> if one hasn't already been defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentRoutingService</code> - the agent routing service</dd>
 <dd><code>taskScheduler</code> - the task scheduler</dd>
+<dd><code>serviceProperties</code> - the service properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentConnectionTrackingServiceImpl</code></a> instance</dd>
 </dl>

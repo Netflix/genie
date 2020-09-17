@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value={<a href="../../../../../../../com/netflix/genie/web/properties/FileCacheProperties.html" title="class in com.netflix.genie.web.properties">FileCacheProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsCleanupProperties.html" title="class in com.netflix.genie.web.properties">JobsCleanupProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsForwardingProperties.html" title="class in com.netflix.genie.web.properties">JobsForwardingProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsLocationsProperties.html" title="class in com.netflix.genie.web.properties">JobsLocationsProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsMaxProperties.html" title="class in com.netflix.genie.web.properties">JobsMaxProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsMemoryProperties.html" title="class in com.netflix.genie.web.properties">JobsMemoryProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsUsersProperties.html" title="class in com.netflix.genie.web.properties">JobsUsersProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/ExponentialBackOffTriggerProperties.html" title="class in com.netflix.genie.web.properties">ExponentialBackOffTriggerProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsActiveLimitProperties.html" title="class in com.netflix.genie.web.properties">JobsActiveLimitProperties.class</a>})
+ @EnableConfigurationProperties(value={<a href="../../../../../../../com/netflix/genie/web/properties/FileCacheProperties.html" title="class in com.netflix.genie.web.properties">FileCacheProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsCleanupProperties.html" title="class in com.netflix.genie.web.properties">JobsCleanupProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsForwardingProperties.html" title="class in com.netflix.genie.web.properties">JobsForwardingProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsLocationsProperties.html" title="class in com.netflix.genie.web.properties">JobsLocationsProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsMaxProperties.html" title="class in com.netflix.genie.web.properties">JobsMaxProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsMemoryProperties.html" title="class in com.netflix.genie.web.properties">JobsMemoryProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsUsersProperties.html" title="class in com.netflix.genie.web.properties">JobsUsersProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/ExponentialBackOffTriggerProperties.html" title="class in com.netflix.genie.web.properties">ExponentialBackOffTriggerProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/JobsActiveLimitProperties.html" title="class in com.netflix.genie.web.properties">JobsActiveLimitProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/AttachmentServiceProperties.html" title="class in com.netflix.genie.web.properties">AttachmentServiceProperties.class</a>})
 public class <span class="typeNameLabel">ServicesAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Configuration for all the services.</div>
@@ -160,8 +160,10 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#attachmentService-com.netflix.genie.web.properties.JobsProperties-">attachmentService</a></span>(<a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</code>
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#attachmentService-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-com.netflix.genie.web.properties.AttachmentServiceProperties-io.micrometer.core.instrument.MeterRegistry-">attachmentService</a></span>(<a href="../../../../../../../com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory,
+                 <a href="../../../../../../../com/netflix/genie/web/properties/AttachmentServiceProperties.html" title="class in com.netflix.genie.web.properties">AttachmentServiceProperties</a>&nbsp;attachmentServiceProperties,
+                 io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code>
 <div class="block">The attachment service to use.</div>
 </td>
 </tr>
@@ -291,6 +293,12 @@ extends java.lang.Object</pre>
                    org.springframework.core.io.Resource&nbsp;genieWorkingDir,
                    io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Get a implementation of the JobSubmitterService that runs jobs locally.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#legacyAttachmentService-com.netflix.genie.web.properties.JobsProperties-">legacyAttachmentService</a></span>(<a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</code>
+<div class="block">The attachment service to use.</div>
 </td>
 </tr>
 </table>
@@ -524,7 +532,25 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/JobCoor
 </dl>
 </li>
 </ul>
-<a name="attachmentService-com.netflix.genie.web.properties.JobsProperties-">
+<a name="legacyAttachmentService-com.netflix.genie.web.properties.JobsProperties-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>legacyAttachmentService</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService.class</a>)
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a>&nbsp;legacyAttachmentService(<a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</pre>
+<div class="block">The attachment service to use.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobsProperties</code> - All properties related to jobs</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The attachment service to use</dd>
+</dl>
+</li>
+</ul>
+<a name="attachmentService-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-com.netflix.genie.web.properties.AttachmentServiceProperties-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -532,13 +558,20 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/JobCoor
 <h4>attachmentService</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a>&nbsp;attachmentService(<a href="../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</pre>
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService(<a href="../../../../../../../com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory,
+                                                                                                           <a href="../../../../../../../com/netflix/genie/web/properties/AttachmentServiceProperties.html" title="class in com.netflix.genie.web.properties">AttachmentServiceProperties</a>&nbsp;attachmentServiceProperties,
+                                                                                                           io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)
+                                                                                                    throws java.io.IOException</pre>
 <div class="block">The attachment service to use.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobsProperties</code> - All properties related to jobs</dd>
+<dd><code>s3ClientFactory</code> - the S3 client factory</dd>
+<dd><code>attachmentServiceProperties</code> - the service properties</dd>
+<dd><code>meterRegistry</code> - the meter registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The attachment service to use</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code> - if the local filesystem implmentation is used and it fails to initialize</dd>
 </dl>
 </li>
 </ul>

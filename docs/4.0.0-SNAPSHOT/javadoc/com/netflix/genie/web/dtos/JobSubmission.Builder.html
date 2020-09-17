@@ -164,14 +164,14 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-org.springframework.core.io.Resource...-">withAttachments</a></span>(org.springframework.core.io.Resource...&nbsp;attachments)</code>
-<div class="block">Set the attachments associated with this submission.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-java.util.Set-">withAttachments</a></span>(java.util.Set&lt;java.net.URI&gt;&nbsp;attachments)</code>
+<div class="block">Set the attachments associated with this submission if there were any.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-java.util.Set-">withAttachments</a></span>(java.util.Set&lt;org.springframework.core.io.Resource&gt;&nbsp;attachments)</code>
-<div class="block">Set the attachments associated with this submission if there were any.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-java.net.URI...-">withAttachments</a></span>(java.net.URI...&nbsp;attachments)</code>
+<div class="block">Set the attachments associated with this submission.</div>
 </td>
 </tr>
 </table>
@@ -227,27 +227,27 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>withAttachments</h4>
 <pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a>&nbsp;withAttachments(@Nullable
-                                             java.util.Set&lt;org.springframework.core.io.Resource&gt;&nbsp;attachments)</pre>
+                                             java.util.Set&lt;java.net.URI&gt;&nbsp;attachments)</pre>
 <div class="block">Set the attachments associated with this submission if there were any.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>attachments</code> - The attachments as <code>Resource</code> instances</dd>
+<dd><code>attachments</code> - The attachments <code>URI</code>s</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the builder</dd>
 </dl>
 </li>
 </ul>
-<a name="withAttachments-org.springframework.core.io.Resource...-">
+<a name="withAttachments-java.net.URI...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>withAttachments</h4>
-<pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a>&nbsp;withAttachments(org.springframework.core.io.Resource...&nbsp;attachments)</pre>
+<pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a>&nbsp;withAttachments(java.net.URI...&nbsp;attachments)</pre>
 <div class="block">Set the attachments associated with this submission.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>attachments</code> - The attachments as <code>Resource</code> instances</dd>
+<dd><code>attachments</code> - The attachments as <code>URI</code>s</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the builder</dd>
 </dl>

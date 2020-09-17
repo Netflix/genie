@@ -73,13 +73,13 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -126,29 +126,6 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- =========== FIELD SUMMARY =========== -->
-<ul class="blockList">
-<li class="blockList"><a name="field.summary">
-<!--   -->
-</a>
-<h3>Field Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
-<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colLast" scope="col">Field and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>protected static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#CLEANUP_TASK_PERIOD">CLEANUP_TASK_PERIOD</a></span></code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>protected static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#STREAM_EXPIRATION_PERIOD">STREAM_EXPIRATION_PERIOD</a></span></code>&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -161,8 +138,9 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#AgentConnectionTrackingServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">AgentConnectionTrackingServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
-                                  org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#AgentConnectionTrackingServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties-">AgentConnectionTrackingServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                                  org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                  <a href="../../../../../../../com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentConnectionTrackingServiceProperties</a>&nbsp;serviceProperties)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -221,59 +199,27 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
-<!-- ============ FIELD DETAIL =========== -->
-<ul class="blockList">
-<li class="blockList"><a name="field.detail">
-<!--   -->
-</a>
-<h3>Field Detail</h3>
-<a name="STREAM_EXPIRATION_PERIOD">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>STREAM_EXPIRATION_PERIOD</h4>
-<pre>protected static final&nbsp;int STREAM_EXPIRATION_PERIOD</pre>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceImpl.STREAM_EXPIRATION_PERIOD">Constant Field Values</a></dd>
-</dl>
-</li>
-</ul>
-<a name="CLEANUP_TASK_PERIOD">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>CLEANUP_TASK_PERIOD</h4>
-<pre>protected static final&nbsp;int CLEANUP_TASK_PERIOD</pre>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceImpl.CLEANUP_TASK_PERIOD">Constant Field Values</a></dd>
-</dl>
-</li>
-</ul>
-</li>
-</ul>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.detail">
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="AgentConnectionTrackingServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">
+<a name="AgentConnectionTrackingServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>AgentConnectionTrackingServiceImpl</h4>
 <pre>public&nbsp;AgentConnectionTrackingServiceImpl(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
-                                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+                                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                          <a href="../../../../../../../com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentConnectionTrackingServiceProperties</a>&nbsp;serviceProperties)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentRoutingService</code> - the agent routing service</dd>
 <dd><code>taskScheduler</code> - the task scheduler</dd>
+<dd><code>serviceProperties</code> - the service properties</dd>
 </dl>
 </li>
 </ul>
@@ -403,13 +349,13 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

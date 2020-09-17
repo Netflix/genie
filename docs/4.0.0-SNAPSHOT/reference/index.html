@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-09-08</span>
+<span id="revdate">2020-09-17</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4802,6 +4802,18 @@ Whereas static properties values are bound during application startup and do not
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.connection-tracking.cleanup-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval at which the cleanup task runs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.connection-tracking.connection-expiration-period</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long after the last heartbeat an agent connection is marked expired</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10s</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.agent-properties-filter-pattern</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Regular expression applied to filter server properties that are forwarded to the agent</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">^genie\.agent\.runtime\..*</p></td>
@@ -5055,6 +5067,24 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.attachments.location-prefix</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Common prefix where attachments are stored</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">s3://genie/attachments</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.attachments.max-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum size of an attachment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100MB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.attachments.max-total-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum size of all attachments combined (Spring and Tomcat may also independently limit the size of upload)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">150MB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -5130,7 +5160,7 @@ cases is specified as part of the <code>Command</code> entity for a particular j
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.attachments</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
-doesn&#8217;t exist.</p></td>
+doesn&#8217;t exist (deprecated, see genie.jobs.attachments.* properties)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/attachments/" class="bare">file://${java.io.tmpdir}genie/attachments/</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -6332,617 +6362,645 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.clusters.selectors.script.select.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken by the loaded script to select a cluster among the one passed as input</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptClusterSelector</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, clusterName, clusterId</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.coordination.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and
-cluster selection strategy.</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.completion.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to perform post-job-completion finalization such as folder cleanup, archival and email notification.</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCompletionService</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>error, status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.errors.count</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts various kinds of nonfatal errors encountered (email, archival, cleanup, &#8230;&#8203;). A single request may increment
-for multiple errors.</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.attachments.s3.count.distribution</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Distribution summary of the number of files attached</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCompletionService</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>error</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.executionMode.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts jobs marked to execute in agent mode (V4) and embedded mode (V3)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobExecutionModeSelector</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>executeWithAgent, decidingCheck</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.file.cache.hitRate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">File cache hit ratio</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">ratio</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CacheGenieFileTransferService</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.file.cache.loadExceptionRate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">File cache loading exception ratio</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">ratio</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CacheGenieFileTransferService</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.file.cache.missRate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">File cache miss ratio</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">ratio</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CacheGenieFileTransferService</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.finished.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of jobs that completed (successfully or not)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.memory.used.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Total amount of memory allocated to local jobs (according to job request)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">Megabytes</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobLauncherImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>launcherClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.notifications.final-state.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of completed job notifications</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>jobFinalState</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.notifications.state-transition.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of job transitions notifications</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>fromState, toState</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.applicationTask.applicationSetup.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to set up individual applications (creating folders, staging dependencies and configurations)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ApplicationTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>applicationId, applicationName</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.applicationTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to stage all applications that a job depends on</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ApplicationTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, applicationId, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.clusterTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to set up cluster a job runs on (creating folders, staging dependencies and configurations)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>clusterId, clusterName, status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.commandTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to set up command a job runs (creating folders, staging dependencies and configurations)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CommandTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>commandId, commandName, status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.initialSetupTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to set up job environment (creating folder structure, shell environment script)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>InitialSetupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to set up run script section that deals with child process termination</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobFailureAndKillHandlerLogicTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.jobKickoffTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to complete job launch</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobKickoffTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.tasks.jobTask.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to set up job-specific environment (creating folders, staging attachments, dependencies)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.stdErrTooLarge.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of jobs killed for exceeding the maximum allowed standard error limit</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.stdOutTooLarge.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of jobs killed for exceeding the maximum allowed standard output limit</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.createInitFailureDetailsFile.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to write a file with details about failure to launch a job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.createJobDir.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to create a job working directory (includes failures to create)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.createRunScript.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to create the job run script</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.executeJob.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to execute the job workflow tasks</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.overall.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to submit a new job (create workspace and scripts, register in database and kick off)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.publishJobStartedEvent.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to publish the event that announces a job has started</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.saveJobExecution.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to persist information about job execution</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.setJobEnvironment.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to persist the job runtime information in the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.rejected.jobs-limit.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>user, jobsUserLimit</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken initialize the job environment (working directory, script) and fork the children</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobLauncher</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.successfulStatusCheck.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the successful checks made on locally running jobs</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.timeout.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of jobs killed for exceeding the maximum allowed run time</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.unableToCancel.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Count number of times a job asynchronous task cancelling was requested and failed (failure to cancel may be due to the task no longer being running)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobStateServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.unableToReAttach.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of times a genie node failed to resume monitoring a local job process after server restart</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitoringCoordinator</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.unsuccessfulStatusCheck.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time an exception was raised while trying to check on a locally running job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.notifications.sns.publish.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of notification published to SNS</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AbstractSNSPublisher</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, type</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.handshake.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to handshake</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.configure.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to obtain runtime configuration</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.reserve.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to reserve a job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.resolve.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to resolve a job request into a job specification</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.getSpecification.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to obtain a job specification</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.dryRunResolve.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to resolve a job request into a job specification (dry run mode)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.claim.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to claim a job for execution</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.changeStatus.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to update a job status</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, statusFrom, statusTo</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.getStatus.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to obtain a job&#8217;s status</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.rpc.job.changeArchiveStatus.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to serve an agent request to update a job archive status</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, statusTo</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.scripts.load.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to load (download, read, compile) a given script</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptManager</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.scripts.evaluate.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to evaluate a given script (if previously compiled successfully)</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptManager</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.agentJob.handshake.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for calls to the 'handshake' protocol of the Genie Agent Job Service</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion, agentHost, handshakeDecision</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.generateClusterCriteriaPermutations.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to generate all the permutations for cluster criteria between the command options and the job request</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>S3AttachmentServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolve.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to completely resolve the job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, saved</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.attachments.s3.largestSize.distribution</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Distribution summary of the size of the largest file attached</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">bytes</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>S3AttachmentServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolveApplications.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to retrieve applications information for this task</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.attachments.s3.totalSize.distribution</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Distribution summary of the total size of the files attached</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">bytes</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>S3AttachmentServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolveCluster.clusterSelector.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster selector algorithms invocations</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status, clusterName, clusterId, clusterSelectorClass</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.attachments.s3.upload.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.attachments.s3.upload.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to upload job attachments to S3 (only measured for jobs with attachments)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>S3AttachmentServiceImpl</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolveCluster.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to resolve the cluster to use for a job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, clusterName, clusterId, exceptionClass</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.selectors.script.select.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken by the loaded script to select a cluster among the one passed as input</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptClusterSelector</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolveCommand.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to resolve the command to use for a job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, commandName, commandId, exceptionClass</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, clusterName, clusterId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.coordination.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and
+cluster selection strategy.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.web.services.archivedJobService.getArchivedJobMetadata.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The time taken to fetch the metadata of an archived job if it isn&#8217;t already cached</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to perform post-job-completion finalization such as folder cleanup, archival and email notification.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCompletionService</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>error, status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.errors.count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts various kinds of nonfatal errors encountered (email, archival, cleanup, &#8230;&#8203;). A single request may increment
+for multiple errors.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCompletionService</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>error</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.executionMode.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts jobs marked to execute in agent mode (V4) and embedded mode (V3)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobExecutionModeSelector</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>executeWithAgent, decidingCheck</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.file.cache.hitRate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">File cache hit ratio</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ratio</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CacheGenieFileTransferService</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.file.cache.loadExceptionRate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">File cache loading exception ratio</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ratio</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CacheGenieFileTransferService</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.file.cache.missRate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">File cache miss ratio</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ratio</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CacheGenieFileTransferService</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.finished.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of jobs that completed (successfully or not)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.used.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Total amount of memory allocated to local jobs (according to job request)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Megabytes</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobLauncherImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>launcherClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.notifications.final-state.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Count the number of completed job notifications</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>jobFinalState</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.notifications.state-transition.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Count the number of job transitions notifications</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>fromState, toState</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.applicationTask.applicationSetup.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to set up individual applications (creating folders, staging dependencies and configurations)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ApplicationTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>applicationId, applicationName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.applicationTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to stage all applications that a job depends on</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ApplicationTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, applicationId, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.clusterTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to set up cluster a job runs on (creating folders, staging dependencies and configurations)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>clusterId, clusterName, status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.commandTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to set up command a job runs (creating folders, staging dependencies and configurations)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CommandTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>commandId, commandName, status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.initialSetupTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to set up job environment (creating folder structure, shell environment script)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>InitialSetupTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to set up run script section that deals with child process termination</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobFailureAndKillHandlerLogicTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.jobKickoffTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to complete job launch</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobKickoffTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.tasks.jobTask.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to set up job-specific environment (creating folders, staging attachments, dependencies)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobTask</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.stdErrTooLarge.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of jobs killed for exceeding the maximum allowed standard error limit</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.stdOutTooLarge.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of jobs killed for exceeding the maximum allowed standard output limit</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.createInitFailureDetailsFile.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to write a file with details about failure to launch a job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.createJobDir.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to create a job working directory (includes failures to create)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.createRunScript.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to create the job run script</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.executeJob.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to execute the job workflow tasks</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.overall.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to submit a new job (create workspace and scripts, register in database and kick off)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.publishJobStartedEvent.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to publish the event that announces a job has started</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.saveJobExecution.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to persist information about job execution</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.setJobEnvironment.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to persist the job runtime information in the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.rejected.jobs-limit.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>user, jobsUserLimit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken initialize the job environment (working directory, script) and fork the children</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobLauncher</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.successfulStatusCheck.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the successful checks made on locally running jobs</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.timeout.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of jobs killed for exceeding the maximum allowed run time</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.unableToCancel.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Count number of times a job asynchronous task cancelling was requested and failed (failure to cancel may be due to the task no longer being running)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobStateServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.unableToReAttach.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of times a genie node failed to resume monitoring a local job process after server restart</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitoringCoordinator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.unsuccessfulStatusCheck.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of time an exception was raised while trying to check on a locally running job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobMonitor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.publish.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Count the number of notification published to SNS</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AbstractSNSPublisher</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.handshake.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to handshake</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.configure.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to obtain runtime configuration</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.reserve.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to reserve a job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.resolve.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to resolve a job request into a job specification</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.getSpecification.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to obtain a job specification</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.dryRunResolve.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to resolve a job request into a job specification (dry run mode)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.claim.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to claim a job for execution</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.changeStatus.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to update a job status</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, statusFrom, statusTo</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.getStatus.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to obtain a job&#8217;s status</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.rpc.job.changeArchiveStatus.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to serve an agent request to update a job archive status</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, statusTo</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.load.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to load (download, read, compile) a given script</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptManager</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.evaluate.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to evaluate a given script (if previously compiled successfully)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptManager</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.agentJob.handshake.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counter for calls to the 'handshake' protocol of the Genie Agent Job Service</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion, agentHost, handshakeDecision</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.generateClusterCriteriaPermutations.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to generate all the permutations for cluster criteria between the command options and the job request</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.resolve.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to completely resolve the job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, saved</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.resolveApplications.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to retrieve applications information for this task</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.resolveCluster.clusterSelector.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counter for cluster selector algorithms invocations</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>class, status, clusterName, clusterId, clusterSelectorClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.resolveCluster.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to resolve the cluster to use for a job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, clusterName, clusterId, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.resolveCommand.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to resolve the command to use for a job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, commandName, commandId, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.web.services.archivedJobService.getArchivedJobMetadata.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">The time taken to fetch the metadata of an archived job if it isn&#8217;t already cached</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ArchivedJobServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.archiveStatusCleanup.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to execute the cleanup task</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.archiveStatusCleanup.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to execute the cleanup task</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ArchiveStatusCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.connectionsReaped.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of agent connections the leader reaped due to the host being unhealthy</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.connectionsReaped.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of agent connections the leader reaped due to the host being unhealthy</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.failedHealthCheck.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time the leader retrieved health status of a remote node and one of the (non-ignored) indicators
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>host</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.failedHealthCheck.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of time the leader retrieved health status of a remote node and one of the (non-ignored) indicators
 had a status different than UP</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host, healthIndicator, healthStatus</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.invalidResponse.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time the leader retrieved health status of a remote node and failed to parse the response</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>host, healthIndicator, healthStatus</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.invalidResponse.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of time the leader retrieved health status of a remote node and failed to parse the response</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.jobsMarkedFailed.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>host</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.jobsMarkedFailed.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, host, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.unhealthyHosts.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Genie nodes that the leader has currently marked unhealthy</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">Current amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, host, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.unhealthyHosts.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of Genie nodes that the leader has currently marked unhealthy</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Current amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.unreachableHost.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time the leader failed to retrieve health status of a remote node (example: socket timeout).</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.unreachableHost.counter</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of time the leader failed to retrieve health status of a remote node (example: socket timeout).</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.applicationDeletion.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete application records from the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>host</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.applicationDeletion.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to delete application records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.clusterDeletion.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete cluster records from the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.clusterDeletion.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to delete cluster records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.commandDeactivation.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to deactivate command records in the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.commandDeactivation.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to deactivate command records in the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.commandDeletion.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete command records from the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.commandDeletion.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to delete command records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.fileDeletion.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete file records from the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.fileDeletion.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to delete file records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.tagDeletion.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete tag records from the database</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.tagDeletion.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to delete tag records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.duration.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to cleanup database records for jobs that executed over a given amount of time in the past</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.duration.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to cleanup database records for jobs that executed over a given amount of time in the past</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedApplications.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of deleted application records purged during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeletedApplications.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of deleted application records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeactivatedCommands.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of command records set to INACTIVE during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeactivatedCommands.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of command records set to INACTIVE during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedClusters.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of terminated cluster records purged during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeletedClusters.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of terminated cluster records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedCommands.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of deleted command records purged during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeletedCommands.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of deleted command records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedFiles.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of unused file references purged during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeletedFiles.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of unused file references purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedJobs.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of job records purged during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeletedJobs.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of job records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedTags.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of unused tag records purged during the last database cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.numDeletedTags.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of unused tag records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.diskCleanup.numberDeletedJobDirs.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of job folders deleted during the last cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.numberDeletedJobDirs.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of job folders deleted during the last cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DiskCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of failures deleting job folders during the last cleanup pass</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of failures deleting job folders during the last cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>amount</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DiskCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.diskCleanup.unableToDeleteJobsDir.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of times a local job folder could not be deleted</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.unableToDeleteJobsDir.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of times a local job folder could not be deleted</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DiskCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.diskCleanup.unableToGetJobs.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of times a local job folder is encountered during cleanup and the corresponding job record in the
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.unableToGetJobs.rate</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts the number of times a local job folder is encountered during cleanup and the corresponding job record in the
 database cannot be found</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DiskCleanupTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.user.active-jobs.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of active jobs tagged with owner user.</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.user.active-jobs.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of active jobs tagged with owner user.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.user.active-memory.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of memory used by active jobs tagged with owner user.</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">Megabytes</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.user.active-memory.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Amount of memory used by active jobs tagged with owner user.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>Megabytes</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.user.active-users.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of distinct users with at least one job in RUNNING state.</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.user.active-users.gauge</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Number of distinct users with at least one job in RUNNING state.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.web.controllers.exception</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts exceptions returned to the user</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.web.controllers.exception</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Counts exceptions returned to the user</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>count</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>GenieExceptionMapper</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>exceptionClass (*)</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -6955,7 +7013,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-09-08 22:52:09 UTC
+Last updated 2020-09-17 17:43:09 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

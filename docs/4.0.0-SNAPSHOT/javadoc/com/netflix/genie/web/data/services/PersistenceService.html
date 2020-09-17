@@ -1978,8 +1978,7 @@ void&nbsp;setJobCompletionInformation(@NotBlank(message="No job id entered. Unab
 <pre>@Nonnull
 java.lang.String&nbsp;saveJobSubmission(@Valid
                                             @Valid <a href="../../../../../../com/netflix/genie/web/dtos/JobSubmission.html" title="class in com.netflix.genie.web.dtos">JobSubmission</a>&nbsp;jobSubmission)
-                                     throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a>,
-                                            <a href="../../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></pre>
+                                     throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></pre>
 <div class="block">Save the given job submission information in the underlying data store.
  <p>
  The job record will be created with initial state of <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html#RESERVED"><code>JobStatus.RESERVED</code></a> meaning that the unique id
@@ -1989,7 +1988,7 @@ java.lang.String&nbsp;saveJobSubmission(@Valid
  The underlying attachment storage system must be accessible by the agent process configured by the system. For
  example if the server is set up to write attachments to local disk but the agent is not running locally but
  instead on the remote system it will not be able to access those attachments (as dependencies) and fail.
- See <a href="../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services"><code>AttachmentService</code></a> for more information.</div>
+ See <a href="../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services"><code>LegacyAttachmentService</code></a> for more information.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobSubmission</code> - All the information the system has gathered regarding the job submission from the user
@@ -1998,9 +1997,6 @@ java.lang.String&nbsp;saveJobSubmission(@Valid
 <dd>The unique id of the job within the Genie ecosystem</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - If the id the user requested already exists in the system for another job</dd>
-<dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></code> - If attachments were sent in with the job submission and they were unable to be
-                                  persisted to an underlying storage mechanism meant to share the data with an
-                                  agent process</dd>
 </dl>
 </li>
 </ul>

@@ -417,7 +417,7 @@
 <dd>
 <div class="block">Tracks active connections and heartbeats coming from agents actively executing a job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">agentConnectionTrackingService(AgentRoutingService, TaskScheduler)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConnectionTrackingService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties-">agentConnectionTrackingService(AgentRoutingService, TaskScheduler, AgentConnectionTrackingServiceProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConnectionTrackingService</code></a> if one hasn't already been defined.</div>
 </dd>
@@ -425,10 +425,16 @@
 <dd>
 <div class="block">This service keeps track of agent connections and heartbeats.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#AgentConnectionTrackingServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">AgentConnectionTrackingServiceImpl(AgentRoutingService, TaskScheduler)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConnectionTrackingServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#AgentConnectionTrackingServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties-">AgentConnectionTrackingServiceImpl(AgentRoutingService, TaskScheduler, AgentConnectionTrackingServiceProperties)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConnectionTrackingServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AgentConnectionTrackingServiceProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConnectionTrackingService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html#AgentConnectionTrackingServiceProperties--">AgentConnectionTrackingServiceProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentConnectionTrackingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentConnectionTrackingServiceProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolver.html" title="class in com.netflix.genie.web.agent.resources"><span class="typeNameLink">AgentFileProtocolResolver</span></a> - Class in <a href="com/netflix/genie/web/agent/resources/package-summary.html">com.netflix.genie.web.agent.resources</a></dt>
 <dd>
 <div class="block">Resource resolver for files local to an agent running a job that can be streamed to the server and served via API.</div>
@@ -1036,11 +1042,37 @@
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">AttachmentService</span></a> - Interface in <a href="com/netflix/genie/web/services/package-summary.html">com.netflix.genie.web.services</a></dt>
 <dd>
-<div class="block">APIs for dealing with attachments sent in with Genie requests.</div>
+<div class="block">APIs for saving a job attachments sent in with Genie requests.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#attachmentService-com.netflix.genie.web.properties.JobsProperties-">attachmentService(JobsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#attachmentService-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-com.netflix.genie.web.properties.AttachmentServiceProperties-io.micrometer.core.instrument.MeterRegistry-">attachmentService(S3ClientFactory, AttachmentServiceProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">The attachment service to use.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/AttachmentServiceProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AttachmentServiceProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties for the <a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services"><code>AttachmentService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AttachmentServiceProperties.html#AttachmentServiceProperties--">AttachmentServiceProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AttachmentServiceProperties.html" title="class in com.netflix.genie.web.properties">AttachmentServiceProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html" title="class in com.netflix.genie.web.exceptions.checked"><span class="typeNameLink">AttachmentTooLargeException</span></a> - Exception in <a href="com/netflix/genie/web/exceptions/checked/package-summary.html">com.netflix.genie.web.exceptions.checked</a></dt>
+<dd>
+<div class="block">Exception thrown when the user tries to submit a job whose attachments exceed the limits.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html#AttachmentTooLargeException--">AttachmentTooLargeException()</a></span> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html" title="class in com.netflix.genie.web.exceptions.checked">AttachmentTooLargeException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html#AttachmentTooLargeException-java.lang.String-">AttachmentTooLargeException(String)</a></span> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html" title="class in com.netflix.genie.web.exceptions.checked">AttachmentTooLargeException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html#AttachmentTooLargeException-java.lang.String-java.lang.Throwable-">AttachmentTooLargeException(String, Throwable)</a></span> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html" title="class in com.netflix.genie.web.exceptions.checked">AttachmentTooLargeException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html#AttachmentTooLargeException-java.lang.Throwable-">AttachmentTooLargeException(Throwable)</a></span> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/AttachmentTooLargeException.html" title="class in com.netflix.genie.web.exceptions.checked">AttachmentTooLargeException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></dt>
 <dd>
@@ -1634,8 +1666,6 @@
 <dd>
 <div class="block">Section of the help message explaining the cleanup strategy.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#CLEANUP_TASK_PERIOD">CLEANUP_TASK_PERIOD</a></span> - Static variable in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConnectionTrackingServiceImpl</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#cleanupArguments--">cleanupArguments()</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.CleanupArguments</code></a>.</div>
@@ -2749,22 +2779,23 @@
 <dd>
 <div class="block">Takes in a Job Request object and does necessary preparation for execution.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#copy-java.lang.String-java.io.File-">copy(String, File)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/AttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-"><code>AttachmentService.copyAll(String, Path)</code></a> instead</span></div>
-</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#copy-java.lang.String-java.io.File-">copy(String, File)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
 <div class="block">Copy all the attachments for a job into the specified directory.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-">copyAll(String, Path)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#copy-java.lang.String-java.io.File-">copy(String, File)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
 <dd>
-<div class="block">Copy all attachments associated with the given id into the provided destination.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/LegacyAttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-"><code>LegacyAttachmentService.copyAll(String, Path)</code></a> instead</span></div>
+</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-">copyAll(String, Path)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
+<div class="block">Copy all attachments associated with the given id into the provided destination.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#copyAll-java.lang.String-java.nio.file.Path-">copyAll(String, Path)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 <div class="block">Copy all attachments associated with the given id into the provided destination.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#COULD_NOT_LOAD_DONE_FILE">COULD_NOT_LOAD_DONE_FILE</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
@@ -3074,22 +3105,23 @@
 <div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
  result of a retryable exception on the previous attempt.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#delete-java.lang.String-">delete(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/AttachmentService.html#deleteAll-java.lang.String-"><code>AttachmentService.deleteAll(String)</code></a> instead</span></div>
-</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#delete-java.lang.String-">delete(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
 <div class="block">Delete the attachments for the given job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#deleteAll-java.lang.String-">deleteAll(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#delete-java.lang.String-">delete(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
 <dd>
-<div class="block">Delete all the attachments that were associated with the given id.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/LegacyAttachmentService.html#deleteAll-java.lang.String-"><code>LegacyAttachmentService.deleteAll(String)</code></a> instead</span></div>
+</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#deleteAll-java.lang.String-">deleteAll(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
+<div class="block">Delete all the attachments that were associated with the given id.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#deleteAll-java.lang.String-">deleteAll(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 <div class="block">Delete all the attachments that were associated with the given id.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/ApplicationService.html#deleteAllApplications--">deleteAllApplications()</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/ApplicationService.html" title="interface in com.netflix.genie.client.apis">ApplicationService</a></dt>
@@ -3172,12 +3204,13 @@
 <dd>
 <div class="block">Delete an <a href="com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> from the system.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#deleteAttachments-java.lang.String-">deleteAttachments(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#deleteAttachments-java.lang.String-">deleteAttachments(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
 <div class="block">Given the id of a job delete all the attachments that were saved for it.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#deleteAttachments-java.lang.String-">deleteAttachments(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#deleteAttachments-java.lang.String-">deleteAttachments(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
 <dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 <div class="block">Given the id of a job delete all the attachments that were saved for it.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn(Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaBaseRepository</a></dt>
@@ -4865,7 +4898,7 @@
 <div class="block">A singleton for sharing a Jackson Object Mapper instance across Genie and not having to redefine the Object Mapper
  everywhere.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.web.services.AttachmentService-">geniePersistenceService(EntityManager, JpaRepositories, AttachmentService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">geniePersistenceService(EntityManager, JpaRepositories)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a default implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> if no other has been defined.</div>
 </dd>
@@ -9220,7 +9253,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#jobProcessorTask-com.netflix.genie.web.services.AttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">jobProcessorTask(AttachmentService, MeterRegistry, GenieFileTransferService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#jobProcessorTask-com.netflix.genie.web.services.LegacyAttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">jobProcessorTask(LegacyAttachmentService, MeterRegistry, GenieFileTransferService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create an Job Task bean that processes Job information provided by user.</div>
 </dd>
@@ -9327,7 +9360,7 @@
 <dd>
 <div class="block">REST end-point for supporting jobs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController(JobLaunchService, DataServices, JobCoordinatorService, EntityModelAssemblers, GenieHostInfo, RestTemplate, JobDirectoryServerService, JobsProperties, MeterRegistry, AgentRoutingService, Environment, AttachmentService, JobExecutionModeSelector)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.services.LegacyAttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController(JobLaunchService, DataServices, JobCoordinatorService, EntityModelAssemblers, GenieHostInfo, RestTemplate, JobDirectoryServerService, JobsProperties, MeterRegistry, AgentRoutingService, Environment, AttachmentService, LegacyAttachmentService, JobExecutionModeSelector)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9596,7 +9629,7 @@
 <dd>
 <div class="block">Implementation of the workflow task for processing job information for genie mode.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/jobs/workflow/impl/JobTask.html#JobTask-com.netflix.genie.web.services.AttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">JobTask(AttachmentService, MeterRegistry, GenieFileTransferService)</a></span> - Constructor for class com.netflix.genie.web.jobs.workflow.impl.<a href="com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/jobs/workflow/impl/JobTask.html#JobTask-com.netflix.genie.web.services.LegacyAttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">JobTask(LegacyAttachmentService, MeterRegistry, GenieFileTransferService)</a></span> - Constructor for class com.netflix.genie.web.jobs.workflow.impl.<a href="com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9645,7 +9678,7 @@
 <dd>
 <div class="block">Implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> using JPA.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.web.services.AttachmentService-">JpaPersistenceServiceImpl(EntityManager, JpaRepositories, AttachmentService)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">JpaPersistenceServiceImpl(EntityManager, JpaRepositories)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9870,6 +9903,16 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">LegacyAttachmentService</span></a> - Interface in <a href="com/netflix/genie/web/services/package-summary.html">com.netflix.genie.web.services</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">in favor of <a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services"><code>AttachmentService</code></a></span></div>
+</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#legacyAttachmentService-com.netflix.genie.web.properties.JobsProperties-">legacyAttachmentService(JobsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dd>
+<div class="block">The attachment service to use.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/CacheGenieFileTransferService.html#loadFile-java.lang.String-">loadFile(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/CacheGenieFileTransferService.html" title="class in com.netflix.genie.web.services.impl">CacheGenieFileTransferService</a></dt>
 <dd>
 <div class="block">Loads the file given the path and stores it under the cache location with file name as UUID string created using
@@ -9902,6 +9945,14 @@
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> based on static configuration if <a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader"><code>LocalLeader</code></a> is
  available and the bean does not already exist.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/services/impl/LocalFileSystemAttachmentServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">LocalFileSystemAttachmentServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
+<dd>
+<div class="block">Implementation of <a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services"><code>AttachmentService</code></a> that saves the files to a local directory.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/LocalFileSystemAttachmentServiceImpl.html#LocalFileSystemAttachmentServiceImpl-com.netflix.genie.web.properties.AttachmentServiceProperties-">LocalFileSystemAttachmentServiceImpl(AttachmentServiceProperties)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/LocalFileSystemAttachmentServiceImpl.html" title="class in com.netflix.genie.web.services.impl">LocalFileSystemAttachmentServiceImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#localFileTransfer--">localFileTransfer()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
 <dd>
@@ -10516,6 +10567,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ArchiveStatusCleanupProperties.html" title="class in com.netflix.genie.web.properties">ArchiveStatusCleanupProperties</a></dt>
 <dd>
 <div class="block">The property prefix for all properties in this group.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AttachmentServiceProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AttachmentServiceProperties.html" title="class in com.netflix.genie.web.properties">AttachmentServiceProperties</a></dt>
+<dd>
+<div class="block">The property prefix for job user limiting.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AwsCredentialsProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AwsCredentialsProperties.html" title="class in com.netflix.genie.web.properties">AwsCredentialsProperties</a></dt>
 <dd>
@@ -11440,6 +11495,14 @@
 <dd>
 <div class="block">Constant for the precedence of the S3 job archive implementation for others to reference if need be.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/services/impl/S3AttachmentServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">S3AttachmentServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
+<dd>
+<div class="block">Implementation of the AttachmentService interface which saves attachments to AWS S3.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/S3AttachmentServiceImpl.html#S3AttachmentServiceImpl-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-com.netflix.genie.web.properties.AttachmentServiceProperties-io.micrometer.core.instrument.MeterRegistry-">S3AttachmentServiceImpl(S3ClientFactory, AttachmentServiceProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/S3AttachmentServiceImpl.html" title="class in com.netflix.genie.web.services.impl">S3AttachmentServiceImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><span class="typeNameLink">S3ClientFactory</span></a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
 <dd>
 <div class="block">An <code>AmazonS3</code> client factory class.</div>
@@ -11513,15 +11576,15 @@
 <div class="block">Configurer bean which will add the <a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> to the set of <code>ProtocolResolver</code> in the
  application context.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#save-java.lang.String-java.lang.String-java.io.InputStream-">save(String, String, InputStream)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/AttachmentService.html#saveAll-java.util.Map-"><code>AttachmentService.saveAll(Map)</code></a> instead</span></div>
-</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#save-java.lang.String-java.lang.String-java.io.InputStream-">save(String, String, InputStream)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
 <div class="block">Save a given attachment for a job for later retrieval.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#save-java.lang.String-java.lang.String-java.io.InputStream-">save(String, String, InputStream)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/services/LegacyAttachmentService.html#saveAll-java.util.Map-"><code>LegacyAttachmentService.saveAll(Map)</code></a> instead</span></div>
+</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveAgentConnection-java.lang.String-java.lang.String-">saveAgentConnection(String, String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
@@ -11531,12 +11594,13 @@
 <dd>
 <div class="block">Store a new connection currently active from the given agent to the given node.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#saveAll-java.util.Map-">saveAll(Map&lt;String, InputStream&gt;)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#saveAll-java.util.Map-">saveAll(Map&lt;String, InputStream&gt;)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
 <div class="block">Save all attachments for a given request.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#saveAll-java.util.Map-">saveAll(Map&lt;String, InputStream&gt;)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#saveAll-java.util.Map-">saveAll(Map&lt;String, InputStream&gt;)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
 <dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 <div class="block">Save all attachments for a given request.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveApplication-com.netflix.genie.common.external.dtos.v4.ApplicationRequest-">saveApplication(ApplicationRequest)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
@@ -11570,11 +11634,24 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments(String, Set&lt;Resource&gt;)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
 <dd>
-<div class="block">Given the id of a job and the set of attachments associated with that job this API should save the attachments
- somewhere that the agent can access as job dependencies once the job runs.</div>
+<div class="block">Save the attachments and return their URIs so agent executing the job can retrieve them.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments(String, Set&lt;Resource&gt;)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
+<div class="block">Given the id of a job and the set of attachments associated with that job this API should save the attachments
+ somewhere that the agent can access as job dependencies once the job runs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/LocalFileSystemAttachmentServiceImpl.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments(String, Set&lt;Resource&gt;)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/LocalFileSystemAttachmentServiceImpl.html" title="class in com.netflix.genie.web.services.impl">LocalFileSystemAttachmentServiceImpl</a></dt>
+<dd>
+<div class="block">Save the attachments and return their URIs so agent executing the job can retrieve them.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/S3AttachmentServiceImpl.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments(String, Set&lt;Resource&gt;)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/S3AttachmentServiceImpl.html" title="class in com.netflix.genie.web.services.impl">S3AttachmentServiceImpl</a></dt>
+<dd>
+<div class="block">Save the attachments and return their URIs so agent executing the job can retrieve them.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/LegacyAttachmentService.html#saveAttachments-java.lang.String-java.util.Set-">saveAttachments(String, Set&lt;Resource&gt;)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 <div class="block">Given the id of a job and the set of attachments associated with that job this API should save the attachments
  somewhere that the agent can access as job dependencies once the job runs.</div>
 </dd>
@@ -12507,8 +12584,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html#stopService--">stopService()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopHeartbeatServiceStage</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html#stopService--">stopService()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopKillServiceStage</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#STREAM_EXPIRATION_PERIOD">STREAM_EXPIRATION_PERIOD</a></span> - Static variable in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConnectionTrackingServiceImpl</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/util/StreamBuffer.html" title="class in com.netflix.genie.web.util"><span class="typeNameLink">StreamBuffer</span></a> - Class in <a href="com/netflix/genie/web/util/package-summary.html">com.netflix.genie.web.util</a></dt>
 <dd>
@@ -13749,11 +13824,11 @@ the order they are declared.</div>
 <dd>
 <div class="block">Set whether the agent should or should not archive the job directory.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-java.util.Set-">withAttachments(Set&lt;Resource&gt;)</a></span> - Method in class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-java.util.Set-">withAttachments(Set&lt;URI&gt;)</a></span> - Method in class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a></dt>
 <dd>
 <div class="block">Set the attachments associated with this submission if there were any.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-org.springframework.core.io.Resource...-">withAttachments(Resource...)</a></span> - Method in class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html#withAttachments-java.net.URI...-">withAttachments(URI...)</a></span> - Method in class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/JobSubmission.Builder.html" title="class in com.netflix.genie.web.dtos">JobSubmission.Builder</a></dt>
 <dd>
 <div class="block">Set the attachments associated with this submission.</div>
 </dd>

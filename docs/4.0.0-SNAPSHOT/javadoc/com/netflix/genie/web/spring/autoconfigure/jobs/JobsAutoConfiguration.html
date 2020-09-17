@@ -211,7 +211,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#jobProcessorTask-com.netflix.genie.web.services.AttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">jobProcessorTask</a></span>(<a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#jobProcessorTask-com.netflix.genie.web.services.LegacyAttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">jobProcessorTask</a></span>(<a href="../../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a>&nbsp;legacyAttachmentService,
                 io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                 <a href="../../../../../../../com/netflix/genie/web/services/impl/GenieFileTransferService.html" title="class in com.netflix.genie.web.services.impl">GenieFileTransferService</a>&nbsp;fts)</code>
 <div class="block">Create an Job Task bean that processes Job information provided by user.</div>
@@ -443,7 +443,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/jobs/workflow/im
 </dl>
 </li>
 </ul>
-<a name="jobProcessorTask-com.netflix.genie.web.services.AttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">
+<a name="jobProcessorTask-com.netflix.genie.web.services.LegacyAttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -452,14 +452,14 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/jobs/workflow/im
 <pre>@Bean
  @Order(value=5)
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask</a>&nbsp;jobProcessorTask(<a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService,
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask</a>&nbsp;jobProcessorTask(<a href="../../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a>&nbsp;legacyAttachmentService,
                                                                                                        io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                                                                                                        @Qualifier(value="genieFileTransferService")
                                                                                                        <a href="../../../../../../../com/netflix/genie/web/services/impl/GenieFileTransferService.html" title="class in com.netflix.genie.web.services.impl">GenieFileTransferService</a>&nbsp;fts)</pre>
 <div class="block">Create an Job Task bean that processes Job information provided by user.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>attachmentService</code> - An implementation of the attachment service</dd>
+<dd><code>legacyAttachmentService</code> - An implementation of the attachment service</dd>
 <dd><code>registry</code> - The metrics registry to use</dd>
 <dd><code>fts</code> - File transfer implementation</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

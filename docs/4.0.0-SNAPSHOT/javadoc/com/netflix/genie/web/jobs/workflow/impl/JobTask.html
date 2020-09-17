@@ -141,7 +141,7 @@ extends <a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/G
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/JobTask.html#JobTask-com.netflix.genie.web.services.AttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">JobTask</a></span>(@NotNull <a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/JobTask.html#JobTask-com.netflix.genie.web.services.LegacyAttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">JobTask</a></span>(@NotNull <a href="../../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a>&nbsp;legacyAttachmentService,
        @NotNull io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
        @NotNull <a href="../../../../../../../com/netflix/genie/web/services/impl/GenieFileTransferService.html" title="class in com.netflix.genie.web.services.impl">GenieFileTransferService</a>&nbsp;fts)</code>
 <div class="block">Constructor.</div>
@@ -197,14 +197,14 @@ extends <a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/G
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobTask-com.netflix.genie.web.services.AttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">
+<a name="JobTask-com.netflix.genie.web.services.LegacyAttachmentService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JobTask</h4>
 <pre>public&nbsp;JobTask(@NotNull
-               @NotNull <a href="../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService,
+               @NotNull <a href="../../../../../../../com/netflix/genie/web/services/LegacyAttachmentService.html" title="interface in com.netflix.genie.web.services">LegacyAttachmentService</a>&nbsp;legacyAttachmentService,
                @NotNull
                @NotNull io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                @NotNull
@@ -212,7 +212,7 @@ extends <a href="../../../../../../../com/netflix/genie/web/jobs/workflow/impl/G
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>attachmentService</code> - An implementation of the Attachment Service</dd>
+<dd><code>legacyAttachmentService</code> - An implementation of the Attachment Service</dd>
 <dd><code>registry</code> - The metrics registry to use</dd>
 <dd><code>fts</code> - File transfer service</dd>
 </dl>
