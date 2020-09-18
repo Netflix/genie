@@ -27,7 +27,6 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -36,6 +35,7 @@ import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
+import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -63,6 +63,7 @@ import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -88,6 +89,11 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
+@TestPropertySource(
+    properties = {
+        LocalAgentLauncherProperties.PROPERTY_PREFIX + ".run-as-user=false",
+    }
+)
 class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
@@ -168,7 +174,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private static final String EXPECTED_STDOUT_CONTENT = "hello world\n";
     private static final int EXPECTED_STDOUT_LENGTH = EXPECTED_STDOUT_CONTENT.length();
 
-    protected boolean agentExecution;
     private ResourceLoader resourceLoader;
     private JsonNode metadata;
     private String schedulerJobName;
@@ -182,10 +187,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
 
     @Autowired
     private Resource jobDirResource;
-
-    JobRestControllerIntegrationTest() {
-        this.agentExecution = false;
-    }
 
     @BeforeEach
     void beforeJobs() throws Exception {
@@ -528,7 +529,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .body("directories[0].name", Matchers.is("genie/"))
             .body("files[0].name", Matchers.is("config1"))
             .body("files[1].name", Matchers.is("dep1"))
-            .body("files[2].name", Matchers.is(this.agentExecution ? "genie_setup.sh" : "jobsetupfile"))
+            .body("files[2].name", Matchers.is("genie_setup.sh"))
             .body("files[3].name", Matchers.is("run"))
             .body("files[4].name", Matchers.is("stderr"))
             .body("files[5].name", Matchers.is("stdout"));
@@ -602,23 +603,21 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .get(
                 JOBS_API + "/{id}/output/{filePath}",
                 id,
-                this.agentExecution ? "genie_setup.sh" : "jobsetupfile"
+                "genie_setup.sh"
             )
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .body(Matchers.is(setupFileContents));
 
         // Validate content of 'run' file
-        final String expectedFilename = this.agentExecution ? "runsh-agent.txt" : "runsh-embedded.txt";
+        final String expectedFilename = "runsh-agent.txt";
         final String runFile = this.getResourceURI(BASE_DIR + expectedFilename);
         final String runFileContent = new String(
             Files.readAllBytes(Paths.get(new URI(runFile))),
             StandardCharsets.UTF_8
         );
 
-        final String testJobsDir = this.agentExecution
-            ? this.jobsLocationsProperties.getJobs().getPath()
-            : this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER;
+        final String testJobsDir = this.jobsLocationsProperties.getJobs().getPath();
         final String expectedRunFileContent = this.getExpectedRunContents(
             runFileContent,
             testJobsDir + id,
@@ -814,18 +813,11 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
             .body(ARCHIVE_STATUS_PATH, Matchers.is(ArchiveStatus.ARCHIVED.toString()));
 
-        // TODO: Fix the difference here
-        if (this.agentExecution) {
-            validatableResponse
-                .body(PROCESS_ID_PATH, Matchers.nullValue())
-                .body(CHECK_DELAY_PATH, Matchers.nullValue())
-                .body(EXIT_CODE_PATH, Matchers.nullValue());
-        } else {
-            validatableResponse
-                .body(PROCESS_ID_PATH, Matchers.notNullValue())
-                .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
-                .body(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE));
-        }
+        // TODO these are not populated
+        validatableResponse
+            .body(PROCESS_ID_PATH, Matchers.nullValue())
+            .body(CHECK_DELAY_PATH, Matchers.nullValue())
+            .body(EXIT_CODE_PATH, Matchers.nullValue());
     }
 
     private void checkJobMetadata(final int documentationId, final String id) {
@@ -854,16 +846,10 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .body(NUM_ATTACHMENTS_PATH, Matchers.notNullValue())
             .body(TOTAL_SIZE_ATTACHMENTS_PATH, Matchers.notNullValue());
 
-        // TODO: Fix this difference
-        if (this.agentExecution) {
-            validatableResponse
-                .body(STD_OUT_SIZE_PATH, Matchers.nullValue())
-                .body(STD_ERR_SIZE_PATH, Matchers.nullValue());
-        } else {
-            validatableResponse
-                .body(STD_OUT_SIZE_PATH, Matchers.notNullValue())
-                .body(STD_ERR_SIZE_PATH, Matchers.notNullValue());
-        }
+        // TODO: These are not populated
+        validatableResponse
+            .body(STD_OUT_SIZE_PATH, Matchers.nullValue())
+            .body(STD_ERR_SIZE_PATH, Matchers.nullValue());
     }
 
     private void checkJobCluster(final int documentationId, final String id) {

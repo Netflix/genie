@@ -58,11 +58,9 @@ import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.AttachmentService;
-import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
+import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobLaunchService;
-import com.netflix.genie.web.services.LegacyAttachmentService;
-import com.netflix.genie.web.util.JobExecutionModeSelector;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -109,7 +107,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -119,9 +116,7 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -142,7 +137,6 @@ public class JobRestController {
     private static final String COMMA = ",";
 
     private final JobLaunchService jobLaunchService;
-    private final JobCoordinatorService jobCoordinatorService;
     private final ApplicationModelAssembler applicationModelAssembler;
     private final ClusterModelAssembler clusterModelAssembler;
     private final CommandModelAssembler commandModelAssembler;
@@ -159,10 +153,7 @@ public class JobRestController {
     private final PersistenceService persistenceService;
     private final Environment environment;
     private final AttachmentService attachmentService;
-
-    // TODO: V3 Execution only
-    private final LegacyAttachmentService legacyAttachmentService;
-    private final JobExecutionModeSelector jobExecutionModeSelector;
+    private final JobKillService jobKillService;
 
     // Metrics
     private final Counter submitJobWithoutAttachmentsRate;
@@ -172,7 +163,6 @@ public class JobRestController {
      * Constructor.
      * @param jobLaunchService          The {@link JobLaunchService} implementation to use
      * @param dataServices              The {@link DataServices} instance to use
-     * @param jobCoordinatorService     The job coordinator service to use.
      * @param entityModelAssemblers     The encapsulation of all the V3 resource assemblers
      * @param genieHostInfo             Information about the host that the Genie process is running on
      * @param restTemplate              The rest template for http requests
@@ -182,15 +172,13 @@ public class JobRestController {
      * @param agentRoutingService       Agent routing service
      * @param environment               The application environment to pull dynamic properties from
      * @param attachmentService         The attachment service to use to save attachments.
-     * @param legacyAttachmentService   The attachment service to use to save attachments.
-     * @param jobExecutionModeSelector  The execution mode (agent vs. embedded) mode selector
+     * @param jobKillService            The service to kill running jobs
      */
     @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
     public JobRestController(
         final JobLaunchService jobLaunchService,
         final DataServices dataServices,
-        final JobCoordinatorService jobCoordinatorService,
         final EntityModelAssemblers entityModelAssemblers,
         final GenieHostInfo genieHostInfo,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
@@ -200,11 +188,9 @@ public class JobRestController {
         final AgentRoutingService agentRoutingService,
         final Environment environment,
         final AttachmentService attachmentService,
-        final LegacyAttachmentService legacyAttachmentService,
-        final JobExecutionModeSelector jobExecutionModeSelector
+        final JobKillService jobKillService
     ) {
         this.jobLaunchService = jobLaunchService;
-        this.jobCoordinatorService = jobCoordinatorService;
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
@@ -221,10 +207,7 @@ public class JobRestController {
         this.persistenceService = dataServices.getPersistenceService();
         this.environment = environment;
         this.attachmentService = attachmentService;
-
-        // TODO: V3 Only. Remove.
-        this.legacyAttachmentService = legacyAttachmentService;
-        this.jobExecutionModeSelector = jobExecutionModeSelector;
+        this.jobKillService = jobKillService;
 
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
@@ -313,13 +296,41 @@ public class JobRestController {
             localClientHost = httpServletRequest.getRemoteAddr();
         }
 
-        final boolean agentExecution = this.jobExecutionModeSelector.executeWithAgent(jobRequest, httpServletRequest);
-        final String jobId;
-        if (agentExecution) {
-            jobId = this.agentExecution(jobRequest, attachments, localClientHost, userAgent);
-        } else {
-            jobId = this.embeddedExecution(jobRequest, attachments, localClientHost, userAgent);
+        // Get attachments metadata
+        int numAttachments = 0;
+        long totalSizeOfAttachments = 0L;
+        if (attachments != null) {
+            numAttachments = attachments.length;
+            for (final MultipartFile attachment : attachments) {
+                totalSizeOfAttachments += attachment.getSize();
+            }
         }
+
+        final JobRequestMetadata metadata = new JobRequestMetadata(
+            new ApiClientMetadata(localClientHost, userAgent),
+            null,
+            numAttachments,
+            totalSizeOfAttachments
+        );
+
+        final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(
+            DtoConverters.toV4JobRequest(jobRequest),
+            metadata
+        );
+
+        if (attachments != null) {
+            jobSubmissionBuilder.withAttachments(
+                this.attachmentService.saveAttachments(
+                    jobRequest.getId().orElse(null),
+                    Arrays
+                        .stream(attachments)
+                        .map(MultipartFile::getResource)
+                        .collect(Collectors.toSet())
+                )
+            );
+        }
+
+        final String jobId = this.jobLaunchService.launchJob(jobSubmissionBuilder.build());
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -521,47 +532,51 @@ public class JobRestController {
             return;
         }
 
-        // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
-        if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
-            final String jobHostname;
-            try {
-                jobHostname = this.getJobOwnerHostname(id, this.persistenceService.isV4(id));
-            } catch (final GenieJobNotFoundException e) {
-                throw new GenieNotFoundException("Job " + id + " not found", e);
-            }
-
-            if (!this.hostname.equals(jobHostname)) {
-                log.info("Job {} is not on this node. Forwarding kill request to {}", id, jobHostname);
-                final String forwardHost = this.buildForwardHost(jobHostname);
-                try {
-                    //Need to forward job
-                    this.restTemplate.execute(
-                        forwardHost + JOB_API_BASE_PATH + id,
-                        HttpMethod.DELETE,
-                        forwardRequest -> copyRequestHeaders(request, forwardRequest),
-                        (final ClientHttpResponse forwardResponse) -> {
-                            response.setStatus(HttpStatus.ACCEPTED.value());
-                            copyResponseHeaders(response, forwardResponse);
-                            return null;
-                        }
-                    );
-                } catch (HttpStatusCodeException e) {
-                    log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
-                    response.sendError(e.getStatusCode().value(), e.getStatusText());
-                } catch (Exception e) {
-                    log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
-                    response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
-                }
-
-                // No need to do anything on this node
-                return;
-            }
+        final String jobHostname;
+        try {
+            jobHostname = this.agentRoutingService
+                .getHostnameForAgentConnection(id)
+                .orElseThrow(() -> new NotFoundException("No hostname found for job - " + id));
+        } catch (final GenieJobNotFoundException e) {
+            throw new GenieNotFoundException("Job " + id + " not found", e);
         }
 
-        log.info("Job {} is on this node. Attempting to kill.", id);
-        // Job is on this node so try to kill it
-        this.jobCoordinatorService.killJob(id, JobStatusMessages.JOB_KILLED_BY_USER);
-        response.setStatus(HttpStatus.ACCEPTED.value());
+        final boolean shouldForward = !this.hostname.equals(jobHostname);
+        final boolean canForward = this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null;
+
+        if (!shouldForward) {
+            log.info("Job {} is connected to this node. Attempting to kill.", id);
+            this.jobKillService.killJob(id, JobStatusMessages.JOB_KILLED_BY_USER);
+            response.setStatus(HttpStatus.ACCEPTED.value());
+
+        } else if (canForward) {
+            log.info("Job {} is not connected to this node. Forwarding kill request to {}", id, jobHostname);
+            final String forwardHost = this.buildForwardHost(jobHostname);
+            try {
+                //Need to forward job
+                this.restTemplate.execute(
+                    forwardHost + JOB_API_BASE_PATH + id,
+                    HttpMethod.DELETE,
+                    forwardRequest -> copyRequestHeaders(request, forwardRequest),
+                    (final ClientHttpResponse forwardResponse) -> {
+                        response.setStatus(HttpStatus.ACCEPTED.value());
+                        copyResponseHeaders(response, forwardResponse);
+                        return null;
+                    }
+                );
+            } catch (HttpStatusCodeException e) {
+                log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
+                response.sendError(e.getStatusCode().value(), e.getStatusText());
+            } catch (Exception e) {
+                log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
+                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            }
+        } else {
+            throw new GenieServerException(
+                "Cannot forward kill request, "
+                + (forwardedFrom == null ? "forwarding disabled" : "request is already a forward")
+            );
+        }
     }
 
     /**
@@ -700,10 +715,11 @@ public class JobRestController {
         final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(id);
 
         if (archiveStatus == ArchiveStatus.PENDING) {
-            final boolean isV4 = this.persistenceService.isV4(id);
             final String jobHostname;
             try {
-                jobHostname = this.getJobOwnerHostname(id, isV4);
+                jobHostname = this.agentRoutingService
+                    .getHostnameForAgentConnection(id)
+                    .orElseThrow(() -> new NotFoundException("No hostname found for job - " + id));
             } catch (NotFoundException e) {
                 throw new GenieServerException("Failed to route request", e);
             }
@@ -815,151 +831,5 @@ public class JobRestController {
                 response.setHeader(header.getKey(), header.getValue());
             }
         }
-    }
-
-    /*
-     * Helper to find the owner for a job.
-     * Owner is defined as
-     * 1. For v3 jobs the server that spawned the process running the job
-     * 2. For v4 jobs the server owning the active connection to the agent
-     *
-     */
-    private String getJobOwnerHostname(
-        @NotBlank(message = "No job id entered. Unable to find the job owner.") final String jobId,
-        final boolean isV4
-    ) throws NotFoundException {
-        if (isV4) {
-            return this.agentRoutingService
-                .getHostnameForAgentConnection(jobId)
-                .orElseThrow(() -> new NotFoundException("No hostname found for v4 job - " + jobId));
-        } else {
-            return this.persistenceService.getJobHost(jobId);
-        }
-    }
-
-    // TODO: Remove this once fully moved to agent execution
-    private String embeddedExecution(
-        final JobRequest jobRequest,
-        @Nullable final MultipartFile[] attachments,
-        final String clientHost,
-        @Nullable final String userAgent
-    ) throws GenieException {
-        final JobRequest jobRequestWithId;
-        // If the job request does not contain an id create one else use the one provided.
-        final String jobId;
-        final Optional<String> jobIdOptional = jobRequest.getId();
-        if (jobIdOptional.isPresent() && StringUtils.isNotBlank(jobIdOptional.get())) {
-            jobId = jobIdOptional.get();
-            jobRequestWithId = jobRequest;
-        } else {
-            jobId = UUID.randomUUID().toString();
-            final JobRequest.Builder builder = new JobRequest.Builder(
-                jobRequest.getName(),
-                jobRequest.getUser(),
-                jobRequest.getVersion(),
-                jobRequest.getClusterCriterias(),
-                jobRequest.getCommandCriteria()
-            )
-                .withId(jobId)
-                .withDisableLogArchival(jobRequest.isDisableLogArchival())
-                .withTags(jobRequest.getTags())
-                .withConfigs(jobRequest.getConfigs())
-                .withDependencies(jobRequest.getDependencies())
-                .withApplications(jobRequest.getApplications());
-
-            jobRequest.getCommandArgs().ifPresent(builder::withCommandArgs);
-            jobRequest.getCpu().ifPresent(builder::withCpu);
-            jobRequest.getMemory().ifPresent(builder::withMemory);
-            jobRequest.getGroup().ifPresent(builder::withGroup);
-            jobRequest.getSetupFile().ifPresent(builder::withSetupFile);
-            jobRequest.getDescription().ifPresent(builder::withDescription);
-            jobRequest.getEmail().ifPresent(builder::withEmail);
-            jobRequest.getTimeout().ifPresent(builder::withTimeout);
-            jobRequest.getMetadata().ifPresent(builder::withMetadata);
-            jobRequest.getGrouping().ifPresent(builder::withGrouping);
-            jobRequest.getGroupingInstance().ifPresent(builder::withGroupingInstance);
-
-            jobRequestWithId = builder.build();
-        }
-
-        // Download attachments
-        int numAttachments = 0;
-        long totalSizeOfAttachments = 0L;
-        if (attachments != null) {
-            log.info("Saving attachments for job {}", jobId);
-            numAttachments = attachments.length;
-            for (final MultipartFile attachment : attachments) {
-                totalSizeOfAttachments += attachment.getSize();
-                log.info(
-                    "Attachment for job: {} name: {} Size: {}",
-                    jobId,
-                    attachment.getOriginalFilename(),
-                    attachment.getSize()
-                );
-                try {
-                    String originalFilename = attachment.getOriginalFilename();
-                    if (originalFilename == null) {
-                        originalFilename = UUID.randomUUID().toString();
-                    }
-                    this.legacyAttachmentService.save(jobId, originalFilename, attachment.getInputStream());
-                } catch (final IOException ioe) {
-                    throw new GenieServerException("Failed to save job attachment", ioe);
-                }
-            }
-        }
-
-        final JobMetadata metadata = new JobMetadata
-            .Builder()
-            .withClientHost(clientHost)
-            .withUserAgent(userAgent)
-            .withNumAttachments(numAttachments)
-            .withTotalSizeOfAttachments(totalSizeOfAttachments)
-            .build();
-
-        this.jobCoordinatorService.coordinateJob(jobRequestWithId, metadata);
-        return jobId;
-    }
-
-    private String agentExecution(
-        final JobRequest jobRequest,
-        @Nullable final MultipartFile[] attachments,
-        final String clientHost,
-        @Nullable final String userAgent
-    ) throws GenieException, GenieCheckedException {
-        // Get attachments metadata
-        int numAttachments = 0;
-        long totalSizeOfAttachments = 0L;
-        if (attachments != null) {
-            numAttachments = attachments.length;
-            for (final MultipartFile attachment : attachments) {
-                totalSizeOfAttachments += attachment.getSize();
-            }
-        }
-
-        final JobRequestMetadata metadata = new JobRequestMetadata(
-            new ApiClientMetadata(clientHost, userAgent),
-            null,
-            numAttachments,
-            totalSizeOfAttachments
-        );
-
-        final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(
-            DtoConverters.toV4JobRequest(jobRequest),
-            metadata
-        );
-
-        if (attachments != null) {
-            jobSubmissionBuilder.withAttachments(
-                this.attachmentService.saveAttachments(
-                    jobRequest.getId().orElse(null),
-                    Arrays
-                        .stream(attachments)
-                        .map(MultipartFile::getResource)
-                        .collect(Collectors.toSet())
-                )
-            );
-        }
-
-        return this.jobLaunchService.launchJob(jobSubmissionBuilder.build());
     }
 }
