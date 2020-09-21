@@ -42,10 +42,7 @@ import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobFileService;
-import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
-import com.netflix.genie.web.services.JobResolverService;
-import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
@@ -67,7 +64,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Unit Tests for {@link ServicesAutoConfiguration} class.
@@ -176,23 +172,6 @@ class ServicesAutoConfigurationTest {
                     workflowTasks,
                     resource,
                     Mockito.mock(MeterRegistry.class)
-                )
-            )
-            .isNotNull();
-    }
-
-    @Test
-    void canGetJobCoordinatorServiceBean() {
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.jobCoordinatorService(
-                    Mockito.mock(DataServices.class),
-                    Mockito.mock(JobKillService.class),
-                    Mockito.mock(JobStateService.class),
-                    JobsProperties.getJobsPropertiesDefaults(),
-                    Mockito.mock(JobResolverService.class),
-                    Mockito.mock(MeterRegistry.class),
-                    new GenieHostInfo(UUID.randomUUID().toString())
                 )
             )
             .isNotNull();

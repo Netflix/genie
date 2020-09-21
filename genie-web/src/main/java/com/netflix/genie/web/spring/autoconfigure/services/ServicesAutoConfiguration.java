@@ -45,14 +45,12 @@ import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.FileTransferFactory;
-import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
-import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.MailService;
@@ -61,7 +59,6 @@ import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
-import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
@@ -278,40 +275,6 @@ public class ServicesAutoConfiguration {
             workflowTasks,
             genieWorkingDir,
             registry
-        );
-    }
-
-    /**
-     * Get an instance of the JobCoordinatorService.
-     *
-     * @param dataServices       The {@link DataServices} encapsulation instance to use
-     * @param jobKillService     The job kill service to use
-     * @param jobStateService    The running job metrics service to use
-     * @param jobsProperties     The jobs properties to use
-     * @param jobResolverService The job specification service to use
-     * @param registry           The metrics registry to use
-     * @param genieHostInfo      Information about the host the Genie process is running on
-     * @return An instance of the JobCoordinatorService.
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobCoordinatorService.class)
-    public JobCoordinatorService jobCoordinatorService(
-        final DataServices dataServices,
-        final JobKillService jobKillService,
-        @Qualifier("jobMonitoringCoordinator") final JobStateService jobStateService,
-        final JobsProperties jobsProperties,
-        final JobResolverService jobResolverService,
-        final MeterRegistry registry,
-        final GenieHostInfo genieHostInfo
-    ) {
-        return new JobCoordinatorServiceImpl(
-            dataServices,
-            jobKillService,
-            jobStateService,
-            jobsProperties,
-            jobResolverService,
-            registry,
-            genieHostInfo.getHostname()
         );
     }
 
