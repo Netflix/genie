@@ -18,9 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
@@ -48,7 +46,6 @@ import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
-import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
@@ -58,7 +55,6 @@ import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
-import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +67,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.retry.support.RetryTemplate;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -267,41 +262,6 @@ public class ServicesAutoConfiguration {
             registry,
             jobsProperties,
             environment
-        );
-    }
-
-    /**
-     * Get an implementation of {@link JobCompletionService} if one hasn't already been defined.
-     *
-     * @param dataServices      The {@link DataServices} instance to use
-     * @param jobArchiveService The {@link JobArchiveService} implementation to use
-     * @param genieWorkingDir   Working directory for genie where it creates jobs directories.
-     * @param mailService       The mail service
-     * @param registry          Registry
-     * @param jobsProperties    The jobs properties to use
-     * @param retryTemplate     The retry template
-     * @return an instance of {@link JobCompletionService}
-     * @throws GenieException if the bean fails during construction
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobCompletionService.class)
-    public JobCompletionService jobCompletionService(
-        final DataServices dataServices,
-        final JobArchiveService jobArchiveService,
-        @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final MailService mailService,
-        final MeterRegistry registry,
-        final JobsProperties jobsProperties,
-        @Qualifier("genieRetryTemplate") final RetryTemplate retryTemplate
-    ) throws GenieException {
-        return new JobCompletionService(
-            dataServices,
-            jobArchiveService,
-            genieWorkingDir,
-            mailService,
-            registry,
-            jobsProperties,
-            retryTemplate
         );
     }
 
