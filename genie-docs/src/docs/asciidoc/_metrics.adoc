@@ -349,59 +349,11 @@ for multiple errors.
 |JobMonitor
 |-
 
-|genie.jobs.submit.localRunner.createInitFailureDetailsFile.timer
-|Time taken to write a file with details about failure to launch a job
-|nanoseconds
-|LocalJobRunner
-|-
-
-|genie.jobs.submit.localRunner.createJobDir.timer
-|Time taken to create a job working directory (includes failures to create)
-|nanoseconds
-|LocalJobRunner
-|-
-
-|genie.jobs.submit.localRunner.createRunScript.timer
-|Time taken to create the job run script
-|nanoseconds
-|LocalJobRunner
-|-
-
-|genie.jobs.submit.localRunner.executeJob.timer
-|Time taken to execute the job workflow tasks
-|nanoseconds
-|LocalJobRunner
-|-
-
-|genie.jobs.submit.localRunner.overall.timer
-|Time taken to submit a new job (create workspace and scripts, register in database and kick off)
-|nanoseconds
-|LocalJobRunner
-|-
-
-|genie.jobs.submit.localRunner.publishJobStartedEvent.timer
-|Time taken to publish the event that announces a job has started
-|nanoseconds
-|LocalJobRunner
-|-
-
-|genie.jobs.submit.localRunner.saveJobExecution.timer
-|Time taken to persist information about job execution
-|nanoseconds
-|LocalJobRunner
-|-
-
 |genie.jobs.submit.rejected.jobs-limit.counter
 |Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs
 |count
 |JobRestController
 |user, jobsUserLimit
-
-|genie.jobs.submit.timer
-|Time taken initialize the job environment (working directory, script) and fork the children
-|nanoseconds
-|JobLauncher
-|status, exceptionClass
 
 |genie.jobs.successfulStatusCheck.rate
 |Counts the successful checks made on locally running jobs

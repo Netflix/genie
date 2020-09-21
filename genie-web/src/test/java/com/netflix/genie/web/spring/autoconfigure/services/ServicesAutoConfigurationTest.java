@@ -27,7 +27,6 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
-import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
@@ -56,14 +55,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Unit Tests for {@link ServicesAutoConfiguration} class.
@@ -149,28 +145,6 @@ class ServicesAutoConfigurationTest {
                     Mockito.mock(FileTransferFactory.class),
                     cacheProperties,
                     Mockito.mock(LocalFileTransferImpl.class),
-                    Mockito.mock(MeterRegistry.class)
-                )
-            )
-            .isNotNull();
-    }
-
-    @Test
-    void canGetJobSubmitterServiceBean() {
-        final PersistenceService persistenceService = Mockito.mock(PersistenceService.class);
-        final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
-        final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
-        final Resource resource = Mockito.mock(Resource.class);
-        final List<WorkflowTask> workflowTasks = new ArrayList<>();
-
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.jobSubmitterService(
-                    dataServices,
-                    genieEventBus,
-                    workflowTasks,
-                    resource,
                     Mockito.mock(MeterRegistry.class)
                 )
             )

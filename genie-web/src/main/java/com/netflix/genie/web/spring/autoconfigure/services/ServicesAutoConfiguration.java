@@ -28,7 +28,6 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
-import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
@@ -51,7 +50,6 @@ import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
-import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
@@ -66,7 +64,6 @@ import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
-import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
@@ -246,34 +243,6 @@ public class ServicesAutoConfiguration {
             fileTransferFactory,
             fileCacheProperties.getLocation().toString(),
             localFileTransfer,
-            registry
-        );
-    }
-
-    /**
-     * Get a implementation of the JobSubmitterService that runs jobs locally.
-     *
-     * @param dataServices    The {@link DataServices} instance to use
-     * @param genieEventBus   The genie event bus implementation to use
-     * @param workflowTasks   List of all the workflow tasks to be executed.
-     * @param genieWorkingDir Working directory for genie where it creates jobs directories.
-     * @param registry        The metrics registry to use
-     * @return An instance of the JobSubmitterService.
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobSubmitterService.class)
-    public JobSubmitterService jobSubmitterService(
-        final DataServices dataServices,
-        final GenieEventBus genieEventBus,
-        final List<WorkflowTask> workflowTasks,
-        @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final MeterRegistry registry
-    ) {
-        return new LocalJobRunner(
-            dataServices,
-            genieEventBus,
-            workflowTasks,
-            genieWorkingDir,
             registry
         );
     }
