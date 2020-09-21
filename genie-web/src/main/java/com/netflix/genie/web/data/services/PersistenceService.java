@@ -48,7 +48,7 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
-import com.netflix.genie.web.services.LegacyAttachmentService;
+import com.netflix.genie.web.services.AttachmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
@@ -719,7 +719,7 @@ public interface PersistenceService {
      * The underlying attachment storage system must be accessible by the agent process configured by the system. For
      * example if the server is set up to write attachments to local disk but the agent is not running locally but
      * instead on the remote system it will not be able to access those attachments (as dependencies) and fail.
-     * See {@link LegacyAttachmentService} for more information.
+     * See {@link AttachmentService} for more information.
      *
      * @param jobSubmission All the information the system has gathered regarding the job submission from the user
      *                      either via the API or via the agent CLI
