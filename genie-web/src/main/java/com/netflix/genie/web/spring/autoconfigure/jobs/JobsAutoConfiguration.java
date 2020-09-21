@@ -18,20 +18,9 @@
 package com.netflix.genie.web.spring.autoconfigure.jobs;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
-import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.jobs.workflow.impl.ApplicationTask;
-import com.netflix.genie.web.jobs.workflow.impl.ClusterTask;
-import com.netflix.genie.web.jobs.workflow.impl.CommandTask;
-import com.netflix.genie.web.jobs.workflow.impl.InitialSetupTask;
-import com.netflix.genie.web.jobs.workflow.impl.JobFailureAndKillHandlerLogicTask;
-import com.netflix.genie.web.jobs.workflow.impl.JobKickoffTask;
-import com.netflix.genie.web.jobs.workflow.impl.JobTask;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
-import com.netflix.genie.web.services.LegacyAttachmentService;
-import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.S3FileTransferImpl;
@@ -42,7 +31,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -112,132 +100,6 @@ public class JobsAutoConfiguration {
         final S3FileTransferProperties s3FileTransferProperties
     ) {
         return new S3FileTransferImpl(s3ClientFactory, registry, s3FileTransferProperties);
-    }
-
-    /**
-     * Create a task that adds logic to handle kill requests to a job.
-     *
-     * @param registry The metrics registry to use
-     * @return A jobKillLogicTask bean.
-     */
-    @Bean
-    @Order(value = 0)
-    @ConditionalOnMissingBean(JobFailureAndKillHandlerLogicTask.class)
-    public JobFailureAndKillHandlerLogicTask jobKillLogicTask(final MeterRegistry registry) {
-        return new JobFailureAndKillHandlerLogicTask(registry);
-    }
-
-    /**
-     * Create an setup Task bean that does initial setup before any of the tasks start.
-     *
-     * @param registry The metrics registry to use
-     * @return An initial setup task object
-     */
-    @Bean
-    @Order(value = 1)
-    @ConditionalOnMissingBean(InitialSetupTask.class)
-    public InitialSetupTask initialSetupTask(final MeterRegistry registry) {
-        return new InitialSetupTask(registry);
-    }
-
-    /**
-     * Create an Cluster Task bean that processes the cluster needed for a job.
-     *
-     * @param registry The metrics registry to use
-     * @param fts      File transfer implementation
-     * @return An cluster task object
-     */
-    @Bean
-    @Order(value = 2)
-    @ConditionalOnMissingBean(ClusterTask.class)
-    public ClusterTask clusterProcessorTask(
-        final MeterRegistry registry,
-        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
-    ) {
-        return new ClusterTask(registry, fts);
-    }
-
-    /**
-     * Create an Application Task bean that processes all Applications needed for a job.
-     *
-     * @param registry The metrics registry to use
-     * @param fts      File transfer implementation
-     * @return An application task object
-     */
-    @Bean
-    @Order(value = 3)
-    @ConditionalOnMissingBean(ApplicationTask.class)
-    public ApplicationTask applicationProcessorTask(
-        final MeterRegistry registry,
-        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
-    ) {
-        return new ApplicationTask(registry, fts);
-    }
-
-    /**
-     * Create an Command Task bean that processes the command needed for a job.
-     *
-     * @param registry The metrics registry to use
-     * @param fts      File transfer implementation
-     * @return An command task object
-     */
-    @Bean
-    @Order(value = 4)
-    @ConditionalOnMissingBean(CommandTask.class)
-    public CommandTask commandProcessorTask(
-        final MeterRegistry registry,
-        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
-    ) {
-        return new CommandTask(registry, fts);
-    }
-
-    /**
-     * Create an Job Task bean that processes Job information provided by user.
-     *
-     * @param legacyAttachmentService An implementation of the attachment service
-     * @param registry                The metrics registry to use
-     * @param fts                     File transfer implementation
-     * @return An job task object
-     */
-    @Bean
-    @Order(value = 5)
-    @ConditionalOnMissingBean(JobTask.class)
-    public JobTask jobProcessorTask(
-        final LegacyAttachmentService legacyAttachmentService,
-        final MeterRegistry registry,
-        @Qualifier("genieFileTransferService") final GenieFileTransferService fts
-    ) {
-        return new JobTask(legacyAttachmentService, registry, fts);
-    }
-
-    /**
-     * Create an Job Kickoff Task bean that runs the job.
-     *
-     * @param jobsProperties                     The various jobs properties
-     * @param executor                           An instance of an executor
-     * @param genieHostInfo                      Info about the host Genie is running on
-     * @param registry                           The metrics registry to use
-     * @param jobDirectoryManifestCreatorService The manifest creation service
-     * @return An application task object
-     */
-    @Bean
-    @Order(value = 6)
-    @ConditionalOnMissingBean(JobKickoffTask.class)
-    public JobKickoffTask jobKickoffTask(
-        final JobsProperties jobsProperties,
-        final Executor executor,
-        final GenieHostInfo genieHostInfo,
-        final MeterRegistry registry,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
-    ) {
-        return new JobKickoffTask(
-            jobsProperties.getUsers().isRunAsUserEnabled(),
-            jobsProperties.getUsers().isCreationEnabled(),
-            executor,
-            genieHostInfo.getHostname(),
-            registry,
-            jobDirectoryManifestCreatorService
-        );
     }
 
     /**

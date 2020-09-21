@@ -265,12 +265,6 @@ for multiple errors.
 |CacheGenieFileTransferService
 |-
 
-|genie.jobs.finished.rate
-|Counts the number of jobs that completed (successfully or not)
-|count
-|JobMonitor
-|-
-
 |genie.jobs.memory.used.gauge
 |Total amount of memory allocated to local jobs (according to job request)
 |Megabytes
@@ -289,89 +283,11 @@ for multiple errors.
 |JobNotificationMetricPublisher
 |fromState, toState
 
-|genie.jobs.tasks.applicationTask.applicationSetup.timer
-|Time taken to set up individual applications (creating folders, staging dependencies and configurations)
-|nanoseconds
-|ApplicationTask
-|applicationId, applicationName
-
-|genie.jobs.tasks.applicationTask.timer
-|Time taken to stage all applications that a job depends on
-|nanoseconds
-|ApplicationTask
-|status, applicationId, exceptionClass
-
-|genie.jobs.tasks.clusterTask.timer
-|Time taken to set up cluster a job runs on (creating folders, staging dependencies and configurations)
-|nanoseconds
-|ClusterTask
-|clusterId, clusterName, status, exceptionClass
-
-|genie.jobs.tasks.commandTask.timer
-|Time taken to set up command a job runs (creating folders, staging dependencies and configurations)
-|nanoseconds
-|CommandTask
-|commandId, commandName, status, exceptionClass
-
-|genie.jobs.tasks.initialSetupTask.timer
-|Time taken to set up job environment (creating folder structure, shell environment script)
-|nanoseconds
-|InitialSetupTask
-|status, exceptionClass
-
-|genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer
-|Time taken to set up run script section that deals with child process termination
-|nanoseconds
-|JobFailureAndKillHandlerLogicTask
-|status, exceptionClass
-
-|genie.jobs.tasks.jobKickoffTask.timer
-|Time taken to complete job launch
-|nanoseconds
-|JobKickoffTask
-|status, exceptionClass
-
-|genie.jobs.tasks.jobTask.timer
-|Time taken to set up job-specific environment (creating folders, staging attachments, dependencies)
-|nanoseconds
-|JobTask
-|status, exceptionClass
-
-|genie.jobs.stdErrTooLarge.rate
-|Counts the number of jobs killed for exceeding the maximum allowed standard error limit
-|count
-|JobMonitor
-|-
-
-|genie.jobs.stdOutTooLarge.rate
-|Counts the number of jobs killed for exceeding the maximum allowed standard output limit
-|count
-|JobMonitor
-|-
-
 |genie.jobs.submit.rejected.jobs-limit.counter
 |Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs
 |count
 |JobRestController
 |user, jobsUserLimit
-
-|genie.jobs.successfulStatusCheck.rate
-|Counts the successful checks made on locally running jobs
-|count
-|JobMonitor
-|-
-
-|genie.jobs.timeout.rate
-|Counts the number of jobs killed for exceeding the maximum allowed run time
-|count
-|JobMonitor
-|-
-
-|genie.jobs.unsuccessfulStatusCheck.rate
-|Counts the number of time an exception was raised while trying to check on a locally running job
-|count
-|JobMonitor
-|-
 
 |genie.notifications.sns.publish.counter
 |Count the number of notification published to SNS
