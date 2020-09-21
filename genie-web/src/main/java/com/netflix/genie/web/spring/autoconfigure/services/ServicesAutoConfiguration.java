@@ -50,12 +50,10 @@ import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
-import com.netflix.genie.web.services.LegacyAttachmentService;
 import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
-import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
@@ -245,18 +243,6 @@ public class ServicesAutoConfiguration {
             localFileTransfer,
             registry
         );
-    }
-
-    /**
-     * The attachment service to use.
-     *
-     * @param jobsProperties All properties related to jobs
-     * @return The attachment service to use
-     */
-    @Bean
-    @ConditionalOnMissingBean(LegacyAttachmentService.class)
-    public FileSystemAttachmentService legacyAttachmentService(final JobsProperties jobsProperties) {
-        return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments().toString());
     }
 
     /**
