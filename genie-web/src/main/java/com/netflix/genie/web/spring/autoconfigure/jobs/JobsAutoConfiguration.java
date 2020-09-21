@@ -17,13 +17,8 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.jobs;
 
-import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
-import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
-import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
-import com.netflix.genie.web.services.impl.S3FileTransferImpl;
 import com.netflix.genie.web.util.JobExecutionModeSelector;
 import com.netflix.genie.web.util.ProcessChecker;
 import com.netflix.genie.web.util.UnixProcessChecker;
@@ -31,14 +26,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -49,58 +40,8 @@ import java.util.Optional;
  * @since 3.0.0
  */
 @Configuration
-@EnableConfigurationProperties(
-    {
-        S3FileTransferProperties.class
-    }
-)
 // TODO: This is going to go away once the V4 API is in place
 public class JobsAutoConfiguration {
-    /**
-     * Bean to create a local file transfer object.
-     *
-     * @return A unix copy implementation of the FileTransferService.
-     */
-    @Bean(name = {"file.system.file", "file.system.null"})
-    @Order(value = 2)
-    @ConditionalOnMissingBean(LocalFileTransferImpl.class)
-    public LocalFileTransferImpl localFileTransfer() {
-        return new LocalFileTransferImpl();
-    }
-
-    /**
-     * Bean to create a http[s] file transfer object.
-     *
-     * @param restTemplate The rest template to use
-     * @param registry     The registry to use for metrics
-     * @return A http implementation of the FileTransferService.
-     */
-    @Bean(name = {"file.system.http", "file.system.https"})
-    @Order(value = 3)
-    @ConditionalOnMissingBean(HttpFileTransferImpl.class)
-    public HttpFileTransferImpl httpFileTransfer(final RestTemplate restTemplate, final MeterRegistry registry) {
-        return new HttpFileTransferImpl(restTemplate, registry);
-    }
-
-    /**
-     * Returns a bean which has an s3 implementation of the File Transfer interface.
-     *
-     * @param s3ClientFactory          S3 client factory to use
-     * @param registry                 The metrics registry to use
-     * @param s3FileTransferProperties Configuration properties
-     * @return An s3 implementation of the FileTransfer interface
-     */
-    @Bean(name = {"file.system.s3", "file.system.s3n", "file.system.s3a"})
-    @Order(value = 1)
-    @ConditionalOnMissingBean(S3FileTransferImpl.class)
-    @ConditionalOnBean(S3ClientFactory.class)
-    public S3FileTransferImpl s3FileTransferImpl(
-        final S3ClientFactory s3ClientFactory,
-        final MeterRegistry registry,
-        final S3FileTransferProperties s3FileTransferProperties
-    ) {
-        return new S3FileTransferImpl(s3ClientFactory, registry, s3FileTransferProperties);
-    }
 
     /**
      * Create a {@link ProcessChecker.Factory} suitable for UNIX systems.
