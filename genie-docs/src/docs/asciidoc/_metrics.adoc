@@ -415,18 +415,6 @@ for multiple errors.
 |JobMonitor
 |-
 
-|genie.jobs.unableToCancel.rate
-|Count number of times a job asynchronous task cancelling was requested and failed (failure to cancel may be due to the task no longer being running)
-|count
-|JobStateServiceImpl
-|-
-
-|genie.jobs.unableToReAttach.rate
-|Counts the number of times a genie node failed to resume monitoring a local job process after server restart
-|count
-|JobMonitoringCoordinator
-|-
-
 |genie.jobs.unsuccessfulStatusCheck.rate
 |Counts the number of time an exception was raised while trying to check on a locally running job
 |count
