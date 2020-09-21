@@ -407,7 +407,7 @@ for multiple errors.
 |genie.jobs.submit.rejected.jobs-limit.counter
 |Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs
 |count
-|JobCoordinatorServiceImpl
+|JobRestController
 |user, jobsUserLimit
 
 |genie.jobs.submit.timer

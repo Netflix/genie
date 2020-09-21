@@ -34,6 +34,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.common.external.dtos.v4.ApiClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
@@ -56,11 +57,13 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobLaunchService;
+import com.netflix.genie.web.util.MetricsConstants;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -135,6 +138,7 @@ public class JobRestController {
     private static final String NAME_HEADER_COOKIE = "cookie";
     private static final String JOB_API_BASE_PATH = "/api/v3/jobs/";
     private static final String COMMA = ",";
+    private static final String USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME = "genie.jobs.submit.rejected.jobs-limit.counter";
 
     private final JobLaunchService jobLaunchService;
     private final ApplicationModelAssembler applicationModelAssembler;
@@ -156,6 +160,7 @@ public class JobRestController {
     private final JobKillService jobKillService;
 
     // Metrics
+    private final MeterRegistry registry;
     private final Counter submitJobWithoutAttachmentsRate;
     private final Counter submitJobWithAttachmentsRate;
 
@@ -208,6 +213,7 @@ public class JobRestController {
         this.environment = environment;
         this.attachmentService = attachmentService;
         this.jobKillService = jobKillService;
+        this.registry = registry;
 
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
@@ -275,18 +281,9 @@ public class JobRestController {
         @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException, GenieCheckedException {
-        // TODO: This is quick and dirty and we may want to handle it better overall for the system going forward
-        //       e.g. should it be in an filter that we can do for more APIs?
-        //            should value be cached rather than checking every time?
-        if (!this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean.class, true)) {
-            // Job Submission is disabled
-            throw new GenieServerUnavailableException(
-                this.environment.getProperty(
-                    JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
-                    JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
-                )
-            );
-        }
+
+        // This node may reject this job
+        this.checkRejectJob(jobRequest);
 
         // get client's host from the context
         final String localClientHost;
@@ -342,6 +339,45 @@ public class JobRestController {
         );
 
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
+    }
+
+    // TODO: refactor this ad-hoc checks into a component allowing more flexible logic (and can be replaced/extended)
+    private void checkRejectJob(
+        final JobRequest jobRequest
+    ) throws GenieServerUnavailableException, GenieUserLimitExceededException {
+
+        if (!this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean.class, true)) {
+            // Job Submission is disabled
+            throw new GenieServerUnavailableException(
+                this.environment.getProperty(
+                    JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                    JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+                )
+            );
+        }
+
+        final JobsActiveLimitProperties activeLimit = this.jobsProperties.getActiveLimit();
+        if (activeLimit.isEnabled()) {
+            final String user = jobRequest.getUser();
+            log.debug("Checking user limits for {}", user);
+            final long activeJobsLimit = activeLimit.getUserLimit(user);
+            final long activeJobsCount = this.persistenceService.getActiveJobCountForUser(user);
+            if (activeJobsCount >= activeJobsLimit) {
+                this.registry.counter(
+                    USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME,
+                    MetricsConstants.TagKeys.USER,
+                    user,
+                    MetricsConstants.TagKeys.JOBS_USER_LIMIT,
+                    String.valueOf(activeJobsLimit)
+                ).increment();
+
+                throw GenieUserLimitExceededException.createForActiveJobsLimit(
+                    user,
+                    activeJobsCount,
+                    activeJobsLimit
+                );
+            }
+        }
     }
 
     /**
