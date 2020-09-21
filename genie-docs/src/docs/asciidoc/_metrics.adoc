@@ -228,13 +228,6 @@ It will have to be added if one is desired otherwise metrics are just published 
 |ScriptClusterSelector
 |status, exceptionClass, clusterName, clusterId
 
-|genie.jobs.coordination.timer
-|Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and
-cluster selection strategy.
-|nanoseconds
-|JobCoordinatorServiceImpl
-|status, exceptionClass
-
 |genie.jobs.completion.timer
 |Time taken to perform post-job-completion finalization such as folder cleanup, archival and email notification.
 |nanoseconds
@@ -397,12 +390,6 @@ for multiple errors.
 |nanoseconds
 |LocalJobRunner
 |-
-
-|genie.jobs.submit.localRunner.setJobEnvironment.timer
-|Time taken to persist the job runtime information in the database
-|nanoseconds
-|JobCoordinatorServiceImpl
-|status, exceptionClass
 
 |genie.jobs.submit.rejected.jobs-limit.counter
 |Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs
