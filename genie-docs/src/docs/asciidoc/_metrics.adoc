@@ -186,19 +186,6 @@ It will have to be added if one is desired otherwise metrics are just published 
 |ScriptClusterSelector
 |status, exceptionClass, clusterName, clusterId
 
-|genie.jobs.completion.timer
-|Time taken to perform post-job-completion finalization such as folder cleanup, archival and email notification.
-|nanoseconds
-|JobCompletionService
-|error, status, exceptionClass
-
-|genie.jobs.errors.count
-|Counts various kinds of nonfatal errors encountered (email, archival, cleanup, ...). A single request may increment
-for multiple errors.
-|count
-|JobCompletionService
-|error
-
 |genie.jobs.executionMode.counter
 |Counts jobs marked to execute in agent mode (V4) and embedded mode (V3)
 |count
