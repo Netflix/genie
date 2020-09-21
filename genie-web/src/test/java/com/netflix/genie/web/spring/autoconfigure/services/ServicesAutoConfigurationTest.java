@@ -29,7 +29,6 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
-import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsCleanupProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
@@ -39,12 +38,10 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.ArchivedJobService;
-import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
-import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -52,14 +49,12 @@ import org.apache.commons.exec.Executor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
 
 /**
  * Unit Tests for {@link ServicesAutoConfiguration} class.
@@ -125,27 +120,6 @@ class ServicesAutoConfigurationTest {
                     Mockito.mock(JobKillServiceV3.class),
                     Mockito.mock(JobKillServiceV4.class),
                     dataServices
-                )
-            )
-            .isNotNull();
-    }
-
-    @Test
-    void canGetGenieFileTransferServiceBean() throws GenieException {
-        Assertions.assertThat(this.servicesAutoConfiguration.genieFileTransferService(scheme -> null)).isNotNull();
-    }
-
-    @Test
-    void canGetCacheGenieFileTransferServiceBean(@TempDir final Path tmpDir) throws GenieException {
-        final FileCacheProperties cacheProperties = Mockito.mock(FileCacheProperties.class);
-        Mockito.when(cacheProperties.getLocation()).thenReturn(tmpDir.toFile().toURI());
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.cacheGenieFileTransferService(
-                    Mockito.mock(FileTransferFactory.class),
-                    cacheProperties,
-                    Mockito.mock(LocalFileTransferImpl.class),
-                    Mockito.mock(MeterRegistry.class)
                 )
             )
             .isNotNull();

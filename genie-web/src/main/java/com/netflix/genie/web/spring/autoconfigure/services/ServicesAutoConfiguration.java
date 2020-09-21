@@ -30,7 +30,6 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
-import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsCleanupProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
@@ -43,7 +42,6 @@ import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
-import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
@@ -52,16 +50,13 @@ import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
-import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
-import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
-import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
@@ -69,7 +64,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -94,7 +88,6 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(
     {
-        FileCacheProperties.class,
         JobsCleanupProperties.class,
         JobsForwardingProperties.class,
         JobsLocationsProperties.class,
@@ -205,47 +198,6 @@ public class ServicesAutoConfiguration {
     }
 
     /**
-     * Get an instance of the Genie File Transfer service.
-     *
-     * @param fileTransferFactory file transfer implementation factory
-     * @return A singleton for GenieFileTransferService
-     * @throws GenieException If there is any problem
-     */
-    @Bean
-    @ConditionalOnMissingBean(name = "genieFileTransferService")
-    public GenieFileTransferService genieFileTransferService(
-        final FileTransferFactory fileTransferFactory
-    ) throws GenieException {
-        return new GenieFileTransferService(fileTransferFactory);
-    }
-
-    /**
-     * Get an instance of the Cache Genie File Transfer service.
-     *
-     * @param fileTransferFactory file transfer implementation factory
-     * @param fileCacheProperties Properties related to the file cache that can be set by the admin
-     * @param localFileTransfer   local file transfer service
-     * @param registry            Registry
-     * @return A singleton for GenieFileTransferService
-     * @throws GenieException If there is any problem
-     */
-    @Bean
-    @ConditionalOnMissingBean(name = "cacheGenieFileTransferService")
-    public GenieFileTransferService cacheGenieFileTransferService(
-        final FileTransferFactory fileTransferFactory,
-        final FileCacheProperties fileCacheProperties,
-        final LocalFileTransferImpl localFileTransfer,
-        final MeterRegistry registry
-    ) throws GenieException {
-        return new CacheGenieFileTransferService(
-            fileTransferFactory,
-            fileCacheProperties.getLocation().toString(),
-            localFileTransfer,
-            registry
-        );
-    }
-
-    /**
      * The attachment service to use.
      *
      * @param s3ClientFactory             the S3 client factory
@@ -272,19 +224,6 @@ public class ServicesAutoConfiguration {
                 "Unknown attachment service implementation to use for location: " + location
             );
         }
-    }
-
-    /**
-     * FileTransfer factory.
-     *
-     * @return FileTransfer factory
-     */
-    @Bean
-    @ConditionalOnMissingBean(name = "fileTransferFactory", value = ServiceLocatorFactoryBean.class)
-    public ServiceLocatorFactoryBean fileTransferFactory() {
-        final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
-        factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
-        return factoryBean;
     }
 
     /**

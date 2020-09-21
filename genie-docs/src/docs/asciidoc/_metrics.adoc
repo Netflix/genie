@@ -119,48 +119,6 @@ It will have to be added if one is desired otherwise metrics are just published 
 |JobRestController
 |-
 
-|genie.files.http.download.timer
-|Time taken to download a file from via HTTP
-|nanoseconds
-|HttpFileTransferImpl
-|status, exceptionClass
-
-|genie.files.http.getLastModified.timer
-|Time taken to retrieve last modification time for a HTTP document
-|nanoseconds
-|HttpFileTransferImpl
-|status, exceptionClass
-
-|genie.files.http.upload.timer
-|Time taken to upload a file via HTTP
-|nanoseconds
-|HttpFileTransferImpl
-|status, exceptionClass
-
-|genie.files.s3.download.timer
-|Time taken to download a file from S3
-|nanoseconds
-|S3FileTransferImpl
-|status, exceptionClass
-
-|genie.files.s3.failStrictValidation.counter
-|Count the number of times a S3 URL fails strict validation, but is allowed through anyway
-|count
-|S3FileTransferImpl
-|-
-
-|genie.files.s3.getObjectMetadata.timer
-|Time taken to obtain S3 file metadata (modification time)
-|nanoseconds
-|S3FileTransferImpl
-|status, exceptionClass
-
-|genie.files.s3.upload.timer
-|Time taken to upload a local file to S3
-|nanoseconds
-|S3FileTransferImpl
-|status, exceptionClass
-
 |genie.files.serve.timer
 |Time taken to serve a file
 |nanoseconds
@@ -246,24 +204,6 @@ for multiple errors.
 |count
 |JobExecutionModeSelector
 |executeWithAgent, decidingCheck
-
-|genie.jobs.file.cache.hitRate
-|File cache hit ratio
-|ratio
-|CacheGenieFileTransferService
-|-
-
-|genie.jobs.file.cache.loadExceptionRate
-|File cache loading exception ratio
-|ratio
-|CacheGenieFileTransferService
-|-
-
-|genie.jobs.file.cache.missRate
-|File cache miss ratio
-|ratio
-|CacheGenieFileTransferService
-|-
 
 |genie.jobs.memory.used.gauge
 |Total amount of memory allocated to local jobs (according to job request)
