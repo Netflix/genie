@@ -24,7 +24,6 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ArchiveStatusCleanupProperties;
-import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
@@ -34,7 +33,6 @@ import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ArchiveStatusCleanupTask;
-import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
 import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
@@ -78,14 +76,12 @@ class LeaderAutoConfigurationTest {
             context -> {
                 Assertions.assertThat(context).hasSingleBean(AgentCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(ArchiveStatusCleanupProperties.class);
-                Assertions.assertThat(context).hasSingleBean(ClusterCheckerProperties.class);
                 Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                 Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
 
                 Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                 Assertions.assertThat(context).hasSingleBean(LocalLeader.class);
-                Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
                 Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
 
@@ -114,14 +110,12 @@ class LeaderAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(AgentCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(ArchiveStatusCleanupProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ClusterCheckerProperties.class);
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                     Assertions.assertThat(context).hasSingleBean(LocalLeader.class);
-                    Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
 
                     Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
                     Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
@@ -145,14 +139,12 @@ class LeaderAutoConfigurationTest {
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(AgentCleanupProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ClusterCheckerProperties.class);
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                     Assertions.assertThat(context).doesNotHaveBean(LocalLeader.class);
-                    Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
 
                     Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
                     Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
