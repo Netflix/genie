@@ -44,6 +44,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+//TODO: this is now only relevant for {@link com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl}.
+// Should refactor as such, rather than having this generic disk cleaner inherited from V3.
+
 /**
  * This task runs on every Genie node and is responsible for cleaning up the local disk so that space can be
  * recaptured.
