@@ -28,7 +28,6 @@ import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -42,7 +41,6 @@ import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
-import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -64,8 +62,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -82,33 +78,26 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
 
     private static final String SLASH = "/";
     private static final String SERVE_RESOURCE_TIMER = "genie.files.serve.timer";
-    private static final String EXECUTION_MODE_TAG = "executionMode";
     private static final String ARCHIVE_STATUS_TAG = "archiveStatus";
-    private static final String AGENT_EXECUTION_MODE_NAME = "agent";
-    private static final String EMBEDDED_EXECUTION_MODE = "embedded";
 
     private final ResourceLoader resourceLoader;
     private final PersistenceService persistenceService;
-    private final JobFileService jobFileService;
     private final AgentFileStreamService agentFileStreamService;
     private final MeterRegistry meterRegistry;
     private final GenieResourceHandler.Factory genieResourceHandlerFactory;
-    private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
     private final ArchivedJobService archivedJobService;
     private final AgentRoutingService agentRoutingService;
 
     /**
      * Constructor.
      *
-     * @param resourceLoader                     The application resource loader used to get references to resources
-     * @param dataServices                       The {@link DataServices} instance to use
-     * @param agentFileStreamService             The service providing file manifest for active agent jobs
-     * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
-     *                                           job data
-     * @param meterRegistry                      The meter registry used to keep track of metrics
-     * @param jobFileService                     The service responsible for managing the job directory for V3 Jobs
-     * @param jobDirectoryManifestCreatorService The job directory manifest service
-     * @param agentRoutingService                The agent routing service
+     * @param resourceLoader         The application resource loader used to get references to resources
+     * @param dataServices           The {@link DataServices} instance to use
+     * @param agentFileStreamService The service providing file manifest for active agent jobs
+     * @param archivedJobService     The {@link ArchivedJobService} implementation to use to get archived
+     *                               job data
+     * @param meterRegistry          The meter registry used to keep track of metrics
+     * @param agentRoutingService    The agent routing service
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
@@ -116,8 +105,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final AgentFileStreamService agentFileStreamService,
         final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
-        final JobFileService jobFileService,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
         final AgentRoutingService agentRoutingService
     ) {
         this(
@@ -127,8 +114,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             archivedJobService,
             new GenieResourceHandler.Factory(),
             meterRegistry,
-            jobFileService,
-            jobDirectoryManifestCreatorService,
             agentRoutingService
         );
     }
@@ -144,17 +129,13 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final ArchivedJobService archivedJobService,
         final GenieResourceHandler.Factory genieResourceHandlerFactory,
         final MeterRegistry meterRegistry,
-        final JobFileService jobFileService,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
         final AgentRoutingService agentRoutingService
     ) {
         this.resourceLoader = resourceLoader;
         this.persistenceService = dataServices.getPersistenceService();
-        this.jobFileService = jobFileService;
         this.agentFileStreamService = agentFileStreamService;
         this.meterRegistry = meterRegistry;
         this.genieResourceHandlerFactory = genieResourceHandlerFactory;
-        this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
         this.archivedJobService = archivedJobService;
         this.agentRoutingService = agentRoutingService;
     }
@@ -178,10 +159,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
 
             // Lookup archive status and job execution type
             final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(id);
-            final boolean isV4 = this.persistenceService.isV4(id);
-            final String executionModeName = isV4 ? AGENT_EXECUTION_MODE_NAME : EMBEDDED_EXECUTION_MODE;
-
-            tags.add(Tag.of(EXECUTION_MODE_TAG, executionModeName));
             tags.add(Tag.of(ARCHIVE_STATUS_TAG, archiveStatus.name()));
 
             final DirectoryManifest manifest;
@@ -201,10 +178,9 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                     throw new GeniePreconditionException("Archive disabled for job " + id);
 
                 case UNKNOWN:
-                    // 2 possible cases:
-                    // - Job was marked failed by leader and archive status is truly unknown
-                    // - Old job with NULL archive status
-                    // In both cases, fall through to attempting to serve from archive
+                    // Set by the server when an agent is AWOL long enough.
+                    // Archive status is truly unknown. As of now, fall-through and attempt serving from archive.
+
                 case ARCHIVED:
                     // Serve file from archive
                     log.debug("Routing request to archive");
@@ -216,31 +192,18 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                     break;
 
                 case PENDING:
-                    // Serve file from live job
-                    if (isV4) {
-                        log.debug("Routing request to connected agent");
-                        if (!this.agentRoutingService.isAgentConnectionLocal(id)) {
-                            throw new GenieServerUnavailableException("Agent connection has moved or was terminated");
-                        }
-                        manifest = this.agentFileStreamService.getManifest(id).orElseThrow(
-                            () -> new GenieServerUnavailableException("Manifest not found for job " + id)
-                        );
-                        jobDirRoot = AgentFileProtocolResolver.createUri(
-                            id,
-                            SLASH,
-                            request.getHeader(HttpHeaders.RANGE)
-                        );
-                    } else {
-                        log.debug("Routing request to a local file");
-                        final Resource jobDir = this.jobFileService.getJobFileAsResource(id, "");
-                        if (!jobDir.exists()) {
-                            throw new GenieNotFoundException("Job directory does not exist: " + jobDir);
-                        }
-                        // Make sure the directory ends in a slash. Normalize will ensure only single slash
-                        jobDirRoot = new URI(jobDir.getURI().toString() + SLASH).normalize();
-                        final Path jobDirPath = Paths.get(jobDirRoot);
-                        manifest = this.jobDirectoryManifestCreatorService.getDirectoryManifest(jobDirPath);
+                    log.debug("Routing request to connected agent");
+                    if (!this.agentRoutingService.isAgentConnectionLocal(id)) {
+                        throw new GenieServerUnavailableException("Agent connection has moved or was terminated");
                     }
+                    manifest = this.agentFileStreamService.getManifest(id).orElseThrow(
+                        () -> new GenieServerUnavailableException("Manifest not found for job " + id)
+                    );
+                    jobDirRoot = AgentFileProtocolResolver.createUri(
+                        id,
+                        SLASH,
+                        request.getHeader(HttpHeaders.RANGE)
+                    );
                     break;
 
                 default:
@@ -248,11 +211,10 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             }
 
             log.debug(
-                "Serving file: {} for job: {} (status: {}, type: {})",
+                "Serving file: {} for job: {} (archive status: {})",
                 relativePath,
                 id,
-                archiveStatus,
-                executionModeName
+                archiveStatus
             );
 
             // Common handling of archived, locally running v3 job or locally connected v4 job

@@ -35,8 +35,6 @@ import javax.validation.Valid;
 public class JobsProperties {
 
     @Valid
-    private JobsCleanupProperties cleanup;
-    @Valid
     private JobsForwardingProperties forwarding;
     @Valid
     private JobsLocationsProperties locations;
@@ -54,7 +52,6 @@ public class JobsProperties {
     /**
      * Constructor.
      *
-     * @param cleanup                cleanup properties
      * @param forwarding             forwarding properties
      * @param locations              locations properties
      * @param max                    max properties
@@ -64,7 +61,6 @@ public class JobsProperties {
      * @param activeLimit            active limit properties
      */
     public JobsProperties(
-        @Valid final JobsCleanupProperties cleanup,
         @Valid final JobsForwardingProperties forwarding,
         @Valid final JobsLocationsProperties locations,
         @Valid final JobsMaxProperties max,
@@ -73,7 +69,6 @@ public class JobsProperties {
         @Valid final ExponentialBackOffTriggerProperties completionCheckBackOff,
         @Valid final JobsActiveLimitProperties activeLimit
     ) {
-        this.cleanup = cleanup;
         this.forwarding = forwarding;
         this.locations = locations;
         this.max = max;
@@ -90,7 +85,6 @@ public class JobsProperties {
      */
     public static JobsProperties getJobsPropertiesDefaults() {
         return new JobsProperties(
-            new JobsCleanupProperties(),
             new JobsForwardingProperties(),
             new JobsLocationsProperties(),
             new JobsMaxProperties(),

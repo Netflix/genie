@@ -235,11 +235,6 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |150MB
 |no
 
-|genie.jobs.cleanup.deleteDependencies
-|Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
-|true
-|no
-
 |genie.jobs.completion-check-back-off.factor
 |Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.
 |1.2

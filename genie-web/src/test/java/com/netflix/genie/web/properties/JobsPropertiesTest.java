@@ -30,7 +30,6 @@ import org.mockito.Mockito;
  */
 class JobsPropertiesTest {
 
-    private JobsCleanupProperties cleanup;
     private JobsMemoryProperties memory;
     private JobsForwardingProperties forwarding;
     private JobsLocationsProperties locations;
@@ -45,7 +44,6 @@ class JobsPropertiesTest {
      */
     @BeforeEach
     void setup() {
-        this.cleanup = Mockito.mock(JobsCleanupProperties.class);
         this.memory = Mockito.mock(JobsMemoryProperties.class);
         this.forwarding = Mockito.mock(JobsForwardingProperties.class);
         this.locations = Mockito.mock(JobsLocationsProperties.class);
@@ -54,8 +52,7 @@ class JobsPropertiesTest {
         this.completionBackOff = Mockito.mock(ExponentialBackOffTriggerProperties.class);
         this.activeLimit = Mockito.mock(JobsActiveLimitProperties.class);
         this.properties = new JobsProperties(
-            this.cleanup,
-            this.forwarding,
+                this.forwarding,
             this.locations,
             this.max,
             this.memory,
@@ -70,7 +67,6 @@ class JobsPropertiesTest {
      */
     @Test
     void canConstruct() {
-        Assertions.assertThat(this.properties.getCleanup()).isNotNull();
         Assertions.assertThat(this.properties.getMemory()).isNotNull();
         Assertions.assertThat(this.properties.getForwarding()).isNotNull();
         Assertions.assertThat(this.properties.getLocations()).isNotNull();
@@ -88,7 +84,6 @@ class JobsPropertiesTest {
         Assertions
             .assertThatCode(
                 () -> {
-                    this.properties.setCleanup(this.cleanup);
                     this.properties.setForwarding(this.forwarding);
                     this.properties.setLocations(this.locations);
                     this.properties.setMax(this.max);
