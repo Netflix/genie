@@ -23,13 +23,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.dto.search.JobSearchResult;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.Application;
@@ -87,7 +84,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.CommandPr
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.JobPredicates;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
@@ -1291,145 +1287,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Deprecated
-    public void createJob(
-        @NotNull final com.netflix.genie.common.dto.JobRequest jobRequest,
-        @NotNull final com.netflix.genie.common.dto.JobMetadata jobMetadata,
-        @NotNull final Job job,
-        @NotNull final JobExecution jobExecution
-    ) throws GenieException {
-        log.debug(
-            "Called with\nRequest:\n{}\nMetadata:\n{}\nJob:\n{}\nExecution:\n{}\n",
-            jobRequest,
-            jobMetadata,
-            job,
-            jobExecution
-        );
-
-        final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
-        final JobEntity jobEntity = this.v3ObjectsToJobEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
-        try {
-            this.jobRepository.save(jobEntity);
-        } catch (final DataIntegrityViolationException e) {
-            throw new GenieConflictException("A job with id " + jobId + " already exists", e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void updateJobWithRuntimeEnvironment(
-        @NotBlank final String jobId,
-        @NotBlank final String clusterId,
-        @NotBlank final String commandId,
-        @NotNull final List<String> applicationIds,
-        @Min(1) final int memory
-    ) throws GenieException {
-        log.debug(
-            "Called to update job ({}) runtime with cluster {}, command {} and applications {}",
-            jobId,
-            clusterId,
-            commandId,
-            applicationIds
-        );
-
-        final JobEntity job = this.jobRepository
-            .findByUniqueId(jobId)
-            .orElseThrow(() -> new GenieNotFoundException("No job with id " + jobId + " exists."));
-        try {
-            this.setExecutionResources(job, clusterId, commandId, applicationIds);
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage(), e);
-        }
-
-        // Save the amount of memory to allocate to the job
-        job.setMemoryUsed(memory);
-        job.setResolved(true);
-        // TODO: Should we set status to RESOLVED here? Not sure how that will work with V3 so leaving it INIT for now
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void updateJobStatus(
-        @NotBlank(message = "No job id entered. Unable to update.") final String id,
-        @NotNull(message = "Status cannot be null.") final com.netflix.genie.common.dto.JobStatus jobStatus,
-        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
-    ) throws GenieException {
-        log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
-
-        final JobEntity jobEntity = this.jobRepository
-            .findByUniqueId(id)
-            .orElseThrow(() -> new GenieNotFoundException("No job exists for the id specified"));
-
-        this.updateJobStatus(jobEntity, DtoConverters.toV4JobStatus(jobStatus), statusMsg);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setJobRunningInformation(
-        @NotBlank final String id,
-        @Min(value = 0, message = "Must be no lower than zero") final int processId,
-        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
-        @NotNull final Instant timeout
-    ) throws GenieException {
-        log.debug("Called with to update job {} with process id {}", id, processId);
-
-        final JobEntity jobEntity = this.jobRepository
-            .findByUniqueId(id)
-            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists. Unable to update"));
-
-        this.updateJobStatus(jobEntity, JobStatus.RUNNING, JobStatusMessages.JOB_RUNNING);
-        jobEntity.setProcessId(processId);
-        jobEntity.setCheckDelay(checkDelay);
-        jobEntity
-            .getStarted()
-            .ifPresent(started -> jobEntity.setTimeoutUsed(this.toTimeoutUsed(started, timeout)));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public void setJobCompletionInformation(
-        @NotBlank(message = "No job id entered. Unable to update.") final String id,
-        final int exitCode,
-        @NotNull(message = "No job status entered.") final com.netflix.genie.common.dto.JobStatus status,
-        @NotBlank(message = "Status message can't be blank. Unable to update") final String statusMessage,
-        @Nullable final Long stdOutSize,
-        @Nullable final Long stdErrSize
-    ) throws GenieException {
-        log.debug(
-            "Called with id: {}, exit code: {}, status: {}, status message: {}, std out size: {}, std err size {}",
-            id,
-            exitCode,
-            status,
-            statusMessage,
-            stdOutSize,
-            stdErrSize
-        );
-        final JobEntity jobEntity = this.jobRepository
-            .findByUniqueId(id)
-            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists unable to update"));
-
-        this.updateJobStatus(jobEntity, DtoConverters.toV4JobStatus(status), statusMessage);
-        jobEntity.setExitCode(exitCode);
-        jobEntity.setStdOutSize(stdOutSize);
-        jobEntity.setStdErrSize(stdErrSize);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(readOnly = true)
     @Deprecated
     public com.netflix.genie.common.dto.JobRequest getV3JobRequest(@NotBlank final String id) throws GenieException {
@@ -1957,18 +1814,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public boolean isV4(@NotBlank final String id) throws NotFoundException {
-        log.debug("[isV4] Read v4 flag from db for job {} ", id);
-        return this.jobRepository
-            .isV4(id)
-            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get v4 flag."));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
     public JobStatus getJobStatus(@NotBlank final String id) throws NotFoundException {
         return DtoConverters.toV4JobStatus(
             this.jobRepository
@@ -2044,33 +1889,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostname) {
-        log.debug("[getAllActiveJobsOnHost] Called with hostname {}", hostname);
-
-        final Set<JobProjection> jobs = this.jobRepository.findByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
-
-        return jobs
-            .stream()
-            .map(EntityV3DtoConverters::toJobDto)
-            .collect(Collectors.toSet());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Set<String> getAllHostsWithActiveJobs() {
-        log.debug("[getAllHostsWithActiveJobs] Called");
-
-        return this.jobRepository.getV3Hosts(ACTIVE_STATUS_SET);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
     public Cluster getJobCluster(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobCluster] Called for job {}", id);
         return EntityV4DtoConverters.toV4ClusterDto(
@@ -2109,18 +1927,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             .stream()
             .map(EntityV4DtoConverters::toV4ApplicationDto)
             .collect(Collectors.toList());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public String getJobHost(@NotBlank final String id) throws NotFoundException {
-        log.debug("[getJobHost] Called for job {}", id);
-        return this.jobRepository
-            .getJobHostname(id)
-            .orElseThrow(() -> new NotFoundException("No hostname set for job " + id));
     }
 
     /**
@@ -2458,14 +2264,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         return this.getAgentConnectionEntity(jobId).map(AgentConnectionEntity::getServerHostname);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int removeAllAgentConnectionsToServer(@NotBlank final String hostname) {
-        log.debug("[removeAllAgentConnectionsToServer] Called for hostname {}", hostname);
-        return this.agentConnectionRepository.deleteByServerHostnameEquals(hostname);
-    }
     //endregion
 
     //region Tag APIs
@@ -2790,111 +2588,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 jobEntity.setFinished(Instant.now());
             }
         }
-    }
-
-    private JobEntity v3ObjectsToJobEntity(
-        final String id,
-        final com.netflix.genie.common.dto.JobRequest jobRequest,
-        final com.netflix.genie.common.dto.JobMetadata jobMetadata,
-        final Job job,
-        final JobExecution jobExecution
-    ) throws GeniePreconditionException {
-        final JobEntity jobEntity = new JobEntity();
-
-        // Fields from the original Job Request
-
-        jobEntity.setUniqueId(id);
-        jobEntity.setName(jobRequest.getName());
-        jobEntity.setUser(jobRequest.getUser());
-        jobEntity.setVersion(jobRequest.getVersion());
-        jobEntity.setStatus(JobStatus.INIT.name());
-        jobRequest.getDescription().ifPresent(jobEntity::setDescription);
-        jobRequest.getMetadata().ifPresent(jobEntity::setMetadata);
-        jobRequest.getCommandArgs().ifPresent(commandArgs -> jobEntity.setCommandArgs(Lists.newArrayList(commandArgs)));
-        jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
-        jobRequest.getSetupFile().ifPresent(setupFile -> jobEntity.setSetupFile(this.createOrGetFileEntity(setupFile)));
-        jobEntity.setClusterCriteria(
-            jobRequest
-                .getClusterCriterias()
-                .stream()
-                .map(
-                    criterion -> {
-                        try {
-                            return DtoConverters.toV4Criterion(criterion);
-                        } catch (GeniePreconditionException e) {
-                            throw new IllegalArgumentException(e);
-                        }
-                    }
-                )
-                .map(this::toCriterionEntity)
-                .collect(Collectors.toList())
-        );
-
-        jobEntity.setCommandCriterion(
-            this.toCriterionEntity(
-                DtoConverters.toV4Criterion(jobRequest.getCommandCriteria())
-            )
-        );
-        jobEntity.setConfigs(this.createOrGetFileEntities(jobRequest.getConfigs()));
-        jobEntity.setDependencies(this.createOrGetFileEntities(jobRequest.getDependencies()));
-        jobEntity.setArchivingDisabled(jobRequest.isDisableLogArchival());
-        jobRequest.getEmail().ifPresent(jobEntity::setEmail);
-        if (!jobRequest.getTags().isEmpty()) {
-            jobEntity.setTags(this.createOrGetTagEntities(jobRequest.getTags()));
-        }
-        jobRequest.getCpu().ifPresent(jobEntity::setRequestedCpu);
-        jobRequest.getMemory().ifPresent(jobEntity::setRequestedMemory);
-        if (!jobRequest.getApplications().isEmpty()) {
-            jobEntity.setRequestedApplications(jobRequest.getApplications());
-        }
-        jobRequest.getTimeout().ifPresent(jobEntity::setRequestedTimeout);
-
-        jobRequest.getGrouping().ifPresent(jobEntity::setGrouping);
-        jobRequest.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
-
-        // Fields collected as metadata
-
-        jobMetadata.getClientHost().ifPresent(jobEntity::setRequestApiClientHostname);
-        jobMetadata.getUserAgent().ifPresent(jobEntity::setRequestApiClientUserAgent);
-        jobMetadata.getNumAttachments().ifPresent(jobEntity::setNumAttachments);
-        jobMetadata.getTotalSizeOfAttachments().ifPresent(jobEntity::setTotalSizeOfAttachments);
-        jobMetadata.getStdErrSize().ifPresent(jobEntity::setStdErrSize);
-        jobMetadata.getStdOutSize().ifPresent(jobEntity::setStdOutSize);
-        // For V3 (which this method supports) it's always API
-        jobEntity.setApi(true);
-
-        // Fields a user cares about (job dto)
-
-        job.getArchiveLocation().ifPresent(jobEntity::setArchiveLocation);
-        job.getStarted().ifPresent(jobEntity::setStarted);
-        job.getFinished().ifPresent(jobEntity::setFinished);
-        jobEntity.setStatus(job.getStatus().name());
-        job
-            .getStatusMsg()
-            .ifPresent(statusMsg -> jobEntity.setStatusMsg(StringUtils.truncate(statusMsg, MAX_STATUS_MESSAGE_LENGTH)));
-
-        // Fields set by system as part of job execution
-        jobEntity.setAgentHostname(jobExecution.getHostName());
-        jobExecution.getProcessId().ifPresent(jobEntity::setProcessId);
-        jobExecution.getCheckDelay().ifPresent(jobEntity::setCheckDelay);
-        if (job.getStarted().isPresent() && jobExecution.getTimeout().isPresent()) {
-            jobEntity.setTimeoutUsed(this.toTimeoutUsed(job.getStarted().get(), jobExecution.getTimeout().get()));
-        }
-        jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
-        jobExecution.getArchiveStatus().ifPresent(s -> jobEntity.setArchiveStatus(s.name()));
-
-        // Flag to signal to rest of system that this job is V3. Temporary until everything moved to v4
-        jobEntity.setV4(false);
-//
-//        // Archival status
-//        // Currently ignores 'disableLogArchival' [GENIE-657]
-//        if (!job.getArchiveLocation().isPresent()) {
-//            jobEntity.setArchiveStatus(ArchiveStatus.DISABLED.name());
-//        } else {
-//            jobEntity.setArchiveStatus(ArchiveStatus.PENDING.name());
-//        }
-
-        return jobEntity;
     }
 
     private void setJobMetadataFields(

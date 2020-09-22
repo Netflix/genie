@@ -116,17 +116,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     );
 
     /**
-     * Find the jobs with one of the statuses entered.
-     *
-     * @param statuses The statuses to search
-     * @return The {@link Set} of hostname's running V3 (embedded) jobs
-     * @deprecated Only used for old v3 jobs
-     */
-    @Query("SELECT DISTINCT(j.agentHostname) FROM JobEntity j WHERE j.v4 = false AND j.status IN (:statuses)")
-    @Deprecated
-    Set<String> getV3Hosts(@Param("statuses") Set<String> statuses);
-
-    /**
      * Count all jobs that belong to a given user and are in any of the given states.
      *
      * @param user     the user name
@@ -213,17 +202,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      */
     @Query("SELECT j.status FROM JobEntity j WHERE j.uniqueId = :id")
     Optional<String> getJobStatus(@Param("id") String id);
-
-    /**
-     * Return whether the job is running with the V4 agent or the older V3 embedded mechanism.
-     *
-     * @param id The unique id of the job
-     * @return {@literal true} if the job is running with the agent. {@link Optional#empty()} if the job doesn't exist
-     * @deprecated Only here during v3 to v4 agent migration
-     */
-    @Query("SELECT j.v4 FROM JobEntity j WHERE j.uniqueId = :id")
-    @Deprecated
-    Optional<Boolean> isV4(@Param("id") String id);
 
     /**
      * Return whether the job was submitted via the API or the Agent CLI.
