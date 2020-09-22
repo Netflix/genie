@@ -220,21 +220,6 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |-
 |yes
 
-|genie.jobs.agent-execution.agent-probability
-|Likelihood (0 <= x <= 1.0) that an incoming job is randomly selected to execute with agent, rather than the regular V3 execution codepath
-|null
-|yes
-
-|genie.jobs.agent-execution.force-agent
-|If true, force all jobs to execute in agent mode
-|null
-|yes
-
-|genie.jobs.agent-execution.force-embedded
-|If true, force all jobs to execute in embedded mode
-|null
-|yes
-
 |genie.jobs.attachments.location-prefix
 |Common prefix where attachments are stored
 |s3://genie/attachments
@@ -467,21 +452,6 @@ of 2.0
 |no
 
 |genie.scripts.command-selector.timeout
-|Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
-|5000
-|no
-
-|genie.scripts.execution-mode-filter.source
-|URI of the script to load. `ExecutionModeFilterScript` is enabled only if this property is set.
-|null
-|no
-
-|genie.scripts.execution-mode-filter.auto-load-enabled
-|If true, the script eagerly load during startup, as opposed to lazily load on first use.
-|false
-|no
-
-|genie.scripts.execution-mode-filter.timeout
 |Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
 |5000
 |no

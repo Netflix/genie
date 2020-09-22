@@ -17,15 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.jobs;
 
-import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
-import com.netflix.genie.web.util.JobExecutionModeSelector;
-import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-
-import java.util.Optional;
 
 /**
  * Configuration for Jobs Setup and Run.
@@ -36,26 +28,4 @@ import java.util.Optional;
 @Configuration
 // TODO: This is going to go away once the V4 API is in place
 public class JobsAutoConfiguration {
-
-    /**
-     * Create a {@link JobExecutionModeSelector} if one does not exist.
-     *
-     * @param environment               The environment
-     * @param meterRegistry             The metrics registry to use
-     * @param executionModeFilterScript The filter script (if one is loaded)
-     * @return a {@link JobExecutionModeSelector}
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobExecutionModeSelector.class)
-    public JobExecutionModeSelector jobExecutionModeSelector(
-        final Environment environment,
-        final MeterRegistry meterRegistry,
-        final Optional<ExecutionModeFilterScript> executionModeFilterScript
-    ) {
-        return new JobExecutionModeSelector(
-            environment,
-            meterRegistry,
-            executionModeFilterScript.orElse(null)
-        );
-    }
 }
