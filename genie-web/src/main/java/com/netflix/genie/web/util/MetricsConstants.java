@@ -42,16 +42,6 @@ public final class MetricsConstants {
         public static final String EXCEPTION_CLASS = "exceptionClass";
 
         /**
-         * Key to tag metrics with application ID.
-         */
-        public static final String APPLICATION_ID = "applicationId";
-
-        /**
-         * Key to tag metrics with application name.
-         */
-        public static final String APPLICATION_NAME = "applicationName";
-
-        /**
          * Key to tag metrics with cluster ID.
          */
         public static final String CLUSTER_ID = "clusterId";
@@ -87,29 +77,9 @@ public final class MetricsConstants {
         public static final String USER = "user";
 
         /**
-         * Key to tag a hostname.
-         */
-        public static final String HOST = "host";
-
-        /**
-         * Key to tag a health indicator name.
-         */
-        public static final String HEALTH_INDICATOR = "healthIndicator";
-
-        /**
-         * Key to tag a health indicator status.
-         */
-        public static final String HEALTH_STATUS = "healthStatus";
-
-        /**
          * Key to tag the user concurrent job limit.
          */
         public static final String JOBS_USER_LIMIT = "jobsUserLimit";
-
-        /**
-         * Key to tag the cluster selector class used.
-         */
-        public static final String CLUSTER_SELECTOR_CLASS = "clusterSelectorClass";
 
         /**
          * Key to tag the origin/source state of a state transition.
