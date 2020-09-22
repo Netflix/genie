@@ -520,100 +520,6 @@ public interface PersistenceService {
     //region V3 Job APIs
 
     /**
-     * Save all the initial job fields in the data store.
-     *
-     * @param jobRequest   the Job request object to save. Not null
-     * @param jobMetadata  metadata about the job request. Not null
-     * @param job          The Job object to create
-     * @param jobExecution The job execution object to create
-     * @throws GenieException if there is an error
-     * @deprecated To be removed at completion of agent migration
-     */
-    @Deprecated
-    void createJob(
-        @NotNull com.netflix.genie.common.dto.JobRequest jobRequest,
-        @NotNull com.netflix.genie.common.dto.JobMetadata jobMetadata,
-        @NotNull Job job,
-        @NotNull JobExecution jobExecution
-    ) throws GenieException;
-
-    /**
-     * Update the job with the various resources used to run the job including the cluster, command and applications.
-     *
-     * @param jobId          The id of the job to update
-     * @param clusterId      The id of the cluster the job runs on
-     * @param commandId      The id of the command the job runs with
-     * @param applicationIds The ids of the applications used to run the job
-     * @param memory         The amount of memory (in MB) to run the job with
-     * @throws GenieException For any problems while updating
-     * @deprecated To be removed at completion of agent migration
-     */
-    @Deprecated
-    void updateJobWithRuntimeEnvironment(
-        @NotBlank String jobId,
-        @NotBlank String clusterId,
-        @NotBlank String commandId,
-        @NotNull List<String> applicationIds,
-        @Min(1) int memory
-    ) throws GenieException;
-
-    /**
-     * Update the status and status message of the job.
-     *
-     * @param id        The id of the job to update the status for.
-     * @param jobStatus The updated status of the job.
-     * @param statusMsg The updated status message of the job.
-     * @throws GenieException if there is an error
-     * @deprecated To be removed at completion of agent migration
-     */
-    @Deprecated
-    void updateJobStatus(
-        @NotBlank(message = "No job id entered. Unable to update.") String id,
-        @NotNull(message = "Status cannot be null.") com.netflix.genie.common.dto.JobStatus jobStatus,
-        @NotBlank(message = "Status message cannot be empty.") String statusMsg
-    ) throws GenieException;
-
-    /**
-     * Update the job with information for the running job process.
-     *
-     * @param id         the id of the job to update the process id for
-     * @param processId  The id of the process on the box for this job
-     * @param checkDelay The delay to check the process with
-     * @param timeout    The date at which this job should timeout
-     * @throws GenieException if there is an error
-     * @deprecated To be removed at completion of agent migration
-     */
-    @Deprecated
-    void setJobRunningInformation(
-        @NotBlank String id,
-        @Min(value = 0, message = "Must be no lower than zero") int processId,
-        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") long checkDelay,
-        @NotNull Instant timeout
-    ) throws GenieException;
-
-    /**
-     * Method to set all job completion information for a job execution.
-     *
-     * @param id            the id of the job to update the exit code
-     * @param exitCode      The exit code of the process
-     * @param status        The job status for the job
-     * @param statusMessage The job status message
-     * @param stdOutSize    The size (in bytes) of the standard out file or null if there isn't one
-     * @param stdErrSize    The size (in bytes) of the standard error file or null if there isn't one
-     * @throws GenieException if there is an error
-     * @deprecated To be removed at completion of agent migration
-     */
-    @Deprecated
-    void setJobCompletionInformation(
-        @NotBlank(message = "No job id entered. Unable to update.") String id,
-        int exitCode,
-        @NotNull(message = "No job status entered.") com.netflix.genie.common.dto.JobStatus status,
-        @NotBlank(message = "Status message can't be blank. Unable to update") String statusMessage,
-        @Nullable Long stdOutSize,
-        @Nullable Long stdErrSize
-    ) throws GenieException;
-
-    /**
      * Get job request for given job id.
      *
      * @param id id of job request to look up
@@ -810,15 +716,6 @@ public interface PersistenceService {
     ) throws NotFoundException;
 
     /**
-     * Get whether the job is a V4 job (Run with agent).
-     *
-     * @param id The id of the job
-     * @return true if its a v4 job
-     * @throws NotFoundException If no job with the given {@code id} exists
-     */
-    boolean isV4(@NotBlank String id) throws NotFoundException;
-
-    /**
      * Get the status for a job with the given {@code id}.
      *
      * @param id The id of the job to get status for
@@ -865,21 +762,6 @@ public interface PersistenceService {
     boolean isApiJob(@NotBlank String id) throws NotFoundException;
 
     /**
-     * Given a hostname return a set of all the jobs currently active on that host.
-     *
-     * @param hostname The host name to search for. Not null or empty.
-     * @return All the jobs active on the host as a set of Job objects
-     */
-    Set<Job> getAllActiveJobsOnHost(@NotBlank String hostname);
-
-    /**
-     * Get a set of host names which are currently have active jobs in the Genie cluster.
-     *
-     * @return The set of hosts with jobs currently in an active state
-     */
-    Set<String> getAllHostsWithActiveJobs();
-
-    /**
      * Get the cluster the job used or is using.
      *
      * @param id The id of the job to get the cluster for
@@ -905,15 +787,6 @@ public interface PersistenceService {
      * @throws NotFoundException If either the job or the applications were not found
      */
     List<Application> getJobApplications(@NotBlank String id) throws NotFoundException;
-
-    /**
-     * Get the hostname a job is running on.
-     *
-     * @param id The id of the job to get the hostname for
-     * @return The hostname
-     * @throws NotFoundException If the job host cannot be found
-     */
-    String getJobHost(@NotBlank String id) throws NotFoundException;
 
     /**
      * Get the count of 'active' jobs for a given user across all instances.
@@ -1229,14 +1102,6 @@ public interface PersistenceService {
      */
     Optional<String> lookupAgentConnectionServer(@NotBlank String jobId);
 
-    /**
-     * Drop all records of agent connections to the specified hostname.
-     * This can be used to conveniently clean data related to a host when failure of the latter is detected.
-     *
-     * @param hostname the server hostname
-     * @return the number of connections purged from persistent storage
-     */
-    int removeAllAgentConnectionsToServer(@NotBlank String hostname);
     //endregion
 
     //region Tag APIs

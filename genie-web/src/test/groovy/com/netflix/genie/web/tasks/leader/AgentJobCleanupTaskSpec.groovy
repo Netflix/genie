@@ -18,10 +18,11 @@
 package com.netflix.genie.web.tasks.leader
 
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -77,7 +78,7 @@ class AgentJobCleanupTaskSpec extends Specification {
 
     def "Run"() {
         setup:
-        GenieException e = new GenieServerException("...")
+        Exception e = new GenieInvalidStatusException("...")
 
         when:
         task.run()
@@ -100,7 +101,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j6") >> false
         4 * taskProperties.getLaunchTimeLimit() >> inTheFuture
         4 * taskProperties.getReconnectTimeLimit() >> inTheFuture
-        0 * persistenceService.setJobCompletionInformation(_, _, _, _, _, _)
+        0 * persistenceService.getJobStatus(_)
+        0 * persistenceService.getJobArchiveStatus(_)
         0 * registry.counter(_, _)
 
         when:
@@ -124,7 +126,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j6") >> true
         2 * taskProperties.getLaunchTimeLimit() >> inTheFuture
         2 * taskProperties.getReconnectTimeLimit() >> inTheFuture
-        0 * persistenceService.setJobCompletionInformation(_, _, _, _, _, _)
+        0 * persistenceService.getJobStatus(_)
+        0 * persistenceService.getJobArchiveStatus(_)
         0 * registry.counter(_, _)
 
         when:
@@ -140,8 +143,9 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j4") >> false
         2 * taskProperties.getLaunchTimeLimit() >> inTheFuture
         2 * taskProperties.getReconnectTimeLimit() >> inThePast
-        1 * persistenceService.setJobCompletionInformation("j3", -1, JobStatus.FAILED, AgentJobCleanupTask.AWOL_STATUS_MESSAGE, null, null)
+        1 * persistenceService.getJobStatus("j3") >> JobStatus.INIT
         1 * persistenceService.getJobArchiveStatus("j3") >> ArchiveStatus.PENDING
+        1 * persistenceService.updateJobStatus("j3", JobStatus.INIT, JobStatus.FAILED, AgentJobCleanupTask.AWOL_STATUS_MESSAGE)
         1 * persistenceService.updateJobArchiveStatus("j3", ArchiveStatus.UNKNOWN)
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
         1 * counter.increment()
@@ -157,7 +161,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * taskProperties.getLaunchTimeLimit() >> inThePast
         1 * taskProperties.getReconnectTimeLimit() >> inTheFuture
-        1 * persistenceService.setJobCompletionInformation("j4", -1, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE, null, null) >> {
+        1 * persistenceService.getJobStatus("j4") >> JobStatus.ACCEPTED
+        1 * persistenceService.getJobArchiveStatus("j4") >> ArchiveStatus.PENDING
+        1 * persistenceService.updateJobArchiveStatus("j4", ArchiveStatus.FAILED)
+        1 * persistenceService.updateJobStatus("j4", JobStatus.ACCEPTED, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE) >> {
             throw e
         }
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newFailureTagsSetForException(e)) >> counter
@@ -180,8 +187,9 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * taskProperties.getLaunchTimeLimit() >> inThePast
         1 * taskProperties.getReconnectTimeLimit() >> inTheFuture
-        1 * persistenceService.setJobCompletionInformation("j4", -1, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE, null, null)
-        1 * persistenceService.getJobArchiveStatus("j4") >> { throw new NotFoundException("...") }
+        1 * persistenceService.getJobStatus("j4") >> {
+            throw new NotFoundException("...")
+        }
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, _) >> counter
         1 * counter.increment()
 
@@ -201,9 +209,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * taskProperties.getLaunchTimeLimit() >> inThePast
         1 * taskProperties.getReconnectTimeLimit() >> inTheFuture
-        1 * persistenceService.setJobCompletionInformation("j4", -1, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE, null, null)
-        1 * persistenceService.getJobArchiveStatus("j4") >> ArchiveStatus.DISABLED
-        0 * persistenceService.updateJobArchiveStatus(_, _)
+        1 * persistenceService.getJobStatus("j4") >> JobStatus.ACCEPTED
+        1 * persistenceService.getJobArchiveStatus("j4") >> ArchiveStatus.PENDING
+        1 * persistenceService.updateJobArchiveStatus("j4", ArchiveStatus.FAILED)
+        1 * persistenceService.updateJobStatus("j4", JobStatus.ACCEPTED, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE)
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, _) >> counter
         1 * counter.increment()
 

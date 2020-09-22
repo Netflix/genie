@@ -56,7 +56,6 @@ import java.util.UUID;
 class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceServiceIntegrationTestBase {
 
     private static final String APP_1_ID = "app1";
-    private static final String CLUSTER_1_ID = "cluster1";
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_1_NAME = "pig_13_prod";

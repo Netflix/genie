@@ -19,10 +19,9 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
@@ -129,28 +128,24 @@ public class AgentJobCleanupTask extends LeaderTask {
             } else {
                 log.warn("Job {} agent AWOL for too long, marking failed", awolJobId);
                 try {
-                    // Mark the job as failed
-                    this.persistenceService.setJobCompletionInformation(
-                        awolJobId,
-                        -1,
-                        JobStatus.FAILED,
-                        jobWasClaimed ? AWOL_STATUS_MESSAGE : NEVER_CLAIMED_STATUS_MESSAGE,
-                        null,
-                        null
-                    );
+                    final JobStatus currentStatus = this.persistenceService.getJobStatus(awolJobId);
+                    final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(awolJobId);
 
                     // Update job archive status
-                    try {
-                        final ArchiveStatus archiveStatus = this.persistenceService.getJobArchiveStatus(awolJobId);
-                        if (archiveStatus == ArchiveStatus.PENDING) {
-                            this.persistenceService.updateJobArchiveStatus(
-                                awolJobId,
-                                jobWasClaimed ? ArchiveStatus.UNKNOWN : ArchiveStatus.FAILED
-                            );
-                        }
-                    } catch (NotFoundException e) {
-                        throw new GenieNotFoundException("Not found: " + awolJobId, e);
+                    if (archiveStatus == ArchiveStatus.PENDING) {
+                        this.persistenceService.updateJobArchiveStatus(
+                            awolJobId,
+                            jobWasClaimed ? ArchiveStatus.UNKNOWN : ArchiveStatus.FAILED
+                        );
                     }
+
+                    // Mark the job as failed
+                    this.persistenceService.updateJobStatus(
+                        awolJobId,
+                        currentStatus,
+                        JobStatus.FAILED,
+                        jobWasClaimed ? AWOL_STATUS_MESSAGE : NEVER_CLAIMED_STATUS_MESSAGE
+                    );
 
                     // If marking as failed succeeded, remove it from the map
                     this.awolJobsMap.remove(awolJobId);
@@ -160,7 +155,7 @@ public class AgentJobCleanupTask extends LeaderTask {
                         TERMINATED_COUNTER_METRIC_NAME,
                         MetricsUtils.newSuccessTagsSet()
                     ).increment();
-                } catch (GenieException e) {
+                } catch (NotFoundException | GenieInvalidStatusException e) {
                     log.warn("Failed to mark AWOL job {} as failed: ", awolJobId, e);
                     // Increment counter, tag as failure
                     this.registry.counter(

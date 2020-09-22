@@ -21,7 +21,6 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.BaseDTO;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -210,96 +209,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_1_ID)).isFalse();
         Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_2_ID)).isFalse();
         Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_3_ID)).isTrue();
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/init.xml")
-    void canPersistAndGetAJob() throws GenieException {
-        // Set up some fields for comparison
-        final com.netflix.genie.common.dto.JobRequest jobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
-            NAME, USER, VERSION, CLUSTER_CRITERIA, COMMAND_CRITERION
-        )
-            .withId(UNIQUE_ID)
-            .withDescription(DESCRIPTION)
-            .withCommandArgs(COMMAND_ARGS)
-            .withGroup(GROUP)
-            .withSetupFile(SETUP_FILE)
-            .withConfigs(CONFIGS)
-            .withDependencies(DEPENDENCIES)
-            .withDisableLogArchival(true)
-            .withEmail(EMAIL)
-            .withTags(TAGS)
-            .withCpu(CPU_REQUESTED)
-            .withMemory(MEMORY_REQUESTED)
-            .withTimeout(TIMEOUT_REQUESTED)
-            .withApplications(APPLICATIONS_REQUESTED)
-            .withGrouping(GROUPING)
-            .withGroupingInstance(GROUPING_INSTANCE)
-            .build();
-
-        final com.netflix.genie.common.dto.JobMetadata jobMetadata = new com.netflix.genie.common.dto.JobMetadata
-            .Builder()
-            .withClientHost(CLIENT_HOST)
-            .withUserAgent(USER_AGENT)
-            .withNumAttachments(NUM_ATTACHMENTS)
-            .withTotalSizeOfAttachments(TOTAL_SIZE_ATTACHMENTS)
-            .withStdErrSize(STD_ERR_SIZE)
-            .withStdOutSize(STD_OUT_SIZE)
-            .build();
-
-        final Job.Builder jobBuilder = new Job.Builder(
-            NAME, USER, VERSION
-        )
-            .withId(UNIQUE_ID)
-            .withDescription(DESCRIPTION)
-            .withTags(TAGS)
-            .withArchiveLocation(ARCHIVE_LOCATION)
-            .withStarted(STARTED)
-            .withFinished(FINISHED)
-            .withStatus(com.netflix.genie.common.dto.JobStatus.RUNNING)
-            .withStatusMsg(STATUS_MSG);
-
-        jobBuilder.withCommandArgs(COMMAND_ARGS);
-        final Job job = jobBuilder.build();
-
-        final JobExecution jobExecution = new JobExecution.Builder(HOSTNAME)
-            .withId(UNIQUE_ID)
-            .withCheckDelay(CHECK_DELAY)
-            .withTimeout(TIMEOUT)
-            .withMemory(MEMORY)
-            .withProcessId(PROCESS_ID)
-            .withArchiveStatus(ArchiveStatus.DISABLED)
-            .build();
-
-        Assertions.assertThat(this.jobRepository.count()).isEqualTo(3L);
-        Assertions.assertThat(this.tagRepository.count()).isEqualTo(17L);
-        Assertions.assertThat(this.fileRepository.count()).isEqualTo(11L);
-        this.service.createJob(jobRequest, jobMetadata, job, jobExecution);
-
-        // Force it to behave as fresh request to API
-        this.entityManager.flush();
-        this.entityManager.clear();
-
-        Assertions.assertThat(this.jobRepository.count()).isEqualTo(4L);
-        Assertions.assertThat(this.tagRepository.count()).isEqualTo(25L);
-        Assertions.assertThat(this.fileRepository.count()).isEqualTo(15L);
-
-        Assertions
-            .assertThat(this.jobRepository.findByUniqueId(UNIQUE_ID))
-            .isPresent()
-            .get()
-            .extracting(JobEntity::isV4)
-            .isEqualTo(false);
-
-        this.validateJobRequest(this.service.getV3JobRequest(UNIQUE_ID));
-        this.validateJob(this.service.getJob(UNIQUE_ID));
-        this.validateJobExecution(this.service.getJobExecution(UNIQUE_ID));
-
-        Assertions
-            .assertThat(this.jobRepository.findByUniqueId(UNIQUE_ID, JobMetadataProjection.class))
-            .isPresent()
-            .get()
-            .satisfies(this::validateJobMetadata);
     }
 
     @Test
@@ -1123,57 +1032,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         );
         Assertions.assertThat(jobs.getTotalElements()).isEqualTo(0L);
         Assertions.assertThat(jobs.getContent()).isEmpty();
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
-    void canFindActiveJobsByHostName() {
-        final String hostA = "a.netflix.com";
-        final String hostB = "b.netflix.com";
-        final String hostC = "c.netflix.com";
-
-        Assertions
-            .assertThat(this.service.getAllActiveJobsOnHost(hostA))
-            .hasSize(1)
-            .extracting(BaseDTO::getId)
-            .filteredOn(Optional::isPresent)
-            .extracting(Optional::get)
-            .containsOnly(JOB_2_ID);
-
-        Assertions
-            .assertThat(this.service.getAllActiveJobsOnHost(hostB))
-            .hasSize(1)
-            .extracting(BaseDTO::getId)
-            .filteredOn(Optional::isPresent)
-            .extracting(Optional::get)
-            .containsOnly(JOB_3_ID);
-
-        Assertions.assertThat(this.service.getAllActiveJobsOnHost(hostC)).isEmpty();
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
-    void canFindHostNamesOfActiveJobs() {
-        final String hostA = "a.netflix.com";
-        final String hostB = "b.netflix.com";
-
-        Assertions
-            .assertThat(this.service.getAllHostsWithActiveJobs())
-            .hasSize(2)
-            .containsExactlyInAnyOrder(hostA, hostB);
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
-    void canGetJobHost() throws NotFoundException {
-        final String host = "a.netflix.com";
-
-        Assertions
-            .assertThat(this.service.getJobHost(JOB_1_ID))
-            .isEqualTo(host);
-        Assertions
-            .assertThatExceptionOfType(NotFoundException.class)
-            .isThrownBy(() -> this.service.getJobHost(UUID.randomUUID().toString()));
     }
 
     @Test

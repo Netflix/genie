@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -105,7 +104,6 @@ class GenieExceptionMapperTest {
     void canHandleGenieExceptions() {
         final List<GenieException> exceptions = Arrays.asList(
             new GenieBadRequestException("bad"),
-            new GenieConflictException("conflict"),
             new GenieNotFoundException("Not Found"),
             new GeniePreconditionException("Precondition"),
             new GenieServerException("server"),
