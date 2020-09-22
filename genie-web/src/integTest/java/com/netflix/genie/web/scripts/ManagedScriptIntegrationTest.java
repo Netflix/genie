@@ -58,7 +58,7 @@ class ManagedScriptIntegrationTest {
         final ManagedScriptBaseProperties scriptProperties
     ) throws Exception {
         // Find the script resource
-        final URI scriptUri = ExecutionModeFilterScript.class.getResource(scriptFilename).toURI();
+        final URI scriptUri = ManagedScriptIntegrationTest.class.getResource(scriptFilename).toURI();
         // Configure script to use it
         scriptProperties.setSource(scriptUri);
         // Trigger loading of script
