@@ -18,7 +18,6 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -26,7 +25,6 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
-import com.netflix.genie.web.properties.JobsCleanupProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import com.netflix.genie.web.properties.JobsMaxProperties;
@@ -38,11 +36,9 @@ import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
-import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
-import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
@@ -50,13 +46,11 @@ import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import javax.validation.constraints.NotEmpty;
@@ -74,7 +68,6 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(
     {
-        JobsCleanupProperties.class,
         JobsForwardingProperties.class,
         JobsLocationsProperties.class,
         JobsMaxProperties.class,
@@ -91,7 +84,6 @@ public class ServicesAutoConfiguration {
     /**
      * Collection of properties related to job execution.
      *
-     * @param cleanup                cleanup properties
      * @param forwarding             forwarding properties
      * @param locations              locations properties
      * @param max                    max properties
@@ -103,7 +95,6 @@ public class ServicesAutoConfiguration {
      */
     @Bean
     public JobsProperties jobsProperties(
-        final JobsCleanupProperties cleanup,
         final JobsForwardingProperties forwarding,
         final JobsLocationsProperties locations,
         final JobsMaxProperties max,
@@ -113,7 +104,6 @@ public class ServicesAutoConfiguration {
         final JobsActiveLimitProperties activeLimit
     ) {
         return new JobsProperties(
-            cleanup,
             forwarding,
             locations,
             max,
@@ -151,19 +141,6 @@ public class ServicesAutoConfiguration {
                 "Unknown attachment service implementation to use for location: " + location
             );
         }
-    }
-
-    /**
-     * Get a {@link JobFileService} implementation if one is required.
-     *
-     * @param jobsDir The job directory resource
-     * @return A {@link DiskJobFileServiceImpl} instance
-     * @throws IOException When the job directory can't be created or isn't a directory
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobFileService.class)
-    public DiskJobFileServiceImpl jobFileService(@Qualifier("jobsDir") final Resource jobsDir) throws IOException {
-        return new DiskJobFileServiceImpl(jobsDir);
     }
 
     /**
@@ -206,9 +183,6 @@ public class ServicesAutoConfiguration {
      * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
      *                                           job data
      * @param meterRegistry                      The meter registry used to keep track of metrics
-     * @param jobFileService                     The service responsible for managing the job working directory on disk
-     *                                           for V3 Jobs
-     * @param jobDirectoryManifestCreatorService The job directory manifest service
      * @param agentRoutingService                The agent routing service
      * @return An instance of {@link JobDirectoryServerServiceImpl}
      */
@@ -220,8 +194,6 @@ public class ServicesAutoConfiguration {
         final AgentFileStreamService agentFileStreamService,
         final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
-        final JobFileService jobFileService,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
         final AgentRoutingService agentRoutingService
     ) {
         return new JobDirectoryServerServiceImpl(
@@ -230,8 +202,6 @@ public class ServicesAutoConfiguration {
             agentFileStreamService,
             archivedJobService,
             meterRegistry,
-            jobFileService,
-            jobDirectoryManifestCreatorService,
             agentRoutingService
         );
     }

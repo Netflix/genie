@@ -18,21 +18,18 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
-import com.netflix.genie.web.properties.JobsCleanupProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.ArchivedJobService;
-import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -66,7 +63,6 @@ class ServicesAutoConfigurationTest {
         Assertions
             .assertThat(
                 this.servicesAutoConfiguration.jobsProperties(
-                    Mockito.mock(JobsCleanupProperties.class),
                     Mockito.mock(JobsForwardingProperties.class),
                     Mockito.mock(JobsLocationsProperties.class),
                     Mockito.mock(JobsMaxProperties.class),
@@ -89,8 +85,6 @@ class ServicesAutoConfigurationTest {
                     Mockito.mock(AgentFileStreamService.class),
                     Mockito.mock(ArchivedJobService.class),
                     Mockito.mock(MeterRegistry.class),
-                    Mockito.mock(JobFileService.class),
-                    Mockito.mock(JobDirectoryManifestCreatorService.class),
                     Mockito.mock(AgentRoutingService.class)
                 )
             )
