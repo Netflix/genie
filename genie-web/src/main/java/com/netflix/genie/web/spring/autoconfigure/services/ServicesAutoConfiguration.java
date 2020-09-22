@@ -17,15 +17,12 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -42,23 +39,17 @@ import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
-import com.netflix.genie.web.services.JobKillService;
-import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
-import com.netflix.genie.web.services.impl.JobKillServiceImpl;
-import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
-import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -130,65 +121,6 @@ public class ServicesAutoConfiguration {
             users,
             completionCheckBackOff,
             activeLimit
-        );
-    }
-
-    /**
-     * Get an local implementation of the JobKillService.
-     *
-     * @param genieHostInfo         Information about the host the Genie process is running on
-     * @param dataServices          The {@link DataServices} instance to use
-     * @param executor              The executor to use to run system processes.
-     * @param jobsProperties        The jobs properties to use
-     * @param genieEventBus         The application event bus to use to publish system wide events
-     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
-     * @param objectMapper          The Jackson ObjectMapper used to serialize from/to JSON
-     * @param processCheckerFactory The process checker factory
-     * @return A job kill service instance.
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobKillServiceV3.class)
-    public JobKillServiceV3 jobKillServiceV3(
-        final GenieHostInfo genieHostInfo,
-        final DataServices dataServices,
-        final Executor executor,
-        final JobsProperties jobsProperties,
-        final GenieEventBus genieEventBus,
-        @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final ObjectMapper objectMapper,
-        final ProcessChecker.Factory processCheckerFactory
-    ) {
-        return new JobKillServiceV3(
-            genieHostInfo.getHostname(),
-            dataServices,
-            executor,
-            jobsProperties.getUsers().isRunAsUserEnabled(),
-            genieEventBus,
-            genieWorkingDir,
-            objectMapper,
-            processCheckerFactory
-        );
-    }
-
-    /**
-     * Get an local implementation of the JobKillService.
-     *
-     * @param jobKillServiceV3 Service to kill V3 jobs.
-     * @param jobKillServiceV4 Service to kill V4 jobs.
-     * @param dataServices     The {@link DataServices} instance to use
-     * @return A job kill service instance.
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobKillService.class)
-    public JobKillServiceImpl jobKillService(
-        final JobKillServiceV3 jobKillServiceV3,
-        final JobKillServiceV4 jobKillServiceV4,
-        final DataServices dataServices
-    ) {
-        return new JobKillServiceImpl(
-            jobKillServiceV3,
-            jobKillServiceV4,
-            dataServices
         );
     }
 

@@ -27,11 +27,10 @@ import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
-import com.netflix.genie.web.services.JobKillServiceV4;
+import com.netflix.genie.web.services.JobKillService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**
@@ -43,7 +42,7 @@ import java.util.Map;
 @Slf4j
 public class GRpcJobKillServiceImpl
     extends JobKillServiceGrpc.JobKillServiceImplBase
-    implements JobKillServiceV4 {
+    implements JobKillService {
 
     private final Map<String, StreamObserver<JobKillRegistrationResponse>> parkedJobKillResponseObservers =
         Maps.newConcurrentMap();
@@ -87,8 +86,8 @@ public class GRpcJobKillServiceImpl
      */
     @Override
     public void killJob(
-        @NotBlank(message = "No job id entered. Unable to kill job.") final String jobId,
-        @NotBlank(message = "No reason provided.") final String reason
+        final String jobId,
+        final String reason
     ) throws GenieException {
         final StreamObserver<JobKillRegistrationResponse> responseObserver =
             parkedJobKillResponseObservers.remove(jobId);

@@ -32,7 +32,7 @@ import javax.validation.constraints.NotBlank;
 public interface JobKillService {
 
     /**
-     * Kill the job with the given id if possible. Should publish a JobFinishedEvent when done.
+     * Kill the job with the given id if possible.
      *
      * @param id     id of job to kill
      * @param reason brief reason for requesting the job be killed
