@@ -342,43 +342,6 @@ It will have to be added if one is desired otherwise metrics are just published 
 |ArchiveStatusCleanupTask
 |status, exceptionClass
 
-|genie.tasks.clusterChecker.connectionsReaped.counter
-|Counts the number of agent connections the leader reaped due to the host being unhealthy
-|count
-|ClusterCheckerTask
-|host
-
-|genie.tasks.clusterChecker.failedHealthCheck.counter
-|Counts the number of time the leader retrieved health status of a remote node and one of the (non-ignored) indicators
-had a status different than UP
-|count
-|ClusterCheckerTask
-|host, healthIndicator, healthStatus
-
-|genie.tasks.clusterChecker.invalidResponse.counter
-|Counts the number of time the leader retrieved health status of a remote node and failed to parse the response
-|count
-|ClusterCheckerTask
-|host
-
-|genie.tasks.clusterChecker.jobsMarkedFailed.counter
-|Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them
-|count
-|ClusterCheckerTask
-|status, host, exceptionClass
-
-|genie.tasks.clusterChecker.unhealthyHosts.gauge
-|Number of Genie nodes that the leader has currently marked unhealthy
-|Current amount
-|ClusterCheckerTask
-|-
-
-|genie.tasks.clusterChecker.unreachableHost.counter
-|Counts the number of time the leader failed to retrieve health status of a remote node (example: socket timeout).
-|count
-|ClusterCheckerTask
-|host
-
 |genie.tasks.databaseCleanup.applicationDeletion.timer
 |Time taken to delete application records from the database
 |nanoseconds

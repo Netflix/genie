@@ -17,13 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ArchiveStatusCleanupProperties;
-import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
@@ -35,7 +33,6 @@ import com.netflix.genie.web.spring.autoconfigure.ZookeeperAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ArchiveStatusCleanupTask;
-import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
 import com.netflix.genie.web.tasks.leader.LeaderTask;
 import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
@@ -43,7 +40,6 @@ import com.netflix.genie.web.tasks.leader.LocalLeader;
 import com.netflix.genie.web.tasks.leader.UserMetricsTask;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -54,7 +50,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.integration.zookeeper.leader.LeaderInitiator;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Set;
 
@@ -69,7 +64,6 @@ import java.util.Set;
     {
         AgentCleanupProperties.class,
         ArchiveStatusCleanupProperties.class,
-        ClusterCheckerProperties.class,
         DatabaseCleanupProperties.class,
         LeadershipProperties.class,
         UserMetricsProperties.class,
@@ -98,37 +92,6 @@ public class LeaderAutoConfiguration {
         final Set<LeaderTask> tasks
     ) {
         return new LeaderTasksCoordinator(taskScheduler, tasks);
-    }
-
-    /**
-     * Create a {@link ClusterCheckerTask} if one hasn't been supplied.
-     *
-     * @param genieHostInfo         Information about the host this Genie process is running on
-     * @param properties            The properties to use to configure the task
-     * @param dataServices          The {@link DataServices} instance to use
-     * @param restTemplate          The rest template for http calls
-     * @param webEndpointProperties The properties where Spring actuator is running
-     * @param registry              The spectator registry for getting metrics
-     * @return The {@link ClusterCheckerTask} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(ClusterCheckerTask.class)
-    public ClusterCheckerTask clusterCheckerTask(
-        final GenieHostInfo genieHostInfo,
-        final ClusterCheckerProperties properties,
-        final DataServices dataServices,
-        @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
-        final WebEndpointProperties webEndpointProperties,
-        final MeterRegistry registry
-    ) {
-        return new ClusterCheckerTask(
-            genieHostInfo,
-            properties,
-            dataServices,
-            restTemplate,
-            webEndpointProperties,
-            registry
-        );
     }
 
     /**

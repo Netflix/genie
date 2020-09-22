@@ -42,7 +42,6 @@ import java.util.concurrent.TimeUnit;
  * The logic is summarized as:
  * If a job finished running more than N minutes ago, and the agent is disconnected and the archive status is PENDING,
  * then set the archive status to UNKNOWN.
- * This task ignores non-agent jobs because {@link ClusterCheckerTask} handles them already.
  *
  * @author mprimi
  * @since 4.0.0

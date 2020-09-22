@@ -492,33 +492,6 @@ of 2.0
 |2m
 |no
 
-|genie.tasks.cluster-checker.healthIndicatorsToIgnore
-|The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
-a comma separated list
-|mail,genieAgent,localAgentLauncher
-|no
-
-|genie.tasks.cluster-checker.lostThreshold
-|The number of times a Genie nodes need to fail health check in order for jobs running on that node to be marked as
-lost and failed by the Genie leader
-|3
-|no
-
-|genie.tasks.cluster-checker.port
-|The port to connect to other Genie nodes on
-|8080
-|no
-
-|genie.tasks.cluster-checker.rate
-|The number of milliseconds to wait between health checks to other Genie nodes
-|300000
-|no
-
-|genie.tasks.cluster-checker.scheme
-|The scheme (http or https) for connecting to other Genie nodes
-|http
-|no
-
 |genie.tasks.database-cleanup.application-cleanup.skip
 |Skip the Applications table when performing database cleanup
 |false
