@@ -17,16 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.PersistenceService;
-import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -35,22 +30,16 @@ import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
-import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.JobFileService;
-import com.netflix.genie.web.services.JobKillServiceV4;
-import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
-import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.commons.exec.Executor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
@@ -85,41 +74,6 @@ class ServicesAutoConfigurationTest {
                     Mockito.mock(JobsUsersProperties.class),
                     Mockito.mock(ExponentialBackOffTriggerProperties.class),
                     Mockito.mock(JobsActiveLimitProperties.class)
-                )
-            )
-            .isNotNull();
-    }
-
-    @Test
-    void canGetJobKillServiceV3Bean() {
-        final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.jobKillServiceV3(
-                    new GenieHostInfo("localhost"),
-                    dataServices,
-                    Mockito.mock(Executor.class),
-                    JobsProperties.getJobsPropertiesDefaults(),
-                    Mockito.mock(GenieEventBus.class),
-                    Mockito.mock(FileSystemResource.class),
-                    GenieObjectMapper.getMapper(),
-                    Mockito.mock(ProcessChecker.Factory.class)
-                )
-            )
-            .isNotNull();
-    }
-
-    @Test
-    void canGetJobKillServiceBean() {
-        final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.jobKillService(
-                    Mockito.mock(JobKillServiceV3.class),
-                    Mockito.mock(JobKillServiceV4.class),
-                    dataServices
                 )
             )
             .isNotNull();
