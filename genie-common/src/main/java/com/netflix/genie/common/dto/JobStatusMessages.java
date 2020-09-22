@@ -37,16 +37,6 @@ public final class JobStatusMessages {
     public static final String JOB_RUNNING = "Job is Running.";
 
     /**
-     * Job killed because maximum stdout length was exceeded.
-     */
-    public static final String JOB_EXCEEDED_STDOUT_LENGTH = "Std out length exceeded.";
-
-    /**
-     * Job killed because maximum stderr length was exceeded.
-     */
-    public static final String JOB_EXCEEDED_STDERR_LENGTH = "Std err length exceeded.";
-
-    /**
      * Job killed because maximum run time was exceeded.
      */
     public static final String JOB_EXCEEDED_TIMEOUT = "Job exceeded timeout.";
@@ -70,49 +60,6 @@ public final class JobStatusMessages {
      * Job terminated with non-zero exit code.
      */
     public static final String JOB_FAILED = "Job failed.";
-
-    /**
-     * Job killed, exit status unknown as done file is unreadable.
-     */
-    public static final String COULD_NOT_LOAD_DONE_FILE = "Failed to load done file.";
-
-    /**
-     * Job killed, could not check on the process.
-     */
-    public static final String JOB_PROCESS_NOT_FOUND = "Couldn't check job process status.";
-
-    /**
-     * Job PID terminated, exist status is yet to be verified.
-     */
-    public static final String PROCESS_DETECTED_TO_BE_COMPLETE = "Process detected to be complete";
-
-    /**
-     * Job is undefined intermediate state caused by a crash during setup.
-     */
-    public static final String SYSTEM_CRASHED_WHILE_JOB_STARTING = "System crashed while job starting";
-
-    /**
-     * Job was launched before Genie stopped, and it cannot be re-attached after restart.
-     */
-    public static final String UNABLE_TO_RE_ATTACH_ON_STARTUP = "Unable to re-attach on startup";
-
-    /**
-     * Job was killed by user before even starting.
-     */
-    public static final String USER_REQUESTED_JOB_BE_KILLED_DURING_INITIALIZATION =
-        "User requested job be killed during initialization";
-
-    /**
-     * Job precondition was not satisfied during initialization.
-     */
-    public static final String SUBMIT_PRECONDITION_FAILURE =
-        "Job validation failed, further details available in the job output directory";
-
-    /**
-     * Job failed with unexpected exception during initialization.
-     */
-    public static final String SUBMIT_INIT_FAILURE =
-        "Job initialization failed, further details available in the job output directory";
 
     /**
      * Job failed in in the setup portion of the run script (setting environment or running resources setup scripts).
