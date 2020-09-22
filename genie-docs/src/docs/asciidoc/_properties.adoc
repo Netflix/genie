@@ -375,21 +375,6 @@ determined by Zookeeper or other mechanism via Spring
 |false
 |no
 
-|genie.mail.fromAddress
-|The e-mail address that should be used as the from address when alert emails are sent
-|no-reply-genie@geniehost.com
-|no
-
-|genie.mail.password
-|The password for the e-mail server
-|
-|no
-
-|genie.mail.user
-|The user to log into the e-mail server with
-|
-|no
-
 |genie.notifications.sns.enabled
 |Wether to enable SNS publishing of events
 |-
