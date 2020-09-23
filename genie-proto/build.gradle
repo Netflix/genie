@@ -19,7 +19,6 @@ dependencies {
 
     implementation("io.grpc:grpc-stub")
     implementation("io.grpc:grpc-protobuf")
-    implementation("jakarta.annotation:jakarta.annotation-api")
 
     /*******************************
      * Compile Only Dependencies
