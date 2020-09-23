@@ -33,9 +33,7 @@ class JobsPropertiesTest {
     private JobsMemoryProperties memory;
     private JobsForwardingProperties forwarding;
     private JobsLocationsProperties locations;
-    private JobsMaxProperties max;
     private JobsUsersProperties users;
-    private ExponentialBackOffTriggerProperties completionBackOff;
     private JobsActiveLimitProperties activeLimit;
     private JobsProperties properties;
 
@@ -47,17 +45,13 @@ class JobsPropertiesTest {
         this.memory = Mockito.mock(JobsMemoryProperties.class);
         this.forwarding = Mockito.mock(JobsForwardingProperties.class);
         this.locations = Mockito.mock(JobsLocationsProperties.class);
-        this.max = Mockito.mock(JobsMaxProperties.class);
         this.users = Mockito.mock(JobsUsersProperties.class);
-        this.completionBackOff = Mockito.mock(ExponentialBackOffTriggerProperties.class);
         this.activeLimit = Mockito.mock(JobsActiveLimitProperties.class);
         this.properties = new JobsProperties(
-                this.forwarding,
+            this.forwarding,
             this.locations,
-            this.max,
             this.memory,
             this.users,
-            this.completionBackOff,
             this.activeLimit
         );
     }
@@ -70,9 +64,7 @@ class JobsPropertiesTest {
         Assertions.assertThat(this.properties.getMemory()).isNotNull();
         Assertions.assertThat(this.properties.getForwarding()).isNotNull();
         Assertions.assertThat(this.properties.getLocations()).isNotNull();
-        Assertions.assertThat(this.properties.getMax()).isNotNull();
         Assertions.assertThat(this.properties.getUsers()).isNotNull();
-        Assertions.assertThat(this.properties.getCompletionCheckBackOff()).isNotNull();
         Assertions.assertThat(this.properties.getActiveLimit()).isNotNull();
     }
 
@@ -86,10 +78,8 @@ class JobsPropertiesTest {
                 () -> {
                     this.properties.setForwarding(this.forwarding);
                     this.properties.setLocations(this.locations);
-                    this.properties.setMax(this.max);
                     this.properties.setMemory(this.memory);
                     this.properties.setUsers(this.users);
-                    this.properties.setCompletionCheckBackOff(this.completionBackOff);
                     this.properties.setActiveLimit(this.activeLimit);
                 }
             )

@@ -39,42 +39,32 @@ public class JobsProperties {
     @Valid
     private JobsLocationsProperties locations;
     @Valid
-    private JobsMaxProperties max;
-    @Valid
     private JobsMemoryProperties memory;
     @Valid
     private JobsUsersProperties users;
-    @Valid
-    private ExponentialBackOffTriggerProperties completionCheckBackOff;
     @Valid
     private JobsActiveLimitProperties activeLimit;
 
     /**
      * Constructor.
      *
-     * @param forwarding             forwarding properties
-     * @param locations              locations properties
-     * @param max                    max properties
-     * @param memory                 memory properties
-     * @param users                  users properties
-     * @param completionCheckBackOff completion back-off properties
-     * @param activeLimit            active limit properties
+     * @param forwarding  forwarding properties
+     * @param locations   locations properties
+     * @param memory      memory properties
+     * @param users       users properties
+     * @param activeLimit active limit properties
      */
     public JobsProperties(
         @Valid final JobsForwardingProperties forwarding,
         @Valid final JobsLocationsProperties locations,
-        @Valid final JobsMaxProperties max,
         @Valid final JobsMemoryProperties memory,
         @Valid final JobsUsersProperties users,
-        @Valid final ExponentialBackOffTriggerProperties completionCheckBackOff,
         @Valid final JobsActiveLimitProperties activeLimit
     ) {
         this.forwarding = forwarding;
         this.locations = locations;
-        this.max = max;
         this.memory = memory;
         this.users = users;
-        this.completionCheckBackOff = completionCheckBackOff;
         this.activeLimit = activeLimit;
     }
 
@@ -87,10 +77,8 @@ public class JobsProperties {
         return new JobsProperties(
             new JobsForwardingProperties(),
             new JobsLocationsProperties(),
-            new JobsMaxProperties(),
             new JobsMemoryProperties(),
             new JobsUsersProperties(),
-            new ExponentialBackOffTriggerProperties(),
             new JobsActiveLimitProperties()
         );
     }

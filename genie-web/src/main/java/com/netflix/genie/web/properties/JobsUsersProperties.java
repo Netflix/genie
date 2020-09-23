@@ -38,6 +38,5 @@ public class JobsUsersProperties {
      * The property prefix for all properties in this group.
      */
     public static final String PROPERTY_PREFIX = "genie.jobs.users";
-    private boolean creationEnabled;
     private boolean runAsUserEnabled;
 }
