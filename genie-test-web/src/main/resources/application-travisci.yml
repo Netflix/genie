@@ -23,5 +23,4 @@ genie:
   jobs:
     locations:
       archives: file:///tmp/genie/archives/
-      attachments: file:///tmp/genie/attachments/
       jobs: file:///tmp/genie/jobs/

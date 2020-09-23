@@ -27,45 +27,30 @@ cloud:
       auto: false
 
 genie:
-  file:
-    cache:
-      location: file://${java.io.tmpdir}genie/cache
   grpc:
     server:
       enabled: false
   health:
     maxCpuLoadPercent: 80
   jobs:
-    cleanup:
-      deleteArchiveFile: true
-      deleteDependencies: true
     forwarding:
       enabled: true
       port: 8080
       scheme: http
     locations:
       archives: file://${java.io.tmpdir}genie/archives/
-      attachments: file://${java.io.tmpdir}genie/attachments/
       jobs: file://${java.io.tmpdir}genie/jobs/
-    max:
-      stdOutSize: 8589934592
-      stdErrSize: 8589934592
     memory:
       maxSystemMemory: 30720
       defaultJobMemory: 1024
       maxJobMemory: 10240
     users:
-      creationEnabled: false
       runAsUserEnabled: false
     active-limit:
       enabled: false
       count: 100
   leader:
     enabled: false
-  mail:
-    fromAddress: no-reply-genie@geniehost.com
-    #user:
-    #password:
   redis:
     enabled: false
   retry:
@@ -85,12 +70,6 @@ genie:
   swagger:
     enabled: false
   tasks:
-    cluster-checker:
-      scheme: http
-      port: 8080
-      rate: 300000
-      lostThreshold: 3
-      healthIndicatorsToIgnore: memory,genieMemory,discoveryComposite,localAgentLauncher
     database-cleanup:
       enabled: true
       expression: 0 0 0 * * *
