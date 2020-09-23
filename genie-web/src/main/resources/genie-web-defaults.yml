@@ -45,9 +45,6 @@ genie:
       send-interval: 5s
     routing:
       refresh-interval: 3s
-  file:
-    cache:
-      location: file://${java.io.tmpdir:/tmp}/genie/cache
   health:
     maxCpuLoadPercent: 80
   jobs:
@@ -55,35 +52,24 @@ genie:
       location-prefix: file://${java.io.tmpdir:/tmp}/genie/attachments
       max-size: 100MB
       max-total-size: 150MB
-    cleanup:
-      deleteDependencies: true
     forwarding:
       enabled: true
       port: 8080
       scheme: http
     locations:
       archives: file://${java.io.tmpdir:/tmp}/genie/archives/
-      attachments: file://${java.io.tmpdir:/tmp}/genie/attachments/
       jobs: file://${java.io.tmpdir:/tmp}/genie/jobs/
-    max:
-      stdOutSize: 8589934592
-      stdErrSize: 8589934592
     memory:
       maxSystemMemory: 30720
       defaultJobMemory: 1024
       maxJobMemory: 10240
     users:
-      creationEnabled: false
       runAsUserEnabled: false
     active-limit:
       enabled: false
       count: 100
   leader:
     enabled: false
-  mail:
-    fromAddress: no-reply-genie@geniehost.com
-    #user:
-    #password:
   redis:
     enabled: false
   retry:
@@ -96,10 +82,6 @@ genie:
       source:
       auto-load-enabled: false
       timeout: 5000
-    execution-mode-filter:
-      source:
-      auto-load-enabled: false
-      timeout: 5000
   smoke: true
   swagger:
     enabled: false
@@ -108,12 +90,6 @@ genie:
       enabled: true
     archive-status-cleanup:
       enabled: true
-    cluster-checker:
-      scheme: http
-      port: 8080
-      rate: 300000
-      lostThreshold: 3
-      healthIndicatorsToIgnore: mail,genieAgent,localAgentLauncher
     database-cleanup:
       enabled: true
       expression: 0 0 0 * * *
