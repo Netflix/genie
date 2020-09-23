@@ -235,22 +235,6 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |150MB
 |no
 
-|genie.jobs.completion-check-back-off.factor
-|Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.
-|1.2
-|no
-
-|genie.jobs.completion-check-back-off.max-interval
-|The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most
-cases is specified as part of the `Command` entity for a particular job.
-|10000
-|no
-
-|genie.jobs.completion-check-back-off.min-interval
-|The minimum time between checks for job completion in milliseconds. Must be greater than zero.
-|100
-|no
-
 |genie.jobs.files.filter.case-sensitive-matching
 |Wether the regular expressions defined in `genie.jobs.files.filter.*` are case-sensitive.
 |true
@@ -291,25 +275,9 @@ cases is specified as part of the `Command` entity for a particular job.
 |file://${java.io.tmpdir}genie/archives/
 |no
 
-|genie.jobs.locations.attachments
-|The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
-doesn't exist (deprecated, see genie.jobs.attachments.* properties)
-|file://${java.io.tmpdir}genie/attachments/
-|no
-
 |genie.jobs.locations.jobs
 |The default root location where job working directories will be placed. Created by system if doesn't exist.
 |file://${java.io.tmpdir}genie/jobs/
-|no
-
-|genie.jobs.max.stdErrSize
-|The maximum number of bytes the job standard error file can grow to before Genie will kill the job
-|8589934592
-|no
-
-|genie.jobs.max.stdOutSize
-|The maximum number of bytes the job standard output file can grow to before Genie will kill the job
-|8589934592
 |no
 
 |genie.jobs.memory.maxSystemMemory
@@ -336,12 +304,6 @@ doesn't exist (deprecated, see genie.jobs.attachments.* properties)
 |A message to return to the users when new job submission is disabled
 |Job submission is currently disabled. Please try again later.
 |yes
-
-|genie.jobs.users.creationEnabled
-|Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
-rights for this to work.
-|false
-|no
 
 |genie.jobs.users.runAsUserEnabled
 |Whether Genie should run the jobs as the user who submitted the job or not. Genie user must have sudo rights for this

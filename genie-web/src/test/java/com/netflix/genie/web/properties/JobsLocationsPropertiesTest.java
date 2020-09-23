@@ -52,9 +52,6 @@ class JobsLocationsPropertiesTest {
             .assertThat(this.properties.getArchives())
             .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/"));
         Assertions
-            .assertThat(this.properties.getAttachments())
-            .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/attachments/"));
-        Assertions
             .assertThat(this.properties.getJobs())
             .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/jobs/"));
     }
@@ -67,16 +64,6 @@ class JobsLocationsPropertiesTest {
         final URI location = URI.create("file:/" + UUID.randomUUID().toString());
         this.properties.setArchives(location);
         Assertions.assertThat(this.properties.getArchives()).isEqualTo(location);
-    }
-
-    /**
-     * Test setting the attachments location.
-     */
-    @Test
-    void canSetAttachmentsLocation() {
-        final URI location = URI.create("file:/" + UUID.randomUUID().toString());
-        this.properties.setAttachments(location);
-        Assertions.assertThat(this.properties.getAttachments()).isEqualTo(location);
     }
 
     /**

@@ -22,11 +22,9 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
-import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
-import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.ArchivedJobService;
@@ -65,10 +63,8 @@ class ServicesAutoConfigurationTest {
                 this.servicesAutoConfiguration.jobsProperties(
                     Mockito.mock(JobsForwardingProperties.class),
                     Mockito.mock(JobsLocationsProperties.class),
-                    Mockito.mock(JobsMaxProperties.class),
                     Mockito.mock(JobsMemoryProperties.class),
                     Mockito.mock(JobsUsersProperties.class),
-                    Mockito.mock(ExponentialBackOffTriggerProperties.class),
                     Mockito.mock(JobsActiveLimitProperties.class)
                 )
             )

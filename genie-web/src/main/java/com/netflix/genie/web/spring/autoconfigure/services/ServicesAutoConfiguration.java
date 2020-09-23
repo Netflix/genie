@@ -23,11 +23,9 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
-import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
-import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
@@ -70,10 +68,8 @@ import java.util.List;
     {
         JobsForwardingProperties.class,
         JobsLocationsProperties.class,
-        JobsMaxProperties.class,
         JobsMemoryProperties.class,
         JobsUsersProperties.class,
-        ExponentialBackOffTriggerProperties.class,
         JobsActiveLimitProperties.class,
         AttachmentServiceProperties.class
     }
@@ -86,10 +82,8 @@ public class ServicesAutoConfiguration {
      *
      * @param forwarding             forwarding properties
      * @param locations              locations properties
-     * @param max                    max properties
      * @param memory                 memory properties
      * @param users                  users properties
-     * @param completionCheckBackOff completion back-off properties
      * @param activeLimit            active limit properties
      * @return a {@code JobsProperties} instance
      */
@@ -97,19 +91,15 @@ public class ServicesAutoConfiguration {
     public JobsProperties jobsProperties(
         final JobsForwardingProperties forwarding,
         final JobsLocationsProperties locations,
-        final JobsMaxProperties max,
         final JobsMemoryProperties memory,
         final JobsUsersProperties users,
-        final ExponentialBackOffTriggerProperties completionCheckBackOff,
         final JobsActiveLimitProperties activeLimit
     ) {
         return new JobsProperties(
             forwarding,
             locations,
-            max,
             memory,
             users,
-            completionCheckBackOff,
             activeLimit
         );
     }

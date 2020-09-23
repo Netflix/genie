@@ -39,24 +39,6 @@ class JobsUsersPropertiesTest {
     }
 
     /**
-     * Make sure the constructor sets defaults.
-     */
-    @Test
-    void canConstruct() {
-        Assertions.assertThat(this.properties.isCreationEnabled()).isFalse();
-        Assertions.assertThat(this.properties.isRunAsUserEnabled()).isFalse();
-    }
-
-    /**
-     * Make sure we can set the creationEnabled field.
-     */
-    @Test
-    void canSetCreationEnabled() {
-        this.properties.setCreationEnabled(true);
-        Assertions.assertThat(this.properties.isCreationEnabled()).isTrue();
-    }
-
-    /**
      * Make sure we can set the run as user field.
      */
     @Test
