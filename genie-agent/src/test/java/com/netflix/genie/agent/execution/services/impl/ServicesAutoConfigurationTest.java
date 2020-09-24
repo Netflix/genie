@@ -87,7 +87,7 @@ class ServicesAutoConfigurationTest {
         @Bean
         ArgumentDelegates.CacheArguments cacheArguments() {
             // Cannot use @TempDir here because static class initialization via annotation
-            final File temp = Files.temporaryFolder();
+            final File temp = Files.newTemporaryFolder();
             final ArgumentDelegates.CacheArguments mock = Mockito.mock(ArgumentDelegates.CacheArguments.class);
             Mockito.when(mock.getCacheDirectory()).thenReturn(temp);
             return mock;

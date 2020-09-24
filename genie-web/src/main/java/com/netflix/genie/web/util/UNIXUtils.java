@@ -126,18 +126,4 @@ public final class UNIXUtils {
             .addArgument(dir);
         executor.execute(commandLine);
     }
-
-    /**
-     * Give write permission to the group owning a given file or directory.
-     *
-     * @param path     the path
-     * @param executor the command executor
-     * @throws IOException if the operation fails
-     */
-    public static void makeDirGroupWritable(final String path, final Executor executor) throws IOException {
-        log.debug("Adding write permissions for the directory {} for the group.", path);
-        final CommandLine commandLIne = new CommandLine(SUDO).addArgument("chmod").addArgument("g+w")
-            .addArgument(path);
-        executor.execute(commandLIne);
-    }
 }

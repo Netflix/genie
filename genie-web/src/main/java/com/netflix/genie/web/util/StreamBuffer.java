@@ -153,7 +153,8 @@ public class StreamBuffer {
                     // Read from current chunk into destination
                     final int leftInCurrentChunk = this.currentChunk.size() - this.currentChunkWatermark;
                     final int bytesRead = Math.min(leftInCurrentChunk, destination.length);
-                    this.currentChunk.copyTo(destination, currentChunkWatermark, 0, bytesRead);
+                    this.currentChunk.substring(currentChunkWatermark, currentChunkWatermark + bytesRead)
+                        .copyTo(destination, 0);
 
                     // Update watermark
                     this.currentChunkWatermark += bytesRead;
