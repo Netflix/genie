@@ -288,7 +288,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         this.waitForDone(id);
 
         this.checkJobStatus(documentationId, id);
-        this.checkJob(documentationId, id, commandArgs, archiveJob);
+        this.checkJob(documentationId, id, commandArgs);
         if (archiveJob) {
             this.checkJobOutput(documentationId, id);
         }
@@ -309,7 +309,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         this.checkJobCommand(documentationId, id);
         this.checkJobApplications(documentationId, id);
         this.checkFindJobs(documentationId, id, JOB_USER);
-        this.checkJobArchive(id, archiveJob);
+        this.checkJobArchive(id);
 
         Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
 
@@ -425,8 +425,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private void checkJob(
         final int documentationId,
         final String id,
-        final List<String> commandArgs,
-        final boolean archiveJob
+        final List<String> commandArgs
     ) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJob/",
@@ -987,26 +986,14 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     private void checkJobArchive(
-        final String id,
-        final boolean jobShouldBeArchived
+        final String id
     ) {
         final Path archiveDirectory = Paths.get(this.jobsLocationsProperties.getArchives()).resolve(id);
         // TODO: This is flipped during V4 migration and should be changed back once clients are fixed
-//        if (jobShouldBeArchived) {
         Assertions.assertThat(Files.exists(archiveDirectory)).isTrue();
         Assertions.assertThat(Files.isDirectory(archiveDirectory)).isTrue();
-//        } else {
-//            Assertions.assertThat(Files.exists(archiveDirectory)).isFalse();
-//        }
     }
 
-//    @Test
-//    public void testSubmitJobMethodTwiceSuccess() throws Exception {
-//        submitAndCheckJob(2, true);
-//        cleanup();
-//        setup();
-//        submitAndCheckJob(3, false);
-//    }
 
     @Test
     void canSubmitJobWithAttachments() throws Exception {

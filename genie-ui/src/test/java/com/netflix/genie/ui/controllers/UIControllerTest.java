@@ -18,8 +18,6 @@
 package com.netflix.genie.ui.controllers;
 
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -52,7 +50,7 @@ class UIControllerTest {
      */
     @Test
     void canGetIndex() {
-        Assert.assertThat(this.controller.getIndex(), Matchers.is("index"));
+        Assertions.assertThat(this.controller.getIndex()).isEqualTo("index");
     }
 
     /**
