@@ -700,11 +700,6 @@
 </a>
 <h3>Class <a href="com/netflix/genie/common/exceptions/GenieBadRequestException.html" title="class in com.netflix.genie.common.exceptions">com.netflix.genie.common.exceptions.GenieBadRequestException</a> extends <a href="com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a> implements Serializable</h3>
 </li>
-<li class="blockList"><a name="com.netflix.genie.common.exceptions.GenieConflictException">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/common/exceptions/GenieConflictException.html" title="class in com.netflix.genie.common.exceptions">com.netflix.genie.common.exceptions.GenieConflictException</a> extends <a href="com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a> implements Serializable</h3>
-</li>
 <li class="blockList"><a name="com.netflix.genie.common.exceptions.GenieException">
 <!--   -->
 </a>
@@ -2206,82 +2201,6 @@
 <li class="blockList">
 <h2 title="Package">Package&nbsp;com.netflix.genie.web.events</h2>
 <ul class="blockList">
-<li class="blockList"><a name="com.netflix.genie.web.events.BaseJobEvent">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/web/events/BaseJobEvent.html" title="class in com.netflix.genie.web.events">com.netflix.genie.web.events.BaseJobEvent</a> extends org.springframework.context.ApplicationEvent implements Serializable</h3>
-<dl class="nameValue">
-<dt>serialVersionUID:</dt>
-<dd>8635146103611268924L</dd>
-</dl>
-<ul class="blockList">
-<li class="blockList">
-<h3>Serialized Fields</h3>
-<ul class="blockList">
-<li class="blockListLast">
-<h4>id</h4>
-<pre>java.lang.String id</pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="blockList"><a name="com.netflix.genie.web.events.JobFinishedEvent">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/web/events/JobFinishedEvent.html" title="class in com.netflix.genie.web.events">com.netflix.genie.web.events.JobFinishedEvent</a> extends <a href="com/netflix/genie/web/events/BaseJobEvent.html" title="class in com.netflix.genie.web.events">BaseJobEvent</a> implements Serializable</h3>
-<ul class="blockList">
-<li class="blockList">
-<h3>Serialized Fields</h3>
-<ul class="blockList">
-<li class="blockList">
-<h4>reason</h4>
-<pre><a href="com/netflix/genie/web/events/JobFinishedReason.html" title="enum in com.netflix.genie.web.events">JobFinishedReason</a> reason</pre>
-</li>
-<li class="blockListLast">
-<h4>message</h4>
-<pre>java.lang.String message</pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="blockList"><a name="com.netflix.genie.web.events.JobScheduledEvent">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/web/events/JobScheduledEvent.html" title="class in com.netflix.genie.web.events">com.netflix.genie.web.events.JobScheduledEvent</a> extends <a href="com/netflix/genie/web/events/BaseJobEvent.html" title="class in com.netflix.genie.web.events">BaseJobEvent</a> implements Serializable</h3>
-<ul class="blockList">
-<li class="blockList">
-<h3>Serialized Fields</h3>
-<ul class="blockList">
-<li class="blockList">
-<h4>task</h4>
-<pre>java.util.concurrent.Future&lt;V&gt; task</pre>
-</li>
-<li class="blockListLast">
-<h4>memory</h4>
-<pre>int memory</pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="blockList"><a name="com.netflix.genie.web.events.JobStartedEvent">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/web/events/JobStartedEvent.html" title="class in com.netflix.genie.web.events">com.netflix.genie.web.events.JobStartedEvent</a> extends <a href="com/netflix/genie/web/events/BaseJobEvent.html" title="class in com.netflix.genie.web.events">BaseJobEvent</a> implements Serializable</h3>
-<ul class="blockList">
-<li class="blockList">
-<h3>Serialized Fields</h3>
-<ul class="blockList">
-<li class="blockListLast">
-<h4>jobExecution</h4>
-<pre><a href="com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a> jobExecution</pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="blockList"><a name="com.netflix.genie.web.events.JobStateChangeEvent">
 <!--   -->
 </a>
@@ -2301,22 +2220,6 @@
 <li class="blockListLast">
 <h4>newStatus</h4>
 <pre><a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a> newStatus</pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="blockList"><a name="com.netflix.genie.web.events.KillJobEvent">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/web/events/KillJobEvent.html" title="class in com.netflix.genie.web.events">com.netflix.genie.web.events.KillJobEvent</a> extends <a href="com/netflix/genie/web/events/BaseJobEvent.html" title="class in com.netflix.genie.web.events">BaseJobEvent</a> implements Serializable</h3>
-<ul class="blockList">
-<li class="blockList">
-<h3>Serialized Fields</h3>
-<ul class="blockList">
-<li class="blockListLast">
-<h4>reason</h4>
-<pre>java.lang.String reason</pre>
 </li>
 </ul>
 </li>

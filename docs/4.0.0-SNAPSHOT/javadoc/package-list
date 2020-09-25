@@ -78,9 +78,6 @@ com.netflix.genie.web.events
 com.netflix.genie.web.exceptions.checked
 com.netflix.genie.web.health
 com.netflix.genie.web.introspection
-com.netflix.genie.web.jobs
-com.netflix.genie.web.jobs.workflow
-com.netflix.genie.web.jobs.workflow.impl
 com.netflix.genie.web.properties
 com.netflix.genie.web.properties.converters
 com.netflix.genie.web.resources.writers
@@ -106,7 +103,6 @@ com.netflix.genie.web.spring.autoconfigure.data
 com.netflix.genie.web.spring.autoconfigure.events
 com.netflix.genie.web.spring.autoconfigure.health
 com.netflix.genie.web.spring.autoconfigure.introspection
-com.netflix.genie.web.spring.autoconfigure.jobs
 com.netflix.genie.web.spring.autoconfigure.properties.converters
 com.netflix.genie.web.spring.autoconfigure.scripts
 com.netflix.genie.web.spring.autoconfigure.selectors
@@ -116,7 +112,6 @@ com.netflix.genie.web.spring.autoconfigure.tasks.leader
 com.netflix.genie.web.spring.autoconfigure.tasks.node
 com.netflix.genie.web.spring.processors
 com.netflix.genie.web.tasks
-com.netflix.genie.web.tasks.job
 com.netflix.genie.web.tasks.leader
 com.netflix.genie.web.tasks.node
 com.netflix.genie.web.util

@@ -112,13 +112,13 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillServiceV4.html" title="interface in com.netflix.genie.web.services">JobKillServiceV4</a>, io.grpc.BindableService</dd>
+<dd><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a>, io.grpc.BindableService</dd>
 </dl>
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">GRpcJobKillServiceImpl</span>
 extends com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase
-implements <a href="../../../../../../../../../com/netflix/genie/web/services/JobKillServiceV4.html" title="interface in com.netflix.genie.web.services">JobKillServiceV4</a></pre>
+implements <a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></pre>
 <div class="block">Service to kill agent jobs.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -163,8 +163,8 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-">killJob</a></span>(@NotBlank(message="No job id entered. Unable to kill job.") java.lang.String&nbsp;jobId,
-       @NotBlank(message="No reason provided.") java.lang.String&nbsp;reason)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-">killJob</a></span>(java.lang.String&nbsp;jobId,
+       java.lang.String&nbsp;reason)</code>
 <div class="block">Kill the job with the given id if possible.</div>
 </td>
 </tr>
@@ -250,15 +250,13 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 <ul class="blockListLast">
 <li class="blockList">
 <h4>killJob</h4>
-<pre>public&nbsp;void&nbsp;killJob(@NotBlank(message="No job id entered. Unable to kill job.")
-                    @NotBlank(message="No job id entered. Unable to kill job.") java.lang.String&nbsp;jobId,
-                    @NotBlank(message="No reason provided.")
-                    @NotBlank(message="No reason provided.") java.lang.String&nbsp;reason)
+<pre>public&nbsp;void&nbsp;killJob(java.lang.String&nbsp;jobId,
+                    java.lang.String&nbsp;reason)
              throws <a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Kill the job with the given id if possible.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillServiceV4.html#killJob-java.lang.String-java.lang.String-">killJob</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillServiceV4.html" title="interface in com.netflix.genie.web.services">JobKillServiceV4</a></code></dd>
+<dd><code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html#killJob-java.lang.String-java.lang.String-">killJob</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - id of job to kill</dd>
 <dd><code>reason</code> - brief reason for requesting the job be killed</dd>

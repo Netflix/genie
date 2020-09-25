@@ -47,8 +47,8 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/web/services/impl/JobKillServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html" target="_top">Frames</a></li>
@@ -137,13 +137,11 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.web.agent.services.AgentRoutingService-">JobDirectoryServerServiceImpl</a></span>(org.springframework.core.io.ResourceLoader&nbsp;resourceLoader,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-">JobDirectoryServerServiceImpl</a></span>(org.springframework.core.io.ResourceLoader&nbsp;resourceLoader,
                              <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                              <a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a>&nbsp;agentFileStreamService,
                              <a href="../../../../../../com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services">ArchivedJobService</a>&nbsp;archivedJobService,
                              io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry,
-                             <a href="../../../../../../com/netflix/genie/web/services/JobFileService.html" title="interface in com.netflix.genie.web.services">JobFileService</a>&nbsp;jobFileService,
-                             <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService,
                              <a href="../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -195,7 +193,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.web.agent.services.AgentRoutingService-">
+<a name="JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -206,8 +204,6 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
                                      <a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a>&nbsp;agentFileStreamService,
                                      <a href="../../../../../../com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services">ArchivedJobService</a>&nbsp;archivedJobService,
                                      io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry,
-                                     <a href="../../../../../../com/netflix/genie/web/services/JobFileService.html" title="interface in com.netflix.genie.web.services">JobFileService</a>&nbsp;jobFileService,
-                                     <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService,
                                      <a href="../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService)</pre>
 <div class="block">Constructor.</div>
 <dl>
@@ -216,10 +212,8 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>agentFileStreamService</code> - The service providing file manifest for active agent jobs</dd>
 <dd><code>archivedJobService</code> - The <a href="../../../../../../com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services"><code>ArchivedJobService</code></a> implementation to use to get archived
-                                           job data</dd>
+                               job data</dd>
 <dd><code>meterRegistry</code> - The meter registry used to keep track of metrics</dd>
-<dd><code>jobFileService</code> - The service responsible for managing the job directory for V3 Jobs</dd>
-<dd><code>jobDirectoryManifestCreatorService</code> - The job directory manifest service</dd>
 <dd><code>agentRoutingService</code> - The agent routing service</dd>
 </dl>
 </li>
@@ -288,8 +282,8 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/web/services/impl/JobKillServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html" target="_top">Frames</a></li>
