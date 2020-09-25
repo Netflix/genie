@@ -27,7 +27,6 @@ import spock.lang.Specification
 class JpaRepositoriesSpec extends Specification {
 
     def "can construct"() {
-        def agentRepo = Mock(JpaAgentConnectionRepository)
         def applicationRepo = Mock(JpaApplicationRepository)
         def clusterRepo = Mock(JpaClusterRepository)
         def commandRepo = Mock(JpaCommandRepository)
@@ -38,7 +37,6 @@ class JpaRepositoriesSpec extends Specification {
 
         when:
         def repositories = new JpaRepositories(
-            agentRepo,
             applicationRepo,
             clusterRepo,
             commandRepo,
@@ -49,7 +47,6 @@ class JpaRepositoriesSpec extends Specification {
         )
 
         then:
-        repositories.getAgentConnectionRepository() == agentRepo
         repositories.getApplicationRepository() == applicationRepo
         repositories.getClusterRepository() == clusterRepo
         repositories.getCommandRepository() == commandRepo

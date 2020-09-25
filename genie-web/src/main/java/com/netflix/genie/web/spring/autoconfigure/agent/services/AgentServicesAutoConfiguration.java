@@ -29,9 +29,8 @@ import com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceI
 import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
-import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
+import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceSingleNodeImpl;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentConfigurationProperties;
 import com.netflix.genie.web.properties.AgentConnectionTrackingServiceProperties;
 import com.netflix.genie.web.properties.AgentRoutingServiceProperties;
@@ -118,11 +117,10 @@ public class AgentServicesAutoConfiguration {
 
     /**
      * Get an implementation of {@link AgentRoutingService} if one hasn't already been defined.
-     * This bean is created if Zookeeper is disabled. This implementation stores connections using persistence service.
+     * This bean is created if Zookeeper is disabled (single-node Genie deployments and tests).
      *
-     * @param persistenceService The persistence service to use for agent connections
-     * @param genieHostInfo      The local genie host information
-     * @return A {@link AgentRoutingServiceImpl} instance
+     * @param genieHostInfo The local genie host information
+     * @return A {@link AgentRoutingServiceSingleNodeImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(
@@ -131,11 +129,10 @@ public class AgentServicesAutoConfiguration {
             ServiceDiscovery.class
         }
     )
-    public AgentRoutingService agentRoutingServicePersistence(
-        final PersistenceService persistenceService,
+    public AgentRoutingService agentRoutingServiceSingleNodeImpl(
         final GenieHostInfo genieHostInfo
     ) {
-        return new AgentRoutingServiceImpl(persistenceService, genieHostInfo);
+        return new AgentRoutingServiceSingleNodeImpl(genieHostInfo);
     }
 
     /**
@@ -148,7 +145,7 @@ public class AgentServicesAutoConfiguration {
      * @param listenableCuratorConnectionState the connection state listenable
      * @param registry                         The metrics registry
      * @param properties                       The service properties
-     * @return A {@link AgentRoutingServiceImpl} instance
+     * @return A {@link AgentRoutingServiceCuratorDiscoveryImpl} instance
      */
     @Bean
     @ConditionalOnBean(ServiceDiscovery.class)

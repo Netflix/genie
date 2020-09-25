@@ -63,7 +63,6 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeExcept
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.data.services.impl.jpa.converters.EntityV3DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.converters.EntityV4DtoConverters;
-import com.netflix.genie.web.data.services.impl.jpa.entities.AgentConnectionEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.BaseEntity;
@@ -86,7 +85,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobExecu
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
-import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaBaseRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
@@ -193,7 +191,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
 
     private final EntityManager entityManager;
 
-    private final JpaAgentConnectionRepository agentConnectionRepository;
     private final JpaApplicationRepository applicationRepository;
     private final JpaClusterRepository clusterRepository;
     private final JpaCommandRepository commandRepository;
@@ -212,7 +209,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final JpaRepositories jpaRepositories
     ) {
         this.entityManager = entityManager;
-        this.agentConnectionRepository = jpaRepositories.getAgentConnectionRepository();
         this.applicationRepository = jpaRepositories.getApplicationRepository();
         this.clusterRepository = jpaRepositories.getClusterRepository();
         this.commandRepository = jpaRepositories.getCommandRepository();
@@ -2226,46 +2222,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     }
     //endregion
 
-    //region Agent Connection APIs
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveAgentConnection(@NotBlank final String jobId, @NotBlank final String hostname) {
-        log.debug("[saveAgentConnection] Called for jobId {} and hostname {}", jobId, hostname);
-        final Optional<AgentConnectionEntity> existingEntity = this.getAgentConnectionEntity(jobId);
-        if (existingEntity.isPresent()) {
-            existingEntity.get().setServerHostname(hostname);
-        } else {
-            this.agentConnectionRepository.save(new AgentConnectionEntity(jobId, hostname));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeAgentConnection(@NotBlank final String jobId, @NotBlank final String hostname) {
-        log.debug("[removeAgentConnection] Called for jobId {} and hostname {}", jobId, hostname);
-        final Optional<AgentConnectionEntity> existingEntity = this.getAgentConnectionEntity(jobId);
-        if (existingEntity.isPresent() && existingEntity.get().getServerHostname().equals(hostname)) {
-            this.agentConnectionRepository.delete(existingEntity.get());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<String> lookupAgentConnectionServer(@NotBlank final String jobId) {
-        log.debug("[lookupAgentConnectionServer] Called for job id {}", jobId);
-        return this.getAgentConnectionEntity(jobId).map(AgentConnectionEntity::getServerHostname);
-    }
-
-    //endregion
-
     //region Tag APIs
 
     /**
@@ -2327,10 +2283,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         return this.jobRepository
             .findByUniqueId(id)
             .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"));
-    }
-
-    private Optional<AgentConnectionEntity> getAgentConnectionEntity(final String jobId) {
-        return this.agentConnectionRepository.findByJobId(jobId);
     }
 
     private FileEntity createOrGetFileEntity(final String file) {

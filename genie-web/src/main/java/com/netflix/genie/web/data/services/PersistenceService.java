@@ -1075,35 +1075,6 @@ public interface PersistenceService {
     ) throws NotFoundException;
     //endregion
 
-    //region Agent Connection APIs
-
-    /**
-     * Store a new connection currently active from the given agent to the given node.
-     *
-     * @param jobId    the id of a job the agent is running
-     * @param hostname the server owning the connection
-     */
-    void saveAgentConnection(@NotBlank String jobId, @NotBlank String hostname);
-
-    /**
-     * Remove an existing connection currently active from the given agent to the local node.
-     * The entity won't be deleted if it was already modified by a different server.
-     *
-     * @param jobId    the id of a job the agent is running
-     * @param hostname the hostname expected to be associated to the connection
-     */
-    void removeAgentConnection(@NotBlank String jobId, @NotBlank String hostname);
-
-    /**
-     * Lookup the hostname/address of the server with an active connection to a given agent.
-     *
-     * @param jobId the id of a job the agent is running
-     * @return the server hostname or empty
-     */
-    Optional<String> lookupAgentConnectionServer(@NotBlank String jobId);
-
-    //endregion
-
     //region Tag APIs
 
     /**
