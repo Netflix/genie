@@ -24,7 +24,6 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
@@ -135,9 +134,6 @@ abstract class RestControllerIntegrationTestBase {
     protected JpaCriterionRepository criterionRepository;
 
     @Autowired
-    protected JpaAgentConnectionRepository agentConnectionRepository;
-
-    @Autowired
     protected Environment environment;
 
     protected int port;
@@ -176,7 +172,6 @@ abstract class RestControllerIntegrationTestBase {
         this.criterionRepository.deleteAll();
         this.fileRepository.deleteAll();
         this.tagRepository.deleteAll();
-        this.agentConnectionRepository.deleteAll();
 
         this.requestSpecification = new RequestSpecBuilder()
             .addFilter(

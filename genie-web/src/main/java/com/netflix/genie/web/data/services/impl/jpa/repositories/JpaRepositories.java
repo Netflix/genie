@@ -29,7 +29,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class JpaRepositories {
-    private final JpaAgentConnectionRepository agentConnectionRepository;
     private final JpaApplicationRepository applicationRepository;
     private final JpaClusterRepository clusterRepository;
     private final JpaCommandRepository commandRepository;

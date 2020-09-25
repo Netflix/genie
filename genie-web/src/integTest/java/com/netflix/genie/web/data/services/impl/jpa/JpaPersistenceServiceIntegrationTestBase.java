@@ -19,7 +19,6 @@ package com.netflix.genie.web.data.services.impl.jpa;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
-import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
@@ -89,9 +88,6 @@ class JpaPersistenceServiceIntegrationTestBase {
 
     @Autowired
     protected JpaTagRepository tagRepository;
-
-    @Autowired
-    protected JpaAgentConnectionRepository agentConnectionRepository;
 
     @Autowired
     protected JpaCriterionRepository criterionRepository;

@@ -19,7 +19,6 @@ package com.netflix.genie.web.spring.autoconfigure.data;
 
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
@@ -58,7 +57,6 @@ class DataAutoConfigurationTest {
     void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
-                Assertions.assertThat(context).hasSingleBean(JpaAgentConnectionRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaApplicationRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaClusterRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaCommandRepository.class);

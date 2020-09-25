@@ -826,12 +826,4 @@
     <jobs_applications job_id="5" application_id="1" application_order="0"/>
     <jobs_applications job_id="5" application_id="2" application_order="1"/>
 
-    <agent_connections
-        created="2016-02-24 01:48:00"
-        updated="2016-02-24 02:59:00"
-        entity_version="1"
-        job_id="agentJob2"
-        server_hostname="b.netflix.com"
-    />
-
 </dataset>

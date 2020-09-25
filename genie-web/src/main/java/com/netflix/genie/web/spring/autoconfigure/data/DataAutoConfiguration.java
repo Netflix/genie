@@ -20,7 +20,6 @@ package com.netflix.genie.web.spring.autoconfigure.data;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
@@ -63,7 +62,6 @@ public class DataAutoConfiguration {
     /**
      * Provide a {@link JpaRepositories} container instance if one wasn't already provided.
      *
-     * @param agentConnectionRepository The {@link JpaAgentConnectionRepository} instance
      * @param applicationRepository     The {@link JpaApplicationRepository} instance
      * @param clusterRepository         The {@link JpaClusterRepository} instance
      * @param commandRepository         The {@link JpaCommandRepository} instance
@@ -76,7 +74,6 @@ public class DataAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(JpaRepositories.class)
     public JpaRepositories genieJpaRepositories(
-        final JpaAgentConnectionRepository agentConnectionRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository,
@@ -86,7 +83,6 @@ public class DataAutoConfiguration {
         final JpaTagRepository tagRepository
     ) {
         return new JpaRepositories(
-            agentConnectionRepository,
             applicationRepository,
             clusterRepository,
             commandRepository,
