@@ -288,6 +288,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |ScriptManager
 |status, exceptionClass, scriptUri
 
+|genie.services.agentConfiguration.reloadProperties.timer
+|Time taken to refresh the set of properties forwarded to bootstrapping agents
+|nanoseconds
+|AgentConfigurationServiceImpl
+|status, exceptionClass, numProperties
+
 |genie.services.agentJob.handshake.counter
 |Counter for calls to the 'handshake' protocol of the Genie Agent Job Service
 |count

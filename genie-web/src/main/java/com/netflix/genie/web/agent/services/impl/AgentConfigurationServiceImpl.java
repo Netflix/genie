@@ -23,6 +23,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.properties.AgentConfigurationProperties;
+import com.netflix.genie.web.util.MetricsUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,6 +38,7 @@ import org.springframework.core.env.StandardEnvironment;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -49,9 +53,12 @@ import java.util.regex.Pattern;
 public class AgentConfigurationServiceImpl implements AgentConfigurationService {
 
     private static final String AGENT_PROPERTIES_CACHE_KEY = "agent-properties";
+    private static final String RELOAD_PROPERTIES_TIMER = "genie.services.agentConfiguration.reloadProperties.timer";
+    private static final String PROPERTIES_COUNT_TAG = "numProperties";
 
     private final AgentConfigurationProperties agentConfigurationProperties;
     private final Environment environment;
+    private final MeterRegistry registry;
     private final Pattern agentPropertiesPattern;
     private final LoadingCache<String, Map<String, String>> cache;
 
@@ -59,14 +66,17 @@ public class AgentConfigurationServiceImpl implements AgentConfigurationService 
      * Constructor.
      *
      * @param agentConfigurationProperties the properties
-     * @param environment the environment
+     * @param environment                  the environment
+     * @param registry                     the metrics registry
      */
     public AgentConfigurationServiceImpl(
         final AgentConfigurationProperties agentConfigurationProperties,
-        final Environment environment
+        final Environment environment,
+        final MeterRegistry registry
     ) {
         this.agentConfigurationProperties = agentConfigurationProperties;
         this.environment = environment;
+        this.registry = registry;
 
         this.agentPropertiesPattern = Pattern.compile(
             this.agentConfigurationProperties.getAgentPropertiesFilterPattern(),
@@ -92,10 +102,26 @@ public class AgentConfigurationServiceImpl implements AgentConfigurationService 
 
 
     private Map<String, String> loadProperties(@NonNull final String propertiesKey) {
-        if (AGENT_PROPERTIES_CACHE_KEY.equals(propertiesKey)) {
-            return reloadAgentProperties();
+        if (!AGENT_PROPERTIES_CACHE_KEY.equals(propertiesKey)) {
+            throw new IllegalArgumentException("Unknown key to load: " + propertiesKey);
         }
-        throw new IllegalArgumentException("Unknown key to load: " + propertiesKey);
+
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
+        Integer numProperties = null;
+        try {
+            final Map<String, String> properties = reloadAgentProperties();
+            MetricsUtils.addSuccessTags(tags);
+            numProperties = properties.size();
+            return properties;
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
+        } finally {
+            tags.add(Tag.of(PROPERTIES_COUNT_TAG, String.valueOf(numProperties)));
+            this.registry.timer(RELOAD_PROPERTIES_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
     }
 
     private Map<String, String> reloadAgentProperties() {
