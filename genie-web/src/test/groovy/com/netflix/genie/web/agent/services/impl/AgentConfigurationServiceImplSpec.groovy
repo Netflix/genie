@@ -19,6 +19,8 @@ package com.netflix.genie.web.agent.services.impl
 
 import com.netflix.genie.web.agent.services.AgentConfigurationService
 import com.netflix.genie.web.properties.AgentConfigurationProperties
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Timer
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.Environment
 import org.springframework.core.env.MapPropertySource
@@ -29,15 +31,19 @@ class AgentConfigurationServiceImplSpec extends Specification {
     AgentConfigurationProperties props
     ConfigurableEnvironment env
     MutablePropertySources propertySources
+    MeterRegistry registry
+    Timer timer
 
     void setup() {
         this.props = new AgentConfigurationProperties()
         this.env = Mock(ConfigurableEnvironment)
+        this.registry = Mock(MeterRegistry)
+        this.timer = Mock(Timer)
         this.propertySources = new MutablePropertySources()
     }
 
     def "Result is cached"() {
-        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env)
+        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env, registry)
 
         then:
 
@@ -46,6 +52,8 @@ class AgentConfigurationServiceImplSpec extends Specification {
 
         then:
         1 * env.getPropertySources() >> propertySources
+        1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
+        1 * timer.record(_, _)
         agentProperties.isEmpty()
 
         when:
@@ -53,17 +61,20 @@ class AgentConfigurationServiceImplSpec extends Specification {
 
         then:
         0 * env.getPropertySources() >> propertySources
+        0 * registry.timer(_, _)
     }
 
     def "Fallback to standard environment during load"() {
         Environment env = Mock(Environment)
 
         when:
-        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env)
+        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env, registry)
         Map<String, String> agentProperties = service.getAgentProperties()
 
         then:
         _ * env.getProperty(_ as String) >> UUID.randomUUID().toString()
+        1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
+        1 * timer.record(_, _)
         agentProperties != null
     }
 
@@ -94,7 +105,7 @@ class AgentConfigurationServiceImplSpec extends Specification {
         propertySources.addFirst(new MapPropertySource("map2", map2))
 
         when:
-        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env)
+        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env, registry)
         Map<String, String> agentProperties = service.getAgentProperties()
 
         then:
@@ -103,6 +114,8 @@ class AgentConfigurationServiceImplSpec extends Specification {
         1 * env.getProperty("agent.bar") >> "Bar"
         1 * env.getProperty("agent.null") >> null
         1 * env.getProperty("agent.empty") >> " "
+        1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
+        1 * timer.record(_, _)
         agentProperties == expectedProperties
     }
 }

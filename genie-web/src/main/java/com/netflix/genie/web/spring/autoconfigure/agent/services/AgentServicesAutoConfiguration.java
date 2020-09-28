@@ -188,18 +188,16 @@ public class AgentServicesAutoConfiguration {
      *
      * @param agentConfigurationProperties the service properties
      * @param environment                  the environment
+     * @param registry                     the metrics registry
      * @return a {@link AgentConfigurationService} instance
      */
     @Bean
     @ConditionalOnMissingBean(AgentConfigurationService.class)
     public AgentConfigurationServiceImpl agentConfigurationService(
         final AgentConfigurationProperties agentConfigurationProperties,
-        final Environment environment
+        final Environment environment,
+        final MeterRegistry registry
     ) {
-        final AgentConfigurationServiceImpl agentConfigurationService =
-            new AgentConfigurationServiceImpl(agentConfigurationProperties, environment);
-        // Warm the cache
-        agentConfigurationService.getAgentProperties();
-        return agentConfigurationService;
+        return new AgentConfigurationServiceImpl(agentConfigurationProperties, environment, registry);
     }
 }
