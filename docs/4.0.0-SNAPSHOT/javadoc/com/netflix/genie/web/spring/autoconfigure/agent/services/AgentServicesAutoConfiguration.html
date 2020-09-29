@@ -153,8 +153,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">agentConfigurationService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
-                         org.springframework.core.env.Environment&nbsp;environment)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">agentConfigurationService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
+                         org.springframework.core.env.Environment&nbsp;environment,
+                         io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
 </td>
 </tr>
@@ -196,8 +197,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServicePersistence-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingServicePersistence</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
-                              <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceSingleNodeImpl-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingServiceSingleNodeImpl</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
@@ -289,24 +289,22 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentRoutingServicePersistence-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">
+<a name="agentRoutingServiceSingleNodeImpl-com.netflix.genie.common.internal.util.GenieHostInfo-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>agentRoutingServicePersistence</h4>
+<h4>agentRoutingServiceSingleNodeImpl</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value={<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService.class</a>,org.apache.curator.x.discovery.ServiceDiscovery.class})
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingServicePersistence(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
-                                                                                                                                                                                    <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingServiceSingleNodeImpl(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.
- This bean is created if Zookeeper is disabled. This implementation stores connections using persistence service.</div>
+ This bean is created if Zookeeper is disabled (single-node Genie deployments and tests).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>persistenceService</code> - The persistence service to use for agent connections</dd>
 <dd><code>genieHostInfo</code> - The local genie host information</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentRoutingServiceImpl</code></a> instance</dd>
+<dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentRoutingServiceSingleNodeImpl</code></a> instance</dd>
 </dl>
 </li>
 </ul>
@@ -337,7 +335,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <dd><code>registry</code> - The metrics registry</dd>
 <dd><code>properties</code> - The service properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentRoutingServiceImpl</code></a> instance</dd>
+<dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></a> instance</dd>
 </dl>
 </li>
 </ul>
@@ -360,7 +358,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">
+<a name="agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -369,12 +367,14 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService.class</a>)
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a>&nbsp;agentConfigurationService(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
-                                                                                                                                       org.springframework.core.env.Environment&nbsp;environment)</pre>
+                                                                                                                                       org.springframework.core.env.Environment&nbsp;environment,
+                                                                                                                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentConfigurationProperties</code> - the service properties</dd>
 <dd><code>environment</code> - the environment</dd>
+<dd><code>registry</code> - the metrics registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> instance</dd>
 </dl>

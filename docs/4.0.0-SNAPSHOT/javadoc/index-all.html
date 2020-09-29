@@ -384,7 +384,7 @@
 <dd>
 <div class="block">Service that provides agent runtime configuration (i.e.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">agentConfigurationService(AgentConfigurationProperties, Environment)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">agentConfigurationService(AgentConfigurationProperties, Environment, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
 </dd>
@@ -393,22 +393,10 @@
 <div class="block">This implementation of <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> forwards properties set on the server that match a given
  set of regular expressions, plus any additional ones specified in configuration.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">AgentConfigurationServiceImpl(AgentConfigurationProperties, Environment)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">AgentConfigurationServiceImpl(AgentConfigurationProperties, Environment, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><span class="typeNameLink">AgentConnectionEntity</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/entities/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.entities</a></dt>
-<dd>
-<div class="block">Agent Connection Entity.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity.html#AgentConnectionEntity-java.lang.String-java.lang.String-">AgentConnectionEntity(String, String)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AgentConnectionEntity</a></dt>
-<dd>
-<div class="block">Constructor.</div>
-</dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><span class="typeNameLink">AgentConnectionEntity_</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/entities/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.entities</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html#AgentConnectionEntity_--">AgentConnectionEntity_()</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AgentConnectionEntity_</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services"><span class="typeNameLink">AgentConnectionTrackingService</span></a> - Interface in <a href="com/netflix/genie/web/agent/services/package-summary.html">com.netflix.genie.web.agent.services</a></dt>
 <dd>
 <div class="block">Tracks active connections and heartbeats coming from agents actively executing a job.</div>
@@ -688,24 +676,24 @@
 <dd>
 <div class="block">Payload for typed <code>ServiceDiscovery</code>.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><span class="typeNameLink">AgentRoutingServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/agent/services/impl/package-summary.html">com.netflix.genie.web.agent.services.impl</a></dt>
-<dd>
-<div class="block">Implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a>.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#AgentRoutingServiceImpl-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">AgentRoutingServiceImpl(PersistenceService, GenieHostInfo)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
-<dd>
-<div class="block">Constructor.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServicePersistence-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingServicePersistence(PersistenceService, GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
-<dd>
-<div class="block">Get an implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AgentRoutingServiceProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
 <div class="block">Properties for <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentRoutingServiceProperties.html#AgentRoutingServiceProperties--">AgentRoutingServiceProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentRoutingServiceProperties.html" title="class in com.netflix.genie.web.properties">AgentRoutingServiceProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><span class="typeNameLink">AgentRoutingServiceSingleNodeImpl</span></a> - Class in <a href="com/netflix/genie/web/agent/services/impl/package-summary.html">com.netflix.genie.web.agent.services.impl</a></dt>
+<dd>
+<div class="block">Implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> that assumes a single Genie node and tracks connections in-memory.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#AgentRoutingServiceSingleNodeImpl-com.netflix.genie.common.internal.util.GenieHostInfo-">AgentRoutingServiceSingleNodeImpl(GenieHostInfo)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceSingleNodeImpl-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingServiceSingleNodeImpl(GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dd>
+<div class="block">Get an implementation of <a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints"><span class="typeNameLink">AgentRpcEndpointsAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/package-summary.html">com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints</a></dt>
 <dd>
 <div class="block">Configures various gRPC services and related beans if gRPC functionality is enabled.</div>
@@ -2633,10 +2621,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/converters/URIPropertyConverter.html#convert-java.lang.String-">convert(String)</a></span> - Method in class com.netflix.genie.web.properties.converters.<a href="com/netflix/genie/web/properties/converters/URIPropertyConverter.html" title="class in com.netflix.genie.web.properties.converters">URIPropertyConverter</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html#convertToDatabaseColumn-com.fasterxml.jackson.databind.JsonNode-">convertToDatabaseColumn(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html#convertToEntityAttribute-java.lang.String-">convertToEntityAttribute(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html#countByServerHostnameEquals-java.lang.String-">countByServerHostnameEquals(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaAgentConnectionRepository</a></dt>
-<dd>
-<div class="block">Find the number of agents currently connected to the given server identified by <code>serverHostName</code>.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#countJobsByUserAndStatusIn-java.lang.String-java.util.Set-">countJobsByUserAndStatusIn(String, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block">Count all jobs that belong to a given user and are in any of the given states.</div>
@@ -2997,10 +2981,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn(Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaTagRepository</a></dt>
 <dd>
 <div class="block">Delete all tags from the database whose ids are in the supplied set.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html#deleteByServerHostnameEquals-java.lang.String-">deleteByServerHostnameEquals(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaAgentConnectionRepository</a></dt>
-<dd>
-<div class="block">Delete all rows associated with a given server identified by <code>serverHostName</code>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/ClusterService.html#deleteCluster-java.lang.String-">deleteCluster(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/ClusterService.html" title="interface in com.netflix.genie.client.apis">ClusterService</a></dt>
 <dd>
@@ -3754,10 +3734,6 @@
 <dd>
 <div class="block">Find file entities where the file value is in the given set of files.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html#findByJobId-java.lang.String-">findByJobId(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaAgentConnectionRepository</a></dt>
-<dd>
-<div class="block">Find entity by jobId.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html#findByTag-java.lang.String-">findByTag(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaTagRepository</a></dt>
 <dd>
 <div class="block">Find a tag by its unique tag value.</div>
@@ -4423,7 +4399,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#genieJpaRepositories-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCriterionRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository-">genieJpaRepositories(JpaAgentConnectionRepository, JpaApplicationRepository, JpaClusterRepository, JpaCommandRepository, JpaCriterionRepository, JpaFileRepository, JpaJobRepository, JpaTagRepository)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#genieJpaRepositories-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCriterionRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository-">genieJpaRepositories(JpaApplicationRepository, JpaClusterRepository, JpaCommandRepository, JpaCriterionRepository, JpaFileRepository, JpaJobRepository, JpaTagRepository)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories"><code>JpaRepositories</code></a> container instance if one wasn't already provided.</div>
 </dd>
@@ -5730,7 +5706,7 @@
 <dd>
 <div class="block">Look up the hostname of the Genie node currently handling the agent connection for a given job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#getHostnameForAgentConnection-java.lang.String-">getHostnameForAgentConnection(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#getHostnameForAgentConnection-java.lang.String-">getHostnameForAgentConnection(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
 <dd>
 <div class="block">Look up the hostname of the Genie node currently handling the agent connection for a given job.</div>
 </dd>
@@ -7217,7 +7193,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#handleClientConnected-java.lang.String-">handleClientConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#handleClientConnected-java.lang.String-">handleClientConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#handleClientConnected-java.lang.String-">handleClientConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
 <dd>
 <div class="block">Handle a new agent connection.</div>
 </dd>
@@ -7227,7 +7203,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
 <dd>
 <div class="block">Handle connected agent disconnection.</div>
 </dd>
@@ -7597,7 +7573,7 @@
 <dd>
 <div class="block">Whether the agent executing a given job is currently connected.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#isAgentConnected-java.lang.String-">isAgentConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#isAgentConnected-java.lang.String-">isAgentConnected(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
 <dd>
 <div class="block">Whether the agent executing a given job is currently connected.</div>
 </dd>
@@ -7609,7 +7585,7 @@
 <dd>
 <div class="block">Tells wether the agent running a given job is connected to the local node.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
 <dd>
 <div class="block">Tells wether the agent running a given job is connected to the local node.</div>
 </dd>
@@ -7781,8 +7757,6 @@
 <dd>
 <div class="block">Job completed successfully.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html#JOB_ID">JOB_ID</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AgentConnectionEntity_</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#JOB_ID_PLACEHOLDER">JOB_ID_PLACEHOLDER</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
 <dd>
 <div class="block">Placeholder for job id in command-line-template.</div>
@@ -8133,8 +8107,6 @@
 <dd>
 <div class="block">Compose the path to the genie logs directory inside a job directory.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html#jobId">jobId</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AgentConnectionEntity_</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/exceptions/JobIdUnavailableException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">JobIdUnavailableException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/exceptions/package-summary.html">com.netflix.genie.agent.execution.exceptions</a></dt>
 <dd>
 <div class="block">Exception thrown by AgentJobService when trying to reserve an ID that has already been used.</div>
@@ -8668,10 +8640,6 @@
 <div class="block">Given an ordered list of command line arguments join them back together as a space delimited String where
  each argument is wrapped in '.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="typeNameLink">JpaAgentConnectionRepository</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a></dt>
-<dd>
-<div class="block">JPA repository for active agent-to-server connections.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="typeNameLink">JpaApplicationRepository</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a></dt>
 <dd>
 <div class="block">Application repository.</div>
@@ -8992,14 +8960,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/test/suppliers/RandomSuppliers.html#LONG">LONG</a></span> - Static variable in class com.netflix.genie.test.suppliers.<a href="com/netflix/genie/test/suppliers/RandomSuppliers.html" title="class in com.netflix.genie.test.suppliers">RandomSuppliers</a></dt>
 <dd>
 <div class="block">Get a random long.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#lookupAgentConnectionServer-java.lang.String-">lookupAgentConnectionServer(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">Lookup the hostname/address of the server with an active connection to a given agent.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#lookupAgentConnectionServer-java.lang.String-">lookupAgentConnectionServer(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
-<dd>
-<div class="block">Lookup the hostname/address of the server with an active connection to a given agent.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobExecution.html#LOST_EXIT_CODE">LOST_EXIT_CODE</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a></dt>
 <dd>
@@ -9684,14 +9644,6 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAgentConnection-java.lang.String-java.lang.String-">removeAgentConnection(String, String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">Remove an existing connection currently active from the given agent to the local node.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#removeAgentConnection-java.lang.String-java.lang.String-">removeAgentConnection(String, String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
-<dd>
-<div class="block">Remove an existing connection currently active from the given agent to the local node.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/CommandService.html#removeAllApplicationsForCommand-java.lang.String-">removeAllApplicationsForCommand(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/CommandService.html" title="interface in com.netflix.genie.client.apis">CommandService</a></dt>
 <dd>
 <div class="block">Method to delete all applications for a command in Genie.</div>
@@ -10370,14 +10322,6 @@
 <div class="block">Configurer bean which will add the <a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> to the set of <code>ProtocolResolver</code> in the
  application context.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveAgentConnection-java.lang.String-java.lang.String-">saveAgentConnection(String, String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">Store a new connection currently active from the given agent to the given node.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#saveAgentConnection-java.lang.String-java.lang.String-">saveAgentConnection(String, String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
-<dd>
-<div class="block">Store a new connection currently active from the given agent to the given node.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveApplication-com.netflix.genie.common.external.dtos.v4.ApplicationRequest-">saveApplication(ApplicationRequest)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Save a new application.</div>
@@ -10611,8 +10555,6 @@
 <div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html#SERVER_HOSTNAME">SERVER_HOSTNAME</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AgentConnectionEntity_</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#SERVER_PORT_PLACEHOLDER">SERVER_PORT_PLACEHOLDER</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
 <dd>
 <div class="block">Placeholder for server port in command-line-template.</div>
@@ -10629,8 +10571,6 @@
 <dd>
 <div class="block">Given the <code>request</code> this API will write the resource to <code>response</code> if possible.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html#serverHostname">serverHostname</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AgentConnectionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AgentConnectionEntity_</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/aspects/SystemArchitecture.html#serviceOperation--">serviceOperation()</a></span> - Method in class com.netflix.genie.web.aspects.<a href="com/netflix/genie/web/aspects/SystemArchitecture.html" title="class in com.netflix.genie.web.aspects">SystemArchitecture</a></dt>
 <dd>
 <div class="block">A service operation is the execution of any method defined on a

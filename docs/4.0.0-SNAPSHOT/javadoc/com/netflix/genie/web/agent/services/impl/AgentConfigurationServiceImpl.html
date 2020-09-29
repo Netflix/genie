@@ -139,8 +139,9 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">AgentConfigurationServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
-                             org.springframework.core.env.Environment&nbsp;environment)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">AgentConfigurationServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
+                             org.springframework.core.env.Environment&nbsp;environment,
+                             io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -187,19 +188,21 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-">
+<a name="AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>AgentConfigurationServiceImpl</h4>
 <pre>public&nbsp;AgentConfigurationServiceImpl(<a href="../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
-                                     org.springframework.core.env.Environment&nbsp;environment)</pre>
+                                     org.springframework.core.env.Environment&nbsp;environment,
+                                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentConfigurationProperties</code> - the properties</dd>
 <dd><code>environment</code> - the environment</dd>
+<dd><code>registry</code> - the metrics registry</dd>
 </dl>
 </li>
 </ul>
