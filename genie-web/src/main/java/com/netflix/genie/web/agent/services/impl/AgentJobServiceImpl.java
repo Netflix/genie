@@ -159,7 +159,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         @Valid final JobRequest jobRequest,
         @Valid final AgentClientMetadata agentClientMetadata
     ) {
-        final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(null, agentClientMetadata, 0, 0);
+        final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(null, agentClientMetadata, 0, 0, null);
         try {
             return this.persistenceService.saveJobSubmission(
                 new JobSubmission.Builder(jobRequest, jobRequestMetadata).build()
