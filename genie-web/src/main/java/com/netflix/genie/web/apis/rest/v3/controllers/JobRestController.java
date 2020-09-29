@@ -19,6 +19,8 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -117,9 +119,11 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -139,6 +143,7 @@ public class JobRestController {
     private static final String JOB_API_BASE_PATH = "/api/v3/jobs/";
     private static final String COMMA = ",";
     private static final String USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME = "genie.jobs.submit.rejected.jobs-limit.counter";
+    private static final Pattern HTTP_HEADER_FILTER_PATTERN = Pattern.compile("^GENIE_.*");
 
     private final JobLaunchService jobLaunchService;
     private final ApplicationModelAssembler applicationModelAssembler;
@@ -307,7 +312,8 @@ public class JobRestController {
             new ApiClientMetadata(localClientHost, userAgent),
             null,
             numAttachments,
-            totalSizeOfAttachments
+            totalSizeOfAttachments,
+            getGenieHeaders(httpServletRequest)
         );
 
         final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(
@@ -339,6 +345,20 @@ public class JobRestController {
         );
 
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
+    }
+
+    private Map<String, String> getGenieHeaders(final HttpServletRequest httpServletRequest) {
+        final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
+        for (Enumeration<String> headerNames = httpServletRequest.getHeaderNames(); headerNames.hasMoreElements();) {
+            final String headerName = headerNames.nextElement();
+            if (HTTP_HEADER_FILTER_PATTERN.matcher(headerName).matches()) {
+                final String headerValue = httpServletRequest.getHeader(headerName);
+                if (headerValue != null) {
+                    mapBuilder.put(headerName, headerValue);
+                }
+            }
+        }
+        return mapBuilder.build();
     }
 
     // TODO: refactor this ad-hoc checks into a component allowing more flexible logic (and can be replaced/extended)

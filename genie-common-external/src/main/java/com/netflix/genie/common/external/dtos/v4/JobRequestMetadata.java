@@ -17,13 +17,16 @@
  */
 package com.netflix.genie.common.external.dtos.v4;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -47,6 +50,8 @@ public class JobRequestMetadata implements Serializable {
     private final int numAttachments;
     @Min(0)
     private final long totalSizeOfAttachments;
+    @NotNull
+    private final Map<String, String> requestHeaders;
 
     /**
      * Constructor. One of {@literal apiClientMetadata} or {@literal agentClientMetadata} is required. Both cannot be
@@ -56,6 +61,7 @@ public class JobRequestMetadata implements Serializable {
      * @param agentClientMetadata    The metadata about the client if this request was received from the Agent
      * @param numAttachments         The number of attachments that came with this job request
      * @param totalSizeOfAttachments The total size of the attachments that came with this job request
+     * @param requestHeaders         The map of HTTP headers (filtered upstream) if this request was received via API
      * @throws IllegalArgumentException If both {@literal apiClientMetadata} and {@literal agentClientMetadata} are
      *                                  missing or both are present
      */
@@ -63,7 +69,8 @@ public class JobRequestMetadata implements Serializable {
         @Nullable final ApiClientMetadata apiClientMetadata,
         @Nullable final AgentClientMetadata agentClientMetadata,
         final int numAttachments,
-        final long totalSizeOfAttachments
+        final long totalSizeOfAttachments,
+        @Nullable final Map<String, String> requestHeaders
     ) throws IllegalArgumentException {
         if (apiClientMetadata == null && agentClientMetadata == null) {
             throw new IllegalArgumentException(
@@ -80,6 +87,7 @@ public class JobRequestMetadata implements Serializable {
         this.agentClientMetadata = agentClientMetadata;
         this.numAttachments = Math.max(numAttachments, 0);
         this.totalSizeOfAttachments = Math.max(totalSizeOfAttachments, 0L);
+        this.requestHeaders = requestHeaders != null ? ImmutableMap.copyOf(requestHeaders) : ImmutableMap.of();
     }
 
     /**

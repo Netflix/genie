@@ -1342,7 +1342,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                 null,
                 agentClientMetadata,
                 numAttachments,
-                totalAttachmentSize
+                totalAttachmentSize,
+                null
             );
         } else {
             final ApiClientMetadata apiClientMetadata = new ApiClientMetadata(
@@ -1354,7 +1355,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                 apiClientMetadata,
                 null,
                 numAttachments,
-                totalAttachmentSize
+                totalAttachmentSize,
+                ImmutableMap.of("Foo", "Bar")
             );
         }
     }

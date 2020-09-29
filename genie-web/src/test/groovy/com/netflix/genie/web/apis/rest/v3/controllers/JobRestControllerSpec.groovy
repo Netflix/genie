@@ -25,6 +25,7 @@ import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.properties.JobsActiveLimitProperties
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.services.AttachmentService
@@ -43,14 +44,16 @@ class JobRestControllerSpec extends Specification {
     JobsProperties jobsProperties
     Environment environment
     PersistenceService persistenceService
+    JobLaunchService jobLaunchService
 
     void setup() {
         this.jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         this.environment = Mock(Environment)
         this.persistenceService = Mock(PersistenceService)
+        this.jobLaunchService = Mock(JobLaunchService)
 
         this.controller = new JobRestController(
-            Mock(JobLaunchService),
+            jobLaunchService,
             new DataServices(this.persistenceService),
             Mock(EntityModelAssemblers),
             Mock(GenieHostInfo),
@@ -89,5 +92,41 @@ class JobRestControllerSpec extends Specification {
         1 * jobRequest.getUser() >> "user-name"
         1 * persistenceService.getActiveJobCountForUser("user-name") >> 1
         thrown(GenieUserLimitExceededException)
+    }
+
+    def "Check job request metadata"() {
+        def request = Mock(HttpServletRequest)
+        JobSubmission jobSubmission = null
+
+        JobRequest jobRequest = new JobRequest.Builder(
+            "name",
+            "user",
+            "version",
+            [] as List,
+            ["type:foo"] as Set
+        ).build()
+
+        when:
+        controller.submitJob(jobRequest, "", "test-client", request)
+
+        then:
+        1 * environment.getProperty("genie.jobs.submission.enabled", _, _) >> true
+        1 * request.getRemoteAddr() >> "8.8.8.8"
+        1 * request.getHeaderNames() >> Collections.enumeration(["foo", "bar", "GENIE_FOO"])
+        1 * request.getHeader("GENIE_FOO") >> "GENIE_BAR"
+        1 * jobLaunchService.launchJob(_ as JobSubmission) >> {
+            JobSubmission js ->
+                jobSubmission = js
+                throw new RuntimeException("End test")
+        }
+        thrown(RuntimeException)
+
+        expect:
+        jobSubmission != null
+        jobSubmission.getJobRequestMetadata().getNumAttachments() == 0
+        jobSubmission.getJobRequestMetadata().getTotalSizeOfAttachments() == 0
+        !jobSubmission.getJobRequestMetadata().getAgentClientMetadata().isPresent()
+        jobSubmission.getJobRequestMetadata().getApiClientMetadata().isPresent()
+        jobSubmission.getJobRequestMetadata().getRequestHeaders() == [GENIE_FOO: "GENIE_BAR"]
     }
 }

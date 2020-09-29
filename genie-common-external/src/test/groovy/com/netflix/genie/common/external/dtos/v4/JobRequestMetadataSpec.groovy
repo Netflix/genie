@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.common.external.dtos.v4
 
+
+import com.google.common.collect.Maps
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification
-
 /**
  * Specifications for the {@link JobRequestMetadata} class.
  *
@@ -32,22 +33,25 @@ class JobRequestMetadataSpec extends Specification {
         def totalSizeOfAttachments = 28_001L
         def apiClientMetadata = Mock(ApiClientMetadata)
         def agentClientMetadata = Mock(AgentClientMetadata)
+        def headersMap = Maps.newHashMap()
+        headersMap.put("Foo", "Bar")
+        headersMap.put("Empty value", "")
         JobRequestMetadata jobRequestMetadata
 
         when:
-        new JobRequestMetadata(null, null, -1, -5L)
+        new JobRequestMetadata(null, null, -1, -5L, null)
 
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new JobRequestMetadata(apiClientMetadata, agentClientMetadata, -1, -5L)
+        new JobRequestMetadata(apiClientMetadata, agentClientMetadata, -1, -5L, null)
 
         then:
         thrown(IllegalArgumentException)
 
         when:
-        jobRequestMetadata = new JobRequestMetadata(apiClientMetadata, null, -1, -5L)
+        jobRequestMetadata = new JobRequestMetadata(apiClientMetadata, null, -1, -5L, headersMap)
 
         then:
         jobRequestMetadata.isApi()
@@ -55,13 +59,15 @@ class JobRequestMetadataSpec extends Specification {
         !jobRequestMetadata.getAgentClientMetadata().isPresent()
         jobRequestMetadata.getNumAttachments() == 0
         jobRequestMetadata.getTotalSizeOfAttachments() == 0
+        jobRequestMetadata.getRequestHeaders() == headersMap
 
         when:
         jobRequestMetadata = new JobRequestMetadata(
             null,
             agentClientMetadata,
             numAttachments,
-            totalSizeOfAttachments
+            totalSizeOfAttachments,
+            null
         )
 
         then:
@@ -70,6 +76,7 @@ class JobRequestMetadataSpec extends Specification {
         jobRequestMetadata.getAgentClientMetadata().orElse(null) == agentClientMetadata
         jobRequestMetadata.getNumAttachments() == numAttachments
         jobRequestMetadata.getTotalSizeOfAttachments() == totalSizeOfAttachments
+        jobRequestMetadata.getRequestHeaders().isEmpty()
     }
 
     def "Test equals"() {
@@ -104,8 +111,8 @@ class JobRequestMetadataSpec extends Specification {
         def agentClientMetadata = Mock(AgentClientMetadata)
         def numAttachments = RandomSuppliers.INT.get()
         def sizeAttachments = RandomSuppliers.LONG.get()
-        base = new JobRequestMetadata(null, agentClientMetadata, numAttachments, sizeAttachments)
-        comparable = new JobRequestMetadata(null, agentClientMetadata, numAttachments, sizeAttachments)
+        base = new JobRequestMetadata(null, agentClientMetadata, numAttachments, sizeAttachments, null)
+        comparable = new JobRequestMetadata(null, agentClientMetadata, numAttachments, sizeAttachments, null)
 
         then:
         base == comparable
@@ -133,8 +140,8 @@ class JobRequestMetadataSpec extends Specification {
         def apiClientMetadata = Mock(ApiClientMetadata)
         def numAttachments = RandomSuppliers.INT.get()
         def sizeAttachments = RandomSuppliers.LONG.get()
-        one = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
-        two = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
+        one = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments, null)
+        two = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments, null)
 
         then:
         one.hashCode() == two.hashCode()
@@ -162,8 +169,8 @@ class JobRequestMetadataSpec extends Specification {
         def apiClientMetadata = Mock(ApiClientMetadata)
         def numAttachments = RandomSuppliers.INT.get()
         def sizeAttachments = RandomSuppliers.LONG.get()
-        one = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
-        two = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
+        one = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments, null)
+        two = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments, null)
 
         then:
         one.toString() == two.toString()
@@ -175,14 +182,14 @@ class JobRequestMetadataSpec extends Specification {
                 Mock(ApiClientMetadata),
                 null,
                 RandomSuppliers.INT.get(),
-                RandomSuppliers.LONG.get()
+                RandomSuppliers.LONG.get(), null
             )
         } else {
             return new JobRequestMetadata(
                 null,
                 Mock(AgentClientMetadata),
                 RandomSuppliers.INT.get(),
-                RandomSuppliers.LONG.get()
+                RandomSuppliers.LONG.get(), null
             )
         }
     }
