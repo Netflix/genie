@@ -300,6 +300,18 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentJobServiceImpl
 |status, exceptionClass, agentVersion, agentHost, handshakeDecision
 
+|genie.services.jobLaunch.launchJob.timer
+|Time taken to launch a job (includes record creation and update, job resolution and agent launch)
+|nanoseconds
+|JobLaunchServiceImpl
+|
+
+|genie.services.jobLaunch.selectLauncher.timer
+|Time taken to invoke a selector to choose which agent launcher to use
+|nanoseconds
+|JobLaunchServiceImpl
+|status exceptionClass, numAvailableLaunchers, agentLauncherSelectorClass, agentLauncherSelectedClass
+
 |genie.services.jobResolver.generateClusterCriteriaPermutations.timer
 |Time taken to generate all the permutations for cluster criteria between the command options and the job request
 |nanoseconds

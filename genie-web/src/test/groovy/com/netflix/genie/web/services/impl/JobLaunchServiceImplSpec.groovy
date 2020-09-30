@@ -18,6 +18,8 @@
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
+import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.web.agent.launchers.AgentLauncher
@@ -25,10 +27,14 @@ import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.dtos.ResolvedJob
+import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException
 import com.netflix.genie.web.exceptions.checked.NotFoundException
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
+import com.netflix.genie.web.selectors.AgentLauncherSelectionContext
+import com.netflix.genie.web.selectors.AgentLauncherSelector
 import com.netflix.genie.web.services.JobResolverService
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import spock.lang.Specification
@@ -43,16 +49,20 @@ class JobLaunchServiceImplSpec extends Specification {
     def "successful launch returns the job id"() {
         def persistenceService = Mock(PersistenceService)
         def jobResolverService = Mock(JobResolverService)
+        def agentLauncherSelector = Mock(AgentLauncherSelector)
         def agentLauncher = Mock(AgentLauncher)
         def registry = new SimpleMeterRegistry()
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> persistenceService
         }
-        def service = new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncher, registry)
+        def service = new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncherSelector, registry)
 
         def jobId = UUID.randomUUID().toString()
         def resolvedJob = Mock(ResolvedJob)
         def jobSubmission = Mock(JobSubmission)
+        def jobRequest = Mock(JobRequest)
+        def jobRequestMetadata = Mock(JobRequestMetadata)
+        def selectionResult = Mock(ResourceSelectionResult)
 
         when:
         def savedJobId = service.launchJob(jobSubmission)
@@ -61,6 +71,11 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
         1 * jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * agentLauncherSelector.getAgentLaunchers() >> [agentLauncher]
+        1 * jobSubmission.getJobRequest() >> jobRequest
+        1 * jobSubmission.getJobRequestMetadata() >> jobRequestMetadata
+        1 * agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.of(agentLauncher)
         1 * agentLauncher.launchAgent(resolvedJob)
         savedJobId == jobId
     }
@@ -69,15 +84,24 @@ class JobLaunchServiceImplSpec extends Specification {
         def persistenceService = Mock(PersistenceService)
         def jobResolverService = Mock(JobResolverService)
         def agentLauncher = Mock(AgentLauncher)
+        def agentLauncherSelector = Mock(AgentLauncherSelector) {
+            getAgentLaunchers() >> [agentLauncher]
+        }
         def registry = new SimpleMeterRegistry()
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> persistenceService
         }
-        def service = new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncher, registry)
+        def service = new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncherSelector, registry)
 
         def jobId = UUID.randomUUID().toString()
         def resolvedJob = Mock(ResolvedJob)
-        def jobSubmission = Mock(JobSubmission)
+        def jobRequest = Mock(JobRequest) {}
+        def jobRequestMetadata = Mock(JobRequestMetadata)
+        def selectionResult = Mock(ResourceSelectionResult)
+        def jobSubmission = Mock(JobSubmission) {
+            getJobRequest() >> jobRequest
+            getJobRequestMetadata() >> jobRequestMetadata
+        }
 
         when:
         service.launchJob(jobSubmission)
@@ -89,7 +113,6 @@ class JobLaunchServiceImplSpec extends Specification {
         0 * jobResolverService.resolveJob(_ as String)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * persistenceService.updateJobArchiveStatus(_, _)
-        0 * agentLauncher.launchAgent(_ as ResolvedJob)
         thrown(IllegalStateException)
 
         when:
@@ -138,12 +161,10 @@ class JobLaunchServiceImplSpec extends Specification {
         then:
         1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
         1 * jobResolverService.resolveJob(jobId) >> resolvedJob
-        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
-        1 * agentLauncher.launchAgent(resolvedJob) >> {
-            throw new AgentLaunchException("that didn't work")
-        }
-        1 * persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
-        1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String) >> { throw new NotFoundException() }
+        0 * persistenceService.updateJobArchiveStatus(_, _)
+        0 * agentLauncher.launchAgent(_ as ResolvedJob)
+        0 * persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
         thrown(AgentLaunchException)
 
         when:
@@ -152,10 +173,38 @@ class JobLaunchServiceImplSpec extends Specification {
         then:
         1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
         1 * jobResolverService.resolveJob(jobId) >> resolvedJob
-        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String) >> { throw new NotFoundException() }
-        0 * persistenceService.updateJobArchiveStatus(_, _)
-        0 * agentLauncher.launchAgent(_ as ResolvedJob)
-        0 * persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> { throw new ResourceSelectionException("...") }
+        0 * agentLauncher.launchAgent(resolvedJob)
+        thrown(AgentLaunchException)
+
+        when:
+        service.launchJob(jobSubmission)
+
+        then:
+        1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.empty()
+        1 * selectionResult.getSelectionRationale() >> Optional.empty()
+        0 * agentLauncher.launchAgent(resolvedJob)
+        thrown(AgentLaunchException)
+
+        when:
+        service.launchJob(jobSubmission)
+
+        then:
+        1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.of(agentLauncher)
+        1 * agentLauncher.launchAgent(resolvedJob) >> {
+            throw new AgentLaunchException("that didn't work")
+        }
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
+        1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         thrown(AgentLaunchException)
     }
 }
