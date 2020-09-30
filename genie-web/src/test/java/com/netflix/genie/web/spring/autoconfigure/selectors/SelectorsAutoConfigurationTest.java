@@ -17,8 +17,10 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
+import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
+import com.netflix.genie.web.selectors.AgentLauncherSelector;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.selectors.impl.RandomClusterSelectorImpl;
@@ -50,7 +52,7 @@ class SelectorsAutoConfigurationTest {
                     SelectorsAutoConfiguration.class
                 )
             )
-            .withUserConfiguration(RegistryConfig.class);
+            .withUserConfiguration(RegistryConfig.class, AgentLaunchersConfig.class);
 
     @Test
     void canCreateDefaultBeans() {
@@ -66,6 +68,7 @@ class SelectorsAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(CommandSelector.class);
                 Assertions.assertThat(context).hasSingleBean(RandomCommandSelectorImpl.class);
                 Assertions.assertThat(context).doesNotHaveBean(ScriptCommandSelectorImpl.class);
+                Assertions.assertThat(context).hasSingleBean(AgentLauncherSelector.class);
             }
         );
     }
@@ -86,6 +89,7 @@ class SelectorsAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(CommandSelector.class);
                     Assertions.assertThat(context).doesNotHaveBean(RandomCommandSelectorImpl.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptCommandSelectorImpl.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentLauncherSelector.class);
                 }
             );
     }
@@ -107,6 +111,7 @@ class SelectorsAutoConfigurationTest {
                     Assertions.assertThat(context).doesNotHaveBean(RandomCommandSelectorImpl.class);
                     Assertions.assertThat(context).doesNotHaveBean(ScriptCommandSelectorImpl.class);
                     Assertions.assertThat(context).hasBean("customCommandSelector");
+                    Assertions.assertThat(context).hasSingleBean(AgentLauncherSelector.class);
                 }
             );
     }
@@ -157,6 +162,22 @@ class SelectorsAutoConfigurationTest {
         @Bean
         public CommandSelector customCommandSelector() {
             return Mockito.mock(CommandSelector.class);
+        }
+    }
+
+    /**
+     * Agent launchers configuration.
+     */
+    private static class AgentLaunchersConfig {
+
+        @Bean
+        public AgentLauncher launcher1() {
+            return Mockito.mock(AgentLauncher.class);
+        }
+
+        @Bean
+        public AgentLauncher launcher2() {
+            return Mockito.mock(AgentLauncher.class);
         }
     }
 }

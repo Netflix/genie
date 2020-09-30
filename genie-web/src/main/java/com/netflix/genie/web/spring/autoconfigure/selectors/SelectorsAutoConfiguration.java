@@ -17,10 +17,13 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
+import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
+import com.netflix.genie.web.selectors.AgentLauncherSelector;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
+import com.netflix.genie.web.selectors.impl.RandomAgentLauncherSelectorImpl;
 import com.netflix.genie.web.selectors.impl.RandomClusterSelectorImpl;
 import com.netflix.genie.web.selectors.impl.RandomCommandSelectorImpl;
 import com.netflix.genie.web.selectors.impl.ScriptClusterSelectorImpl;
@@ -33,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -106,5 +110,19 @@ public class SelectorsAutoConfiguration {
         } else {
             return new RandomCommandSelectorImpl();
         }
+    }
+
+    /**
+     * Provide a default {@link AgentLauncherSelector} implementation if no other has been defined in the context.
+     *
+     * @param agentLaunchers A collection of usable {@link AgentLauncher} beans.
+     * @return A {@link RandomAgentLauncherSelectorImpl}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentLauncherSelector.class)
+    public AgentLauncherSelector agentLauncherSelector(
+        final Collection<AgentLauncher> agentLaunchers
+    ) {
+        return new RandomAgentLauncherSelectorImpl(agentLaunchers);
     }
 }
