@@ -21,11 +21,8 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.dto.search.BaseSearchResult;
 import com.netflix.genie.common.dto.search.JobSearchResult;
@@ -55,7 +52,6 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatus
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
@@ -86,7 +82,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -106,64 +101,16 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     private static final String AGENT_JOB_2 = "agentJob2";
 
     // Job Request fields
-    private static final String UNIQUE_ID = UUID.randomUUID().toString();
-    private static final String NAME = UUID.randomUUID().toString();
-    private static final String USER = UUID.randomUUID().toString();
-    private static final String VERSION = UUID.randomUUID().toString();
-    private static final String DESCRIPTION = UUID.randomUUID().toString();
-    private static final List<String> COMMAND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
-    private static final String GROUP = UUID.randomUUID().toString();
-    private static final String SETUP_FILE = UUID.randomUUID().toString();
-    private static final String CLUSTER_TAG_1 = UUID.randomUUID().toString();
-    private static final String CLUSTER_TAG_2 = UUID.randomUUID().toString();
-    private static final String CLUSTER_TAG_3 = UUID.randomUUID().toString();
-    private static final List<ClusterCriteria> CLUSTER_CRITERIA = Lists.newArrayList(
-        new ClusterCriteria(Sets.newHashSet(CLUSTER_TAG_1)),
-        new ClusterCriteria(Sets.newHashSet(CLUSTER_TAG_2)),
-        new ClusterCriteria(Sets.newHashSet(CLUSTER_TAG_3))
-    );
-    private static final String COMMAND_TAG_1 = UUID.randomUUID().toString();
-    private static final String COMMAND_TAG_2 = UUID.randomUUID().toString();
-    private static final Set<String> COMMAND_CRITERION = Sets.newHashSet(COMMAND_TAG_1, COMMAND_TAG_2);
-    private static final String CONFIG_1 = UUID.randomUUID().toString();
-    private static final String CONFIG_2 = UUID.randomUUID().toString();
-    private static final Set<String> CONFIGS = Sets.newHashSet(CONFIG_1, CONFIG_2);
-    private static final String DEPENDENCY = UUID.randomUUID().toString();
-    private static final Set<String> DEPENDENCIES = Sets.newHashSet(DEPENDENCY);
-    private static final String EMAIL = UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com";
-    private static final String TAG_1 = UUID.randomUUID().toString();
-    private static final String TAG_2 = UUID.randomUUID().toString();
-    private static final String TAG_3 = UUID.randomUUID().toString();
-    private static final Set<String> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
     private static final int CPU_REQUESTED = 2;
     private static final int MEMORY_REQUESTED = 1024;
-    private static final String APP_REQUESTED_1 = UUID.randomUUID().toString();
-    private static final String APP_REQUESTED_2 = UUID.randomUUID().toString();
-    private static final List<String> APPLICATIONS_REQUESTED = Lists.newArrayList(APP_REQUESTED_1, APP_REQUESTED_2);
     private static final int TIMEOUT_REQUESTED = 84500;
-    private static final String GROUPING = UUID.randomUUID().toString();
-    private static final String GROUPING_INSTANCE = UUID.randomUUID().toString();
 
     // Job Metadata fields
-    private static final String CLIENT_HOST = UUID.randomUUID().toString();
-    private static final String USER_AGENT = UUID.randomUUID().toString();
     private static final int NUM_ATTACHMENTS = 3;
     private static final long TOTAL_SIZE_ATTACHMENTS = 38023423L;
-    private static final long STD_ERR_SIZE = 98025245L;
-    private static final long STD_OUT_SIZE = 78723423L;
 
     // Job fields
     private static final String ARCHIVE_LOCATION = UUID.randomUUID().toString();
-    private static final Instant FINISHED = Instant.now();
-    private static final Instant STARTED = Instant.now();
-    private static final String STATUS_MSG = UUID.randomUUID().toString();
-
-    // Job Execution fields
-    private static final String HOSTNAME = UUID.randomUUID().toString();
-    private static final int PROCESS_ID = 3203;
-    private static final long CHECK_DELAY = 8728L;
-    private static final Instant TIMEOUT = STARTED.plus(50L, ChronoUnit.SECONDS);
-    private static final int MEMORY = 2048;
 
     @Test
     @DatabaseSetup("persistence/jobs/init.xml")
@@ -1229,67 +1176,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                 )
             ).hasSize(2)
             .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
-    }
-
-    private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
-        Assertions.assertThat(savedJobRequest.getId()).isPresent().contains(UNIQUE_ID);
-        Assertions.assertThat(savedJobRequest.getName()).isEqualTo(NAME);
-        Assertions.assertThat(savedJobRequest.getUser()).isEqualTo(USER);
-        Assertions.assertThat(savedJobRequest.getVersion()).isEqualTo(VERSION);
-        Assertions.assertThat(savedJobRequest.getDescription()).isPresent().contains(DESCRIPTION);
-        Assertions.assertThat(savedJobRequest.getCommandArgs()).isPresent().contains(COMMAND_ARGS.get(0));
-        Assertions.assertThat(savedJobRequest.getGroup()).isPresent().contains(GROUP);
-        Assertions.assertThat(savedJobRequest.getSetupFile()).isPresent().contains(SETUP_FILE);
-        Assertions.assertThat(savedJobRequest.getClusterCriterias()).isEqualTo(CLUSTER_CRITERIA);
-        Assertions.assertThat(savedJobRequest.getCommandCriteria()).isEqualTo(COMMAND_CRITERION);
-        Assertions.assertThat(savedJobRequest.getConfigs()).isEqualTo(CONFIGS);
-        Assertions.assertThat(savedJobRequest.getDependencies()).isEqualTo(DEPENDENCIES);
-        Assertions.assertThat(savedJobRequest.isDisableLogArchival()).isTrue();
-        Assertions.assertThat(savedJobRequest.getEmail()).isPresent().contains(EMAIL);
-        Assertions.assertThat(savedJobRequest.getTags()).isEqualTo(TAGS);
-        Assertions.assertThat(savedJobRequest.getCpu()).isPresent().contains(CPU_REQUESTED);
-        Assertions.assertThat(savedJobRequest.getMemory()).isPresent().contains(MEMORY_REQUESTED);
-        Assertions.assertThat(savedJobRequest.getApplications()).isEqualTo(APPLICATIONS_REQUESTED);
-        Assertions.assertThat(savedJobRequest.getTimeout()).isPresent().contains(TIMEOUT_REQUESTED);
-        Assertions.assertThat(savedJobRequest.getGrouping()).isPresent().contains(GROUPING);
-        Assertions.assertThat(savedJobRequest.getGroupingInstance()).isPresent().contains(GROUPING_INSTANCE);
-    }
-
-    private void validateJob(final Job savedJob) {
-        Assertions.assertThat(savedJob.getId()).isPresent().contains(UNIQUE_ID);
-        Assertions.assertThat(savedJob.getName()).isEqualTo(NAME);
-        Assertions.assertThat(savedJob.getUser()).isEqualTo(USER);
-        Assertions.assertThat(savedJob.getVersion()).isEqualTo(VERSION);
-        Assertions.assertThat(savedJob.getDescription()).isPresent().contains(DESCRIPTION);
-        Assertions.assertThat(savedJob.getCommandArgs()).isPresent().contains(COMMAND_ARGS.get(0));
-        Assertions.assertThat(savedJob.getTags()).isEqualTo(TAGS);
-        Assertions.assertThat(savedJob.getArchiveLocation()).isPresent().contains(ARCHIVE_LOCATION);
-        Assertions.assertThat(savedJob.getStarted()).isPresent().contains(STARTED);
-        Assertions.assertThat(savedJob.getFinished()).isPresent().contains(FINISHED);
-        Assertions
-            .assertThat(savedJob.getStatus())
-            .isEqualByComparingTo(com.netflix.genie.common.dto.JobStatus.RUNNING);
-        Assertions.assertThat(savedJob.getStatusMsg()).isPresent().contains(STATUS_MSG);
-        Assertions.assertThat(savedJob.getGrouping()).isPresent().contains(GROUPING);
-        Assertions.assertThat(savedJob.getGroupingInstance()).isPresent().contains(GROUPING_INSTANCE);
-    }
-
-    private void validateJobExecution(final JobExecution savedJobExecution) {
-        Assertions.assertThat(savedJobExecution.getHostName()).isEqualTo(HOSTNAME);
-        Assertions.assertThat(savedJobExecution.getProcessId()).isPresent().contains(PROCESS_ID);
-        Assertions.assertThat(savedJobExecution.getCheckDelay()).contains(CHECK_DELAY);
-        Assertions.assertThat(savedJobExecution.getTimeout()).contains(TIMEOUT);
-        Assertions.assertThat(savedJobExecution.getMemory()).contains(MEMORY);
-        Assertions.assertThat(savedJobExecution.getArchiveStatus()).isEqualTo(Optional.of(ArchiveStatus.DISABLED));
-    }
-
-    private void validateJobMetadata(final JobMetadataProjection savedMetadata) {
-        Assertions.assertThat(savedMetadata.getRequestApiClientHostname()).contains(CLIENT_HOST);
-        Assertions.assertThat(savedMetadata.getRequestApiClientUserAgent()).contains(USER_AGENT);
-        Assertions.assertThat(savedMetadata.getNumAttachments()).contains(NUM_ATTACHMENTS);
-        Assertions.assertThat(savedMetadata.getTotalSizeOfAttachments()).contains(TOTAL_SIZE_ATTACHMENTS);
-        Assertions.assertThat(savedMetadata.getStdErrSize()).contains(STD_ERR_SIZE);
-        Assertions.assertThat(savedMetadata.getStdOutSize()).contains(STD_OUT_SIZE);
     }
 
     private void validateSavedJobSubmission(
