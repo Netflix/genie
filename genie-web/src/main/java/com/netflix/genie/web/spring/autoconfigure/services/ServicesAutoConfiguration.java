@@ -18,7 +18,6 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
@@ -29,6 +28,7 @@ import com.netflix.genie.web.properties.JobsLocationsProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
+import com.netflix.genie.web.selectors.AgentLauncherSelector;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
@@ -80,11 +80,11 @@ public class ServicesAutoConfiguration {
     /**
      * Collection of properties related to job execution.
      *
-     * @param forwarding             forwarding properties
-     * @param locations              locations properties
-     * @param memory                 memory properties
-     * @param users                  users properties
-     * @param activeLimit            active limit properties
+     * @param forwarding  forwarding properties
+     * @param locations   locations properties
+     * @param memory      memory properties
+     * @param users       users properties
+     * @param activeLimit active limit properties
      * @return a {@code JobsProperties} instance
      */
     @Bean
@@ -167,13 +167,13 @@ public class ServicesAutoConfiguration {
     /**
      * Provide the default implementation of {@link JobDirectoryServerService} for serving job directory resources.
      *
-     * @param resourceLoader                     The application resource loader used to get references to resources
-     * @param dataServices                       The {@link DataServices} instance to use
-     * @param agentFileStreamService             The service to request a file from an agent running a job
-     * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
-     *                                           job data
-     * @param meterRegistry                      The meter registry used to keep track of metrics
-     * @param agentRoutingService                The agent routing service
+     * @param resourceLoader         The application resource loader used to get references to resources
+     * @param dataServices           The {@link DataServices} instance to use
+     * @param agentFileStreamService The service to request a file from an agent running a job
+     * @param archivedJobService     The {@link ArchivedJobService} implementation to use to get archived
+     *                               job data
+     * @param meterRegistry          The meter registry used to keep track of metrics
+     * @param agentRoutingService    The agent routing service
      * @return An instance of {@link JobDirectoryServerServiceImpl}
      */
     @Bean
@@ -199,10 +199,10 @@ public class ServicesAutoConfiguration {
     /**
      * Provide a {@link JobLaunchService} implementation if one isn't available.
      *
-     * @param dataServices       The {@link DataServices} instance to use
-     * @param jobResolverService The {@link JobResolverService} implementation to use
-     * @param agentLauncher      The {@link AgentLauncher} implementation to use
-     * @param registry           The metrics registry to use
+     * @param dataServices          The {@link DataServices} instance to use
+     * @param jobResolverService    The {@link JobResolverService} implementation to use
+     * @param agentLauncherSelector The {@link AgentLauncherSelector} implementation to use
+     * @param registry              The metrics registry to use
      * @return A {@link JobLaunchServiceImpl} instance
      */
     @Bean
@@ -210,10 +210,10 @@ public class ServicesAutoConfiguration {
     public JobLaunchServiceImpl jobLaunchService(
         final DataServices dataServices,
         final JobResolverService jobResolverService,
-        final AgentLauncher agentLauncher,
+        final AgentLauncherSelector agentLauncherSelector,
         final MeterRegistry registry
     ) {
-        return new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncher, registry);
+        return new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncherSelector, registry);
     }
 
     /**

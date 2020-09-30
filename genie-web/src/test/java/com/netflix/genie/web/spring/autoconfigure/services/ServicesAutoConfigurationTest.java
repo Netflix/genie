@@ -26,92 +26,114 @@ import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
+import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
+import com.netflix.genie.web.selectors.AgentLauncherSelector;
+import com.netflix.genie.web.selectors.ClusterSelector;
+import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
-import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
-import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
+import com.netflix.genie.web.services.AttachmentService;
+import com.netflix.genie.web.services.JobDirectoryServerService;
+import com.netflix.genie.web.services.JobLaunchService;
+import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ResourceLoader;
 
-import java.io.IOException;
-import java.net.URI;
-
 /**
- * Unit Tests for {@link ServicesAutoConfiguration} class.
+ * Tests for {@link ServicesAutoConfiguration} class.
  *
- * @author amsharma
- * @since 3.0.0
+ * @author mprimi
+ * @since 4.0.0
  */
 class ServicesAutoConfigurationTest {
-    //TODO update this test class to use ContextRunner, like the rest of configuration tests
 
-    private ServicesAutoConfiguration servicesAutoConfiguration;
-
-    @BeforeEach
-    void setUp() {
-        this.servicesAutoConfiguration = new ServicesAutoConfiguration();
-    }
+    private ApplicationContextRunner contextRunner =
+        new ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    ServicesAutoConfiguration.class
+                )
+            )
+            .withUserConfiguration(RequiredMockConfig.class);
 
     @Test
-    void canGetJobPropertiesBean() {
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.jobsProperties(
-                    Mockito.mock(JobsForwardingProperties.class),
-                    Mockito.mock(JobsLocationsProperties.class),
-                    Mockito.mock(JobsMemoryProperties.class),
-                    Mockito.mock(JobsUsersProperties.class),
-                    Mockito.mock(JobsActiveLimitProperties.class)
-                )
-            )
-            .isNotNull();
+    void canCreateBeans() {
+
+        this.contextRunner.run(
+            context -> {
+                Assertions.assertThat(context).hasSingleBean(JobsForwardingProperties.class);
+                Assertions.assertThat(context).hasSingleBean(JobsLocationsProperties.class);
+                Assertions.assertThat(context).hasSingleBean(JobsMemoryProperties.class);
+                Assertions.assertThat(context).hasSingleBean(JobsUsersProperties.class);
+                Assertions.assertThat(context).hasSingleBean(JobsActiveLimitProperties.class);
+                Assertions.assertThat(context).hasSingleBean(AttachmentServiceProperties.class);
+                Assertions.assertThat(context).hasSingleBean(JobsProperties.class);
+                Assertions.assertThat(context).hasSingleBean(AttachmentService.class);
+                Assertions.assertThat(context).hasSingleBean(JobResolverService.class);
+                Assertions.assertThat(context).hasSingleBean(JobDirectoryServerService.class);
+                Assertions.assertThat(context).hasSingleBean(JobLaunchService.class);
+                Assertions.assertThat(context).hasSingleBean(ArchivedJobService.class);
+            }
+        );
     }
 
-    @Test
-    void canGetJobDirectoryServerServiceBean() {
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.jobDirectoryServerService(
-                    Mockito.mock(ResourceLoader.class),
-                    Mockito.mock(DataServices.class),
-                    Mockito.mock(AgentFileStreamService.class),
-                    Mockito.mock(ArchivedJobService.class),
-                    Mockito.mock(MeterRegistry.class),
-                    Mockito.mock(AgentRoutingService.class)
-                )
-            )
-            .isNotNull();
-    }
+    private static class RequiredMockConfig {
 
-    @Test
-    void canGetS3AttachmentServiceServiceBean() throws IOException {
+        @Bean
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
+        }
 
-        final AttachmentServiceProperties properties = new AttachmentServiceProperties();
+        @Bean
+        ResourceLoader resourceLoader() {
+            return Mockito.mock(ResourceLoader.class);
+        }
 
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.attachmentService(
-                    Mockito.mock(S3ClientFactory.class),
-                    properties,
-                    Mockito.mock(MeterRegistry.class)
-                )
-            )
-            .isInstanceOf(LocalFileSystemAttachmentServiceImpl.class);
+        @Bean
+        DataServices dataServices() {
+            return Mockito.mock(DataServices.class);
+        }
 
-        properties.setLocationPrefix(URI.create("s3://foo/bar/genie/attachments"));
+        @Bean
+        AgentFileStreamService agentFileStreamService() {
+            return Mockito.mock(AgentFileStreamService.class);
+        }
 
-        Assertions
-            .assertThat(
-                this.servicesAutoConfiguration.attachmentService(
-                    Mockito.mock(S3ClientFactory.class),
-                    properties,
-                    Mockito.mock(MeterRegistry.class)
-                )
-            )
-            .isInstanceOf(S3AttachmentServiceImpl.class);
+        @Bean
+        AgentRoutingService agentRoutingService() {
+            return Mockito.mock(AgentRoutingService.class);
+        }
+
+        @Bean
+        S3ClientFactory s3ClientFactory() {
+            return Mockito.mock(S3ClientFactory.class);
+        }
+
+        @Bean
+        CommandSelector commandSelector() {
+            return Mockito.mock(CommandSelector.class);
+        }
+
+        @Bean
+        ClusterSelector clusterSelector1() {
+            return Mockito.mock(ClusterSelector.class);
+        }
+
+        @Bean
+        ClusterSelector clusterSelector2() {
+            return Mockito.mock(ClusterSelector.class);
+        }
+
+        @Bean
+        AgentLauncherSelector agentLauncherSelector() {
+            return Mockito.mock(AgentLauncherSelector.class);
+        }
     }
 }

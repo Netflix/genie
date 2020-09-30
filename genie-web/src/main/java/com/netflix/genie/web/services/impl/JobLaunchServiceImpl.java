@@ -27,10 +27,13 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
+import com.netflix.genie.web.selectors.AgentLauncherSelectionContext;
+import com.netflix.genie.web.selectors.AgentLauncherSelector;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -40,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -53,29 +57,33 @@ import java.util.concurrent.TimeUnit;
 public class JobLaunchServiceImpl implements JobLaunchService {
 
     private static final String LAUNCH_JOB_TIMER = "genie.services.jobLaunch.launchJob.timer";
+    private static final String AGENT_LAUNCHER_SELECTOR_TIMER = "genie.services.jobLaunch.selectLauncher.timer";
+    private static final String AVAILABLE_LAUNCHERS_TAG = "numAvailableLaunchers";
+    private static final String SELECTOR_CLASS_TAG = "agentLauncherSelectorClass";
+    private static final String LAUNCHER_CLASS_TAG = "agentLauncherSelectedClass";
 
     private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
-    private final AgentLauncher agentLauncher;
+    private final AgentLauncherSelector agentLauncherSelector;
     private final MeterRegistry registry;
 
     /**
      * Constructor.
      *
-     * @param dataServices       The {@link DataServices} instance to use
-     * @param jobResolverService {@link JobResolverService} implementation used to resolve job details
-     * @param agentLauncher      {@link AgentLauncher} implementation to launch agents
-     * @param registry           {@link MeterRegistry} metrics repository
+     * @param dataServices          The {@link DataServices} instance to use
+     * @param jobResolverService    {@link JobResolverService} implementation used to resolve job details
+     * @param agentLauncherSelector {@link AgentLauncher} implementation to launch agents
+     * @param registry              {@link MeterRegistry} metrics repository
      */
     public JobLaunchServiceImpl(
         final DataServices dataServices,
         final JobResolverService jobResolverService,
-        final AgentLauncher agentLauncher,
+        final AgentLauncherSelector agentLauncherSelector,
         final MeterRegistry registry
     ) {
         this.persistenceService = dataServices.getPersistenceService();
         this.jobResolverService = jobResolverService;
-        this.agentLauncher = agentLauncher;
+        this.agentLauncherSelector = agentLauncherSelector;
         this.registry = registry;
     }
 
@@ -90,8 +98,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
         AgentLaunchException,
         GenieJobResolutionException,
         IdAlreadyExistsException,
-        NotFoundException,
-        SaveAttachmentException {
+        NotFoundException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -138,7 +145,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
 
             // Already throws an exception
             try {
-                this.agentLauncher.launchAgent(resolvedJob);
+                this.selectLauncher(jobId, jobSubmission).launchAgent(resolvedJob);
             } catch (final AgentLaunchException e) {
                 // TODO: this could fail as well
                 this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());
@@ -157,6 +164,46 @@ public class JobLaunchServiceImpl implements JobLaunchService {
         } finally {
             this.registry
                 .timer(LAUNCH_JOB_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private AgentLauncher selectLauncher(
+        final String jobId,
+        final JobSubmission jobSubmission
+    ) throws AgentLaunchException {
+        final Collection<AgentLauncher> availableLaunchers = this.agentLauncherSelector.getAgentLaunchers();
+        final AgentLauncherSelectionContext context = new AgentLauncherSelectionContext(
+            jobId,
+            jobSubmission.getJobRequest(),
+            true,
+            jobSubmission.getJobRequestMetadata(),
+            availableLaunchers
+        );
+
+        final Set<Tag> tags = Sets.newHashSet();
+        final long start = System.nanoTime();
+        tags.add(Tag.of(AVAILABLE_LAUNCHERS_TAG, String.valueOf(availableLaunchers.size())));
+        tags.add(Tag.of(SELECTOR_CLASS_TAG, this.agentLauncherSelector.getClass().getSimpleName()));
+
+        final ResourceSelectionResult<AgentLauncher> selectionResult;
+        try {
+            selectionResult = this.agentLauncherSelector.select(context);
+            final AgentLauncher selectedLauncher = selectionResult.getSelectedResource().orElseThrow(
+                () -> new ResourceSelectionException(
+                    "No AgentLauncher selected: "
+                        + selectionResult.getSelectionRationale().orElse("Rationale unknown")
+                )
+            );
+            MetricsUtils.addSuccessTags(tags);
+            tags.add(Tag.of(LAUNCHER_CLASS_TAG, selectedLauncher.getClass().getSimpleName()));
+            return selectedLauncher;
+        } catch (ResourceSelectionException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw new AgentLaunchException("Failed to select an Agent Launcher", e);
+        } finally {
+            this.registry
+                .timer(AGENT_LAUNCHER_SELECTOR_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
