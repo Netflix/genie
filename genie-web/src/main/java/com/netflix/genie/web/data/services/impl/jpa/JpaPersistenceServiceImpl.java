@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -2021,6 +2023,65 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             updated
         );
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateRequestedLauncherExt(
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final JsonNode launcherExtension
+    ) throws NotFoundException {
+        log.debug("[updateRequestedLauncherExt] Requested to update launcher requested ext of job {}", id);
+
+        this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No job exists for the id specified"))
+            .setRequestedLauncherExt(launcherExtension);
+
+        log.debug("[updateRequestedLauncherExt] Updated launcher requested ext of job {}", id);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JsonNode getRequestedLauncherExt(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getRequestedLauncherExt] Requested for job {}", id);
+        return this.jobRepository.getRequestedLauncherExt(id).orElse(NullNode.getInstance());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateLauncherExt(
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final JsonNode launcherExtension
+    ) throws NotFoundException {
+        log.debug("[updateRequestedLauncherExt] Requested to update launcher ext of job {}", id);
+
+        this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No job exists for the id specified"))
+            .setLauncherExt(launcherExtension);
+
+        log.debug("[updateRequestedLauncherExt] Updated launcher ext of job {}", id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JsonNode getLauncherExt(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getLauncherExt] Requested for job {}", id);
+        return this.jobRepository.getLauncherExt(id).orElse(NullNode.getInstance());
+    }
+
     //endregion
     //endregion
 

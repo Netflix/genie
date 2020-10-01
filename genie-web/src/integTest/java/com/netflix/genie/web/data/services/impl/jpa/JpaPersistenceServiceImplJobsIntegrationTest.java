@@ -17,9 +17,14 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -1176,6 +1181,49 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                 )
             ).hasSize(2)
             .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/launcher_ext.xml")
+    void canGetAndUpdateLauncherExt() throws NotFoundException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final JsonNode emptyExt = NullNode.getInstance();
+
+        final Map<Object, Object> ext1 = Maps.newHashMap();
+        ext1.put("Foo", 3);
+        ext1.put("Bar", Lists.newArrayList("x", 3));
+
+        final List<Object> ext2 = Lists.newArrayList("Foo", "Bar", 123);
+
+        final JsonNode extNode1 = objectMapper.valueToTree(ext1);
+        final JsonNode extNode2 = objectMapper.valueToTree(ext2);
+
+        // Job does not exist, expect null node
+        Assertions.assertThat(this.service.getRequestedLauncherExt(UUID.randomUUID().toString())).isEqualTo(emptyExt);
+
+        // Jobs exists, but all ext fields are null, expect null nodes
+        Assertions.assertThat(this.service.getRequestedLauncherExt(AGENT_JOB_1)).isEqualTo(emptyExt);
+        Assertions.assertThat(this.service.getLauncherExt(AGENT_JOB_1)).isEqualTo(emptyExt);
+        Assertions.assertThat(this.service.getRequestedLauncherExt(AGENT_JOB_2)).isEqualTo(emptyExt);
+        Assertions.assertThat(this.service.getLauncherExt(AGENT_JOB_2)).isEqualTo(emptyExt);
+
+        // Update values for existing jobs
+        this.service.updateRequestedLauncherExt(AGENT_JOB_1, extNode1);
+        this.service.updateLauncherExt(AGENT_JOB_2, extNode2);
+
+        // Update values for non-existing jobs
+        Assertions
+            .assertThatExceptionOfType(NotFoundException.class)
+            .isThrownBy(() -> this.service.updateRequestedLauncherExt(UUID.randomUUID().toString(), extNode1));
+        Assertions
+            .assertThatExceptionOfType(NotFoundException.class)
+            .isThrownBy(() -> this.service.updateRequestedLauncherExt(UUID.randomUUID().toString(), extNode1));
+
+        // Retrieve persisted values
+        Assertions.assertThat(this.service.getRequestedLauncherExt(AGENT_JOB_1)).isEqualTo(extNode1);
+        Assertions.assertThat(this.service.getLauncherExt(AGENT_JOB_1)).isEqualTo(emptyExt);
+        Assertions.assertThat(this.service.getRequestedLauncherExt(AGENT_JOB_2)).isEqualTo(emptyExt);
+        Assertions.assertThat(this.service.getLauncherExt(AGENT_JOB_2)).isEqualTo(extNode2);
     }
 
     private void validateSavedJobSubmission(

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
@@ -853,6 +854,50 @@ public interface PersistenceService {
         @NotEmpty Set<ArchiveStatus> archiveStatuses,
         @NotNull Instant updated
     );
+
+    /**
+     * Update the requested launcher extension field for this job.
+     *
+     * @param id                The id of the job to update the laucher extension for.
+     * @param launcherExtension The updated requested launcher extension JSON blob.
+     * @throws NotFoundException If no job with the given {@code id} exists
+     */
+    void updateRequestedLauncherExt(
+        @NotBlank(message = "No job id entered. Unable to update.") String id,
+        @NotNull(message = "Status cannot be null.") JsonNode launcherExtension
+    ) throws NotFoundException;
+
+    /**
+     * Get the command the job used or is using.
+     *
+     * @param id The id of the job to get the command for
+     * @return The {@link JsonNode} passed to the launcher at launch, or a
+     * {@link com.fasterxml.jackson.databind.node.NullNode} if none was saved
+     * @throws NotFoundException If no job with the given {@code id} exists
+     */
+    JsonNode getRequestedLauncherExt(@NotBlank String id) throws NotFoundException;
+
+    /**
+     * Update the launcher extension field for this job.
+     *
+     * @param id                The id of the job to update the laucher extension for.
+     * @param launcherExtension The updated launcher extension JSON blob.
+     * @throws NotFoundException If no job with the given {@code id} exists
+     */
+    void updateLauncherExt(
+        @NotBlank(message = "No job id entered. Unable to update.") String id,
+        @NotNull(message = "Status cannot be null.") JsonNode launcherExtension
+    ) throws NotFoundException;
+
+    /**
+     * Get the job requested launcher extension.
+     *
+     * @param id The id of the job to get the command for
+     * @return The {@link JsonNode} emitted by the launcher at launch
+     * @throws NotFoundException If no job with the given {@code id} exists
+     */
+    JsonNode getLauncherExt(@NotBlank String id) throws NotFoundException;
+
     //endregion
     //endregion
 

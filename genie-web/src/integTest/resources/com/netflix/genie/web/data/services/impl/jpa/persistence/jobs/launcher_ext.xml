@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2020 Netflix, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<dataset>
+
+    <commands
+        id="1"
+        created="2016-03-21 01:47:00"
+        updated="2016-03-21 01:59:00"
+        entity_version="0"
+        unique_id="command1"
+        genie_user="tgianos"
+        name="spark"
+        version="1.6.0"
+        check_delay="10000"
+        status="ACTIVE"
+    />
+
+    <command_executable_arguments
+        command_id="1"
+        argument="spark"
+        argument_order="0"
+    />
+
+    <clusters
+        id="1"
+        created="2016-03-21 01:49:00"
+        updated="2016-03-21 02:59:00"
+        entity_version="0"
+        unique_id="cluster1"
+        genie_user="tgianos"
+        name="h2query"
+        version="2.4.0"
+        status="UP"
+    />
+
+    <criteria
+        id="0"
+        name="spark"
+    />
+
+    <!-- Should match with the right threshold -->
+    <jobs
+        id="1"
+        created="2020-01-01 00:00:00"
+        updated="2020-01-01 00:00:00"
+        entity_version="1"
+        unique_id="agentJob1"
+        genie_user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="1"
+        requested_memory="1560"
+        requested_timeout="608400"
+        status="SUCCEEDED"
+        cluster_id="1"
+        command_id="1"
+        check_delay="10000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
+        v4="true"
+        cluster_name="h2query"
+        command_name="spark"
+        api="true"
+        archive_status="PENDING"
+    />
+
+    <!-- Should match with the right threshold -->
+    <jobs
+        id="2"
+        created="2020-01-01 00:00:00"
+        updated="2020-01-01 00:00:00"
+        entity_version="1"
+        unique_id="agentJob2"
+        genie_user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="1"
+        requested_memory="1560"
+        requested_timeout="608400"
+        status="FAILED"
+        cluster_id="1"
+        command_id="1"
+        check_delay="10000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
+        v4="true"
+        cluster_name="h2query"
+        command_name="spark"
+        api="true"
+        archive_status="PENDING"
+    />
+
+    <!-- Not "v4"-->
+    <jobs
+        id="3"
+        created="2020-01-01 00:00:00"
+        updated="2020-01-01 00:00:00"
+        entity_version="1"
+        unique_id="NotAgentJob1"
+        genie_user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="1"
+        requested_memory="1560"
+        requested_timeout="608400"
+        status="SUCCEEDED"
+        cluster_id="1"
+        command_id="1"
+        check_delay="10000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
+        v4="false"
+        cluster_name="h2query"
+        command_name="spark"
+        api="true"
+        archive_status="PENDING"
+    />
+
+    <!-- Not in final state -->
+    <jobs
+        id="4"
+        created="2020-01-01 00:00:00"
+        updated="2020-01-01 00:00:00"
+        entity_version="1"
+        unique_id="InitJob"
+        genie_user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="1"
+        requested_memory="1560"
+        requested_timeout="608400"
+        status="INIT"
+        cluster_id="1"
+        command_id="1"
+        check_delay="10000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
+        v4="true"
+        cluster_name="h2query"
+        command_name="spark"
+        api="true"
+        archive_status="PENDING"
+    />
+
+    <!-- Not in final state -->
+    <jobs
+        id="5"
+        created="2020-01-01 00:00:00"
+        updated="2020-01-01 00:00:00"
+        entity_version="1"
+        unique_id="RunningJob"
+        genie_user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="1"
+        requested_memory="1560"
+        requested_timeout="608400"
+        status="RUNNING"
+        cluster_id="1"
+        command_id="1"
+        check_delay="10000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
+        v4="true"
+        cluster_name="h2query"
+        command_name="spark"
+        api="true"
+        archive_status="PENDING"
+    />
+    <!-- Not pending -->
+    <jobs
+        id="6"
+        created="2020-01-01 00:00:00"
+        updated="2020-01-01 00:00:00"
+        entity_version="1"
+        unique_id="ArchivedJob"
+        genie_user="tgianos"
+        name="testSparkJob"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="1"
+        requested_memory="1560"
+        requested_timeout="608400"
+        status="SUCCEEDED"
+        cluster_id="1"
+        command_id="1"
+        check_delay="10000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
+        v4="true"
+        cluster_name="h2query"
+        command_name="spark"
+        api="true"
+        archive_status="ARCHIVED"
+    />
+
+</dataset>
