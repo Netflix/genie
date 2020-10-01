@@ -15,6 +15,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.repositories;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
@@ -229,6 +230,24 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      */
     @Query("SELECT COALESCE(j.archiveStatus, 'UNKNOWN') FROM JobEntity j WHERE j.uniqueId = :id")
     Optional<String> getArchiveStatus(@Param("id") String id);
+
+    /**
+     * Get only the requested launcher ext of a job.
+     *
+     * @param id The id of the job
+     * @return The requested launcher ext JSON node {@link Optional#empty()} if no job with the given id exists
+     */
+    @Query("SELECT j.requestedLauncherExt FROM JobEntity j WHERE j.uniqueId = :id")
+    Optional<JsonNode> getRequestedLauncherExt(@Param("id") String id);
+
+    /**
+     * Get only the launcher ext of a job.
+     *
+     * @param id The id of the job
+     * @return The launcher ext JSON node {@link Optional#empty()} if no job with the given id exists
+     */
+    @Query("SELECT j.launcherExt FROM JobEntity j WHERE j.uniqueId = :id")
+    Optional<JsonNode> getLauncherExt(@Param("id") String id);
 
     /**
      * Get the data needed to create a V3 Job DTO.
