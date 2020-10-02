@@ -21,22 +21,24 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
 import com.netflix.genie.web.agent.launchers.AgentLauncher
+import com.netflix.genie.web.dtos.ResolvedJob
 import spock.lang.Specification
 
 class AgentLauncherSelectionContextSpec extends Specification {
 
     def "Constructor" () {
+        def jobId = UUID.randomUUID().toString()
         def jobRequest = Mock(JobRequest)
         def jobRequestMetadata = Mock(JobRequestMetadata)
         def launchers = Sets.newHashSet(Mock(AgentLauncher), Mock(AgentLauncher))
-        def jobId = UUID.randomUUID().toString()
+        def resolvedJob = Mock(ResolvedJob)
 
         when:
         def context = new AgentLauncherSelectionContext(
             jobId,
             jobRequest,
-            true,
             jobRequestMetadata,
+            resolvedJob,
             launchers
         )
 
@@ -45,6 +47,7 @@ class AgentLauncherSelectionContextSpec extends Specification {
         context.getJobRequestMetadata() == jobRequestMetadata
         context.getJobId() == jobId
         context.getAgentLaunchers() == launchers
+        context.getResolvedJob() == resolvedJob
         context.getResources() == launchers
     }
 }

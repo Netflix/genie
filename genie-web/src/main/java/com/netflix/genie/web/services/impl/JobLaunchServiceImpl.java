@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
@@ -44,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -143,9 +145,14 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 throw new AgentLaunchException(t);
             }
 
-            // Already throws an exception
+            // TODO: at the moment this is not populated, it's going to be a null node (not null)
+            final JsonNode requestedLauncherExt =
+                this.persistenceService.getRequestedLauncherExt(jobId);
+
+            final Optional<JsonNode> launcherExt;
             try {
-                this.selectLauncher(jobId, jobSubmission).launchAgent(resolvedJob);
+                 launcherExt = this.selectLauncher(jobId, jobSubmission, resolvedJob)
+                    .launchAgent(resolvedJob, requestedLauncherExt);
             } catch (final AgentLaunchException e) {
                 // TODO: this could fail as well
                 this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());
@@ -154,6 +161,10 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 //       We don't get the ID until after saveJobSubmission so if that fails we'd still return nothing
                 //       Probably need multiple exceptions to be thrown from this API (if we go with checked)
                 throw e;
+            }
+
+            if (launcherExt.isPresent()) {
+                this.persistenceService.updateLauncherExt(jobId, launcherExt.get());
             }
 
             MetricsUtils.addSuccessTags(tags);
@@ -170,14 +181,15 @@ public class JobLaunchServiceImpl implements JobLaunchService {
 
     private AgentLauncher selectLauncher(
         final String jobId,
-        final JobSubmission jobSubmission
+        final JobSubmission jobSubmission,
+        final ResolvedJob resolvedJob
     ) throws AgentLaunchException {
         final Collection<AgentLauncher> availableLaunchers = this.agentLauncherSelector.getAgentLaunchers();
         final AgentLauncherSelectionContext context = new AgentLauncherSelectionContext(
             jobId,
             jobSubmission.getJobRequest(),
-            true,
             jobSubmission.getJobRequestMetadata(),
+            resolvedJob,
             availableLaunchers
         );
 

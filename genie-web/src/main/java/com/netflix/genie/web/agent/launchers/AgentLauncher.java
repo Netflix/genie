@@ -17,9 +17,13 @@
  */
 package com.netflix.genie.web.agent.launchers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import org.springframework.boot.actuate.health.HealthIndicator;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * A interface which implementations will launch instances of an agent in some manner in order to run a job.
@@ -32,8 +36,13 @@ public interface AgentLauncher extends HealthIndicator {
     /**
      * Launch an agent to execute the given {@link ResolvedJob} information.
      *
-     * @param resolvedJob The {@link ResolvedJob} information for the agent to act on
+     * @param resolvedJob          The {@link ResolvedJob} information for the agent to act on
+     * @param requestedLauncherExt The launcher requested extension, or null
      * @throws AgentLaunchException For any error launching an Agent instance to run the job
+     * @return an optional {@link JsonNode} with the launcher context about the launched job
      */
-    void launchAgent(ResolvedJob resolvedJob) throws AgentLaunchException;
+    Optional<JsonNode> launchAgent(
+        ResolvedJob resolvedJob,
+        @Nullable JsonNode requestedLauncherExt
+    ) throws AgentLaunchException;
 }
