@@ -383,6 +383,21 @@ of 2.0
 |300000
 |no
 
+|genie.scripts.agent-launcher-selector.source
+|URI of the script to load. `AgentLauncherSelectorManagedScript` is enabled only if this property is set.
+|null
+|no
+
+|genie.scripts.agent-launcher-selector.auto-load-enabled
+|If true, the script eagerly load during startup, as opposed to lazily load on first use.
+|false
+|no
+
+|genie.scripts.agent-launcher-selector.timeout
+|Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
+|5000
+|no
+
 |genie.scripts.cluster-selector.source
 |URI of the script to load. `ScriptClusterSelector` is enabled only if this property is set.
 |null

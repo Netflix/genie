@@ -42,6 +42,11 @@ public final class MetricsConstants {
         public static final String EXCEPTION_CLASS = "exceptionClass";
 
         /**
+         * Key to tag metrics with class of agent launcher.
+         */
+        public static final String AGENT_LAUNCHER_CLASS = "agentLauncherClass";
+
+        /**
          * Key to tag metrics with cluster ID.
          */
         public static final String CLUSTER_ID = "clusterId";

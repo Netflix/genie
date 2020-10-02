@@ -149,6 +149,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentJobCleanupTask
 |status, exceptionClass
 
+|genie.jobs.agentLauncher.selectors.script.select.timer
+|Time taken to select the agent launcher for a job
+|count
+|AgentJobCleanupTask
+|status, exceptionClass, agentLauncherClass
+
 |genie.jobs.archiveStatus.cleanup.counter
 |Counter of jobs whose archive status was left in PENDING state after execution completed
 |count

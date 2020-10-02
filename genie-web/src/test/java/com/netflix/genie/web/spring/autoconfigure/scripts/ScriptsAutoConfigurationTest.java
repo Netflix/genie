@@ -17,8 +17,10 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
+import com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
+import com.netflix.genie.web.scripts.AgentLauncherSelectorManagedScript;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ScriptManager;
@@ -57,10 +59,12 @@ class ScriptsAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ClusterSelectorScriptProperties.class);
                     Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScriptProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentLauncherSelectorScriptProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
                     Assertions.assertThat(context).doesNotHaveBean(ClusterSelectorManagedScript.class);
                     Assertions.assertThat(context).doesNotHaveBean(CommandSelectorManagedScript.class);
+                    Assertions.assertThat(context).doesNotHaveBean(AgentLauncherSelectorManagedScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
                 }
             );
@@ -71,16 +75,19 @@ class ScriptsAutoConfigurationTest {
         this.contextRunner
             .withPropertyValues(
                 ClusterSelectorScriptProperties.SOURCE_PROPERTY + "=file:///script.js",
-                CommandSelectorManagedScriptProperties.SOURCE_PROPERTY + "=file:///script.groovy"
+                CommandSelectorManagedScriptProperties.SOURCE_PROPERTY + "=file:///script.groovy",
+                AgentLauncherSelectorScriptProperties.SOURCE_PROPERTY + "=file:///script.groovy"
             )
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ClusterSelectorScriptProperties.class);
                     Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScriptProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentLauncherSelectorScriptProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
                     Assertions.assertThat(context).hasSingleBean(ClusterSelectorManagedScript.class);
                     Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScript.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentLauncherSelectorManagedScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
                 }
             );

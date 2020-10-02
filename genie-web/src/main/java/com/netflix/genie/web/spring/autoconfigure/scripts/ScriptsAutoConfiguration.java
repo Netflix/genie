@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
+import com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
+import com.netflix.genie.web.scripts.AgentLauncherSelectorManagedScript;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ManagedScript;
@@ -48,6 +50,7 @@ import java.util.concurrent.Executors;
 @Configuration
 @EnableConfigurationProperties(
     {
+        AgentLauncherSelectorScriptProperties.class,
         ClusterSelectorScriptProperties.class,
         CommandSelectorManagedScriptProperties.class,
         ScriptManagerProperties.class,
@@ -136,6 +139,29 @@ public class ScriptsAutoConfiguration {
         return new CommandSelectorManagedScript(
             scriptManager,
             commandSelectorManagedScriptProperties,
+            meterRegistry
+        );
+    }
+
+    /**
+     * Create a {@link AgentLauncherSelectorManagedScript}  if necessary and one doesn't already exist.
+     *
+     * @param scriptManager                         script manager
+     * @param agentLauncherSelectorScriptProperties script properties
+     * @param meterRegistry                         meter registry
+     * @return a {@link AgentLauncherSelectorManagedScript}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentLauncherSelectorManagedScript.class)
+    @ConditionalOnProperty(value = AgentLauncherSelectorScriptProperties.SOURCE_PROPERTY)
+    AgentLauncherSelectorManagedScript agentLauncherSelectorManagedScript(
+        final ScriptManager scriptManager,
+        final AgentLauncherSelectorScriptProperties agentLauncherSelectorScriptProperties,
+        final MeterRegistry meterRegistry
+    ) {
+        return new AgentLauncherSelectorManagedScript(
+            scriptManager,
+            agentLauncherSelectorScriptProperties,
             meterRegistry
         );
     }

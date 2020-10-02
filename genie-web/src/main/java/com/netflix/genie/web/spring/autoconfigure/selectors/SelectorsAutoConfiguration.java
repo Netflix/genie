@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
+import com.netflix.genie.web.scripts.AgentLauncherSelectorManagedScript;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.selectors.AgentLauncherSelector;
@@ -26,6 +27,7 @@ import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.selectors.impl.RandomAgentLauncherSelectorImpl;
 import com.netflix.genie.web.selectors.impl.RandomClusterSelectorImpl;
 import com.netflix.genie.web.selectors.impl.RandomCommandSelectorImpl;
+import com.netflix.genie.web.selectors.impl.ScriptAgentLauncherSelectorImpl;
 import com.netflix.genie.web.selectors.impl.ScriptClusterSelectorImpl;
 import com.netflix.genie.web.selectors.impl.ScriptCommandSelectorImpl;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -36,6 +38,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -115,14 +118,29 @@ public class SelectorsAutoConfiguration {
     /**
      * Provide a default {@link AgentLauncherSelector} implementation if no other has been defined in the context.
      *
-     * @param agentLaunchers A collection of usable {@link AgentLauncher} beans.
-     * @return A {@link RandomAgentLauncherSelectorImpl}
+     * @param agentLauncherSelectorManagedScript An {@link Optional} {@link AgentLauncherSelectorManagedScript}
+     *                                           instance if one is present in the context
+     * @param agentLaunchers                     The available agent launchers
+     * @param registry                           The {@link MeterRegistry} instance to use
+     * @return A {@link ScriptAgentLauncherSelectorImpl} if a {@link AgentLauncherSelectorManagedScript} instance is
+     * present, else a {@link RandomAgentLauncherSelectorImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(AgentLauncherSelector.class)
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public AgentLauncherSelector agentLauncherSelector(
-        final Collection<AgentLauncher> agentLaunchers
+        final Optional<AgentLauncherSelectorManagedScript> agentLauncherSelectorManagedScript,
+        @NotEmpty final Collection<AgentLauncher> agentLaunchers,
+        final MeterRegistry registry
     ) {
-        return new RandomAgentLauncherSelectorImpl(agentLaunchers);
+        if (agentLauncherSelectorManagedScript.isPresent()) {
+            return new ScriptAgentLauncherSelectorImpl(
+                agentLauncherSelectorManagedScript.get(),
+                agentLaunchers,
+                registry
+            );
+        } else {
+            return new RandomAgentLauncherSelectorImpl(agentLaunchers);
+        }
     }
 }

@@ -20,6 +20,7 @@ package com.netflix.genie.web.scripts;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.web.selectors.AgentLauncherSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelectionContext;
 import groovy.lang.Binding;
@@ -62,6 +63,20 @@ public final class GroovyScriptUtils {
         final Binding binding
     ) throws IllegalArgumentException {
         return getObjectVariable(binding, ResourceSelectorScript.CONTEXT_BINDING, ClusterSelectionContext.class);
+    }
+
+    /**
+     * Given the {@link Binding} that a script has attempt to extract the cluster selection context.
+     *
+     * @param binding The {@link Binding} for the script
+     * @return The {@link ClusterSelectionContext} instance
+     * @throws IllegalArgumentException If there is no context parameter for the script or it is not a
+     *                                  {@link ClusterSelectionContext}
+     */
+    public static AgentLauncherSelectionContext getAgentLauncherSelectionContext(
+        final Binding binding
+    ) throws IllegalArgumentException {
+        return getObjectVariable(binding, ResourceSelectorScript.CONTEXT_BINDING, AgentLauncherSelectionContext.class);
     }
 
     /**
