@@ -24,6 +24,9 @@ import com.netflix.genie.common.external.dtos.v4.Command
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
+import com.netflix.genie.web.dtos.ResolvedJob
+import com.netflix.genie.web.selectors.AgentLauncherSelectionContext
 import com.netflix.genie.web.selectors.ClusterSelectionContext
 import com.netflix.genie.web.selectors.CommandSelectionContext
 import spock.lang.Specification
@@ -96,6 +99,35 @@ class GroovyScriptUtilsSpec extends Specification {
         )
         this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, expectedContext)
         def context = GroovyScriptUtils.getClusterSelectionContext(this.scriptBinding)
+
+        then:
+        context == expectedContext
+    }
+
+    def "Can get agent launcher selection context"() {
+        when:
+        GroovyScriptUtils.getAgentLauncherSelectionContext(this.scriptBinding)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, 1)
+        GroovyScriptUtils.getAgentLauncherSelectionContext(this.scriptBinding)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        def expectedContext = new AgentLauncherSelectionContext(
+            UUID.randomUUID().toString(),
+            Mock(JobRequest),
+            Mock(JobRequestMetadata),
+            Mock(ResolvedJob),
+            Lists.newArrayList()
+        )
+        this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, expectedContext)
+        def context = GroovyScriptUtils.getAgentLauncherSelectionContext(this.scriptBinding)
 
         then:
         context == expectedContext
