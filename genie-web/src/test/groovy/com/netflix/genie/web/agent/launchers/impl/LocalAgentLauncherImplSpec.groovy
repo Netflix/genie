@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.agent.launchers.impl
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
@@ -78,6 +79,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     Executor sharedExecutor
     Executor executor
     Map<String, String> additionalEnvironment
+    JsonNode requestedLauncherExt
 
     def setup() {
         this.hostname = UUID.randomUUID().toString()
@@ -103,6 +105,7 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
+        this.requestedLauncherExt = null;
     }
 
     @Unroll
@@ -131,7 +134,7 @@ class LocalAgentLauncherImplSpec extends Specification {
         0 * jobInfo.getTotalMemoryUsed()
 
         when:
-        this.launcher.launchAgent(this.resolvedJob)
+        Optional<JsonNode> launcherExt = this.launcher.launchAgent(this.resolvedJob, requestedLauncherExt)
 
         then:
         1 * this.resolvedJob.getJobMetadata() >> this.jobMetadata
@@ -157,6 +160,7 @@ class LocalAgentLauncherImplSpec extends Specification {
                 assert env.get("foo") == "bar"
                 assert env.size() > 1
         }
+        !launcherExt.isPresent()
 
         where:
         runAsUser | expectedCommandLine

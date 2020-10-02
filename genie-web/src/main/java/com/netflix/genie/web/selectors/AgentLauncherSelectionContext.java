@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -38,6 +39,7 @@ import java.util.Set;
 @ToString(callSuper = true, doNotUseGetters = true)
 public class AgentLauncherSelectionContext extends ResourceSelectionContext<AgentLauncher> {
     private final JobRequestMetadata jobRequestMetadata;
+    private final ResolvedJob resolvedJob;
     private final Set<AgentLauncher> agentLaunchers;
 
     /**
@@ -45,19 +47,20 @@ public class AgentLauncherSelectionContext extends ResourceSelectionContext<Agen
      *
      * @param jobId              the job id
      * @param jobRequest         the job request
-     * @param apiJob             whether this job was submitted through the API
      * @param jobRequestMetadata the job request metadata
+     * @param resolvedJob        the resolved job details
      * @param agentLaunchers     the list of available launchers
      */
     public AgentLauncherSelectionContext(
         @NotBlank final String jobId,
         final JobRequest jobRequest,
-        final boolean apiJob,
         final JobRequestMetadata jobRequestMetadata,
+        final ResolvedJob resolvedJob,
         final Collection<AgentLauncher> agentLaunchers
     ) {
-        super(jobId, jobRequest, apiJob);
+        super(jobId, jobRequest, true);
         this.jobRequestMetadata = jobRequestMetadata;
+        this.resolvedJob = resolvedJob;
         this.agentLaunchers = ImmutableSet.copyOf(agentLaunchers);
     }
 

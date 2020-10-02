@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.agent.launchers.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
@@ -47,12 +48,14 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.boot.actuate.health.Health;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -170,9 +173,13 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
     /**
      * {@inheritDoc}
+     * @return
      */
     @Override
-    public void launchAgent(@Valid final ResolvedJob resolvedJob) throws AgentLaunchException {
+    public Optional<JsonNode> launchAgent(
+        @Valid final ResolvedJob resolvedJob,
+        @Nullable final JsonNode requestedLauncherExt
+    ) throws AgentLaunchException {
         log.debug("Received request to launch local agent to run job: {}", resolvedJob);
 
         final JobMetadata jobMetadata = resolvedJob.getJobMetadata();
@@ -263,6 +270,8 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
                 ioe
             );
         }
+
+        return Optional.empty();
     }
 
     /**
