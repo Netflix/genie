@@ -19,7 +19,6 @@ package com.netflix.genie.web.scripts;
 
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.selectors.AgentLauncherSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelectionContext;
@@ -77,35 +76,6 @@ public final class GroovyScriptUtils {
         final Binding binding
     ) throws IllegalArgumentException {
         return getObjectVariable(binding, ResourceSelectorScript.CONTEXT_BINDING, AgentLauncherSelectionContext.class);
-    }
-
-    /**
-     * Given the {@link Binding} that a script has attempt to extract the job id parameter.
-     *
-     * @param binding The {@link Binding} for the script
-     * @return The job id
-     * @throws IllegalArgumentException If there is no job id parameter for the script or it is not a String
-     * @deprecated Use {@link #getClusterSelectionContext(Binding)} or {@link #getCommandSelectionContext(Binding)}
-     * instead
-     */
-    @Deprecated
-    public static String getJobId(final Binding binding) throws IllegalArgumentException {
-        return getObjectVariable(binding, ResourceSelectorScript.JOB_ID_BINDING, String.class);
-    }
-
-    /**
-     * Given the {@link Binding} that a script has attempt to extract the job request parameter.
-     *
-     * @param binding The {@link Binding} for the script
-     * @return The {@link JobRequest}
-     * @throws IllegalArgumentException If there is no job request parameter for the script or it is not a
-     *                                  {@link JobRequest}
-     * @deprecated Use {@link #getClusterSelectionContext(Binding)} or {@link #getCommandSelectionContext(Binding)}
-     * instead
-     */
-    @Deprecated
-    public static JobRequest getJobRequest(final Binding binding) throws IllegalArgumentException {
-        return getObjectVariable(binding, ResourceSelectorScript.JOB_REQUEST_BINDING, JobRequest.class);
     }
 
     /**

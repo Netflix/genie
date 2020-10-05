@@ -40,8 +40,6 @@ import java.util.Map;
 @Slf4j
 public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> extends ManagedScript {
 
-    static final String JOB_REQUEST_BINDING = "jobRequestParameter";
-    static final String JOB_ID_BINDING = "jobIdParameter";
     static final String CONTEXT_BINDING = "contextParameter";
 
     /**
@@ -105,9 +103,5 @@ public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> ex
      */
     protected void addParametersForScript(final Map<String, Object> parameters, final C context) {
         parameters.put(CONTEXT_BINDING, context);
-
-        // TODO: Remove once internal scripts migrate to use context directly
-        parameters.put(JOB_REQUEST_BINDING, context.getJobRequest());
-        parameters.put(JOB_ID_BINDING, context.getJobId());
     }
 }

@@ -133,63 +133,6 @@ class GroovyScriptUtilsSpec extends Specification {
         context == expectedContext
     }
 
-    def "Can get job id"() {
-        when:
-        GroovyScriptUtils.getJobId(this.scriptBinding)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        this.scriptBinding.setVariable(ResourceSelectorScript.JOB_ID_BINDING, 1234L)
-        GroovyScriptUtils.getJobId(this.scriptBinding)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        def expectedJobId = UUID.randomUUID().toString()
-        this.scriptBinding.setVariable(ResourceSelectorScript.JOB_ID_BINDING, expectedJobId)
-        def jobId = GroovyScriptUtils.getJobId(this.scriptBinding)
-
-        then:
-        jobId == expectedJobId
-    }
-
-    def "Can get job request"() {
-        when:
-        GroovyScriptUtils.getJobRequest(this.scriptBinding)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        this.scriptBinding.setVariable(ResourceSelectorScript.JOB_REQUEST_BINDING, 1234L)
-        GroovyScriptUtils.getJobRequest(this.scriptBinding)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        def expectedJobRequest = new JobRequest(
-            null,
-            null,
-            Lists.newArrayList(UUID.randomUUID().toString()),
-            new JobMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
-            ).build(),
-            Mock(ExecutionResourceCriteria),
-            null,
-            null
-        )
-        this.scriptBinding.setVariable(ResourceSelectorScript.JOB_REQUEST_BINDING, expectedJobRequest)
-        def jobRequest = GroovyScriptUtils.getJobRequest(this.scriptBinding)
-
-        then:
-        jobRequest == expectedJobRequest
-    }
-
     def "Can get clusters"() {
         when:
         GroovyScriptUtils.getClusters(this.scriptBinding)
