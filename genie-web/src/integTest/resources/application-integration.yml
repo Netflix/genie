@@ -29,9 +29,6 @@ genie:
     cluster-selector:
       source: file:///tmp/genie/scripts/selectCluster.js
       auto-load-enabled: true
-    execution-mode-filter:
-      source: file:///tmp/genie/scripts/executionModeFilter.js
-      auto-load-enabled: true
 
 # Start gRPC on a random available port to avoid port binding conflicts during
 # integration tests shutting down less than gracefully
