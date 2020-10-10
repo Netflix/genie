@@ -139,10 +139,11 @@ implements java.io.Serializable</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html#JobRequestMetadata-com.netflix.genie.common.external.dtos.v4.ApiClientMetadata-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-int-long-">JobRequestMetadata</a></span>(<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ApiClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ApiClientMetadata</a>&nbsp;apiClientMetadata,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html#JobRequestMetadata-com.netflix.genie.common.external.dtos.v4.ApiClientMetadata-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-int-long-java.util.Map-">JobRequestMetadata</a></span>(<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ApiClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ApiClientMetadata</a>&nbsp;apiClientMetadata,
                   <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata,
                   int&nbsp;numAttachments,
-                  long&nbsp;totalSizeOfAttachments)</code>
+                  long&nbsp;totalSizeOfAttachments,
+                  java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;requestHeaders)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -195,7 +196,7 @@ implements java.io.Serializable</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobRequestMetadata-com.netflix.genie.common.external.dtos.v4.ApiClientMetadata-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-int-long-">
+<a name="JobRequestMetadata-com.netflix.genie.common.external.dtos.v4.ApiClientMetadata-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-int-long-java.util.Map-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -206,7 +207,9 @@ implements java.io.Serializable</pre>
                           @Nullable
                           <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata,
                           int&nbsp;numAttachments,
-                          long&nbsp;totalSizeOfAttachments)
+                          long&nbsp;totalSizeOfAttachments,
+                          @Nullable
+                          java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;requestHeaders)
                    throws java.lang.IllegalArgumentException</pre>
 <div class="block">Constructor. One of apiClientMetadata or agentClientMetadata is required. Both cannot be
  present.</div>
@@ -216,6 +219,7 @@ implements java.io.Serializable</pre>
 <dd><code>agentClientMetadata</code> - The metadata about the client if this request was received from the Agent</dd>
 <dd><code>numAttachments</code> - The number of attachments that came with this job request</dd>
 <dd><code>totalSizeOfAttachments</code> - The total size of the attachments that came with this job request</dd>
+<dd><code>requestHeaders</code> - The map of HTTP headers (filtered upstream) if this request was received via API</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.lang.IllegalArgumentException</code> - If both apiClientMetadata and agentClientMetadata are
                                   missing or both are present</dd>

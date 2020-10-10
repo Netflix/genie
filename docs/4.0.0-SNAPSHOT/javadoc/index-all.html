@@ -248,6 +248,10 @@
 <dd>
 <div class="block">Add a source file specifying a target file destination.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.AgentLauncherSelectionContext-">addParametersForScript(Map&lt;String, Object&gt;, AgentLauncherSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a></dt>
+<dd>
+<div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.ClusterSelectionContext-">addParametersForScript(Map&lt;String, Object&gt;, ClusterSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
@@ -337,6 +341,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#AGENT_JAR_PLACEHOLDER">AGENT_JAR_PLACEHOLDER</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
 <dd>
 <div class="block">Placeholder for agent jar path in command-line-template.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#AGENT_LAUNCHER_CLASS">AGENT_LAUNCHER_CLASS</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
+<dd>
+<div class="block">Key to tag metrics with class of agent launcher.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#AGENT_PID">AGENT_PID</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -580,6 +588,37 @@
 <div class="block">Auto configuration for beans responsible ofor launching Genie Agent instances.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#AgentLaunchersAutoConfiguration--">AgentLaunchersAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html" title="class in com.netflix.genie.web.selectors"><span class="typeNameLink">AgentLauncherSelectionContext</span></a> - Class in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
+<dd>
+<div class="block">Extension of <a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in AgentLauncher selection.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html#AgentLauncherSelectionContext-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobRequest-com.netflix.genie.common.external.dtos.v4.JobRequestMetadata-com.netflix.genie.web.dtos.ResolvedJob-java.util.Collection-">AgentLauncherSelectionContext(String, JobRequest, JobRequestMetadata, ResolvedJob, Collection&lt;AgentLauncher&gt;)</a></span> - Constructor for class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html" title="class in com.netflix.genie.web.selectors">AgentLauncherSelectionContext</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="typeNameLink">AgentLauncherSelector</span></a> - Interface in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
+<dd>
+<div class="block">Interface for any classes which provide a way to select a <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> from a set of available candidates.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#agentLauncherSelector-java.util.Optional-java.util.Collection-io.micrometer.core.instrument.MeterRegistry-">agentLauncherSelector(Optional&lt;AgentLauncherSelectorManagedScript&gt;, Collection&lt;AgentLauncher&gt;, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.selectors.<a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.selectors">SelectorsAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a default <a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><code>AgentLauncherSelector</code></a> implementation if no other has been defined in the context.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">AgentLauncherSelectorManagedScript</span></a> - Class in <a href="com/netflix/genie/web/scripts/package-summary.html">com.netflix.genie.web.scripts</a></dt>
+<dd>
+<div class="block">Extension of <a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> that delegates selection of a job's agent launcher when more than one
+ choice is available.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-">AgentLauncherSelectorManagedScript(ScriptManager, AgentLauncherSelectorScriptProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">AgentLauncherSelectorScriptProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties for agent launcher selection via script.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html#AgentLauncherSelectorScriptProperties--">AgentLauncherSelectorScriptProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked"><span class="typeNameLink">AgentLaunchException</span></a> - Exception in <a href="com/netflix/genie/web/exceptions/checked/package-summary.html">com.netflix.genie.web.exceptions.checked</a></dt>
 <dd>
@@ -4612,6 +4651,16 @@
 <dd>
 <div class="block">Find agent jobs in the given set of states.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html#getAgentLaunchers--">getAgentLaunchers()</a></span> - Method in interface com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a></dt>
+<dd>
+<div class="block">Get the list of all available <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html#getAgentLaunchers--">getAgentLaunchers()</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptAgentLauncherSelectorImpl</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getAgentLauncherSelectionContext-groovy.lang.Binding-">getAgentLauncherSelectionContext(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
+<dd>
+<div class="block">Given the <code>Binding</code> that a script has attempt to extract the cluster selection context.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/AgentMetadata.html#getAgentPid--">getAgentPid()</a></span> - Method in interface com.netflix.genie.agent.<a href="com/netflix/genie/agent/AgentMetadata.html" title="interface in com.netflix.genie.agent">AgentMetadata</a></dt>
 <dd>
 <div class="block">Get the agent process ID.</div>
@@ -5886,13 +5935,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobId--">getJobId()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getJobId-groovy.lang.Binding-">getJobId(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
- instead</span></div>
-</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobMetadata--">getJobMetadata()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#getJobMetadata-java.lang.String-">getJobMetadata(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
@@ -5948,13 +5990,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobRequest-java.lang.String-">getJobRequest(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the original request for a job.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getJobRequest-groovy.lang.Binding-">getJobRequest(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
-<dd>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
- instead</span></div>
-</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-java.lang.Integer-java.lang.String-java.lang.Integer-">getJobs(String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, String, String, String, Long, Long, Long, Long, String, String, Integer, String, Integer)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
 <dd>
@@ -6095,6 +6130,18 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#getLauncherExt--">getLauncherExt()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
 <div class="block">Get any metadata associated with this job pertaining to the launcher that launched it.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getLauncherExt-java.lang.String-">getLauncherExt(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Get the job requested launcher extension.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getLauncherExt-java.lang.String-">getLauncherExt(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get only the launcher ext of a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getLauncherExt-java.lang.String-">getLauncherExt(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Get the job requested launcher extension.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/locks/impl/FileLockFactory.html#getLock-java.io.File-">getLock(File)</a></span> - Method in class com.netflix.genie.agent.utils.locks.impl.<a href="com/netflix/genie/agent/utils/locks/impl/FileLockFactory.html" title="class in com.netflix.genie.agent.utils.locks.impl">FileLockFactory</a></dt>
 <dd>
@@ -6459,6 +6506,18 @@
 <dd>
 <div class="block">Get any metadata the user provided with respect to the launcher.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getRequestedLauncherExt-java.lang.String-">getRequestedLauncherExt(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Get the command the job used or is using.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getRequestedLauncherExt-java.lang.String-">getRequestedLauncherExt(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get only the requested launcher ext of a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getRequestedLauncherExt-java.lang.String-">getRequestedLauncherExt(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Get the command the job used or is using.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html#getRequestedMemory--">getRequestedMemory()</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.<a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a></dt>
 <dd>
 <div class="block">Getter for optional field.</div>
@@ -6518,6 +6577,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a></dt>
 <dd>
 <div class="block">Get the resources that were resolved.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html" title="class in com.netflix.genie.web.selectors">AgentLauncherSelectionContext</a></dt>
+<dd>
+<div class="block">Return the <code>Set</code> of distinct resources that a selector is meant to chose from.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a></dt>
 <dd>
@@ -8154,7 +8217,7 @@
 <dd>
 <div class="block">Top level coordination service responsible for taking a job request and running the job if possible.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">jobLaunchService(DataServices, JobResolverService, AgentLauncher, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">jobLaunchService(DataServices, JobResolverService, AgentLauncherSelector, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a> implementation if one isn't available.</div>
 </dd>
@@ -8162,7 +8225,7 @@
 <dd>
 <div class="block">Default implementation of the <a href="com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl(DataServices, JobResolverService, AgentLauncher, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl(DataServices, JobResolverService, AgentLauncherSelector, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8365,7 +8428,7 @@
 <dd>
 <div class="block">Metadata gathered by the system as part of any <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html#JobRequestMetadata-com.netflix.genie.common.external.dtos.v4.ApiClientMetadata-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-int-long-">JobRequestMetadata(ApiClientMetadata, AgentClientMetadata, int, long)</a></span> - Constructor for class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequestMetadata</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html#JobRequestMetadata-com.netflix.genie.common.external.dtos.v4.ApiClientMetadata-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-int-long-java.util.Map-">JobRequestMetadata(ApiClientMetadata, AgentClientMetadata, int, long, Map&lt;String, String&gt;)</a></span> - Constructor for class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequestMetadata</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8768,11 +8831,11 @@
 <h2 class="title">L</h2>
 <dl>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#lastModified--">lastModified()</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">launchAgent(ResolvedJob)</a></span> - Method in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">launchAgent(ResolvedJob, JsonNode)</a></span> - Method in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
 <dd>
 <div class="block">Launch an agent to execute the given <a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">launchAgent(ResolvedJob)</a></span> - Method in class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">launchAgent(ResolvedJob, JsonNode)</a></span> - Method in class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a></dt>
 <dd>
 <div class="block">Launch an agent to execute the given <a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
 </dd>
@@ -9356,6 +9419,10 @@
 <dd>
 <div class="block">Properties prefix.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html#PREFIX">PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a></dt>
+<dd>
+<div class="block">Prefix for this properties class.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html#PREFIX">PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties</a></dt>
 <dd>
 <div class="block">Prefix for this properties class.</div>
@@ -9541,6 +9608,15 @@
 </a>
 <h2 class="title">R</h2>
 <dl>
+<dt><a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><span class="typeNameLink">RandomAgentLauncherSelectorImpl</span></a> - Class in <a href="com/netflix/genie/web/selectors/impl/package-summary.html">com.netflix.genie.web.selectors.impl</a></dt>
+<dd>
+<div class="block">Basic implementation of a <a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><code>AgentLauncherSelector</code></a> where a random <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> is selected from the
+ options presented.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html#RandomAgentLauncherSelectorImpl-java.util.Collection-">RandomAgentLauncherSelectorImpl(Collection&lt;AgentLauncher&gt;)</a></span> - Constructor for class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomAgentLauncherSelectorImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/selectors/impl/RandomClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><span class="typeNameLink">RandomClusterSelectorImpl</span></a> - Class in <a href="com/netflix/genie/web/selectors/impl/package-summary.html">com.netflix.genie.web.selectors.impl</a></dt>
 <dd>
 <div class="block">Basic implementation of a <a href="com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><code>ClusterSelector</code></a> where a random <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> is selected from the options
@@ -10404,6 +10480,15 @@
 <dd>
 <div class="block">Key to tag the URI for a given script resource.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><span class="typeNameLink">ScriptAgentLauncherSelectorImpl</span></a> - Class in <a href="com/netflix/genie/web/selectors/impl/package-summary.html">com.netflix.genie.web.selectors.impl</a></dt>
+<dd>
+<div class="block">An implementation of the <a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><code>AgentLauncherSelector</code></a> interface which uses user-provided script to make decisions
+ based on the list of agent launchers and the job request supplied.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html#ScriptAgentLauncherSelectorImpl-com.netflix.genie.web.scripts.AgentLauncherSelectorManagedScript-java.util.Collection-io.micrometer.core.instrument.MeterRegistry-">ScriptAgentLauncherSelectorImpl(AgentLauncherSelectorManagedScript, Collection&lt;AgentLauncher&gt;, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptAgentLauncherSelectorImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#scriptClusterSelector-com.netflix.genie.web.scripts.ClusterSelectorManagedScript-io.micrometer.core.instrument.MeterRegistry-">scriptClusterSelector(ClusterSelectorManagedScript, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.selectors.<a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.selectors">SelectorsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Produce the <a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptClusterSelectorImpl</code></a> instance to use for this Genie node if it was configured by the
@@ -10514,6 +10599,10 @@
 <dd>
 <div class="block">An interface whose implementation is supposed to modify the HTTP Request by adding Security credentials.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html#select-com.netflix.genie.web.selectors.AgentLauncherSelectionContext-">select(AgentLauncherSelectionContext)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptAgentLauncherSelectorImpl</a></dt>
+<dd>
+<div class="block">Select a resource from the given set of resources if possible.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html#select-com.netflix.genie.web.selectors.ClusterSelectionContext-">select(ClusterSelectionContext)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></dt>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
@@ -10540,6 +10629,11 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#SelectorsAutoConfiguration--">SelectorsAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.selectors.<a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.selectors">SelectorsAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#selectResource-com.netflix.genie.web.selectors.AgentLauncherSelectionContext-">selectResource(AgentLauncherSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a></dt>
+<dd>
+<div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
+ invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#selectResource-com.netflix.genie.web.selectors.ClusterSelectionContext-">selectResource(ClusterSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
@@ -10949,6 +11043,10 @@
 <dt><a href="com/netflix/genie/client/apis/SortDirection.html" title="enum in com.netflix.genie.client.apis"><span class="typeNameLink">SortDirection</span></a> - Enum in <a href="com/netflix/genie/client/apis/package-summary.html">com.netflix.genie.client.apis</a></dt>
 <dd>
 <div class="block">Sort direction of entity search results.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html#SOURCE_PROPERTY">SOURCE_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a></dt>
+<dd>
+<div class="block">Name of script source property.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html#SOURCE_PROPERTY">SOURCE_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties</a></dt>
 <dd>
@@ -11927,6 +12025,22 @@
 <dd>
 <div class="block">Update the status of the job identified with <code>id</code> to be <code>newStatus</code> provided that the current status
  of the job matches <code>newStatus</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">updateLauncherExt(String, JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Update the launcher extension field for this job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#updateLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">updateLauncherExt(String, JsonNode)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Update the launcher extension field for this job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateRequestedLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">updateRequestedLauncherExt(String, JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Update the requested launcher extension field for this job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#updateRequestedLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">updateRequestedLauncherExt(String, JsonNode)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Update the requested launcher extension field for this job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>

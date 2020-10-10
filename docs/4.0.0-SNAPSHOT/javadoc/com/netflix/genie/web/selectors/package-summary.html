@@ -88,6 +88,12 @@
 </tr>
 <tbody>
 <tr class="altColor">
+<td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a></td>
+<td class="colLast">
+<div class="block">Interface for any classes which provide a way to select a <a href="../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> from a set of available candidates.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a></td>
 <td class="colLast">
 <div class="block">Interface for any classes which provide a way to select a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> from a set of clusters
@@ -95,14 +101,14 @@
  selected for a given job.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a></td>
 <td class="colLast">
 <div class="block">Interface for any classes which provide a way to select a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> from a set of commands
  which matched criterion provided by a user in a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;R,C extends <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;R&gt;&gt;</td>
 <td class="colLast">
 <div class="block">Generic interface for a selector which selects a resource from a set of resources for a given job request.</div>
@@ -120,18 +126,24 @@
 </tr>
 <tbody>
 <tr class="altColor">
+<td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html" title="class in com.netflix.genie.web.selectors">AgentLauncherSelectionContext</a></td>
+<td class="colLast">
+<div class="block">Extension of <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in AgentLauncher selection.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a></td>
 <td class="colLast">
 <div class="block">Extension of <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in cluster selection.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a></td>
 <td class="colLast">
 <div class="block">Extension of <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in command selection.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;R&gt;</td>
 <td class="colLast">
 <div class="block">Context object for encapsulating state into the selectors.</div>

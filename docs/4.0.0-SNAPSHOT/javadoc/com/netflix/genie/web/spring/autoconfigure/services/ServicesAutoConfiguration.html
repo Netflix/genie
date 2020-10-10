@@ -180,9 +180,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">jobLaunchService</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">jobLaunchService</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                 <a href="../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
-                <a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&nbsp;agentLauncher,
+                <a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector,
                 io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide a <a href="../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a> implementation if one isn't available.</div>
 </td>
@@ -347,7 +347,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/Jo
 <dd><code>dataServices</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>agentFileStreamService</code> - The service to request a file from an agent running a job</dd>
 <dd><code>archivedJobService</code> - The <a href="../../../../../../../com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services"><code>ArchivedJobService</code></a> implementation to use to get archived
-                                           job data</dd>
+                               job data</dd>
 <dd><code>meterRegistry</code> - The meter registry used to keep track of metrics</dd>
 <dd><code>agentRoutingService</code> - The agent routing service</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -355,7 +355,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/Jo
 </dl>
 </li>
 </ul>
-<a name="jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">
+<a name="jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -365,14 +365,14 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/Jo
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService.class</a>)
 public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a>&nbsp;jobLaunchService(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                                                                                             <a href="../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
-                                                                                                            <a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&nbsp;agentLauncher,
+                                                                                                            <a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector,
                                                                                                             io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Provide a <a href="../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a> implementation if one isn't available.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>dataServices</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - The <a href="../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> implementation to use</dd>
-<dd><code>agentLauncher</code> - The <a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation to use</dd>
+<dd><code>agentLauncherSelector</code> - The <a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><code>AgentLauncherSelector</code></a> implementation to use</dd>
 <dd><code>registry</code> - The metrics registry to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><code>JobLaunchServiceImpl</code></a> instance</dd>

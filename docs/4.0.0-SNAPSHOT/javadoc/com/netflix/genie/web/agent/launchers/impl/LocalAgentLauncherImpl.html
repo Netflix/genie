@@ -166,8 +166,9 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#health--">health</a></span>()</code></td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">launchAgent</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)</code>
+<td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">launchAgent</a></span>(@Valid <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob,
+           com.fasterxml.jackson.databind.JsonNode&nbsp;requestedLauncherExt)</code>
 <div class="block">Launch an agent to execute the given <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
 </td>
 </tr>
@@ -233,21 +234,25 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">
+<a name="launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>launchAgent</h4>
-<pre>public&nbsp;void&nbsp;launchAgent(@Valid
-                        @Valid <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)
-                 throws <a href="../../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></pre>
+<pre>public&nbsp;java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;launchAgent(@Valid
+                                                                               @Valid <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob,
+                                                                               @Nullable
+                                                                               com.fasterxml.jackson.databind.JsonNode&nbsp;requestedLauncherExt)
+                                                                        throws <a href="../../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></pre>
 <div class="block">Launch an agent to execute the given <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-">launchAgent</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></code></dd>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">launchAgent</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>resolvedJob</code> - The <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information for the agent to act on</dd>
+<dd><code>requestedLauncherExt</code> - The launcher requested extension, or null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></code> - For any error launching an Agent instance to run the job</dd>
 </dl>

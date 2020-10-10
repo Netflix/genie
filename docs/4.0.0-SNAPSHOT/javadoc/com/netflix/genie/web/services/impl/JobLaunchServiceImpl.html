@@ -137,9 +137,9 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                     <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
-                    <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&nbsp;agentLauncher,
+                    <a href="../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector,
                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -187,7 +187,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">
+<a name="JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -195,14 +195,14 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <h4>JobLaunchServiceImpl</h4>
 <pre>public&nbsp;JobLaunchServiceImpl(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                             <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
-                            <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&nbsp;agentLauncher,
+                            <a href="../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector,
                             io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> implementation used to resolve job details</dd>
-<dd><code>agentLauncher</code> - <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation to launch agents</dd>
+<dd><code>agentLauncherSelector</code> - <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation to launch agents</dd>
 <dd><code>registry</code> - <code>MeterRegistry</code> metrics repository</dd>
 </dl>
 </li>
@@ -227,8 +227,7 @@ public&nbsp;java.lang.String&nbsp;launchJob(@Valid
                                     throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a>,
                                            <a href="../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a>,
                                            <a href="../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a>,
-                                           <a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
-                                           <a href="../../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></pre>
+                                           <a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Launches a job on behalf of the user.
  <p>
  Given the information submitted to Genie this service will attempt to run the job which will include:
@@ -250,7 +249,6 @@ public&nbsp;java.lang.String&nbsp;launchJob(@Valid
 <dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - If the unique identifier for the job conflicts with an already existing job</dd>
 <dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When a resource that is expected to exist, like a job or a cluster, is not
                                      found in the system at runtime for some reason</dd>
-<dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></code> - When a job is submitted with attachments but there is an error saving them</dd>
 </dl>
 </li>
 </ul>

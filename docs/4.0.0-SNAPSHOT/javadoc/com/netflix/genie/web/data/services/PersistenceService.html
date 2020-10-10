@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6,"i37":6,"i38":6,"i39":6,"i40":6,"i41":6,"i42":6,"i43":6,"i44":6,"i45":6,"i46":6,"i47":6,"i48":6,"i49":6,"i50":6,"i51":6,"i52":6,"i53":6,"i54":6,"i55":38,"i56":6,"i57":6,"i58":6,"i59":6,"i60":6,"i61":6,"i62":6,"i63":6,"i64":6,"i65":6,"i66":6,"i67":6,"i68":6,"i69":6,"i70":6,"i71":6,"i72":6,"i73":6,"i74":6,"i75":6,"i76":6,"i77":6,"i78":6,"i79":6,"i80":6,"i81":6,"i82":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6,"i37":6,"i38":6,"i39":6,"i40":6,"i41":6,"i42":6,"i43":6,"i44":6,"i45":6,"i46":6,"i47":6,"i48":6,"i49":6,"i50":6,"i51":6,"i52":6,"i53":6,"i54":6,"i55":6,"i56":6,"i57":38,"i58":6,"i59":6,"i60":6,"i61":6,"i62":6,"i63":6,"i64":6,"i65":6,"i66":6,"i67":6,"i68":6,"i69":6,"i70":6,"i71":6,"i72":6,"i73":6,"i74":6,"i75":6,"i76":6,"i77":6,"i78":6,"i79":6,"i80":6,"i81":6,"i82":6,"i83":6,"i84":6,"i85":6,"i86":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -494,84 +494,96 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i51" class="rowColor">
+<td class="colFirst"><code>com.fasterxml.jackson.databind.JsonNode</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getLauncherExt-java.lang.String-">getLauncherExt</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
+<div class="block">Get the job requested launcher extension.</div>
+</td>
+</tr>
+<tr id="i52" class="altColor">
+<td class="colFirst"><code>com.fasterxml.jackson.databind.JsonNode</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getRequestedLauncherExt-java.lang.String-">getRequestedLauncherExt</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
+<div class="block">Get the command the job used or is using.</div>
+</td>
+</tr>
+<tr id="i53" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getTagsForResource-java.lang.String-java.lang.Class-">getTagsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                   java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Get the set of tags associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i52" class="altColor">
+<tr id="i54" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs</a></span>()</code>
 <div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
 </td>
 </tr>
-<tr id="i53" class="rowColor">
+<tr id="i55" class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getUsedMemoryOnHost-java.lang.String-">getUsedMemoryOnHost</a></span>(@NotBlank java.lang.String&nbsp;hostname)</code>
 <div class="block">Get the amount of memory currently used on the given host by Genie jobs in any of the following states.</div>
 </td>
 </tr>
-<tr id="i54" class="altColor">
+<tr id="i56" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../../../com/netflix/genie/common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto">UserResourcesSummary</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getUserResourcesSummaries-java.util.Set-boolean-">getUserResourcesSummaries</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
                          boolean&nbsp;api)</code>
 <div class="block">Get a map of summaries of resources usage for each user with at least one active job.</div>
 </td>
 </tr>
-<tr id="i55" class="rowColor">
+<tr id="i57" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getV3JobRequest-java.lang.String-">getV3JobRequest</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 </td>
 </tr>
-<tr id="i56" class="altColor">
+<tr id="i58" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#isApiJob-java.lang.String-">isApiJob</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Get whether the job with the given ID was submitted via the REST API or other mechanism.</div>
 </td>
 </tr>
-<tr id="i57" class="rowColor">
+<tr id="i59" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeAllClusterCriteriaForCommand-java.lang.String-">removeAllClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Remove all the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i58" class="altColor">
+<tr id="i60" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeAllConfigsForResource-java.lang.String-java.lang.Class-">removeAllConfigsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                            java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Remove all configuration files from the resource.</div>
 </td>
 </tr>
-<tr id="i59" class="rowColor">
+<tr id="i61" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeAllDependenciesForResource-java.lang.String-java.lang.Class-">removeAllDependenciesForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                                 java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Remove all dependency files from the resource.</div>
 </td>
 </tr>
-<tr id="i60" class="altColor">
+<tr id="i62" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeAllTagsForResource-java.lang.String-java.lang.Class-">removeAllTagsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                         java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Remove all tags from the resource.</div>
 </td>
 </tr>
-<tr id="i61" class="rowColor">
+<tr id="i63" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeApplicationForCommand-java.lang.String-java.lang.String-">removeApplicationForCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
                            @NotBlank java.lang.String&nbsp;appId)</code>
 <div class="block">Remove the application from the command.</div>
 </td>
 </tr>
-<tr id="i62" class="altColor">
+<tr id="i64" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeApplicationsForCommand-java.lang.String-">removeApplicationsForCommand</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Remove all the applications from the command.</div>
 </td>
 </tr>
-<tr id="i63" class="rowColor">
+<tr id="i65" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeClusterCriterionForCommand-java.lang.String-int-">removeClusterCriterionForCommand</a></span>(java.lang.String&nbsp;id,
                                 @Min(value=0L) int&nbsp;priority)</code>
@@ -579,7 +591,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
  associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i64" class="altColor">
+<tr id="i66" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeConfigForResource-java.lang.String-java.lang.String-java.lang.Class-">removeConfigForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                        @NotBlank java.lang.String&nbsp;config,
@@ -587,7 +599,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove a configuration file from the given resource.</div>
 </td>
 </tr>
-<tr id="i65" class="rowColor">
+<tr id="i67" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeDependencyForResource-java.lang.String-java.lang.String-java.lang.Class-">removeDependencyForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                            @NotBlank java.lang.String&nbsp;dependency,
@@ -595,7 +607,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove a dependency file from the given resource.</div>
 </td>
 </tr>
-<tr id="i66" class="altColor">
+<tr id="i68" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#removeTagForResource-java.lang.String-java.lang.String-java.lang.Class-">removeTagForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                     @NotBlank java.lang.String&nbsp;tag,
@@ -603,45 +615,45 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove a tag from the given resource.</div>
 </td>
 </tr>
-<tr id="i67" class="rowColor">
+<tr id="i69" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#saveApplication-com.netflix.genie.common.external.dtos.v4.ApplicationRequest-">saveApplication</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationRequest</a>&nbsp;applicationRequest)</code>
 <div class="block">Save a new application.</div>
 </td>
 </tr>
-<tr id="i68" class="altColor">
+<tr id="i70" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#saveCluster-com.netflix.genie.common.external.dtos.v4.ClusterRequest-">saveCluster</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest</a>&nbsp;clusterRequest)</code>
 <div class="block">Save a <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>.</div>
 </td>
 </tr>
-<tr id="i69" class="rowColor">
+<tr id="i71" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#saveCommand-com.netflix.genie.common.external.dtos.v4.CommandRequest-">saveCommand</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest</a>&nbsp;commandRequest)</code>
 <div class="block">Save a <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> in the system based on the given <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>CommandRequest</code></a>.</div>
 </td>
 </tr>
-<tr id="i70" class="altColor">
+<tr id="i72" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#saveJobSubmission-com.netflix.genie.web.dtos.JobSubmission-">saveJobSubmission</a></span>(@Valid <a href="../../../../../../com/netflix/genie/web/dtos/JobSubmission.html" title="class in com.netflix.genie.web.dtos">JobSubmission</a>&nbsp;jobSubmission)</code>
 <div class="block">Save the given job submission information in the underlying data store.</div>
 </td>
 </tr>
-<tr id="i71" class="rowColor">
+<tr id="i73" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#saveResolvedJob-java.lang.String-com.netflix.genie.web.dtos.ResolvedJob-">saveResolvedJob</a></span>(@NotBlank java.lang.String&nbsp;id,
                @Valid <a href="../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)</code>
 <div class="block">Save the given resolved details for a job.</div>
 </td>
 </tr>
-<tr id="i72" class="altColor">
+<tr id="i74" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#setApplicationsForCommand-java.lang.String-java.util.List-">setApplicationsForCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
                          @NotNull java.util.List&lt;java.lang.String&gt;&nbsp;applicationIds)</code>
 <div class="block">Set the applications for the command.</div>
 </td>
 </tr>
-<tr id="i73" class="rowColor">
+<tr id="i75" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#setClusterCriteriaForCommand-java.lang.String-java.util.List-">setClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id,
                             java.util.List&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
@@ -649,28 +661,28 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
  clusterCriteria.</div>
 </td>
 </tr>
-<tr id="i74" class="altColor">
+<tr id="i76" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateApplication-java.lang.String-com.netflix.genie.common.external.dtos.v4.Application-">updateApplication</a></span>(@NotBlank java.lang.String&nbsp;id,
                  @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;updateApp)</code>
 <div class="block">Update an <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a>.</div>
 </td>
 </tr>
-<tr id="i75" class="rowColor">
+<tr id="i77" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateCluster-java.lang.String-com.netflix.genie.common.external.dtos.v4.Cluster-">updateCluster</a></span>(@NotBlank java.lang.String&nbsp;id,
              @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;updateCluster)</code>
 <div class="block">Update a <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with the given information.</div>
 </td>
 </tr>
-<tr id="i76" class="altColor">
+<tr id="i78" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateCommand-java.lang.String-com.netflix.genie.common.external.dtos.v4.Command-">updateCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
              @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;updateCommand)</code>
 <div class="block">Update a <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>.</div>
 </td>
 </tr>
-<tr id="i77" class="rowColor">
+<tr id="i79" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateConfigsForResource-java.lang.String-java.util.Set-java.lang.Class-">updateConfigsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                         java.util.Set&lt;java.lang.String&gt;&nbsp;configs,
@@ -678,7 +690,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Update the set of configuration files associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i78" class="altColor">
+<tr id="i80" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateDependenciesForResource-java.lang.String-java.util.Set-java.lang.Class-">updateDependenciesForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                              java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies,
@@ -686,14 +698,14 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Update the set of dependency files associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i79" class="rowColor">
+<tr id="i81" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateJobArchiveStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.ArchiveStatus-">updateJobArchiveStatus</a></span>(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
                       @NotNull(message="Status cannot be null.") <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)</code>
 <div class="block">Update the status and status message of the job.</div>
 </td>
 </tr>
-<tr id="i80" class="altColor">
+<tr id="i82" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
                @NotNull <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
@@ -703,7 +715,21 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
  of the job matches <code>newStatus</code>.</div>
 </td>
 </tr>
-<tr id="i81" class="rowColor">
+<tr id="i83" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">updateLauncherExt</a></span>(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
+                 @NotNull(message="Status cannot be null.") com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExtension)</code>
+<div class="block">Update the launcher extension field for this job.</div>
+</td>
+</tr>
+<tr id="i84" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateRequestedLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">updateRequestedLauncherExt</a></span>(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
+                          @NotNull(message="Status cannot be null.") com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExtension)</code>
+<div class="block">Update the requested launcher extension field for this job.</div>
+</td>
+</tr>
+<tr id="i85" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands</a></span>(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
                              java.time.Instant&nbsp;commandCreatedThreshold,
@@ -714,7 +740,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
  in the Genie system after jobCreatedThreshold.</div>
 </td>
 </tr>
-<tr id="i82" class="altColor">
+<tr id="i86" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateTagsForResource-java.lang.String-java.util.Set-java.lang.Class-">updateTagsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
@@ -2173,6 +2199,89 @@ java.lang.String&nbsp;saveJobSubmission(@Valid
 <dd><code>updated</code> - the threshold of last update</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a set of job ids</dd>
+</dl>
+</li>
+</ul>
+<a name="updateRequestedLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>updateRequestedLauncherExt</h4>
+<pre>void&nbsp;updateRequestedLauncherExt(@NotBlank(message="No job id entered. Unable to update.")
+                                @NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
+                                @NotNull(message="Status cannot be null.")
+                                @NotNull(message="Status cannot be null.") com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExtension)
+                         throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<div class="block">Update the requested launcher extension field for this job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to update the laucher extension for.</dd>
+<dd><code>launcherExtension</code> - The updated requested launcher extension JSON blob.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with the given <code>id</code> exists</dd>
+</dl>
+</li>
+</ul>
+<a name="getRequestedLauncherExt-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getRequestedLauncherExt</h4>
+<pre>com.fasterxml.jackson.databind.JsonNode&nbsp;getRequestedLauncherExt(@NotBlank
+                                                                @NotBlank java.lang.String&nbsp;id)
+                                                         throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<div class="block">Get the command the job used or is using.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to get the command for</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <code>JsonNode</code> passed to the launcher at launch, or a
+ <code>NullNode</code> if none was saved</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with the given <code>id</code> exists</dd>
+</dl>
+</li>
+</ul>
+<a name="updateLauncherExt-java.lang.String-com.fasterxml.jackson.databind.JsonNode-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>updateLauncherExt</h4>
+<pre>void&nbsp;updateLauncherExt(@NotBlank(message="No job id entered. Unable to update.")
+                       @NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
+                       @NotNull(message="Status cannot be null.")
+                       @NotNull(message="Status cannot be null.") com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExtension)
+                throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<div class="block">Update the launcher extension field for this job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to update the laucher extension for.</dd>
+<dd><code>launcherExtension</code> - The updated launcher extension JSON blob.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with the given <code>id</code> exists</dd>
+</dl>
+</li>
+</ul>
+<a name="getLauncherExt-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLauncherExt</h4>
+<pre>com.fasterxml.jackson.databind.JsonNode&nbsp;getLauncherExt(@NotBlank
+                                                       @NotBlank java.lang.String&nbsp;id)
+                                                throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<div class="block">Get the job requested launcher extension.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the job to get the command for</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <code>JsonNode</code> emitted by the launcher at launch</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with the given <code>id</code> exists</dd>
 </dl>
 </li>
 </ul>

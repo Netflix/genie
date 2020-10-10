@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -173,19 +173,27 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#agentLauncherSelector-java.util.Optional-java.util.Collection-io.micrometer.core.instrument.MeterRegistry-">agentLauncherSelector</a></span>(java.util.Optional&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a>&gt;&nbsp;agentLauncherSelectorManagedScript,
+                     @NotEmpty java.util.Collection&lt;<a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&gt;&nbsp;agentLaunchers,
+                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+<div class="block">Provide a default <a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><code>AgentLauncherSelector</code></a> implementation if no other has been defined in the context.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#commandSelector-java.util.Optional-io.micrometer.core.instrument.MeterRegistry-">commandSelector</a></span>(java.util.Optional&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a>&gt;&nbsp;commandSelectorManagedScriptOptional,
                io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide a default <a href="../../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors"><code>CommandSelector</code></a> implementation if no other has been defined in the context already.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/selectors/impl/RandomClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomClusterSelectorImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#randomizedClusterSelector--">randomizedClusterSelector</a></span>()</code>
 <div class="block">The default cluster selector if all others fail.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#scriptClusterSelector-com.netflix.genie.web.scripts.ClusterSelectorManagedScript-io.micrometer.core.instrument.MeterRegistry-">scriptClusterSelector</a></span>(<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a>&nbsp;clusterSelectorManagedScript,
                      io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
@@ -301,7 +309,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/selectors/impl/R
 <a name="commandSelector-java.util.Optional-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>commandSelector</h4>
 <pre>@Bean
@@ -318,6 +326,31 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/selectors/Comman
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptCommandSelectorImpl</code></a> if a <a href="../../../../../../../com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts"><code>CommandSelectorManagedScript</code></a> instance as present else
  a <a href="../../../../../../../com/netflix/genie/web/selectors/impl/RandomCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>RandomCommandSelectorImpl</code></a> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="agentLauncherSelector-java.util.Optional-java.util.Collection-io.micrometer.core.instrument.MeterRegistry-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>agentLauncherSelector</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector.class</a>)
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector(java.util.Optional&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a>&gt;&nbsp;agentLauncherSelectorManagedScript,
+                                                                                                                       @NotEmpty
+                                                                                                                       @NotEmpty java.util.Collection&lt;<a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&gt;&nbsp;agentLaunchers,
+                                                                                                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+<div class="block">Provide a default <a href="../../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors"><code>AgentLauncherSelector</code></a> implementation if no other has been defined in the context.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentLauncherSelectorManagedScript</code> - An <code>Optional</code> <a href="../../../../../../../com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts"><code>AgentLauncherSelectorManagedScript</code></a>
+                                           instance if one is present in the context</dd>
+<dd><code>agentLaunchers</code> - The available agent launchers</dd>
+<dd><code>registry</code> - The <code>MeterRegistry</code> instance to use</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptAgentLauncherSelectorImpl</code></a> if a <a href="../../../../../../../com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts"><code>AgentLauncherSelectorManagedScript</code></a> instance is
+ present, else a <a href="../../../../../../../com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>RandomAgentLauncherSelectorImpl</code></a> instance</dd>
 </dl>
 </li>
 </ul>

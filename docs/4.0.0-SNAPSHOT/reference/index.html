@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-09-29</span>
+<span id="revdate">2020-10-10</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5238,6 +5238,24 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.agent-launcher-selector.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>AgentLauncherSelectorManagedScript</code> is enabled only if this property is set.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.agent-launcher-selector.auto-load-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, the script eagerly load during startup, as opposed to lazily load on first use.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.agent-launcher-selector.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ScriptClusterSelector</code> is enabled only if this property is set.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
@@ -6157,6 +6175,13 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.agentLauncher.selectors.script.select.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to select the agent launcher for a job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentLauncherClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.archiveStatus.cleanup.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter of jobs whose archive status was left in PENDING state after execution completed</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6333,6 +6358,20 @@ It will have to be added if one is desired otherwise metrics are just published 
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion, agentHost, handshakeDecision</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobLaunch.launchJob.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to launch a job (includes record creation and update, job resolution and agent launch)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobLaunchServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobLaunch.selectLauncher.timer</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to invoke a selector to choose which agent launcher to use</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobLaunchServiceImpl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status exceptionClass, numAvailableLaunchers, agentLauncherSelectorClass, agentLauncherSelectedClass</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobResolver.generateClusterCriteriaPermutations.timer</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to generate all the permutations for cluster criteria between the command options and the job request</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
@@ -6553,7 +6592,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-09-29 23:34:03 UTC
+Last updated 2020-10-09 23:56:40 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

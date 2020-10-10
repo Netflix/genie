@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":41,"i1":9,"i2":41,"i3":9,"i4":41,"i5":41};
+var methods = {"i0":9,"i1":41,"i2":9,"i3":41,"i4":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -133,6 +133,12 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>static <a href="../../../../../com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html" title="class in com.netflix.genie.web.selectors">AgentLauncherSelectionContext</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getAgentLauncherSelectionContext-groovy.lang.Binding-">getAgentLauncherSelectionContext</a></span>(groovy.lang.Binding&nbsp;binding)</code>
+<div class="block">Given the <code>Binding</code> that a script has attempt to extract the cluster selection context.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>static java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusters-groovy.lang.Binding-">getClusters</a></span>(groovy.lang.Binding&nbsp;binding)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -141,13 +147,13 @@ extends java.lang.Object</pre>
 </div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-">getClusterSelectionContext</a></span>(groovy.lang.Binding&nbsp;binding)</code>
 <div class="block">Given the <code>Binding</code> that a script has attempt to extract the cluster selection context.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommands-groovy.lang.Binding-">getCommands</a></span>(groovy.lang.Binding&nbsp;binding)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -156,28 +162,10 @@ extends java.lang.Object</pre>
 </div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../com/netflix/genie/web/selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-">getCommandSelectionContext</a></span>(groovy.lang.Binding&nbsp;binding)</code>
 <div class="block">Given the <code>Binding</code> that a script has attempt to extract the command selection context.</div>
-</td>
-</tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getJobId-groovy.lang.Binding-">getJobId</a></span>(groovy.lang.Binding&nbsp;binding)</code>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
-<div class="block"><span class="deprecationComment">Use <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>getClusterSelectionContext(Binding)</code></a> or <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>getCommandSelectionContext(Binding)</code></a>
- instead</span></div>
-</div>
-</td>
-</tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code>static <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getJobRequest-groovy.lang.Binding-">getJobRequest</a></span>(groovy.lang.Binding&nbsp;binding)</code>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
-<div class="block"><span class="deprecationComment">Use <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>getClusterSelectionContext(Binding)</code></a> or <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>getCommandSelectionContext(Binding)</code></a>
- instead</span></div>
-</div>
 </td>
 </tr>
 </table>
@@ -242,48 +230,23 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="getJobId-groovy.lang.Binding-">
+<a name="getAgentLauncherSelectionContext-groovy.lang.Binding-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getJobId</h4>
-<pre>@Deprecated
-public static&nbsp;java.lang.String&nbsp;getJobId(groovy.lang.Binding&nbsp;binding)
-                                             throws java.lang.IllegalArgumentException</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>getClusterSelectionContext(Binding)</code></a> or <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>getCommandSelectionContext(Binding)</code></a>
- instead</span></div>
-<div class="block">Given the <code>Binding</code> that a script has attempt to extract the job id parameter.</div>
+<h4>getAgentLauncherSelectionContext</h4>
+<pre>public static&nbsp;<a href="../../../../../com/netflix/genie/web/selectors/AgentLauncherSelectionContext.html" title="class in com.netflix.genie.web.selectors">AgentLauncherSelectionContext</a>&nbsp;getAgentLauncherSelectionContext(groovy.lang.Binding&nbsp;binding)
+                                                                      throws java.lang.IllegalArgumentException</pre>
+<div class="block">Given the <code>Binding</code> that a script has attempt to extract the cluster selection context.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>binding</code> - The <code>Binding</code> for the script</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The job id</dd>
+<dd>The <a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ClusterSelectionContext</code></a> instance</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.lang.IllegalArgumentException</code> - If there is no job id parameter for the script or it is not a String</dd>
-</dl>
-</li>
-</ul>
-<a name="getJobRequest-groovy.lang.Binding-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getJobRequest</h4>
-<pre>@Deprecated
-public static&nbsp;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;getJobRequest(groovy.lang.Binding&nbsp;binding)
-                                            throws java.lang.IllegalArgumentException</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>getClusterSelectionContext(Binding)</code></a> or <a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>getCommandSelectionContext(Binding)</code></a>
- instead</span></div>
-<div class="block">Given the <code>Binding</code> that a script has attempt to extract the job request parameter.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>binding</code> - The <code>Binding</code> for the script</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a></dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.lang.IllegalArgumentException</code> - If there is no job request parameter for the script or it is not a
-                                  <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a></dd>
+<dd><code>java.lang.IllegalArgumentException</code> - If there is no context parameter for the script or it is not a
+                                  <a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ClusterSelectionContext</code></a></dd>
 </dl>
 </li>
 </ul>
