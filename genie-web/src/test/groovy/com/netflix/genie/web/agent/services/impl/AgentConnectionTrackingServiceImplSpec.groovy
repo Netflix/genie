@@ -68,10 +68,10 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
     def "2 agents"() {
         setup:
         Runnable cleanupTask
-        String agent1streamId = UUID.randomUUID().toString()
-        String agent2streamId = UUID.randomUUID().toString()
-        String agent1jobId = UUID.randomUUID().toString()
-        String agent2jobId = UUID.randomUUID().toString()
+        String agent1streamId = "Agent-1-stream-X"
+        String agent2streamId = "Agent-2-stream-Y"
+        String agent1jobId = "Agent-1-job"
+        String agent2jobId = "Agent-2-job"
         Instant currentTime
 
         when:
@@ -95,6 +95,9 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         1 * agentRoutingService.handleClientConnected(agent1jobId)
         1 * agentRoutingService.handleClientConnected(agent2jobId)
 
+        expect:
+        service.getConnectedAgentsCount() == 2
+
         when: "Cleanup runs"
         currentTime = currentTime.plusMillis(100)
         cleanupTask.run()
@@ -103,8 +106,11 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         1 * timeSupplier.get() >> { return currentTime }
         0 * agentRoutingService._
 
+        expect:
+        service.getConnectedAgentsCount() == 2
+
         when: "First agent renews heartbeat"
-        currentTime = currentTime.plusMillis(100)
+        currentTime = currentTime.plusMillis(3_000)
         service.notifyHeartbeat(agent1streamId, agent1jobId)
 
         then: "Record is updated"
@@ -118,12 +124,18 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         1 * timeSupplier.get() >> { return currentTime }
         1 * agentRoutingService.handleClientDisconnected(agent2jobId)
 
+        expect:
+        service.getConnectedAgentsCount() == 1
+
         when: "First agent disconnects"
         service.notifyDisconnected(agent1streamId, agent1jobId)
 
         then: "Routing service notified: agent 1 is gone"
         1 * agentRoutingService.handleClientDisconnected(agent1jobId)
         0 * timeSupplier._
+
+        expect:
+        service.getConnectedAgentsCount() == 0
 
         when: "Cleanup runs"
         currentTime = currentTime.plusMillis(1000)
@@ -199,36 +211,12 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         1 * agentRoutingService.handleClientDisconnected(jobId)
     }
 
-    def "Cleanup task exception"() {
-        setup:
-        Runnable cleanupTask
-
-        when:
-        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, serviceProperties, timeSupplier)
-
-        then:
-        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
-            args ->
-                cleanupTask = args[0] as Runnable
-                return Mock(ScheduledFuture)
-        }
-        cleanupTask != null
-
-        when:
-        cleanupTask.run()
-
-        then:
-        1 * timeSupplier.get() >> { throw new RuntimeException() }
-        noExceptionThrown()
-    }
-
     def "Contribute info detail"() {
         setup:
         String agent1streamId = UUID.randomUUID().toString()
         String agent2streamId = UUID.randomUUID().toString()
         String agent1jobId = UUID.randomUUID().toString()
         String agent2jobId = UUID.randomUUID().toString()
-        Instant currentTime
         List<String> connectedAgents
         Info.Builder infoBuilder = Mock(Info.Builder)
 
