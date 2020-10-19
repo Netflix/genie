@@ -30,11 +30,10 @@ import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 /**
@@ -49,7 +48,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
 
     private final AgentRoutingService agentRoutingService;
     private final TaskScheduler taskScheduler;
-    private final ConcurrentMap<String, JobStreamsRecord> jobStreamRecordsMap = Maps.newConcurrentMap();
+    private final HashMap<String, JobStreamsRecord> jobStreamRecordsMap = Maps.newHashMap();
     private final AgentConnectionTrackingServiceProperties serviceProperties;
     private final Supplier<Instant> timeSupplier;
 
@@ -87,18 +86,21 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
      * {@inheritDoc}
      */
     @Override
-    public void notifyHeartbeat(final String streamId, final String claimedJobId) {
-        final AtomicBoolean atomicIsNew = new AtomicBoolean(false);
+    public synchronized void notifyHeartbeat(final String streamId, final String claimedJobId) {
 
-        final JobStreamsRecord jobStreamsRecord = this.jobStreamRecordsMap.computeIfAbsent(
-            claimedJobId,
-            jobId -> {
-                atomicIsNew.set(true);
-                return new JobStreamsRecord(jobId);
-            }
-        );
+        boolean isNew = false;
+        final JobStreamsRecord record;
 
-        final boolean isNew = atomicIsNew.get();
+        if (this.jobStreamRecordsMap.containsKey(claimedJobId)) {
+            record = this.jobStreamRecordsMap.get(claimedJobId);
+        } else {
+            record = new JobStreamsRecord(claimedJobId);
+            this.jobStreamRecordsMap.put(claimedJobId, record);
+            isNew = true;
+        }
+
+        // Update TTL for this stream
+        record.updateActiveStream(streamId, timeSupplier.get());
 
         log.debug(
             "Received heartbeat for {} job {} using stream {}",
@@ -107,12 +109,9 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
             streamId
         );
 
-        // Update TTL for this stream
-        jobStreamsRecord.updateActiveStream(streamId, timeSupplier.get());
-
-        // If this job record is new, notify routing service
+        // If this job record is new, wake up observer
         if (isNew) {
-            log.debug("Notifying new agent connected executing job: {}", claimedJobId);
+            log.debug("Notify new agent connection for job {}", claimedJobId);
             this.agentRoutingService.handleClientConnected(claimedJobId);
         }
     }
@@ -121,7 +120,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
      * {@inheritDoc}
      */
     @Override
-    public void notifyDisconnected(final String streamId, final String claimedJobId) {
+    public synchronized void notifyDisconnected(final String streamId, final String claimedJobId) {
         // Retrieve entry
         final JobStreamsRecord jobStreamsRecord = this.jobStreamRecordsMap.get(claimedJobId);
 
@@ -148,20 +147,18 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
      * {@inheritDoc}
      */
     @Override
-    public long getConnectedAgentsCount() {
+    public synchronized long getConnectedAgentsCount() {
         return this.jobStreamRecordsMap.size();
     }
 
-    private void cleanupTask() {
-        try {
-            this.removeExpiredStreams();
-            this.removeExpiredAgents();
-        } catch (Exception e) {
-            log.error("Exception in cleanup task", e);
-        }
-    }
+    private synchronized void cleanupTask() {
+        final Instant cutoff = this.timeSupplier.get().minus(serviceProperties.getConnectionExpirationPeriod());
 
-    private void removeExpiredAgents() {
+        // Drop all streams that didn't heartbeat recently
+        this.jobStreamRecordsMap.forEach(
+            (jobId, record) -> record.expungeExpiredStreams(cutoff)
+        );
+
         // Remove all records that have no active streams
         final Set<String> removedJobIds = Sets.newHashSet();
         this.jobStreamRecordsMap.entrySet().removeIf(
@@ -181,21 +178,17 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
         }
     }
 
-    private void removeExpiredStreams() {
-        final Instant cutoff = this.timeSupplier.get().minus(serviceProperties.getConnectionExpirationPeriod());
-        // Purge streams that did not send a heartbeat more recently than cutoff
-        this.jobStreamRecordsMap.forEach(
-            (jobId, record) -> record.expungeExpiredStreams(cutoff)
-        );
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void contribute(final Info.Builder builder) {
-        final List<String> jobIds = ImmutableList.copyOf(this.jobStreamRecordsMap.keySet());
+        final List<String> jobIds = this.getConnectedAgentsIds();
         builder.withDetail("connectedAgents", jobIds);
+    }
+
+    private synchronized List<String> getConnectedAgentsIds() {
+        return ImmutableList.copyOf(this.jobStreamRecordsMap.keySet());
     }
 
     private static final class JobStreamsRecord {
@@ -206,7 +199,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
             this.jobId = jobId;
         }
 
-        private synchronized void updateActiveStream(final String streamId, final Instant currentTime) {
+        private void updateActiveStream(final String streamId, final Instant currentTime) {
             final Instant previousHeartbeat = this.streamsLastHeartbeatMap.put(streamId, currentTime);
 
             log.debug(
@@ -217,7 +210,7 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
             );
         }
 
-        private synchronized void removeActiveStream(final String streamId) {
+        private void removeActiveStream(final String streamId) {
             final Instant previousHeartbeat = this.streamsLastHeartbeatMap.remove(streamId);
 
             if (previousHeartbeat != null) {
@@ -225,11 +218,11 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
             }
         }
 
-        private synchronized boolean hasActiveStreams() {
+        private boolean hasActiveStreams() {
             return !this.streamsLastHeartbeatMap.isEmpty();
         }
 
-        private synchronized void expungeExpiredStreams(final Instant cutoff) {
+        private void expungeExpiredStreams(final Instant cutoff) {
             final boolean removed = this.streamsLastHeartbeatMap.entrySet().removeIf(
                 entry -> entry.getValue().isBefore(cutoff)
             );
