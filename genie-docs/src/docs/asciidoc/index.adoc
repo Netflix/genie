@@ -36,6 +36,8 @@ include::concepts/_concepts.adoc[]
 
 include::features/_features.adoc[]
 
+include::internals/_internals.adoc[]
+
 include::_installation.adoc[]
 
 include::_properties.adoc[]
