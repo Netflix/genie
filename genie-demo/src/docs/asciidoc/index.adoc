@@ -259,8 +259,22 @@ Move the `sched:sla` tag back
 .. Look through the scripts to get a sense of what is submitted to Genie
 . Log out of the container
 .. `exit`
-. Shut the demo down
-.. Once you're done trying everything out you can shut down the demo
+. Login to the main Genie app container (which it contains the agent CLI )
+.. From terminal `docker exec -it genie_demo_app_{revnumber} /bin/bash`
+. Verify you can launch the agent
+.. `java -jar /usr/local/bin/genie-agent.jar help`
+. Verify the agent can connect to the local Genie server
+.. `java -jar /usr/local/bin/genie-agent.jar ping --serverHost localhost --serverPort 9090`
+. Launch a Genie job, similar to the ones above
+.. `java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Presto Job' --commandCriterion 'TAGS=type:presto' --clusterCriterion 'TAGS=sched:adhoc,type:presto' -- --execute 'select * from tpcds.sf1.item limit 100;'`
+.. `java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Spark Shell Interactive Job' --commandCriterion 'TAGS=type:spark-shell' --clusterCriterion 'TAGS=sched:sla,type:yarn' --interactive`
+... This starts an interactive Spark shell. Hit `ctrl-d` to exit gracefully
+. In the http://localhost:8080[Genie UI], explore the two jobs
+.. Notice how the first one (non-interactive) dumped the query results in a `stdout`
+.. Notice how the second one (interactive) does not create `stdout` and `stderr` files, since the streams are presented directly in the shell
+. Log out of the container
+.. `exit`
+. Once you're done trying everything out you can shut down the demo
 .. `docker-compose down`
 .. This will stop and remove all the containers from the demo.
 The images will remain on disk and if you run the demo again it will startup much faster since nothing needs to be downloaded or built.
