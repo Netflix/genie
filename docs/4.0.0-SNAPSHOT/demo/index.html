@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-10-19</span>
+<span id="revdate">2020-10-23</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1458,12 +1458,82 @@ Move the <code>sched:sla</code> tag back</p>
 </div>
 </li>
 <li>
-<p>Shut the demo down</p>
+<p>Login to the main Genie app container (which it contains the agent CLI )</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Once you&#8217;re done trying everything out you can shut down the demo</p>
+<p>From terminal <code>docker exec -it genie_demo_app_4.0.0-SNAPSHOT /bin/bash</code></p>
 </li>
+</ol>
+</div>
+</li>
+<li>
+<p>Verify you can launch the agent</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>java -jar /usr/local/bin/genie-agent.jar help</code></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Verify the agent can connect to the local Genie server</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>java -jar /usr/local/bin/genie-agent.jar ping --serverHost localhost --serverPort 9090</code></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Launch a Genie job, similar to the ones above</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Presto Job' --commandCriterion 'TAGS=type:presto' --clusterCriterion 'TAGS=sched:adhoc,type:presto'&#8201;&#8212;&#8201;--execute 'select * from tpcds.sf1.item limit 100;'</code></p>
+</li>
+<li>
+<p><code>java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Spark Shell Interactive Job' --commandCriterion 'TAGS=type:spark-shell' --clusterCriterion 'TAGS=sched:sla,type:yarn' --interactive</code></p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>This starts an interactive Spark shell. Hit <code>ctrl-d</code> to exit gracefully</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>In the <a href="http://localhost:8080">Genie UI</a>, explore the two jobs</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Notice how the first one (non-interactive) dumped the query results in a <code>stdout</code></p>
+</li>
+<li>
+<p>Notice how the second one (interactive) does not create <code>stdout</code> and <code>stderr</code> files, since the streams are presented directly in the shell</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Log out of the container</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>exit</code></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Once you&#8217;re done trying everything out you can shut down the demo</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
 <li>
 <p><code>docker-compose down</code></p>
 </li>
@@ -1490,7 +1560,7 @@ The images will remain on disk and if you run the demo again it will startup muc
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-10-19 19:34:46 UTC
+Last updated 2020-10-23 20:41:47 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
