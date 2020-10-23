@@ -170,12 +170,25 @@ Therefore a hook is provided to plug-in a Groovy selector script that can make t
 
 ==== Job State Change Notifications
 
+Genie emits internal application events whenever a job changes state.
 
+Genie includes 2 built-in components that consume theese events and publish notifications to Amazon SNS.
 
 ==== User limits
 
-==== Security
+Genie can cap the maximum number of jobs that a given user is allowed to run.
+
+The global default can be adjusted, and overrides for individual users can be set higher or lower.
 
 ==== Job attachments
 
+Genie allows API job requests to submit one or more attachments (by submitting a multi-part POST).
+These files are placed in the job directory before launch.
+
+Example usage include Presto scripts, and Spark application jars, and additional property files.
+
 ==== Job archival
+
+After a job is completed, successfully or not, job file outputs and logs can be archived for later access.
+
+The set of files that get archived is configurable. Or it can be disabled completely.
