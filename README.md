@@ -7,19 +7,37 @@
 
 ## Introduction
 
-Genie is a federated job orchestration engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
-data jobs like Hadoop, Pig, Hive, Spark, Presto, Sqoop and more. It also provides APIs for managing the metadata of many 
-distributed processing clusters and the commands and applications which run on them.
+Genie is a federated Big Data orchestration and execution engine developed by Netflix.
 
-## Documentation
+Genie’s value is best described in terms of the problem it solves.
 
-See the official [website](https://netflix.github.io/genie) to find documentation about Genie and specific 
-documentation for various releases.
+Big Data infrastructure is complex and ever-evolving.
 
-## Demo
+Data consumers (Data Scientists or other applications) need to jump over a lot of hurdles in order to run a simple query:
+ - Find, download, install and configure a number of binaries, libraries and tools
+ - Point to the correct cluster, using valid configuration and reasonable parameters, some of which are very obscure
+ - Manually monitor the query, retrieve its output
 
-Genie has demo instructions available for all 3.x.x releases. Please see the release you're interested in demoing 
-on the [releases](https://netflix.github.io/genie/releases/) page. Click on the release and then demo docs.
+What works today, may not work tomorrow.
+The cluster may have moved, the binaries may no longer be compatible, etc.
+
+Multiply this overhead times the number of data consumers, and it adds up to a lot of wasted time (and grief!).
+
+Data infrastructure providers face a different set of problems:
+ - Users require a lot of help configuring their working setup, which is not easy to debug remotely
+ - Infrastructure upgrades and expansion require careful coordination with all users
+
+
+Genie is designed to sit at the boundary of these two worlds, and simplify the lives of people on either side.
+
+A data scientist can “rub the magic lamp” and just say “Genie, run query ‘Q’ using engine SparkSQL against production data”.
+Genie takes care of all the nitty-gritty details. It dynamically assembles the necessary binaries and configurations, execute the job, monitors it, notifies the user of its completion, and makes the output data available for immediate and future use.
+
+Providers of Big data infrastructure work with Genie by making resources available for use (clusters, binaries, etc) and plugging in the magic logic that the user doesn’t need to worry about: which cluster should a given query be routed to? Which version of spark should a given query be executed with? Is this user allowed to access this data? etc.
+Moreover, every job’s details are recorded for later audit or debugging.
+
+Genie is designed from the ground up to be very flexible and customizable.
+For more details visit the [official documentation](https://netflix.github.io/genie)
 
 ## Builds
 
@@ -27,25 +45,58 @@ Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
 
 | Branch |                                                     Build                                                     |                                                                 Coverage (coveralls.io)                                                                |                                                        Coverage (codecov.io)                                                       |
 |:------:|:-------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
-| master | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master) | [![codecov](https://codecov.io/gh/Netflix/genie/branch/master/graph/badge.svg)](https://codecov.io/gh/Netflix/genie/branch/master) |
+| master (4.0.x) | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master) | [![codecov](https://codecov.io/gh/Netflix/genie/branch/master/graph/badge.svg)](https://codecov.io/gh/Netflix/genie/branch/master) |
 |  3.3.x |  [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=3.3.x)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=3.3.x)](https://coveralls.io/github/Netflix/genie?branch=3.3.x)  |  [![codecov](https://codecov.io/gh/Netflix/genie/branch/3.3.x/graph/badge.svg)](https://codecov.io/gh/Netflix/genie/branch/3.3.x)  |
-|  3.2.x |  [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=3.2.x)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=3.2.x)](https://coveralls.io/github/Netflix/genie?branch=3.2.x)  |  [![codecov](https://codecov.io/gh/Netflix/genie/branch/3.2.x/graph/badge.svg)](https://codecov.io/gh/Netflix/genie/branch/3.2.x)  |
-|  3.1.x |  [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=3.1.x)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=3.1.x)](https://coveralls.io/github/Netflix/genie?branch=3.1.x)  |  [![codecov](https://codecov.io/gh/Netflix/genie/branch/3.1.x/graph/badge.svg)](https://codecov.io/gh/Netflix/genie/branch/3.1.x)  |
-|  3.0.x |  [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=3.0.x)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=3.0.x)](https://coveralls.io/github/Netflix/genie?branch=3.0.x)  |  [![codecov](https://codecov.io/gh/Netflix/genie/branch/3.0.x/graph/badge.svg)](https://codecov.io/gh/Netflix/genie/branch/3.0.x)  |
 
-## Docker
+## Project structure
 
-Successful builds will also generate a docker image which is published to Docker Hub. 
+### `genie-app`
+Self-contained Genie service server.
 
-### App Image
+### `genie-agent-app`
+Self-contained Genie CLI job executor.
 
-[![App Image](https://img.shields.io/docker/pulls/netflixoss/genie-app.svg)](https://hub.docker.com/r/netflixoss/genie-app/)
+### `genie-client`
+Genie client interact with the service via REST API.
 
-This is the image for the sample Spring Boot all in one jar. You can use `docker pull netflixoss/genie-app:{version}` 
-to test the one you want.
- 
-You can run via `docker run -t --rm -p 8080:8080 netflixoss/genie-app:{version}`
+### `genie-web`
+The main server library, can be rewrapped to inject and override server components.
+
+### `genie-agent`
+The main agent library, can be rewrapped to inject and override components.
+
+### `genie-common`, `genie-common-internal`, `genie-common-external`
+
+Internal components libraries shared by server, agent, and client modules.
+
+### `genie-proto`
+Protobuf messages and gRPC services definition shared by server and agent.
+This is not a public API meant for use by other clients.
+
+### `genie-docs`, `genie-demo`
+Documentation and demo application.
+
+### `genie-test`, `genie-test-web`
+Testing classes and utilities shared by other modules.
+
+### `genie-ui`
+JavaScript UI to search and visualize jobs, clusters, commands.
+
+## Artifacts
+
+Genie publishes to [Bintray Maven](https://bintray.com/netflixoss/maven/genie/_latestVersion) and [Docker Hub](https://hub.docker.com/r/netflixoss/genie-app/)
+
+Refer to the [demo]() section of the documentations for examples.
+And to the [setup]() section for more detailed instructions to set up Genie.
 
 ## Python Client
 
-The [Genie Python](https://github.com/Netflix/pygenie) client has been moved into its own repo.
+The [Genie Python client](https://github.com/Netflix/pygenie) is hosted in a different repository.
+
+## Further info
+For a detailed explanation of Genie architecture, use cases, API documentation, demos, deployment and customization guides, and more, visit the
+[Genie documentation](https://netflix.github.io/genie).
+
+## Contact
+
+To contact Genie developers with questions and suggestions, please use [GitHub Issues](https://github.com/Netflix/genie/issues)
