@@ -1,0 +1,152 @@
+=== Job overview
+
+This section provides an high level overview of what a Genie job is.
+More details on the concepts covered here are provided in later sections.
+
+===== API jobs vs agent CLI jobs
+
+Genie provides 2 ways to execute a job:
+
+ * Submit via API (delegating execution to the server)
+ * Execute locally via agent CLI
+
+API jobs are easier to submit with any REST client.
+For example, the user can just say "Run query Q with SparkSQL".
+The server takes care of all the details, the user can sit back, wait for the job to complete and then retrieve the output via API.
+
+A job request via API may look something like this:
+
+```
+{
+  "command" : ["type:spark-sql", "version:2.1.1"],
+  "cluster" : ["data:production"],
+  "arguments" : "-e 'select count(*) from some_table'"
+  "memory" : 1024,
+  "user" : "jdoe"
+}
+```
+
+The advantages of API jobs are:
+
+ - The server takes care of execution end-to-end
+ - Any rest client is sufficient to submit jobs, check their statuses and retrieve their results
+
+Genie V4 and above provides a different way to execute jobs: the agent CLI.
+
+The agent CLI can be used to launch jobs outside of the Genie cluster (e.g., on the user Laptop) while still leveraging
+Genie for configuration, monitoring, audit, archival, etc.
+
+An agent job launched via CLI may look something like this:
+
+```
+$ genie-agent exec  \
+  --command='type:spark-shell'
+  --cluster='data:test' \
+  -- --shell-color=true'
+```
+
+There are two primary reasons for choosing agent CLI over API job request:
+
+ * Interactive jobs (such as Spark Shell or other REPL interfaces)
+ * More control over the job environment (geographical location, special hardware, etc)
+
+===== Job Lifecycle
+
+Regardless of how a job is launched, it will leverage Genie to:
+
+ - Resolve symbolic resources to concrete cluster/commands installed
+ - Track job status
+ - Access logs and outputs during and after execution
+
+Every job goes through the following stages:
+
+ - Unique job id is reserved upon job request
+ - Job resources criteria are resolved to concrete resources (cluster/command pair)
+ - Job setup downloads and configures all necessary libraries, binaries, Configurations
+ - Job is launched and monitored
+ - Job final status, statistics and outputs are preserved for later consumption and audit
+
+.Lifecycle of an API job
+image::apijob.png[API Job, link="{imagesdir}/apijob.png"]
+
+1. User submits a job request via REST API
+2. Genie server creates a record, resolves resources (command, cluster) and fills-in other details
+3. Genie server launches an agent to execute the job (on the same host, or in a remote container)
+4. The agent connects back to the Genie cluster and retrieves the job specification. It also keeps the server informed of its progress.
+5. The agent sets up the job (downloads dependencies, runs setup scripts, ...), then launches it, all while regularly updating the server. After the job is done, the agent archives outputs and logs.
+6. While the job is running and after completion, the user can retrieve job status and download outputs and logs (and even kill the job).
+
+.Lifecycle of a CLI job
+image::clijob.png[CLI Job, link="{imagesdir}/clijob.png"]
+
+1. The user launches a job via CLI (this job execute locally, wherever the agent is invoked)
+2. The agent connects to the Genie cluster and creates the job record, resolves resources (cluster, command). It also keeps the server informed of its progress.
+3. The agent sets up the job (downloads dependencies, runs setup scripts, ...), then launches it, all while regularly updating the server. After the job is done, the agent archives outputs and logs.
+6. While the job is running and after completion, the user can retrieve job status and download outputs and logs (and even kill the job).
+
+===== Status Transitions
+
+Possible statuses of a job:
+
+ * `RESERVED` - The id of the job has been reserved, and the corresponding request persisted
+ * `RESOLVED` - The job request has been successfully resolved into a concrete job specification
+ * `ACCEPTED` - The job has been accepted by the system via the REST API
+ * `CLAIMED` - The job has been claimed by an agent for immediate execution
+ * `INIT` - Job has begun setup (e.g, download and unpacking of dependencies, etc.)
+ * `RUNNING` - Job has launched and is now running
+ * `SUCCEEDED` - The job process has completed and exited with code 0
+ * `KILLED` - The job was killed (due to timeout, user request, etc.)
+ * `FAILED` - The job failed (due to unsatisfiable criteria, errors during setup, non-zero exit code, etc.)
+
+Transitions between these states are slightly different depending on the kind of job:
+
+.State transitions for API-submitted jobs
+|===
+|Transition |Event
+
+|`null -> RESERVED`
+|A valid job request was received and saved (API jobs only: the attachments (if any) were successfully saved)
+
+|`RESERVED -> RESOLVED`
+|The job request criteria were successfully resolved into a job specification
+
+|`RESERVED -> FAILED`
+|The job request criteria could not be satisfied
+
+|`RESOLVED -> ACCEPTED`
+|(API jobs only) The server is proceeding to launch an agent to execute this job
+
+|`ACCEPTED -> CLAIMED`
+|(API jobs only) The server-launched agent claimed this job for execution
+
+|`ACCEPTED -> FAILED`
+|(API jobs only) The server failed to launch an agent to execute the job
+
+|`RESOLVED -> CLAIMED`
+|(CLI jobs only) The CLI-launched agent claimed this job for execution
+
+|`RESOLVED -> FAILED`
+|No agent has claimed this job for execution, and the server marked the job failed
+
+|`CLAIMED -> INIT`
+|The agent started job setup (download dependencies, etc.)
+
+|`CLAIMED -> FAILED`
+|The agent that claimed this job stopped heartbeating, and the server marked the job failed
+
+|`INIT -> RUNNING`
+|The job setup completed successfully and the job process was launched
+
+|`INIT -> FAILED`
+|Job setup failed (missing dependency, setup script error) or the agent that claimed the job stopped hearbeating
+
+|`RUNNING -> SUCCEEDED`
+|The job command sub-process completed with exit code 0
+
+|`RUNNING -> FAILED`
+|The job command sub-process completed with exit code different than 0
+
+|`INIT -> KILLED`, `RUNNING -> KILLED`
+|The job was killed (as requested by the user via API, or due to timeout or other limits exceeded)
+
+|===

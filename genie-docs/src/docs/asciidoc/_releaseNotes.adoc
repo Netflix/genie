@@ -2,223 +2,30 @@
 
 The following are the release notes for Genie {revnumber}.
 
-=== Features
+== 4.0.0 Release Notes
 
-* Upgrade to Spring Boot 2.0
-* Switch metric collection to use http://micrometer.io/[Micrometer]
-** Allows users to plugin their own backend (Atlas, DataDog, etc)
-** Standard for Boot 2.0
-* Switched to https://jcp.org/en/jsr/detail?id=310[JSR 310] classes for date and time manipulation
-* Upgrade to JPA 2.2
-* Integrate gRPC for Agent to server communication
-* Break 3.x security implementations into `genie-security` module
+=== Major differences between 3.x and 4.x
 
-=== Library Upgrades
-
-* Spring Boot 2.0
-** Many changes see their
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Release-Notes[Release Notes] and
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide[Migration Guide]
-* Upgrade to http://hibernate.org/orm/releases/5.2/[Hibernate 5.2.x]
-** Supports JPA 2.2 specification and JSR 310 Java 8 Times (including `Instant` which isn't supported by JPA 2.2)
-* Switched to https://brettwooldridge.github.io/HikariCP/[HikariCP] for DB connection pool
-
-=== Property Changes
-
-NOTE: Many Spring properties were changed as part of the Boot 2.0 release. Those are not documented here. Please
-refer to their documentation.
-
-==== Added
-
-|===
-|Property |Description| Default Value
-
-|cloud.aws.credentials.useDefaultAwsCredentialsChain
-|Whether to attempt creation of a standard AWS credentials chain.
-See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
-|true
-
-|cloud.aws.region.auto
-|Whether the AWS region will be attempted to be auto recognized via the AWS metadata services on EC2.
-See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
-|false
-
-|cloud.aws.region.static
-|The default AWS region. See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
-|us-east-1
-
-|cloud.aws.stack.auto
-|Whether auto stack detection is enabled.
-See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
-|false
-
-|management.endpoints.web.base-path
-|The default base path for the Spring Actuator[https://docs.spring.io/spring-boot/docs/current/actuator-api/html/]
-management endpoints. Switched from default `/actuator`
-|/admin
-
-|genie.aws.s3.buckets.[bucketName].roleARN
-|For the bucket with name `bucketName` the ARN of the role to assume to read/write to that bucket. If a bucket is used
-that isn't listed in this map the default credentials configured will be used
-|
-
-|genie.aws.s3.buckets.[bucketName].region
-|The AWS region the bucket with `bucketName` is in. Clients to talk to this bucket will be created in this region. If
-no value is specified the bucket is assumed to be in the same region as the Genie process.
-|
-
-|genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds
-|How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
-whether the `maxSyncMessages` threshold has been reached or not
-|30,000
-
-|genie.grpc.server.services.job-file-sync.maxSyncMessages
-|How many messages to receive from the agent before an acknowledgement message is sent back from the server
-|10
-
-|spring.data.redis.repositories.enabled
-|Whether Spring data repositories are enabled on top of redis as the backend store
-|false
-
-|genie.agent.filter.enabled
-|If set to `true`, enables the built-in agent filter service. The filter behavior is controlled by other active `genie.agent.filter.*` properties.
-|
-
-|genie.agent.filter.version.minimum
-|(Dynamic) The minimum version an agent needs to be (e.g., `1.2.3`) in order to communicate with this server. The filter needs to be enabled for this to take effect.
-|
-
-|genie.agent.filter.version.blacklist
-|(Dynamic) A regex matched against agent version (e.g., `1\.2\..*`), matching agents are rejected. The filter needs to be enabled for this to take effect.
-|
-
-|genie.agent.filter.version.whitelist
-|(Dynamic) A regex matched against agent version (e.g., `1\.2\..*`), agents not matching are rejected. The filter needs to be enabled for this to take effect.
-|
-
-|===
-
-==== Renamed
-
-|===
-|Old Name |New Name |Reason
-
-|genie.tasks.clusterChecker.*
-|genie.tasks.cluster-checker.*
-|Modifications to how Spring handled
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
-
-|genie.tasks.databaseCleanup.*
-|genie.tasks.database-cleanup.*
-|Modifications to how Spring handled
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
-
-|genie.tasks.diskCleanup.*
-|genie.tasks.disk-cleanup.*
-|Modifications to how Spring handled
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
-
-|genie.jobs.clusters.loadBalancers.script.*
-|genie.jobs.clusters.load-balancers.script.*
-|Modifications to how Spring handled
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
-
-|genie.jobs.users.activeLimit.*
-|genie.jobs.active-limit.*
-|Modifications to how Spring handled
-https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
-
-|genie.zookeeper.enabled
-|spring.cloud.zookeeper.enabled
-|Leverage existing code rather than re-invent the wheel
-
-|genie.zookeeper.connectionString
-|spring.cloud.zookeeper.connectString
-|Leverage existing code rather than re-invent the wheel
-
-|===
-
-==== Removed
-
-|===
-|Name |Reason
-
-|genie.aws.credentials.file
-|No longer necessary as `cloud.aws.credentials.useDefaultAwsCredentialsChain` is enabled by default an other Spring
-Cloud AWS properties can be used to configure more specifically.
-
-|genie.aws.credentials.role
-|Replaced with `genie.aws.s3.buckets.[bucketName].roleARN` for more specific control
-
-|spring.jackson.date-format
-|Switched to `java.time.Instant` from `java.util.Date` for timestamps. Formatting in ISO8601 supported out of the box
-for `Instant` serialization/deserialization.
-
-|genie.jobs.clusters.load-balancers.script.order
-|This behavior was to control the order the script load balancer was evaluated relative to other cluster load
-balancer's. This logic is more a framework or execution configuration than anything specific to the class itself. It
-shouldn't know how it's used. The new mechanism is to provide an `@Order` annotation on beans that fit in the order
-the user wants at runtime via a Spring bean definition.
-
-|genie.jobs.cleanup.deleteArchiveFile
-|Archival is now done in a flat structure to the destination location
-
-|===
-
-=== Metric Changes
-
-Switched to http://micrometer.io/[Micrometer]
-
-==== Added
-
-|===
-|Name |Reason
-
-|genie.services.agentJob.handshake.counter
-|Count usages of 'handshake' protocol, record agent metadata and decision made
-
-|===
-
-==== Renamed
-
-|===
-|Old Name |New Name |Reason
-
-|genie.jobs.coordination.clusterCommandQuery.timer
-|genie.services.specification.clusterCommandQuery.timer
-|Functionality moved to new service
-
-|genie.jobs.submit.selectCluster.loadBalancer.counter
-|genie.services.specification.loadBalancer.counter
-|Functionality moved to new service
-
-|genie.jobs.submit.localRunner.selectApplications.timer
-|genie.services.specification.selectApplications.timer
-|Functionality moved to new service
-
-|genie.jobs.submit.localRunner.selectCluster.timer
-|genie.services.specification.selectCluster.timer
-|Functionality moved to new service
-
-|genie.jobs.submit.selectCluster.noneSelected.counter
-|genie.services.specification.selectCluster.noneSelected.counter
-|Functionality moved to new service
-
-|genie.jobs.submit.selectCluster.noneFound.counter
-|genie.services.specification.selectCluster.noneFound.counter
-|Functionality moved to new service
-
-|genie.jobs.submit.localRunner.selectCommand.timer
-|genie.services.specification.selectCommand.timer
-|Functionality moved to new service
-
-|===
+ * Distributed execution - jobs are no longer restricted to execute on a Genie instance host
+ ** All jobs are executed via agent: a standalone process which takes ownership of a job, executes it, and reports updates back to the server via gRPC
+ * Job execution CLI - jobs can be launched outside of the Genie cluster via command-line interface
+ * Resource selection criteria - allow for additional criteria in addition to matching based on tags
+ * Resource resolution - provide a more flexible and customizable way to select command and cluster for a job
+ ** Command can specify cluster criteria, removing the need for explicit 1:1 mapping between the two entities
+ ** Command selected based on job command criteria. Cluster selected based on the combination of job and command cluster criteria
+ ** Pluggable resolution logic for advanced usage (in the form of Groovy scripts)
+ * Long-term job output archival - archive job outputs outside the cluster
+ ** Customizable filtering of archived files
+ ** Explicit tracking of archival status, surfaced via API
+ * Job status change notifications
+ * Explicit tracking of job archival status
+ * Zookeeper-based cluster membership (for request routing) and leader election
+ * Pagination of results in Java Genie client
+ * Based on Spring Boot 2.3.x
 
 == 3.3.0 Release Notes
 
 The following are the release notes for Genie 3.3.0.
-
-=== Features
 
 * Complete database schema and interaction code re-write for more normalization
 ** Allows more insights into job and user behavior by breaking apart large JSON blobs and other denormalized fields

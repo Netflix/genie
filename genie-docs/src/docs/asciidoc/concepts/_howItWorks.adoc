@@ -26,32 +26,21 @@ are available they can find what to submit their jobs with so it is routed to th
 Once resources are registered they should be linked together. By linking we mean to represent relationships between the
 resources.
 
-====== Commands for a Cluster
+====== Command Cluster Criteria
 
-Adding commands to a cluster means that the administrator acknowledges that this cluster can run a given set of
-commands. If a command is not linked to a cluster it cannot be used to run a job.
+Starting in Genie V4, commands and clusters are not longer expliticly linked.
 
-The commands are added in priority order. For example say you have different Spark commands you want to add to a given
-YARN cluster but you want Genie to treat one as the default. Here is how those commands might be tagged:
+Instead, the command provides criteria describing the clusters suitable to execute it.
 
-Spark 1.6.0 (id: spark16)
-* `type:sparksubmit`
-* `ver:1.6`
-* `ver:1.6.0`
+For example, a `spark-submit (v.2.1.1)` command may declare the following cluster criteria:
+ * `type:hadoop`
+ * `spark-version:2.1`
 
-Spark 1.6.1 (id: spark161)
-* `type:sparksubmit`
-* `ver:1.6.1`
+This section of the command definition says: "this command is suitable to run against hadoop clusters running version 2.1".
 
-Spark 2.0.0 (id: spark200)
-* `type:sparksubmit`
-* `ver:2.0`
-* `ver:2.0.0`
+Implicitly, this excludes clusters that are not hadoop (say, Presto clusters), or Hadoop clusters that don't support Spark 2.1.
 
-Now if we added the commands to the cluster in this order: `spark16, spark161, spark200` and a user submitted a job
-only requesting a command tagged with `type:sparksubmit` (as in they don't care what version just the default) they
-would get Spark 1.6.0. However if we later deemed 2.0.0 to be ready to be the default we would reorder the commands to
-`spark200, spark16, spark161` and that same job if submitted again would now run with Spark 2.0.0.
+The command's cluster criteria are combined with the job's cluster criteria to further narrow the set of viable clusters.
 
 ====== Applications for a Command
 

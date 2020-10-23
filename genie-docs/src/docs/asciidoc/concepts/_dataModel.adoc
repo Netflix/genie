@@ -1,9 +1,9 @@
 === Data Model
 
-The Genie 3 data model contains several modifications and additions to the
-https://netflix.github.io/genie/concepts/2/DataModel.html[Genie 2 data model] to enable even more flexibility,
+The Genie 4 data model contains several modifications and additions to the
+https://netflix.github.io/genie/concepts/3/DataModel.html[Genie 3 data model] to enable even more flexibility,
 modularity and meta data retention. This section will go over the purpose of the various resources available from the
-Genie API and how they interact together.
+Genie API and how they interact.
 
 ==== Caveats
 
@@ -17,25 +17,6 @@ https://netflix.github.io/genie/docs/{revnumber}/rest/[API Docs] for how to mani
 will focus on the high level purposes for each resource and how they rely and/or interact with other resources within
 the system.
 
-===== Tagging
-
-An important concept is the tagging of resources. Genie relies heavily on tags for how the system discovers
-resources like clusters and commands for a job. Each of the core resources has a set of tags that can be associated
-with them. These tags can be of set to whatever you want but it is recommended to come up with some sort of consistent
-structure for your tags to make it easier for users to understand their purpose. For example at Netflix we've adopted
-some of the following standards for our tags:
-
-* `sched:{something}`
-** This corresponds to any schedule like that this resource (likely a cluster) is expected to adhere to
-** e.g. `sched:sla` or `sched:adhoc`
-* `type:{something}`
-** e.g. `type:yarn` or `type:presto` for a cluster or `type:hive` or `type:spark` for a command
-* `ver:{something}`
-** The specific version of said resource
-** e.g. two different Spark commands could have `ver:1.6.1` vs `ver:2.0.0`
-* `data:{something}`
-** Used to classify the type of data a resource (usually a command) will access
-** e.g. `data:prod` or `data:test`
 
 ===== Configuration Resources
 
@@ -46,7 +27,7 @@ They're generally set up by the Genie administrator and available to all users f
 
 An application resource represents pretty much what you'd expect. It is a reusable set of binaries, configuration files
 and setup files that can be used to install and configure (surprise!) an application. Generally these resources are
-used when an application isn't already installed and on the `PATH` on a Genie node.
+necessary when an application isn't already installed and on the `PATH` of the host running the job.
 
 When a job is run the job Genie will download all the dependencies, configuration files and
 setup files of each application and cluster and store it all in the job working directory. It will then
@@ -64,17 +45,13 @@ without redeploying a Genie cluster.
 At Netflix our applications frequently consists of a zip of all the binaries uploaded to s3 along with a setup file to
 unzip and configure environment variables for that application.
 
-It is important to note applications are entirely optional and if you prefer to just install all client binaries on a
-Genie node beforehand you're free to do that. It will save in overhead for job launch times but you will lose
-flexibility in the trade-off.
-
 ====== Command Resource
 
 Commands resources primarily represent what a user would enter at the command line if you wanted to run a process on a
 cluster and what binaries (i.e., applications) you would need on your PATH to make that possible.
 
 Commands can have configuration, setup and dependencies files just like applications but primarily they should have an ordered list
-of applications associated with them if necessary. For example lets take a typical scenario involving running Hive. To
+of applications associated with them if necessary. For example, lets take a typical scenario involving running Hive. To
 run Hive you generally need a few things:
 
 . A cluster to run its processing on (we'll get to that in the Cluster section)
@@ -103,6 +80,26 @@ Once a cluster has been linked to commands your Genie instance is ready to start
 described in the following section. One important thing to note is that the list of commands linked to the cluster
 is a priority ordered list. That means if you have two pig commands available on your system for the same cluster the
 first one found in the list will be chosen provided all tags match. See <<How it Works>> for more details.
+
+===== Tagging
+
+An important concept is the tagging of resources. Genie relies heavily on tags for how the system discovers
+resources like clusters and commands for a job. Each of the core resources has a set of tags that can be associated
+with them. These tags can be of set to whatever you want but it is recommended to come up with some sort of consistent
+structure for your tags to make it easier for users to understand their purpose. For example at Netflix we've adopted
+some of the following standards for our tags:
+
+* `sched:{something}`
+** This corresponds to any schedule like that this resource (likely a cluster) is expected to adhere to
+** e.g. `sched:sla` or `sched:adhoc`
+* `type:{something}`
+** e.g. `type:yarn` or `type:presto` for a cluster or `type:hive` or `type:spark` for a command
+* `ver:{something}`
+** The specific version of said resource
+** e.g. two different Spark commands could have `ver:1.6.1` vs `ver:2.0.0`
+* `data:{something}`
+** Used to classify the type of data a resource (usually a command) will access
+** e.g. `data:prod` or `data:test`
 
 ===== Job Resources
 
