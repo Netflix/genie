@@ -4,7 +4,7 @@ This section gives an overview of how Genie is configured and deployed at Netfli
 
 ==== Genie OSS vs Genie Netflix
 
-Genie leverages Spring Boot to enable customization for our internal deployment, leading to good integration with the rest of the internal Netflix ecosystem.
+Genie leverages Spring Boot to enable customization for our internal deployment, allowing deep integration with the rest of the internal Netflix ecosystem.
 
 Some examples of the additional component we use:
 
@@ -14,7 +14,7 @@ Some examples of the additional component we use:
  - https://netflix.github.io/titus/[Titus] for job containers
  - And many other Netflix-internal components related to security, monitoring, observability, log indexing, etc.
 
-We augment Genie OSS with this components and more by injecting them via Spring Boot, without having to change a line of upstream code.
+We augment the open-source Genie components with internal ones by injecting the latter via Spring Boot, without having to change a line of upstream code.
 
 This pattern works well for Genie server, client, and agent CLI, all of which get injected with additional Netflix components for internal use.
 
