@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-10-23</span>
+<span id="revdate">2020-10-26</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -824,9 +824,8 @@ b.conum * { color: inherit !important; }
 <li><a href="#_plug_in_selectors">9.9. Plug-in Selectors</a></li>
 <li><a href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></li>
 <li><a href="#_user_limits">9.11. User limits</a></li>
-<li><a href="#_security">9.12. Security</a></li>
-<li><a href="#_job_attachments">9.13. Job attachments</a></li>
-<li><a href="#_job_archival">9.14. Job archival</a></li>
+<li><a href="#_job_attachments">9.12. Job attachments</a></li>
+<li><a href="#_job_archival">9.13. Job archival</a></li>
 </ul>
 </li>
 <li><a href="#_installation">10. Installation</a>
@@ -1718,7 +1717,7 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="https://netflix.github.io/genie/images/3.0.0/apijob.png"><img src="https://netflix.github.io/genie/images/3.0.0/apijob.png" alt="API Job"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/api-job.png"><img src="https://netflix.github.io/genie/images/3.0.0/apijob.png" alt="API Job"></a>
 </div>
 <div class="title">Figure 1. Lifecycle of an API job</div>
 </div>
@@ -1746,7 +1745,7 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="https://netflix.github.io/genie/images/3.0.0/clijob.png"><img src="https://netflix.github.io/genie/images/3.0.0/clijob.png" alt="CLI Job"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/cli-job.png"><img src="https://netflix.github.io/genie/images/3.0.0/clijob.png" alt="CLI Job"></a>
 </div>
 <div class="title">Figure 2. Lifecycle of a CLI job</div>
 </div>
@@ -4077,7 +4076,7 @@ Netflix.</p>
 <h4 id="_deployment_overview"><a class="anchor" href="#_deployment_overview"></a><a class="link" href="#_deployment_overview">7.5.2. Deployment overview</a></h4>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="https://netflix.github.io/genie/images/3.0.0/deployment-v4.png"><img src="https://netflix.github.io/genie/images/3.0.0/deployment.png" alt="Netflix Deployment"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/netflix-deployment.png"><img src="https://netflix.github.io/genie/images/3.0.0/deployment.png" alt="Netflix Deployment"></a>
 </div>
 <div class="title">Figure 3. Genie Netflix Deployment</div>
 </div>
@@ -4791,23 +4790,40 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 </div>
 <div class="sect3">
 <h4 id="_job_state_change_notifications"><a class="anchor" href="#_job_state_change_notifications"></a><a class="link" href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></h4>
-
+<div class="paragraph">
+<p>Genie emits internal application events whenever a job changes state.</p>
+</div>
+<div class="paragraph">
+<p>Genie includes 2 built-in components that consume theese events and publish notifications to Amazon SNS.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_user_limits"><a class="anchor" href="#_user_limits"></a><a class="link" href="#_user_limits">9.11. User limits</a></h4>
-
+<div class="paragraph">
+<p>Genie can cap the maximum number of jobs that a given user is allowed to run.</p>
+</div>
+<div class="paragraph">
+<p>The global default can be adjusted, and overrides for individual users can be set higher or lower.</p>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_security"><a class="anchor" href="#_security"></a><a class="link" href="#_security">9.12. Security</a></h4>
-
+<h4 id="_job_attachments"><a class="anchor" href="#_job_attachments"></a><a class="link" href="#_job_attachments">9.12. Job attachments</a></h4>
+<div class="paragraph">
+<p>Genie allows API job requests to submit one or more attachments (by submitting a multi-part POST).
+These files are placed in the job directory before launch.</p>
+</div>
+<div class="paragraph">
+<p>Example usage include Presto scripts, and Spark application jars, and additional property files.</p>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_job_attachments"><a class="anchor" href="#_job_attachments"></a><a class="link" href="#_job_attachments">9.13. Job attachments</a></h4>
-
+<h4 id="_job_archival"><a class="anchor" href="#_job_archival"></a><a class="link" href="#_job_archival">9.13. Job archival</a></h4>
+<div class="paragraph">
+<p>After a job is completed, successfully or not, job file outputs and logs can be archived for later access.</p>
 </div>
-<div class="sect3">
-<h4 id="_job_archival"><a class="anchor" href="#_job_archival"></a><a class="link" href="#_job_archival">9.14. Job archival</a></h4>
-
+<div class="paragraph">
+<p>The set of files that get archived is configurable. Or it can be disabled completely.</p>
+</div>
 </div>
 </div>
 </div>
@@ -6973,7 +6989,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-10-23 20:41:47 UTC
+Last updated 2020-10-26 17:12:51 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
