@@ -33,7 +33,7 @@ The advantages of API jobs are:
 
 Genie V4 and above provides a different way to execute jobs: the agent CLI.
 
-The agent CLI can be used to launch jobs outside of the Genie cluster (e.g., on the user Laptop) while still leveraging
+The agent CLI can be used to launch jobs outside of the Genie cluster (e.g., on the user's laptop) while still leveraging
 Genie for configuration, monitoring, audit, archival, etc.
 
 An agent job launched via CLI may look something like this:
