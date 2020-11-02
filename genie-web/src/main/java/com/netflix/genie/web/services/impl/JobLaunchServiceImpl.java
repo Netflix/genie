@@ -185,6 +185,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
         final ResolvedJob resolvedJob
     ) throws AgentLaunchException {
         final Collection<AgentLauncher> availableLaunchers = this.agentLauncherSelector.getAgentLaunchers();
+        log.debug("Selecting agent launcher for job {} ({} available)", jobId, availableLaunchers.size());
         final AgentLauncherSelectionContext context = new AgentLauncherSelectionContext(
             jobId,
             jobSubmission.getJobRequest(),
@@ -209,8 +210,10 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             );
             MetricsUtils.addSuccessTags(tags);
             tags.add(Tag.of(LAUNCHER_CLASS_TAG, selectedLauncher.getClass().getSimpleName()));
+            log.debug("Selected launcher {} for job {}", selectedLauncher, jobId);
             return selectedLauncher;
         } catch (ResourceSelectionException e) {
+            log.error("Error selecting agent launcher", e);
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw new AgentLaunchException("Failed to select an Agent Launcher", e);
         } finally {
