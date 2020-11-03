@@ -44,6 +44,8 @@ genie:
     heart-beat:
       send-interval: 5s
     launcher:
+      local:
+        enabled: true
       titus:
         enabled: false
     routing:

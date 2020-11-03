@@ -49,6 +49,11 @@ public class LocalAgentLauncherProperties {
     public static final String PROPERTY_PREFIX = "genie.agent.launcher.local";
 
     /**
+     * Name of the property that enables/disables the launcher.
+     */
+    public static final String ENABLE_PROPERTY = PROPERTY_PREFIX + ".enabled";
+
+    /**
      * Placeholder for server port in command-line-template.
      */
     public static final String SERVER_PORT_PLACEHOLDER = "<SERVER_PORT_PLACEHOLDER>";
@@ -62,6 +67,11 @@ public class LocalAgentLauncherProperties {
      * Placeholder for agent jar path in command-line-template.
      */
     public static final String AGENT_JAR_PLACEHOLDER = "<AGENT_JAR_PLACEHOLDER>";
+
+    /**
+     * Property that enables or disables the launcher.
+     */
+    private boolean enabled = true;
 
     /**
      * The command that should be run to execute the Genie agent. Required.
