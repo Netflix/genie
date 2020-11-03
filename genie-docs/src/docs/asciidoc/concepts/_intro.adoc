@@ -67,7 +67,7 @@ Every job goes through the following stages:
  - Job final status, statistics and outputs are preserved for later consumption and audit
 
 .Lifecycle of an API job
-image::apijob.png[API Job, link="{v4imagesdir}/api-job.png"]
+image::4.0.0/api-job.png[API Job, link="{imagesdir}/4.0.0/api-job.png"]
 
 1. User submits a job request via REST API
 2. Genie server creates a record, resolves resources (command, cluster) and fills-in other details
@@ -77,7 +77,7 @@ image::apijob.png[API Job, link="{v4imagesdir}/api-job.png"]
 6. While the job is running and after completion, the user can retrieve job status and download outputs and logs (and even kill the job).
 
 .Lifecycle of a CLI job
-image::clijob.png[CLI Job, link="{v4imagesdir}/cli-job.png"]
+image::4.0.0/cli-job.png[CLI Job, link="{imagesdir}/4.0.0/cli-job.png"]
 
 1. The user launches a job via CLI (this job execute locally, wherever the agent is invoked)
 2. The agent connects to the Genie cluster and creates the job record, resolves resources (cluster, command). It also keeps the server informed of its progress.

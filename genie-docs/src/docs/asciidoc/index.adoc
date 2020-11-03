@@ -15,8 +15,7 @@ v{revnumber}, {localdate}
 :stylesheet: rubygems.css
 :stylesdir: stylesheets
 :source-highlighter: highlight.js
-:imagesdir: https://netflix.github.io/genie/images/3.0.0
-:v4imagesdir: https://netflix.github.io/genie/images/4.0.0
+:imagesdir: https://netflix.github.io/genie/images/
 
 == Introduction
 
