@@ -173,7 +173,6 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
     /**
      * {@inheritDoc}
-     * @return
      */
     @Override
     public Optional<JsonNode> launchAgent(
