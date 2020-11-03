@@ -40,6 +40,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         def properties = new LocalAgentLauncherProperties()
 
         then:
+        properties.isEnabled()
         properties.getLaunchCommandTemplate() == ["java", "-jar", LocalAgentLauncherProperties.AGENT_JAR_PLACEHOLDER, "exec", "--server-host", "127.0.0.1", "--server-port", LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, "--api-job", "--job-id", LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER]
         properties.getAgentJarPath() == "/tmp/genie-agent.jar"
         properties.getMaxJobMemory() == 10_240
@@ -62,6 +63,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         def refreshAfter = Duration.ofMillis(12L)
 
         when:
+        properties.setEnabled(false)
         properties.setLaunchCommandTemplate(newExecutable)
         properties.setAgentJarPath(newJar)
         properties.setMaxJobMemory(newMaxJobMemory)
@@ -73,6 +75,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         properties.setHostInfoRefreshAfter(refreshAfter)
 
         then:
+        !properties.isEnabled()
         properties.getLaunchCommandTemplate() == newExecutable
         properties.getAgentJarPath() == newJar
         properties.getMaxJobMemory() == newMaxJobMemory

@@ -102,8 +102,7 @@ public class AgentLaunchersAutoConfiguration {
     }
 
     /**
-     * Provide a {@link AgentLauncher} implementation which launches local agent processes if no other implementation
-     * is defined.
+     * Provide a {@link AgentLauncher} implementation which launches local agent processes if enabled via property.
      *
      * @param genieWebHostInfo   The {@link GenieWebHostInfo} of this instance
      * @param genieWebRpcInfo    The {@link GenieWebRpcInfo} of this instance
@@ -114,7 +113,7 @@ public class AgentLaunchersAutoConfiguration {
      * @return A {@link LocalAgentLauncherImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(AgentLauncher.class)
+    @ConditionalOnProperty(name = LocalAgentLauncherProperties.ENABLE_PROPERTY, havingValue = "true")
     public LocalAgentLauncherImpl localAgentLauncher(
         final GenieWebHostInfo genieWebHostInfo,
         final GenieWebRpcInfo genieWebRpcInfo,

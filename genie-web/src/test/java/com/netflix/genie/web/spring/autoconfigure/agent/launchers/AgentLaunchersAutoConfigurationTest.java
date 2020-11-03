@@ -60,7 +60,11 @@ class AgentLaunchersAutoConfigurationTest {
      */
     @Test
     void testExpectedBeansExist() {
-        this.contextRunner.run(
+        this.contextRunner
+            .withPropertyValues(
+                "genie.agent.launcher.local.enabled=true"
+            )
+            .run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
                 Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
@@ -75,13 +79,14 @@ class AgentLaunchersAutoConfigurationTest {
      * .
      */
     @Test
-    void testTitusAgentLauncherBean() {
+    void testTitusAgentLauncherOnlyBean() {
         this.contextRunner
             .withUserConfiguration(
                 TitusRestTemplateConfig.class
             )
             .withPropertyValues(
-                "genie.agent.launcher.titus.enabled=true"
+                "genie.agent.launcher.titus.enabled=true",
+                "genie.agent.launcher.local.enabled=false"
             )
             .run(
                 context -> {

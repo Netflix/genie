@@ -102,6 +102,11 @@ Whereas static properties values are bound during application startup and do not
 |/tmp/genie-agent.jar
 |no
 
+|genie.agent.launcher.local.enabled
+|Enable or disable the corresponding launcher.
+|true
+|no
+
 |genie.agent.launcher.local.host-info-expire-after
 |How long after the job information for this host is written into a local cache is it evicted. See
 https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion[Spring Docs]
