@@ -43,6 +43,9 @@ genie:
       write-retry-delay: 300ms
     heart-beat:
       send-interval: 5s
+    launcher:
+      titus:
+        enabled: false
     routing:
       refresh-interval: 3s
   health:
