@@ -18,11 +18,13 @@
 package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
+import com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
+import com.netflix.genie.web.properties.TitusAgentLauncherProperties;
 import com.netflix.genie.web.util.ExecutorFactory;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -32,6 +34,7 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
@@ -60,10 +63,34 @@ class AgentLaunchersAutoConfigurationTest {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
+                Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
                 Assertions.assertThat(context).hasSingleBean(ExecutorFactory.class);
                 Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
+                Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.class);
             }
         );
+    }
+
+    /**
+     * .
+     */
+    @Test
+    void testTitusAgentLauncherBean() {
+        this.contextRunner
+            .withUserConfiguration(
+                TitusRestTemplateConfig.class
+            )
+            .withPropertyValues(
+                "genie.agent.launcher.titus.enabled=true"
+            )
+            .run(
+                context -> {
+                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherImpl.class);
+                    Assertions.assertThat(context).doesNotHaveBean(LocalAgentLauncherImpl.class);
+                }
+            );
     }
 
     static class UserConfig {
@@ -92,6 +119,13 @@ class AgentLaunchersAutoConfigurationTest {
         @Bean
         MeterRegistry meterRegistry() {
             return new SimpleMeterRegistry();
+        }
+    }
+
+    static class TitusRestTemplateConfig {
+        @Bean(name = "titusRestTemplate")
+        RestTemplate restTemplate() {
+            return Mockito.mock(RestTemplate.class);
         }
     }
 }

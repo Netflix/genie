@@ -216,6 +216,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |JobRestController
 |user, jobsUserLimit
 
+|genie.launchers.titus.launch.timer
+|Time taken to launch request a job be launched on Titus
+|nanoseconds
+|TitusAgentLauncher
+|status, exceptionClass
+
 |genie.notifications.sns.publish.counter
 |Count the number of notification published to SNS
 |count

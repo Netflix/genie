@@ -17,18 +17,28 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
+import com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
+import com.netflix.genie.web.properties.TitusAgentLauncherProperties;
 import com.netflix.genie.web.util.ExecutorFactory;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Auto configuration for beans responsible ofor launching Genie Agent instances.
@@ -39,10 +49,46 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(
     {
-        LocalAgentLauncherProperties.class
+        LocalAgentLauncherProperties.class,
+        TitusAgentLauncherProperties.class
     }
 )
 public class AgentLaunchersAutoConfiguration {
+
+    /**
+     * Provide a {@link TitusAgentLauncherImpl} implementation which launches agent processes in a dedicated Titus
+     * container if enabled via property.
+     *
+     * @param restTemplate                 the rest template
+     * @param genieHostInfo                the metadata about the local server and host
+     * @param titusAgentLauncherProperties the configuration properties
+     * @param registry                     the metric registry
+     * @return a {@link TitusAgentLauncherImpl}
+     */
+    @Bean
+    @ConditionalOnProperty(name = TitusAgentLauncherProperties.ENABLE_PROPERTY, havingValue = "true")
+    public TitusAgentLauncherImpl titusAgentLauncher(
+        @Qualifier("titusRestTemplate") final RestTemplate restTemplate,
+        final GenieHostInfo genieHostInfo,
+        final TitusAgentLauncherProperties titusAgentLauncherProperties,
+        final MeterRegistry registry
+    ) {
+        final Cache<String, String> healthIndicatorCache = Caffeine.newBuilder()
+            .maximumSize(titusAgentLauncherProperties.getHealthIndicatorMaxSize())
+            .expireAfterWrite(
+                titusAgentLauncherProperties.getHealthIndicatorExpiration().getSeconds(),
+                TimeUnit.SECONDS
+            )
+            .build();
+
+        return new TitusAgentLauncherImpl(
+            restTemplate,
+            healthIndicatorCache,
+            genieHostInfo,
+            titusAgentLauncherProperties,
+            registry
+        );
+    }
 
     /**
      * Provide an {@link ExecutorFactory} instance if no other was defined.

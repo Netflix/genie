@@ -142,6 +142,106 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |false
 |no
 
+|genie.agent.launcher.titus.enabled
+|Whether the Titus agent launcher is active
+|false
+|no
+
+|genie.agent.launcher.titus.endpoint
+|The Titus API endpoint URI
+|https://example-titus-endpoint.tld:1234
+|no
+
+|genie.agent.launcher.titus.entry-point-template
+|The container entry point expression, placeholder values are substituted at runtime
+|[/bin/genie-agent, exec, --api-job, --launchInJobDirectory, --job-id, <JOB_ID>, --server-host, <SERVER_HOST>, --server-port, <SERVER_PORT>]
+|no
+
+|genie.agent.launcher.titus.owner-email
+|The team email of the owners of the Titus job
+|owners@genie.tld
+|no
+
+|genie.agent.launcher.titus.application-name
+|The name of the application that launches the Titus job
+|genie
+|no
+
+|genie.agent.launcher.titus.capacity-group
+|The name of the capacity group to target
+|default
+|no
+
+|genie.agent.launcher.titus.security-attributes
+|A map of security attributes
+|
+|no
+
+|genie.agent.launcher.titus.security-groups
+|A list of security groups for the job
+|default
+|no
+
+|genie.agent.launcher.titus.i-am-role
+|The IAM role to launch the job as
+|arn:aws:iam::000000000:role/SomeProfile
+|no
+
+|genie.agent.launcher.titus.image-name
+|The name of the container image
+|image-name
+|no
+
+|genie.agent.launcher.titus.image-tag
+|The image tag
+|latest
+|no
+
+|genie.agent.launcher.titus.disk-size
+|The size of the disk volume to attach to the job container
+|10G
+|no
+
+|genie.agent.launcher.titus.network-bandwidth
+|The network bandwidth to allocate to the container
+|7M
+|no
+
+|genie.agent.launcher.titus.retries
+|How many times to retry launch if the job fails
+|0
+|no
+
+|genie.agent.launcher.titus.runtime-limit
+|The maximum runtime of the job
+|12H
+|no
+
+|genie.agent.launcher.titus.genie-server-host
+|The hostname of the Genie server or cluster for the agent to connect to
+|example.genie.tld
+|no
+
+|genie.agent.launcher.titus.genie-server-port
+|The port number of the Genie server or cluster for the agent to connect to
+|9090
+|no
+
+|genie.agent.launcher.titus.healthIndicator-max-size
+|Maximum number of recently launched jobs displayed in the health indicator details
+|100
+|no
+
+|genie.agent.launcher.titus.health-indicator-expiration
+|Maximum time a job is displayed in the health indicator details after launch
+|30m
+|no
+
+|genie.agent.launcher.titus.additional-environment
+|Map of additional environment variables to set for the job
+|default
+|no
+
 |genie.agent.routing.refresh-interval
 |Interval at which individual connections are refreshed
 |3s
