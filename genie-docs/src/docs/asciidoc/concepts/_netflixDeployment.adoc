@@ -21,7 +21,7 @@ This pattern works well for Genie server, client, and agent CLI, all of which ge
 ==== Deployment overview
 
 .Genie Netflix Deployment
-image::deployment.png[Netflix Deployment, link="{v4imagesdir}/netflix-deployment.png"]
+image::4.0.0/netflix-deployment.png[Netflix Deployment, link="{imagesdir}/4.0.0/netflix-deployment.png"]
 
 ===== EC2 instances and Auto Scaling Group (ASG)
 
