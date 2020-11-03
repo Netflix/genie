@@ -2045,7 +2045,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
 
     /**
      * {@inheritDoc}
-     * @return
      */
     @Override
     @Transactional(readOnly = true)
