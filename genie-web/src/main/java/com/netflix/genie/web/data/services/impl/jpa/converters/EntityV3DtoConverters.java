@@ -173,6 +173,7 @@ public final class EntityV3DtoConverters {
             // If NULL or set to an invalid enum value
             builder.withArchiveStatus(ArchiveStatus.UNKNOWN);
         }
+        jobExecutionProjection.getLauncherExt().ifPresent(builder::withLauncherExt);
 
         return builder.build();
     }
