@@ -1058,6 +1058,12 @@ final class Snippets {
                 .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "archiveStatus"))
                 .description("The archival status of the job directory")
                 .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("launcherExt")
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "launcherExt"))
+                .description("The launcher extension")
+                .type(JsonFieldType.OBJECT)
                 .optional()
         );
     }

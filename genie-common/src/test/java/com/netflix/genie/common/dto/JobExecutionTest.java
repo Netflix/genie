@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -54,6 +56,7 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(execution.getMemory().isPresent()).isFalse();
         Assertions.assertThat(execution.getArchiveStatus().isPresent()).isFalse();
+        Assertions.assertThat(execution.getLauncherExt().isPresent()).isFalse();
     }
 
     /**
@@ -81,6 +84,9 @@ class JobExecutionTest {
         final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
+        final JsonNode launcherExt = JsonNodeFactory.instance.objectNode();
+        builder.withLauncherExt(launcherExt);
+
         final JobExecution execution = builder.build();
         Assertions.assertThat(execution.getHostName()).isEqualTo(HOST_NAME);
         Assertions
@@ -97,6 +103,8 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getMemory().orElseThrow(IllegalArgumentException::new)).isEqualTo(MEMORY);
         Assertions.assertThat(execution.getArchiveStatus().orElseThrow(IllegalArgumentException::new))
             .isEqualTo(ArchiveStatus.ARCHIVED);
+        Assertions.assertThat(execution.getLauncherExt().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(launcherExt);
     }
 
     /**
@@ -114,6 +122,7 @@ class JobExecutionTest {
         builder.withId(null);
         builder.withUpdated(null);
         builder.withArchiveStatus(null);
+        builder.withLauncherExt(null);
 
         final JobExecution execution = builder.build();
         Assertions.assertThat(execution.getHostName()).isEqualTo(HOST_NAME);
@@ -126,6 +135,7 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(execution.getMemory().isPresent()).isFalse();
         Assertions.assertThat(execution.getArchiveStatus().isPresent()).isFalse();
+        Assertions.assertThat(execution.getLauncherExt().isPresent()).isFalse();
     }
 
     /**

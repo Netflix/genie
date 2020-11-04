@@ -18,6 +18,7 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import lombok.Getter;
@@ -71,6 +72,7 @@ public class JobExecution extends BaseDTO {
     )
     private final Integer memory;
     private final ArchiveStatus archiveStatus;
+    private final JsonNode launcherExt;
 
     /**
      * Constructor used by the builder build() method.
@@ -86,6 +88,7 @@ public class JobExecution extends BaseDTO {
         this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
         this.archiveStatus = builder.bArchiveStatus;
+        this.launcherExt = builder.bLauncherExt;
     }
 
     /**
@@ -143,6 +146,15 @@ public class JobExecution extends BaseDTO {
     }
 
     /**
+     * Get the launcher extension.
+     *
+     * @return the launcher extension as Optional as it could be null
+     */
+    public Optional<JsonNode> getLauncherExt() {
+        return Optional.ofNullable(this.launcherExt);
+    }
+
+    /**
      * A builder to create job requests.
      *
      * @author tgianos
@@ -157,6 +169,7 @@ public class JobExecution extends BaseDTO {
         private Integer bExitCode;
         private Integer bMemory;
         private ArchiveStatus bArchiveStatus;
+        private JsonNode bLauncherExt;
 
         /**
          * Constructor which has required fields.
@@ -233,6 +246,17 @@ public class JobExecution extends BaseDTO {
          */
         public Builder withArchiveStatus(final ArchiveStatus archiveStatus) {
             this.bArchiveStatus = archiveStatus;
+            return this;
+        }
+
+        /**
+         * Set the launcher extension for this job.
+         *
+         * @param launcherExt The launcher extension
+         * @return The builder
+         */
+        public Builder withLauncherExt(@Nullable final JsonNode launcherExt) {
+            this.bLauncherExt = launcherExt;
             return this;
         }
 

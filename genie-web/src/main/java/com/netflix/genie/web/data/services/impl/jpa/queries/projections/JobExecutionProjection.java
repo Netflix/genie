@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.projections;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.time.Instant;
 import java.util.Optional;
 
@@ -83,4 +85,11 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
      * @return An Optional wrapping the string representation of the archive status, if is present.
      */
     Optional<String> getArchiveStatus();
+
+    /**
+     * Get the launcher metadata for this job.
+     *
+     * @return An Optional wrapping the JSON representation of the launcher metadata, if present.
+     */
+    Optional<JsonNode> getLauncherExt();
 }
