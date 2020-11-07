@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value=<a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties.class</a>)
+ @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties.class</a>})
 public class <span class="typeNameLabel">AgentLaunchersAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Auto configuration for beans responsible ofor launching Genie Agent instances.</div>
@@ -159,14 +159,23 @@ extends java.lang.Object</pre>
                   <a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                   <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util">ExecutorFactory</a>&nbsp;executorFactory,
                   io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
-<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation which launches local agent processes if no other implementation
- is defined.</div>
+<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation which launches local agent processes if enabled via property.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util">ExecutorFactory</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#processExecutorFactory--">processExecutorFactory</a></span>()</code>
 <div class="block">Provide an <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util"><code>ExecutorFactory</code></a> instance if no other was defined.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                  <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
+                  <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
+                  io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
+ container if enabled via property.</div>
 </td>
 </tr>
 </table>
@@ -208,6 +217,33 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-io.micrometer.core.instrument.MeterRegistry-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>titusAgentLauncher</h4>
+<pre>@Bean
+ @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
+                       havingValue="true")
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a>&nbsp;titusAgentLauncher(@Qualifier(value="titusRestTemplate")
+                                                                                                                                                                     org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
+                                                                                                                                                                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
+ container if enabled via property.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>restTemplate</code> - the rest template</dd>
+<dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>
+<dd><code>titusAgentLauncherProperties</code> - the configuration properties</dd>
+<dd><code>registry</code> - the metric registry</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a></dd>
+</dl>
+</li>
+</ul>
 <a name="processExecutorFactory--">
 <!--   -->
 </a>
@@ -231,15 +267,15 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/util/Executor
 <li class="blockList">
 <h4>localAgentLauncher</h4>
 <pre>@Bean
- @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher.class</a>)
+ @ConditionalOnProperty(name="genie.agent.launcher.local.enabled",
+                       havingValue="true")
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a>&nbsp;localAgentLauncher(<a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebHostInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebHostInfo</a>&nbsp;genieWebHostInfo,
-                                                                                                             <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebRpcInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebRpcInfo</a>&nbsp;genieWebRpcInfo,
-                                                                                                             <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
-                                                                                                             <a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
-                                                                                                             <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util">ExecutorFactory</a>&nbsp;executorFactory,
-                                                                                                             io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
-<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation which launches local agent processes if no other implementation
- is defined.</div>
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebRpcInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebRpcInfo</a>&nbsp;genieWebRpcInfo,
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util">ExecutorFactory</a>&nbsp;executorFactory,
+                                                                                                                                                                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+<div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation which launches local agent processes if enabled via property.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>genieWebHostInfo</code> - The <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebHostInfo.html" title="class in com.netflix.genie.web.introspection"><code>GenieWebHostInfo</code></a> of this instance</dd>

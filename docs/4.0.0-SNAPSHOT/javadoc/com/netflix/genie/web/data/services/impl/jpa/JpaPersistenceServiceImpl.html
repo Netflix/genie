@@ -2473,6 +2473,8 @@ public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getRequestedLauncherExt
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to get the command for</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <code>JsonNode</code> passed to the launcher at launch, or a
+ <code>NullNode</code> if none was saved</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with the given <code>id</code> exists</dd>
 </dl>
