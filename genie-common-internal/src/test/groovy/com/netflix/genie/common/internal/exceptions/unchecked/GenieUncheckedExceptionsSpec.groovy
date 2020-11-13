@@ -70,6 +70,7 @@ class GenieUncheckedExceptionsSpec extends Specification {
         GenieIdAlreadyExistsException          | _
         GenieInvalidStatusException            | _
         GenieJobAlreadyClaimedException        | _
+        GenieJobResolutionRuntimeException     | _
         GenieJobSpecificationNotFoundException | _
         GenieRuntimeException                  | _
     }

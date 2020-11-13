@@ -82,11 +82,6 @@ genie:
       noOfRetries: 5
   scripts-manager:
     refresh-interval: 300000
-  scripts:
-    cluster-selector:
-      source:
-      auto-load-enabled: false
-      timeout: 5000
   smoke: true
   swagger:
     enabled: false

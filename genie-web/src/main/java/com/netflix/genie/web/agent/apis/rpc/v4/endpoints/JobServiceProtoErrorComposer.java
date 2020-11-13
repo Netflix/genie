@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExis
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
@@ -70,6 +71,7 @@ public class JobServiceProtoErrorComposer {
             .put(ConstraintViolationException.class, JobSpecificationError.Type.INVALID_REQUEST)
             .put(GenieJobResolutionException.class, JobSpecificationError.Type.RESOLUTION_FAILED)
             .put(GeniePreconditionException.class, JobSpecificationError.Type.RESOLUTION_FAILED)
+            .put(GenieJobResolutionRuntimeException.class, JobSpecificationError.Type.RUNTIME_ERROR)
             .build();
 
     private static final Map<Class<? extends Exception>, ClaimJobError.Type> CLAIM_JOB_ERROR_MAP =

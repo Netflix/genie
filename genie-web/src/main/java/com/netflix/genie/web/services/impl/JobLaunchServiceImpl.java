@@ -119,12 +119,19 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             try {
                 resolvedJob = this.jobResolverService.resolveJob(jobId);
             } catch (final Throwable t) {
+                final String message;
+                if (t instanceof  GenieJobResolutionException) {
+                    message = JobStatusMessages.FAILED_TO_RESOLVE_JOB;
+                } else {
+                    message = JobStatusMessages.RESOLUTION_RUNTIME_ERROR;
+                }
+
                 MetricsUtils.addFailureTagsWithException(tags, t);
                 this.persistenceService.updateJobStatus(
                     jobId,
                     JobStatus.RESERVED,
                     JobStatus.FAILED,
-                    JobStatusMessages.FAILED_TO_RESOLVE_JOB // TODO: Move somewhere not in genie-common
+                    message // TODO: Move somewhere not in genie-common
                 );
                 this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
                 throw t; // Caught below for metrics gathering

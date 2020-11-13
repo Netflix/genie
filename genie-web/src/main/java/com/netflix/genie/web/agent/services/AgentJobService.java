@@ -28,6 +28,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExis
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import org.springframework.validation.annotation.Validated;
 
@@ -81,10 +82,14 @@ public interface AgentJobService {
      *
      * @param id The id of the job to resolve the specification for. Must already have a reserved an id in the database
      * @return The job specification if one could be resolved
-     * @throws GenieJobResolutionException  On error resolving the job given the input parameters and system state
-     * @throws ConstraintViolationException If the arguments fail validation
+     * @throws GenieJobResolutionException        On error resolving the job given the input parameters and system state
+     * @throws ConstraintViolationException       If the arguments fail validation
+     * @throws GenieJobResolutionRuntimeException If job resolution fails due to a runtime error (as opposed to
+     *                                            unsatisfiable constraints)
      */
-    JobSpecification resolveJobSpecification(@NotBlank String id) throws GenieJobResolutionException;
+    JobSpecification resolveJobSpecification(
+        @NotBlank String id
+    ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException;
 
     /**
      * Get a job specification if has been resolved.
