@@ -18,11 +18,13 @@
 package com.netflix.genie.web.services.impl
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException
 import com.netflix.genie.web.agent.launchers.AgentLauncher
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -154,11 +156,25 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * jobResolverService.resolveJob(jobId) >> {
             throw new GenieJobResolutionException("fail")
         }
-        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESERVED, JobStatus.FAILED, _ as String)
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESERVED, JobStatus.FAILED, JobStatusMessages.FAILED_TO_RESOLVE_JOB)
         1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
         thrown(GenieJobResolutionException)
+
+        when:
+        service.launchJob(jobSubmission)
+
+        then:
+        1 * persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * jobResolverService.resolveJob(jobId) >> {
+            throw new GenieJobResolutionRuntimeException("fail")
+        }
+        1 * persistenceService.updateJobStatus(jobId, JobStatus.RESERVED, JobStatus.FAILED, JobStatusMessages.RESOLUTION_RUNTIME_ERROR)
+        1 * persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
+        0 * persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
+        thrown(GenieJobResolutionRuntimeException)
 
         when:
         service.launchJob(jobSubmission)

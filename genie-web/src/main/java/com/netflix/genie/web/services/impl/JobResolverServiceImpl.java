@@ -32,11 +32,13 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelector;
@@ -189,7 +191,9 @@ public class JobResolverServiceImpl implements JobResolverService {
     @Override
     @Nonnull
     @Transactional
-    public ResolvedJob resolveJob(final String id) throws GenieJobResolutionException {
+    public ResolvedJob resolveJob(
+        final String id
+    ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet(SAVED_TAG);
         try {
@@ -215,7 +219,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             throw e;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
+            throw new GenieJobResolutionRuntimeException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_JOB_TIMER, tags)
@@ -232,7 +236,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id,
         @Valid final JobRequest jobRequest,
         final boolean apiJob
-    ) throws GenieJobResolutionException {
+    ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet(NOT_SAVED_TAG);
         try {
@@ -252,7 +256,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             throw e;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
+            throw new GenieJobResolutionRuntimeException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_JOB_TIMER, tags)
@@ -262,7 +266,9 @@ public class JobResolverServiceImpl implements JobResolverService {
     //endregion
 
     //region Resolution Helpers
-    private ResolvedJob resolve(final JobResolutionContext context) throws GenieJobResolutionException {
+    private ResolvedJob resolve(
+        final JobResolutionContext context
+    ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
         this.resolveCommand(context);
         this.resolveCluster(context);
         this.resolveApplications(context);
@@ -370,15 +376,15 @@ public class JobResolverServiceImpl implements JobResolverService {
             tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getMetadata().getName()));
             context.setCommand(command);
         } catch (final GenieJobResolutionException e) {
+            // No candidates or selector choose none
             tags.add(NO_COMMAND_RESOLVED_ID);
             tags.add(NO_COMMAND_RESOLVED_NAME);
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw e;
-        } catch (final Throwable t) {
-            tags.add(NO_COMMAND_RESOLVED_ID);
-            tags.add(NO_COMMAND_RESOLVED_NAME);
+        } catch (final ResourceSelectionException t) {
+            // Selector runtime error
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
+            throw new GenieJobResolutionRuntimeException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_COMMAND_TIMER, tags)
@@ -466,8 +472,9 @@ public class JobResolverServiceImpl implements JobResolverService {
                         );
                     }
                 } catch (final Exception e) {
-                    selectorTags.add(NO_CLUSTER_RESOLVED_ID);
-                    selectorTags.add(NO_CLUSTER_RESOLVED_NAME);
+                    // Swallow exception and proceed to next selector.
+                    // This is a choice to provides "best-service": select a cluster as long as it matches criteria,
+                    // even if one of the selectors encountered an error and cannot choose the best candidate.
                     MetricsUtils.addFailureTagsWithException(selectorTags, e);
                     log.warn(
                         "Cluster selector {} evaluation threw exception for job {}",
@@ -496,10 +503,8 @@ public class JobResolverServiceImpl implements JobResolverService {
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw e;
         } catch (final Throwable t) {
-            tags.add(NO_CLUSTER_RESOLVED_ID);
-            tags.add(NO_CLUSTER_RESOLVED_NAME);
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
+            throw new GenieJobResolutionRuntimeException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_CLUSTER_TIMER, tags)
@@ -540,7 +545,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             context.setApplications(applications);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new GenieJobResolutionException(t);
+            throw new GenieJobResolutionRuntimeException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_APPLICATIONS_TIMER, tags)

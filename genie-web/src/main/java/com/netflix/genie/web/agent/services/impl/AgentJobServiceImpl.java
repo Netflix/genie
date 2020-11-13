@@ -28,6 +28,7 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionEx
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.agent.services.AgentConfigurationService;
@@ -174,7 +175,9 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJobSpecification(@NotBlank final String id) throws GenieJobResolutionException {
+    public JobSpecification resolveJobSpecification(
+        @NotBlank final String id
+    ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
         try {
             final JobRequest jobRequest = this.persistenceService.getJobRequest(id);
             final ResolvedJob resolvedJob = this.jobResolverService.resolveJob(id, jobRequest, false);

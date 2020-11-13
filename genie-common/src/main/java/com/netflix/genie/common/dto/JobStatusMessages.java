@@ -152,6 +152,11 @@ public final class JobStatusMessages {
     public static final String JOB_MARKED_FAILED = "The job status changed server-side while the job was running";
 
     /**
+     * Job resolution fails due to runtime error (i.e. NOT due to unsatisfiable constraints).
+     */
+    public static final String RESOLUTION_RUNTIME_ERROR = "Runtime error during job resolution";
+
+    /**
      * Private constructor, this class is not meant to be instantiated.
      */
     private JobStatusMessages() {

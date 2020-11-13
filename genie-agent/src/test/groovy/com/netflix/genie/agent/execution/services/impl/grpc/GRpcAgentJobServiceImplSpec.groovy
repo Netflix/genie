@@ -288,6 +288,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         JobSpecificationError.Type.NO_JOB_FOUND         | JobSpecificationResolutionException
         JobSpecificationError.Type.NO_COMMAND_FOUND     | JobSpecificationResolutionException
         JobSpecificationError.Type.RESOLUTION_FAILED    | JobSpecificationResolutionException
+        JobSpecificationError.Type.RUNTIME_ERROR        | GenieRuntimeException
         JobSpecificationError.Type.UNKNOWN              | GenieRuntimeException
     }
 

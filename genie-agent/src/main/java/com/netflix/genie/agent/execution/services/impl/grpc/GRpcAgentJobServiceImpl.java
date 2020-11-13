@@ -384,6 +384,9 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
                         + ": "
                         + error.getMessage()
                 );
+            case RUNTIME_ERROR:
+                throw new GenieRuntimeException(
+                    "Transient error resolving job specification: " + error.getMessage());
             case UNKNOWN:
             default:
                 throw new GenieRuntimeException(

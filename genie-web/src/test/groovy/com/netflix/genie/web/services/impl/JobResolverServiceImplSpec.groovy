@@ -39,6 +39,7 @@ import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException
 import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -272,6 +273,82 @@ class JobResolverServiceImplSpec extends Specification {
         jobEnvironment.getCpu() == 1
         !jobEnvironment.getExt().isPresent()
         !jobSpec.getTimeout().isPresent()
+    }
+
+    def "Can handle runtime resolution errors with V3 and V4 algorithms"() {
+        def command0Id = UUID.randomUUID().toString()
+        def command1Id = UUID.randomUUID().toString()
+        def executableBinary = UUID.randomUUID().toString()
+        def executableArgument0 = UUID.randomUUID().toString()
+        def executableArgument1 = UUID.randomUUID().toString()
+        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
+        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
+        def command0 = createCommand(command0Id, executable)
+        def command1 = createCommand(command1Id, executable)
+        def commands = Sets.newHashSet(command0, command1)
+
+        def jobId = UUID.randomUUID().toString()
+
+        def jobRequest = createJobRequest(arguments, null, null)
+
+        def command0JobRequestClusters = createClustersBasedOnCriteria(2, command0, jobRequest)
+        def command1JobRequestClusters = createClustersBasedOnCriteria(3, command1, jobRequest)
+        def jobRequest0Clusters = Sets.newHashSet(command0JobRequestClusters)
+        jobRequest0Clusters.addAll(command1JobRequestClusters)
+
+        when: "V4 resolution"
+        this.service.resolveJob(jobId, jobRequest, true)
+
+        then:
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest.getCriteria().getCommandCriterion(), true) >> commands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest0Clusters
+        1 * this.commandSelector.select(_ as CommandSelectionContext) >> {
+            throw exception
+        }
+        thrown(expectedException)
+
+        when: "V3 resolution"
+        this.service.resolveJob(jobId)
+
+        then:
+        1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
+        1 * this.persistenceService.getJobRequest(jobId) >> jobRequest
+        1 * this.persistenceService.isApiJob(jobId) >> true
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest.getCriteria().getCommandCriterion(), true) >> commands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest0Clusters
+        1 * this.commandSelector.select(_ as CommandSelectionContext) >> {
+            throw exception
+        }
+        thrown(expectedException)
+
+        where:
+        exception                        | expectedException
+        new ResourceSelectionException() | GenieJobResolutionRuntimeException
+        new RuntimeException()           | GenieJobResolutionRuntimeException
+    }
+
+    def "Can handle resources not found errors with V3 and V4 algorithms"() {
+        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
+        def jobId = UUID.randomUUID().toString()
+        def jobRequest0 = createJobRequest(arguments, null, null)
+        def emptySet = Sets.newHashSet()
+
+        when: "V4 resolution"
+        this.service.resolveJob(jobId, jobRequest0, true)
+
+        then:
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest0.getCriteria().getCommandCriterion(), true) >> emptySet
+        thrown(GenieJobResolutionException)
+
+        when: "V3 resolution"
+        this.service.resolveJob(jobId)
+
+        then:
+        1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
+        1 * this.persistenceService.getJobRequest(jobId) >> jobRequest0
+        1 * this.persistenceService.isApiJob(jobId) >> true
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest0.getCriteria().getCommandCriterion(), true) >> emptySet
+        thrown(GenieJobResolutionException)
     }
 
     def "Can convert tags to string"(Set<String> input, String output) {
@@ -621,7 +698,7 @@ class JobResolverServiceImplSpec extends Specification {
                 }
             }
         ) >> { throw new ResourceSelectionException() }
-        thrown(GenieJobResolutionException)
+        thrown(GenieJobResolutionRuntimeException)
 
         when: "The selectors select a command"
         context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
@@ -679,7 +756,7 @@ class JobResolverServiceImplSpec extends Specification {
         then: "An exception is thrown"
         1 * context.getCommand() >> Optional.empty()
         0 * context.setCluster(_ as Cluster)
-        thrown(GenieJobResolutionException)
+        thrown(GenieJobResolutionRuntimeException)
 
         when: "No command -> cluster map was stored in the context"
         this.service.resolveCluster(context)
@@ -688,7 +765,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * context.getCommand() >> Optional.of(command)
         1 * context.getCommandClusters() >> Optional.empty()
         0 * context.setCluster(_ as Cluster)
-        thrown(GenieJobResolutionException)
+        thrown(GenieJobResolutionRuntimeException)
 
         when: "No command -> cluster mapping is found"
         this.service.resolveCluster(context)
@@ -697,7 +774,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * context.getCommand() >> Optional.of(command)
         1 * context.getCommandClusters() >> Optional.of([:])
         0 * context.setCluster(_ as Cluster)
-        thrown(GenieJobResolutionException)
+        thrown(GenieJobResolutionRuntimeException)
 
         when: "No command -> cluster mapping is empty"
         this.service.resolveCluster(context)
@@ -706,7 +783,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * context.getCommand() >> Optional.of(command)
         1 * context.getCommandClusters() >> Optional.of([(command): Sets.newHashSet()])
         0 * context.setCluster(_ as Cluster)
-        thrown(GenieJobResolutionException)
+        thrown(GenieJobResolutionRuntimeException)
 
         when: "Selector has no preference and there are no more selectors"
         this.service.resolveCluster(context)
