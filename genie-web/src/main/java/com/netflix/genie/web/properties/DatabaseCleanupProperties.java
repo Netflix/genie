@@ -54,6 +54,11 @@ public class DatabaseCleanupProperties {
     public static final String EXPRESSION_PROPERTY = PROPERTY_PREFIX + ".expression";
 
     /**
+     * The batch size used to iteratively delete unused entities.
+     */
+    public static final String BATCH_SIZE_PROPERTY = PROPERTY_PREFIX + ".batchSize";
+
+    /**
      * The property key for whether this feature is enabled or not.
      */
     private boolean enabled;
@@ -63,6 +68,12 @@ public class DatabaseCleanupProperties {
      */
     @NotBlank
     private String expression = "0 0 0 * * *";
+
+    /**
+     * The batch size used to iteratively delete unused entities.
+     */
+    @Min(1)
+    private int batchSize = 10_000;
 
     /**
      * Properties related to cleaning up application records from the database.

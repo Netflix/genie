@@ -574,6 +574,11 @@ of 2.0
 |2m
 |no
 
+|genie.tasks.database-cleanup.batch-size
+|The max number of entities to delete per transaction (applies to files, clusters, commands, tags, applications)
+|1000
+|yes
+
 |genie.tasks.database-cleanup.application-cleanup.skip
 |Skip the Applications table when performing database cleanup
 |false

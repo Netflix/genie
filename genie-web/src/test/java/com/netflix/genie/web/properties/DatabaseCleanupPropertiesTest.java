@@ -42,6 +42,7 @@ class DatabaseCleanupPropertiesTest {
     void canGetDefaultValues() {
         Assertions.assertThat(this.properties.isEnabled()).isFalse();
         Assertions.assertThat(this.properties.getExpression()).isEqualTo("0 0 0 * * *");
+        Assertions.assertThat(this.properties.getBatchSize()).isEqualTo(10_000);
         Assertions.assertThat(this.properties.getApplicationCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getCommandCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getCommandDeactivation().isSkip()).isFalse();
@@ -67,6 +68,14 @@ class DatabaseCleanupPropertiesTest {
         final String expression = UUID.randomUUID().toString();
         this.properties.setExpression(expression);
         Assertions.assertThat(this.properties.getExpression()).isEqualTo(expression);
+    }
+
+
+    @Test
+    void canSetBatchSize() {
+        final int batchSize = 123;
+        this.properties.setBatchSize(batchSize);
+        Assertions.assertThat(this.properties.getBatchSize()).isEqualTo(batchSize);
     }
 
     @Test

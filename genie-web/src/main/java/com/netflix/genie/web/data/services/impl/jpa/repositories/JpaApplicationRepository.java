@@ -40,17 +40,22 @@ public interface JpaApplicationRepository extends JpaBaseRepository<ApplicationE
             + " FROM applications"
             + " WHERE created < :createdThreshold"
             + " AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications)"
-            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)";
+            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)"
+            + " LIMIT :limit";
 
     /**
      * Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
      * created before the given time.
      *
-     * @param createdThreshold The instant in time before which records should be considered for deletion. Exclusive.O
+     * @param createdThreshold The instant in time before which records should be considered for deletion. Exclusive.
+     * @param limit            Maximum number of IDs to return
      * @return The ids of the applications that are unused
      */
     @Query(value = FIND_UNUSED_APPLICATIONS_QUERY, nativeQuery = true)
-    Set<Long> findUnusedApplications(@Param("createdThreshold") Instant createdThreshold);
+    Set<Long> findUnusedApplications(
+        @Param("createdThreshold") Instant createdThreshold,
+        @Param("limit") int limit
+    );
 
     /**
      * Get the {@link ApplicationEntity} but eagerly fetch all relational information needed to construct a DTO.

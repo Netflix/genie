@@ -72,6 +72,7 @@ genie:
   tasks:
     database-cleanup:
       enabled: true
+      batch-size: 10000
       expression: 0 0 0 * * *
       retention: 90
     disk-cleanup:
