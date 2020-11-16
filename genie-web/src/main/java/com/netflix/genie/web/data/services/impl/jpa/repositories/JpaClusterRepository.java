@@ -40,7 +40,8 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
             + " FROM clusters"
             + " WHERE status IN (:unusedStatuses)"
             + " AND created < :clusterCreatedThreshold"
-            + " AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)";
+            + " AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)"
+            + " LIMIT :limit";
 
     /**
      * Find all the clusters that aren't attached to any jobs in the database, were created before the given time
@@ -49,13 +50,15 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
      * @param unusedStatuses          The set of statuses a cluster must have to be considered unused
      * @param clusterCreatedThreshold The instant in time which a cluster must have been created before to be considered
      *                                unused. Exclusive.
+     * @param limit                   Maximum number of IDs to return
      * @return The ids of the clusters that are considered unused
      */
     @Query(value = FIND_UNUSED_CLUSTERS_SQL, nativeQuery = true)
     // TODO: Could use different lock mode
     Set<Long> findUnusedClusters(
         @Param("unusedStatuses") Set<String> unusedStatuses,
-        @Param("clusterCreatedThreshold") Instant clusterCreatedThreshold
+        @Param("clusterCreatedThreshold") Instant clusterCreatedThreshold,
+        @Param("limit") int limit
     );
 
     /**

@@ -203,8 +203,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
 
     /**
      * Constructor.
-     *  @param entityManager           The {@link EntityManager} to use
-     * @param jpaRepositories         All the repositories in the Genie application
+     *
+     * @param entityManager   The {@link EntityManager} to use
+     * @param jpaRepositories All the repositories in the Genie application
      */
     public JpaPersistenceServiceImpl(
         final EntityManager entityManager,
@@ -457,10 +458,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedApplications(final Instant createdThreshold) {
+    public long deleteUnusedApplications(final Instant createdThreshold, final int batchSize) {
         log.info("Attempting to delete unused applications created before {}", createdThreshold);
         return this.applicationRepository.deleteByIdIn(
-            this.applicationRepository.findUnusedApplications(createdThreshold)
+            this.applicationRepository.findUnusedApplications(createdThreshold, batchSize)
         );
     }
     //endregion
@@ -675,7 +676,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedClusters(final Set<ClusterStatus> deleteStatuses, final Instant clusterCreatedThreshold) {
+    public long deleteUnusedClusters(
+        final Set<ClusterStatus> deleteStatuses,
+        final Instant clusterCreatedThreshold,
+        final int batchSize
+    ) {
         log.info(
             "[deleteUnusedClusters] Deleting with statuses {} that were created before {}",
             deleteStatuses,
@@ -684,7 +689,8 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         return this.clusterRepository.deleteByIdIn(
             this.clusterRepository.findUnusedClusters(
                 deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
-                clusterCreatedThreshold
+                clusterCreatedThreshold,
+                batchSize
             )
         );
     }
@@ -1262,7 +1268,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedCommands(final Set<CommandStatus> deleteStatuses, final Instant commandCreatedThreshold) {
+    public long deleteUnusedCommands(
+        final Set<CommandStatus> deleteStatuses,
+        final Instant commandCreatedThreshold,
+        final int batchSize
+    ) {
         log.info(
             "Deleting commands with statuses {} that were created before {}",
             deleteStatuses,
@@ -1271,7 +1281,8 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         return this.commandRepository.deleteByIdIn(
             this.commandRepository.findUnusedCommands(
                 deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
-                commandCreatedThreshold
+                commandCreatedThreshold,
+                batchSize
             )
         );
     }
@@ -2289,11 +2300,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedTags(@NotNull final Instant createdThreshold) {
+    public long deleteUnusedTags(@NotNull final Instant createdThreshold, @Min(1) final int batchSize) {
         log.info("[deleteUnusedTags] Called to delete unused tags created before {}", createdThreshold);
         return this.tagRepository.deleteByIdIn(
             this.tagRepository
-                .findUnusedTags(createdThreshold)
+                .findUnusedTags(createdThreshold, batchSize)
                 .stream()
                 .map(Number::longValue)
                 .collect(Collectors.toSet())
@@ -2308,11 +2319,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedFiles(@NotNull final Instant createdThreshold) {
+    public long deleteUnusedFiles(@NotNull final Instant createdThreshold, @Min(1) final int batchSize) {
         log.debug("[deleteUnusedFiles] Called to delete unused files created before {}", createdThreshold);
         return this.fileRepository.deleteByIdIn(
             this.fileRepository
-                .findUnusedFiles(createdThreshold)
+                .findUnusedFiles(createdThreshold, batchSize)
                 .stream()
                 .map(Number::longValue)
                 .collect(Collectors.toSet())

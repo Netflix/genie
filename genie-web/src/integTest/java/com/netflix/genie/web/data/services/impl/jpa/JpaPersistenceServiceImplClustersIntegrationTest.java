@@ -538,6 +538,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
     void testDeleteUnusedClusters() throws GenieCheckedException {
+        final int batchSize = 10;
         Assertions.assertThat(this.clusterRepository.count()).isEqualTo(2L);
         final String testCluster0Id = this.createTestCluster(null, null, ClusterStatus.OUT_OF_SERVICE).getId();
 
@@ -545,19 +546,25 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
         final Set<ClusterStatus> deleteStatuses = EnumSet.of(ClusterStatus.TERMINATED);
 
         // Shouldn't delete any clusters as all are UP or OOS
-        Assertions.assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold)).isEqualTo(0);
+        Assertions
+            .assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold, batchSize))
+            .isEqualTo(0);
 
         // Add new up cluster
         final String testCluster1Id = this.createTestCluster(null, null, ClusterStatus.UP).getId();
 
         // All clusters are UP/OOS or attached to jobs
-        Assertions.assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold)).isEqualTo(0);
+        Assertions
+            .assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold, batchSize))
+            .isEqualTo(0);
 
         // Create Terminated Cluster
         final String testCluster2Id = this.createTestCluster(null, null, ClusterStatus.TERMINATED).getId();
 
         // All clusters are UP/OOS or attached to jobs
-        Assertions.assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold)).isEqualTo(1);
+        Assertions
+            .assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold, batchSize))
+            .isEqualTo(1);
 
         // Make sure it didn't delete any of the clusters we wanted
         Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isTrue();

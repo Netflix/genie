@@ -46,6 +46,7 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) "
             + "AND created <= :createdThreshold "
+            + "LIMIT :limit "
             + "FOR UPDATE;";
 
     /**
@@ -78,10 +79,14 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      *
      * @param createdThreshold The instant in time where tags created before this time that aren't referenced
      *                         will be returned. Inclusive
+     * @param limit            Maximum number of IDs to return
      * @return The number of tags deleted
      */
     @Query(value = SELECT_FOR_UPDATE_UNUSED_TAGS_SQL, nativeQuery = true)
-    Set<Number> findUnusedTags(@Param("createdThreshold") Instant createdThreshold);
+    Set<Number> findUnusedTags(
+        @Param("createdThreshold") Instant createdThreshold,
+        @Param("limit") int limit
+    );
 
     /**
      * Delete all tags from the database whose ids are in the supplied set.

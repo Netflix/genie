@@ -279,18 +279,37 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping clusters cleanup");
                 this.numDeletedClusters.set(0);
             } else {
-                final long countDeletedClusters = this.persistenceService.deleteUnusedClusters(
-                    TO_DELETE_CLUSTER_STATUSES,
-                    creationThreshold
+                final int batchSize = this.environment.getProperty(
+                    DatabaseCleanupProperties.BATCH_SIZE_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getBatchSize()
                 );
+
+                log.info(
+                    "Attempting to delete unused clusters from before {} in batches of {}",
+                    creationThreshold,
+                    batchSize
+                );
+
+                long deleted;
+                long totalDeleted = 0L;
+                do {
+                    deleted = this.persistenceService.deleteUnusedClusters(
+                        TO_DELETE_CLUSTER_STATUSES,
+                        creationThreshold,
+                        batchSize
+                    );
+                    totalDeleted += deleted;
+                } while (deleted > 0);
+
                 log.info(
                     "Deleted {} clusters that were in one of {} states, were created before {} and weren't "
                         + " attached to any jobs",
-                    countDeletedClusters,
+                    totalDeleted,
                     TO_DELETE_CLUSTER_STATUSES,
                     creationThreshold
                 );
-                this.numDeletedClusters.set(countDeletedClusters);
+                this.numDeletedClusters.set(totalDeleted);
             }
         } catch (final Exception e) {
             log.error("Unable to delete clusters from database", e);
@@ -315,12 +334,29 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping files cleanup");
                 this.numDeletedFiles.set(0);
             } else {
-                final long countDeletedFiles = this.persistenceService.deleteUnusedFiles(creationThreshold);
-                log.info(
-                    "Deleted {} files that were unused by any resource and created over an hour ago",
-                    countDeletedFiles
+                final int batchSize = this.environment.getProperty(
+                    DatabaseCleanupProperties.BATCH_SIZE_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getBatchSize()
                 );
-                this.numDeletedFiles.set(countDeletedFiles);
+                log.info(
+                    "Attempting to delete unused files from before {} in batches of {}",
+                    creationThreshold,
+                    batchSize
+                );
+
+                long deleted;
+                long totalDeleted = 0L;
+                do {
+                    deleted = this.persistenceService.deleteUnusedFiles(creationThreshold, batchSize);
+                    totalDeleted += deleted;
+                } while (deleted > 0);
+                log.info(
+                    "Deleted {} files that were unused by any resource and created before {}",
+                    totalDeleted,
+                    creationThreshold
+                );
+                this.numDeletedFiles.set(totalDeleted);
             }
         } catch (final Exception e) {
             log.error("Unable to delete files from database", e);
@@ -345,12 +381,30 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping tags cleanup");
                 this.numDeletedTags.set(0);
             } else {
-                final long countDeletedTags = this.persistenceService.deleteUnusedTags(creationThreshold);
-                log.info(
-                    "Deleted {} tags that were unused by any resource and created over an hour ago",
-                    countDeletedTags
+                final int batchSize = this.environment.getProperty(
+                    DatabaseCleanupProperties.BATCH_SIZE_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getBatchSize()
                 );
-                this.numDeletedTags.set(countDeletedTags);
+
+                log.info(
+                    "Attempting to delete unused tags from before {} in batches of {}",
+                    creationThreshold,
+                    batchSize
+                );
+
+                long deleted;
+                long totalDeleted = 0L;
+                do {
+                    deleted = this.persistenceService.deleteUnusedTags(creationThreshold, batchSize);
+                    totalDeleted += deleted;
+                } while (deleted > 0);
+                log.info(
+                    "Deleted {} tags that were unused by any resource and created before {}",
+                    totalDeleted,
+                    creationThreshold
+                );
+                this.numDeletedTags.set(totalDeleted);
             }
         } catch (final Exception e) {
             log.error("Unable to delete tags from database", e);
@@ -432,15 +486,33 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping command cleanup");
                 this.numDeletedCommands.set(0);
             } else {
-                final long deletedCommandCount = this.persistenceService.deleteUnusedCommands(
-                    TO_DELETE_COMMAND_STATUSES,
-                    creationThreshold
+                final int batchSize = this.environment.getProperty(
+                    DatabaseCleanupProperties.BATCH_SIZE_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getBatchSize()
                 );
                 log.info(
-                    "Deleted {} commands that were unused by any resource and created over an hour ago",
-                    deletedCommandCount
+                    "Attempting to delete unused commands from before {} in batches of {}",
+                    creationThreshold,
+                    batchSize
                 );
-                this.numDeletedCommands.set(deletedCommandCount);
+
+                long deleted;
+                long totalDeleted = 0L;
+                do {
+                    deleted = this.persistenceService.deleteUnusedCommands(
+                        TO_DELETE_COMMAND_STATUSES,
+                        creationThreshold,
+                        batchSize
+                    );
+                    totalDeleted += deleted;
+                } while (deleted > 0);
+                log.info(
+                    "Deleted {} commands that were unused by any resource and created before {}",
+                    totalDeleted,
+                    creationThreshold
+                );
+                this.numDeletedCommands.set(totalDeleted);
             }
         } catch (final Exception e) {
             log.error("Unable to delete commands in database", e);
@@ -465,13 +537,32 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping application cleanup");
                 this.numDeletedCommands.set(0);
             } else {
-                final long deletedApplicationCount = this.persistenceService
-                    .deleteUnusedApplications(creationThreshold);
-                log.info(
-                    "Deleted {} applications that were unused by any resource and created over an hour ago",
-                    deletedApplicationCount
+                final int batchSize = this.environment.getProperty(
+                    DatabaseCleanupProperties.BATCH_SIZE_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getBatchSize()
                 );
-                this.numDeletedApplications.set(deletedApplicationCount);
+                log.info(
+                    "Attempting to delete unused applications from before {} in batches of {}",
+                    creationThreshold,
+                    batchSize
+                );
+
+                long deleted;
+                long totalDeleted = 0L;
+                do {
+                    deleted = this.persistenceService.deleteUnusedApplications(
+                        creationThreshold,
+                        batchSize
+                    );
+                    totalDeleted += deleted;
+                } while (deleted > 0);
+                log.info(
+                    "Deleted {} applications that were unused by any resource and created before {}",
+                    totalDeleted,
+                    creationThreshold
+                );
+                this.numDeletedApplications.set(totalDeleted);
             }
         } catch (final Exception e) {
             log.error("Unable to delete applications in database", e);

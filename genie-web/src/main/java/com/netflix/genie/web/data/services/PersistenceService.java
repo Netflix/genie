@@ -166,9 +166,10 @@ public interface PersistenceService {
      * @param createdThreshold The instant in time that any application had to be created before (exclusive) to be
      *                         considered for deletion. Presents ability to filter out newly created applications if
      *                         desired.
+     * @param batchSize        The maximum number of applications to delete in a single transaction
      * @return The number of successfully deleted applications
      */
-    long deleteUnusedApplications(Instant createdThreshold);
+    long deleteUnusedApplications(@NotNull Instant createdThreshold, @Min(1) int batchSize);
     //endregion
 
     //region Cluster APIs
@@ -247,9 +248,14 @@ public interface PersistenceService {
      *                                deletion.
      * @param clusterCreatedThreshold The instant in time before which a cluster must have been created to be
      *                                considered for deletion. Exclusive.
+     * @param batchSize               The maximum number of clusters to delete in a single transaction
      * @return The number of clusters deleted
      */
-    long deleteUnusedClusters(Set<ClusterStatus> deleteStatuses, Instant clusterCreatedThreshold);
+    long deleteUnusedClusters(
+        Set<ClusterStatus> deleteStatuses,
+        @NotNull Instant clusterCreatedThreshold,
+        @Min(1) int batchSize
+    );
 
     /**
      * Find all the {@link Cluster}'s that match the given {@link Criterion}.
@@ -511,9 +517,14 @@ public interface PersistenceService {
      * @param deleteStatuses          The set of statuses a command must be in in order to be considered for deletion
      * @param commandCreatedThreshold The instant in time a command must have been created before to be considered for
      *                                deletion. Exclusive.
+     * @param batchSize               The maximum number of commands to delete in a single transaction
      * @return The number of commands that were deleted
      */
-    long deleteUnusedCommands(Set<CommandStatus> deleteStatuses, Instant commandCreatedThreshold);
+    long deleteUnusedCommands(
+        Set<CommandStatus> deleteStatuses,
+        @NotNull Instant commandCreatedThreshold,
+        @Min(1) int batchSize
+    );
     //endregion
 
     //region Job APIs
@@ -1128,9 +1139,10 @@ public interface PersistenceService {
      *
      * @param createdThreshold The instant in time where tags created before this time that aren't referenced
      *                         will be deleted. Inclusive
+     * @param batchSize        The maximum number of tags to delete in a single transaction
      * @return The number of tags deleted
      */
-    long deleteUnusedTags(@NotNull Instant createdThreshold);
+    long deleteUnusedTags(@NotNull Instant createdThreshold, @Min(1) int batchSize);
     //endregion
 
     //region File APIs
@@ -1141,8 +1153,9 @@ public interface PersistenceService {
      *
      * @param createdThreshold The instant in time where files created before this time that aren't referenced
      *                         will be deleted. Inclusive
+     * @param batchSize        The maximum number of files to delete in a single transaction
      * @return The number of files deleted
      */
-    long deleteUnusedFiles(@NotNull Instant createdThreshold);
+    long deleteUnusedFiles(@NotNull Instant createdThreshold, @Min(1) int batchSize);
     //endregion
 }

@@ -59,7 +59,8 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + "SELECT DISTINCT(command_id)"
             + " FROM jobs"
             + " WHERE command_id IS NOT NULL"
-            + ")";
+            + ")"
+            + " LIMIT :limit";
 
     /**
      * Bulk set the status of commands which match the given inputs. Considers whether a command was used in some
@@ -89,12 +90,14 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
      * @param unusedStatuses          The set of statuses a command must be in in order to be considered unused
      * @param commandCreatedThreshold The instant in time a command must have been created before to be considered
      *                                unused. Exclusive.
+     * @param limit                   Maximum number of IDs to return
      * @return The ids of the commands that are considered unused
      */
     @Query(value = FIND_UNUSED_COMMANDS_QUERY, nativeQuery = true)
     Set<Long> findUnusedCommands(
         @Param("unusedStatuses") Set<String> unusedStatuses,
-        @Param("commandCreatedThreshold") Instant commandCreatedThreshold
+        @Param("commandCreatedThreshold") Instant commandCreatedThreshold,
+        @Param("limit") int limit
     );
 
     /**

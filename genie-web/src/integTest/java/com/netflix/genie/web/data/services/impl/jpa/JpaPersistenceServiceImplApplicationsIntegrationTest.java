@@ -572,7 +572,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
         Assertions.assertThat(this.applicationRepository.existsByUniqueId("app2")).isTrue();
         Assertions.assertThat(this.applicationRepository.count()).isEqualTo(6);
         final Instant createdThreshold = Instant.parse("2020-03-10T02:44:00.000Z");
-        Assertions.assertThat(this.service.deleteUnusedApplications(createdThreshold)).isEqualTo(1L);
+        Assertions.assertThat(this.service.deleteUnusedApplications(createdThreshold, 10)).isEqualTo(1L);
         Assertions.assertThat(this.applicationRepository.count()).isEqualTo(5);
         Assertions.assertThat(this.applicationRepository.existsByUniqueId("app2")).isFalse();
     }

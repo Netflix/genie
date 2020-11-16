@@ -975,7 +975,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             .assertThat(
                 this.service.deleteUnusedCommands(
                     EnumSet.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED),
-                    createdThreshold
+                    createdThreshold,
+                    10
                 )
             )
             .isEqualTo(3);
