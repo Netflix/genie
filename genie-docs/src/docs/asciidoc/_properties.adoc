@@ -32,14 +32,9 @@ Whereas static properties values are bound during application startup and do not
 |^genie\.agent\.runtime\..*
 |no
 
-|genie.agent.configuration.cache-expiration-interval
-|Interval after which the agent properties cache is considered stale and re-calculated
-|1m
-|no
-
 |genie.agent.configuration.cache-refresh-interval
-|Interval for after which the agent properties cache is forcefully refreshed in case of no access
-|5m
+|Interval for after which the agent properties cache is refreshed
+|1m
 |no
 
 |genie.agent.filestream.max-concurrent-transfers

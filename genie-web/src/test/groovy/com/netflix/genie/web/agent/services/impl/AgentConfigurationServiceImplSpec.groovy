@@ -61,7 +61,8 @@ class AgentConfigurationServiceImplSpec extends Specification {
 
         then:
         0 * env.getPropertySources() >> propertySources
-        0 * registry.timer(_, _)
+        1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
+        1 * timer.record(_, _)
     }
 
     def "Fallback to standard environment during load"() {

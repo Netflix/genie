@@ -28,17 +28,14 @@ class AgentConfigurationPropertiesSpec extends Specification {
 
         expect:
         props.getAgentPropertiesFilterPattern() == "^genie\\.agent\\.runtime\\..*"
-        props.getCacheExpirationInterval() == Duration.ofMinutes(1)
-        props.getCacheRefreshInterval() == Duration.ofMinutes(5)
+        props.getCacheRefreshInterval() == Duration.ofMinutes(1)
 
         when:
         props.setAgentPropertiesFilterPattern("^agent\\..*")
-        props.setCacheExpirationInterval(Duration.ofMinutes(10))
         props.setCacheRefreshInterval(Duration.ofMinutes(20))
 
         then:
         props.getAgentPropertiesFilterPattern() == "^agent\\..*"
-        props.getCacheExpirationInterval() == Duration.ofMinutes(10)
         props.getCacheRefreshInterval() == Duration.ofMinutes(20)
 
     }

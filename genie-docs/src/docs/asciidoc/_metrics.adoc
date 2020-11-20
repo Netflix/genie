@@ -301,7 +301,7 @@ It will have to be added if one is desired otherwise metrics are just published 
 |status, exceptionClass, scriptUri
 
 |genie.services.agentConfiguration.reloadProperties.timer
-|Time taken to refresh the set of properties forwarded to bootstrapping agents
+|Time taken to retrieve the set of properties forwarded to bootstrapping agents
 |nanoseconds
 |AgentConfigurationServiceImpl
 |status, exceptionClass, numProperties
