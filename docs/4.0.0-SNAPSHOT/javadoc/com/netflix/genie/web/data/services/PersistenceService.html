@@ -227,36 +227,41 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i14" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedApplications-java.time.Instant-">deleteUnusedApplications</a></span>(java.time.Instant&nbsp;createdThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedApplications-java.time.Instant-int-">deleteUnusedApplications</a></span>(@NotNull java.time.Instant&nbsp;createdThreshold,
+                        @Min(value=1L) int&nbsp;batchSize)</code>
 <div class="block">Delete any unused applications that were created before the given time.</div>
 </td>
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedClusters-java.util.Set-java.time.Instant-">deleteUnusedClusters</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
-                    java.time.Instant&nbsp;clusterCreatedThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedClusters-java.util.Set-java.time.Instant-int-">deleteUnusedClusters</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
+                    @NotNull java.time.Instant&nbsp;clusterCreatedThreshold,
+                    @Min(value=1L) int&nbsp;batchSize)</code>
 <div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
  the given time.</div>
 </td>
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedCommands-java.util.Set-java.time.Instant-">deleteUnusedCommands</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
-                    java.time.Instant&nbsp;commandCreatedThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedCommands-java.util.Set-java.time.Instant-int-">deleteUnusedCommands</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
+                    @NotNull java.time.Instant&nbsp;commandCreatedThreshold,
+                    @Min(value=1L) int&nbsp;batchSize)</code>
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </td>
 </tr>
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedFiles-java.time.Instant-">deleteUnusedFiles</a></span>(@NotNull java.time.Instant&nbsp;createdThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedFiles-java.time.Instant-int-">deleteUnusedFiles</a></span>(@NotNull java.time.Instant&nbsp;createdThreshold,
+                 @Min(value=1L) int&nbsp;batchSize)</code>
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 </td>
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedTags-java.time.Instant-">deleteUnusedTags</a></span>(@NotNull java.time.Instant&nbsp;createdThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedTags-java.time.Instant-int-">deleteUnusedTags</a></span>(@NotNull java.time.Instant&nbsp;createdThreshold,
+                @Min(value=1L) int&nbsp;batchSize)</code>
 <div class="block">Delete all tags from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 </td>
@@ -913,13 +918,16 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a name="deleteUnusedApplications-java.time.Instant-">
+<a name="deleteUnusedApplications-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteUnusedApplications</h4>
-<pre>long&nbsp;deleteUnusedApplications(java.time.Instant&nbsp;createdThreshold)</pre>
+<pre>long&nbsp;deleteUnusedApplications(@NotNull
+                              @NotNull java.time.Instant&nbsp;createdThreshold,
+                              @Min(value=1L)
+                              @Min(value=1L) int&nbsp;batchSize)</pre>
 <div class="block">Delete any unused applications that were created before the given time.
  Unused means they aren't linked to any other resources in the Genie system like jobs or commands and therefore
  referential integrity is maintained.</div>
@@ -928,6 +936,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dd><code>createdThreshold</code> - The instant in time that any application had to be created before (exclusive) to be
                          considered for deletion. Presents ability to filter out newly created applications if
                          desired.</dd>
+<dd><code>batchSize</code> - The maximum number of applications to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of successfully deleted applications</dd>
 </dl>
@@ -1060,14 +1069,17 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a name="deleteUnusedClusters-java.util.Set-java.time.Instant-">
+<a name="deleteUnusedClusters-java.util.Set-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteUnusedClusters</h4>
 <pre>long&nbsp;deleteUnusedClusters(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
-                          java.time.Instant&nbsp;clusterCreatedThreshold)</pre>
+                          @NotNull
+                          @NotNull java.time.Instant&nbsp;clusterCreatedThreshold,
+                          @Min(value=1L)
+                          @Min(value=1L) int&nbsp;batchSize)</pre>
 <div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
  the given time.</div>
 <dl>
@@ -1076,6 +1088,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
                                 deletion.</dd>
 <dd><code>clusterCreatedThreshold</code> - The instant in time before which a cluster must have been created to be
                                 considered for deletion. Exclusive.</dd>
+<dd><code>batchSize</code> - The maximum number of clusters to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of clusters deleted</dd>
 </dl>
@@ -1550,14 +1563,17 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a name="deleteUnusedCommands-java.util.Set-java.time.Instant-">
+<a name="deleteUnusedCommands-java.util.Set-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteUnusedCommands</h4>
 <pre>long&nbsp;deleteUnusedCommands(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
-                          java.time.Instant&nbsp;commandCreatedThreshold)</pre>
+                          @NotNull
+                          @NotNull java.time.Instant&nbsp;commandCreatedThreshold,
+                          @Min(value=1L)
+                          @Min(value=1L) int&nbsp;batchSize)</pre>
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 <dl>
@@ -1565,6 +1581,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dd><code>deleteStatuses</code> - The set of statuses a command must be in in order to be considered for deletion</dd>
 <dd><code>commandCreatedThreshold</code> - The instant in time a command must have been created before to be considered for
                                 deletion. Exclusive.</dd>
+<dd><code>batchSize</code> - The maximum number of commands to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of commands that were deleted</dd>
 </dl>
@@ -2642,39 +2659,45 @@ java.lang.String&nbsp;saveJobSubmission(@Valid
 </dl>
 </li>
 </ul>
-<a name="deleteUnusedTags-java.time.Instant-">
+<a name="deleteUnusedTags-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteUnusedTags</h4>
 <pre>long&nbsp;deleteUnusedTags(@NotNull
-                      @NotNull java.time.Instant&nbsp;createdThreshold)</pre>
+                      @NotNull java.time.Instant&nbsp;createdThreshold,
+                      @Min(value=1L)
+                      @Min(value=1L) int&nbsp;batchSize)</pre>
 <div class="block">Delete all tags from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>createdThreshold</code> - The instant in time where tags created before this time that aren't referenced
                          will be deleted. Inclusive</dd>
+<dd><code>batchSize</code> - The maximum number of tags to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of tags deleted</dd>
 </dl>
 </li>
 </ul>
-<a name="deleteUnusedFiles-java.time.Instant-">
+<a name="deleteUnusedFiles-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>deleteUnusedFiles</h4>
 <pre>long&nbsp;deleteUnusedFiles(@NotNull
-                       @NotNull java.time.Instant&nbsp;createdThreshold)</pre>
+                       @NotNull java.time.Instant&nbsp;createdThreshold,
+                       @Min(value=1L)
+                       @Min(value=1L) int&nbsp;batchSize)</pre>
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>createdThreshold</code> - The instant in time where files created before this time that aren't referenced
                          will be deleted. Inclusive</dd>
+<dd><code>batchSize</code> - The maximum number of files to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of files deleted</dd>
 </dl>

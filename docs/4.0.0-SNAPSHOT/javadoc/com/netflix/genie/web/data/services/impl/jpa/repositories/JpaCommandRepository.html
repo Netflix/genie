@@ -153,8 +153,9 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#findUnusedCommands-java.util.Set-java.time.Instant-">findUnusedCommands</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
-                  java.time.Instant&nbsp;commandCreatedThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#findUnusedCommands-java.util.Set-java.time.Instant-int-">findUnusedCommands</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                  java.time.Instant&nbsp;commandCreatedThreshold,
+                  int&nbsp;limit)</code>
 <div class="block">Find commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </td>
@@ -317,18 +318,20 @@ int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
 </dl>
 </li>
 </ul>
-<a name="findUnusedCommands-java.util.Set-java.time.Instant-">
+<a name="findUnusedCommands-java.util.Set-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findUnusedCommands</h4>
-<pre>@Query(value="SELECT id FROM commands WHERE status IN (:unusedStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL)",
+<pre>@Query(value="SELECT id FROM commands WHERE status IN (:unusedStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) LIMIT :limit",
        nativeQuery=true)
 java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedCommands(@Param(value="unusedStatuses")
-                                                                                                                                                                                                                                                                              java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
-                                                                                                                                                                                                                                                                              @Param(value="commandCreatedThreshold")
-                                                                                                                                                                                                                                                                              java.time.Instant&nbsp;commandCreatedThreshold)</pre>
+                                                                                                                                                                                                                                                                                           java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                                                                                                                                                                                                                                                                                           @Param(value="commandCreatedThreshold")
+                                                                                                                                                                                                                                                                                           java.time.Instant&nbsp;commandCreatedThreshold,
+                                                                                                                                                                                                                                                                                           @Param(value="limit")
+                                                                                                                                                                                                                                                                                           int&nbsp;limit)</pre>
 <div class="block">Find commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 <dl>
@@ -336,6 +339,7 @@ java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedCommands(@Param(value="unused
 <dd><code>unusedStatuses</code> - The set of statuses a command must be in in order to be considered unused</dd>
 <dd><code>commandCreatedThreshold</code> - The instant in time a command must have been created before to be considered
                                 unused. Exclusive.</dd>
+<dd><code>limit</code> - Maximum number of IDs to return</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ids of the commands that are considered unused</dd>
 </dl>

@@ -148,8 +148,9 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#findUnusedClusters-java.util.Set-java.time.Instant-">findUnusedClusters</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
-                  java.time.Instant&nbsp;clusterCreatedThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#findUnusedClusters-java.util.Set-java.time.Instant-int-">findUnusedClusters</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                  java.time.Instant&nbsp;clusterCreatedThreshold,
+                  int&nbsp;limit)</code>
 <div class="block">Find all the clusters that aren't attached to any jobs in the database, were created before the given time
  and have one of the given statuses.</div>
 </td>
@@ -240,18 +241,20 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="findUnusedClusters-java.util.Set-java.time.Instant-">
+<a name="findUnusedClusters-java.util.Set-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findUnusedClusters</h4>
-<pre>@Query(value="SELECT id FROM clusters WHERE status IN (:unusedStatuses) AND created &lt; :clusterCreatedThreshold AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)",
+<pre>@Query(value="SELECT id FROM clusters WHERE status IN (:unusedStatuses) AND created &lt; :clusterCreatedThreshold AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) LIMIT :limit",
        nativeQuery=true)
 java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedClusters(@Param(value="unusedStatuses")
-                                                                                                                                                                                                                                                                              java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
-                                                                                                                                                                                                                                                                              @Param(value="clusterCreatedThreshold")
-                                                                                                                                                                                                                                                                              java.time.Instant&nbsp;clusterCreatedThreshold)</pre>
+                                                                                                                                                                                                                                                                                           java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                                                                                                                                                                                                                                                                                           @Param(value="clusterCreatedThreshold")
+                                                                                                                                                                                                                                                                                           java.time.Instant&nbsp;clusterCreatedThreshold,
+                                                                                                                                                                                                                                                                                           @Param(value="limit")
+                                                                                                                                                                                                                                                                                           int&nbsp;limit)</pre>
 <div class="block">Find all the clusters that aren't attached to any jobs in the database, were created before the given time
  and have one of the given statuses.</div>
 <dl>
@@ -259,6 +262,7 @@ java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedClusters(@Param(value="unused
 <dd><code>unusedStatuses</code> - The set of statuses a cluster must have to be considered unused</dd>
 <dd><code>clusterCreatedThreshold</code> - The instant in time which a cluster must have been created before to be considered
                                 unused. Exclusive.</dd>
+<dd><code>limit</code> - Maximum number of IDs to return</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ids of the clusters that are considered unused</dd>
 </dl>

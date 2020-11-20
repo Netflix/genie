@@ -278,7 +278,8 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 <h4>resolveJobSpecification</h4>
 <pre><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;resolveJobSpecification(@NotBlank
                                          @NotBlank java.lang.String&nbsp;id)
-                                  throws <a href="../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></pre>
+                                  throws <a href="../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a>,
+                                         <a href="../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></pre>
 <div class="block">Resolve the job specification for job identified by the given id. This method will persist the job specification
  details to the database.</div>
 <dl>
@@ -289,6 +290,8 @@ public interface <span class="typeNameLabel">AgentJobService</span></pre>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></code> - On error resolving the job given the input parameters and system state</dd>
 <dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code><a href="../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></code> - If job resolution fails due to a runtime error (as opposed to
+                                            unsatisfiable constraints)</dd>
 </dl>
 </li>
 </ul>

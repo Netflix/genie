@@ -148,7 +148,8 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html#findUnusedApplications-java.time.Instant-">findUnusedApplications</a></span>(java.time.Instant&nbsp;createdThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html#findUnusedApplications-java.time.Instant-int-">findUnusedApplications</a></span>(java.time.Instant&nbsp;createdThreshold,
+                      int&nbsp;limit)</code>
 <div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
  created before the given time.</div>
 </td>
@@ -251,21 +252,24 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="findUnusedApplications-java.time.Instant-">
+<a name="findUnusedApplications-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findUnusedApplications</h4>
-<pre>@Query(value="SELECT id FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)",
+<pre>@Query(value="SELECT id FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications) LIMIT :limit",
        nativeQuery=true)
 java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedApplications(@Param(value="createdThreshold")
-                                                                                                                                                                                                                                                                                                              java.time.Instant&nbsp;createdThreshold)</pre>
+                                                                                                                                                                                                                                                                                                                           java.time.Instant&nbsp;createdThreshold,
+                                                                                                                                                                                                                                                                                                                           @Param(value="limit")
+                                                                                                                                                                                                                                                                                                                           int&nbsp;limit)</pre>
 <div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
  created before the given time.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>createdThreshold</code> - The instant in time before which records should be considered for deletion. Exclusive.O</dd>
+<dd><code>createdThreshold</code> - The instant in time before which records should be considered for deletion. Exclusive.</dd>
+<dd><code>limit</code> - Maximum number of IDs to return</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ids of the applications that are unused</dd>
 </dl>
