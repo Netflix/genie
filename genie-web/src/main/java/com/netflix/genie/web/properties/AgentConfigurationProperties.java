@@ -40,6 +40,5 @@ public class AgentConfigurationProperties {
     static final String PREFIX = "genie.agent.configuration";
 
     private String agentPropertiesFilterPattern = "^genie\\.agent\\.runtime\\..*";
-    private Duration cacheExpirationInterval = Duration.ofMinutes(1);
-    private Duration cacheRefreshInterval = Duration.ofMinutes(5);
+    private Duration cacheRefreshInterval = Duration.ofMinutes(1);
 }
