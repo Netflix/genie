@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
@@ -34,12 +35,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.script.ScriptEngineManager;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 /**
  * Configuration for script extensions.
@@ -102,6 +105,7 @@ public class ScriptsAutoConfiguration {
      *
      * @param scriptManager    script manager
      * @param scriptProperties script properties
+     * @param environment      environment
      * @param meterRegistry    meter registry
      * @return a {@link ClusterSelectorManagedScript}
      */
@@ -111,21 +115,30 @@ public class ScriptsAutoConfiguration {
     ClusterSelectorManagedScript clusterSelectorScript(
         final ScriptManager scriptManager,
         final ClusterSelectorScriptProperties scriptProperties,
+        final Environment environment,
         final MeterRegistry meterRegistry
     ) {
+
+
         return new ClusterSelectorManagedScript(
             scriptManager,
             scriptProperties,
-            meterRegistry
+            meterRegistry,
+            new DynamicPropertiesMapCache(
+                scriptProperties.getPropertiesRefreshInterval(),
+                environment,
+                Pattern.compile(scriptProperties.getPropertiesPattern())
+            )
         );
     }
 
     /**
      * Create a {@link CommandSelectorManagedScript}  if necessary and one doesn't already exist.
      *
-     * @param scriptManager                          script manager
-     * @param commandSelectorManagedScriptProperties script properties
-     * @param meterRegistry                          meter registry
+     * @param scriptManager    script manager
+     * @param scriptProperties script properties
+     * @param environment      environment
+     * @param meterRegistry    meter registry
      * @return a {@link CommandSelectorManagedScript}
      */
     @Bean
@@ -133,22 +146,28 @@ public class ScriptsAutoConfiguration {
     @ConditionalOnProperty(value = CommandSelectorManagedScriptProperties.SOURCE_PROPERTY)
     CommandSelectorManagedScript commandSelectormanagedScript(
         final ScriptManager scriptManager,
-        final CommandSelectorManagedScriptProperties commandSelectorManagedScriptProperties,
-        final MeterRegistry meterRegistry
+        final CommandSelectorManagedScriptProperties scriptProperties,
+        final Environment environment, final MeterRegistry meterRegistry
     ) {
         return new CommandSelectorManagedScript(
             scriptManager,
-            commandSelectorManagedScriptProperties,
-            meterRegistry
+            scriptProperties,
+            meterRegistry,
+            new DynamicPropertiesMapCache(
+                scriptProperties.getPropertiesRefreshInterval(),
+                environment,
+                Pattern.compile(scriptProperties.getPropertiesPattern())
+            )
         );
     }
 
     /**
      * Create a {@link AgentLauncherSelectorManagedScript}  if necessary and one doesn't already exist.
      *
-     * @param scriptManager                         script manager
-     * @param agentLauncherSelectorScriptProperties script properties
-     * @param meterRegistry                         meter registry
+     * @param scriptManager    script manager
+     * @param scriptProperties script properties
+     * @param environment      environment
+     * @param meterRegistry    meter registry
      * @return a {@link AgentLauncherSelectorManagedScript}
      */
     @Bean
@@ -156,13 +175,18 @@ public class ScriptsAutoConfiguration {
     @ConditionalOnProperty(value = AgentLauncherSelectorScriptProperties.SOURCE_PROPERTY)
     AgentLauncherSelectorManagedScript agentLauncherSelectorManagedScript(
         final ScriptManager scriptManager,
-        final AgentLauncherSelectorScriptProperties agentLauncherSelectorScriptProperties,
-        final MeterRegistry meterRegistry
+        final AgentLauncherSelectorScriptProperties scriptProperties,
+        final Environment environment, final MeterRegistry meterRegistry
     ) {
         return new AgentLauncherSelectorManagedScript(
             scriptManager,
-            agentLauncherSelectorScriptProperties,
-            meterRegistry
+            scriptProperties,
+            meterRegistry,
+            new DynamicPropertiesMapCache(
+                scriptProperties.getPropertiesRefreshInterval(),
+                environment,
+                Pattern.compile(scriptProperties.getPropertiesPattern())
+            )
         );
     }
 

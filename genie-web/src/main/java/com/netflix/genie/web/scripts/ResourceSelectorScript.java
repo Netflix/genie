@@ -19,6 +19,7 @@ package com.netflix.genie.web.scripts;
 
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
@@ -41,20 +42,25 @@ import java.util.Map;
 public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> extends ManagedScript {
 
     static final String CONTEXT_BINDING = "contextParameter";
+    static final String PROPERTIES_MAP_BINDING = "propertiesMap";
+    private final DynamicPropertiesMapCache propertiesCache;
 
     /**
      * Constructor.
      *
-     * @param scriptManager The {@link ScriptManager} instance to use
-     * @param properties    The {@link ManagedScriptBaseProperties} instance to use
-     * @param registry      The {@link MeterRegistry} instance to use
+     * @param scriptManager           The {@link ScriptManager} instance to use
+     * @param properties              The {@link ManagedScriptBaseProperties} instance to use
+     * @param registry                The {@link MeterRegistry} instance to use
+     * @param dynamicPropertyMapCache The {@link DynamicPropertiesMapCache} instance to use
      */
     protected ResourceSelectorScript(
         final ScriptManager scriptManager,
         final ManagedScriptBaseProperties properties,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final DynamicPropertiesMapCache dynamicPropertyMapCache
     ) {
         super(scriptManager, properties, registry);
+        this.propertiesCache = dynamicPropertyMapCache;
     }
 
     /**
@@ -69,6 +75,7 @@ public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> ex
     public ResourceSelectorScriptResult<R> selectResource(final C context) throws ResourceSelectionException {
         try {
             final Map<String, Object> parameters = Maps.newHashMap();
+            parameters.put(PROPERTIES_MAP_BINDING, this.propertiesCache.get());
             this.addParametersForScript(parameters, context);
             final Object evaluationResult = this.evaluateScript(parameters);
             if (!(evaluationResult instanceof ResourceSelectorScriptResult)) {

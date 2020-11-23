@@ -18,6 +18,7 @@
 package com.netflix.genie.web.scripts;
 
 import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.selectors.CommandSelectionContext;
@@ -41,16 +42,18 @@ public class CommandSelectorManagedScript extends ResourceSelectorScript<Command
     /**
      * Constructor.
      *
-     * @param scriptManager The {@link ScriptManager} instance to use
-     * @param properties    The {@link CommandSelectorManagedScriptProperties} instance to use
-     * @param registry      The {@link MeterRegistry} instance to use
+     * @param scriptManager           The {@link ScriptManager} instance to use
+     * @param properties              The {@link CommandSelectorManagedScriptProperties} instance to use
+     * @param registry                The {@link MeterRegistry} instance to use
+     * @param dynamicPropertyMapCache The {@link DynamicPropertiesMapCache} instance to use
      */
     public CommandSelectorManagedScript(
         final ScriptManager scriptManager,
         final CommandSelectorManagedScriptProperties properties,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final DynamicPropertiesMapCache dynamicPropertyMapCache
     ) {
-        super(scriptManager, properties, registry);
+        super(scriptManager, properties, registry, dynamicPropertyMapCache);
     }
 
     /**

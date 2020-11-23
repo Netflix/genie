@@ -26,6 +26,7 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
@@ -102,6 +103,7 @@ class AgentLauncherSelectorManagedScriptIntegrationTest {
 
     private AgentLauncherSelectorScriptProperties scriptProperties;
     private AgentLauncherSelectorManagedScript agentLauncherSelectorScript;
+    private DynamicPropertiesMapCache cache;
 
     private static JobRequest createTestJobRequest(final String requestedId) {
         return new JobRequest(
@@ -132,10 +134,12 @@ class AgentLauncherSelectorManagedScriptIntegrationTest {
             meterRegistry
         );
         this.scriptProperties = new AgentLauncherSelectorScriptProperties();
+        this.cache = Mockito.mock(DynamicPropertiesMapCache.class);
         this.agentLauncherSelectorScript = new AgentLauncherSelectorManagedScript(
             scriptManager,
             this.scriptProperties,
-            meterRegistry
+            meterRegistry,
+            cache
         );
     }
 

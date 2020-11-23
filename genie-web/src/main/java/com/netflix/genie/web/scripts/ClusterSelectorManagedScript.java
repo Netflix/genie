@@ -18,6 +18,7 @@
 package com.netflix.genie.web.scripts;
 
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
@@ -47,16 +48,18 @@ public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster
     /**
      * Constructor.
      *
-     * @param scriptManager script manager
-     * @param properties    script manager properties
-     * @param registry      meter registry
+     * @param scriptManager           script manager
+     * @param properties              script manager properties
+     * @param registry                meter registry
+     * @param dynamicPropertyMapCache dynamic properties map cache
      */
     public ClusterSelectorManagedScript(
         final ScriptManager scriptManager,
         final ClusterSelectorScriptProperties properties,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final DynamicPropertiesMapCache dynamicPropertyMapCache
     ) {
-        super(scriptManager, properties, registry);
+        super(scriptManager, properties, registry, dynamicPropertyMapCache);
     }
 
     /**
