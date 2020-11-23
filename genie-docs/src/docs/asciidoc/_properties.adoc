@@ -483,6 +483,16 @@ of 2.0
 |300000
 |no
 
+|genie.scripts.agent-launcher-selector.properties-pattern
+|The regular expression that filters which properties get passed to the script.
+|^agent-launcher-selector\..*
+|no
+
+|genie.scripts.agent-launcher-selector.properties-refresh-interval
+|Interval for refreshing property values passed to the script.
+|5m
+|no
+
 |genie.scripts.agent-launcher-selector.source
 |URI of the script to load. `AgentLauncherSelectorManagedScript` is enabled only if this property is set.
 |null
@@ -498,6 +508,16 @@ of 2.0
 |5000
 |no
 
+|genie.scripts.cluster-selector.properties-pattern
+|The regular expression that filters which properties get passed to the script.
+|^cluster-selector\..*
+|no
+
+|genie.scripts.cluster-selector.properties-refresh-interval
+|Interval for refreshing property values passed to the script.
+|5m
+|no
+
 |genie.scripts.cluster-selector.source
 |URI of the script to load. `ScriptClusterSelector` is enabled only if this property is set.
 |null
@@ -511,6 +531,16 @@ of 2.0
 |genie.scripts.cluster-selector.timeout
 |Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
 |5000
+|no
+
+|genie.scripts.command-selector.properties-pattern
+|The regular expression that filters which properties get passed to the script.
+|^command-selector\..*
+|no
+
+|genie.scripts.command-selector.properties-refresh-interval
+|Interval for refreshing property values passed to the script.
+|5m
 |no
 
 |genie.scripts.command-selector.source

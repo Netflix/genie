@@ -27,6 +27,7 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
@@ -37,6 +38,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
@@ -84,6 +86,7 @@ class ClusterSelectorManagedScriptIntegrationTest {
 
     private ClusterSelectorScriptProperties scriptProperties;
     private ClusterSelectorManagedScript clusterSelectorScript;
+    private DynamicPropertiesMapCache cache;
 
     private static Cluster createTestCluster(final String id) {
         return new Cluster(
@@ -129,10 +132,12 @@ class ClusterSelectorManagedScriptIntegrationTest {
             meterRegistry
         );
         this.scriptProperties = new ClusterSelectorScriptProperties();
+        this.cache = Mockito.mock(DynamicPropertiesMapCache.class);
         this.clusterSelectorScript = new ClusterSelectorManagedScript(
             scriptManager,
             this.scriptProperties,
-            meterRegistry
+            meterRegistry,
+            this.cache
         );
     }
 

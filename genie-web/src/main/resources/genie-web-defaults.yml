@@ -79,6 +79,13 @@ genie:
   retry:
     s3:
       noOfRetries: 5
+  scripts:
+    command-selector:
+      properties-pattern: ^command-selector\..*
+    cluster-selector:
+      properties-pattern: ^cluster-selector\..*
+    agent-launcher-selector:
+      properties-pattern: ^agent-launcher-selector\..*
   scripts-manager:
     refresh-interval: 300000
   smoke: true

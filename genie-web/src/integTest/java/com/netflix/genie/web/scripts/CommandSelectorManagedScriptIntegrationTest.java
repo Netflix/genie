@@ -28,6 +28,7 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
@@ -96,6 +97,7 @@ class CommandSelectorManagedScriptIntegrationTest {
     private CommandSelectorManagedScript commandSelectorManagedScript;
     private MeterRegistry meterRegistry;
     private ExecutorService executorService;
+    private DynamicPropertiesMapCache cache;
 
     private static Command createTestCommand(final String id) {
         return new Command(
@@ -141,10 +143,12 @@ class CommandSelectorManagedScriptIntegrationTest {
             this.meterRegistry
         );
         this.scriptProperties = new CommandSelectorManagedScriptProperties();
+        this.cache = Mockito.mock(DynamicPropertiesMapCache.class);
         this.commandSelectorManagedScript = new CommandSelectorManagedScript(
             scriptManager,
             this.scriptProperties,
-            this.meterRegistry
+            this.meterRegistry,
+            this.cache
         );
     }
 

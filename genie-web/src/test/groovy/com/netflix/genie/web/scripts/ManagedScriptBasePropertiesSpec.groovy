@@ -19,6 +19,7 @@ package com.netflix.genie.web.scripts
 
 import spock.lang.Specification
 
+import java.time.Duration
 
 class ManagedScriptBasePropertiesSpec extends Specification {
     TestProperties testProperties
@@ -32,16 +33,22 @@ class ManagedScriptBasePropertiesSpec extends Specification {
         this.testProperties.getSource() == null
         this.testProperties.getTimeout() == 5_000L
         this.testProperties.isAutoLoadEnabled()
+        this.testProperties.getPropertiesRefreshInterval() == Duration.ofMinutes(5)
+        this.testProperties.getPropertiesPattern() == "^\$"
 
         when:
         this.testProperties.setSource(new URI("file:///foo.js"))
         this.testProperties.setTimeout(333L)
         this.testProperties.setAutoLoadEnabled(false)
+        this.testProperties.setPropertiesRefreshInterval(Duration.ofSeconds(10))
+        this.testProperties.setPropertiesPattern("foo.*")
 
         then:
         this.testProperties.getSource() != null
         this.testProperties.getTimeout() == 333L
         !this.testProperties.isAutoLoadEnabled()
+        this.testProperties.getPropertiesRefreshInterval() == Duration.ofSeconds(10)
+        this.testProperties.getPropertiesPattern() == "foo.*"
     }
 
     private static class TestProperties extends ManagedScriptBaseProperties {
