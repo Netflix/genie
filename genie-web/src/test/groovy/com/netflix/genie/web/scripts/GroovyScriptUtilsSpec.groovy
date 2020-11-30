@@ -18,11 +18,10 @@
 package com.netflix.genie.web.scripts
 
 import com.google.common.collect.Lists
+import com.google.common.collect.Maps
 import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.Command
-import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
 import com.netflix.genie.web.dtos.ResolvedJob
@@ -131,6 +130,41 @@ class GroovyScriptUtilsSpec extends Specification {
 
         then:
         context == expectedContext
+    }
+
+
+    def "Can get properties"() {
+        Map<String, String> propertiesMap
+        Map<String, String> expectedPropertiesMap = Maps.newHashMap()
+
+        when:
+        propertiesMap = GroovyScriptUtils.getProperties(this.scriptBinding)
+
+        then:
+        propertiesMap.isEmpty()
+
+        when:
+        this.scriptBinding.setVariable(ResourceSelectorScript.PROPERTIES_MAP_BINDING, 1)
+        propertiesMap = GroovyScriptUtils.getProperties(this.scriptBinding)
+
+        then:
+        propertiesMap.isEmpty()
+
+        when:
+        this.scriptBinding.setVariable(ResourceSelectorScript.PROPERTIES_MAP_BINDING, new Object())
+        propertiesMap = GroovyScriptUtils.getProperties(this.scriptBinding)
+
+        then:
+        propertiesMap.isEmpty()
+
+        when:
+        expectedPropertiesMap.put("Foo", "true")
+        expectedPropertiesMap.put("Bar", "3.14")
+        this.scriptBinding.setVariable(ResourceSelectorScript.PROPERTIES_MAP_BINDING, expectedPropertiesMap)
+        propertiesMap = GroovyScriptUtils.getProperties(this.scriptBinding)
+
+        then:
+        propertiesMap == expectedPropertiesMap
     }
 
     def "Can get clusters"() {

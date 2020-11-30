@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.scripts;
 
+import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.web.selectors.AgentLauncherSelectionContext;
@@ -24,6 +25,7 @@ import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelectionContext;
 import groovy.lang.Binding;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,6 +35,8 @@ import java.util.Set;
  * @since 4.0.0
  */
 public final class GroovyScriptUtils {
+    private static final Map<String, String> EMPTY_PROPERTIES_MAP = ImmutableMap.of();
+
     private GroovyScriptUtils() {
     }
 
@@ -76,6 +80,28 @@ public final class GroovyScriptUtils {
         final Binding binding
     ) throws IllegalArgumentException {
         return getObjectVariable(binding, ResourceSelectorScript.CONTEXT_BINDING, AgentLauncherSelectionContext.class);
+    }
+
+
+    /**
+     * Given the {@link Binding} that a script has attempt to extract the properties map.
+     *
+     * @param binding The {@link Binding} for the script
+     * @return The map of properties
+     */
+    @SuppressWarnings("unchecked") // Due to cast of Map to Map<String, String>
+    public static Map<String, String> getProperties(
+        final Binding binding
+    ) {
+        try {
+            if (binding.hasVariable(ResourceSelectorScript.PROPERTIES_MAP_BINDING)) {
+                return (Map<String, String>) binding.getVariable(ResourceSelectorScript.PROPERTIES_MAP_BINDING);
+            }
+        } catch (ClassCastException e) {
+            // Value bound is not Map<String, String> -- should never happen
+        }
+        // Properties not bound -- should never happen
+        return EMPTY_PROPERTIES_MAP;
     }
 
     /**
