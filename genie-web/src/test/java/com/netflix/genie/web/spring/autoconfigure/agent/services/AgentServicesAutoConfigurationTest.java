@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.agent.services;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
@@ -139,6 +140,11 @@ class AgentServicesAutoConfigurationTest {
         @Bean
         PersistenceService geniePersistenceService() {
             return Mockito.mock(PersistenceService.class);
+        }
+
+        @Bean
+        PropertiesMapCache.Factory propertiesMapCacheFactory() {
+            return Mockito.mock(PropertiesMapCache.Factory.class);
         }
     }
 

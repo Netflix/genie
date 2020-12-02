@@ -20,7 +20,7 @@ package com.netflix.genie.web.scripts
 import com.google.common.collect.Maps
 import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.JobRequest
-import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache
+import com.netflix.genie.common.internal.util.PropertiesMapCache
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.selectors.ResourceSelectionContext
 import io.micrometer.core.instrument.MeterRegistry
@@ -50,7 +50,7 @@ class ResourceSelectorScriptSpec extends Specification {
     ScriptManager scriptManager
     TestProperties scriptProperties
     MeterRegistry registry
-    DynamicPropertiesMapCache cache
+    PropertiesMapCache cache
     TestResourceSelectorScript resourceSelectorScript
     TestSelectionContext context
 
@@ -58,7 +58,7 @@ class ResourceSelectorScriptSpec extends Specification {
         this.scriptManager = Mock(ScriptManager)
         this.scriptProperties = new TestProperties()
         this.registry = new SimpleMeterRegistry()
-        this.cache = Mock(DynamicPropertiesMapCache)
+        this.cache = Mock(PropertiesMapCache)
         this.context = Mock(TestSelectionContext)
 
         this.resourceSelectorScript = new TestResourceSelectorScript(
@@ -159,7 +159,7 @@ class ResourceSelectorScriptSpec extends Specification {
             final ScriptManager scriptManager,
             final ManagedScriptBaseProperties properties,
             final MeterRegistry registry,
-            final DynamicPropertiesMapCache dynamicPropertyMapCache
+            final PropertiesMapCache dynamicPropertyMapCache
         ) {
             super(scriptManager, properties, registry, dynamicPropertyMapCache)
         }

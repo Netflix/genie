@@ -27,7 +27,7 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
@@ -86,7 +86,7 @@ class ClusterSelectorManagedScriptIntegrationTest {
 
     private ClusterSelectorScriptProperties scriptProperties;
     private ClusterSelectorManagedScript clusterSelectorScript;
-    private DynamicPropertiesMapCache cache;
+    private PropertiesMapCache cache;
 
     private static Cluster createTestCluster(final String id) {
         return new Cluster(
@@ -132,7 +132,7 @@ class ClusterSelectorManagedScriptIntegrationTest {
             meterRegistry
         );
         this.scriptProperties = new ClusterSelectorScriptProperties();
-        this.cache = Mockito.mock(DynamicPropertiesMapCache.class);
+        this.cache = Mockito.mock(PropertiesMapCache.class);
         this.clusterSelectorScript = new ClusterSelectorManagedScript(
             scriptManager,
             this.scriptProperties,

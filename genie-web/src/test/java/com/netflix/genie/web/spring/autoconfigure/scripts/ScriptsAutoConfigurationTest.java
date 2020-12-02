@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
@@ -108,6 +109,11 @@ class ScriptsAutoConfigurationTest {
         @Bean
         ResourceLoader resourceLoader() {
             return Mockito.mock(ResourceLoader.class);
+        }
+
+        @Bean
+        PropertiesMapCache.Factory propertiesMapCacheFactory() {
+            return Mockito.mock(PropertiesMapCache.Factory.class);
         }
     }
 }

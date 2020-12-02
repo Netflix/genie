@@ -27,6 +27,7 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorSer
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.JobArchiveServiceImpl;
 import com.netflix.genie.common.internal.services.impl.JobDirectoryManifestCreatorServiceImpl;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.common.internal.util.RegexDirectoryManifestFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -145,5 +147,16 @@ public class CommonServicesAutoConfiguration {
     @ConditionalOnMissingBean(DirectoryManifest.Filter.class)
     public DirectoryManifest.Filter directoryManifestFilter(final RegexDirectoryManifestProperties properties) {
         return new RegexDirectoryManifestFilter(properties);
+    }
+
+    /**
+     * Provide a {@link PropertiesMapCache.Factory} if no override is defined.
+     * @param environment the environment
+     * @return a properties map cache factory
+     */
+    @Bean
+    @ConditionalOnMissingBean(PropertiesMapCache.Factory.class)
+    public PropertiesMapCache.Factory propertiesMapCacheFactory(final Environment environment) {
+        return new PropertiesMapCache.Factory(environment);
     }
 }

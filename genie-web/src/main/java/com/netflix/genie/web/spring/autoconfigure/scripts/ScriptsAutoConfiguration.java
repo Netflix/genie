@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
-import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
@@ -35,7 +35,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -103,10 +102,10 @@ public class ScriptsAutoConfiguration {
     /**
      * Create a {@link ClusterSelectorManagedScript} unless one exists.
      *
-     * @param scriptManager    script manager
-     * @param scriptProperties script properties
-     * @param environment      environment
-     * @param meterRegistry    meter registry
+     * @param scriptManager           script manager
+     * @param scriptProperties        script properties
+     * @param propertyMapCacheFactory the cache factory
+     * @param meterRegistry           meter registry
      * @return a {@link ClusterSelectorManagedScript}
      */
     @Bean
@@ -115,18 +114,15 @@ public class ScriptsAutoConfiguration {
     ClusterSelectorManagedScript clusterSelectorScript(
         final ScriptManager scriptManager,
         final ClusterSelectorScriptProperties scriptProperties,
-        final Environment environment,
+        final PropertiesMapCache.Factory propertyMapCacheFactory,
         final MeterRegistry meterRegistry
     ) {
-
-
         return new ClusterSelectorManagedScript(
             scriptManager,
             scriptProperties,
             meterRegistry,
-            new DynamicPropertiesMapCache(
+            propertyMapCacheFactory.get(
                 scriptProperties.getPropertiesRefreshInterval(),
-                environment,
                 Pattern.compile(scriptProperties.getPropertiesPattern())
             )
         );
@@ -135,10 +131,10 @@ public class ScriptsAutoConfiguration {
     /**
      * Create a {@link CommandSelectorManagedScript}  if necessary and one doesn't already exist.
      *
-     * @param scriptManager    script manager
-     * @param scriptProperties script properties
-     * @param environment      environment
-     * @param meterRegistry    meter registry
+     * @param scriptManager           script manager
+     * @param scriptProperties        script properties
+     * @param propertyMapCacheFactory the cache factory
+     * @param meterRegistry           meter registry
      * @return a {@link CommandSelectorManagedScript}
      */
     @Bean
@@ -147,15 +143,15 @@ public class ScriptsAutoConfiguration {
     CommandSelectorManagedScript commandSelectormanagedScript(
         final ScriptManager scriptManager,
         final CommandSelectorManagedScriptProperties scriptProperties,
-        final Environment environment, final MeterRegistry meterRegistry
+        final PropertiesMapCache.Factory propertyMapCacheFactory,
+        final MeterRegistry meterRegistry
     ) {
         return new CommandSelectorManagedScript(
             scriptManager,
             scriptProperties,
             meterRegistry,
-            new DynamicPropertiesMapCache(
+            propertyMapCacheFactory.get(
                 scriptProperties.getPropertiesRefreshInterval(),
-                environment,
                 Pattern.compile(scriptProperties.getPropertiesPattern())
             )
         );
@@ -164,10 +160,10 @@ public class ScriptsAutoConfiguration {
     /**
      * Create a {@link AgentLauncherSelectorManagedScript}  if necessary and one doesn't already exist.
      *
-     * @param scriptManager    script manager
-     * @param scriptProperties script properties
-     * @param environment      environment
-     * @param meterRegistry    meter registry
+     * @param scriptManager           script manager
+     * @param scriptProperties        script properties
+     * @param propertyMapCacheFactory the cache factory
+     * @param meterRegistry           meter registry
      * @return a {@link AgentLauncherSelectorManagedScript}
      */
     @Bean
@@ -176,15 +172,15 @@ public class ScriptsAutoConfiguration {
     AgentLauncherSelectorManagedScript agentLauncherSelectorManagedScript(
         final ScriptManager scriptManager,
         final AgentLauncherSelectorScriptProperties scriptProperties,
-        final Environment environment, final MeterRegistry meterRegistry
+        final PropertiesMapCache.Factory propertyMapCacheFactory,
+        final MeterRegistry meterRegistry
     ) {
         return new AgentLauncherSelectorManagedScript(
             scriptManager,
             scriptProperties,
             meterRegistry,
-            new DynamicPropertiesMapCache(
+            propertyMapCacheFactory.get(
                 scriptProperties.getPropertiesRefreshInterval(),
-                environment,
                 Pattern.compile(scriptProperties.getPropertiesPattern())
             )
         );

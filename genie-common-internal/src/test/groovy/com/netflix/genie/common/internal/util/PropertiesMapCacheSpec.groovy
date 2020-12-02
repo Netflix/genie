@@ -25,7 +25,7 @@ import spock.lang.Specification
 import java.time.Duration
 import java.util.regex.Pattern
 
-class DynamicPropertiesMapCacheSpec extends Specification {
+class PropertiesMapCacheSpec extends Specification {
     ConfigurableEnvironment env
     MutablePropertySources propertySources
 
@@ -61,7 +61,7 @@ class DynamicPropertiesMapCacheSpec extends Specification {
         propertySources.addFirst(new MapPropertySource("map2", map2))
 
         when:
-        DynamicPropertiesMapCache cache = new DynamicPropertiesMapCache(Duration.ofMinutes(5), env, pattern)
+        PropertiesMapCache cache = new PropertiesMapCache.Factory(env).get(Duration.ofMinutes(5), pattern)
         Map<String, String> agentProperties
 
         then:

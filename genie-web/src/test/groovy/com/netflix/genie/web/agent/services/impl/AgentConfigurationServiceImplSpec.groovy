@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.agent.services.impl
 
+import com.google.common.collect.Maps
+import com.netflix.genie.common.internal.util.PropertiesMapCache
 import com.netflix.genie.web.agent.services.AgentConfigurationService
 import com.netflix.genie.web.properties.AgentConfigurationProperties
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
 import org.springframework.core.env.ConfigurableEnvironment
-import org.springframework.core.env.Environment
-import org.springframework.core.env.MapPropertySource
 import org.springframework.core.env.MutablePropertySources
 import spock.lang.Specification
 
@@ -33,6 +33,7 @@ class AgentConfigurationServiceImplSpec extends Specification {
     MutablePropertySources propertySources
     MeterRegistry registry
     Timer timer
+    PropertiesMapCache cache
 
     void setup() {
         this.props = new AgentConfigurationProperties()
@@ -40,83 +41,34 @@ class AgentConfigurationServiceImplSpec extends Specification {
         this.registry = Mock(MeterRegistry)
         this.timer = Mock(Timer)
         this.propertySources = new MutablePropertySources()
+        this.cache = Mock(PropertiesMapCache)
     }
 
-    def "Result is cached"() {
-        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env, registry)
-
-        then:
+    def "Produce properties"() {
+        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, cache, registry)
+        Map<String, String> expectedProperties = Maps.newHashMap()
+        expectedProperties.put("foo", "bar")
 
         when:
         Map<String, String> agentProperties = service.getAgentProperties()
 
         then:
-        1 * env.getPropertySources() >> propertySources
+        1 * cache.get() >> expectedProperties
         1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
         1 * timer.record(_, _)
-        agentProperties.isEmpty()
+        agentProperties == expectedProperties
+    }
+
+    def "Handle runtime error"() {
+        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, cache, registry)
 
         when:
         service.getAgentProperties()
 
         then:
-        0 * env.getPropertySources() >> propertySources
+        1 * cache.get() >> { throw new RuntimeException("...") }
         1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
         1 * timer.record(_, _)
-    }
-
-    def "Fallback to standard environment during load"() {
-        Environment env = Mock(Environment)
-
-        when:
-        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env, registry)
-        Map<String, String> agentProperties = service.getAgentProperties()
-
-        then:
-        _ * env.getProperty(_ as String) >> UUID.randomUUID().toString()
-        1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
-        1 * timer.record(_, _)
-        agentProperties != null
-    }
-
-    def "Iterate through property sources with custom filter and some blank values"() {
-        props.setAgentPropertiesFilterPattern("^agent\\..*")
-
-        def map1 = [
-            'agent.foo': "...",
-            'agent.bar': "...",
-            'server.foo': "...",
-            'server.bar': "...",
-            'agent.null': "...",
-            'agent.empty': "...",
-        ]
-        def map2 = [
-            'agent.foo': "...",
-            'genie.agent.foo': "...",
-            'genie.agent.bar': "...",
-        ]
-
-        def expectedProperties = [
-            'agent.foo': "Foo",
-            'agent.bar': "Bar",
-        ]
-
-        def propertySources = new MutablePropertySources()
-        propertySources.addFirst(new MapPropertySource("map1", map1))
-        propertySources.addFirst(new MapPropertySource("map2", map2))
-
-        when:
-        AgentConfigurationService service = new AgentConfigurationServiceImpl(props, env, registry)
-        Map<String, String> agentProperties = service.getAgentProperties()
-
-        then:
-        1 * env.getPropertySources() >> propertySources
-        1 * env.getProperty("agent.foo") >> "Foo"
-        1 * env.getProperty("agent.bar") >> "Bar"
-        1 * env.getProperty("agent.null") >> null
-        1 * env.getProperty("agent.empty") >> " "
-        1 * registry.timer(AgentConfigurationServiceImpl.RELOAD_PROPERTIES_TIMER, _) >> timer
-        1 * timer.record(_, _)
-        agentProperties == expectedProperties
+        thrown(RuntimeException)
     }
 }
