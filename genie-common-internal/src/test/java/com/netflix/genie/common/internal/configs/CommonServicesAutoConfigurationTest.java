@@ -23,6 +23,7 @@ import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -59,6 +60,7 @@ class CommonServicesAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
                 Assertions.assertThat(context).hasSingleBean(JobArchiver.class);
                 Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
+                Assertions.assertThat(context).hasSingleBean(PropertiesMapCache.Factory.class);
             }
         );
     }
@@ -88,6 +90,7 @@ class CommonServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
                     Assertions.assertThat(context).hasSingleBean(S3JobArchiverImpl.class);
                     Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
+                    Assertions.assertThat(context).hasSingleBean(PropertiesMapCache.Factory.class);
 
                     // TODO: Find a way to test the order
                     Assertions

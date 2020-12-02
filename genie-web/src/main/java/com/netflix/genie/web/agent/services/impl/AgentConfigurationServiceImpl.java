@@ -18,19 +18,17 @@
 package com.netflix.genie.web.agent.services.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.properties.AgentConfigurationProperties;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * This implementation of {@link AgentConfigurationService} forwards properties set on the server that match a given
@@ -47,38 +45,24 @@ public class AgentConfigurationServiceImpl implements AgentConfigurationService 
     private static final String PROPERTIES_COUNT_TAG = "numProperties";
 
     private final AgentConfigurationProperties agentConfigurationProperties;
-    private final Environment environment;
     private final MeterRegistry registry;
-    private final Pattern agentPropertiesPattern;
-    private final DynamicPropertiesMapCache propertiesMapCache;
+    private final PropertiesMapCache propertiesMapCache;
 
     /**
      * Constructor.
      *
      * @param agentConfigurationProperties the properties
-     * @param environment                  the environment
+     * @param propertyMapCache             the property map cache
      * @param registry                     the metrics registry
      */
     public AgentConfigurationServiceImpl(
         final AgentConfigurationProperties agentConfigurationProperties,
-        final Environment environment,
+        final PropertiesMapCache propertyMapCache,
         final MeterRegistry registry
     ) {
         this.agentConfigurationProperties = agentConfigurationProperties;
-        this.environment = environment;
+        this.propertiesMapCache = propertyMapCache;
         this.registry = registry;
-
-        this.agentPropertiesPattern = Pattern.compile(
-            this.agentConfigurationProperties.getAgentPropertiesFilterPattern(),
-            Pattern.CASE_INSENSITIVE
-        );
-
-        // Use a cache to re-compute agent properties periodically, rather than for every request.
-        this.propertiesMapCache = new DynamicPropertiesMapCache(
-            this.agentConfigurationProperties.getCacheRefreshInterval(),
-            this.environment,
-            this.agentPropertiesPattern
-        );
     }
 
     /**

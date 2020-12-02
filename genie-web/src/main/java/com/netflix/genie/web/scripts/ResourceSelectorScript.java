@@ -19,7 +19,7 @@ package com.netflix.genie.web.scripts;
 
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
@@ -43,24 +43,24 @@ public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> ex
 
     static final String CONTEXT_BINDING = "contextParameter";
     static final String PROPERTIES_MAP_BINDING = "propertiesMap";
-    private final DynamicPropertiesMapCache propertiesCache;
+    private final PropertiesMapCache propertiesCache;
 
     /**
      * Constructor.
      *
-     * @param scriptManager           The {@link ScriptManager} instance to use
-     * @param properties              The {@link ManagedScriptBaseProperties} instance to use
-     * @param registry                The {@link MeterRegistry} instance to use
-     * @param dynamicPropertyMapCache The {@link DynamicPropertiesMapCache} instance to use
+     * @param scriptManager    The {@link ScriptManager} instance to use
+     * @param properties       The {@link ManagedScriptBaseProperties} instance to use
+     * @param registry         The {@link MeterRegistry} instance to use
+     * @param propertyMapCache The {@link PropertiesMapCache} instance to use
      */
     protected ResourceSelectorScript(
         final ScriptManager scriptManager,
         final ManagedScriptBaseProperties properties,
         final MeterRegistry registry,
-        final DynamicPropertiesMapCache dynamicPropertyMapCache
+        final PropertiesMapCache propertyMapCache
     ) {
         super(scriptManager, properties, registry);
-        this.propertiesCache = dynamicPropertyMapCache;
+        this.propertiesCache = propertyMapCache;
     }
 
     /**

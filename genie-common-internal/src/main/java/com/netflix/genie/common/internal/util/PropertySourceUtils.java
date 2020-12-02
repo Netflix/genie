@@ -17,11 +17,23 @@
  */
 package com.netflix.genie.common.internal.util;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.env.YamlPropertySourceLoader;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Utilities for working with Spring {@link PropertySource}.
@@ -29,6 +41,7 @@ import java.io.IOException;
  * @author tgianos
  * @since 4.0.0
  */
+@Slf4j
 public final class PropertySourceUtils {
 
     private static final YamlPropertySourceLoader YAML_PROPERTY_SOURCE_LOADER = new YamlPropertySourceLoader();
@@ -52,5 +65,55 @@ public final class PropertySourceUtils {
         } catch (final IOException ex) {
             throw new IllegalStateException("Failed to load yaml configuration from " + resource, ex);
         }
+    }
+
+
+    /**
+     * Takes a snapshot of the properties that match a given pattern pattern.
+     * Properties with empty and null values are not included.
+     *
+     * @param environment         the environment
+     * @param propertyNamePattern the regular expression to select the properties to include
+     * @return an immutable map of property name and property value in string form
+     */
+    public static Map<String, String> createDynamicPropertiesMap(
+        final Environment environment,
+        final Pattern propertyNamePattern
+    ) {
+        // Obtain properties sources from environment
+        final PropertySources propertySources;
+        if (environment instanceof ConfigurableEnvironment) {
+            propertySources = ((ConfigurableEnvironment) environment).getPropertySources();
+        } else {
+            propertySources = new StandardEnvironment().getPropertySources();
+        }
+
+        // Create set of all properties that match the filter pattern
+        final Set<String> filteredPropertyNames = Sets.newHashSet();
+        for (final PropertySource<?> propertySource : propertySources) {
+            if (propertySource instanceof EnumerablePropertySource) {
+                for (final String propertyName : ((EnumerablePropertySource<?>) propertySource).getPropertyNames()) {
+                    if (propertyNamePattern.matcher(propertyName).matches()) {
+                        log.debug("Adding matching property: {}", propertyName);
+                        filteredPropertyNames.add(propertyName);
+                    } else {
+                        log.debug("Ignoring property: {}", propertyName);
+                    }
+                }
+            }
+        }
+
+        // Create immutable properties map
+        final ImmutableMap.Builder<String, String> propertiesMapBuilder = ImmutableMap.builder();
+        for (final String propertyName : filteredPropertyNames) {
+            final String propertyValue = environment.getProperty(propertyName);
+            if (StringUtils.isBlank(propertyValue)) {
+                log.debug("Skipping blank value property: {}", propertyName);
+            } else {
+                propertiesMapBuilder.put(propertyName, propertyValue);
+            }
+        }
+
+        return propertiesMapBuilder.build();
     }
 }

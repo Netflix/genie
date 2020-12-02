@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.agent.services;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.services.AgentConfigurationService;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
@@ -45,10 +46,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Auto configuration for services needed in the {@literal agent} module.
@@ -187,7 +188,7 @@ public class AgentServicesAutoConfiguration {
      * Provide a {@link AgentConfigurationService} if one is not defined.
      *
      * @param agentConfigurationProperties the service properties
-     * @param environment                  the environment
+     * @param propertiesMapCacheFactory    the properties map cache factory
      * @param registry                     the metrics registry
      * @return a {@link AgentConfigurationService} instance
      */
@@ -195,9 +196,16 @@ public class AgentServicesAutoConfiguration {
     @ConditionalOnMissingBean(AgentConfigurationService.class)
     public AgentConfigurationServiceImpl agentConfigurationService(
         final AgentConfigurationProperties agentConfigurationProperties,
-        final Environment environment,
+        final PropertiesMapCache.Factory propertiesMapCacheFactory,
         final MeterRegistry registry
     ) {
-        return new AgentConfigurationServiceImpl(agentConfigurationProperties, environment, registry);
+        return new AgentConfigurationServiceImpl(
+            agentConfigurationProperties,
+            propertiesMapCacheFactory.get(
+                agentConfigurationProperties.getCacheRefreshInterval(),
+                Pattern.compile(agentConfigurationProperties.getAgentPropertiesFilterPattern())
+            ),
+            registry
+        );
     }
 }

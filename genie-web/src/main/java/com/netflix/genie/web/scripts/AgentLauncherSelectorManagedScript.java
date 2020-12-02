@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.scripts;
 
-import com.netflix.genie.common.internal.util.DynamicPropertiesMapCache;
+import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties;
@@ -43,18 +43,18 @@ public class AgentLauncherSelectorManagedScript
     /**
      * Constructor.
      *
-     * @param scriptManager           script manager
-     * @param properties              script manager properties
-     * @param registry                meter registry
-     * @param dynamicPropertyMapCache dynamic properties map cache
+     * @param scriptManager    script manager
+     * @param properties       script manager properties
+     * @param registry         meter registry
+     * @param propertyMapCache dynamic properties map cache
      */
     public AgentLauncherSelectorManagedScript(
         final ScriptManager scriptManager,
         final AgentLauncherSelectorScriptProperties properties,
         final MeterRegistry registry,
-        final DynamicPropertiesMapCache dynamicPropertyMapCache
+        final PropertiesMapCache propertyMapCache
     ) {
-        super(scriptManager, properties, registry, dynamicPropertyMapCache);
+        super(scriptManager, properties, registry, propertyMapCache);
     }
 
     /**
