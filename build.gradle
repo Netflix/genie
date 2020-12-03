@@ -13,17 +13,17 @@ buildscript {
 }
 
 plugins {
-    id "com.github.kt3k.coveralls" version "2.10.1"
+    id "com.github.kt3k.coveralls" version "2.10.2"
     id "nebula.netflixoss" version "8.8.1"
-    id "org.ajoberstar.grgit" version "4.0.2"
-    id "org.ajoberstar.git-publish" version "2.1.3"
+    id "org.ajoberstar.grgit" version "4.1.0"
+    id "org.ajoberstar.git-publish" version "3.0.0"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
-    id "org.asciidoctor.jvm.convert" version "3.2.0" apply false
-    id "com.gorylenko.gradle-git-properties" version "2.2.3" apply false
-    id "com.google.protobuf" version "0.8.12" apply false
+    id "org.asciidoctor.jvm.convert" version "3.3.0" apply false
+    id "com.gorylenko.gradle-git-properties" version "2.2.4" apply false
+    id "com.google.protobuf" version "0.8.14" apply false
     id "io.franzbecker.gradle-lombok" version "4.0.0" apply false
     id "nebula.node" version "1.3.1" apply false
-    id "com.github.spotbugs" version "4.4.4" apply false
+    id "com.github.spotbugs" version "4.6.0" apply false
 }
 
 apply plugin: "nebula-aggregate-javadocs"
@@ -487,7 +487,7 @@ task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub 
         rootProject.ext.isDockerRunning()
     }
     dependsOn tasks.dockerLogout
-    commandLine "docker", "login", "-u", System.getenv("DOCKER_USER"), "-p", System.getenv("DOCKER_PASSWORD")
+    commandLine "docker", "login", "-u", System.getenv("DOCKER_USER") ?: "", "-p", System.getenv("DOCKER_PASSWORD") ?: ""
 }
 
 task dockerBuildAllImages(group: "Docker", description: "Container task for all docker image builds") {
