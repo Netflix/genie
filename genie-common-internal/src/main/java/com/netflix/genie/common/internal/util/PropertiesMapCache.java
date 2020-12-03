@@ -22,12 +22,13 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 
+import javax.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
- * Utility class that produces a map of properties and their values if they match a given pattern.
+ * Utility class that produces a map of properties and their values if they match a given prefix.
+ * The prefix is stripped.
  * The map is cached for a fixed amount of time to avoid re-computing for each call.
  *
  * @author mprimi
@@ -38,23 +39,23 @@ public class PropertiesMapCache {
 
     private static final String CACHE_KEY = "properties-map";
     private final Environment environment;
-    private final Pattern propertiesNamesPattern;
+    private final String prefix;
     private final LoadingCache<String, Map<String, String>> cache;
 
     /**
      * Constructor.
      *
-     * @param refreshInterval        the properties snapshot refresh interval
-     * @param environment            the environment
-     * @param propertiesNamesPattern the properties name regex filter
+     * @param refreshInterval the properties snapshot refresh interval
+     * @param environment     the environment
+     * @param prefix          the properties prefix to match and strip
      */
     public PropertiesMapCache(
         final Duration refreshInterval,
         final Environment environment,
-        final Pattern propertiesNamesPattern
+        @NotBlank final String prefix
     ) {
         this.environment = environment;
-        this.propertiesNamesPattern = propertiesNamesPattern;
+        this.prefix = prefix;
         this.cache = Caffeine
             .newBuilder()
             .refreshAfterWrite(refreshInterval)
@@ -74,9 +75,9 @@ public class PropertiesMapCache {
 
     private Map<String, String> loadProperties(final String propertiesKey) {
         // There's only 1 item in this cache, so key is redundant
-        return PropertySourceUtils.createDynamicPropertiesMap(
+        return PropertySourceUtils.createPropertiesSnapshot(
             this.environment,
-            this.propertiesNamesPattern
+            this.prefix
         );
     }
 
@@ -98,12 +99,12 @@ public class PropertiesMapCache {
         /**
          * Create a {@link PropertiesMapCache} with the given refresh interval and filter pattern.
          *
-         * @param refreshInterval        the refresh interval
-         * @param propertiesNamesPattern the property name regex filter
+         * @param refreshInterval the refresh interval
+         * @param prefix          the prefix to match and strip
          * @return a {@link PropertiesMapCache}
          */
-        public PropertiesMapCache get(final Duration refreshInterval, final Pattern propertiesNamesPattern) {
-            return new PropertiesMapCache(refreshInterval, environment, propertiesNamesPattern);
+        public PropertiesMapCache get(final Duration refreshInterval, @NotBlank final String prefix) {
+            return new PropertiesMapCache(refreshInterval, environment, prefix);
         }
     }
 }

@@ -39,6 +39,11 @@ public class AgentConfigurationProperties {
      */
     static final String PREFIX = "genie.agent.configuration";
 
-    private String agentPropertiesFilterPattern = "^genie\\.agent\\.runtime\\..*";
+    /**
+     * The prefix that properties need to match in order to be forwarded to agents during configuration.
+     * The prefix is stripped before forwarding.
+     */
+    public static final String DYNAMIC_PROPERTIES_PREFIX = PREFIX + ".dynamic.";
+
     private Duration cacheRefreshInterval = Duration.ofMinutes(1);
 }

@@ -33,7 +33,6 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Utilities for working with Spring {@link PropertySource}.
@@ -69,16 +68,17 @@ public final class PropertySourceUtils {
 
 
     /**
-     * Takes a snapshot of the properties that match a given pattern pattern.
+     * Takes a snapshot of the properties that match a given prefix.
+     * The prefix is stripped from the property name.
      * Properties with empty and null values are not included.
      *
-     * @param environment         the environment
-     * @param propertyNamePattern the regular expression to select the properties to include
+     * @param environment the environment
+     * @param prefix      the prefix to match
      * @return an immutable map of property name and property value in string form
      */
-    public static Map<String, String> createDynamicPropertiesMap(
+    public static Map<String, String> createPropertiesSnapshot(
         final Environment environment,
-        final Pattern propertyNamePattern
+        final String prefix
     ) {
         // Obtain properties sources from environment
         final PropertySources propertySources;
@@ -93,7 +93,7 @@ public final class PropertySourceUtils {
         for (final PropertySource<?> propertySource : propertySources) {
             if (propertySource instanceof EnumerablePropertySource) {
                 for (final String propertyName : ((EnumerablePropertySource<?>) propertySource).getPropertyNames()) {
-                    if (propertyNamePattern.matcher(propertyName).matches()) {
+                    if (propertyName.startsWith(prefix)) {
                         log.debug("Adding matching property: {}", propertyName);
                         filteredPropertyNames.add(propertyName);
                     } else {
@@ -107,10 +107,11 @@ public final class PropertySourceUtils {
         final ImmutableMap.Builder<String, String> propertiesMapBuilder = ImmutableMap.builder();
         for (final String propertyName : filteredPropertyNames) {
             final String propertyValue = environment.getProperty(propertyName);
-            if (StringUtils.isBlank(propertyValue)) {
+            final String strippedPropertyName = StringUtils.removeStart(propertyName, prefix);
+            if (StringUtils.isBlank(strippedPropertyName) || StringUtils.isBlank(propertyValue)) {
                 log.debug("Skipping blank value property: {}", propertyName);
             } else {
-                propertiesMapBuilder.put(propertyName, propertyValue);
+                propertiesMapBuilder.put(strippedPropertyName, propertyValue);
             }
         }
 

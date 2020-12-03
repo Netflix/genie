@@ -41,7 +41,6 @@ import org.springframework.scheduling.TaskScheduler;
 import javax.script.ScriptEngineManager;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 /**
  * Configuration for script extensions.
@@ -123,7 +122,7 @@ public class ScriptsAutoConfiguration {
             meterRegistry,
             propertyMapCacheFactory.get(
                 scriptProperties.getPropertiesRefreshInterval(),
-                Pattern.compile(scriptProperties.getPropertiesPattern())
+                ClusterSelectorScriptProperties.SCRIPT_PROPERTIES_PREFIX
             )
         );
     }
@@ -152,7 +151,7 @@ public class ScriptsAutoConfiguration {
             meterRegistry,
             propertyMapCacheFactory.get(
                 scriptProperties.getPropertiesRefreshInterval(),
-                Pattern.compile(scriptProperties.getPropertiesPattern())
+                CommandSelectorManagedScriptProperties.SCRIPT_PROPERTIES_PREFIX
             )
         );
     }
@@ -181,7 +180,7 @@ public class ScriptsAutoConfiguration {
             meterRegistry,
             propertyMapCacheFactory.get(
                 scriptProperties.getPropertiesRefreshInterval(),
-                Pattern.compile(scriptProperties.getPropertiesPattern())
+                AgentLauncherSelectorScriptProperties.SCRIPT_PROPERTIES_PREFIX
             )
         );
     }

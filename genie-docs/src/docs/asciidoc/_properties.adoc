@@ -27,11 +27,6 @@ Whereas static properties values are bound during application startup and do not
 |10s
 |no
 
-|genie.agent.configuration.agent-properties-filter-pattern
-|Regular expression applied to filter server properties that are forwarded to the agent
-|^genie\.agent\.runtime\..*
-|no
-
 |genie.agent.configuration.cache-refresh-interval
 |Interval for after which the agent properties cache is refreshed
 |1m
@@ -247,8 +242,8 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |3s
 |no
 
-|genie.agent.runtime.*
-|Properties with this prefix are forwarded to each agent during startup
+|genie.agent.configuration.dynamic.*
+|Properties with this prefix are forwarded to each agent during startup (with the prefix stripped)
 |
 |yes
 
@@ -483,11 +478,6 @@ of 2.0
 |300000
 |no
 
-|genie.scripts.agent-launcher-selector.properties-pattern
-|The regular expression that filters which properties get passed to the script.
-|^agent-launcher-selector\..*
-|no
-
 |genie.scripts.agent-launcher-selector.properties-refresh-interval
 |Interval for refreshing property values passed to the script.
 |5m
@@ -508,11 +498,6 @@ of 2.0
 |5000
 |no
 
-|genie.scripts.cluster-selector.properties-pattern
-|The regular expression that filters which properties get passed to the script.
-|^cluster-selector\..*
-|no
-
 |genie.scripts.cluster-selector.properties-refresh-interval
 |Interval for refreshing property values passed to the script.
 |5m
@@ -531,11 +516,6 @@ of 2.0
 |genie.scripts.cluster-selector.timeout
 |Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
 |5000
-|no
-
-|genie.scripts.command-selector.properties-pattern
-|The regular expression that filters which properties get passed to the script.
-|^command-selector\..*
 |no
 
 |genie.scripts.command-selector.properties-refresh-interval
@@ -933,10 +913,14 @@ This section describes the various properties that can be set to control the beh
 Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
 The server also has a chance to override them during the 'Agent Configuration' execution stage.
 
-=== Default Properties
+==== Properties forwarding
 
-==== Genie Properties
+Server-side properties that match a given prefix are forwarded to all agents during agent configuration stage.
+For a property to be forwarded, it needs to be prefixed with `genie.agent.configuration.dynamic.`.
 
+Example:
+Set property `genie.agent.configuration.dynamic.genie.agent.runtime.emergency-shutdown-delay` on the server to have it
+forwarded to all agents as `genie.agent.runtime.emergency-shutdown-delay`.
 
 |===
 |Property |Description |Default Value | Notes
@@ -1080,5 +1064,26 @@ The server also has a chance to override them during the 'Agent Configuration' e
 | Time allowed on task running on Spring's system task scheduler to complete before the agent terminates
 | 60s
 | This property is bound during initialization and cannot be modified at runtime by the server.
+
+|===
+
+
+== Selector Script Properties
+
+Properties with a special prefix are forwarded to the script selector runtime (with the prefix stripped).
+
+For example, server property `cluster-selector.canary` is passed to the script runtime as `canary`.
+
+|===
+|Selector Script | Prefix
+
+| Cluster Selector Script
+| `cluster-selector.`
+
+| Command Selector Script
+| `command-selector.`
+
+| Agent Launcher Selector Script
+| `agent-launcher-selector.`
 
 |===
