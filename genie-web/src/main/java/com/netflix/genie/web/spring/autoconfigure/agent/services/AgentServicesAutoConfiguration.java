@@ -49,7 +49,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Auto configuration for services needed in the {@literal agent} module.
@@ -203,7 +202,7 @@ public class AgentServicesAutoConfiguration {
             agentConfigurationProperties,
             propertiesMapCacheFactory.get(
                 agentConfigurationProperties.getCacheRefreshInterval(),
-                Pattern.compile(agentConfigurationProperties.getAgentPropertiesFilterPattern())
+                AgentConfigurationProperties.DYNAMIC_PROPERTIES_PREFIX
             ),
             registry
         );

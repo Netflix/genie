@@ -36,4 +36,9 @@ public class AgentLauncherSelectorScriptProperties extends ManagedScriptBaseProp
      * Name of script source property.
      */
     public static final String SOURCE_PROPERTY = PREFIX + ManagedScriptBaseProperties.SOURCE_PROPERTY_SUFFIX;
+
+    /**
+     * Prefix for properties passed to the script (with the prefix stripped).
+     */
+    public static final String SCRIPT_PROPERTIES_PREFIX = "agent-launcher-selector.";
 }

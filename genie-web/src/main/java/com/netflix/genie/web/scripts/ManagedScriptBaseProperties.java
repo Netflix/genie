@@ -22,7 +22,6 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
 import java.net.URI;
 import java.time.Duration;
 
@@ -43,6 +42,4 @@ public abstract class ManagedScriptBaseProperties {
     private long timeout = 5_000L;
     private boolean autoLoadEnabled = true;
     private Duration propertiesRefreshInterval = Duration.ofMinutes(5);
-    @NotEmpty
-    private String propertiesPattern = "^$";
 }

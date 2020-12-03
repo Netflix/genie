@@ -35,7 +35,6 @@ class PropertiesMapCacheSpec extends Specification {
     }
 
     def "Build map and cache it"() {
-        Pattern pattern = Pattern.compile("^agent\\..*")
 
         def map1 = [
             'agent.foo': "...",
@@ -52,8 +51,8 @@ class PropertiesMapCacheSpec extends Specification {
         ]
 
         def expectedProperties = [
-            'agent.foo': "Foo",
-            'agent.bar': "Bar",
+            'foo': "Foo",
+            'bar': "Bar",
         ]
 
         def propertySources = new MutablePropertySources()
@@ -61,7 +60,7 @@ class PropertiesMapCacheSpec extends Specification {
         propertySources.addFirst(new MapPropertySource("map2", map2))
 
         when:
-        PropertiesMapCache cache = new PropertiesMapCache.Factory(env).get(Duration.ofMinutes(5), pattern)
+        PropertiesMapCache cache = new PropertiesMapCache.Factory(env).get(Duration.ofMinutes(5), "agent.")
         Map<String, String> agentProperties
 
         then:
