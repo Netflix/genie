@@ -107,13 +107,13 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd>org.springframework.hateoas.server.RepresentationModelAssembler&lt;com.fasterxml.jackson.databind.JsonNode,org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;&gt;</dd>
+<dd>org.springframework.hateoas.server.RepresentationModelAssembler&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;,org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&gt;</dd>
 </dl>
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">RootModelAssembler</span>
 extends java.lang.Object
-implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;com.fasterxml.jackson.databind.JsonNode,org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;&gt;</pre>
+implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;,org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&gt;</pre>
 <div class="block">Assembles root resource from a JsonNode.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -155,8 +155,8 @@ implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;co
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/RootModelAssembler.html#toModel-com.fasterxml.jackson.databind.JsonNode-">toModel</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;metadata)</code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/RootModelAssembler.html#toModel-java.util.Map-">toModel</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</code></td>
 </tr>
 </table>
 <ul class="blockList">
@@ -204,17 +204,17 @@ implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;co
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="toModel-com.fasterxml.jackson.databind.JsonNode-">
+<a name="toModel-java.util.Map-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>toModel</h4>
 <pre>@Nonnull
-public&nbsp;org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;toModel(com.fasterxml.jackson.databind.JsonNode&nbsp;metadata)</pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;toModel(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>toModel</code>&nbsp;in interface&nbsp;<code>org.springframework.hateoas.server.RepresentationModelAssembler&lt;com.fasterxml.jackson.databind.JsonNode,org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;&gt;</code></dd>
+<dd><code>toModel</code>&nbsp;in interface&nbsp;<code>org.springframework.hateoas.server.RepresentationModelAssembler&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;,org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&gt;</code></dd>
 </dl>
 </li>
 </ul>

@@ -154,7 +154,7 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/RootRestController.html#getRoot--">getRoot</a></span>()</code>
 <div class="block">Get a simple HAL+JSON object which represents the various links available in Genie REST API as an entry point.</div>
 </td>
@@ -212,7 +212,7 @@ public&nbsp;RootRestController(<a href="../../../../../../../../com/netflix/geni
 <h4>getRoot</h4>
 <pre>@GetMapping(produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;org.springframework.hateoas.EntityModel&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getRoot()</pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getRoot()</pre>
 <div class="block">Get a simple HAL+JSON object which represents the various links available in Genie REST API as an entry point.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
