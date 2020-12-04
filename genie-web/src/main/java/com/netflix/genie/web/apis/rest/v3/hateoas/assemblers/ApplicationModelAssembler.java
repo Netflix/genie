@@ -44,7 +44,7 @@ public class ApplicationModelAssembler implements RepresentationModelAssembler<A
     @Nonnull
     public EntityModel<Application> toModel(final Application application) {
         final String id = application.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<Application> applicationModel = new EntityModel<>(application);
+        final EntityModel<Application> applicationModel = EntityModel.of(application);
 
         try {
             applicationModel.add(

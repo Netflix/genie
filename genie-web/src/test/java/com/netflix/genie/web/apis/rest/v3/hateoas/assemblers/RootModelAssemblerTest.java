@@ -17,12 +17,13 @@
  */
 package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Unit tests for the {@link RootModelAssembler}.
@@ -46,9 +47,9 @@ class RootModelAssemblerTest {
 
     @Test
     void canConvertToResource() {
-        final JsonNode node
-            = JsonNodeFactory.instance.objectNode().set("description", JsonNodeFactory.instance.textNode("blah"));
-        final EntityModel<JsonNode> model = this.assembler.toModel(node);
+        final Map<String, String> metadata = new HashMap<>();
+        metadata.put("description", "blah");
+        final EntityModel<Map<String, String>> model = this.assembler.toModel(metadata);
         Assertions.assertThat(model.getLinks()).hasSize(5);
         Assertions.assertThat(model.getContent()).isNotNull();
         Assertions.assertThat(model.getLink("self")).isNotNull();
