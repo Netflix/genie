@@ -24,13 +24,13 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorSer
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import com.netflix.genie.common.internal.util.PropertiesMapCache;
+import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
 
 /**
  * Tests for behavior of {@link CommonServicesAutoConfiguration}.

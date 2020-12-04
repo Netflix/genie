@@ -40,6 +40,7 @@ dependencies {
      *******************************/
 
     implementation("io.grpc:grpc-netty")
+    implementation("io.awspring.cloud:spring-cloud-starter-aws")
     implementation("io.zipkin.brave:brave")
     implementation("io.zipkin.brave:brave-instrumentation-grpc")
     implementation("org.apache.commons:commons-lang3")
@@ -48,7 +49,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.cloud:spring-cloud-starter-aws")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 
     /*******************************

@@ -18,7 +18,7 @@
 package com.netflix.genie.common.internal.aws.s3
 
 import com.amazonaws.services.s3.AmazonS3
-import org.springframework.cloud.aws.core.io.s3.SimpleStorageProtocolResolver
+import io.awspring.cloud.core.io.s3.SimpleStorageProtocolResolver
 import org.springframework.context.support.AbstractApplicationContext
 import org.springframework.core.io.ProtocolResolver
 import spock.lang.Specification

@@ -29,6 +29,7 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.ResolvableType;
 
 import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 /**
  * An event bus implementation for the Genie application to use.
@@ -38,7 +39,10 @@ import javax.annotation.Nullable;
  */
 @Slf4j
 public class GenieEventBusImpl implements
-    GenieEventBus, ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
+    GenieEventBus,
+    ApplicationEventMulticaster,
+    BeanClassLoaderAware,
+    BeanFactoryAware {
 
     private final SimpleApplicationEventMulticaster syncMulticaster;
     private final SimpleApplicationEventMulticaster asyncMulticaster;
@@ -115,6 +119,26 @@ public class GenieEventBusImpl implements
         log.debug("Removing application listener bean with name {}", listenerBeanName);
         this.syncMulticaster.removeApplicationListenerBean(listenerBeanName);
         this.asyncMulticaster.removeApplicationListenerBean(listenerBeanName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeApplicationListeners(final Predicate<ApplicationListener<?>> predicate) {
+        log.debug("Removing application listeners matching predicate {}", predicate);
+        this.syncMulticaster.removeApplicationListeners(predicate);
+        this.asyncMulticaster.removeApplicationListeners(predicate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeApplicationListenerBeans(final Predicate<String> predicate) {
+        log.debug("Removing application listener beans matching predicate {}", predicate);
+        this.syncMulticaster.removeApplicationListenerBeans(predicate);
+        this.asyncMulticaster.removeApplicationListenerBeans(predicate);
     }
 
     /**

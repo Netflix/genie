@@ -18,11 +18,11 @@
 package com.netflix.genie.common.internal.aws.s3;
 
 import com.amazonaws.regions.Regions;
+import io.awspring.cloud.core.naming.AmazonResourceName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.cloud.aws.core.naming.AmazonResourceName;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;

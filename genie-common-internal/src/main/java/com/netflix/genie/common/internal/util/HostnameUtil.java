@@ -18,8 +18,8 @@
 package com.netflix.genie.common.internal.util;
 
 import com.amazonaws.util.EC2MetadataUtils;
+import io.awspring.cloud.context.support.env.AwsCloudEnvironmentCheckUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cloud.aws.context.support.env.AwsCloudEnvironmentCheckUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

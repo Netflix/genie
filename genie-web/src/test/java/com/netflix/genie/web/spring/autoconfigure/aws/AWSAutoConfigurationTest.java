@@ -19,14 +19,14 @@ package com.netflix.genie.web.spring.autoconfigure.aws;
 
 import com.amazonaws.retry.RetryPolicy;
 import com.amazonaws.services.sns.AmazonSNS;
+import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
+import io.awspring.cloud.core.config.AmazonWebserviceClientConfigurationUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import org.springframework.cloud.aws.core.config.AmazonWebserviceClientConfigurationUtils;
 
 /**
  * Tests for behavior of {@link AWSAutoConfiguration}.
