@@ -19,11 +19,11 @@ package com.netflix.genie.common.internal.aws.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
+import io.awspring.cloud.core.io.s3.AmazonS3ProxyFactory;
+import io.awspring.cloud.core.io.s3.SimpleStorageResource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.cloud.aws.core.io.s3.AmazonS3ProxyFactory;
-import org.springframework.cloud.aws.core.io.s3.SimpleStorageResource;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.FileNotFoundException;
@@ -52,10 +52,11 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         final AmazonS3 client,
         final String bucket,
         final String key,
-        final String versionId, final TaskExecutor s3TaskExecutor,
+        final String versionId,
+        final TaskExecutor s3TaskExecutor,
         final Pair<Integer, Integer> range
     ) throws IOException {
-        super(client, bucket, key, s3TaskExecutor, versionId);
+        super(client, bucket, key, s3TaskExecutor, versionId, null);
         this.client = AmazonS3ProxyFactory.createProxy(client);
         this.bucket = bucket;
         this.key = key;

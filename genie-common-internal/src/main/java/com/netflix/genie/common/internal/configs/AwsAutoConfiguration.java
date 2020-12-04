@@ -27,6 +27,13 @@ import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
+import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextInstanceDataAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.ContextStackAutoConfiguration;
+import io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties;
+import io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -34,13 +41,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextInstanceDataAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties;
-import org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -105,21 +105,8 @@ public class AwsAutoConfiguration {
                     return region.getName();
                 }
             };
-        } else if (awsRegionProperties.isAuto()) {
-            return new DefaultAwsRegionProviderChain();
         } else {
-            // Sensible default
-            return new AwsRegionProvider() {
-                /**
-                 * Always default to us-east-1.
-                 *
-                 * {@inheritDoc}
-                 */
-                @Override
-                public String getRegion() throws SdkClientException {
-                    return Regions.US_EAST_1.getName();
-                }
-            };
+            return new DefaultAwsRegionProviderChain();
         }
     }
 

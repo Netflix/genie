@@ -19,7 +19,7 @@ package com.netflix.genie.common.internal.configs
 
 import com.amazonaws.regions.DefaultAwsRegionProviderChain
 import com.amazonaws.regions.Regions
-import org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties
+import io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -31,12 +31,11 @@ import spock.lang.Unroll
 class AwsAutoConfigurationSpec extends Specification {
 
     @Unroll
-    def "Can create the expected AwsRegionProvider instance when auto is #auto and static is #staticRegion"() {
+    def "Can create the expected AwsRegionProvider instance when static is #staticRegion"() {
         def config = new AwsAutoConfiguration()
         def properties = new AwsRegionProperties()
 
         when:
-        properties.setAuto(auto)
         properties.setStatic(staticRegion)
         def regionProvider = config.awsRegionProvider(properties)
 
@@ -45,14 +44,12 @@ class AwsAutoConfigurationSpec extends Specification {
             regionProvider.getRegion() == expectedRegion
         } else {
             // We expect the default to be returned when these conditions are true
-            auto
             staticRegion == null
         }
 
         where:
-        auto  | staticRegion                | expectedRegion
-        true  | Regions.US_WEST_2.getName() | Regions.US_WEST_2.getName()
-        true  | null                        | "shouldn't matter"
-        false | null                        | Regions.US_EAST_1.getName()
+        staticRegion                | expectedRegion
+        Regions.US_WEST_2.getName() | Regions.US_WEST_2.getName()
+        null                        | "shouldn't matter"
     }
 }

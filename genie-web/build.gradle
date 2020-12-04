@@ -70,6 +70,8 @@ dependencies {
     implementation("commons-validator:commons-validator")
     implementation("io.grpc:grpc-netty")
     implementation("io.grpc:grpc-protobuf")
+    implementation("io.awspring.cloud:spring-cloud-starter-aws")
+    implementation("io.awspring.cloud:spring-cloud-starter-aws-messaging")
     implementation("io.zipkin.brave:brave")
     implementation("io.zipkin.brave:brave-instrumentation-grpc")
     implementation("org.apache.commons:commons-lang3")
@@ -88,8 +90,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.cloud:spring-cloud-starter-aws")
-    implementation("org.springframework.cloud:spring-cloud-starter-aws-messaging")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
     implementation("org.springframework.cloud:spring-cloud-starter-zookeeper")
     implementation("org.springframework.integration:spring-integration-zookeeper")
@@ -126,6 +126,7 @@ dependencies {
     integTestImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-core")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-restassured")
+    integTestRuntimeOnly("org.springframework:spring-webflux")
 
     /*******************************
      * Agent Dependencies

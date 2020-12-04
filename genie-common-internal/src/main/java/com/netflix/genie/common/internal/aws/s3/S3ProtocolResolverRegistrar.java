@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
+import io.awspring.cloud.core.io.s3.SimpleStorageProtocolResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.cloud.aws.core.io.s3.SimpleStorageProtocolResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;

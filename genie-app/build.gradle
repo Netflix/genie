@@ -30,6 +30,8 @@ dependencies {
     testImplementation(project(":genie-test"))
     testImplementation(project(":genie-test-web"))
 
+    smokeTestRuntimeOnly("org.springframework:spring-webflux")
+
     /*******************************
      * Agent Dependencies
      *******************************/
@@ -52,8 +54,8 @@ springBoot {
 def dockerDir = new File(project.buildDir, "/docker")
 
 task dockerCreateInputDir(type: Copy, group: "Docker", description: "Stage all the necessary files docker image") {
-    dependsOn tasks.jar, tasks.bootJar, project.findProject(":genie-agent-app").tasks.bootJar
-    from tasks.jar
+    dependsOn tasks.bootJar, project.findProject(":genie-agent-app").tasks.bootJar
+    from tasks.bootJar
     from new File(project.projectDir, "src/main/docker/Dockerfile")
     from "${configurations.genieAgent.asPath}"
     into dockerDir
