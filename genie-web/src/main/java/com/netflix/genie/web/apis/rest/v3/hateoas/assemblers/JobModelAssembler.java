@@ -51,7 +51,7 @@ public class JobModelAssembler implements RepresentationModelAssembler<Job, Enti
     @Nonnull
     public EntityModel<Job> toModel(final Job job) {
         final String id = job.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<Job> jobModel = new EntityModel<>(job);
+        final EntityModel<Job> jobModel = EntityModel.of(job);
 
         try {
             jobModel.add(

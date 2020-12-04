@@ -39,7 +39,8 @@ dependencies {
 protobuf {
     protoc {
         // Download the protoc compiler
-        artifact = 'com.google.protobuf:protoc'
+        // This particular protobuf dependency isn't in the BOM for some reason
+        artifact = "com.google.protobuf:protoc:${protobuf_version}"
         // Use project convention for generated files
         generatedFilesBaseDir = project.generatedSourcesDir
     }
@@ -47,15 +48,15 @@ protobuf {
     plugins {
         grpc {
             // Download the grpc compiler
-            artifact = 'io.grpc:protoc-gen-grpc-java'
+            artifact = "io.grpc:protoc-gen-grpc-java"
         }
     }
 
     generateProtoTasks {
-        ofSourceSet('main')*.plugins {
+        ofSourceSet("main")*.plugins {
             // Activate the gRPC plugin
             grpc {
-                outputSubDir = 'java'
+                outputSubDir = "java"
             }
         }
     }

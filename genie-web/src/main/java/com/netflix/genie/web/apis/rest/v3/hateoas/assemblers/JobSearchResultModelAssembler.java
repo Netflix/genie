@@ -41,7 +41,7 @@ public class JobSearchResultModelAssembler
     @Override
     @Nonnull
     public EntityModel<JobSearchResult> toModel(final JobSearchResult job) {
-        final EntityModel<JobSearchResult> jobSearchResultModel = new EntityModel<>(job);
+        final EntityModel<JobSearchResult> jobSearchResultModel = EntityModel.of(job);
 
         try {
             jobSearchResultModel.add(

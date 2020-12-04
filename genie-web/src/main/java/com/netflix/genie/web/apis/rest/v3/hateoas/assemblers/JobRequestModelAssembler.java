@@ -48,7 +48,7 @@ public class JobRequestModelAssembler implements RepresentationModelAssembler<Jo
     @Nonnull
     public EntityModel<JobRequest> toModel(final JobRequest jobRequest) {
         final String id = jobRequest.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<JobRequest> jobRequestModel = new EntityModel<>(jobRequest);
+        final EntityModel<JobRequest> jobRequestModel = EntityModel.of(jobRequest);
 
         try {
             jobRequestModel.add(

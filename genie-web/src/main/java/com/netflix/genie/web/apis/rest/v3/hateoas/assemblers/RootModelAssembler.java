@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.apis.rest.v3.controllers.ApplicationRestController;
@@ -31,6 +30,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * Assembles root resource from a JsonNode.
@@ -38,7 +38,8 @@ import javax.annotation.Nonnull;
  * @author tgianos
  * @since 3.0.0
  */
-public class RootModelAssembler implements RepresentationModelAssembler<JsonNode, EntityModel<JsonNode>> {
+public class RootModelAssembler implements
+    RepresentationModelAssembler<Map<String, String>, EntityModel<Map<String, String>>> {
 
     private static final String APPLICATIONS_LINK = "applications";
     private static final String COMMANDS_LINK = "commands";
@@ -51,8 +52,8 @@ public class RootModelAssembler implements RepresentationModelAssembler<JsonNode
     @Override
     @SuppressFBWarnings("NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS")
     @Nonnull
-    public EntityModel<JsonNode> toModel(final JsonNode metadata) {
-        final EntityModel<JsonNode> rootResource = new EntityModel<>(metadata);
+    public EntityModel<Map<String, String>> toModel(final Map<String, String> metadata) {
+        final EntityModel<Map<String, String>> rootResource = EntityModel.of(metadata);
 
         try {
             rootResource.add(

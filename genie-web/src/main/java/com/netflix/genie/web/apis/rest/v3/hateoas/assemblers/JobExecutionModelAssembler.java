@@ -49,7 +49,7 @@ public class JobExecutionModelAssembler implements
     @Nonnull
     public EntityModel<JobExecution> toModel(final JobExecution jobExecution) {
         final String id = jobExecution.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<JobExecution> jobExecutionModel = new EntityModel<>(jobExecution);
+        final EntityModel<JobExecution> jobExecutionModel = EntityModel.of(jobExecution);
 
         try {
             jobExecutionModel.add(

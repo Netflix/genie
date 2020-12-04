@@ -48,7 +48,7 @@ public class JobMetadataModelAssembler implements RepresentationModelAssembler<J
     @Nonnull
     public EntityModel<JobMetadata> toModel(final JobMetadata jobMetadata) {
         final String id = jobMetadata.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<JobMetadata> jobMetadataModel = new EntityModel<>(jobMetadata);
+        final EntityModel<JobMetadata> jobMetadataModel = EntityModel.of(jobMetadata);
 
         try {
             jobMetadataModel.add(

@@ -45,7 +45,7 @@ public class CommandModelAssembler implements RepresentationModelAssembler<Comma
     @Nonnull
     public EntityModel<Command> toModel(final Command command) {
         final String id = command.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<Command> commandModel = new EntityModel<>(command);
+        final EntityModel<Command> commandModel = EntityModel.of(command);
 
         try {
             commandModel.add(

@@ -41,7 +41,7 @@ class RootRestControllerIntegrationTest extends RestControllerIntegrationTestBas
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
-            .body("content.description", Matchers.notNullValue())
+            .body("description", Matchers.notNullValue())
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(5))
             .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
             .body(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY))

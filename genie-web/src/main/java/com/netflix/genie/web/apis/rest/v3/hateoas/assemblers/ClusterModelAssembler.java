@@ -43,7 +43,7 @@ public class ClusterModelAssembler implements RepresentationModelAssembler<Clust
     @Nonnull
     public EntityModel<Cluster> toModel(final Cluster cluster) {
         final String id = cluster.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<Cluster> clusterModel = new EntityModel<>(cluster);
+        final EntityModel<Cluster> clusterModel = EntityModel.of(cluster);
 
         try {
             clusterModel.add(

@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Rest controller for the V3 API root.
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RootRestController {
 
     private final RootModelAssembler rootModelAssembler;
+    private final Map<String, String> metadata;
 
     /**
      * Constructor.
@@ -51,6 +53,8 @@ public class RootRestController {
     @Autowired
     public RootRestController(final RootModelAssembler rootModelAssembler) {
         this.rootModelAssembler = rootModelAssembler;
+        this.metadata = new HashMap<>();
+        this.metadata.put("description", "Genie V3 API");
     }
 
     /**
@@ -60,14 +64,7 @@ public class RootRestController {
      */
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<JsonNode> getRoot() {
-        final JsonNodeFactory factory = JsonNodeFactory.instance;
-        final JsonNode node = factory
-            .objectNode()
-            .set(
-                "description",
-                factory.textNode("Genie V3 API")
-            );
-        return this.rootModelAssembler.toModel(node);
+    public EntityModel<Map<String, String>> getRoot() {
+        return this.rootModelAssembler.toModel(this.metadata);
     }
 }
