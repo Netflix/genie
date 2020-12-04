@@ -153,8 +153,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">agentConfigurationService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
-                         org.springframework.core.env.Environment&nbsp;environment,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-com.netflix.genie.common.internal.util.PropertiesMapCache.Factory-io.micrometer.core.instrument.MeterRegistry-">agentConfigurationService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
+                         <a href="../../../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory</a>&nbsp;propertiesMapCacheFactory,
                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
 </td>
@@ -358,7 +358,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
+<a name="agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-com.netflix.genie.common.internal.util.PropertiesMapCache.Factory-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -367,13 +367,13 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services">AgentConfigurationService.class</a>)
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a>&nbsp;agentConfigurationService(<a href="../../../../../../../../com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a>&nbsp;agentConfigurationProperties,
-                                                                                                                                       org.springframework.core.env.Environment&nbsp;environment,
+                                                                                                                                       <a href="../../../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory</a>&nbsp;propertiesMapCacheFactory,
                                                                                                                                        io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentConfigurationProperties</code> - the service properties</dd>
-<dd><code>environment</code> - the environment</dd>
+<dd><code>propertiesMapCacheFactory</code> - the properties map cache factory</dd>
 <dd><code>registry</code> - the metrics registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> instance</dd>

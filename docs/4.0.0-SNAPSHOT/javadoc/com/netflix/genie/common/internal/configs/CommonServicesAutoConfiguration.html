@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -211,6 +211,12 @@ extends java.lang.Object</pre>
 <div class="block">Provide a <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services"><code>JobDirectoryManifestCreatorService</code></a> if no override is defined.</div>
 </td>
 </tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#propertiesMapCacheFactory-org.springframework.core.env.Environment-">propertiesMapCacheFactory</a></span>(org.springframework.core.env.Environment&nbsp;environment)</code>
+<div class="block">Provide a <code>PropertiesMapCache.Factory</code> if no override is defined.</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -368,7 +374,7 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/dtos/Di
 <a name="directoryManifestFilter-com.netflix.genie.common.internal.properties.RegexDirectoryManifestProperties-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>directoryManifestFilter</h4>
 <pre>@Bean
@@ -381,6 +387,24 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/dtos/Di
 <dd><code>properties</code> - the properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a directory manifest filter</dd>
+</dl>
+</li>
+</ul>
+<a name="propertiesMapCacheFactory-org.springframework.core.env.Environment-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>propertiesMapCacheFactory</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory.class</a>)
+public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory</a>&nbsp;propertiesMapCacheFactory(org.springframework.core.env.Environment&nbsp;environment)</pre>
+<div class="block">Provide a <code>PropertiesMapCache.Factory</code> if no override is defined.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>environment</code> - the environment</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a properties map cache factory</dd>
 </dl>
 </li>
 </ul>

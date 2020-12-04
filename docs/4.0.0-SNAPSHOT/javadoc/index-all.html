@@ -392,7 +392,7 @@
 <dd>
 <div class="block">Service that provides agent runtime configuration (i.e.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">agentConfigurationService(AgentConfigurationProperties, Environment, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentConfigurationService-com.netflix.genie.web.properties.AgentConfigurationProperties-com.netflix.genie.common.internal.util.PropertiesMapCache.Factory-io.micrometer.core.instrument.MeterRegistry-">agentConfigurationService(AgentConfigurationProperties, PropertiesMapCache.Factory, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> if one is not defined.</div>
 </dd>
@@ -401,7 +401,7 @@
 <div class="block">This implementation of <a href="com/netflix/genie/web/agent/services/AgentConfigurationService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentConfigurationService</code></a> forwards properties set on the server that match a given
  set of regular expressions, plus any additional ones specified in configuration.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">AgentConfigurationServiceImpl(AgentConfigurationProperties, Environment, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html#AgentConfigurationServiceImpl-com.netflix.genie.web.properties.AgentConfigurationProperties-com.netflix.genie.common.internal.util.PropertiesMapCache-io.micrometer.core.instrument.MeterRegistry-">AgentConfigurationServiceImpl(AgentConfigurationProperties, PropertiesMapCache, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConfigurationServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConfigurationServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -610,7 +610,7 @@
 <div class="block">Extension of <a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> that delegates selection of a job's agent launcher when more than one
  choice is available.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-">AgentLauncherSelectorManagedScript(ScriptManager, AgentLauncherSelectorScriptProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">AgentLauncherSelectorManagedScript(ScriptManager, AgentLauncherSelectorScriptProperties, MeterRegistry, PropertiesMapCache)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">AgentLauncherSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -1851,7 +1851,7 @@
 <div class="block">Extension of <a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> that delegates selection of a job's cluster when more than one choice is
  available.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#ClusterSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.ClusterSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-">ClusterSelectorManagedScript(ScriptManager, ClusterSelectorScriptProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#ClusterSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.ClusterSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">ClusterSelectorManagedScript(ScriptManager, ClusterSelectorScriptProperties, MeterRegistry, PropertiesMapCache)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -2519,7 +2519,7 @@
 <div class="block">An extension of <a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> which from a set of commands and the original job request will
  attempt to determine the best command to use for execution.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#CommandSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties-io.micrometer.core.instrument.MeterRegistry-">CommandSelectorManagedScript(ScriptManager, CommandSelectorManagedScriptProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#CommandSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">CommandSelectorManagedScript(ScriptManager, CommandSelectorManagedScriptProperties, MeterRegistry, PropertiesMapCache)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -2744,6 +2744,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html#CreateJobScriptStage-com.netflix.genie.agent.execution.services.JobSetupService-">CreateJobScriptStage(JobSetupService)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobScriptStage</a></dt>
 <dd>
 <div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/PropertySourceUtils.html#createPropertiesSnapshot-org.springframework.core.env.Environment-java.lang.String-">createPropertiesSnapshot(Environment, String)</a></span> - Static method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/PropertySourceUtils.html" title="class in com.netflix.genie.common.internal.util">PropertySourceUtils</a></dt>
+<dd>
+<div class="block">Takes a snapshot of the properties that match a given prefix.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#createRelative-java.lang.String-">createRelative(String)</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#createRetryableException-java.lang.Throwable-">createRetryableException(Throwable)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></dt>
@@ -3304,6 +3308,10 @@
 <dd>
 <div class="block">Utility class to help converting between V3 and V4 DTOs during migration period.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentConfigurationProperties.html#DYNAMIC_PROPERTIES_PREFIX">DYNAMIC_PROPERTIES_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentConfigurationProperties.html" title="class in com.netflix.genie.web.properties">AgentConfigurationProperties</a></dt>
+<dd>
+<div class="block">The prefix that properties need to match in order to be forwarded to agents during configuration.</div>
+</dd>
 </dl>
 <a name="I:E">
 <!--   -->
@@ -3575,6 +3583,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Factory.html#Factory-com.netflix.genie.common.internal.dtos.DirectoryManifest.Filter-">Factory(DirectoryManifest.Filter)</a></span> - Constructor for class com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Factory.html" title="class in com.netflix.genie.common.internal.dtos">DirectoryManifest.Factory</a></dt>
 <dd>
 <div class="block">Constructor with filter.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html#Factory-org.springframework.core.env.Environment-">Factory(Environment)</a></span> - Constructor for class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory</a></dt>
+<dd>
+<div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_AGENT_CONFIGURATION">FAILED_AGENT_CONFIGURATION</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
@@ -4644,6 +4656,14 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/FetchingCacheService.html#get-java.util.Set-">get(Set&lt;Pair&lt;URI, File&gt;&gt;)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/FetchingCacheService.html" title="interface in com.netflix.genie.agent.execution.services">FetchingCacheService</a></dt>
 <dd>
 <div class="block">Download a given set of resources (if not already cached) and copy them to the specified destinations.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html#get-java.time.Duration-java.lang.String-">get(Duration, String)</a></span> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache.Factory</a></dt>
+<dd>
+<div class="block">Create a <a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util"><code>PropertiesMapCache</code></a> with the given refresh interval and filter pattern.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html#get--">get()</a></span> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a></dt>
+<dd>
+<div class="block">Get the current map of properties and their values.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveAgentJobs--">getActiveAgentJobs()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
@@ -6393,6 +6413,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getProcessId--">getProcessId()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobExecutionProjection</a></dt>
 <dd>
 <div class="block">Get the process id of the job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getProperties-groovy.lang.Binding-">getProperties(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
+<dd>
+<div class="block">Given the <code>Binding</code> that a script has attempt to extract the properties map.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html#getRationale--">getRationale()</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a></dt>
 <dd>
@@ -9525,6 +9549,22 @@
 <dd>
 <div class="block">Aspect implementation method of retrying the data service method on certain failures.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">PropertiesMapCache</span></a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
+<dd>
+<div class="block">Utility class that produces a map of properties and their values if they match a given prefix.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html#PropertiesMapCache-java.time.Duration-org.springframework.core.env.Environment-java.lang.String-">PropertiesMapCache(Duration, Environment, String)</a></span> - Constructor for class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">PropertiesMapCache.Factory</span></a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
+<dd>
+<div class="block">Factory class that produces <a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util"><code>PropertiesMapCache</code></a> instances.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#propertiesMapCacheFactory-org.springframework.core.env.Environment-">propertiesMapCacheFactory(Environment)</a></span> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">CommonServicesAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a <code>PropertiesMapCache.Factory</code> if no override is defined.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.common.internal.properties.<a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties">RegexDirectoryManifestProperties</a></dt>
 <dd>
 <div class="block">Properties prefix.</div>
@@ -10303,7 +10343,7 @@
 <div class="block">Interface for defining the contract between the selection of a resource from a set of resources for a given
  job request.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html#ResourceSelectorScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.scripts.ManagedScriptBaseProperties-io.micrometer.core.instrument.MeterRegistry-">ResourceSelectorScript(ScriptManager, ManagedScriptBaseProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html#ResourceSelectorScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.scripts.ManagedScriptBaseProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">ResourceSelectorScript(ScriptManager, ManagedScriptBaseProperties, MeterRegistry, PropertiesMapCache)</a></span> - Constructor for class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -10547,6 +10587,18 @@
 <dd>
 <div class="block">The relative order of the <a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptClusterSelectorImpl</code></a> if one is enabled relative to other
  <a href="com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><code>ClusterSelector</code></a> instances that may be in the context.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html#SCRIPT_PROPERTIES_PREFIX">SCRIPT_PROPERTIES_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a></dt>
+<dd>
+<div class="block">Prefix for properties passed to the script (with the prefix stripped).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html#SCRIPT_PROPERTIES_PREFIX">SCRIPT_PROPERTIES_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties</a></dt>
+<dd>
+<div class="block">Prefix for properties passed to the script (with the prefix stripped).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html#SCRIPT_PROPERTIES_PREFIX">SCRIPT_PROPERTIES_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties">CommandSelectorManagedScriptProperties</a></dt>
+<dd>
+<div class="block">Prefix for properties passed to the script (with the prefix stripped).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#SCRIPT_URI">SCRIPT_URI</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>

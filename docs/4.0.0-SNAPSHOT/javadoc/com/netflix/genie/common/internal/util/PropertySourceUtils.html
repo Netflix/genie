@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9};
+var methods = {"i0":9,"i1":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/common/internal/util/HostnameUtil.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../../../../com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -133,6 +133,13 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>static java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/util/PropertySourceUtils.html#createPropertiesSnapshot-org.springframework.core.env.Environment-java.lang.String-">createPropertiesSnapshot</a></span>(org.springframework.core.env.Environment&nbsp;environment,
+                        java.lang.String&nbsp;prefix)</code>
+<div class="block">Takes a snapshot of the properties that match a given prefix.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>static org.springframework.core.env.PropertySource&lt;?&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/util/PropertySourceUtils.html#loadYamlPropertySource-java.lang.String-org.springframework.core.io.Resource-">loadYamlPropertySource</a></span>(java.lang.String&nbsp;propertySourceName,
                       org.springframework.core.io.Resource&nbsp;resource)</code>
@@ -164,7 +171,7 @@ extends java.lang.Object</pre>
 <a name="loadYamlPropertySource-java.lang.String-org.springframework.core.io.Resource-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>loadYamlPropertySource</h4>
 <pre>public static&nbsp;org.springframework.core.env.PropertySource&lt;?&gt;&nbsp;loadYamlPropertySource(java.lang.String&nbsp;propertySourceName,
@@ -176,6 +183,26 @@ extends java.lang.Object</pre>
 <dd><code>resource</code> - The resource. Must exist and be YAML.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>PropertySource</code> representing this set of properties</dd>
+</dl>
+</li>
+</ul>
+<a name="createPropertiesSnapshot-org.springframework.core.env.Environment-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>createPropertiesSnapshot</h4>
+<pre>public static&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;createPropertiesSnapshot(org.springframework.core.env.Environment&nbsp;environment,
+                                                                                        java.lang.String&nbsp;prefix)</pre>
+<div class="block">Takes a snapshot of the properties that match a given prefix.
+ The prefix is stripped from the property name.
+ Properties with empty and null values are not included.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>environment</code> - the environment</dd>
+<dd><code>prefix</code> - the prefix to match</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an immutable map of property name and property value in string form</dd>
 </dl>
 </li>
 </ul>
@@ -206,7 +233,7 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/common/internal/util/HostnameUtil.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.Factory.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../../../../com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">

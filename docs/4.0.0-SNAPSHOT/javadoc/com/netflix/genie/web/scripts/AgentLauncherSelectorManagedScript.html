@@ -143,9 +143,10 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-">AgentLauncherSelectorManagedScript</a></span>(<a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a>&nbsp;scriptManager,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/AgentLauncherSelectorManagedScript.html#AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">AgentLauncherSelectorManagedScript</a></span>(<a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a>&nbsp;scriptManager,
                                   <a href="../../../../../com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a>&nbsp;properties,
-                                  io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+                                  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                                  <a href="../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a>&nbsp;propertyMapCache)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -207,7 +208,7 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-">
+<a name="AgentLauncherSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.AgentLauncherSelectorScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -215,13 +216,15 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <h4>AgentLauncherSelectorManagedScript</h4>
 <pre>public&nbsp;AgentLauncherSelectorManagedScript(<a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a>&nbsp;scriptManager,
                                           <a href="../../../../../com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a>&nbsp;properties,
-                                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+                                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                                          <a href="../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a>&nbsp;propertyMapCache)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>scriptManager</code> - script manager</dd>
 <dd><code>properties</code> - script manager properties</dd>
 <dd><code>registry</code> - meter registry</dd>
+<dd><code>propertyMapCache</code> - dynamic properties map cache</dd>
 </dl>
 </li>
 </ul>

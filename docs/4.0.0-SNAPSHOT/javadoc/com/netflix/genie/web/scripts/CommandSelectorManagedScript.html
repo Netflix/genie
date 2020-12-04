@@ -143,9 +143,10 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#CommandSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties-io.micrometer.core.instrument.MeterRegistry-">CommandSelectorManagedScript</a></span>(<a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a>&nbsp;scriptManager,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#CommandSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">CommandSelectorManagedScript</a></span>(<a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a>&nbsp;scriptManager,
                             <a href="../../../../../com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties">CommandSelectorManagedScriptProperties</a>&nbsp;properties,
-                            io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+                            io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                            <a href="../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a>&nbsp;propertyMapCache)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -207,7 +208,7 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="CommandSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties-io.micrometer.core.instrument.MeterRegistry-">
+<a name="CommandSelectorManagedScript-com.netflix.genie.web.scripts.ScriptManager-com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.PropertiesMapCache-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -215,13 +216,15 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <h4>CommandSelectorManagedScript</h4>
 <pre>public&nbsp;CommandSelectorManagedScript(<a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a>&nbsp;scriptManager,
                                     <a href="../../../../../com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties">CommandSelectorManagedScriptProperties</a>&nbsp;properties,
-                                    io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+                                    io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
+                                    <a href="../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a>&nbsp;propertyMapCache)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>scriptManager</code> - The <a href="../../../../../com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts"><code>ScriptManager</code></a> instance to use</dd>
 <dd><code>properties</code> - The <a href="../../../../../com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties"><code>CommandSelectorManagedScriptProperties</code></a> instance to use</dd>
 <dd><code>registry</code> - The <code>MeterRegistry</code> instance to use</dd>
+<dd><code>propertyMapCache</code> - The <a href="../../../../../com/netflix/genie/common/internal/util/PropertiesMapCache.html" title="class in com.netflix.genie.common.internal.util"><code>PropertiesMapCache</code></a> instance to use</dd>
 </dl>
 </li>
 </ul>

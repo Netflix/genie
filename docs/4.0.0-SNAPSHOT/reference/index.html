@@ -861,15 +861,12 @@ b.conum * { color: inherit !important; }
 </ul>
 </li>
 <li><a href="#_genie_agent">13. Genie Agent</a>
-<ul class="sectlevel2">
-<li><a href="#_default_properties_2">13.1. Default Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_genie_properties_2">13.1.1. Genie Properties</a></li>
+<li><a href="#_properties_forwarding">13.1. Properties forwarding</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#_metrics">14. Metrics</a></li>
+<li><a href="#_selector_script_properties">14. Selector Script Properties</a></li>
+<li><a href="#_metrics">15. Metrics</a></li>
 </ul>
 </div>
 </div>
@@ -5211,21 +5208,9 @@ Whereas static properties values are bound during application startup and do not
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.agent-properties-filter-pattern</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Regular expression applied to filter server properties that are forwarded to the agent</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">^genie\.agent\.runtime\..*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.cache-expiration-interval</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interval after which the agent properties cache is considered stale and re-calculated</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1m</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.cache-refresh-interval</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for after which the agent properties cache is forcefully refreshed in case of no access</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for after which the agent properties cache is refreshed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1m</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5480,8 +5465,8 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.runtime.*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Properties with this prefix are forwarded to each agent during startup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.configuration.dynamic.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties with this prefix are forwarded to each agent during startup (with the prefix stripped)</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
@@ -5761,6 +5746,12 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.agent-launcher-selector.properties-refresh-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for refreshing property values passed to the script.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.agent-launcher-selector.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>AgentLauncherSelectorManagedScript</code> is enabled only if this property is set.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
@@ -5779,6 +5770,12 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.properties-refresh-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for refreshing property values passed to the script.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5m</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ScriptClusterSelector</code> is enabled only if this property is set.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
@@ -5794,6 +5791,12 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.command-selector.properties-refresh-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for refreshing property values passed to the script.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5m</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -6318,10 +6321,17 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <p>Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
 The server also has a chance to override them during the 'Agent Configuration' execution stage.</p>
 </div>
-<div class="sect2">
-<h3 id="_default_properties_2"><a class="anchor" href="#_default_properties_2"></a><a class="link" href="#_default_properties_2">13.1. Default Properties</a></h3>
 <div class="sect3">
-<h4 id="_genie_properties_2"><a class="anchor" href="#_genie_properties_2"></a><a class="link" href="#_genie_properties_2">13.1.1. Genie Properties</a></h4>
+<h4 id="_properties_forwarding"><a class="anchor" href="#_properties_forwarding"></a><a class="link" href="#_properties_forwarding">13.1. Properties forwarding</a></h4>
+<div class="paragraph">
+<p>Server-side properties that match a given prefix are forwarded to all agents during agent configuration stage.
+For a property to be forwarded, it needs to be prefixed with <code>genie.agent.configuration.dynamic.</code>.</p>
+</div>
+<div class="paragraph">
+<p>Example:
+Set property <code>genie.agent.configuration.dynamic.genie.agent.runtime.emergency-shutdown-delay</code> on the server to have it
+forwarded to all agents as <code>genie.agent.runtime.emergency-shutdown-delay</code>.</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6511,9 +6521,45 @@ The server also has a chance to override them during the 'Agent Configuration' e
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_selector_script_properties"><a class="anchor" href="#_selector_script_properties"></a><a class="link" href="#_selector_script_properties">14. Selector Script Properties</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Properties with a special prefix are forwarded to the script selector runtime (with the prefix stripped).</p>
+</div>
+<div class="paragraph">
+<p>For example, server property <code>cluster-selector.canary</code> is passed to the script runtime as <code>canary</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Selector Script</th>
+<th class="tableblock halign-left valign-top">Prefix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cluster Selector Script</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>cluster-selector.</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command Selector Script</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>command-selector.</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Agent Launcher Selector Script</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agent-launcher-selector.</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="sect1">
-<h2 id="_metrics"><a class="anchor" href="#_metrics"></a><a class="link" href="#_metrics">14. Metrics</a></h2>
+<h2 id="_metrics"><a class="anchor" href="#_metrics"></a><a class="link" href="#_metrics">15. Metrics</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following is an extensive list of metrics (counters, timers, gauges, &#8230;&#8203;) published organically by Genie, in addition to metrics published by Spring, JVM and system metrics and statistics.</p>
@@ -6881,7 +6927,7 @@ It will have to be added if one is desired otherwise metrics are just published 
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.agentConfiguration.reloadProperties.timer</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to refresh the set of properties forwarded to bootstrapping agents</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to retrieve the set of properties forwarded to bootstrapping agents</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentConfigurationServiceImpl</code></p></td>
 </tr>
@@ -7128,7 +7174,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-12-04 19:11:16 UTC
+Last updated 2020-12-04 21:14:52 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
