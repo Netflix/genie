@@ -19,9 +19,8 @@ package com.netflix.genie.common.internal.dtos
 
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import org.apache.commons.codec.digest.DigestUtils
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 import spock.lang.Unroll
 
 import javax.annotation.Nullable
@@ -37,8 +36,9 @@ import java.nio.file.attribute.BasicFileAttributes
  */
 class DirectoryManifestSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
+    @TempDir
+    Path temporaryFolder
+
     Path rootPath
     String root
     Path stdoutPath
@@ -72,13 +72,16 @@ class DirectoryManifestSpec extends Specification {
     long sizeOfFiles
 
     def setup() {
-        this.rootPath = this.temporaryFolder.newFolder().toPath()
+        this.rootPath = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString()))
 
         // Valid symlink to outside of job directory
-        this.symLinkFileRealPath = this.temporaryFolder.newFile("realSymFile").toPath()
-        Files.write(this.symLinkFileRealPath, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+        this.symLinkFileRealPath = Files.write(
+            this.temporaryFolder.resolve("realSymFile"),
+            UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
+        )
         this.symLinkFilePath = Files.createSymbolicLink(
-            this.rootPath.resolve("symFile"), this.symLinkFileRealPath
+            this.rootPath.resolve("symFile"),
+            this.symLinkFileRealPath
         )
 
         // create a directory structure
@@ -144,6 +147,12 @@ class DirectoryManifestSpec extends Specification {
             this.symLinkFileRealPath,
             this.stdoutPath // In here twice to account for symlink to this file
         ].forEach({ this.sizeOfFiles += Files.size(it) })
+    }
+
+    def cleanup() {
+        Files.delete(this.cyclicSymLinkPath)
+        Files.delete(this.symLinkFilePath)
+        Files.delete(this.stdOutSymLinkPath)
     }
 
     @Unroll
@@ -226,7 +235,7 @@ class DirectoryManifestSpec extends Specification {
         // This is to document behavior
         assert !manifest.hasEntry(this.cyclicSymLink)
 
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.root).orElseThrow({ new IllegalArgumentException() }),
             this.root,
             this.rootPath,
@@ -235,7 +244,7 @@ class DirectoryManifestSpec extends Specification {
             [this.stderr, this.stdout, this.genieDir, this.clusterDir, this.applicationDir, this.symLinkFile, this.stdOutSymLink],
             false
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.stdout).orElseThrow({ new IllegalArgumentException() }),
             this.stdout,
             this.stdoutPath,
@@ -244,7 +253,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.stderr).orElseThrow({ new IllegalArgumentException() }),
             this.stderr,
             this.stderrPath,
@@ -253,7 +262,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.genieDir).orElseThrow({ new IllegalArgumentException() }),
             this.genieDir,
             this.genieDirPath,
@@ -265,7 +274,7 @@ class DirectoryManifestSpec extends Specification {
             [this.envFile, this.genieSubDir, this.cyclicSymLink],
             false
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.envFile).orElseThrow({ new IllegalArgumentException() }),
             this.envFile,
             this.envFilePath,
@@ -274,7 +283,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.genieSubDir).orElseThrow({ new IllegalArgumentException() }),
             this.genieSubDir,
             this.genieSubDirPath,
@@ -283,7 +292,7 @@ class DirectoryManifestSpec extends Specification {
             [this.exitFile],
             false
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.exitFile).orElseThrow({ new IllegalArgumentException() }),
             this.exitFile,
             this.exitFilePath,
@@ -292,7 +301,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.clusterDir).orElseThrow({ new IllegalArgumentException() }),
             this.clusterDir,
             this.clusterDirPath,
@@ -301,7 +310,7 @@ class DirectoryManifestSpec extends Specification {
             [this.clusterSetupScript],
             false
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.clusterSetupScript).orElseThrow({ new IllegalArgumentException() }),
             this.clusterSetupScript,
             this.clusterSetupScriptPath,
@@ -310,7 +319,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.applicationDir).orElseThrow({ new IllegalArgumentException() }),
             this.applicationDir,
             this.applicationDirPath,
@@ -319,7 +328,7 @@ class DirectoryManifestSpec extends Specification {
             [this.applicationSetupScript],
             false
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.applicationSetupScript).orElseThrow({ new IllegalArgumentException() }),
             this.applicationSetupScript,
             this.applicationSetupScriptPath,
@@ -328,7 +337,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.symLinkFile).orElseThrow({ new IllegalArgumentException() }),
             this.symLinkFile,
             this.symLinkFilePath,
@@ -337,7 +346,7 @@ class DirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
-        this.verifyEntry(
+        verifyEntry(
             manifest.getEntry(this.stdOutSymLink).orElseThrow({ new IllegalArgumentException() }),
             this.stdOutSymLink,
             this.stdOutSymLinkPath,
@@ -376,7 +385,7 @@ class DirectoryManifestSpec extends Specification {
         assert manifest.getTotalSizeOfFiles() == this.sizeOfFiles
     }
 
-    def verifyEntry(
+    static def verifyEntry(
         DirectoryManifest.ManifestEntry entry,
         String expectedRelativePath,
         Path expectedFile,
@@ -397,7 +406,7 @@ class DirectoryManifestSpec extends Specification {
             if (expectedMd5Present) {
                 assert entry
                     .getMd5()
-                    .orElseThrow({ new IllegalArgumentException() }) == expectedFile.withInputStream {
+                    .orElseThrow({ new IllegalArgumentException() }) == expectedFile.toFile().withInputStream {
                     return DigestUtils.md5Hex(it)
                 }
             } else {

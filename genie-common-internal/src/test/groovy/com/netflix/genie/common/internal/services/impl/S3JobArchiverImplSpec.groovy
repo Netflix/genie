@@ -23,9 +23,11 @@ import com.amazonaws.services.s3.transfer.MultipleFileUpload
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * Specifications for {@link S3JobArchiverImpl}.
@@ -33,8 +35,8 @@ import spock.lang.Specification
  * @author standon
  */
 class S3JobArchiverImplSpec extends Specification {
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
     S3ClientFactory s3ClientFactory
     TransferManager transferManager
     S3JobArchiverImpl s3ArchivalService
@@ -65,7 +67,7 @@ class S3JobArchiverImplSpec extends Specification {
         this.s3ClientFactory = Mock(S3ClientFactory)
         this.transferManager = Mock(TransferManager)
         this.s3ArchivalService = new S3JobArchiverImpl(this.s3ClientFactory)
-        this.jobDir = this.temporaryFolder.newFolder()
+        this.jobDir = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toFile()
         this.stdout = new File(jobDir, "stdout")
         this.stdout.createNewFile()
         this.stdout.write("Stdout content")

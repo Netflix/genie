@@ -19,13 +19,11 @@ package com.netflix.genie.common.internal.services.impl
 
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
-import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.common.internal.services.JobArchiver
 import org.apache.commons.lang3.StringUtils
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -39,25 +37,25 @@ import java.util.stream.Collectors
  */
 class JobArchiveServiceImplSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
+    @TempDir
+    Path temporaryFolder
 
     def "When archiveDirectory is invoked a valid manifest is written into the expected directory"() {
         def skippedArchiver = Mock(JobArchiver)
         def archiver = Mock(JobArchiver)
         DirectoryManifest.Factory directoryManifestFactory = Mock(DirectoryManifest.Factory)
         def service = new JobArchiveServiceImpl([skippedArchiver, archiver], directoryManifestFactory)
-        def jobDirectory = this.temporaryFolder.newFolder().toPath()
+        def jobDirectory = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString()))
         def someFilePath = jobDirectory.resolve("someFile")
         Files.write(someFilePath, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         Files.createDirectory(jobDirectory.resolve("subDir"))
-        def target = this.temporaryFolder.newFolder().toURI()
+        def target = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toUri()
         def manifestDirectoryPath = StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)
             ? jobDirectory
             : jobDirectory.resolve(JobArchiveService.MANIFEST_DIRECTORY)
         def manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME)
         def originalManifest = new DirectoryManifest.Factory().getDirectoryManifest(jobDirectory, true)
-        def filesList = [manifestPath, someFilePath].stream().map({path -> path.toFile()}).collect(Collectors.toList())
+        def filesList = [manifestPath, someFilePath].stream().map({ path -> path.toFile() }).collect(Collectors.toList())
 
         when:
         service.archiveDirectory(jobDirectory, target)

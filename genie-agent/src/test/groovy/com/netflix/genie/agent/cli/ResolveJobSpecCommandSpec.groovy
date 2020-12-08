@@ -23,14 +23,16 @@ import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.util.GenieObjectMapper
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 class ResolveJobSpecCommandSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
     ResolveJobSpecCommand.ResolveJobSpecCommandArguments commandArgs
     AgentJobService service
@@ -102,7 +104,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         String specId = "12345"
 
         when:
-        ExitCode exitCode = command.run()
+        command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> specId
@@ -114,7 +116,7 @@ class ResolveJobSpecCommandSpec extends Specification {
     def "Write spec to file"() {
         setup:
         String specId = "12345"
-        File outputFile = new File(temporaryFolder.getRoot(), "spec.json")
+        File outputFile = this.temporaryFolder.resolve( "spec.json").toFile()
 
         when:
         ExitCode exitCode = command.run()
@@ -131,10 +133,10 @@ class ResolveJobSpecCommandSpec extends Specification {
     def "Write spec to file that exists"() {
         setup:
         String specId = "12345"
-        File outputFile = temporaryFolder.newFile()
+        File outputFile = Files.createFile(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toFile()
 
         when:
-        ExitCode exitCode = command.run()
+        command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> specId
@@ -148,7 +150,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         setup:
 
         when:
-        ExitCode exitCode = command.run()
+        command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> " "
@@ -164,7 +166,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         setup:
 
         when:
-        ExitCode exitCode = command.run()
+        command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> " "

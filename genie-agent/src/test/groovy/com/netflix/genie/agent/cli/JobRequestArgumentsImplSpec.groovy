@@ -22,14 +22,16 @@ import com.beust.jcommander.ParameterException
 import com.beust.jcommander.ParametersDelegate
 import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.external.util.GenieObjectMapper
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 class JobRequestArgumentsImplSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
     MainCommandArguments commandArguments
     TestOptions options
     JCommander jCommander
@@ -81,11 +83,11 @@ class JobRequestArgumentsImplSpec extends Specification {
     def "Parse"() {
         setup:
         def archiveLocationPrefix = "s3://bucket/" + UUID.randomUUID().toString()
-        File cfg1 = temporaryFolder.newFile("cfg1.cfg")
-        File cfg2 = temporaryFolder.newFile("cfg2.cfg")
-        File dep1 = temporaryFolder.newFile("dep1.bin")
-        File dep2 = temporaryFolder.newFile("dep2.jar")
-        File setup = temporaryFolder.newFile("setup.sh")
+        Path cfg1 = Files.createFile(temporaryFolder.resolve("cfg1.cfg"))
+        Path cfg2 = Files.createFile(temporaryFolder.resolve("cfg2.cfg"))
+        Path dep1 = Files.createFile(temporaryFolder.resolve("dep1.bin"))
+        Path dep2 = Files.createFile(temporaryFolder.resolve("dep2.jar"))
+        Path setup = Files.createFile(temporaryFolder.resolve("setup.sh"))
 
         when:
         jCommander.parse(
@@ -109,11 +111,11 @@ class JobRequestArgumentsImplSpec extends Specification {
             "--job-version", "1.0",
             "--job-metadata", "{\"foo\": false}",
             "--api-job",
-            "--job-configuration", cfg1.getPath().toString(),
-            "--job-configuration", cfg2.getPath().toString(),
-            "--job-dependency", dep1.getPath().toString(),
-            "--job-dependency", dep2.getPath().toString(),
-            "--job-setup", setup.getPath().toString(),
+            "--job-configuration", cfg1.toString(),
+            "--job-configuration", cfg2.toString(),
+            "--job-dependency", dep1.toString(),
+            "--job-dependency", dep2.toString(),
+            "--job-setup", setup.toString(),
             "--disable-archiving"
         )
 
@@ -148,8 +150,8 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.isArchivingDisabled()
     }
 
-    String fileResource(final File file) {
-        return "file:" + file.toPath().toAbsolutePath().toString()
+    static String fileResource(final Path file) {
+        return "file:" + file.toAbsolutePath().toString()
     }
 
     def "Unknown parameters throw"() {
@@ -194,10 +196,10 @@ class JobRequestArgumentsImplSpec extends Specification {
     def "Invalid file references throw ParameterException"() {
 
         setup:
-        File folder = temporaryFolder.newFolder()
+        Path folder = Files.createDirectory(temporaryFolder.resolve(UUID.randomUUID().toString()))
 
         when:
-        jCommander.parse("--job-dependency", folder.toPath().toString())
+        jCommander.parse("--job-dependency", folder.toString())
 
         then:
         thrown(ParameterException)

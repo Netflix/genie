@@ -23,14 +23,15 @@ import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
 import com.netflix.genie.web.properties.AttachmentServiceProperties
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.util.unit.DataSize
 import spock.lang.Specification
+import spock.lang.TempDir
 import spock.lang.Unroll
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.stream.Collectors
 
@@ -39,13 +40,13 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
     AttachmentServiceProperties serviceProperties
     LocalFileSystemAttachmentServiceImpl service
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
 
     def setup() {
         this.serviceProperties = new AttachmentServiceProperties()
-        this.serviceProperties.setLocationPrefix(temporaryFolder.getRoot().toURI())
+        this.serviceProperties.setLocationPrefix(this.temporaryFolder.toUri())
         this.serviceProperties.setMaxSize(DataSize.ofBytes(100))
         this.serviceProperties.setMaxTotalSize(DataSize.ofBytes(150))
         this.service = new LocalFileSystemAttachmentServiceImpl(serviceProperties)
@@ -63,8 +64,8 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
 
     @Unroll
     def "saveAttachments (job id present: #jobIdPresent)"() {
-        File input1 = temporaryFolder.newFile("file1.txt")
-        File input2 = temporaryFolder.newFile("file2.txt")
+        File input1 = Files.createFile(this.temporaryFolder.resolve("file1.txt")).toFile()
+        File input2 = Files.createFile(this.temporaryFolder.resolve("file2.txt")).toFile()
         input1.write(RandomStringUtils.randomAscii(50))
         input2.write(RandomStringUtils.randomAscii(80))
         Resource resource1 = new FileSystemResource(input1)
@@ -81,7 +82,7 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
 
         then:
         attachmentUris.size() == 2
-        List<String> attachmentsList = attachmentUris.stream().map({uri -> Paths.get(uri).toAbsolutePath().toString()}).collect(Collectors.toList())
+        List<String> attachmentsList = attachmentUris.stream().map({ uri -> Paths.get(uri).toAbsolutePath().toString() }).collect(Collectors.toList())
         Collections.sort(attachmentsList)
         FileUtils.contentEquals(new File(attachmentsList.get(0)), input1)
         FileUtils.contentEquals(new File(attachmentsList.get(1)), input2)
@@ -92,8 +93,8 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
 
     @Unroll
     def "reject attachments with sizes: #firstFileSize and #secondFileSize"() {
-        File input1 = temporaryFolder.newFile("file1.txt")
-        File input2 = temporaryFolder.newFile("file2.txt")
+        File input1 = Files.createFile(this.temporaryFolder.resolve("file1.txt")).toFile()
+        File input2 = Files.createFile(this.temporaryFolder.resolve("file2.txt")).toFile()
         input1.write(RandomStringUtils.randomAscii(firstFileSize))
         input2.write(RandomStringUtils.randomAscii(secondFileSize))
         Resource resource1 = new FileSystemResource(input1)
@@ -115,7 +116,7 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
     }
 
     def "saveAttachments copy exception (job id present: #jobIdPresent)"() {
-        File input = temporaryFolder.newFile("file1.txt")
+        File input = Files.createFile(this.temporaryFolder.resolve("file1.txt")).toFile()
         input.write(RandomStringUtils.randomAscii(50))
         Resource resource = new FileSystemResource(input)
         Set<Resource> attachments = Sets.newHashSet(resource)

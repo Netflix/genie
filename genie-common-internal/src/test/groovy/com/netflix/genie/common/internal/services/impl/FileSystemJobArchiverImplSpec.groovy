@@ -19,9 +19,8 @@ package com.netflix.genie.common.internal.services.impl
 
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
 import org.apache.commons.codec.digest.DigestUtils
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.FileVisitResult
@@ -40,13 +39,12 @@ import java.util.stream.Stream
  */
 class FileSystemJobArchiverImplSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
     def "Can archive job directory"() {
-        setup:
-        def source = this.temporaryFolder.newFolder().toPath()
-        def target = this.temporaryFolder.newFolder().toPath()
+        def source = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString()))
+        def target = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString()))
         def archiver = new FileSystemJobArchiverImpl()
 
         // create a directory structure
@@ -97,7 +95,6 @@ class FileSystemJobArchiverImplSpec extends Specification {
     }
 
     class FileListVisitor implements FileVisitor<Path> {
-
         Path root
         Map<Path, byte[]> visitedFiles = [:]
         List<Path> visitedFilesAndDirectories = []
@@ -105,7 +102,6 @@ class FileSystemJobArchiverImplSpec extends Specification {
         FileListVisitor(Path root) {
             this.root = root
         }
-
 
         @Override
         FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
@@ -133,28 +129,35 @@ class FileSystemJobArchiverImplSpec extends Specification {
     }
 
     def "Test error cases"() {
-        setup:
         def archiver = new FileSystemJobArchiverImpl()
 
         when: "source doesn't exist"
-        def sourceDoesNotExist = this.temporaryFolder.getRoot().toPath().resolve(UUID.randomUUID().toString())
-        archiver.archiveDirectory(sourceDoesNotExist, [], this.temporaryFolder.newFolder().toPath().toUri())
+        def sourceDoesNotExist = this.temporaryFolder.resolve(UUID.randomUUID().toString())
+        archiver.archiveDirectory(
+            sourceDoesNotExist,
+            [],
+            Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toUri()
+        )
 
         then: "An exception is thrown"
         thrown(JobArchiveException)
 
         when: "source isn't a directory"
-        def sourceIsFile = this.temporaryFolder.newFile().toPath()
-        archiver.archiveDirectory(sourceIsFile, [], this.temporaryFolder.newFolder().toPath().toUri())
+        def sourceIsFile = Files.createFile(this.temporaryFolder.resolve(UUID.randomUUID().toString()))
+        archiver.archiveDirectory(
+            sourceIsFile,
+            [],
+            Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toUri()
+        )
 
         then: "An exception is thrown"
         thrown(JobArchiveException)
 
         when: "Target exists but is a file"
         archiver.archiveDirectory(
-            this.temporaryFolder.newFolder().toPath(),
+            Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString())),
             [],
-            this.temporaryFolder.newFile().toPath().toUri()
+            Files.createFile(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toUri()
         )
 
         then: "An exception is thrown"
@@ -162,9 +165,9 @@ class FileSystemJobArchiverImplSpec extends Specification {
 
         when: "Target cannot be copied"
         def target = Paths.get("/dev/null/foo")
-        def file = this.temporaryFolder.newFile()
+        def file = Files.createFile(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toFile()
         archiver.archiveDirectory(
-            this.temporaryFolder.getRoot().toPath(),
+            this.temporaryFolder,
             [file],
             target.toUri()
         )
@@ -174,11 +177,10 @@ class FileSystemJobArchiverImplSpec extends Specification {
     }
 
     def "Test reject"() {
-        setup:
         def archiver = new FileSystemJobArchiverImpl()
 
         when:
-        def accept = archiver.archiveDirectory(temporaryFolder.getRoot().toPath(), [], new URI("ftp:///foo/bar"))
+        def accept = archiver.archiveDirectory(this.temporaryFolder, [], new URI("ftp:///foo/bar"))
 
         then:
         !accept
