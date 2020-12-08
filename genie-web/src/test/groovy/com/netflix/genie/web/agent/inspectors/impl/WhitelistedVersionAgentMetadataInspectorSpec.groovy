@@ -36,7 +36,7 @@ class WhitelistedVersionAgentMetadataInspectorSpec extends Specification {
     }
 
     @Unroll
-    def "Match #agentVersion against #blacklistExpression and expect #expectedDecision"() {
+    def "Match #agentVersion against #whitelistExpression and expect #expectedDecision"() {
 
         InspectionReport decision
 

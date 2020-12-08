@@ -17,21 +17,22 @@
  */
 package com.netflix.genie.agent.execution.services.impl
 
+import com.google.common.collect.Sets
 import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.utils.locks.CloseableLock
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory
 import org.apache.commons.lang3.tuple.Pair
-import org.assertj.core.util.Sets
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
 
 class FetchingCacheServiceImplSpec extends Specification {
@@ -42,12 +43,12 @@ class FetchingCacheServiceImplSpec extends Specification {
     Resource resource
     long DEFAULT_RESOURCE_LAST_MODIFIED_TS = 100
     URI uri
-    FileLockFactory fileLockFactory;
-    CloseableLock lock;
+    FileLockFactory fileLockFactory
+    CloseableLock lock
     ReentrantLock reentrantLock = new ReentrantLock()
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
     @Shared
     def fetchingCacheServiceCleanUpTaskExecutor = new ThreadPoolTaskExecutor()
@@ -61,12 +62,12 @@ class FetchingCacheServiceImplSpec extends Specification {
         this.fetchingCacheServiceCleanUpTaskExecutor.shutdown()
     }
 
-    void setup() {
+    def setup() {
         resourceLoader = Mock()
         cacheArguments = Mock()
-        cacheArguments.getCacheDirectory() >> temporaryFolder.getRoot()
+        cacheArguments.getCacheDirectory() >> temporaryFolder.toFile()
         resource = Mock()
-        fileLockFactory = Mock();
+        fileLockFactory = Mock()
         lock = Mock()
         fileLockFactory.getLock(_ as File) >> lock
         lock.lock() >> reentrantLock.lock()
@@ -78,7 +79,7 @@ class FetchingCacheServiceImplSpec extends Specification {
     def "Get resource not cached. Get resources cached"() {
         setup:
         String fileContents = "example file contents\n"
-        File targetFile = new File(temporaryFolder.getRoot(), "target")
+        File targetFile = temporaryFolder.resolve("target").toFile()
         File cachedFile = cache.getCacheResourceVersionDataFile(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
         File lockFile = cache.getCacheResourceVersionLockFile(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
         File downloadDataFile = cache.getCacheResourceVersionDownloadFile(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
@@ -113,12 +114,12 @@ class FetchingCacheServiceImplSpec extends Specification {
     def "Download new version, delete previous version"() {
         setup:
         String fileContents = "example file contents\n"
-        File targetFile = new File(temporaryFolder.getRoot(), "target")
+        File targetFile = this.temporaryFolder.resolve("target").toFile()
         File cachedFile = cache.getCacheResourceVersionDataFile(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
         File downloadDataFile = cache.getCacheResourceVersionDownloadFile(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
         File lockFile = cache.getCacheResourceVersionLockFile(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
         File resourceVersionDirectory = cache.getCacheResourceVersionDir(cache.getResourceCacheId(uri), DEFAULT_RESOURCE_LAST_MODIFIED_TS)
-        File targetFile2 = new File(temporaryFolder.getRoot(), "target2")
+        File targetFile2 = this.temporaryFolder.resolve("target2").toFile()
         long newerVersionLastModifiedTimestamp = DEFAULT_RESOURCE_LAST_MODIFIED_TS + 1
         File cachedFile2 = cache.getCacheResourceVersionDataFile(cache.getResourceCacheId(uri), newerVersionLastModifiedTimestamp)
         File lockFile2 = cache.getCacheResourceVersionLockFile(cache.getResourceCacheId(uri), newerVersionLastModifiedTimestamp)
@@ -163,7 +164,7 @@ class FetchingCacheServiceImplSpec extends Specification {
 
     def "Get resource nonexistent"() {
         setup:
-        File targetFile = new File(temporaryFolder.getRoot(), "target")
+        File targetFile = this.temporaryFolder.resolve("target").toFile()
 
         when:
         cache.get(uri, targetFile)
@@ -177,7 +178,7 @@ class FetchingCacheServiceImplSpec extends Specification {
 
     def "Download resource error"() {
         setup:
-        File targetFile = new File(temporaryFolder.getRoot(), "target")
+        File targetFile = this.temporaryFolder.resolve("target").toFile()
 
         when:
         cache.get(uri, targetFile)
@@ -198,9 +199,9 @@ class FetchingCacheServiceImplSpec extends Specification {
             new URI("https://my-server.com/path/to/dependencies/bin.tar.gz")
         ]
         File[] targetFiles = [
-            temporaryFolder.newFile("config.xml"),
-            temporaryFolder.newFile("setup.sh"),
-            temporaryFolder.newFile("bin.tar.gz")
+            Files.createFile(this.temporaryFolder.resolve("config.xml")).toFile(),
+            Files.createFile(this.temporaryFolder.resolve("setup.sh")).toFile(),
+            Files.createFile(this.temporaryFolder.resolve("bin.tar.gz")).toFile()
         ]
         Resource[] resources = [
             Mock(Resource),
@@ -250,7 +251,7 @@ class FetchingCacheServiceImplSpec extends Specification {
     def "Construct: create a dir succesfully"() {
         setup:
         ArgumentDelegates.CacheArguments goodCacheArguments = Mock()
-        File cacheDir = new File(temporaryFolder.getRoot(), "genie-cache")
+        File cacheDir = this.temporaryFolder.resolve("genie-cache").toFile()
 
         when:
         new FetchingCacheServiceImpl(resourceLoader, goodCacheArguments, fileLockFactory, fetchingCacheServiceCleanUpTaskExecutor)
@@ -268,7 +269,7 @@ class FetchingCacheServiceImplSpec extends Specification {
         new FetchingCacheServiceImpl(resourceLoader, badCacheArguments, fileLockFactory, fetchingCacheServiceCleanUpTaskExecutor)
 
         then:
-        1 * badCacheArguments.getCacheDirectory() >> temporaryFolder.newFile()
+        1 * badCacheArguments.getCacheDirectory() >> Files.createFile(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toFile()
         thrown(IOException)
     }
 }

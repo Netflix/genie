@@ -21,10 +21,9 @@ import com.netflix.genie.agent.cli.logging.AgentLogManagerLog4j2Impl
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.appender.FileAppender
 import org.apache.logging.log4j.core.config.Configuration
-import org.junit.Ignore
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import spock.lang.Ignore
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -38,16 +37,16 @@ class AgentLogManagerSpec extends Specification {
     Path temporaryLogFilePath
     Path newLogFilePath
 
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
+    @TempDir
+    Path temporaryFolder
 
     void setup() {
         this.loggerContext = Mock(LoggerContext)
         this.configuration = Mock(Configuration)
-        this.temporaryLogFilePath = Paths.get(temporaryFolder.getRoot().toString(), "agent.log")
+        this.temporaryLogFilePath = this.temporaryFolder.resolve("agent.log")
         this.newLogFilePath = Paths.get(temporaryFolder.getRoot().toString(), "agent-relocated.log")
         this.appender = GroovyMock(FileAppender)
-        Files.createFile(temporaryLogFilePath)
+        Files.createFile(this.temporaryLogFilePath)
     }
 
     def "Relocate successfully"() {

@@ -30,21 +30,21 @@ import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.jobs.JobConstants
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.ClassPathResource
 import spock.lang.Specification
+import spock.lang.TempDir
 import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.stream.Collectors
 
 class JobSetupServiceImplSpec extends Specification {
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
-    JobSetupService service;
+    JobSetupService service
     DownloadService downloadService
 
     ExecutionContext executionContext
@@ -97,7 +97,7 @@ class JobSetupServiceImplSpec extends Specification {
     JobSetupServiceProperties jobSetupProperties
     AgentProperties agentProperties
 
-    void setup() {
+    def setup() {
         this.executionContext = Mock(ExecutionContext)
 
         this.manifestUris = Sets.newHashSet()
@@ -113,7 +113,7 @@ class JobSetupServiceImplSpec extends Specification {
         }
 
         this.jobId = UUID.randomUUID().toString()
-        this.jobDir = new File(temporaryFolder.getRoot(), jobId)
+        this.jobDir = this.temporaryFolder.resolve(jobId).toFile()
         this.jobSetup = Optional.empty()
         this.jobConfigs = []
         this.jobDeps = []
@@ -200,7 +200,7 @@ class JobSetupServiceImplSpec extends Specification {
             _ * getCluster() >> cluster
             _ * getCommand() >> command
             _ * getJob() >> job
-            _ * getJobDirectoryLocation() >> temporaryFolder.getRoot()
+            _ * getJobDirectoryLocation() >> temporaryFolder.toFile()
             _ * getEnvironmentVariables() >> jobServerEnvMap
         }
 
@@ -237,7 +237,7 @@ class JobSetupServiceImplSpec extends Specification {
         JobSpecification.ExecutionResource app1 = Mock(JobSpecification.ExecutionResource)
         JobSpecification.ExecutionResource app2 = Mock(JobSpecification.ExecutionResource)
 
-        def testDirectory = temporaryFolder.newFolder("createJobDirectory")
+        def testDirectory = Files.createDirectory(this.temporaryFolder.resolve("createJobDirectory")).toFile()
 
         when: "Create directory that already exists"
         new File(testDirectory, id2).createNewFile()
@@ -334,7 +334,7 @@ class JobSetupServiceImplSpec extends Specification {
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> downloadedFiles = service.downloadJobResources(spec, jobDirectory)
+        service.downloadJobResources(spec, jobDirectory)
         File jobScript = service.createJobScript(spec, jobDirectory)
 
         then:
@@ -389,7 +389,7 @@ class JobSetupServiceImplSpec extends Specification {
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> downloadedFiles = service.downloadJobResources(spec, jobDirectory)
+        service.downloadJobResources(spec, jobDirectory)
         File jobScript = service.createJobScript(spec, jobDirectory)
 
         then:
@@ -440,7 +440,7 @@ class JobSetupServiceImplSpec extends Specification {
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> downloadedFiles = service.downloadJobResources(spec, jobDirectory)
+        service.downloadJobResources(spec, jobDirectory)
         File jobScript = service.createJobScript(spec, jobDirectory)
 
         then:
@@ -489,7 +489,7 @@ class JobSetupServiceImplSpec extends Specification {
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
+        service.downloadJobResources(spec, jobDirectory)
 
         then:
         1 * downloadService.newManifestBuilder() >> manifestBuilder
@@ -502,7 +502,7 @@ class JobSetupServiceImplSpec extends Specification {
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
+        service.downloadJobResources(spec, jobDirectory)
 
         then:
         1 * downloadService.newManifestBuilder() >> manifestBuilder
@@ -518,7 +518,7 @@ class JobSetupServiceImplSpec extends Specification {
             jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
             jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
             jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
-        ].collect { new File(temporaryFolder.getRoot(), it) }
+        ].collect { this.temporaryFolder.resolve(it).toFile() }
 
         File[] otherFiles = [
             jobId + "/run",
@@ -527,7 +527,7 @@ class JobSetupServiceImplSpec extends Specification {
             jobId + "/genie/genie.done",
             jobId + "/stdout",
             jobId + "/stderr"
-        ].collect { new File(temporaryFolder.getRoot(), it) }
+        ].collect { this.temporaryFolder.resolve(it).toFile() }
 
         def allFiles = dependencies + otherFiles as File[]
 
@@ -539,7 +539,7 @@ class JobSetupServiceImplSpec extends Specification {
                 Files.createFile(file.toPath())
         }
 
-        File jobDirectory = new File(temporaryFolder.getRoot(), jobId)
+        File jobDirectory = this.temporaryFolder.resolve(jobId).toFile()
 
         when:
         service.cleanupJobDirectory(jobDirectory.toPath(), CleanupStrategy.NO_CLEANUP)
@@ -557,7 +557,7 @@ class JobSetupServiceImplSpec extends Specification {
             jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
             jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
             jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
-        ].collect { new File(temporaryFolder.getRoot(), it) }
+        ].collect { this.temporaryFolder.resolve(it).toFile() }
 
         File[] otherFiles = [
             jobId + "/run",
@@ -566,7 +566,7 @@ class JobSetupServiceImplSpec extends Specification {
             jobId + "/genie/genie.done",
             jobId + "/stdout",
             jobId + "/stderr"
-        ].collect { new File(temporaryFolder.getRoot(), it) }
+        ].collect { this.temporaryFolder.resolve(it).toFile() }
 
         def allFiles = dependencies + otherFiles as File[]
 
@@ -578,7 +578,7 @@ class JobSetupServiceImplSpec extends Specification {
                 Files.createFile(file.toPath())
         }
 
-        File jobDirectory = new File(temporaryFolder.getRoot(), jobId)
+        File jobDirectory = this.temporaryFolder.resolve(jobId).toFile()
 
         when:
         service.cleanupJobDirectory(jobDirectory.toPath(), CleanupStrategy.FULL_CLEANUP)
@@ -593,7 +593,7 @@ class JobSetupServiceImplSpec extends Specification {
             jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
             jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
             jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
-        ].collect { new File(temporaryFolder.getRoot(), it) }
+        ].collect { this.temporaryFolder.resolve(it).toFile() }
 
         File[] otherFiles = [
             jobId + "/run",
@@ -609,7 +609,7 @@ class JobSetupServiceImplSpec extends Specification {
             jobId + "/stderr",
             jobId + "/script.presto",
             "dependencies/foo.txt"
-        ].collect { new File(temporaryFolder.getRoot(), it) }
+        ].collect { this.temporaryFolder.resolve(it).toFile() }
 
         def allFiles = dependencies + otherFiles as File[]
 
@@ -621,7 +621,7 @@ class JobSetupServiceImplSpec extends Specification {
                 Files.createFile(file.toPath())
         }
 
-        File jobDirectory = new File(temporaryFolder.getRoot(), jobId)
+        File jobDirectory = this.temporaryFolder.resolve(jobId).toFile()
 
         when:
         service.cleanupJobDirectory(jobDirectory.toPath(), CleanupStrategy.DEPENDENCIES_CLEANUP)

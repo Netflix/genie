@@ -21,16 +21,17 @@ import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.FetchingCacheService
 import org.apache.commons.lang3.tuple.Pair
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.mockito.internal.util.collections.Sets
 import spock.lang.Specification
+import spock.lang.TempDir
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.stream.Collectors
 
 class DownloadServiceImplSpec extends Specification {
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
     FetchingCacheService cacheService
     DownloadServiceImpl downloadService
@@ -40,18 +41,18 @@ class DownloadServiceImplSpec extends Specification {
     File fileInCache
     String fileContents = "Example content of a file in cache\n"
 
-    void setup() {
+    def setup() {
         cacheService = Mock()
         downloadService = new DownloadServiceImpl(cacheService)
         manifest = Mock()
-        cacheDir = temporaryFolder.newFolder("cache")
-        jobDir = temporaryFolder.newFolder("job")
+        cacheDir = Files.createDirectory(this.temporaryFolder.resolve("cache")).toFile()
+        jobDir = Files.createDirectory(this.temporaryFolder.resolve("job")).toFile()
         fileInCache = new File(cacheDir, "cached-file")
         fileInCache.createNewFile()
         fileInCache.write(fileContents)
     }
 
-    void cleanup() {
+    def cleanup() {
     }
 
     def "Download empty manifest"() {

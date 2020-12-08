@@ -18,24 +18,26 @@
 package com.netflix.genie.agent.utils.locks.impl
 
 import com.netflix.genie.agent.execution.exceptions.LockException
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * Specifications for the {@link FileLock} class.
  *
- * @author standon* @since 4.0.0
+ * @author standon
  */
 class FileLockSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path tmpDir
 
     def "Valid file returns a lock"() {
         FileLock lock
         when:
-        lock = new FileLock(temporaryFolder.newFile())
+        lock = new FileLock(Files.createFile(this.tmpDir.resolve(UUID.randomUUID().toString())).toFile())
 
         then:
         lock != null
@@ -43,7 +45,7 @@ class FileLockSpec extends Specification {
 
     def "Throws exception for bad file"() {
         when:
-        new FileLock(new File(temporaryFolder.getRoot(), UUID.randomUUID().toString()))
+        new FileLock(this.tmpDir.resolve(UUID.randomUUID().toString()).toFile())
 
         then:
         thrown(LockException)

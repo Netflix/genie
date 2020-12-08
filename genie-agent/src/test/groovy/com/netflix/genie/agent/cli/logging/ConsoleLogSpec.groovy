@@ -17,9 +17,6 @@
  */
 package com.netflix.genie.agent.cli.logging
 
-
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.slf4j.Logger
 import org.springframework.core.env.Environment
 import spock.lang.Specification
@@ -28,9 +25,6 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 class ConsoleLogSpec extends Specification {
-
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def "GetLogger"() {
         when:

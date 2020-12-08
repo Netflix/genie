@@ -24,57 +24,57 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import spock.lang.IgnoreIf
 import spock.lang.Specification
+import spock.lang.TempDir
 import spock.lang.Unroll
 import spock.util.environment.OperatingSystem
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
 
 @IgnoreIf({ OperatingSystem.getCurrent().isWindows() })
 class JobProcessManagerImplSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder
+    @TempDir
+    Path temporaryFolder
 
     File stdOut
     File stdErr
     TaskScheduler scheduler
     JobProcessManager manager
 
-    void setup() {
-        this.stdOut = PathUtils.jobStdOutPath(temporaryFolder.getRoot()).toFile()
-        this.stdErr = PathUtils.jobStdErrPath(temporaryFolder.getRoot()).toFile()
+    def setup() {
+        this.stdOut = PathUtils.jobStdOutPath(temporaryFolder.toFile()).toFile()
+        this.stdErr = PathUtils.jobStdErrPath(temporaryFolder.toFile()).toFile()
         Files.createDirectories(this.stdOut.getParentFile().toPath())
         Files.createDirectories(this.stdErr.getParentFile().toPath())
         this.scheduler = Mock(TaskScheduler)
         this.manager = new JobProcessManagerImpl(this.scheduler)
     }
 
-    void cleanup() {
+    def cleanup() {
     }
 
     @Unroll
     def "LaunchProcess, (interactive: #interactive)"() {
-        File expectedFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
+        File expectedFile = this.temporaryFolder.resolve(UUID.randomUUID().toString()).toFile()
         assert !expectedFile.exists()
 
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.append("echo Hello stdout;\n");
-        jobScript.append("echo Hello stderr 1>&2;\n");
-        jobScript.append("touch " + expectedFile + ";\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.append("echo Hello stdout;\n")
+        jobScript.append("echo Hello stderr 1>&2;\n")
+        jobScript.append("touch " + expectedFile + ";\n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             interactive,
             null,
@@ -107,15 +107,15 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "LaunchProcess changing directory before launch"() {
-        String expectedString = this.temporaryFolder.getRoot().getPath()
+        String expectedString = this.temporaryFolder
 
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("pwd\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("pwd\n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             false,
             null,
@@ -139,15 +139,15 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "LaunchProcess script error"() {
-        File nonExistentFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
+        File nonExistentFile = this.temporaryFolder.resolve(UUID.randomUUID().toString()).toFile()
 
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("cat " + nonExistentFile + "\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("cat " + nonExistentFile + "\n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             false,
             null,
@@ -171,18 +171,18 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "LaunchProcess script setup error"() {
-        File nonExistentFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
+        File nonExistentFile = this.temporaryFolder.resolve(UUID.randomUUID().toString()).toFile()
 
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("source " + nonExistentFile + "\n");
-        File setupFailedFile = PathUtils.jobSetupErrorMarkerFilePath(this.temporaryFolder.getRoot()).toFile()
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("source " + nonExistentFile + "\n")
+        File setupFailedFile = PathUtils.jobSetupErrorMarkerFilePath(this.temporaryFolder.toFile()).toFile()
         Files.createDirectories(setupFailedFile.getParentFile().toPath())
         setupFailedFile.write("See setup log for details")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             false,
             null,
@@ -223,7 +223,7 @@ class JobProcessManagerImplSpec extends Specification {
     def "Job directory not a directory"() {
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.newFile("foo"),
+            Files.createFile(this.temporaryFolder.resolve("foo")).toFile(),
             Mock(File),
             false,
             null,
@@ -238,7 +238,7 @@ class JobProcessManagerImplSpec extends Specification {
     def "Job folder not existing"() {
         when:
         this.manager.launchProcess(
-            new File(this.temporaryFolder.getRoot(), "foo"),
+            this.temporaryFolder.resolve("foo").toFile(),
             Mock(File),
             false,
             null,
@@ -253,7 +253,7 @@ class JobProcessManagerImplSpec extends Specification {
     def "Script is null"() {
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             null,
             false,
             null,
@@ -266,12 +266,12 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Script does not exist"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            null,
+            this.temporaryFolder.toFile(),
+            jobScript,
             false,
             null,
             false
@@ -283,13 +283,13 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Script is not not executable"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
         jobScript.write("echo hello world")
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            null,
+            this.temporaryFolder.toFile(),
+            jobScript,
             false,
             null,
             false
@@ -303,13 +303,13 @@ class JobProcessManagerImplSpec extends Specification {
     def "Kill running process"() {
         def future = Mock(ScheduledFuture)
 
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("sleep 60 \n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("sleep 60 \n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             59,
@@ -340,13 +340,13 @@ class JobProcessManagerImplSpec extends Specification {
 
     @Unroll
     def "Kill running process via event (source: #killSource)"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("sleep 60 \n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("sleep 60 \n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             null,
@@ -388,13 +388,13 @@ class JobProcessManagerImplSpec extends Specification {
     //       Why should a job that is completed successfully be marked as killed instead of successful? we should fix
     //       this case
     def "Kill completed process"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("echo\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("echo\n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             null,
@@ -426,8 +426,8 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Skip process launch"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("echo\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("echo\n")
         jobScript.setExecutable(true)
 
         when:
@@ -438,7 +438,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             10,
@@ -463,13 +463,13 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Double launch"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("echo\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("echo\n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             null,
@@ -482,7 +482,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         when:
         this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             null,
@@ -503,8 +503,8 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Job killed due to timeout"() {
-        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
-        jobScript.write("sleep 60\n");
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write("sleep 60\n")
         jobScript.setExecutable(true)
 
         // This really are more of an integration test...
@@ -517,7 +517,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         when:
         realManager.launchProcess(
-            this.temporaryFolder.getRoot(),
+            this.temporaryFolder.toFile(),
             jobScript,
             true,
             1,
