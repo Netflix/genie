@@ -122,7 +122,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getAttributes().get("genie_job_id") == JOB_ID
         requestCapture.getContainer().getResources().getCpu() == 3
         requestCapture.getContainer().getResources().getGpu() == 0
-        requestCapture.getContainer().getResources().getMemoryMB() == 1024
+        requestCapture.getContainer().getResources().getMemoryMB() == 1024 + 2048
         requestCapture.getContainer().getResources().getDiskMB() == launcherProperties.getDiskSize().toMegabytes()
         requestCapture.getContainer().getResources().getNetworkMbps() == launcherProperties.getNetworkBandwidth().toMegabytes() * 8
         requestCapture.getContainer().getSecurityProfile().getAttributes() == launcherProperties.getSecurityAttributes()
