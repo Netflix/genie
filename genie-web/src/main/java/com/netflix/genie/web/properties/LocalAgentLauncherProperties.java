@@ -54,6 +54,11 @@ public class LocalAgentLauncherProperties {
     public static final String ENABLE_PROPERTY = PROPERTY_PREFIX + ".enabled";
 
     /**
+     * Placeholder for server hostname in command-line-template.
+     */
+    public static final String SERVER_HOST_PLACEHOLDER = "<SERVER_HOST_PLACEHOLDER>";
+
+    /**
      * Placeholder for server port in command-line-template.
      */
     public static final String SERVER_PORT_PLACEHOLDER = "<SERVER_PORT_PLACEHOLDER>";
@@ -82,7 +87,7 @@ public class LocalAgentLauncherProperties {
         "java",
         "-jar", AGENT_JAR_PLACEHOLDER,
         "exec",
-        "--server-host", "127.0.0.1",
+        "--server-host", SERVER_HOST_PLACEHOLDER,
         "--server-port", SERVER_PORT_PLACEHOLDER,
         "--api-job",
         "--job-id", JOB_ID_PLACEHOLDER
@@ -135,4 +140,10 @@ public class LocalAgentLauncherProperties {
      * Should be lower than {@link #getHostInfoExpireAfter()}.
      */
     private Duration hostInfoRefreshAfter = Duration.ofSeconds(30L);
+
+    /**
+     * Genie server hostname to connect to. Only used if the command-line template references a placeholder for this
+     * value.
+     */
+    private String serverHostname = "127.0.0.1";
 }
