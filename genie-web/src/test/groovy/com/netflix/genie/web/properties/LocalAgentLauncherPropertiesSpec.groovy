@@ -41,7 +41,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
 
         then:
         properties.isEnabled()
-        properties.getLaunchCommandTemplate() == ["java", "-jar", LocalAgentLauncherProperties.AGENT_JAR_PLACEHOLDER, "exec", "--server-host", "127.0.0.1", "--server-port", LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, "--api-job", "--job-id", LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER]
+        properties.getLaunchCommandTemplate() == ["java", "-jar", LocalAgentLauncherProperties.AGENT_JAR_PLACEHOLDER, "exec", "--server-host", LocalAgentLauncherProperties.SERVER_HOST_PLACEHOLDER, "--server-port", LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, "--api-job", "--job-id", LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER]
         properties.getAgentJarPath() == "/tmp/genie-agent.jar"
         properties.getMaxJobMemory() == 10_240
         properties.getMaxTotalJobMemory() == 30_720L
@@ -50,6 +50,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         !properties.isProcessOutputCaptureEnabled()
         properties.getHostInfoExpireAfter() == Duration.ofMinutes(1L)
         properties.getHostInfoRefreshAfter() == Duration.ofSeconds(30L)
+        properties.getServerHostname() == "127.0.0.1"
     }
 
     def "Setters and getters work properly"() {
@@ -73,6 +74,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         properties.setProcessOutputCaptureEnabled(true)
         properties.setHostInfoExpireAfter(expireAfter)
         properties.setHostInfoRefreshAfter(refreshAfter)
+        properties.setServerHostname("genie.netflix.net")
 
         then:
         !properties.isEnabled()
@@ -85,5 +87,6 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         properties.isProcessOutputCaptureEnabled()
         properties.getHostInfoExpireAfter() == expireAfter
         properties.getHostInfoRefreshAfter() == refreshAfter
+        properties.getServerHostname() == "genie.netflix.net"
     }
 }

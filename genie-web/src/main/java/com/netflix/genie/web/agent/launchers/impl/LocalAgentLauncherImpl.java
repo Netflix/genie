@@ -211,6 +211,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
         final CommandLine commandLine = this.createCommandLine(
             ImmutableMap.of(
+                LocalAgentLauncherProperties.SERVER_HOST_PLACEHOLDER, this.launcherProperties.getServerHostname(),
                 LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, Integer.toString(this.rpcPort),
                 LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER, jobId,
                 RUN_USER_PLACEHOLDER, user,

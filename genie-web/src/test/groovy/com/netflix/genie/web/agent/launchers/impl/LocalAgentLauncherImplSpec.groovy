@@ -51,10 +51,11 @@ class LocalAgentLauncherImplSpec extends Specification {
     static final int RPC_PORT = new Random().nextInt()
     static final String JOB_ID = UUID.randomUUID().toString()
     static final String USERNAME = UUID.randomUUID().toString()
+    static final String HOSTNAME = "genie.netflix.net"
     static final List<String> expectedCommandLineBase = [
         "java", "-jar", "/tmp/genie-agent.jar",
         "exec",
-        "--server-host", "127.0.0.1",
+        "--server-host", HOSTNAME,
         "--server-port", String.valueOf(RPC_PORT),
         "--api-job",
         "--job-id", JOB_ID
@@ -105,7 +106,8 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
-        this.requestedLauncherExt = null;
+        this.requestedLauncherExt = null
+        this.launchProperties.setServerHostname(HOSTNAME)
     }
 
     @Unroll

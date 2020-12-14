@@ -137,6 +137,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |false
 |no
 
+|genie.agent.launcher.local.server-hostname
+|The hostname to connect to. This value is used if the command-line template references the server hostname placeholder
+|127.0.0.1
+|no
+
 |genie.agent.launcher.titus.enabled
 |Whether the Titus agent launcher is active
 |false
