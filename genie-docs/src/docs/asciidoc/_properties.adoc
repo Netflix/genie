@@ -237,6 +237,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |default
 |no
 
+|genie.agent.launcher.titus.additional-memory
+|Amount of memory requested for the container in addition to the amount requested by the job
+|2GB
+|no
+
 |genie.agent.routing.refresh-interval
 |Interval at which individual connections are refreshed
 |3s

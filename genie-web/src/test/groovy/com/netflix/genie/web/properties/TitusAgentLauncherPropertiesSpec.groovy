@@ -57,6 +57,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getHealthIndicatorMaxSize() == 100
         p.getHealthIndicatorExpiration() == Duration.ofMinutes(30)
         p.getAdditionalEnvironment() == [:]
+        p.getAdditionalMemory() == DataSize.ofGigabytes(2)
 
         when:
         p.setEnabled(true)
@@ -87,6 +88,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.setHealthIndicatorMaxSize(200)
         p.setHealthIndicatorExpiration(Duration.ofMinutes(15))
         p.setAdditionalEnvironment([FOO: "BAR"])
+        p.setAdditionalMemory(DataSize.ofGigabytes(4))
 
         then:
         p.isEnabled()
@@ -117,5 +119,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getHealthIndicatorMaxSize() == 200
         p.getHealthIndicatorExpiration() == Duration.ofMinutes(15)
         p.getAdditionalEnvironment() == [FOO: "BAR"]
+        p.getAdditionalMemory() == DataSize.ofGigabytes(4)
     }
 }

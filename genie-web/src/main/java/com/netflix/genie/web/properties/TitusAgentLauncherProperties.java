@@ -199,4 +199,9 @@ public class TitusAgentLauncherProperties {
      */
     @NotNull
     private Map<String, String> additionalEnvironment = Maps.newHashMap();
+
+    /**
+     * The amount of memory to request in addition to the amount requested by the job.
+     */
+    private DataSize additionalMemory = DataSize.ofGigabytes(2);
 }

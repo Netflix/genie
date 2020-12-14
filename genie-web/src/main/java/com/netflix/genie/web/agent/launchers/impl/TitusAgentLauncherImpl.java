@@ -187,6 +187,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 .map(s -> placeholdersMap.getOrDefault(s, s))
                 .collect(Collectors.toList());
 
+        final long memory = resolvedJob.getJobEnvironment().getMemory()
+            + this.titusAgentLauncherProperties.getAdditionalMemory().toMegabytes();
+
         return new TitusBatchJobRequest(
             new TitusBatchJobRequest.Owner(this.titusAgentLauncherProperties.getOwnerEmail()),
             this.titusAgentLauncherProperties.getApplicationName(),
@@ -201,7 +204,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 new TitusBatchJobRequest.Resources(
                     resolvedJob.getJobEnvironment().getCpu(),
                     0,
-                    resolvedJob.getJobEnvironment().getMemory(),
+                    memory,
                     this.titusAgentLauncherProperties.getDiskSize().toMegabytes(),
                     this.titusAgentLauncherProperties.getNetworkBandwidth().toMegabytes() * 8 //MB to Mb
                 ),
