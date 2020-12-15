@@ -48,8 +48,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getIAmRole() == "arn:aws:iam::000000000:role/SomeProfile"
         p.getImageName() == "image-name"
         p.getImageTag() == "latest"
-        p.getDiskSize() == DataSize.ofGigabytes(10)
-        p.getNetworkBandwidth() == DataSize.ofMegabytes(7)
         p.getRetries() == 0
         p.getRuntimeLimit() == Duration.ofHours(12)
         p.getGenieServerHost() == "example.genie.tld"
@@ -57,7 +55,16 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getHealthIndicatorMaxSize() == 100
         p.getHealthIndicatorExpiration() == Duration.ofMinutes(30)
         p.getAdditionalEnvironment() == [:]
-        p.getAdditionalMemory() == DataSize.ofGigabytes(2)
+        p.getAdditionalMemory().toGigabytes() == 2
+        p.getAdditionalBandwidth().toMegabytes() == 0
+        p.getAdditionalCPU() == 1
+        p.getAdditionalDiskSize().toGigabytes() == 1
+        p.getAdditionalGPU() == 0
+        p.getMinimumBandwidth().toMegabytes() == 7
+        p.getMinimumCPU() == 1
+        p.getMinimumDiskSize().toGigabytes() == 10
+        p.getMinimumMemory().toGigabytes() == 4
+        p.getMinimumGPU() == 0
 
         when:
         p.setEnabled(true)
@@ -79,8 +86,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.setIAmRole("arn:aws:iam::99999999:role/SomeOtherProfile")
         p.setImageName("another-image-name")
         p.setImageTag("latest.release")
-        p.setDiskSize(DataSize.ofGigabytes(20))
-        p.setNetworkBandwidth(DataSize.ofMegabytes(14))
         p.setRetries(1)
         p.setRuntimeLimit(Duration.ofHours(24))
         p.setGenieServerHost("genie.tld")
@@ -89,6 +94,15 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.setHealthIndicatorExpiration(Duration.ofMinutes(15))
         p.setAdditionalEnvironment([FOO: "BAR"])
         p.setAdditionalMemory(DataSize.ofGigabytes(4))
+        p.setAdditionalBandwidth(DataSize.ofMegabytes(2))
+        p.setAdditionalCPU(2)
+        p.setAdditionalDiskSize(DataSize.ofGigabytes(2))
+        p.setAdditionalGPU(1)
+        p.setMinimumBandwidth(DataSize.ofMegabytes(14))
+        p.setMinimumCPU(2)
+        p.setMinimumDiskSize(DataSize.ofGigabytes(20))
+        p.setMinimumMemory(DataSize.ofGigabytes(8))
+        p.setMinimumGPU(1)
 
         then:
         p.isEnabled()
@@ -110,8 +124,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getIAmRole() == "arn:aws:iam::99999999:role/SomeOtherProfile"
         p.getImageName() == "another-image-name"
         p.getImageTag() == "latest.release"
-        p.getDiskSize() == DataSize.ofGigabytes(20)
-        p.getNetworkBandwidth() == DataSize.ofMegabytes(14)
         p.getRetries() == 1
         p.getRuntimeLimit() == Duration.ofHours(24)
         p.getGenieServerHost() == "genie.tld"
@@ -120,5 +132,15 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getHealthIndicatorExpiration() == Duration.ofMinutes(15)
         p.getAdditionalEnvironment() == [FOO: "BAR"]
         p.getAdditionalMemory() == DataSize.ofGigabytes(4)
+        p.getAdditionalMemory().toGigabytes() == 4
+        p.getAdditionalBandwidth().toMegabytes() == 2
+        p.getAdditionalCPU() == 2
+        p.getAdditionalGPU() == 1
+        p.getAdditionalDiskSize().toGigabytes() == 2
+        p.getMinimumBandwidth().toMegabytes() == 14
+        p.getMinimumCPU() == 2
+        p.getMinimumDiskSize().toGigabytes() == 20
+        p.getMinimumMemory().toGigabytes() == 8
+        p.getMinimumGPU() == 1
     }
 }

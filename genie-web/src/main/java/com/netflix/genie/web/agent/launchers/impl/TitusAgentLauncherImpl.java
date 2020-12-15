@@ -66,6 +66,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private static final String TITUS_JOB_RESPONSE_EXT_FIELD = "titus_job_response";
     private static final String THIS_CLASS = TitusAgentLauncherImpl.class.getCanonicalName();
     private static final int TITUS_JOB_BATCH_SIZE = 1;
+    private static final int ZERO = 0;
+    private static final int MEGABYTE_TO_MEGABIT = 8;
 
     private final RestTemplate restTemplate;
     private final Cache<String, String> healthIndicatorCache;
@@ -187,8 +189,31 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 .map(s -> placeholdersMap.getOrDefault(s, s))
                 .collect(Collectors.toList());
 
-        final long memory = resolvedJob.getJobEnvironment().getMemory()
-            + this.titusAgentLauncherProperties.getAdditionalMemory().toMegabytes();
+        final long memory = Math.max(
+            this.titusAgentLauncherProperties.getMinimumMemory().toMegabytes(),
+            resolvedJob.getJobEnvironment().getMemory()
+                + this.titusAgentLauncherProperties.getAdditionalMemory().toMegabytes()
+        );
+        final int cpu = Math.max(
+            this.titusAgentLauncherProperties.getMinimumCPU(),
+            resolvedJob.getJobEnvironment().getCpu()
+                + this.titusAgentLauncherProperties.getAdditionalCPU()
+        );
+        final long diskSize = Math.max(
+            this.titusAgentLauncherProperties.getMinimumDiskSize().toMegabytes(),
+            ZERO // Placeholder for job request field
+                + this.titusAgentLauncherProperties.getAdditionalDiskSize().toMegabytes()
+        );
+        final long networkMbps = Math.max(
+            this.titusAgentLauncherProperties.getMinimumBandwidth().toMegabytes(),
+            ZERO // Placeholder for job request field
+                + this.titusAgentLauncherProperties.getAdditionalBandwidth().toMegabytes()
+        ) * MEGABYTE_TO_MEGABIT;
+        final int gpus = Math.max(
+            this.titusAgentLauncherProperties.getMinimumGPU(),
+            ZERO // Placeholder for job request field
+                + this.titusAgentLauncherProperties.getAdditionalGPU()
+        );
 
         return new TitusBatchJobRequest(
             new TitusBatchJobRequest.Owner(this.titusAgentLauncherProperties.getOwnerEmail()),
@@ -202,11 +227,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             ),
             new TitusBatchJobRequest.Container(
                 new TitusBatchJobRequest.Resources(
-                    resolvedJob.getJobEnvironment().getCpu(),
-                    0,
+                    cpu,
+                    gpus,
                     memory,
-                    this.titusAgentLauncherProperties.getDiskSize().toMegabytes(),
-                    this.titusAgentLauncherProperties.getNetworkBandwidth().toMegabytes() * 8 //MB to Mb
+                    diskSize,
+                    networkMbps
                 ),
                 new TitusBatchJobRequest.SecurityProfile(
                     this.titusAgentLauncherProperties.getSecurityAttributes(),
