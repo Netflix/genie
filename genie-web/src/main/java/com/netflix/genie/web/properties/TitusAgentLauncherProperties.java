@@ -147,18 +147,6 @@ public class TitusAgentLauncherProperties {
     private String imageTag = "latest";
 
     /**
-     * The disk size to allocate.
-     */
-    @NotNull
-    private DataSize diskSize = DataSize.ofGigabytes(10);
-
-    /**
-     * The network bandwidth to allocate.
-     */
-    @NotNull
-    private DataSize networkBandwidth = DataSize.ofMegabytes(7);
-
-    /**
      * The number of retries if the job fails.
      */
     @Min(0)
@@ -201,7 +189,59 @@ public class TitusAgentLauncherProperties {
     private Map<String, String> additionalEnvironment = Maps.newHashMap();
 
     /**
+     * The amount of bandwidth to request in addition to the amount requested by the job.
+     */
+    private DataSize additionalBandwidth = DataSize.ofBytes(0);
+
+    /**
+     * The amount of CPUs to request in addition to the amount requested by the job.
+     */
+    @Min(0)
+    private int additionalCPU = 1;
+
+    /**
+     * The amount of disk space to request in addition to the amount requested by the job.
+     */
+    private DataSize additionalDiskSize = DataSize.ofGigabytes(1);
+
+    /**
+     * The amount of GPUs to request in addition to the amount requested by the job.
+     */
+    @Min(0)
+    private int additionalGPU;
+
+    /**
      * The amount of memory to request in addition to the amount requested by the job.
      */
     private DataSize additionalMemory = DataSize.ofGigabytes(2);
+
+    /**
+     * The minimum amount of bandwidth to request for the container.
+     */
+    @NotNull
+    private DataSize minimumBandwidth = DataSize.ofMegabytes(7);
+
+    /**
+     * The minimum amount of CPUs to request for the container.
+     */
+    @Min(1)
+    private int minimumCPU = 1;
+
+    /**
+     * The minimum amount of storage to request for the container.
+     */
+    @NotNull
+    private DataSize minimumDiskSize = DataSize.ofGigabytes(10);
+
+    /**
+     * The minimum amount of GPUs to request for the container.
+     */
+    @Min(0)
+    private int minimumGPU;
+
+    /**
+     * The minimum amount of memory to request for the container.
+     */
+    @NotNull
+    private DataSize minimumMemory = DataSize.ofGigabytes(4);
 }

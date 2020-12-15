@@ -30,6 +30,7 @@ import com.netflix.genie.web.dtos.TitusBatchJobResponse
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.properties.TitusAgentLauncherProperties
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.springframework.util.unit.DataSize
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
@@ -57,7 +58,13 @@ class TitusAgentLauncherImplSpec extends Specification {
     SimpleMeterRegistry registry
     TitusAgentLauncherImpl launcher
 
+    int requestedCPU
+    long requestedMemory
+
     void setup() {
+
+        requestedCPU = 3
+        requestedMemory = 1024
 
         this.job = Mock(JobSpecification.ExecutionResource) {
             getId() >> JOB_ID
@@ -69,8 +76,8 @@ class TitusAgentLauncherImplSpec extends Specification {
             getUser() >> USER
         }
         this.jobEnvironment = Mock(JobEnvironment) {
-            getCpu() >> 3
-            getMemory() >> 1024
+            getCpu() >> {return requestedCPU}
+            getMemory() >> {return requestedMemory}
         }
         this.resolvedJob = Mock(ResolvedJob) {
             getJobSpecification() >> jobSpecification
@@ -120,11 +127,11 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getAttributes().get("genie_source_host") == "hostname"
         requestCapture.getAttributes().get("genie_endpoint") == launcherProperties.getGenieServerHost()
         requestCapture.getAttributes().get("genie_job_id") == JOB_ID
-        requestCapture.getContainer().getResources().getCpu() == 3
+        requestCapture.getContainer().getResources().getCpu() == 3 + 1
         requestCapture.getContainer().getResources().getGpu() == 0
-        requestCapture.getContainer().getResources().getMemoryMB() == 1024 + 2048
-        requestCapture.getContainer().getResources().getDiskMB() == launcherProperties.getDiskSize().toMegabytes()
-        requestCapture.getContainer().getResources().getNetworkMbps() == launcherProperties.getNetworkBandwidth().toMegabytes() * 8
+        requestCapture.getContainer().getResources().getMemoryMB() == DataSize.ofGigabytes(4).toMegabytes()
+        requestCapture.getContainer().getResources().getDiskMB() == DataSize.ofGigabytes(10).toMegabytes()
+        requestCapture.getContainer().getResources().getNetworkMbps() == DataSize.ofMegabytes(7).toMegabytes() * 8
         requestCapture.getContainer().getSecurityProfile().getAttributes() == launcherProperties.getSecurityAttributes()
         requestCapture.getContainer().getSecurityProfile().getSecurityGroups() == launcherProperties.getSecurityGroups()
         requestCapture.getContainer().getSecurityProfile().getIamRole() == launcherProperties.getIAmRole()
@@ -188,4 +195,50 @@ class TitusAgentLauncherImplSpec extends Specification {
     private static TitusBatchJobResponse toTitusResponse(String s) {
         return new ObjectMapper().readValue(s, TitusBatchJobResponse.class)
     }
+
+    @Unroll
+    def "Check resources allocation: #description"() {
+        setup:
+        this.requestedCPU = reqCPU
+        this.requestedMemory = reqMem
+        this.launcherProperties.setAdditionalBandwidth(DataSize.ofMegabytes(addlBw))
+        this.launcherProperties.setAdditionalCPU(addlCPU)
+        this.launcherProperties.setAdditionalDiskSize(DataSize.ofGigabytes(addlDisk))
+        this.launcherProperties.setAdditionalGPU(addlGPU)
+        this.launcherProperties.setAdditionalMemory(DataSize.ofGigabytes(addlMem))
+        this.launcherProperties.setMinimumBandwidth(DataSize.ofMegabytes(minBw))
+        this.launcherProperties.setMinimumCPU(minCPU)
+        this.launcherProperties.setMinimumDiskSize(DataSize.ofGigabytes(minDisk))
+        this.launcherProperties.setMinimumGPU(minGPU)
+        this.launcherProperties.setMinimumMemory(DataSize.ofGigabytes(minMem))
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getResources().getCpu() == 4
+        requestCapture.getContainer().getResources().getGpu() == 2
+        requestCapture.getContainer().getResources().getMemoryMB() == DataSize.ofGigabytes(10).toMegabytes()
+        requestCapture.getContainer().getResources().getDiskMB() == DataSize.ofGigabytes(20).toMegabytes()
+        requestCapture.getContainer().getResources().getNetworkMbps() == DataSize.ofMegabytes(7).toMegabytes() * 8
+
+        where:
+        reqMem | reqCPU | addlBw | addlCPU | addlDisk | addlGPU | addlMem | minBw | minCPU | minDisk | minGPU | minMem | description
+        512    | 1      | 1      | 1       | 1        | 1       | 1       | 7     | 4      | 20      | 2      | 10     | "Fall back to minimum values"
+        1024   | 3      | 7      | 1       | 20       | 2       | 9       | 1     | 1      | 10      | 0      | 4      | "Use requested plus additional"
+    }
+
 }
