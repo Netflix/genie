@@ -109,4 +109,18 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Set<UserJobAmountAggregateProjection> getUsersJobsTotalMemory(
         @Param("statuses") @NotEmpty final Set<JobStatus> statuses
     );
+
+    /**
+     * Returns the slice of ids for jobs created before the given date with the given statuses.
+     *
+     * @param date     The date before which the job requests were created
+     * @param statuses The set of statuses a job must be in in order to be returned
+     * @param pageable The page of data to get
+     * @return List of job request ids
+     */
+    Slice<IdProjection> findByCreatedBeforeAndStatusIn(
+        @NotNull final Date date,
+        @NotEmpty final Set<JobStatus> statuses,
+        @NotNull Pageable pageable
+    );
 }

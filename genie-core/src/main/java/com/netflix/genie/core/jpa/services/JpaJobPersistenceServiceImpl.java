@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -47,6 +48,7 @@ import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -57,8 +59,10 @@ import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -263,47 +267,29 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         @Min(1) final int maxDeleted,
         @Min(1) final int pageSize
     ) {
-        log.info(
-            "Attempting to delete batch of jobs (at most {}) created before {} ms from epoch",
+        return this.deleteBatchOfJobsCreatedBeforeWithStatuses(
+            date,
             maxDeleted,
-            date.getTime()
+            Sets.newEnumSet(Arrays.asList(JobStatus.values()), JobStatus.class),
+            pageSize
         );
-        long jobsDeleted = 0;
-        long totalAttemptedDeletions = 0;
-        final Pageable page = new PageRequest(0, pageSize);
-        Slice<IdProjection> idProjections;
-        do {
-            idProjections = this.jobRepository.findByCreatedBefore(date, page);
-            if (idProjections.hasContent()) {
-                final List<Long> ids = idProjections
-                    .getContent()
-                    .stream()
-                    .map(IdProjection::getId)
-                    .collect(Collectors.toList());
+    }
 
-                final long toBeDeleted = ids.size();
-                totalAttemptedDeletions += toBeDeleted;
-
-                log.debug("Attempting to delete {} rows from jobs...", toBeDeleted);
-                final long deletedJobs = this.jobRepository.deleteByIdIn(ids);
-                log.debug("Successfully deleted {} rows from jobs...", deletedJobs);
-                if (deletedJobs != toBeDeleted) {
-                    log.error(
-                        "Deleted {} job records but expected to delete {}",
-                        deletedJobs,
-                        toBeDeleted
-                    );
-                }
-                jobsDeleted += deletedJobs;
-            }
-        } while (idProjections.hasNext() && totalAttemptedDeletions < maxDeleted);
-
-        log.info(
-            "Deleted a chunk of {} job records: {} job",
-            totalAttemptedDeletions,
-            jobsDeleted
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long deleteBatchOfFinishedJobsCreatedBeforeDate(
+        @NotNull final Date date,
+        @Min(1) final int maxDeleted,
+        @Min(1) final int pageSize
+    ) {
+        return this.deleteBatchOfJobsCreatedBeforeWithStatuses(
+            date,
+            maxDeleted,
+            JobStatus.getFinishedStatuses(),
+            pageSize
         );
-        return totalAttemptedDeletions;
     }
 
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {
@@ -409,5 +395,55 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
 
         return jobEntity;
+    }
+
+    private long deleteBatchOfJobsCreatedBeforeWithStatuses(
+        @NotNull final Date date,
+        @Min(1) final int maxDeleted,
+        @NotEmpty final Set<JobStatus> statuses,
+        @Min(1) final int pageSize
+    ) {
+        log.info(
+            "Attempting to delete batch of jobs (at most {}) created before {} ms from epoch with status in {}",
+            maxDeleted,
+            date.getTime(),
+            statuses
+        );
+        long jobsDeleted = 0;
+        long totalAttemptedDeletions = 0;
+        final Pageable page = new PageRequest(0, pageSize);
+        Slice<IdProjection> idProjections;
+        do {
+            idProjections = this.jobRepository.findByCreatedBeforeAndStatusIn(date, statuses, page);
+            if (idProjections.hasContent()) {
+                final List<Long> ids = idProjections
+                    .getContent()
+                    .stream()
+                    .map(IdProjection::getId)
+                    .collect(Collectors.toList());
+
+                final long toBeDeleted = ids.size();
+                totalAttemptedDeletions += toBeDeleted;
+
+                log.debug("Attempting to delete {} rows from jobs...", toBeDeleted);
+                final long deletedJobs = this.jobRepository.deleteByIdIn(ids);
+                log.debug("Successfully deleted {} rows from jobs...", deletedJobs);
+                if (deletedJobs != toBeDeleted) {
+                    log.error(
+                        "Deleted {} job records but expected to delete {}",
+                        deletedJobs,
+                        toBeDeleted
+                    );
+                }
+                jobsDeleted += deletedJobs;
+            }
+        } while (idProjections.hasNext() && totalAttemptedDeletions < maxDeleted);
+
+        log.info(
+            "Deleted a chunk of {} job records: {} job",
+            totalAttemptedDeletions,
+            jobsDeleted
+        );
+        return totalAttemptedDeletions;
     }
 }
