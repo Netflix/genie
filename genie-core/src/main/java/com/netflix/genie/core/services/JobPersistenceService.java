@@ -134,7 +134,25 @@ public interface JobPersistenceService {
      * @param pageSize   Page size used to iterate through jobs
      * @return the number of deleted jobs
      */
-    long deleteBatchOfJobsCreatedBeforeDate(@NotNull final Date date,
-                                            @Min(1) final int maxDeleted,
-                                            @Min(1) final int pageSize);
+    long deleteBatchOfJobsCreatedBeforeDate(
+        @NotNull final Date date,
+        @Min(1) final int maxDeleted,
+        @Min(1) final int pageSize
+    );
+
+    /**
+     * This method will delete a chunk of jobs whose creation time is earlier than the given date which have a completed
+     * status.
+     *
+     * @param date       The date before which all jobs should be deleted
+     * @param maxDeleted The maximum number of jobs that should be deleted
+     *                   (soft limit, can be rounded up to multiple of page size)
+     * @param pageSize   Page size used to iterate through jobs
+     * @return the number of deleted jobs
+     */
+    long deleteBatchOfFinishedJobsCreatedBeforeDate(
+        @NotNull final Date date,
+        @Min(1) final int maxDeleted,
+        @Min(1) final int pageSize
+    );
 }

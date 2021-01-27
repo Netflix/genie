@@ -231,7 +231,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
         );
         long totalDeletedJobs = 0;
         while (true) {
-            final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+            final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
                 retentionLimit,
                 batchSize,
                 pageSize

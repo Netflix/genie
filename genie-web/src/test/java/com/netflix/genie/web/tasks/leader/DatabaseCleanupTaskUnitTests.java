@@ -112,7 +112,7 @@ public class DatabaseCleanupTaskUnitTests {
         final long deletedCount3 = 2L;
         Mockito
             .when(
-                this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
                     Mockito.any(Date.class),
                     Mockito.anyInt(),
                     Mockito.anyInt()
@@ -137,7 +137,11 @@ public class DatabaseCleanupTaskUnitTests {
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito
                 .verify(this.jobPersistenceService, Mockito.times(5))
-                .deleteBatchOfJobsCreatedBeforeDate(argument.capture(), Mockito.eq(maxDeleted), Mockito.eq(pageSize));
+                .deleteBatchOfFinishedJobsCreatedBeforeDate(
+                    argument.capture(),
+                    Mockito.eq(maxDeleted),
+                    Mockito.eq(pageSize)
+                );
             final Calendar date = Calendar.getInstance(JobConstants.UTC);
             date.set(Calendar.HOUR_OF_DAY, 0);
             date.set(Calendar.MINUTE, 0);
@@ -172,7 +176,7 @@ public class DatabaseCleanupTaskUnitTests {
 
         Mockito
             .when(
-                this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
                     Mockito.any(Date.class),
                     Mockito.anyInt(),
                     Mockito.anyInt()

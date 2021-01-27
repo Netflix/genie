@@ -61,6 +61,7 @@ import java.util.UUID;
 @DatabaseTearDown("cleanup.xml")
 public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
 
+    private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
 
     // Job Request fields
@@ -289,6 +290,93 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             = this.jobRepository.findByUniqueId(UNIQUE_ID, JobMetadataProjection.class);
         Assert.assertTrue(metadataProjection.isPresent());
         this.validateJobMetadata(metadataProjection.get());
+    }
+
+    /**
+     * Make sure we can delete finished jobs that were created before a given date.
+     */
+    @Test
+    public void canDeleteFinishedJobsCreatedBeforeDateWithMinTransactionAndPageSize() {
+        // Try to delete a single job from before Jan 1, 2016
+        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
+        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        final long deleted = this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
+            cal.getTime(),
+            1,
+            1
+        );
+
+        Assert.assertThat(deleted, Matchers.is(1L));
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+    }
+
+    /**
+     * Make sure we can delete finished jobs that were created before a given date.
+     */
+    @Test
+    public void canDeleteFinishedJobsCreatedBeforeDateWithPageLargerThanMax() {
+        // Try to delete a all jobs from before Jan 1, 2016
+        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
+        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        final long deleted = this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
+            cal.getTime(),
+            1,
+            10
+        );
+
+        Assert.assertThat(deleted, Matchers.is(1L));
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_2_ID).isPresent());
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+    }
+
+    /**
+     * Make sure we can delete finished jobs that were created before a given date.
+     */
+    @Test
+    public void canDeleteFinishedJobsCreatedBeforeDateWithMaxLargerThanPage() {
+        // Try to delete a all jobs from before Jan 1, 2016
+        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
+        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        final long deleted = this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
+            cal.getTime(),
+            10,
+            1
+        );
+
+        Assert.assertThat(deleted, Matchers.is(1L));
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_2_ID).isPresent());
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+    }
+
+    /**
+     * Make sure we can delete finished jobs that were created before a given date.
+     */
+    @Test
+    public void canDeleteFinishedJobsCreatedBeforeDateWithLargeTransactionAndPageSize() {
+        // Try to delete all jobs before Jan 1, 2016
+        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
+        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        final long deleted = this.jobPersistenceService.deleteBatchOfFinishedJobsCreatedBeforeDate(
+            cal.getTime(),
+            10_000,
+            1
+        );
+
+        Assert.assertThat(deleted, Matchers.is(1L));
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_2_ID).isPresent());
     }
 
     private void validateJobRequest(final JobRequest savedJobRequest) {
