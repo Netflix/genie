@@ -61,6 +61,15 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Set<JobHostNameProjection> findByStatusIn(final Set<JobStatus> statuses);
 
     /**
+     * Find the distinct host names which currently have jobs in the given statuses.
+     *
+     * @param statuses The statuses to search
+     * @return The set of hostnames
+     */
+    @Query("SELECT DISTINCT(j.hostName) FROM JobEntity j WHERE j.status IN (:statuses)")
+    Set<String> findDistinctHostsWithJobsInStatuses(@Param("statuses") @NotEmpty final Set<JobStatus> statuses);
+
+    /**
      * Deletes all jobs for the given ids.
      *
      * @param ids list of ids for which the jobs should be deleted
