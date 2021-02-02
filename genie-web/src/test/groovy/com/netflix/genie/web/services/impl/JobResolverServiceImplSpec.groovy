@@ -115,10 +115,11 @@ class JobResolverServiceImplSpec extends Specification {
         def expectedCommandArgs = executable
         def expectedJobArgs = arguments
 
-        def jobRequest0 = createJobRequest(arguments, null, null)
-        def jobRequest1 = createJobRequest(arguments, null, 5_002)
+        def jobRequest0 = createJobRequest(arguments, null, null, null)
+        def jobRequest1 = createJobRequest(arguments, null, 5_002, null)
         def requestedMemory = 6_323
-        def jobRequest2 = createJobRequest(arguments, requestedMemory, null)
+        def requestedCpu = 5
+        def jobRequest2 = createJobRequest(arguments, requestedMemory, null, requestedCpu)
 
         def command0JobRequest0Clusters = createClustersBasedOnCriteria(2, command0, jobRequest0)
         def command1JobRequest0Clusters = createClustersBasedOnCriteria(3, command1, jobRequest0)
@@ -270,7 +271,7 @@ class JobResolverServiceImplSpec extends Specification {
             )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
         jobEnvironment.getMemory() == requestedMemory
-        jobEnvironment.getCpu() == 1
+        jobEnvironment.getCpu() == requestedCpu
         !jobEnvironment.getExt().isPresent()
         !jobSpec.getTimeout().isPresent()
     }
@@ -289,7 +290,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         def jobId = UUID.randomUUID().toString()
 
-        def jobRequest = createJobRequest(arguments, null, null)
+        def jobRequest = createJobRequest(arguments, null, null, null)
 
         def command0JobRequestClusters = createClustersBasedOnCriteria(2, command0, jobRequest)
         def command1JobRequestClusters = createClustersBasedOnCriteria(3, command1, jobRequest)
@@ -330,7 +331,7 @@ class JobResolverServiceImplSpec extends Specification {
     def "Can handle resources not found errors with V3 and V4 algorithms"() {
         def arguments = Lists.newArrayList(UUID.randomUUID().toString())
         def jobId = UUID.randomUUID().toString()
-        def jobRequest0 = createJobRequest(arguments, null, null)
+        def jobRequest0 = createJobRequest(arguments, null, null, null)
         def emptySet = Sets.newHashSet()
 
         when: "V4 resolution"
@@ -564,7 +565,7 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "can resolve command"() {
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null)
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
         def jobId = UUID.randomUUID().toString()
         def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
         def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
@@ -735,7 +736,7 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster2 = createCluster(UUID.randomUUID().toString())
         def clusters = Sets.newHashSet(cluster0, cluster1, cluster2)
         def jobId = UUID.randomUUID().toString()
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null)
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
         def commandClusters = [
             (command)      : clusters,
             (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
@@ -859,7 +860,7 @@ class JobResolverServiceImplSpec extends Specification {
             createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
             createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
         )
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null)
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
 
         // build expected map
         final Map<Command, List<Criterion>> expectedMap = [:]
@@ -994,6 +995,7 @@ class JobResolverServiceImplSpec extends Specification {
         def jobRequest = createJobRequest(
             Lists.newArrayList(UUID.randomUUID().toString()),
             null,
+            null,
             null
         )
         def apiJob = true
@@ -1024,6 +1026,7 @@ class JobResolverServiceImplSpec extends Specification {
             (Mock(Command)): Sets.newHashSet(Mock(Cluster)),
             (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
         ]
+        def cpu = 5
 
         when:
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob)
@@ -1041,6 +1044,7 @@ class JobResolverServiceImplSpec extends Specification {
         !context.getArchiveLocation().isPresent()
         !context.getJobDirectory().isPresent()
         !context.getCommandClusters().isPresent()
+        !context.getCpu().isPresent()
 
         when:
         context.build()
@@ -1124,6 +1128,12 @@ class JobResolverServiceImplSpec extends Specification {
 
         then:
         context.getCommandClusters().orElse(null) == commandClusters
+
+        when:
+        context.setCpu(cpu)
+
+        then:
+        context.getCpu().orElse(null) == cpu
     }
 
     //region Helper Methods
@@ -1179,7 +1189,8 @@ class JobResolverServiceImplSpec extends Specification {
     private static JobRequest createJobRequest(
         List<String> commandArgs,
         @Nullable Integer requestedMemory,
-        @Nullable Integer requestedTimeout
+        @Nullable Integer requestedTimeout,
+        @Nullable Integer requestedCpu
     ) {
         def clusterCriteria = Lists.newArrayList(
             new Criterion
@@ -1198,9 +1209,10 @@ class JobResolverServiceImplSpec extends Specification {
             commandArgs,
             new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build(),
             new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
-            requestedMemory == null
-                ? null
-                : new JobEnvironmentRequest.Builder().withRequestedJobMemory(requestedMemory).build(),
+            new JobEnvironmentRequest.Builder()
+                .withRequestedJobMemory(requestedMemory)
+                .withRequestedJobCpu(requestedCpu)
+                .build(),
             requestedTimeout == null
                 ? null
                 : new AgentConfigRequest.Builder().withTimeoutRequested(requestedTimeout).build()
