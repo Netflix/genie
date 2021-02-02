@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.dtos.ResolvedJob;
@@ -38,6 +37,7 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,17 +54,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TitusAgentLauncherImpl implements AgentLauncher {
 
-    private static final String LAUNCH_TIMER = "genie.launchers.titus.launch.timer";
     private static final String GENIE_USER_ATTR = "genie_user";
     private static final String GENIE_SOURCE_HOST_ATTR = "genie_source_host";
     private static final String GENIE_ENDPOINT_ATTR = "genie_endpoint";
     private static final String GENIE_JOB_ID_ATTR = "genie_job_id";
     private static final String TITUS_API_JOB_PATH = "/api/v3/jobs";
-    private static final String LAUNCHER_CLASS_EXT_FIELD = "launcher_class";
-    private static final String TITUS_JOB_ID_EXT_FIELD = "titus_job_id";
-    private static final String TITUS_JOB_REQUEST_EXT_FIELD = "titus_job_request";
-    private static final String TITUS_JOB_RESPONSE_EXT_FIELD = "titus_job_response";
+    private static final String TITUS_JOB_ID_EXT_FIELD = "titusId";
+    private static final String TITUS_JOB_REQUEST_EXT_FIELD = "titusRequest";
+    private static final String TITUS_JOB_RESPONSE_EXT_FIELD = "titusResponse";
     private static final String THIS_CLASS = TitusAgentLauncherImpl.class.getCanonicalName();
+    private static final Tag CLASS_TAG = Tag.of(LAUNCHER_CLASS_KEY, THIS_CLASS);
     private static final int TITUS_JOB_BATCH_SIZE = 1;
     private static final int ZERO = 0;
     private static final int MEGABYTE_TO_MEGABIT = 8;
@@ -106,15 +105,17 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         final ResolvedJob resolvedJob,
         @Nullable final JsonNode requestedLauncherExt
     ) throws AgentLaunchException {
+        final long start = System.nanoTime();
+        log.info("Received request to launch Titus agent to run job: {}", resolvedJob);
+        final Set<Tag> tags = new HashSet<>();
+        tags.add(CLASS_TAG);
 
         final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
         final TitusBatchJobRequest titusJobRequest = this.createJobRequest(resolvedJob);
-        final Set<Tag> tags = Sets.newHashSet();
 
         String titusJobId = null;
 
-        final long start = System.nanoTime();
         try {
             final TitusBatchJobResponse titusResponse = this.restTemplate.postForObject(
                 this.titusAgentLauncherProperties.getEndpoint().toString() + TITUS_API_JOB_PATH,
@@ -135,25 +136,24 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 );
             }
 
-            log.info("Created Titus job {} to execute job {}", titusJobId, jobId);
+            log.info("Created Titus job {} to execute Genie job {}", titusJobId, jobId);
 
             MetricsUtils.addSuccessTags(tags);
 
-            final JsonNode launcherExt = JsonNodeFactory.instance.objectNode()
-                .put(LAUNCHER_CLASS_EXT_FIELD, THIS_CLASS)
-                .put(TITUS_JOB_ID_EXT_FIELD, titusJobId)
-                .putPOJO(TITUS_JOB_REQUEST_EXT_FIELD, titusJobRequest)
-                .putPOJO(TITUS_JOB_RESPONSE_EXT_FIELD, titusResponse);
-
-            return Optional.of(launcherExt);
-
+            return Optional.of(
+                JsonNodeFactory.instance.objectNode()
+                    .put(LAUNCHER_CLASS_EXT_FIELD, THIS_CLASS)
+                    .put(SOURCE_HOST_EXT_FIELD, this.genieHostInfo.getHostname())
+                    .put(TITUS_JOB_ID_EXT_FIELD, titusJobId)
+                    .putPOJO(TITUS_JOB_REQUEST_EXT_FIELD, titusJobRequest)
+                    .putPOJO(TITUS_JOB_RESPONSE_EXT_FIELD, titusResponse)
+            );
         } catch (Exception e) {
             log.error("Failed to launch job on Titus", e);
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw new AgentLaunchException("Failed to create titus job for job " + jobId, e);
         } finally {
-            final long end = System.nanoTime();
-            this.registry.timer(LAUNCH_TIMER, tags).record(end - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(LAUNCH_TIMER, tags).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
             this.healthIndicatorCache.put(jobId, StringUtils.isBlank(titusJobId) ? "-" : titusJobId);
         }
     }

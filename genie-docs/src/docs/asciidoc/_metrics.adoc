@@ -107,6 +107,12 @@ It will have to be added if one is desired otherwise metrics are just published 
 |GRpcAgentFileStreamServiceImpl
 |-
 
+|genie.agents.launchers.launch.timer
+|Timer recording how long it takes to execute the launch API for that specific implementation
+|nanoseconds
+|LocalAgentLauncherImpl, TitusAgentLauncherImpl
+|status, exceptionClass, launcherClass
+
 |genie.api.v3.jobs.submitJobWithoutAttachments.rate
 |Counts the number of jobs submitted without an attachment
 |count
@@ -316,7 +322,7 @@ It will have to be added if one is desired otherwise metrics are just published 
 |Time taken to launch a job (includes record creation and update, job resolution and agent launch)
 |nanoseconds
 |JobLaunchServiceImpl
-|
+|status, exceptionClass, agentLauncherSelectedClass
 
 |genie.services.jobLaunch.selectLauncher.timer
 |Time taken to invoke a selector to choose which agent launcher to use

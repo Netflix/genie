@@ -162,7 +162,7 @@ class LocalAgentLauncherImplSpec extends Specification {
                 assert env.get("foo") == "bar"
                 assert env.size() > 1
         }
-        !launcherExt.isPresent()
+        launcherExt.isPresent()
 
         where:
         runAsUser | expectedCommandLine

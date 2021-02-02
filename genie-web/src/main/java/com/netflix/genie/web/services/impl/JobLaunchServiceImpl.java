@@ -157,9 +157,9 @@ public class JobLaunchServiceImpl implements JobLaunchService {
 
             final Optional<JsonNode> launcherExt;
             try {
-                launcherExt = this
-                    .selectLauncher(jobId, jobSubmission, resolvedJob)
-                    .launchAgent(resolvedJob, requestedLauncherExt);
+                final AgentLauncher launcher = this.selectLauncher(jobId, jobSubmission, resolvedJob);
+                tags.add(Tag.of(LAUNCHER_CLASS_TAG, launcher.getClass().getCanonicalName()));
+                launcherExt = launcher.launchAgent(resolvedJob, requestedLauncherExt);
             } catch (final AgentLaunchException e) {
                 // TODO: this could fail as well
                 this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());

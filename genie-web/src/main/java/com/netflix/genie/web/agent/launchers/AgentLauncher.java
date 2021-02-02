@@ -34,12 +34,36 @@ import java.util.Optional;
 public interface AgentLauncher extends HealthIndicator {
 
     /**
+     * Shared name of a timer that can be used by launchers to record how long it took them to perform their
+     * respective launch.
+     */
+    String LAUNCH_TIMER = "genie.agents.launchers.launch.timer";
+
+    /**
+     * Shared key for a tag that can be added to the timer metric to add the implementation class in order to aid in
+     * adding a convenient dimension.
+     *
+     * @see #LAUNCH_TIMER
+     */
+    String LAUNCHER_CLASS_KEY = "launcherClass";
+
+    /**
+     * Shared key representing the class that key for the Launcher Ext context the API can return.
+     */
+    String LAUNCHER_CLASS_EXT_FIELD = "launcherClass";
+
+    /**
+     * Shared key representing the hostname of the Genie server the Agent Launcher was executed on.
+     */
+    String SOURCE_HOST_EXT_FIELD = "sourceHostname";
+
+    /**
      * Launch an agent to execute the given {@link ResolvedJob} information.
      *
      * @param resolvedJob          The {@link ResolvedJob} information for the agent to act on
      * @param requestedLauncherExt The launcher requested extension, or null
-     * @throws AgentLaunchException For any error launching an Agent instance to run the job
      * @return an optional {@link JsonNode} with the launcher context about the launched job
+     * @throws AgentLaunchException For any error launching an Agent instance to run the job
      */
     Optional<JsonNode> launchAgent(
         ResolvedJob resolvedJob,
