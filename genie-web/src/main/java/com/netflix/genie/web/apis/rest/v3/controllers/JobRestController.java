@@ -311,7 +311,7 @@ public class JobRestController {
             null,
             numAttachments,
             totalSizeOfAttachments,
-            getGenieHeaders(httpServletRequest)
+            this.getGenieHeaders(httpServletRequest)
         );
 
         final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(

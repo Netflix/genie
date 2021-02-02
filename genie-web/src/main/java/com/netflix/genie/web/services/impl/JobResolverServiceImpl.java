@@ -211,6 +211,16 @@ public class JobResolverServiceImpl implements JobResolverService {
             final JobResolutionContext context = new JobResolutionContext(id, jobRequest, apiJob);
 
             final ResolvedJob resolvedJob = this.resolve(context);
+
+            /*
+             * TODO: There is currently a gap in database schema where the resolved CPU value is not persisted. This
+             *       means that it requires that the returned resolvedJob object here be used within the same call. If
+             *       we for some reason eventually put the job id on a queue or something and pull data back from DB
+             *       it WILL NOT be accurate. I'm purposely not doing this right now as it's not critical and modifying
+             *       the schema will require a prod downtime and there are likely other fields (requestedNetwork,
+             *       usedNetwork, usedDisk, resolvedDisk, requestedImage, usedImage) we want to add at the
+             *       same time to minimize downtimes. - TJG 2/2/21
+             */
             this.persistenceService.saveResolvedJob(id, resolvedJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
@@ -277,6 +287,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.resolveTimeout(context);
         this.resolveArchiveLocation(context);
         this.resolveJobDirectory(context);
+        this.resolveCpu(context);
 
         return context.build();
     }
@@ -644,6 +655,15 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
+    private void resolveCpu(final JobResolutionContext context) {
+        context.setCpu(
+            context.getJobRequest()
+                .getRequestedJobEnvironment()
+                .getRequestedJobCpu()
+                .orElse(null)
+        );
+    }
+
     private void resolveArchiveLocation(final JobResolutionContext context) {
         // TODO: Disable ability to disable archival for all jobs during internal V4 migration.
         //       Will allow us to reach out to clients who may set this variable but still expect output after
@@ -893,6 +913,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         private Integer timeout;
         private String archiveLocation;
         private File jobDirectory;
+        private Integer cpu;
 
         private Map<Command, Set<Cluster>> commandClusters;
 
@@ -930,6 +951,10 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         Optional<Map<Command, Set<Cluster>>> getCommandClusters() {
             return Optional.ofNullable(this.commandClusters);
+        }
+
+        Optional<Integer> getCpu() {
+            return Optional.ofNullable(this.cpu);
         }
 
         ResolvedJob build() {
@@ -982,6 +1007,7 @@ public class JobResolverServiceImpl implements JobResolverService {
 
             final JobEnvironment jobEnvironment = new JobEnvironment
                 .Builder(this.jobMemory)
+                .withCpu(this.cpu)
                 .withEnvironmentVariables(this.environmentVariables)
                 .build();
 

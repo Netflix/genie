@@ -120,7 +120,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 resolvedJob = this.jobResolverService.resolveJob(jobId);
             } catch (final Throwable t) {
                 final String message;
-                if (t instanceof  GenieJobResolutionException) {
+                if (t instanceof GenieJobResolutionException) {
                     message = JobStatusMessages.FAILED_TO_RESOLVE_JOB;
                 } else {
                     message = JobStatusMessages.RESOLUTION_RUNTIME_ERROR;
@@ -153,12 +153,12 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             }
 
             // TODO: at the moment this is not populated, it's going to be a null node (not null)
-            final JsonNode requestedLauncherExt =
-                this.persistenceService.getRequestedLauncherExt(jobId);
+            final JsonNode requestedLauncherExt = this.persistenceService.getRequestedLauncherExt(jobId);
 
             final Optional<JsonNode> launcherExt;
             try {
-                 launcherExt = this.selectLauncher(jobId, jobSubmission, resolvedJob)
+                launcherExt = this
+                    .selectLauncher(jobId, jobSubmission, resolvedJob)
                     .launchAgent(resolvedJob, requestedLauncherExt);
             } catch (final AgentLaunchException e) {
                 // TODO: this could fail as well
