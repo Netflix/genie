@@ -54,10 +54,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TitusAgentLauncherImpl implements AgentLauncher {
 
-    private static final String GENIE_USER_ATTR = "genie_user";
-    private static final String GENIE_SOURCE_HOST_ATTR = "genie_source_host";
-    private static final String GENIE_ENDPOINT_ATTR = "genie_endpoint";
-    private static final String GENIE_JOB_ID_ATTR = "genie_job_id";
+    private static final String GENIE_USER_ATTR = "genie.user";
+    private static final String GENIE_SOURCE_HOST_ATTR = "genie.sourceHost";
+    private static final String GENIE_ENDPOINT_ATTR = "genie.endpoint";
+    private static final String GENIE_JOB_ID_ATTR = "genie.jobId";
     private static final String TITUS_API_JOB_PATH = "/api/v3/jobs";
     private static final String TITUS_JOB_ID_EXT_FIELD = "titusId";
     private static final String TITUS_JOB_REQUEST_EXT_FIELD = "titusRequest";

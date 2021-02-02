@@ -123,10 +123,10 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getOwner().getTeamEmail() == launcherProperties.getOwnerEmail()
         requestCapture.getApplicationName() == launcherProperties.getApplicationName()
         requestCapture.getCapacityGroup() == launcherProperties.getCapacityGroup()
-        requestCapture.getAttributes().get("genie_user") == USER
-        requestCapture.getAttributes().get("genie_source_host") == "hostname"
-        requestCapture.getAttributes().get("genie_endpoint") == launcherProperties.getGenieServerHost()
-        requestCapture.getAttributes().get("genie_job_id") == JOB_ID
+        requestCapture.getAttributes().get("genie.user") == USER
+        requestCapture.getAttributes().get("genie.sourceHost") == "hostname"
+        requestCapture.getAttributes().get("genie.endpoint") == launcherProperties.getGenieServerHost()
+        requestCapture.getAttributes().get("genie.jobId") == JOB_ID
         requestCapture.getContainer().getResources().getCpu() == 3 + 1
         requestCapture.getContainer().getResources().getGpu() == 0
         requestCapture.getContainer().getResources().getMemoryMB() == DataSize.ofGigabytes(4).toMegabytes()
