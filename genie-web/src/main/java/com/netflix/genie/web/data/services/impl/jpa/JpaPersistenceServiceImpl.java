@@ -2072,14 +2072,14 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @NotBlank(message = "No job id entered. Unable to update.") final String id,
         @NotNull(message = "Status cannot be null.") final JsonNode launcherExtension
     ) throws NotFoundException {
-        log.debug("[updateRequestedLauncherExt] Requested to update launcher ext of job {}", id);
+        log.debug("[updateLauncherExt] Requested to update launcher ext of job {}", id);
 
         this.jobRepository
             .findByUniqueId(id)
             .orElseThrow(() -> new NotFoundException("No job exists for the id specified"))
             .setLauncherExt(launcherExtension);
 
-        log.debug("[updateRequestedLauncherExt] Updated launcher ext of job {}", id);
+        log.debug("[updateLauncherExt] Updated launcher ext of job {}", id);
     }
 
     /**

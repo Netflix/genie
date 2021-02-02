@@ -72,14 +72,6 @@ final class Snippets {
     static final ResponseHeadersSnippet JSON_CONTENT_TYPE_HEADER = HeaderDocumentation.responseHeaders(
         HeaderDocumentation.headerWithName(HttpHeaders.CONTENT_TYPE).description(MediaType.APPLICATION_JSON_VALUE)
     );
-    //    static final ResponseFieldsSnippet ERROR_FIELDS = PayloadDocumentation.responseFields(
-//        PayloadDocumentation.fieldWithPath("error").description("The HTTP error that occurred, e.g. `Bad Request`"),
-//        PayloadDocumentation.fieldWithPath("message").description("A description of the cause of the error"),
-//        PayloadDocumentation.fieldWithPath("path").description("The path to which the request was made"),
-//        PayloadDocumentation.fieldWithPath("status").description("The HTTP status code, e.g. `400`"),
-//        PayloadDocumentation.fieldWithPath("timestamp")
-//            .description("The time, in milliseconds, at which the error occurred")
-//    );
     static final PathParametersSnippet ID_PATH_PARAM = RequestDocumentation.pathParameters(
         RequestDocumentation.parameterWithName("id").description("The resource id")
     );
@@ -1060,9 +1052,9 @@ final class Snippets {
                 .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
-                .fieldWithPath("launcherExt")
+                .subsectionWithPath("launcherExt")
                 .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "launcherExt"))
-                .description("The launcher extension")
+                .description("JSON object that contains metadata specific to the launcher implementation for the job")
                 .type(JsonFieldType.OBJECT)
                 .optional()
         );
