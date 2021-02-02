@@ -73,13 +73,13 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -120,6 +120,47 @@ extends org.springframework.boot.actuate.health.HealthIndicator</pre>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCH_TIMER">LAUNCH_TIMER</a></span></code>
+<div class="block">Shared name of a timer that can be used by launchers to record how long it took them to perform their
+ respective launch.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCHER_CLASS_EXT_FIELD">LAUNCHER_CLASS_EXT_FIELD</a></span></code>
+<div class="block">Shared key representing the class that key for the Launcher Ext context the API can return.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCHER_CLASS_KEY">LAUNCHER_CLASS_KEY</a></span></code>
+<div class="block">Shared key for a tag that can be added to the timer metric to add the implementation class in order to aid in
+ adding a convenient dimension.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#SOURCE_HOST_EXT_FIELD">SOURCE_HOST_EXT_FIELD</a></span></code>
+<div class="block">Shared key representing the hostname of the Genie server the Agent Launcher was executed on.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -155,6 +196,73 @@ extends org.springframework.boot.actuate.health.HealthIndicator</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="LAUNCH_TIMER">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>LAUNCH_TIMER</h4>
+<pre>static final&nbsp;java.lang.String LAUNCH_TIMER</pre>
+<div class="block">Shared name of a timer that can be used by launchers to record how long it took them to perform their
+ respective launch.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.web.agent.launchers.AgentLauncher.LAUNCH_TIMER">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="LAUNCHER_CLASS_KEY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>LAUNCHER_CLASS_KEY</h4>
+<pre>static final&nbsp;java.lang.String LAUNCHER_CLASS_KEY</pre>
+<div class="block">Shared key for a tag that can be added to the timer metric to add the implementation class in order to aid in
+ adding a convenient dimension.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCH_TIMER"><code>LAUNCH_TIMER</code></a>, 
+<a href="../../../../../../constant-values.html#com.netflix.genie.web.agent.launchers.AgentLauncher.LAUNCHER_CLASS_KEY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="LAUNCHER_CLASS_EXT_FIELD">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>LAUNCHER_CLASS_EXT_FIELD</h4>
+<pre>static final&nbsp;java.lang.String LAUNCHER_CLASS_EXT_FIELD</pre>
+<div class="block">Shared key representing the class that key for the Launcher Ext context the API can return.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.web.agent.launchers.AgentLauncher.LAUNCHER_CLASS_EXT_FIELD">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="SOURCE_HOST_EXT_FIELD">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>SOURCE_HOST_EXT_FIELD</h4>
+<pre>static final&nbsp;java.lang.String SOURCE_HOST_EXT_FIELD</pre>
+<div class="block">Shared key representing the hostname of the Genie server the Agent Launcher was executed on.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.web.agent.launchers.AgentLauncher.SOURCE_HOST_EXT_FIELD">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -236,13 +344,13 @@ extends org.springframework.boot.actuate.health.HealthIndicator</pre>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

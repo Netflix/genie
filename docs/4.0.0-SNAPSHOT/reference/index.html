@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-12-15</span>
+<span id="revdate">2021-02-02</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -6713,6 +6713,13 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.launchers.launch.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timer recording how long it takes to execute the launch API for that specific implementation</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalAgentLauncherImpl, TitusAgentLauncherImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, launcherClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.api.v3.jobs.submitJobWithoutAttachments.rate</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of jobs submitted without an attachment</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6958,7 +6965,7 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobLaunchServiceImpl</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>status, exceptionClass, agentLauncherSelectedClass</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.jobLaunch.selectLauncher.timer</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">Time taken to invoke a selector to choose which agent launcher to use</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>nanoseconds</code></p></td>
@@ -7186,7 +7193,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-12-15 21:30:28 UTC
+Last updated 2021-02-02 23:37:01 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

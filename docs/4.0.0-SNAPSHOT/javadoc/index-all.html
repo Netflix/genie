@@ -8910,6 +8910,11 @@
 <h2 class="title">L</h2>
 <dl>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#lastModified--">lastModified()</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCH_TIMER">LAUNCH_TIMER</a></span> - Static variable in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
+<dd>
+<div class="block">Shared name of a timer that can be used by launchers to record how long it took them to perform their
+ respective launch.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">launchAgent(ResolvedJob, JsonNode)</a></span> - Method in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
 <dd>
 <div class="block">Launch an agent to execute the given <a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
@@ -8921,6 +8926,15 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#launchAgent-com.netflix.genie.web.dtos.ResolvedJob-com.fasterxml.jackson.databind.JsonNode-">launchAgent(ResolvedJob, JsonNode)</a></span> - Method in class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></dt>
 <dd>
 <div class="block">Launch an agent to execute the given <a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> information.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCHER_CLASS_EXT_FIELD">LAUNCHER_CLASS_EXT_FIELD</a></span> - Static variable in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
+<dd>
+<div class="block">Shared key representing the class that key for the Launcher Ext context the API can return.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#LAUNCHER_CLASS_KEY">LAUNCHER_CLASS_KEY</a></span> - Static variable in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
+<dd>
+<div class="block">Shared key for a tag that can be added to the timer metric to add the implementation class in order to aid in
+ adding a convenient dimension.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#LAUNCHER_EXT">LAUNCHER_EXT</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -11183,6 +11197,10 @@
 <dt><a href="com/netflix/genie/client/apis/SortDirection.html" title="enum in com.netflix.genie.client.apis"><span class="typeNameLink">SortDirection</span></a> - Enum in <a href="com/netflix/genie/client/apis/package-summary.html">com.netflix.genie.client.apis</a></dt>
 <dd>
 <div class="block">Sort direction of entity search results.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html#SOURCE_HOST_EXT_FIELD">SOURCE_HOST_EXT_FIELD</a></span> - Static variable in interface com.netflix.genie.web.agent.launchers.<a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></dt>
+<dd>
+<div class="block">Shared key representing the hostname of the Genie server the Agent Launcher was executed on.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html#SOURCE_PROPERTY">SOURCE_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentLauncherSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">AgentLauncherSelectorScriptProperties</a></dt>
 <dd>
