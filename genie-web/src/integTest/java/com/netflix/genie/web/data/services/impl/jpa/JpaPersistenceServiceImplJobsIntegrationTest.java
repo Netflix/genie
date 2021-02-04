@@ -1104,20 +1104,20 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
-    void canGetAgentActiveJobs() {
+    void canGetActiveJobs() {
         Assertions
             .assertThat(this.service.getActiveJobs())
-            .hasSize(2)
-            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
+            .hasSize(4)
+            .containsExactlyInAnyOrder(JOB_2_ID, JOB_3_ID, AGENT_JOB_1, AGENT_JOB_2);
     }
 
     @Test
     @DatabaseSetup("persistence/jobs/unclaimed.xml")
-    void canGetUnclaimedAgentJobs() {
+    void canGetUnclaimedJobs() {
         Assertions
             .assertThat(this.service.getUnclaimedJobs())
-            .hasSize(2)
-            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
+            .hasSize(3)
+            .containsExactlyInAnyOrder(JOB_2_ID, AGENT_JOB_1, AGENT_JOB_2);
     }
 
     @Test
@@ -1161,7 +1161,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                     pendingJobArchiveStatuses,
                     lastJobUpdate
                 )
-            ).isEmpty();
+            )
+            .isEmpty();
 
         Assertions
             .assertThat(
@@ -1170,7 +1171,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                     pendingJobArchiveStatuses,
                     notMatchingThreshold
                 )
-            ).isEmpty();
+            )
+            .isEmpty();
 
         Assertions
             .assertThat(
@@ -1179,8 +1181,9 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                     pendingJobArchiveStatuses,
                     matchingThreshold
                 )
-            ).hasSize(2)
-            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
+            )
+            .hasSize(3)
+            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2, "NotAgentJob1");
     }
 
     @Test

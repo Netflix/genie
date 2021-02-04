@@ -155,12 +155,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses the job statuses filter
      * @return a set of job projections
      */
-    @Query(
-        "SELECT j.uniqueId"
-            + " FROM JobEntity j"
-            + " WHERE j.status IN (:statuses)"
-            + " AND j.v4 = TRUE"
-    )
+    @Query("SELECT j.uniqueId FROM JobEntity j WHERE j.status IN (:statuses)")
     Set<String> getJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
 
     /**
@@ -177,7 +172,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
             + " WHERE j.status IN (:statuses)"
             + " AND j.archiveStatus IN (:archiveStatuses)"
             + " AND j.updated < :updatedThreshold"
-            + " AND j.v4 = TRUE"
     )
     Set<String> getJobsWithStatusAndArchiveStatusUpdatedBefore(
         @Param("statuses") @NotEmpty Set<String> statuses,
