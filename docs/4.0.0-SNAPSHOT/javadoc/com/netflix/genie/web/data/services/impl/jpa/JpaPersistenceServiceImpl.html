@@ -371,15 +371,15 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 </td>
 </tr>
 <tr id="i26" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveAgentJobs--">getActiveAgentJobs</a></span>()</code>
-<div class="block">Get the set of active agent jobs.</div>
-</td>
-</tr>
-<tr id="i27" class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveJobCountForUser-java.lang.String-">getActiveJobCountForUser</a></span>(@NotBlank java.lang.String&nbsp;user)</code>
 <div class="block">Get the count of 'active' jobs for a given user across all instances.</div>
+</td>
+</tr>
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveJobs--">getActiveJobs</a></span>()</code>
+<div class="block">Get the set of active jobs.</div>
 </td>
 </tr>
 <tr id="i28" class="altColor">
@@ -549,8 +549,8 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i54" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs</a></span>()</code>
-<div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUnclaimedJobs--">getUnclaimedJobs</a></span>()</code>
+<div class="block">Get the set of jobs in that have not reached CLAIMED state.</div>
 </td>
 </tr>
 <tr id="i55" class="rowColor">
@@ -2363,37 +2363,37 @@ public&nbsp;long&nbsp;getUsedMemoryOnHost(@NotBlank
 </dl>
 </li>
 </ul>
-<a name="getActiveAgentJobs--">
+<a name="getActiveJobs--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getActiveAgentJobs</h4>
+<h4>getActiveJobs</h4>
 <pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveAgentJobs()</pre>
-<div class="block">Get the set of active agent jobs.</div>
+public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveJobs()</pre>
+<div class="block">Get the set of active jobs.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getActiveAgentJobs--">getActiveAgentJobs</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getActiveJobs--">getActiveJobs</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The list of job ids</dd>
+<dd>The set of job ids which currently have a status which is considered active</dd>
 </dl>
 </li>
 </ul>
-<a name="getUnclaimedAgentJobs--">
+<a name="getUnclaimedJobs--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getUnclaimedAgentJobs</h4>
+<h4>getUnclaimedJobs</h4>
 <pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getUnclaimedAgentJobs()</pre>
-<div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
+public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getUnclaimedJobs()</pre>
+<div class="block">Get the set of jobs in that have not reached CLAIMED state.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getUnclaimedJobs--">getUnclaimedJobs</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The list of job ids</dd>
+<dd>The set of job ids for jobs which are active but haven't been claimed</dd>
 </dl>
 </li>
 </ul>

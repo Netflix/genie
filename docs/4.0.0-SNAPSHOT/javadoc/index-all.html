@@ -3791,10 +3791,6 @@
 <dd>
 <div class="block">Find applications which match the given filter criteria.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">findByAgentHostnameAndStatusIn(String, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Find jobs by host name and status.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html#findByFile-java.lang.String-">findByFile(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaFileRepository</a></dt>
 <dd>
 <div class="block">Find a file by its unique file value.</div>
@@ -4665,14 +4661,6 @@
 <dd>
 <div class="block">Get the current map of properties and their values.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveAgentJobs--">getActiveAgentJobs()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">Get the set of active agent jobs.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getActiveAgentJobs--">getActiveAgentJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
-<dd>
-<div class="block">Get the set of active agent jobs.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveJobCountForUser-java.lang.String-">getActiveJobCountForUser(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Get the count of 'active' jobs for a given user across all instances.</div>
@@ -4680,6 +4668,14 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getActiveJobCountForUser-java.lang.String-">getActiveJobCountForUser(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the count of 'active' jobs for a given user across all instances.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveJobs--">getActiveJobs()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Get the set of active jobs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getActiveJobs--">getActiveJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Get the set of active jobs.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatus.html#getActiveStatuses--">getActiveStatuses()</a></span> - Static method in enum com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a></dt>
 <dd>
@@ -4704,10 +4700,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/AgentHostnameProjection.html#getAgentHostname--">getAgentHostname()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/AgentHostnameProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">AgentHostnameProjection</a></dt>
 <dd>
 <div class="block">Get the host name where the agent ran or is running the job.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getAgentJobIdsWithStatusIn-java.util.Set-">getAgentJobIdsWithStatusIn(Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Find agent jobs in the given set of states.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html#getAgentLaunchers--">getAgentLaunchers()</a></span> - Method in interface com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a></dt>
 <dd>
@@ -5993,6 +5985,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobId--">getJobId()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobIdsWithStatusIn-java.util.Set-">getJobIdsWithStatusIn(Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Find agent jobs in the given set of states.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobMetadata--">getJobMetadata()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#getJobMetadata-java.lang.String-">getJobMetadata(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
@@ -6094,6 +6090,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getJobSpecification-java.lang.String-">getJobSpecification(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Get the saved job specification for the given job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobSpecification-java.lang.String-">getJobSpecification(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobSpecification-java.lang.String-">getJobSpecification(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
@@ -7020,13 +7020,13 @@
 <dd>
 <div class="block">Get the type of this application.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUnclaimedJobs--">getUnclaimedJobs()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
-<div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
+<div class="block">Get the set of jobs in that have not reached CLAIMED state.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getUnclaimedJobs--">getUnclaimedJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
-<div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
+<div class="block">Get the set of jobs in that have not reached CLAIMED state.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html#getUniqueId--">getUniqueId()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a></dt>
 <dd>
@@ -7147,10 +7147,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobRequest-java.lang.String-">getV4JobRequest(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block">Get the data needed to create a V4 Job Request DTO.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobSpecification-java.lang.String-">getV4JobSpecification(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html#getVersion--">getVersion()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a></dt>
 <dd>

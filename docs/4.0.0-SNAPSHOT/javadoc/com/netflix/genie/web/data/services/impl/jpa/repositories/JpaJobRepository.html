@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -153,13 +153,6 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobProjection</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">findByAgentHostnameAndStatusIn</a></span>(java.lang.String&nbsp;agentHostname,
-                              java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
-<div class="block">Find jobs by host name and status.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findJobsCreatedBefore-java.time.Instant-java.util.Set-int-">findJobsCreatedBefore</a></span>(java.time.Instant&nbsp;createdThreshold,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;excludeStatuses,
@@ -167,19 +160,13 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Find a batch of jobs that were created before the given time.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getAgentJobIdsWithStatusIn-java.util.Set-">getAgentJobIdsWithStatusIn</a></span>(@NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
-<div class="block">Find agent jobs in the given set of states.</div>
-</td>
-</tr>
-<tr id="i4" class="altColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getArchiveStatus-java.lang.String-">getArchiveStatus</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get only the archive status of a job.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getHostJobInfo-java.lang.String-java.util.Set-java.util.Set-">getHostJobInfo</a></span>(java.lang.String&nbsp;agentHostname,
               java.util.Set&lt;java.lang.String&gt;&nbsp;activeStatuses,
@@ -188,28 +175,40 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
  host.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobApplicationsProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobApplicationsProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobApplications-java.lang.String-">getJobApplications</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the applications for a job.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobClusterProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobClusterProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobCluster-java.lang.String-">getJobCluster</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the cluster for a job.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobCommandProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobCommandProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobCommand-java.lang.String-">getJobCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the command for a job.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobHostname-java.lang.String-">getJobHostname</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get only the hostname of a job.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobIdsWithStatusIn-java.util.Set-">getJobIdsWithStatusIn</a></span>(@NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
+<div class="block">Find agent jobs in the given set of states.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobSpecificationProjection</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobSpecification-java.lang.String-">getJobSpecification</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
 </td>
 </tr>
 <tr id="i10" class="altColor">
@@ -271,12 +270,6 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </td>
 </tr>
 <tr id="i19" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobSpecificationProjection</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobSpecification-java.lang.String-">getV4JobSpecification</a></span>(java.lang.String&nbsp;id)</code>
-<div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
-</td>
-</tr>
-<tr id="i20" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Boolean&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#isAPI-java.lang.String-">isAPI</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Return whether the job was submitted via the API or the Agent CLI.</div>
@@ -361,26 +354,6 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="findByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>findByAgentHostnameAndStatusIn</h4>
-<pre>@EntityGraph(value="Job.v3.dto.job",
-             type=LOAD)
-java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobProjection</a>&gt;&nbsp;findByAgentHostnameAndStatusIn(java.lang.String&nbsp;agentHostname,
-                                                                                                                         java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</pre>
-<div class="block">Find jobs by host name and status.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>agentHostname</code> - The host name to search for</dd>
-<dd><code>statuses</code> - The job statuses to filter by</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The jobs</dd>
-</dl>
-</li>
-</ul>
 <a name="getTotalMemoryUsedOnHost-java.lang.String-java.util.Set-">
 <!--   -->
 </a>
@@ -495,15 +468,15 @@ java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/
 </dl>
 </li>
 </ul>
-<a name="getAgentJobIdsWithStatusIn-java.util.Set-">
+<a name="getJobIdsWithStatusIn-java.util.Set-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getAgentJobIdsWithStatusIn</h4>
-<pre>@Query(value="SELECT j.uniqueId FROM JobEntity j WHERE j.status IN (:statuses) AND j.v4 = TRUE")
-java.util.Set&lt;java.lang.String&gt;&nbsp;getAgentJobIdsWithStatusIn(@Param(value="statuses") @NotEmpty
-                                                                                                                                                            @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</pre>
+<h4>getJobIdsWithStatusIn</h4>
+<pre>@Query(value="SELECT j.uniqueId FROM JobEntity j WHERE j.status IN (:statuses)")
+java.util.Set&lt;java.lang.String&gt;&nbsp;getJobIdsWithStatusIn(@Param(value="statuses") @NotEmpty
+                                                                                                                                       @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</pre>
 <div class="block">Find agent jobs in the given set of states.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -519,13 +492,13 @@ java.util.Set&lt;java.lang.String&gt;&nbsp;getAgentJobIdsWithStatusIn(@Param(val
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobsWithStatusAndArchiveStatusUpdatedBefore</h4>
-<pre>@Query(value="SELECT j.uniqueId FROM JobEntity j WHERE j.status IN (:statuses) AND j.archiveStatus IN (:archiveStatuses) AND j.updated &lt; :updatedThreshold AND j.v4 = TRUE")
+<pre>@Query(value="SELECT j.uniqueId FROM JobEntity j WHERE j.status IN (:statuses) AND j.archiveStatus IN (:archiveStatuses) AND j.updated &lt; :updatedThreshold")
 java.util.Set&lt;java.lang.String&gt;&nbsp;getJobsWithStatusAndArchiveStatusUpdatedBefore(@Param(value="statuses") @NotEmpty
-                                                                                                                                                                                                                                                            @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
-                                                                                                                                                                                                                                                            @Param(value="archiveStatuses") @NotEmpty
-                                                                                                                                                                                                                                                            @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;archiveStatuses,
-                                                                                                                                                                                                                                                            @Param(value="updatedThreshold")
-                                                                                                                                                                                                                                                            java.time.Instant&nbsp;updateThreshold)</pre>
+                                                                                                                                                                                                                                            @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
+                                                                                                                                                                                                                                            @Param(value="archiveStatuses") @NotEmpty
+                                                                                                                                                                                                                                            @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;archiveStatuses,
+                                                                                                                                                                                                                                            @Param(value="updatedThreshold")
+                                                                                                                                                                                                                                            java.time.Instant&nbsp;updateThreshold)</pre>
 <div class="block">Find agent jobs in the given set of job and archive states that were marked finished before a given threshold.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -705,17 +678,17 @@ java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/
 </dl>
 </li>
 </ul>
-<a name="getV4JobSpecification-java.lang.String-">
+<a name="getJobSpecification-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getV4JobSpecification</h4>
+<h4>getJobSpecification</h4>
 <pre>@Query(value="SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
  @EntityGraph(value="Job.v4.dto.specification",
              type=LOAD)
-java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobSpecificationProjection</a>&gt;&nbsp;getV4JobSpecification(@Param(value="id")
-                                                                                                                                                                                                              java.lang.String&nbsp;id)</pre>
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobSpecificationProjection</a>&gt;&nbsp;getJobSpecification(@Param(value="id")
+                                                                                                                                                                                                            java.lang.String&nbsp;id)</pre>
 <div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
