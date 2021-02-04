@@ -89,28 +89,24 @@ public class AgentJobCleanupTask extends LeaderTask {
     @Override
     public void run() {
         // Get agent jobs that in active status
-        final Set<String> activeAgentJobIds = this.persistenceService.getActiveAgentJobs();
+        final Set<String> activeAgentJobIds = this.persistenceService.getActiveJobs();
 
         // Get agent jobs that in ACCEPTED status (i.e. waiting for agent to start)
-        final Set<String> acceptedAgentJobIds = this.persistenceService.getUnclaimedAgentJobs();
+        final Set<String> acceptedAgentJobIds = this.persistenceService.getUnclaimedJobs();
 
         // Filter out jobs whose agent is connected
-        final Set<String> currentlyAwolJobsIds = activeAgentJobIds.stream()
+        final Set<String> currentlyAwolJobsIds = activeAgentJobIds
+            .stream()
             .filter(jobId -> !this.agentRoutingService.isAgentConnected(jobId))
             .collect(Collectors.toSet());
 
-
         // Purge records if corresponding agent is now connected
-        this.awolJobsMap.entrySet().removeIf(
-            awolJobEntry -> !currentlyAwolJobsIds.contains(awolJobEntry.getKey())
-        );
+        this.awolJobsMap.entrySet().removeIf(awolJobEntry -> !currentlyAwolJobsIds.contains(awolJobEntry.getKey()));
 
         final Instant now = Instant.now();
 
         // Add records for any agent that was not previously AWOL
-        currentlyAwolJobsIds.forEach(
-            jobId -> this.awolJobsMap.putIfAbsent(jobId, now)
-        );
+        currentlyAwolJobsIds.forEach(jobId -> this.awolJobsMap.putIfAbsent(jobId, now));
 
         // Iterate over jobs whose agent is currently AWOL
         for (final Map.Entry<String, Instant> entry : this.awolJobsMap.entrySet()) {
@@ -189,7 +185,6 @@ public class AgentJobCleanupTask extends LeaderTask {
      */
     @Override
     public long getFixedRate() {
-        return properties.getRefreshInterval().toMillis();
+        return this.properties.getRefreshInterval().toMillis();
     }
-
 }

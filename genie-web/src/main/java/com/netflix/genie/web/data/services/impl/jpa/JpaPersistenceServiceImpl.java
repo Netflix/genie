@@ -1680,7 +1680,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Optional<JobSpecification> getJobSpecification(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobSpecification] Requested to get job specification for job {}", id);
         final JobSpecificationProjection projection = this.jobRepository
-            .getV4JobSpecification(id)
+            .getJobSpecification(id)
             .orElseThrow(
                 () -> new NotFoundException("No job ith id " + id + " exists. Unable to get job specification.")
             );
@@ -1987,9 +1987,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getActiveAgentJobs() {
+    public Set<String> getActiveJobs() {
         log.debug("[getActiveAgentJobs] Called");
-        return this.jobRepository.getAgentJobIdsWithStatusIn(ACTIVE_STATUS_SET);
+        return this.jobRepository.getJobIdsWithStatusIn(ACTIVE_STATUS_SET);
     }
 
     /**
@@ -1997,9 +1997,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getUnclaimedAgentJobs() {
+    public Set<String> getUnclaimedJobs() {
         log.debug("[getUnclaimedAgentJobs] Called");
-        return this.jobRepository.getAgentJobIdsWithStatusIn(UNCLAIMED_STATUS_SET);
+        return this.jobRepository.getJobIdsWithStatusIn(UNCLAIMED_STATUS_SET);
     }
 
     /**

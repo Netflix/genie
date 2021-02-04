@@ -18,8 +18,6 @@
 package com.netflix.genie.web.tasks.leader
 
 import com.google.common.collect.Sets
-import com.netflix.genie.common.exceptions.GenieException
-import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
@@ -84,7 +82,7 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+        1 * persistenceService.getActiveJobs() >> Sets.newHashSet(
             "j1", //Active status, connected
             "j2", // Accepted status, connected
             "j3", // Active status, disconnected
@@ -92,7 +90,7 @@ class AgentJobCleanupTaskSpec extends Specification {
             "j5", // Active status, disconnected (reconnects next iteration)
             "j6" // Accepted status, disconnected (reconnects next iteration)
         )
-        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j2", "j4", "j6")
+        1 * persistenceService.getUnclaimedJobs() >> Sets.newHashSet("j2", "j4", "j6")
         1 * agentRoutingService.isAgentConnected("j1") >> true
         1 * agentRoutingService.isAgentConnected("j2") >> true
         1 * agentRoutingService.isAgentConnected("j3") >> false
@@ -109,7 +107,7 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+        1 * persistenceService.getActiveJobs() >> Sets.newHashSet(
             "j1", //Active status, connected
             "j2", // Accepted status, connected
             "j3", // Active status, disconnected
@@ -117,7 +115,7 @@ class AgentJobCleanupTaskSpec extends Specification {
             "j5", // Active status, just reconnected
             "j6" // Accepted status, just reconnected
         )
-        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j2", "j4", "j6")
+        1 * persistenceService.getUnclaimedJobs() >> Sets.newHashSet("j2", "j4", "j6")
         1 * agentRoutingService.isAgentConnected("j1") >> true
         1 * agentRoutingService.isAgentConnected("j2") >> true
         1 * agentRoutingService.isAgentConnected("j3") >> false
@@ -134,11 +132,11 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+        1 * persistenceService.getActiveJobs() >> Sets.newHashSet(
             "j3", // Active status, disconnected
             "j4", // Accepted status, disconnected
         )
-        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4", "j6")
+        1 * persistenceService.getUnclaimedJobs() >> Sets.newHashSet("j4", "j6")
         1 * agentRoutingService.isAgentConnected("j3") >> false
         1 * agentRoutingService.isAgentConnected("j4") >> false
         2 * taskProperties.getLaunchTimeLimit() >> inTheFuture
@@ -154,10 +152,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+        1 * persistenceService.getActiveJobs() >> Sets.newHashSet(
             "j4", // Accepted status, disconnected
         )
-        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4")
+        1 * persistenceService.getUnclaimedJobs() >> Sets.newHashSet("j4")
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * taskProperties.getLaunchTimeLimit() >> inThePast
         1 * taskProperties.getReconnectTimeLimit() >> inTheFuture
@@ -180,10 +178,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+        1 * persistenceService.getActiveJobs() >> Sets.newHashSet(
             "j4", // Accepted status, disconnected
         )
-        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4")
+        1 * persistenceService.getUnclaimedJobs() >> Sets.newHashSet("j4")
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * taskProperties.getLaunchTimeLimit() >> inThePast
         1 * taskProperties.getReconnectTimeLimit() >> inTheFuture
@@ -202,10 +200,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+        1 * persistenceService.getActiveJobs() >> Sets.newHashSet(
             "j4", // Accepted status, disconnected
         )
-        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4")
+        1 * persistenceService.getUnclaimedJobs() >> Sets.newHashSet("j4")
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * taskProperties.getLaunchTimeLimit() >> inThePast
         1 * taskProperties.getReconnectTimeLimit() >> inTheFuture

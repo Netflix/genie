@@ -1106,7 +1106,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @DatabaseSetup("persistence/jobs/search.xml")
     void canGetAgentActiveJobs() {
         Assertions
-            .assertThat(this.service.getActiveAgentJobs())
+            .assertThat(this.service.getActiveJobs())
             .hasSize(2)
             .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
     }
@@ -1115,7 +1115,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @DatabaseSetup("persistence/jobs/unclaimed.xml")
     void canGetUnclaimedAgentJobs() {
         Assertions
-            .assertThat(this.service.getUnclaimedAgentJobs())
+            .assertThat(this.service.getUnclaimedJobs())
             .hasSize(2)
             .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
     }
