@@ -56,16 +56,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
 
     /**
-     * Find jobs by host name and status.
-     *
-     * @param agentHostname The host name to search for
-     * @param statuses      The job statuses to filter by
-     * @return The jobs
-     */
-    @EntityGraph(value = JobEntity.V3_JOB_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
-    Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<String> statuses);
-
-    /**
      * Given the hostname that agents are running on return the total memory their jobs are currently using.
      *
      * @param agentHostname The agent hostname
@@ -171,7 +161,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
             + " WHERE j.status IN (:statuses)"
             + " AND j.v4 = TRUE"
     )
-    Set<String> getAgentJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
+    Set<String> getJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
 
     /**
      * Find agent jobs in the given set of job and archive states that were marked finished before a given threshold.
@@ -287,7 +277,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      */
     @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
     @EntityGraph(value = JobEntity.V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
-    Optional<JobSpecificationProjection> getV4JobSpecification(@Param("id") String id);
+    Optional<JobSpecificationProjection> getJobSpecification(@Param("id") String id);
 
     /**
      * Get the applications for a job.

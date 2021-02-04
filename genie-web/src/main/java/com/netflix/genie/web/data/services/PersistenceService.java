@@ -830,18 +830,18 @@ public interface PersistenceService {
     long getUsedMemoryOnHost(@NotBlank String hostname);
 
     /**
-     * Get the set of active agent jobs.
+     * Get the set of active jobs.
      *
-     * @return The list of job ids
+     * @return The set of job ids which currently have a status which is considered active
      */
-    Set<String> getActiveAgentJobs();
+    Set<String> getActiveJobs();
 
     /**
-     * Get the set of agent jobs in that have not reached CLAIMED state.
+     * Get the set of jobs in that have not reached CLAIMED state.
      *
-     * @return The list of job ids
+     * @return The set of job ids for jobs which are active but haven't been claimed
      */
-    Set<String> getUnclaimedAgentJobs();
+    Set<String> getUnclaimedJobs();
 
     /**
      * Get all the aggregate metadata information about jobs running on a given hostname.

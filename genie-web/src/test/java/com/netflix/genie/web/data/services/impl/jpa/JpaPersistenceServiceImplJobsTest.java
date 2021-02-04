@@ -235,7 +235,7 @@ class JpaPersistenceServiceImplJobsTest {
     void unresolvedJobReturnsEmptyJobSpecificationOptional() throws GenieCheckedException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito
-            .when(this.jobRepository.getV4JobSpecification(Mockito.anyString()))
+            .when(this.jobRepository.getJobSpecification(Mockito.anyString()))
             .thenReturn(Optional.of(jobEntity));
 
         Mockito.when(jobEntity.isResolved()).thenReturn(false);
@@ -581,11 +581,11 @@ class JpaPersistenceServiceImplJobsTest {
         final String job2Id = UUID.randomUUID().toString();
 
         Mockito
-            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
+            .when(this.jobRepository.getJobIdsWithStatusIn(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
             .thenReturn(Sets.newHashSet(job1Id, job2Id));
 
         Assertions
-            .assertThat(this.persistenceService.getActiveAgentJobs())
+            .assertThat(this.persistenceService.getActiveJobs())
             .isEqualTo(Sets.newHashSet(job1Id, job2Id));
     }
 
@@ -593,11 +593,11 @@ class JpaPersistenceServiceImplJobsTest {
     void canGetActiveAgentJobsWhenEmpty() {
 
         Mockito
-            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
+            .when(this.jobRepository.getJobIdsWithStatusIn(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
             .thenReturn(Sets.newHashSet());
 
         Assertions
-            .assertThat(this.persistenceService.getActiveAgentJobs())
+            .assertThat(this.persistenceService.getActiveJobs())
             .isEqualTo(Sets.newHashSet());
     }
 
@@ -607,22 +607,22 @@ class JpaPersistenceServiceImplJobsTest {
         final String jobId2 = UUID.randomUUID().toString();
 
         Mockito
-            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.UNCLAIMED_STATUS_SET))
+            .when(this.jobRepository.getJobIdsWithStatusIn(JpaPersistenceServiceImpl.UNCLAIMED_STATUS_SET))
             .thenReturn(Sets.newHashSet(jobId1, jobId2));
 
         Assertions
-            .assertThat(this.persistenceService.getUnclaimedAgentJobs())
+            .assertThat(this.persistenceService.getUnclaimedJobs())
             .isEqualTo(Sets.newHashSet(jobId1, jobId2));
     }
 
     @Test
     void canGetUnclaimedAgentJobsWhenEmpty() {
         Mockito
-            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.UNCLAIMED_STATUS_SET))
+            .when(this.jobRepository.getJobIdsWithStatusIn(JpaPersistenceServiceImpl.UNCLAIMED_STATUS_SET))
             .thenReturn(Sets.newHashSet());
 
         Assertions
-            .assertThat(this.persistenceService.getUnclaimedAgentJobs())
+            .assertThat(this.persistenceService.getUnclaimedJobs())
             .isEqualTo(Sets.newHashSet());
     }
 
