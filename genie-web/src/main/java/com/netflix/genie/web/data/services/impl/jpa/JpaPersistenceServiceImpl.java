@@ -1988,7 +1988,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getActiveJobs() {
-        log.debug("[getActiveAgentJobs] Called");
+        log.debug("[getActiveJobs] Called");
         return this.jobRepository.getJobIdsWithStatusIn(ACTIVE_STATUS_SET);
     }
 
@@ -1998,7 +1998,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     @Transactional(readOnly = true)
     public Set<String> getUnclaimedJobs() {
-        log.debug("[getUnclaimedAgentJobs] Called");
+        log.debug("[getUnclaimedJobs] Called");
         return this.jobRepository.getJobIdsWithStatusIn(UNCLAIMED_STATUS_SET);
     }
 
