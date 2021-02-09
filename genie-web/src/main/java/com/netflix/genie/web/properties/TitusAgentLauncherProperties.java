@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.properties;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +31,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,14 +89,17 @@ public class TitusAgentLauncherProperties {
      * Placeholder values are substituted before submission
      */
     @NotEmpty(message = "The command-line launch template cannot be empty")
-    private List<@NotBlank String> entryPointTemplate = Lists.newArrayList(
+    private List<@NotBlank String> entryPointTemplate = Arrays.asList(
         "/bin/genie-agent",
         "exec",
         "--api-job",
         "--launchInJobDirectory",
-        "--job-id", JOB_ID_PLACEHOLDER,
-        "--server-host", SERVER_HOST_PLACEHOLDER,
-        "--server-port", SERVER_PORT_PLACEHOLDER
+        "--job-id",
+        JOB_ID_PLACEHOLDER,
+        "--server-host",
+        SERVER_HOST_PLACEHOLDER,
+        "--server-port",
+        SERVER_PORT_PLACEHOLDER
     );
 
     /**
@@ -120,13 +124,13 @@ public class TitusAgentLauncherProperties {
      * A map of security attributes.
      */
     @NotNull
-    private Map<String, String> securityAttributes = Maps.newHashMap();
+    private Map<String, String> securityAttributes = new HashMap<>();
 
     /**
      * A list of security groups.
      */
     @NotNull
-    private List<String> securityGroups = Lists.newArrayList();
+    private List<String> securityGroups = new ArrayList<>();
 
     /**
      * The IAM role.
@@ -186,7 +190,7 @@ public class TitusAgentLauncherProperties {
      * Additional environment variables to set.
      */
     @NotNull
-    private Map<String, String> additionalEnvironment = Maps.newHashMap();
+    private Map<String, String> additionalEnvironment = new HashMap<>();
 
     /**
      * The amount of bandwidth to request in addition to the amount requested by the job.
