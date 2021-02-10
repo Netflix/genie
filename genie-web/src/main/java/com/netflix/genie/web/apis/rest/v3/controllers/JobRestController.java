@@ -140,6 +140,7 @@ public class JobRestController {
     private static final String NAME_HEADER_COOKIE = "cookie";
     private static final String JOB_API_BASE_PATH = "/api/v3/jobs/";
     private static final String COMMA = ",";
+    private static final String EMPTY_STRING = "";
     private static final String USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME = "genie.jobs.submit.rejected.jobs-limit.counter";
     private static final Pattern HTTP_HEADER_FILTER_PATTERN = Pattern.compile("^GENIE_.*");
 
@@ -169,6 +170,7 @@ public class JobRestController {
 
     /**
      * Constructor.
+     *
      * @param jobLaunchService          The {@link JobLaunchService} implementation to use
      * @param dataServices              The {@link DataServices} instance to use
      * @param entityModelAssemblers     The encapsulation of all the V3 resource assemblers
@@ -347,7 +349,7 @@ public class JobRestController {
 
     private Map<String, String> getGenieHeaders(final HttpServletRequest httpServletRequest) {
         final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
-        for (Enumeration<String> headerNames = httpServletRequest.getHeaderNames(); headerNames.hasMoreElements();) {
+        for (Enumeration<String> headerNames = httpServletRequest.getHeaderNames(); headerNames.hasMoreElements(); ) {
             final String headerName = headerNames.nextElement();
             if (HTTP_HEADER_FILTER_PATTERN.matcher(headerName).matches()) {
                 final String headerValue = httpServletRequest.getHeader(headerName);
@@ -579,7 +581,11 @@ public class JobRestController {
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws GenieException, NotFoundException, IOException {
-        log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
+        log.info(
+            "[killJob] Called for job: {}.{}",
+            id,
+            forwardedFrom == null ? EMPTY_STRING : " Forwarded from " + forwardedFrom
+        );
 
         if (this.persistenceService.getJobStatus(id).isFinished()) {
             // Job is already done no need to kill
@@ -628,7 +634,7 @@ public class JobRestController {
         } else {
             throw new GenieServerException(
                 "Cannot forward kill request, "
-                + (forwardedFrom == null ? "forwarding disabled" : "request is already a forward")
+                    + (forwardedFrom == null ? "forwarding disabled" : "request is already a forward")
             );
         }
     }
@@ -755,7 +761,12 @@ public class JobRestController {
     ) throws GenieException, NotFoundException {
 
         final String path = ControllerUtils.getRemainingPath(request);
-        log.info("[getJobOutput] Called to get output path \"{}\" for job with id \"{}\"", path, id);
+        log.info(
+            "[getJobOutput] Called to get output path: \"{}\" for job: \"{}\".{}",
+            path,
+            id,
+            forwardedFrom == null ? EMPTY_STRING : " Requested forwarded from: " + forwardedFrom
+        );
 
         final URL baseUrl;
         try {
