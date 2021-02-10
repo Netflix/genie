@@ -170,9 +170,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
                   <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                   <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
+                  org.springframework.core.env.Environment&nbsp;environment,
                   io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
  container if enabled via property.</div>
@@ -217,7 +218,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-io.micrometer.core.instrument.MeterRegistry-">
+<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -230,6 +231,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
                                                                                                                                                                      org.springframework.web.client.RestTemplate&nbsp;restTemplate,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
+                                                                                                                                                                     org.springframework.core.env.Environment&nbsp;environment,
                                                                                                                                                                      io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
  container if enabled via property.</div>
@@ -238,6 +240,8 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
 <dd><code>restTemplate</code> - the rest template</dd>
 <dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>
 <dd><code>titusAgentLauncherProperties</code> - the configuration properties</dd>
+<dd><code>environment</code> - The application <code>Environment</code> used to pull dynamic properties after
+                                     launch</dd>
 <dd><code>registry</code> - the metric registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a></dd>

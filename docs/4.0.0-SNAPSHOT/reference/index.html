@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2021-02-04</span>
+<span id="revdate">2021-02-10</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5345,8 +5345,56 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.application-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the application that launches the Titus job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-bandwidth</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An additional amount of overhead bandwidth that should be added to whatever the job originally requested</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0B</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-cpu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An additional number of CPUs that should be added to whatever the job originally requested</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-disk-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An additional amount of disk space that should be added to whatever the job originally requested</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1GB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-environment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map of additional environment variables to set for the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-gpu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An additional number of GPUs that should be added to whatever the job originally requested</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-memory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An additional amount of memory that should be added to whatever the job originally requested</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2GB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.capacity-group</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the capacity group to target</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">default</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the Titus agent launcher is active</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the Titus agent launcher is active or not</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -5360,78 +5408,6 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.entry-point-template</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The container entry point expression, placeholder values are substituted at runtime</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">[/bin/genie-agent, exec, --api-job, --launchInJobDirectory, --job-id, &lt;JOB_ID&gt;, --server-host, &lt;SERVER_HOST&gt;, --server-port, &lt;SERVER_PORT&gt;]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.owner-email</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The team email of the owners of the Titus job</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="mailto:owners@genie.tld">owners@genie.tld</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.application-name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the application that launches the Titus job</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.capacity-group</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the capacity group to target</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">default</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.security-attributes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A map of security attributes</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.security-groups</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A list of security groups for the job</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">default</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.i-am-role</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The IAM role to launch the job as</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">arn:aws:iam::000000000:role/SomeProfile</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.image-name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the container image</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">image-name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.image-tag</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The image tag</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">latest</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.disk-size</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The size of the disk volume to attach to the job container</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10G</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.network-bandwidth</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The network bandwidth to allocate to the container</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">7M</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.retries</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">How many times to retry launch if the job fails</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.runtime-limit</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum runtime of the job</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12H</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5459,15 +5435,81 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-environment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Map of additional environment variables to set for the job</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">default</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.i-am-role</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The IAM role to launch the job as</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">arn:aws:iam::000000000:role/SomeProfile</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-memory</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of memory requested for the container in addition to the amount requested by the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.image-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the container image</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.image-tag</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The image tag</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">latest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.minimum-bandwidth</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum network bandwidth to allocate to the container</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7MB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.minimum-cpu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum number of CPUs any container should launch with</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.minimum-disk-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum size of the disk volume to attach to the job container</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10GB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.minimum-gpu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum number of GPUs any container should launch with</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.minimum-memory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum amount of memory a container should be allocated</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2GB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.owner-email</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The team email of the owners of the Titus job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="mailto:owners@genie.tld">owners@genie.tld</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.retries</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many times to retry launch if the job fails</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.runtime-limit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum runtime of the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12H</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.security-attributes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A map of security attributes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty map</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.security-groups</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A list of security groups for the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty list</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5582,7 +5624,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.files.filter.case-sensitive-matching</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Wether the regular expressions defined in <code>genie.jobs.files.filter.*</code> are case-sensitive.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the regular expressions defined in <code>genie.jobs.files.filter.*</code> are case-sensitive or not.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -5606,7 +5648,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to attempt to forward kill and get output requests for jobs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to attempt to forward kill and get output requests for jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -7193,7 +7235,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2021-02-04 20:57:02 UTC
+Last updated 2021-02-10 01:24:46 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
