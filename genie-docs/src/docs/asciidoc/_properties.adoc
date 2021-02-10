@@ -142,8 +142,48 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |127.0.0.1
 |no
 
+|genie.agent.launcher.titus.application-name
+|The name of the application that launches the Titus job
+|genie
+|no
+
+|genie.agent.launcher.titus.additional-bandwidth
+|An additional amount of overhead bandwidth that should be added to whatever the job originally requested
+|0B
+|yes
+
+|genie.agent.launcher.titus.additional-cpu
+|An additional number of CPUs that should be added to whatever the job originally requested
+|1
+|yes
+
+|genie.agent.launcher.titus.additional-disk-size
+|An additional amount of disk space that should be added to whatever the job originally requested
+|1GB
+|yes
+
+|genie.agent.launcher.titus.additional-environment
+|Map of additional environment variables to set for the job
+|empty
+|no
+
+|genie.agent.launcher.titus.additional-gpu
+|An additional number of GPUs that should be added to whatever the job originally requested
+|0
+|yes
+
+|genie.agent.launcher.titus.additional-memory
+|An additional amount of memory that should be added to whatever the job originally requested
+|2GB
+|yes
+
+|genie.agent.launcher.titus.capacity-group
+|The name of the capacity group to target
+|default
+|yes
+
 |genie.agent.launcher.titus.enabled
-|Whether the Titus agent launcher is active
+|Whether the Titus agent launcher is active or not
 |false
 |no
 
@@ -155,66 +195,6 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |genie.agent.launcher.titus.entry-point-template
 |The container entry point expression, placeholder values are substituted at runtime
 |[/bin/genie-agent, exec, --api-job, --launchInJobDirectory, --job-id, <JOB_ID>, --server-host, <SERVER_HOST>, --server-port, <SERVER_PORT>]
-|no
-
-|genie.agent.launcher.titus.owner-email
-|The team email of the owners of the Titus job
-|owners@genie.tld
-|no
-
-|genie.agent.launcher.titus.application-name
-|The name of the application that launches the Titus job
-|genie
-|no
-
-|genie.agent.launcher.titus.capacity-group
-|The name of the capacity group to target
-|default
-|no
-
-|genie.agent.launcher.titus.security-attributes
-|A map of security attributes
-|
-|no
-
-|genie.agent.launcher.titus.security-groups
-|A list of security groups for the job
-|default
-|no
-
-|genie.agent.launcher.titus.i-am-role
-|The IAM role to launch the job as
-|arn:aws:iam::000000000:role/SomeProfile
-|no
-
-|genie.agent.launcher.titus.image-name
-|The name of the container image
-|image-name
-|no
-
-|genie.agent.launcher.titus.image-tag
-|The image tag
-|latest
-|no
-
-|genie.agent.launcher.titus.disk-size
-|The size of the disk volume to attach to the job container
-|10G
-|no
-
-|genie.agent.launcher.titus.network-bandwidth
-|The network bandwidth to allocate to the container
-|7M
-|no
-
-|genie.agent.launcher.titus.retries
-|How many times to retry launch if the job fails
-|0
-|no
-
-|genie.agent.launcher.titus.runtime-limit
-|The maximum runtime of the job
-|12H
 |no
 
 |genie.agent.launcher.titus.genie-server-host
@@ -237,14 +217,69 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |30m
 |no
 
-|genie.agent.launcher.titus.additional-environment
-|Map of additional environment variables to set for the job
-|default
+|genie.agent.launcher.titus.i-am-role
+|The IAM role to launch the job as
+|arn:aws:iam::000000000:role/SomeProfile
 |no
 
-|genie.agent.launcher.titus.additional-memory
-|Amount of memory requested for the container in addition to the amount requested by the job
+|genie.agent.launcher.titus.image-name
+|The name of the container image
+|image-name
+|yes
+
+|genie.agent.launcher.titus.image-tag
+|The image tag
+|latest
+|yes
+
+|genie.agent.launcher.titus.minimum-bandwidth
+|The minimum network bandwidth to allocate to the container
+|7MB
+|yes
+
+|genie.agent.launcher.titus.minimum-cpu
+|The minimum number of CPUs any container should launch with
+|1
+|yes
+
+|genie.agent.launcher.titus.minimum-disk-size
+|The minimum size of the disk volume to attach to the job container
+|10GB
+|yes
+
+|genie.agent.launcher.titus.minimum-gpu
+|The minimum number of GPUs any container should launch with
+|0
+|yes
+
+|genie.agent.launcher.titus.minimum-memory
+|The minimum amount of memory a container should be allocated
 |2GB
+|yes
+
+|genie.agent.launcher.titus.owner-email
+|The team email of the owners of the Titus job
+|owners@genie.tld
+|no
+
+|genie.agent.launcher.titus.retries
+|How many times to retry launch if the job fails
+|0
+|yes
+
+|genie.agent.launcher.titus.runtime-limit
+|The maximum runtime of the job
+|12H
+|no
+
+|genie.agent.launcher.titus.security-attributes
+|A map of security attributes
+|empty map
+|no
+
+|genie.agent.launcher.titus.security-groups
+|A list of security groups for the job
+|empty list
 |no
 
 |genie.agent.routing.refresh-interval
@@ -341,7 +376,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |no
 
 |genie.jobs.files.filter.case-sensitive-matching
-|Wether the regular expressions defined in `genie.jobs.files.filter.*` are case-sensitive.
+|Whether the regular expressions defined in `genie.jobs.files.filter.*` are case-sensitive or not.
 |true
 |no
 
@@ -361,7 +396,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |no
 
 |genie.jobs.forwarding.enabled
-|Whether or not to attempt to forward kill and get output requests for jobs
+|Whether to attempt to forward kill and get output requests for jobs
 |true
 |no
 

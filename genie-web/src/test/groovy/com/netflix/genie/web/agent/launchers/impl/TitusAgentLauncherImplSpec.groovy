@@ -30,6 +30,7 @@ import com.netflix.genie.web.dtos.TitusBatchJobResponse
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.properties.TitusAgentLauncherProperties
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.springframework.mock.env.MockEnvironment
 import org.springframework.util.unit.DataSize
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
@@ -57,14 +58,14 @@ class TitusAgentLauncherImplSpec extends Specification {
     TitusAgentLauncherProperties launcherProperties
     SimpleMeterRegistry registry
     TitusAgentLauncherImpl launcher
+    MockEnvironment environment
 
     int requestedCPU
     long requestedMemory
 
     void setup() {
-
-        requestedCPU = 3
-        requestedMemory = 1024
+        this.requestedCPU = 3
+        this.requestedMemory = 1024
 
         this.job = Mock(JobSpecification.ExecutionResource) {
             getId() >> JOB_ID
@@ -76,8 +77,8 @@ class TitusAgentLauncherImplSpec extends Specification {
             getUser() >> USER
         }
         this.jobEnvironment = Mock(JobEnvironment) {
-            getCpu() >> {return requestedCPU}
-            getMemory() >> {return requestedMemory}
+            getCpu() >> { return requestedCPU }
+            getMemory() >> { return requestedMemory }
         }
         this.resolvedJob = Mock(ResolvedJob) {
             getJobSpecification() >> jobSpecification
@@ -91,13 +92,15 @@ class TitusAgentLauncherImplSpec extends Specification {
         this.launcherProperties = new TitusAgentLauncherProperties()
         this.launcherProperties.setEndpoint(URI.create(TITUS_ENDPOINT_PREFIX))
         this.registry = new SimpleMeterRegistry()
+        this.environment = new MockEnvironment()
 
         this.launcher = new TitusAgentLauncherImpl(
-            restTemplate,
-            cache,
-            genieHostInfo,
-            launcherProperties,
-            registry
+            this.restTemplate,
+            this.cache,
+            this.genieHostInfo,
+            this.launcherProperties,
+            this.environment,
+            this.registry
         )
     }
 
@@ -241,4 +244,237 @@ class TitusAgentLauncherImplSpec extends Specification {
         1024   | 3      | 7      | 1       | 20       | 2       | 9       | 1     | 1      | 10      | 0      | 4      | "Use requested plus additional"
     }
 
+    @Unroll
+    def "Check memory allocation logic"() {
+        if (envMinimumMemory != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.MINIMUM_MEMORY_PROPERTY, envMinimumMemory)
+        }
+        if (envAdditionalMemory != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.ADDITIONAL_MEMORY_PROPERTY, envAdditionalMemory)
+        }
+        this.requestedMemory = jobRequestMemory
+        this.launcherProperties.setMinimumMemory(minimumMemory)
+        this.launcherProperties.setAdditionalMemory(additionalMemory)
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getResources().getMemoryMB() == expectedMemory
+
+        where:
+        jobRequestMemory                    | minimumMemory         | envMinimumMemory | additionalMemory      | envAdditionalMemory | expectedMemory
+        DataSize.parse("2GB").toMegabytes() | DataSize.parse("1GB") | null             | DataSize.parse("1MB") | null                | DataSize.parse("2GB").toMegabytes() + 1
+        DataSize.parse("1GB").toMegabytes() | DataSize.parse("2GB") | null             | DataSize.parse("1MB") | null                | DataSize.parse("2GB").toMegabytes()
+        DataSize.parse("2GB").toMegabytes() | DataSize.parse("1GB") | "3GB"            | DataSize.parse("1MB") | null                | DataSize.parse("3GB").toMegabytes()
+        DataSize.parse("3GB").toMegabytes() | DataSize.parse("1GB") | "2GB"            | DataSize.parse("1MB") | "10MB"              | DataSize.parse("3GB").toMegabytes() + 10
+    }
+
+    @Unroll
+    def "Check cpu allocation logic"() {
+        if (envMinimumCPU != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.MINIMUM_CPU_PROPERTY, envMinimumCPU)
+        }
+        if (envAdditionalCPU != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.ADDITIONAL_CPU_PROPERTY, envAdditionalCPU)
+        }
+        this.requestedCPU = jobRequestCPU
+        this.launcherProperties.setMinimumCPU(minimumCPU)
+        this.launcherProperties.setAdditionalCPU(additionalCPU)
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getResources().getCpu() == expectedCPU
+
+        where:
+        jobRequestCPU | minimumCPU | envMinimumCPU | additionalCPU | envAdditionalCPU | expectedCPU
+        2             | 1          | null          | 1             | null             | 3
+        1             | 2          | null          | 1             | null             | 2
+        2             | 1          | "3"           | 1             | null             | 3
+        3             | 1          | "2"           | 1             | "2"              | 5
+    }
+
+    @Unroll
+    def "Check disk size allocation logic"() {
+        if (envMinimumDiskSize != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.MINIMUM_DISK_SIZE_PROPERTY, envMinimumDiskSize)
+        }
+        if (envAdditionalDiskSize != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.ADDITIONAL_DISK_SIZE_PROPERTY, envAdditionalDiskSize)
+        }
+        this.launcherProperties.setMinimumDiskSize(minimumDiskSize)
+        this.launcherProperties.setAdditionalDiskSize(additionalDiskSize)
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getResources().getDiskMB() == expectedDiskSize
+
+        where:
+        minimumDiskSize       | envMinimumDiskSize | additionalDiskSize    | envAdditionalDiskSize | expectedDiskSize
+        DataSize.parse("1GB") | null               | DataSize.parse("1MB") | null                  | DataSize.parse("1GB").toMegabytes()
+        DataSize.parse("2GB") | null               | DataSize.parse("1MB") | null                  | DataSize.parse("2GB").toMegabytes()
+        DataSize.parse("1GB") | "3GB"              | DataSize.parse("1MB") | null                  | DataSize.parse("3GB").toMegabytes()
+        DataSize.parse("1GB") | "2GB"              | DataSize.parse("1MB") | "10GB"                | DataSize.parse("10GB").toMegabytes()
+    }
+
+    @Unroll
+    def "Check network allocation logic"() {
+        if (envMinimumBandwidth != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.MINIMUM_BANDWIDTH_PROPERTY, envMinimumBandwidth)
+        }
+        if (envAdditionalBandwidth != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.ADDITIONAL_BANDWIDTH_PROPERTY, envAdditionalBandwidth)
+        }
+        this.launcherProperties.setMinimumBandwidth(minimumBandwidth)
+        this.launcherProperties.setAdditionalBandwidth(additionalBandwidth)
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getResources().getNetworkMbps() == expectedBandwidth
+
+        where:
+        minimumBandwidth      | envMinimumBandwidth | additionalBandwidth   | envAdditionalBandwidth | expectedBandwidth
+        DataSize.parse("1GB") | null                | DataSize.parse("1MB") | null                   | DataSize.parse("1GB").toMegabytes() * TitusAgentLauncherImpl.MEGABYTE_TO_MEGABIT
+        DataSize.parse("2GB") | null                | DataSize.parse("1MB") | null                   | DataSize.parse("2GB").toMegabytes() * TitusAgentLauncherImpl.MEGABYTE_TO_MEGABIT
+        DataSize.parse("1GB") | "3GB"               | DataSize.parse("1MB") | null                   | DataSize.parse("3GB").toMegabytes() * TitusAgentLauncherImpl.MEGABYTE_TO_MEGABIT
+        DataSize.parse("1GB") | "2GB"               | DataSize.parse("1MB") | "10GB"                 | DataSize.parse("10GB").toMegabytes() * TitusAgentLauncherImpl.MEGABYTE_TO_MEGABIT
+    }
+
+    @Unroll
+    def "Check gpu allocation logic"() {
+        if (envMinimumGPU != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.MINIMUM_GPU_PROPERTY, envMinimumGPU)
+        }
+        if (envAdditionalGPU != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.ADDITIONAL_GPU_PROPERTY, envAdditionalGPU)
+        }
+        this.launcherProperties.setMinimumGPU(minimumGPU)
+        this.launcherProperties.setAdditionalGPU(additionalGPU)
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getResources().getGpu() == expectedGPU
+
+        where:
+        minimumGPU | envMinimumGPU | additionalGPU | envAdditionalGPU | expectedGPU
+        1          | null          | 1             | null             | 1
+        2          | null          | 1             | null             | 2
+        1          | "3"           | 1             | null             | 3
+        1          | "2"           | 1             | "5"              | 5
+    }
+
+    @Unroll
+    def "Check image and retry resolution"() {
+        if (envImageName != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY, envImageName)
+        }
+        if (envImageTag != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY, envImageTag)
+        }
+        if (envRetries != null) {
+            this.environment.withProperty(TitusAgentLauncherProperties.RETRIES_PROPERTY, envRetries)
+        }
+        this.launcherProperties.setImageName(imageName)
+        this.launcherProperties.setImageTag(imageTag)
+        this.launcherProperties.setRetries(retries)
+
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+
+        expect:
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getImage().getName() == expectedImageName
+        requestCapture.getContainer().getImage().getTag() == expectedImageTag
+        requestCapture.getBatch().getRetryPolicy().getImmediate().getRetries() == expectedRetries
+
+        where:
+        imageName     | envImageName          | imageTag         | envImageTag | retries | envRetries | expectedImageName | expectedImageTag | expectedRetries
+        "genie-agent" | null                  | "latest.release" | null        | 4     | null     | "genie-agent"         | "latest.release" | 4
+        "genie-agent" | "genie-agent-tgianos" | "latest.release" | "4.0.82"    | 4     | "1"      | "genie-agent-tgianos" | "4.0.82"         | 1
+    }
 }

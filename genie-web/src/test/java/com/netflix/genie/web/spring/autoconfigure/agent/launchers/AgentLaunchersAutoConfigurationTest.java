@@ -46,7 +46,7 @@ import java.util.UUID;
  */
 class AgentLaunchersAutoConfigurationTest {
 
-    private ApplicationContextRunner contextRunner =
+    private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
