@@ -34,9 +34,14 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +59,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TitusAgentLauncherImpl implements AgentLauncher {
 
+    static final int MEGABYTE_TO_MEGABIT = 8;
     private static final String GENIE_USER_ATTR = "genie.user";
     private static final String GENIE_SOURCE_HOST_ATTR = "genie.sourceHost";
     private static final String GENIE_ENDPOINT_ATTR = "genie.endpoint";
@@ -66,12 +72,12 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private static final Tag CLASS_TAG = Tag.of(LAUNCHER_CLASS_KEY, THIS_CLASS);
     private static final int TITUS_JOB_BATCH_SIZE = 1;
     private static final int ZERO = 0;
-    private static final int MEGABYTE_TO_MEGABIT = 8;
-
     private final RestTemplate restTemplate;
     private final Cache<String, String> healthIndicatorCache;
     private final GenieHostInfo genieHostInfo;
     private final TitusAgentLauncherProperties titusAgentLauncherProperties;
+    private final Environment environment;
+    private final boolean hasDataSizeConverters;
     private final MeterRegistry registry;
 
     /**
@@ -81,6 +87,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
      * @param healthIndicatorCache         a cache to store metadata about recently launched jobs
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
+     * @param environment                  The application environment to pull dynamic properties from
      * @param registry                     the metric registry
      */
     public TitusAgentLauncherImpl(
@@ -88,12 +95,23 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         final Cache<String, String> healthIndicatorCache,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
+        final Environment environment,
         final MeterRegistry registry
     ) {
         this.restTemplate = restTemplate;
         this.healthIndicatorCache = healthIndicatorCache;
         this.genieHostInfo = genieHostInfo;
         this.titusAgentLauncherProperties = titusAgentLauncherProperties;
+        this.environment = environment;
+        if (this.environment instanceof ConfigurableEnvironment) {
+            final ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) this.environment;
+            final ConversionService conversionService = configurableEnvironment.getConversionService();
+            this.hasDataSizeConverters
+                = conversionService.canConvert(String.class, DataSize.class)
+                && conversionService.canConvert(Integer.class, DataSize.class);
+        } else {
+            this.hasDataSizeConverters = false;
+        }
         this.registry = registry;
     }
 
@@ -169,7 +187,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     }
 
     private TitusBatchJobRequest createJobRequest(final ResolvedJob resolvedJob) {
-
         final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
         // Map placeholders in entry point template to their values
@@ -190,35 +207,69 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 .collect(Collectors.toList());
 
         final long memory = Math.max(
-            this.titusAgentLauncherProperties.getMinimumMemory().toMegabytes(),
-            resolvedJob.getJobEnvironment().getMemory()
-                + this.titusAgentLauncherProperties.getAdditionalMemory().toMegabytes()
+            this.getDataSizeProperty(
+                TitusAgentLauncherProperties.MINIMUM_MEMORY_PROPERTY,
+                this.titusAgentLauncherProperties.getMinimumMemory()
+            ).toMegabytes(),
+            resolvedJob.getJobEnvironment().getMemory() + this.getDataSizeProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_MEMORY_PROPERTY,
+                this.titusAgentLauncherProperties.getAdditionalMemory()
+            ).toMegabytes()
         );
         final int cpu = Math.max(
-            this.titusAgentLauncherProperties.getMinimumCPU(),
-            resolvedJob.getJobEnvironment().getCpu()
-                + this.titusAgentLauncherProperties.getAdditionalCPU()
+            this.environment.getProperty(
+                TitusAgentLauncherProperties.MINIMUM_CPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getMinimumCPU()
+            ),
+            resolvedJob.getJobEnvironment().getCpu() + this.environment.getProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_CPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getAdditionalCPU()
+            )
         );
         final long diskSize = Math.max(
-            this.titusAgentLauncherProperties.getMinimumDiskSize().toMegabytes(),
-            ZERO // Placeholder for job request field
-                + this.titusAgentLauncherProperties.getAdditionalDiskSize().toMegabytes()
+            this.getDataSizeProperty(
+                TitusAgentLauncherProperties.MINIMUM_DISK_SIZE_PROPERTY,
+                this.titusAgentLauncherProperties.getMinimumDiskSize()
+            ).toMegabytes(),
+            ZERO /* TODO: Placeholder for job request field */ + this.getDataSizeProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_DISK_SIZE_PROPERTY,
+                this.titusAgentLauncherProperties.getAdditionalDiskSize()
+            ).toMegabytes()
         );
         final long networkMbps = Math.max(
-            this.titusAgentLauncherProperties.getMinimumBandwidth().toMegabytes(),
-            ZERO // Placeholder for job request field
-                + this.titusAgentLauncherProperties.getAdditionalBandwidth().toMegabytes()
+            this.getDataSizeProperty(
+                TitusAgentLauncherProperties.MINIMUM_BANDWIDTH_PROPERTY,
+                this.titusAgentLauncherProperties.getMinimumBandwidth()
+            ).toMegabytes(),
+            ZERO /* TODO: Placeholder for job request field */ + this.getDataSizeProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_BANDWIDTH_PROPERTY,
+                this.titusAgentLauncherProperties.getAdditionalBandwidth()
+            ).toMegabytes()
         ) * MEGABYTE_TO_MEGABIT;
         final int gpus = Math.max(
-            this.titusAgentLauncherProperties.getMinimumGPU(),
-            ZERO // Placeholder for job request field
-                + this.titusAgentLauncherProperties.getAdditionalGPU()
+            this.environment.getProperty(
+                TitusAgentLauncherProperties.MINIMUM_GPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getMinimumGPU()
+            ),
+            ZERO /* TODO: Placeholder for job request field */ + this.environment.getProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_GPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getAdditionalGPU()
+            )
         );
+        final Duration runtimeLimit = this.titusAgentLauncherProperties.getRuntimeLimit();
 
         return new TitusBatchJobRequest(
             new TitusBatchJobRequest.Owner(this.titusAgentLauncherProperties.getOwnerEmail()),
             this.titusAgentLauncherProperties.getApplicationName(),
-            this.titusAgentLauncherProperties.getCapacityGroup(),
+            this.environment.getProperty(
+                TitusAgentLauncherProperties.CAPACITY_GROUP_PROPERTY,
+                String.class,
+                this.titusAgentLauncherProperties.getCapacityGroup()
+            ),
             ImmutableMap.of(
                 GENIE_USER_ATTR, resolvedJob.getJobMetadata().getUser(),
                 GENIE_SOURCE_HOST_ATTR, this.genieHostInfo.getHostname(),
@@ -239,8 +290,16 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     this.titusAgentLauncherProperties.getIAmRole()
                 ),
                 new TitusBatchJobRequest.Image(
-                    this.titusAgentLauncherProperties.getImageName(),
-                    this.titusAgentLauncherProperties.getImageTag()
+                    this.environment.getProperty(
+                        TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
+                        String.class,
+                        this.titusAgentLauncherProperties.getImageName()
+                    ),
+                    this.environment.getProperty(
+                        TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
+                        String.class,
+                        this.titusAgentLauncherProperties.getImageTag()
+                    )
                 ),
                 entryPoint,
                 this.titusAgentLauncherProperties.getAdditionalEnvironment()
@@ -248,13 +307,45 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             new TitusBatchJobRequest.Batch(
                 TITUS_JOB_BATCH_SIZE,
                 new TitusBatchJobRequest.RetryPolicy(
-                    new TitusBatchJobRequest.Immediate(this.titusAgentLauncherProperties.getRetries())
+                    new TitusBatchJobRequest.Immediate(
+                        this.environment.getProperty(
+                            TitusAgentLauncherProperties.RETRIES_PROPERTY,
+                            Integer.class,
+                            this.titusAgentLauncherProperties.getRetries()
+                        )
+                    )
                 ),
-                this.titusAgentLauncherProperties.getRuntimeLimit().getSeconds()
+                runtimeLimit.getSeconds()
             ),
-            new TitusBatchJobRequest.DisruptionBudget(
-                new TitusBatchJobRequest.SelfManaged(this.titusAgentLauncherProperties.getRuntimeLimit().toMillis())
-            )
+            new TitusBatchJobRequest.DisruptionBudget(new TitusBatchJobRequest.SelfManaged(runtimeLimit.toMillis()))
         );
+    }
+
+    /**
+     * Helper method to avoid runtime errors if for some reason the DataSize converters aren't loaded.
+     *
+     * @param propertyKey  The key to get from the environment
+     * @param defaultValue The default value to apply
+     * @return The resolved value
+     */
+    private DataSize getDataSizeProperty(final String propertyKey, final DataSize defaultValue) {
+        if (this.hasDataSizeConverters) {
+            return this.environment.getProperty(propertyKey, DataSize.class, defaultValue);
+        } else {
+            final String propValue = this.environment.getProperty(propertyKey);
+            if (propValue != null) {
+                try {
+                    return DataSize.parse(propValue);
+                } catch (final IllegalArgumentException e) {
+                    log.error(
+                        "Unable to parse value of {} as DataSize. Falling back to default value {}",
+                        propertyKey,
+                        defaultValue,
+                        e
+                    );
+                }
+            }
+            return defaultValue;
+        }
     }
 }

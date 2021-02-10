@@ -36,6 +36,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,8 @@ public class AgentLaunchersAutoConfiguration {
      * @param restTemplate                 the rest template
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
+     * @param environment                  The application {@link Environment} used to pull dynamic properties after
+     *                                     launch
      * @param registry                     the metric registry
      * @return a {@link TitusAgentLauncherImpl}
      */
@@ -71,6 +74,7 @@ public class AgentLaunchersAutoConfiguration {
         @Qualifier("titusRestTemplate") final RestTemplate restTemplate,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
+        final Environment environment,
         final MeterRegistry registry
     ) {
         final Cache<String, String> healthIndicatorCache = Caffeine.newBuilder()
@@ -86,6 +90,7 @@ public class AgentLaunchersAutoConfiguration {
             healthIndicatorCache,
             genieHostInfo,
             titusAgentLauncherProperties,
+            environment,
             registry
         );
     }

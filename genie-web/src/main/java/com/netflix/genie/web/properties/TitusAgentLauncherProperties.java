@@ -55,9 +55,84 @@ public class TitusAgentLauncherProperties {
     public static final String PREFIX = "genie.agent.launcher.titus";
 
     /**
+     * An additional amount of overhead bandwidth that should be added to whatever the job originally requested.
+     */
+    public static final String ADDITIONAL_BANDWIDTH_PROPERTY = PREFIX + ".additionalBandwidth";
+
+    /**
+     * An additional number of CPUs that should be added to whatever the job originally requested.
+     */
+    public static final String ADDITIONAL_CPU_PROPERTY = PREFIX + ".additionalCPU";
+
+    /**
+     * An additional amount of disk space that should be added to whatever the job originally requested.
+     */
+    public static final String ADDITIONAL_DISK_SIZE_PROPERTY = PREFIX + ".additionalDiskSize";
+
+    /**
+     * An additional number of GPUs that should be added to whatever the job originally requested.
+     */
+    public static final String ADDITIONAL_GPU_PROPERTY = PREFIX + ".additionalGPU";
+
+    /**
+     * An additional amount of memory that should be added to whatever the job originally requested.
+     */
+    public static final String ADDITIONAL_MEMORY_PROPERTY = PREFIX + ".additionalMemory";
+
+    /**
+     * The capacity group to launch Genie containers in Titus with.
+     */
+    public static final String CAPACITY_GROUP_PROPERTY = PREFIX + ".capacityGroup";
+
+    /**
      * Name of the property that enables {@link TitusAgentLauncherImpl}.
      */
     public static final String ENABLE_PROPERTY = PREFIX + ".enabled";
+
+    /**
+     * The name of the property that dictates which image to launch on Titus with.
+     */
+    public static final String IMAGE_NAME_PROPERTY = PREFIX + ".imageName";
+
+    /**
+     * The name of the property that dictates which image tag to launch on Titus with.
+     */
+    public static final String IMAGE_TAG_PROPERTY = PREFIX + ".imageTag";
+
+    /**
+     * The minimum network bandwidth to allocate to the container.
+     */
+    public static final String MINIMUM_BANDWIDTH_PROPERTY = PREFIX + ".minimumBandwidth";
+
+    /**
+     * The minimum number of CPUs any container should launch with.
+     */
+    public static final String MINIMUM_CPU_PROPERTY = PREFIX + ".minimumCPU";
+
+    /**
+     * The minimum size of the disk volume to attach to the job container.
+     */
+    public static final String MINIMUM_DISK_SIZE_PROPERTY = PREFIX + ".minimumDiskSize";
+
+    /**
+     * The minimum number of GPUs any container should launch with.
+     */
+    public static final String MINIMUM_GPU_PROPERTY = PREFIX + ".minimumGPU";
+
+    /**
+     * The minimum amount of memory a container should be allocated.
+     */
+    public static final String MINIMUM_MEMORY_PROPERTY = PREFIX + ".minimumMemory";
+
+    /**
+     * The number of retries to make on the Titus submission.
+     */
+    public static final String RETRIES_PROPERTY = PREFIX + ".retries";
+
+    /**
+     * The max duration a Titus job is allowed to run after Genie has submitted it.
+     */
+    public static final String RUNTIME_LIMIT = PREFIX + ".runtimeLimit";
 
     /**
      * Placeholder for job id for use in entry point expression.
