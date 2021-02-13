@@ -23,7 +23,6 @@ import org.springframework.core.env.MutablePropertySources
 import spock.lang.Specification
 
 import java.time.Duration
-import java.util.regex.Pattern
 
 class PropertiesMapCacheSpec extends Specification {
     ConfigurableEnvironment env
@@ -37,15 +36,15 @@ class PropertiesMapCacheSpec extends Specification {
     def "Build map and cache it"() {
 
         def map1 = [
-            'agent.foo': "...",
-            'agent.bar': "...",
-            'server.foo': "...",
-            'server.bar': "...",
-            'agent.null': "...",
+            'agent.foo'  : "...",
+            'agent.bar'  : "...",
+            'server.foo' : "...",
+            'server.bar' : "...",
+            'agent.null' : "...",
             'agent.empty': "...",
         ]
         def map2 = [
-            'agent.foo': "...",
+            'agent.foo'      : "...",
             'genie.agent.foo': "...",
             'genie.agent.bar': "...",
         ]

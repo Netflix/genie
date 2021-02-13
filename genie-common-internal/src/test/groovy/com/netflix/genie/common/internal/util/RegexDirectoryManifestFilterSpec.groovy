@@ -91,10 +91,10 @@ class RegexDirectoryManifestFilterSpec extends Specification {
         includedInManifest == expectIncludedInManifest
 
         where:
-            expectIncludedInManifest | patterns
-            true                     | []
-            true                     | ["foo"]
-            false                    | ["foo", ".*/logs"]
+        expectIncludedInManifest | patterns
+        true                     | []
+        true                     | ["foo"]
+        false                    | ["foo", ".*/logs"]
     }
 
     @Unroll

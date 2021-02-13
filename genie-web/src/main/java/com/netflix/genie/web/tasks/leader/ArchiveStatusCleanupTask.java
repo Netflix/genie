@@ -87,10 +87,10 @@ public class ArchiveStatusCleanupTask extends LeaderTask {
         try {
             final Instant updatedThreshold = Instant.now().minus(this.properties.getGracePeriod());
             final Set<String> jobIds = this.persistenceService.getJobsWithStatusAndArchiveStatusUpdatedBefore(
-                    JobStatus.getFinishedStatuses(),
-                    PENDING_STATUS_SET,
-                    updatedThreshold
-                );
+                JobStatus.getFinishedStatuses(),
+                PENDING_STATUS_SET,
+                updatedThreshold
+            );
             if (!jobIds.isEmpty()) {
                 log.debug("Found {} finished jobs with PENDING archive status", jobIds.size());
                 this.clearJobsArchiveStatus(jobIds);

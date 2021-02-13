@@ -223,9 +223,9 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         (error ? 0 : 1) * controlStreamResponseObserver.onCompleted()
 
         where:
-        description         |error
-        "stream error"      |true
-        "stream completion" |false
+        description         | error
+        "stream error"      | true
+        "stream completion" | false
     }
 
     def "Newer control stream replaces and closes a previous one"() {

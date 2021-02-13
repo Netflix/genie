@@ -21,7 +21,6 @@
  * Performs a 3 second wait. The test invoking this should timeout and kill.
  *
  * @author mprimi
- * @since 4.0.0
  */
 
 sleep(3000)

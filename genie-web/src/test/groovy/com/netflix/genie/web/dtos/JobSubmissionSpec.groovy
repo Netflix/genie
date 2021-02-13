@@ -19,7 +19,6 @@ package com.netflix.genie.web.dtos
 
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
-import org.springframework.core.io.Resource
 import spock.lang.Specification
 
 /**

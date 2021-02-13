@@ -656,19 +656,12 @@ public class GRpcAgentFileStreamServiceImpl
     private static final class FileTransfer {
         @Getter
         private final String transferId;
-        @Getter
-        private AgentFileChunkObserver agentFileChunkObserver;
         private final StreamBuffer buffer;
         private final String description;
+        @Getter
+        private AgentFileChunkObserver agentFileChunkObserver;
         private State state = State.NEW;
         private Instant lastAckTimestamp;
-
-        private enum State {
-            NEW,
-            IN_PROGRESS,
-            COMPLETED,
-            FAILED
-        }
 
         private FileTransfer(
             final String transferId,
@@ -720,6 +713,13 @@ public class GRpcAgentFileStreamServiceImpl
                 ServerAckMessage.newBuilder().build()
             );
             this.lastAckTimestamp = Instant.now();
+        }
+
+        private enum State {
+            NEW,
+            IN_PROGRESS,
+            COMPLETED,
+            FAILED
         }
     }
 

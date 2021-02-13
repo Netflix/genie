@@ -84,14 +84,14 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
     /**
      * Constructor.
      *
-     * @param requestedId              The requested id of the job if one was provided by the user
-     * @param resources                The execution resources (if any) provided by the user
-     * @param commandArgs              Any command args provided by the user
-     * @param metadata                 Any metadata related to the job provided by the user
-     * @param criteria                 The criteria used by the server to determine execution resources
-     *                                 (cluster, command, etc)
-     * @param requestedJobEnvironment  The optional job environment request parameters
-     * @param requestedAgentConfig     The optional configuration options for the Genie Agent
+     * @param requestedId             The requested id of the job if one was provided by the user
+     * @param resources               The execution resources (if any) provided by the user
+     * @param commandArgs             Any command args provided by the user
+     * @param metadata                Any metadata related to the job provided by the user
+     * @param criteria                The criteria used by the server to determine execution resources
+     *                                (cluster, command, etc)
+     * @param requestedJobEnvironment The optional job environment request parameters
+     * @param requestedAgentConfig    The optional configuration options for the Genie Agent
      */
     public JobRequest(
         @Nullable final String requestedId,

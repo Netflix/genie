@@ -27,7 +27,7 @@ import java.time.Duration;
 
 /**
  * Properties for {@link com.netflix.genie.common.internal.util.ExponentialBackOffTrigger} used in various places.
- *
+ * <p>
  * Notice this class is not tagged as {@link org.springframework.boot.context.properties.ConfigurationProperties}
  * since it's not a root property class.
  *

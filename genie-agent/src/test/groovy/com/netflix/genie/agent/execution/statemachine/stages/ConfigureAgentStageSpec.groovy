@@ -17,18 +17,14 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages
 
-import com.netflix.genie.agent.cli.ArgumentDelegates
-import com.netflix.genie.agent.cli.JobRequestConverter
-import com.netflix.genie.agent.execution.CleanupStrategy
+
 import com.netflix.genie.agent.execution.exceptions.ConfigureException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.agent.properties.AgentProperties
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import spock.lang.Specification
 
 import java.time.Duration
@@ -80,7 +76,7 @@ class ConfigureAgentStageSpec extends Specification {
         1 * executionContext.getAgentProperties() >> agentProperties
         1 * agentJobService.configure(agentClientMetadata) >> [
             'genie.agent.runtime.heart-beat-service.interval': '10s',
-            'foo.bar': 'blah',
+            'foo.bar'                                        : 'blah',
         ]
 
         expect:

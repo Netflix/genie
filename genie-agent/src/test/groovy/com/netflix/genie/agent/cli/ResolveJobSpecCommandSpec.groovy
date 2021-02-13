@@ -116,7 +116,7 @@ class ResolveJobSpecCommandSpec extends Specification {
     def "Write spec to file"() {
         setup:
         String specId = "12345"
-        File outputFile = this.temporaryFolder.resolve( "spec.json").toFile()
+        File outputFile = this.temporaryFolder.resolve("spec.json").toFile()
 
         when:
         ExitCode exitCode = command.run()

@@ -62,13 +62,13 @@ public class DataAutoConfiguration {
     /**
      * Provide a {@link JpaRepositories} container instance if one wasn't already provided.
      *
-     * @param applicationRepository     The {@link JpaApplicationRepository} instance
-     * @param clusterRepository         The {@link JpaClusterRepository} instance
-     * @param commandRepository         The {@link JpaCommandRepository} instance
-     * @param criterionRepository       The {@link JpaCriterionRepository} instance
-     * @param fileRepository            The {@link JpaFileRepository} instance
-     * @param jobRepository             The {@link JpaJobRepository} instance
-     * @param tagRepository             The {@link JpaTagRepository} instance
+     * @param applicationRepository The {@link JpaApplicationRepository} instance
+     * @param clusterRepository     The {@link JpaClusterRepository} instance
+     * @param commandRepository     The {@link JpaCommandRepository} instance
+     * @param criterionRepository   The {@link JpaCriterionRepository} instance
+     * @param fileRepository        The {@link JpaFileRepository} instance
+     * @param jobRepository         The {@link JpaJobRepository} instance
+     * @param tagRepository         The {@link JpaTagRepository} instance
      * @return A new {@link JpaRepositories} instance to simplify passing around all repositories
      */
     @Bean
@@ -96,8 +96,8 @@ public class DataAutoConfiguration {
     /**
      * Provide a default implementation of {@link PersistenceService} if no other has been defined.
      *
-     * @param entityManager           The {@link EntityManager} for this application
-     * @param jpaRepositories         The {@link JpaRepositories} for Genie
+     * @param entityManager   The {@link EntityManager} for this application
+     * @param jpaRepositories The {@link JpaRepositories} for Genie
      * @return A {@link JpaPersistenceServiceImpl} instance which implements {@link PersistenceService} backed by
      * JPA and a relational database
      */

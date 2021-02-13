@@ -36,13 +36,20 @@ import java.util.Map;
 @ToString
 public class TitusBatchJobRequest {
 
-    @NotNull private final Owner owner;
-    @NotNull private final String applicationName;
-    @NotNull private final String capacityGroup;
-    @NotNull private final Map<String, String> attributes;
-    @NotNull private final Container container;
-    @NotNull private final Batch batch;
-    @NotNull private final DisruptionBudget disruptionBudget;
+    @NotNull
+    private final Owner owner;
+    @NotNull
+    private final String applicationName;
+    @NotNull
+    private final String capacityGroup;
+    @NotNull
+    private final Map<String, String> attributes;
+    @NotNull
+    private final Container container;
+    @NotNull
+    private final Batch batch;
+    @NotNull
+    private final DisruptionBudget disruptionBudget;
 
     /**
      * Titus job owner DTO.

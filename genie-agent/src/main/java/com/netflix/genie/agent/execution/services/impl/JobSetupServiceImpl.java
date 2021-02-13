@@ -400,7 +400,7 @@ class JobSetupServiceImpl implements JobSetupService {
         JobScriptComposer(
             final JobSpecification jobSpecification,
             final File jobDirectory
-            ) {
+        ) {
 
             this.jobId = jobSpecification.getJob().getId();
 

@@ -43,7 +43,7 @@ public class AgentRoutingServiceSingleNodeImpl implements AgentRoutingService {
     /**
      * Constructor.
      *
-     * @param genieHostInfo      local genie node host information
+     * @param genieHostInfo local genie node host information
      */
     public AgentRoutingServiceSingleNodeImpl(final GenieHostInfo genieHostInfo) {
         this.genieHostInfo = genieHostInfo;

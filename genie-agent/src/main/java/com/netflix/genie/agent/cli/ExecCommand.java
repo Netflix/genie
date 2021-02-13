@@ -51,10 +51,9 @@ class ExecCommand implements AgentCommand {
     private final KillService killService;
     private final ThreadFactory threadFactory;
     private final ShutdownProperties shutdownProperties;
-
-    private boolean isRunning;
     private final ReentrantLock isRunningLock = new ReentrantLock();
     private final Condition isRunningCondition = this.isRunningLock.newCondition();
+    private boolean isRunning;
 
     ExecCommand(
         final ExecCommandArguments execCommandArguments,

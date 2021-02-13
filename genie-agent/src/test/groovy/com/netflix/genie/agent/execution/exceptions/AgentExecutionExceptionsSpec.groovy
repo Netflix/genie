@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.exceptions
 
-import com.netflix.genie.proto.ChangeJobArchiveStatusRequest
+
 import spock.lang.Specification
 import spock.lang.Unroll
 

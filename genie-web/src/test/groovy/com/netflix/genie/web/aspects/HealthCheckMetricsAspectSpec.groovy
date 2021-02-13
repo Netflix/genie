@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit
  * Unit tests for HealthCheckMetricsAspect
  *
  * @author mprimi
- * @since 3.2.4
  */
 class HealthCheckMetricsAspectSpec extends Specification {
     MeterRegistry registry

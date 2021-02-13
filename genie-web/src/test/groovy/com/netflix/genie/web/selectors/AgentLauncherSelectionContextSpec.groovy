@@ -26,7 +26,7 @@ import spock.lang.Specification
 
 class AgentLauncherSelectionContextSpec extends Specification {
 
-    def "Constructor" () {
+    def "Constructor"() {
         def jobId = UUID.randomUUID().toString()
         def jobRequest = Mock(JobRequest)
         def jobRequestMetadata = Mock(JobRequestMetadata)

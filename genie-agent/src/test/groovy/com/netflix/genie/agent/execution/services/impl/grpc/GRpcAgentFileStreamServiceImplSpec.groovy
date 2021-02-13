@@ -388,7 +388,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
                         .setDeprecatedStartOffset(0)
                         .setDeprecatedEndOffset(20)
                         .setStartOffset(0)
-                        .setEndOffset(20)                        .build()
+                        .setEndOffset(20).build()
                 )
                 .build()
         )
@@ -460,7 +460,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         Random rnd = new Random()
         int fileSize = 0
         File largeFile = Files.createFile(temporaryFolder.resolve("large-file.txt")).toFile()
-        while(fileSize <= fileStreamServiceProperties.getDataChunkMaxSize().toBytes() * 2) {
+        while (fileSize <= fileStreamServiceProperties.getDataChunkMaxSize().toBytes() * 2) {
             byte[] buf = new byte[512]
             rnd.nextBytes(buf)
             largeFile.append(buf)

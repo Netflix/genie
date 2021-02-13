@@ -21,7 +21,6 @@ import spock.lang.Specification
 
 import java.time.Duration
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 class ArchiveStatusCleanupPropertiesSpec extends Specification {
     def "testDefaultsSettersAndGetters"() {

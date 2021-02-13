@@ -467,7 +467,7 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
 
         then:
         1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
-        1 * threadFactory.newThread(_ as Runnable ) >> new Thread(
+        1 * threadFactory.newThread(_ as Runnable) >> new Thread(
             {
                 println("running")
             }
@@ -484,7 +484,7 @@ class AgentRoutingServiceCuratorDiscoveryImplSpec extends Specification {
 
         then:
         1 * meterRegistry.counter(AgentRoutingServiceCuratorDiscoveryImpl.ZOOKEEPER_SESSION_STATE_COUNTER_NAME, _) >> counter
-        1 * threadFactory.newThread(_ as Runnable ) >> new Thread(
+        1 * threadFactory.newThread(_ as Runnable) >> new Thread(
             {
                 println("running")
             }
