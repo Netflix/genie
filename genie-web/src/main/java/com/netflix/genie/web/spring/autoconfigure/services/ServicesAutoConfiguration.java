@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
@@ -36,20 +37,24 @@ import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
+import com.netflix.genie.web.services.RequestForwardingService;
 import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
+import com.netflix.genie.web.services.impl.RequestForwardingServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -232,5 +237,24 @@ public class ServicesAutoConfiguration {
         final MeterRegistry meterRegistry
     ) {
         return new ArchivedJobServiceImpl(dataServices, resourceLoader, meterRegistry);
+    }
+
+    /**
+     * Provide a default implementation of {@link RequestForwardingService} for use by other services.
+     *
+     * @param genieRestTemplate        The {@link RestTemplate} configured to be used to call other Genie nodes
+     * @param hostInfo                 The {@link GenieHostInfo} instance containing introspection information about
+     *                                 the current node
+     * @param jobsForwardingProperties The properties for forwarding requests between Genie nodes
+     * @return A {@link RequestForwardingServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(RequestForwardingService.class)
+    public RequestForwardingServiceImpl requestForwardingService(
+        @Qualifier("genieRestTemplate") final RestTemplate genieRestTemplate,
+        final GenieHostInfo hostInfo,
+        final JobsForwardingProperties jobsForwardingProperties
+    ) {
+        return new RequestForwardingServiceImpl(genieRestTemplate, hostInfo, jobsForwardingProperties);
     }
 }

@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Test;
  */
 class JobStatusTest {
 
-    /**
-     * Test to make sure isActive is working properly.
-     */
     @Test
     void testIsActive() {
         Assertions.assertThat(JobStatus.RUNNING.isActive()).isTrue();
@@ -45,9 +42,6 @@ class JobStatusTest {
         Assertions.assertThat(JobStatus.ACCEPTED.isActive()).isTrue();
     }
 
-    /**
-     * Test to make sure isFinished is working properly.
-     */
     @Test
     void testIsFinished() {
         Assertions.assertThat(JobStatus.RUNNING.isFinished()).isFalse();
@@ -62,9 +56,6 @@ class JobStatusTest {
         Assertions.assertThat(JobStatus.ACCEPTED.isFinished()).isFalse();
     }
 
-    /**
-     * Test to make sure isResolvable is working properly.
-     */
     @Test
     void testIsResolvable() {
         Assertions.assertThat(JobStatus.RUNNING.isResolvable()).isFalse();
@@ -79,9 +70,6 @@ class JobStatusTest {
         Assertions.assertThat(JobStatus.ACCEPTED.isResolvable()).isFalse();
     }
 
-    /**
-     * Test to make sure isClaimable is working properly.
-     */
     @Test
     void testIsClaimable() {
         Assertions.assertThat(JobStatus.RUNNING.isClaimable()).isFalse();
@@ -96,9 +84,6 @@ class JobStatusTest {
         Assertions.assertThat(JobStatus.ACCEPTED.isClaimable()).isTrue();
     }
 
-    /**
-     * Make sure all the active statuses are present in the set.
-     */
     @Test
     void testGetActivesStatuses() {
         Assertions
@@ -113,9 +98,6 @@ class JobStatusTest {
             );
     }
 
-    /**
-     * Make sure all the finished statuses are present in the set.
-     */
     @Test
     void testGetFinishedStatuses() {
         Assertions
@@ -123,21 +105,22 @@ class JobStatusTest {
             .containsExactlyInAnyOrder(JobStatus.INVALID, JobStatus.FAILED, JobStatus.KILLED, JobStatus.SUCCEEDED);
     }
 
-    /**
-     * Make sure all the claimable status are present in the set.
-     */
     @Test
     void testGetResolvableStatuses() {
         Assertions.assertThat(JobStatus.getResolvableStatuses()).containsExactlyInAnyOrder(JobStatus.RESERVED);
     }
 
-    /**
-     * Make sure all the claimable status are present in the set.
-     */
     @Test
     void testGetClaimableStatuses() {
         Assertions
             .assertThat(JobStatus.getClaimableStatuses())
             .containsExactlyInAnyOrder(JobStatus.RESOLVED, JobStatus.ACCEPTED);
+    }
+
+    @Test
+    void testGetStatusesBeforeClaimed() {
+        Assertions
+            .assertThat(JobStatus.getStatusesBeforeClaimed())
+            .containsExactlyInAnyOrder(JobStatus.ACCEPTED, JobStatus.RESERVED, JobStatus.RESOLVED);
     }
 }

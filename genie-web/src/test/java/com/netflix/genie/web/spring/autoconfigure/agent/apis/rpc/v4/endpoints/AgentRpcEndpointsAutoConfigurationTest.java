@@ -31,10 +31,12 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcPingServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentFileStreamProperties;
 import com.netflix.genie.web.properties.HeartBeatProperties;
+import com.netflix.genie.web.services.RequestForwardingService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,7 +54,7 @@ import org.springframework.scheduling.TaskScheduler;
  */
 class AgentRpcEndpointsAutoConfigurationTest {
 
-    private ApplicationContextRunner contextRunner =
+    private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
@@ -204,6 +206,16 @@ class AgentRpcEndpointsAutoConfigurationTest {
             final DataServices dataServices = Mockito.mock(DataServices.class);
             Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
             return dataServices;
+        }
+
+        @Bean
+        AgentRoutingService agentRoutingService() {
+            return Mockito.mock(AgentRoutingService.class);
+        }
+
+        @Bean
+        RequestForwardingService requestForwardingService() {
+            return Mockito.mock(RequestForwardingService.class);
         }
     }
 
