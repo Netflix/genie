@@ -19,7 +19,6 @@ package com.netflix.genie.web.util
 
 import com.google.protobuf.ByteString
 import org.apache.commons.lang3.NotImplementedException
-import org.apache.commons.lang3.StringUtils
 import org.springframework.util.unit.DataSize
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -322,7 +321,7 @@ class StreamBufferSpec extends Specification {
         inputStream.skip(skipOffset)
 
         int bufferOffset = 0
-        while(true) {
+        while (true) {
             int maxBytesToRead = Math.max(1, random.nextInt(bufferSize + 1 - bufferOffset))
             int bytesRead = inputStream.read(readBuffer, bufferOffset, maxBytesToRead)
             bufferOffset += bytesRead
@@ -356,7 +355,7 @@ class StreamBufferSpec extends Specification {
         assert skippedBytes == skipOffset
 
         int bufferOffset = 0
-        while(true) {
+        while (true) {
             int maxBytesToRead = Math.max(1, random.nextInt(bufferSize + 1 - bufferOffset))
             int bytesRead = inputStream.read(readBuffer, bufferOffset, maxBytesToRead)
             bufferOffset += bytesRead

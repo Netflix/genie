@@ -99,6 +99,16 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         this.listener.stateMachineStopped();
     }
 
+    @Override
+    public void kill(final KillService.KillSource killSource) {
+        log.info("Shutting down job execution (kill event source: {}", killSource);
+        if (killSource == KillService.KillSource.REMOTE_STATUS_MONITOR) {
+            this.executionContext.setSkipFinalStatusUpdate(true);
+        }
+        this.executionContext.setJobKilled(true);
+        this.jobProcessManager.kill(killSource);
+    }
+
     private void executeStageAction(final States state, final ExecutionStage executionStage) {
 
         // Reset retries backoff
@@ -186,16 +196,6 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
                 log.info("Interrupted during delayed retry");
             }
         }
-    }
-
-    @Override
-    public void kill(final KillService.KillSource killSource) {
-        log.info("Shutting down job execution (kill event source: {}", killSource);
-        if (killSource == KillService.KillSource.REMOTE_STATUS_MONITOR) {
-            this.executionContext.setSkipFinalStatusUpdate(true);
-        }
-        this.executionContext.setJobKilled(true);
-        this.jobProcessManager.kill(killSource);
     }
 
     private static final class CompositeListener implements JobExecutionListener {

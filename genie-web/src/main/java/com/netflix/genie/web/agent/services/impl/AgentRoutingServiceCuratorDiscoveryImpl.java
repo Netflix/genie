@@ -357,30 +357,6 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
         }
     }
 
-    @Override
-    public void handleClientConnected(@NotBlank final String jobId) {
-        log.debug("Adding to routing table (pending registration): {}", jobId);
-
-        final boolean isNew = this.connectedAgentsSet.add(jobId);
-        this.registrationQueue.add(RegisterMutation.update(jobId));
-
-        if (isNew) {
-            this.registry.counter(AGENT_CONNECTED_COUNTER_NAME).increment();
-        }
-    }
-
-    @Override
-    public void handleClientDisconnected(@NotBlank final String jobId) {
-        log.debug("Removing from routing table (pending un-registration): {}", jobId);
-
-        final boolean removed = this.connectedAgentsSet.remove(jobId);
-        this.registrationQueue.add(RegisterMutation.update(jobId));
-
-        if (removed) {
-            this.registry.counter(AGENT_DISCONNECTED_COUNTER_NAME).increment();
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -424,6 +400,30 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
     @Override
     public boolean isAgentConnectionLocal(@NotBlank final String jobId) {
         return this.connectedAgentsSet.contains(jobId);
+    }
+
+    @Override
+    public void handleClientConnected(@NotBlank final String jobId) {
+        log.debug("Adding to routing table (pending registration): {}", jobId);
+
+        final boolean isNew = this.connectedAgentsSet.add(jobId);
+        this.registrationQueue.add(RegisterMutation.update(jobId));
+
+        if (isNew) {
+            this.registry.counter(AGENT_CONNECTED_COUNTER_NAME).increment();
+        }
+    }
+
+    @Override
+    public void handleClientDisconnected(@NotBlank final String jobId) {
+        log.debug("Removing from routing table (pending un-registration): {}", jobId);
+
+        final boolean removed = this.connectedAgentsSet.remove(jobId);
+        this.registrationQueue.add(RegisterMutation.update(jobId));
+
+        if (removed) {
+            this.registry.counter(AGENT_DISCONNECTED_COUNTER_NAME).increment();
+        }
     }
 
     /**
@@ -471,6 +471,14 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
             this.timestamp = System.nanoTime();
         }
 
+        static RegisterMutation refresh(final String jobId) {
+            return new RegisterMutation(jobId, true);
+        }
+
+        static RegisterMutation update(final String jobId) {
+            return new RegisterMutation(jobId, false);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -486,14 +494,6 @@ public class AgentRoutingServiceCuratorDiscoveryImpl implements AgentRoutingServ
             } else {
                 return this.isRefresh() ? 1 : -1;
             }
-        }
-
-        static RegisterMutation refresh(final String jobId) {
-            return new RegisterMutation(jobId, true);
-        }
-
-        static RegisterMutation update(final String jobId) {
-            return new RegisterMutation(jobId, false);
         }
     }
 }

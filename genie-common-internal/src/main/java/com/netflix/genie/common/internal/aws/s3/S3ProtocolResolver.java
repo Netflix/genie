@@ -73,6 +73,39 @@ public class S3ProtocolResolver implements ProtocolResolver {
     }
 
     /**
+     * TODO: It would be nice to use Spring's HttpRange for this parsing, but this module does not
+     * currently depend on spring-web. And this class cannot be moved to genie-web since it is used by
+     * {@link S3ProtocolResolver} which is shared with the genie-agent module.
+     */
+    static Pair<Integer, Integer> parseRangeHeader(@Nullable final String rangeHeader) {
+        if (StringUtils.isBlank(rangeHeader)) {
+            return NULL_RANGE;
+        }
+
+        final Matcher matcher = RANGE_HEADER_PATTERN.matcher(rangeHeader);
+
+        if (!matcher.matches()) {
+            return NULL_RANGE;
+        }
+
+        final String rangeStartString = matcher.group(1);
+        final String rangeEndString = matcher.group(2);
+
+        Integer rangeStart = null;
+        Integer rangeEnd = null;
+
+        if (!StringUtils.isBlank(rangeStartString)) {
+            rangeStart = Integer.parseInt(rangeStartString);
+        }
+
+        if (!StringUtils.isBlank(rangeEndString)) {
+            rangeEnd = Integer.parseInt(rangeEndString);
+        }
+
+        return ImmutablePair.of(rangeStart, rangeEnd);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -127,38 +160,5 @@ public class S3ProtocolResolver implements ProtocolResolver {
             log.error("Failed to create S3 resource: " + location + ": " + e.getMessage());
             return null;
         }
-    }
-
-    /**
-     * TODO: It would be nice to use Spring's HttpRange for this parsing, but this module does not
-     * currently depend on spring-web. And this class cannot be moved to genie-web since it is used by
-     * {@link S3ProtocolResolver} which is shared with the genie-agent module.
-     */
-    static Pair<Integer, Integer> parseRangeHeader(@Nullable final String rangeHeader) {
-        if (StringUtils.isBlank(rangeHeader)) {
-            return NULL_RANGE;
-        }
-
-        final Matcher matcher = RANGE_HEADER_PATTERN.matcher(rangeHeader);
-
-        if (!matcher.matches()) {
-            return NULL_RANGE;
-        }
-
-        final String rangeStartString = matcher.group(1);
-        final String rangeEndString = matcher.group(2);
-
-        Integer rangeStart = null;
-        Integer rangeEnd = null;
-
-        if (!StringUtils.isBlank(rangeStartString)) {
-            rangeStart = Integer.parseInt(rangeStartString);
-        }
-
-        if (!StringUtils.isBlank(rangeEndString)) {
-            rangeEnd = Integer.parseInt(rangeEndString);
-        }
-
-        return ImmutablePair.of(rangeStart, rangeEnd);
     }
 }

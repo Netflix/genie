@@ -169,9 +169,9 @@ class S3AttachmentServiceImplSpec extends Specification {
             !null as ObjectMetadata
         )
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
-        1 * timer.record(_ , TimeUnit.NANOSECONDS)
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         attachmentUris.size() == 2
-        attachmentUris.findAll({it.toString() ==~ /s3:\/\/some-bucket\/some\/prefix\/.+\/script[12]\.sql/}).size() == 2
+        attachmentUris.findAll({ it.toString() ==~ /s3:\/\/some-bucket\/some\/prefix\/.+\/script[12]\.sql/ }).size() == 2
 
         where:
         jobIdPresent << [true, false]
@@ -214,7 +214,7 @@ class S3AttachmentServiceImplSpec extends Specification {
             throw new SdkClientException("...")
         }
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
-        1 * timer.record(_ , TimeUnit.NANOSECONDS)
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         thrown(SaveAttachmentException)
 
         where:
@@ -250,7 +250,7 @@ class S3AttachmentServiceImplSpec extends Specification {
         0 * s3Client.putObject(*_)
         0 * s3Client.getUrl(*_)
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
-        1 * timer.record(_ , TimeUnit.NANOSECONDS)
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
         thrown(SaveAttachmentException)
 
         where:

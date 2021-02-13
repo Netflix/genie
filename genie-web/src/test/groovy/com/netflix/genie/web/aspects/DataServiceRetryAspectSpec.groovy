@@ -24,7 +24,6 @@ import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
 import com.netflix.genie.web.properties.DataServiceRetryProperties
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory

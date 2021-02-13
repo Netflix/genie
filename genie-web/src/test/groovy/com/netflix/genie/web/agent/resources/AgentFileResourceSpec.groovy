@@ -18,8 +18,6 @@
 package com.netflix.genie.web.agent.resources
 
 import com.netflix.genie.web.agent.services.AgentFileStreamService
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import spock.lang.Specification
 
 import java.nio.file.Path

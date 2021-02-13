@@ -172,7 +172,7 @@ class JobServiceProtoErrorComposerSpec extends Specification {
         response.getPropertiesMap().isEmpty()
 
         where:
-        exception                                      | _
-        new RuntimeException(MESSAGE)                  | _
+        exception                     | _
+        new RuntimeException(MESSAGE) | _
     }
 }

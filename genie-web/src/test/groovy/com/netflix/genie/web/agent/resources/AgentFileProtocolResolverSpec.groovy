@@ -18,7 +18,6 @@
 package com.netflix.genie.web.agent.resources
 
 import com.netflix.genie.web.agent.services.AgentFileStreamService
-import org.apache.commons.lang3.tuple.ImmutablePair
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpRange

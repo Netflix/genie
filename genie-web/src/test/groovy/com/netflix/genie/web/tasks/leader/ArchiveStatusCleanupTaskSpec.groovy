@@ -82,7 +82,7 @@ class ArchiveStatusCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j1") >> true
         0 * persistenceServiceMock.updateJobArchiveStatus("j1", _)
         1 * agentRoutingService.isAgentConnected("j2") >> false
-        1 * persistenceServiceMock.updateJobArchiveStatus("j2", ArchiveStatus.UNKNOWN) >> {throw new NotFoundException("...")}
+        1 * persistenceServiceMock.updateJobArchiveStatus("j2", ArchiveStatus.UNKNOWN) >> { throw new NotFoundException("...") }
         1 * agentRoutingService.isAgentConnected("j3") >> false
         1 * persistenceServiceMock.updateJobArchiveStatus("j3", ArchiveStatus.UNKNOWN)
 
@@ -93,7 +93,7 @@ class ArchiveStatusCleanupTaskSpec extends Specification {
         1 * persistenceServiceMock.getJobsWithStatusAndArchiveStatusUpdatedBefore(_, _, _) >> Sets.newHashSet("j4")
 
         then:
-        1 * agentRoutingService.isAgentConnected("j4") >> { throw new RuntimeException("...")}
+        1 * agentRoutingService.isAgentConnected("j4") >> { throw new RuntimeException("...") }
         0 * persistenceServiceMock.updateJobArchiveStatus("j4", ArchiveStatus.UNKNOWN)
         noExceptionThrown()
     }

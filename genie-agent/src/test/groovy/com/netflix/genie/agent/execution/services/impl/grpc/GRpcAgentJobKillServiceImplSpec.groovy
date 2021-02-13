@@ -126,7 +126,7 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         task.run()
 
         then:
-        0 * server.registerForKillNotification(_ , _)
+        0 * server.registerForKillNotification(_, _)
 
         when:
         observer.onNext(JobKillRegistrationResponse.newInstance())
@@ -141,7 +141,6 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         then:
         1 * killService.kill(KillService.KillSource.API_KILL_REQUEST)
     }
-
 
 
     def "Error"() {

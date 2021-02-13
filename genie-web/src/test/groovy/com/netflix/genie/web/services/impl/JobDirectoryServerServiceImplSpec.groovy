@@ -91,7 +91,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
             timer(TIMER_NAME, _ as Iterable<Tag>) >> {
                 String timerName, Iterable<Tag> tags ->
                     print("Timer: " + timerName + " tags: ")
-                    tags.forEach({ tag -> print(tag.getKey() + "=" + tag.getValue() + ", ")})
+                    tags.forEach({ tag -> print(tag.getKey() + "=" + tag.getValue() + ", ") })
                     println()
                     return timer
             }
@@ -105,14 +105,14 @@ class JobDirectoryServerServiceImplSpec extends Specification {
             getPersistenceService() >> this.persistenceService
         }
         this.service = new JobDirectoryServerServiceImpl(
-                this.resourceLoader,
-                dataServices,
-                this.agentFileStreamService,
-                this.archivedJobService,
-                this.handlerFactory,
-                this.meterRegistry
-                ,
-                this.agentRoutingService
+            this.resourceLoader,
+            dataServices,
+            this.agentFileStreamService,
+            this.archivedJobService,
+            this.handlerFactory,
+            this.meterRegistry
+            ,
+            this.agentRoutingService
         )
 
         this.request = Mock(HttpServletRequest)

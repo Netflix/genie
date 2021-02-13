@@ -69,7 +69,7 @@ public interface JobSetupService {
      * Creates the executable script that executes setup and runs the job (a.k.a. run file).
      *
      * @param jobSpecification the job specification
-     * @param jobDirectory the job directory
+     * @param jobDirectory     the job directory
      * @return the generated executable script file
      * @throws SetUpJobException if the file cannot be created
      */

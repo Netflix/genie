@@ -39,10 +39,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * This integration test "documents" the behavior of Curator's Discovery Service and the assumptions on top of which
  * {@link AgentRoutingServiceCuratorDiscoveryImpl} is build upon.
- *  - Multiple calls to {@code registerService} are idempotent
- *  - {@code registerService} overwrites the existing service instance (if one exists) regardless of owner/timestamp
- *  - {@code unregisterService} deletes the service instance regardless of owner/timestamp
- *  - {@code unregisterService} deletes the service instance regardless of owner/timestamp
+ * - Multiple calls to {@code registerService} are idempotent
+ * - {@code registerService} overwrites the existing service instance (if one exists) regardless of owner/timestamp
+ * - {@code unregisterService} deletes the service instance regardless of owner/timestamp
+ * - {@code unregisterService} deletes the service instance regardless of owner/timestamp
  */
 class CuratorDiscoveryIntegrationTest {
 

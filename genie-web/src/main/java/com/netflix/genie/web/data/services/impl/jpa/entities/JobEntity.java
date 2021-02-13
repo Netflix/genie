@@ -1082,6 +1082,42 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
+     * Get the archive status for the job if there is one.
+     *
+     * @return The archive status or {@link Optional#empty()} if there is none
+     */
+    public Optional<String> getArchiveStatus() {
+        return Optional.ofNullable(this.archiveStatus);
+    }
+
+    /**
+     * Set the archive status for this job.
+     *
+     * @param archiveStatus The new archive status
+     */
+    public void setArchiveStatus(@Nullable final String archiveStatus) {
+        this.archiveStatus = archiveStatus;
+    }
+
+    /**
+     * Get any metadata associated with this job pertaining to the launcher that launched it.
+     *
+     * @return The metadata or {@link Optional#empty()} if there isn't any
+     */
+    public Optional<JsonNode> getLauncherExt() {
+        return Optional.ofNullable(this.launcherExt);
+    }
+
+    /**
+     * Set any metadata pertaining to the launcher that launched this job.
+     *
+     * @param launcherExt The metadata
+     */
+    public void setLauncherExt(@Nullable final JsonNode launcherExt) {
+        this.launcherExt = launcherExt;
+    }
+
+    /**
      * Set the command arguments to use with this job.
      *
      * @param commandArgs The command arguments to use
@@ -1219,24 +1255,6 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the archive status for the job if there is one.
-     *
-     * @return The archive status or {@link Optional#empty()} if there is none
-     */
-    public Optional<String> getArchiveStatus() {
-        return Optional.ofNullable(this.archiveStatus);
-    }
-
-    /**
-     * Set the archive status for this job.
-     *
-     * @param archiveStatus The new archive status
-     */
-    public void setArchiveStatus(@Nullable final String archiveStatus) {
-        this.archiveStatus = archiveStatus;
-    }
-
-    /**
      * Get any metadata the user provided with respect to the launcher.
      *
      * @return The metadata or {@link Optional#empty()} if there isn't any
@@ -1252,24 +1270,6 @@ public class JobEntity extends BaseEntity implements
      */
     public void setRequestedLauncherExt(@Nullable final JsonNode requestedLauncherExt) {
         this.requestedLauncherExt = requestedLauncherExt;
-    }
-
-    /**
-     * Get any metadata associated with this job pertaining to the launcher that launched it.
-     *
-     * @return The metadata or {@link Optional#empty()} if there isn't any
-     */
-    public Optional<JsonNode> getLauncherExt() {
-        return Optional.ofNullable(this.launcherExt);
-    }
-
-    /**
-     * Set any metadata pertaining to the launcher that launched this job.
-     *
-     * @param launcherExt The metadata
-     */
-    public void setLauncherExt(@Nullable final JsonNode launcherExt) {
-        this.launcherExt = launcherExt;
     }
 
     /**

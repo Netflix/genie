@@ -31,7 +31,10 @@ import javax.annotation.Nullable;
 @Getter
 @Setter
 public class TitusBatchJobResponse {
-    @Nullable private String id;
-    @Nullable private Integer statusCode;
-    @Nullable private String message;
+    @Nullable
+    private String id;
+    @Nullable
+    private Integer statusCode;
+    @Nullable
+    private String message;
 }

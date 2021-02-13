@@ -65,14 +65,14 @@ class AgentLaunchersAutoConfigurationTest {
                 "genie.agent.launcher.local.enabled=true"
             )
             .run(
-            context -> {
-                Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
-                Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
-                Assertions.assertThat(context).hasSingleBean(ExecutorFactory.class);
-                Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
-                Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.class);
-            }
-        );
+                context -> {
+                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(ExecutorFactory.class);
+                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
+                    Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.class);
+                }
+            );
     }
 
     /**

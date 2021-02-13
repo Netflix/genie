@@ -88,8 +88,8 @@ class PathUtilsSpec extends Specification {
         PathUtils.jobEntitySetupFilePath(entityDirectoryPath).toString() == expectedPath
 
         where:
-        entityDirectoryPath | expectedPath
-        jobDirectory.toPath() | jobDirectoryStr + "/genie_setup.sh"
+        entityDirectoryPath                                           | expectedPath
+        jobDirectory.toPath()                                         | jobDirectoryStr + "/genie_setup.sh"
         PathUtils.jobApplicationDirectoryPath(jobDirectory, "my-app") | jobDirectoryStr + "/genie/applications/my-app/genie_setup.sh"
         PathUtils.jobClusterDirectoryPath(jobDirectory, "my-cluster") | jobDirectoryStr + "/genie/cluster/my-cluster/genie_setup.sh"
         PathUtils.jobCommandDirectoryPath(jobDirectory, "my-command") | jobDirectoryStr + "/genie/command/my-command/genie_setup.sh"

@@ -50,6 +50,7 @@ switch (jobId) {
             Optional<JsonNode> launchAgent(final ResolvedJob resolvedJob, final JsonNode requestedLauncherExt) throws AgentLaunchException {
                 return null
             }
+
             @Override
             Health health() {
                 return null

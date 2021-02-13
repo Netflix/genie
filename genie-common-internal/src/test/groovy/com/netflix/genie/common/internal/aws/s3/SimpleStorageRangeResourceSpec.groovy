@@ -210,9 +210,9 @@ class SimpleStorageRangeResourceSpec extends Specification {
         bytesRead == -1
 
         where:
-        range                       | contentLength | skip
-        ImmutablePair.of(100, null) | 100           | 100
-        ImmutablePair.of(null, null)| 0             | 0
+        range                        | contentLength | skip
+        ImmutablePair.of(100, null)  | 100           | 100
+        ImmutablePair.of(null, null) | 0             | 0
     }
 
     @Unroll

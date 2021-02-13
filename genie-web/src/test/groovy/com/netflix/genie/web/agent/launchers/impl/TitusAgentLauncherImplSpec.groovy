@@ -473,8 +473,8 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getBatch().getRetryPolicy().getImmediate().getRetries() == expectedRetries
 
         where:
-        imageName     | envImageName          | imageTag         | envImageTag | retries | envRetries | expectedImageName | expectedImageTag | expectedRetries
-        "genie-agent" | null                  | "latest.release" | null        | 4     | null     | "genie-agent"         | "latest.release" | 4
-        "genie-agent" | "genie-agent-tgianos" | "latest.release" | "4.0.82"    | 4     | "1"      | "genie-agent-tgianos" | "4.0.82"         | 1
+        imageName     | envImageName          | imageTag         | envImageTag | retries | envRetries | expectedImageName     | expectedImageTag | expectedRetries
+        "genie-agent" | null                  | "latest.release" | null        | 4       | null       | "genie-agent"         | "latest.release" | 4
+        "genie-agent" | "genie-agent-tgianos" | "latest.release" | "4.0.82"    | 4       | "1"        | "genie-agent-tgianos" | "4.0.82"         | 1
     }
 }

@@ -54,6 +54,7 @@ public class StreamBuffer {
 
     /**
      * Constructor.
+     *
      * @param skipOffset index of the first actual byte to return (
      */
     public StreamBuffer(final long skipOffset) {

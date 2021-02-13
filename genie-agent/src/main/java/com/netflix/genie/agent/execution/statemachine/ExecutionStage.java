@@ -46,7 +46,7 @@ public abstract class ExecutionStage {
      * @param state the state machine state associated with this stage
      */
     protected ExecutionStage(
-            final States state
+        final States state
     ) {
         this.state = state;
     }
@@ -57,15 +57,15 @@ public abstract class ExecutionStage {
 
     protected FatalJobExecutionException createFatalException(final Throwable cause) {
         return this.createFatalException(
-                "Fatal error in state " + this.getState().name() + ": " + cause.getMessage(),
-                cause
+            "Fatal error in state " + this.getState().name() + ": " + cause.getMessage(),
+            cause
         );
     }
 
     protected RetryableJobExecutionException createRetryableException(final Throwable cause) {
         throw new RetryableJobExecutionException(
-                "Retryable error in state " + this.getState().name() + ": " + cause.getMessage(),
-                cause
+            "Retryable error in state " + this.getState().name() + ": " + cause.getMessage(),
+            cause
         );
     }
 
@@ -80,6 +80,6 @@ public abstract class ExecutionStage {
      *                                        job id that was already in use)
      */
     protected abstract void attemptStageAction(
-            ExecutionContext executionContext
+        ExecutionContext executionContext
     ) throws RetryableJobExecutionException, FatalJobExecutionException;
 }

@@ -151,6 +151,7 @@ public class CommonServicesAutoConfiguration {
 
     /**
      * Provide a {@link PropertiesMapCache.Factory} if no override is defined.
+     *
      * @param environment the environment
      * @return a properties map cache factory
      */

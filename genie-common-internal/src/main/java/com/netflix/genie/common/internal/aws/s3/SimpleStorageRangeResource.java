@@ -56,7 +56,7 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         final Pair<Integer, Integer> range
     ) throws IOException {
         super(client, bucket, key, s3TaskExecutor, versionId);
-        this.client =  AmazonS3ProxyFactory.createProxy(client);
+        this.client = AmazonS3ProxyFactory.createProxy(client);
         this.bucket = bucket;
         this.key = key;
         this.versionId = versionId;
@@ -81,15 +81,6 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
                 "Invalid range " + lower + "-" + upper + " for S3 object of size " + contentLength
             );
         }
-    }
-
-
-    @Override
-    public boolean exists() {
-        if (this.contentLength == -1) {
-            return false;
-        }
-        return super.exists();
     }
 
     /**
@@ -149,6 +140,14 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         return new SkipInputStream(skipBytes, inputStream);
     }
 
+    @Override
+    public boolean exists() {
+        if (this.contentLength == -1) {
+            return false;
+        }
+        return super.exists();
+    }
+
     /**
      * An input stream that skips some amount of bytes because they are ignored by the web tier when sending back
      * the response content.
@@ -160,12 +159,6 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         SkipInputStream(final long bytesToSkip, final InputStream objectRangeInputStream) {
             this.objectRangeInputStream = objectRangeInputStream;
             this.skipBytesLeft = bytesToSkip;
-        }
-
-        @Override
-        public void close() throws IOException {
-            super.close();
-            this.objectRangeInputStream.close();
         }
 
         @Override
@@ -203,6 +196,12 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
             }
 
             return skipped;
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+            this.objectRangeInputStream.close();
         }
     }
 

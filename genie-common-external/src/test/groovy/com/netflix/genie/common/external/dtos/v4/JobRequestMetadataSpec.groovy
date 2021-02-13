@@ -21,6 +21,7 @@ package com.netflix.genie.common.external.dtos.v4
 import com.google.common.collect.Maps
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification
+
 /**
  * Specifications for the {@link JobRequestMetadata} class.
  *

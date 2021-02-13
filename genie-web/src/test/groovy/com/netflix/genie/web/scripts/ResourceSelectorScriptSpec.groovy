@@ -115,7 +115,7 @@ class ResourceSelectorScriptSpec extends Specification {
 
         then:
         1 * cache.get() >> { throw runtimeException }
-        def e = thrown (ResourceSelectionException)
+        def e = thrown(ResourceSelectionException)
         e.getCause() == runtimeException
 
         when:

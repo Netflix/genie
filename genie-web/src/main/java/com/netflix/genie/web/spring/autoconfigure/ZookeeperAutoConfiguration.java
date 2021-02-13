@@ -95,7 +95,7 @@ public class ZookeeperAutoConfiguration {
     /**
      * The Curator-client connection state listenable.
      *
-     * @param client              The curator framework client to use
+     * @param client The curator framework client to use
      * @return {@link ServiceDiscovery} bean for instances of type {@link AgentRoutingServiceCuratorDiscoveryImpl.Agent}
      */
     @Bean
