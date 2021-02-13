@@ -17,44 +17,66 @@
  */
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
-import com.google.common.collect.Maps;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.JobKillService;
+import com.netflix.genie.web.services.RequestForwardingService;
 import io.grpc.stub.StreamObserver;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Service to kill agent jobs.
+ * Implementation of {@link JobKillService} which uses parked gRPC requests to tell the agent to
+ * shutdown via a user kill request if the job is in an active state.
  *
- * @author standon
+ * @author tgianos
  * @since 4.0.0
  */
 @Slf4j
-public class GRpcJobKillServiceImpl
-    extends JobKillServiceGrpc.JobKillServiceImplBase
-    implements JobKillService {
+public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImplBase implements JobKillService {
 
-    private final Map<String, StreamObserver<JobKillRegistrationResponse>> parkedJobKillResponseObservers =
-        Maps.newConcurrentMap();
+    @VisibleForTesting
+    @Getter(AccessLevel.PACKAGE)
+    private final Map<String, StreamObserver<JobKillRegistrationResponse>> parkedJobKillResponseObservers;
     private final PersistenceService persistenceService;
+    private final AgentRoutingService agentRoutingService;
+    private final RequestForwardingService requestForwardingService;
 
     /**
      * Constructor.
      *
-     * @param dataServices The {@link DataServices} instance to use
+     * @param dataServices             The {@link DataServices} instance to use
+     * @param agentRoutingService      The {@link AgentRoutingService} instance to use to find where agents are
+     *                                 connected
+     * @param requestForwardingService The service to use to forward requests to other Genie nodes
      */
-    public GRpcJobKillServiceImpl(final DataServices dataServices) {
+    public GRpcJobKillServiceImpl(
+        final DataServices dataServices,
+        final AgentRoutingService agentRoutingService,
+        final RequestForwardingService requestForwardingService
+    ) {
         this.persistenceService = dataServices.getPersistenceService();
+        this.parkedJobKillResponseObservers = new ConcurrentHashMap<>();
+        this.agentRoutingService = agentRoutingService;
+        this.requestForwardingService = requestForwardingService;
     }
 
     /**
@@ -68,49 +90,101 @@ public class GRpcJobKillServiceImpl
         final JobKillRegistrationRequest request,
         final StreamObserver<JobKillRegistrationResponse> responseObserver
     ) {
-        final StreamObserver<JobKillRegistrationResponse> existingObserver =
-            parkedJobKillResponseObservers.put(request.getJobId(), responseObserver);
+        final StreamObserver<JobKillRegistrationResponse> existingObserver = this.parkedJobKillResponseObservers.put(
+            request.getJobId(),
+            responseObserver
+        );
 
-        // If a previous observer/request is present,
+        // If a previous observer/request is present close that request
         if (existingObserver != null) {
             existingObserver.onCompleted();
         }
     }
 
     /**
-     * Kill the job with the given id if possible.
-     *
-     * @param jobId  id of job to kill
-     * @param reason brief reason for requesting the job be killed
-     * @throws GenieServerException in case there is no response observer found to communicate with the agent
+     * {@inheritDoc}
      */
     @Override
+    @Retryable(
+        value = {
+            GenieInvalidStatusException.class,
+            GenieServerException.class
+        },
+        backoff = @Backoff(delay = 1000)
+    )
     public void killJob(
         final String jobId,
-        final String reason
-    ) throws GenieException {
-        final StreamObserver<JobKillRegistrationResponse> responseObserver =
-            parkedJobKillResponseObservers.remove(jobId);
-
-        if (responseObserver == null) {
-            log.error("Job not killed. No response observer found for killing the job with id: {} ", jobId);
-            throw new GenieServerException(
-                "Job not killed. No response observer found for killing the job with id: " + jobId);
+        final String reason,
+        @Nullable final HttpServletRequest request
+    ) throws GenieJobNotFoundException, GenieServerException {
+        final JobStatus currentJobStatus;
+        try {
+            currentJobStatus = this.persistenceService.getJobStatus(jobId);
+        } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e);
         }
 
-        try {
-            if (this.persistenceService.getJobStatus(jobId).isFinished()) {
-                log.info("v4 job {} was already finished when the kill request came", jobId);
-            } else { //Non null response observer and an unfinished job. Send a kill to the agent
-                responseObserver.onNext(
-                    JobKillRegistrationResponse.newBuilder().build()
+        if (currentJobStatus.isFinished()) {
+            log.info("Job {} was already finished when the kill request arrived. Nothing to do.", jobId);
+        } else if (JobStatus.getStatusesBeforeClaimed().contains(currentJobStatus)) {
+            // Agent hasn't come up and claimed job yet. Setting to killed should prevent agent from starting
+            try {
+                this.persistenceService.updateJobStatus(jobId, currentJobStatus, JobStatus.KILLED, reason);
+            } catch (final GenieInvalidStatusException e) {
+                // This is the case where somewhere else in the system the status was changed before we could kill
+                // Should retry entire method as job may have transitioned to a finished state
+                log.error(
+                    "Unable to set job status for {} to {} due to current status not being expected {}",
+                    jobId,
+                    JobStatus.KILLED,
+                    currentJobStatus
                 );
+                throw e;
+            } catch (final NotFoundException e) {
+                throw new GenieJobNotFoundException(e);
+            }
+        } else if (currentJobStatus.isActive()) {
+            // If we get here the Job should not currently be regarded as finished AND an agent has come up and
+            // connected to one of the Genie servers, possibly this one
+            if (this.agentRoutingService.isAgentConnectionLocal(jobId)) {
+                // Agent should be connected here so we should have a response observer to use
+                final StreamObserver<JobKillRegistrationResponse> responseObserver
+                    = this.parkedJobKillResponseObservers.remove(jobId);
+
+                if (responseObserver == null) {
+                    log.error("Job {} not killed. Expected local agent connection not found", jobId);
+                    throw new GenieServerException(
+                        "Job " + jobId + " not killed. Expected local agent connection not found."
+                    );
+                }
+                responseObserver.onNext(JobKillRegistrationResponse.newBuilder().build());
                 responseObserver.onCompleted();
 
                 log.info("Agent notified for killing job {}", jobId);
+            } else {
+                // Agent is running somewhere else try to forward the request
+                final String hostname = this.agentRoutingService
+                    .getHostnameForAgentConnection(jobId)
+                    .orElseThrow(
+                        // Note: this should retry as we may have hit a case where agent is transitioning nodes
+                        //       it is connected to
+                        () -> new GenieServerException(
+                            "Unable to locate host where agent is connected for job " + jobId
+                        )
+                    );
+                log.info(
+                    "Agent for job {} currently connected to {}. Attempting to forward kill request",
+                    jobId,
+                    hostname
+                );
+                this.requestForwardingService.kill(hostname, jobId, request);
             }
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage(), e);
+        } else {
+            // The job is in some unknown state throw exception that forces method to try again
+            log.error("{} is an unhandled state for job {}", currentJobStatus, jobId);
+            throw new GenieServerException(
+                "Job " + jobId + " is currently in " + currentJobStatus + " status, which isn't currently handled"
+            );
         }
     }
 }

@@ -19,12 +19,19 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
+import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.exceptions.checked.NotFoundException
+import com.netflix.genie.web.services.RequestForwardingService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
+
+import javax.servlet.http.HttpServletRequest
 
 /**
  * Specifications for the {@link GRpcJobKillServiceImpl} class.
@@ -35,64 +42,147 @@ class GRpcJobKillServiceImplSpec extends Specification {
 
     GRpcJobKillServiceImpl service
     String jobId
+    String reason
+    String remoteHost
     JobKillRegistrationRequest request
     JobKillRegistrationResponse response
-    PersistenceService persistenceService = Mock()
+    PersistenceService persistenceService
+    AgentRoutingService agentRoutingService
+    RequestForwardingService requestForwardingService
     StreamObserver<JobKillRegistrationResponse> responseObserver = Mock()
+    HttpServletRequest servletRequest
 
     void setup() {
-        jobId = UUID.randomUUID().toString()
-        request = JobKillRegistrationRequest.newBuilder().setJobId(jobId).build()
-        response = JobKillRegistrationResponse.newBuilder().build()
+        this.persistenceService = Mock(PersistenceService)
+        this.agentRoutingService = Mock(AgentRoutingService)
+        this.requestForwardingService = Mock(RequestForwardingService)
+        this.jobId = UUID.randomUUID().toString()
+        this.reason = UUID.randomUUID().toString()
+        this.remoteHost = UUID.randomUUID().toString()
+        this.request = JobKillRegistrationRequest.newBuilder().setJobId(this.jobId).build()
+        this.response = JobKillRegistrationResponse.newBuilder().build()
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
-        service = new GRpcJobKillServiceImpl(dataServices)
+        this.service = new GRpcJobKillServiceImpl(dataServices, this.agentRoutingService, this.requestForwardingService)
+        this.servletRequest = Mock(HttpServletRequest)
     }
 
-    def "Can kill unfinished jobs and clean up response observer"() {
-
+    def "Can register for kill notification"() {
         when:
-        service.registerForKillNotification(request, responseObserver)
+        this.service.registerForKillNotification(this.request, this.responseObserver)
 
         then:
         noExceptionThrown()
+        this.service.getParkedJobKillResponseObservers().size() == 1
+        this.service.getParkedJobKillResponseObservers().get(this.jobId) == this.responseObserver
 
-        when:
-        service.killJob(jobId, "testing")
+        when: "A new registration occurs for the same job id"
+        this.service.registerForKillNotification(this.request, Mock(StreamObserver))
 
-        then:
-        1 * persistenceService.getJobStatus(jobId) >> JobStatus.RUNNING
-        1 * responseObserver.onNext(response)
-        1 * responseObserver.onCompleted()
-
-        when:
-        service.killJob(jobId, "testing")
-
-        then:
-        thrown(GenieServerException)
+        then: "The old one is removed and closed"
+        noExceptionThrown()
+        this.service.getParkedJobKillResponseObservers().size() == 1
+        this.service.getParkedJobKillResponseObservers().get(this.jobId) != this.responseObserver
+        1 * this.responseObserver.onCompleted()
     }
 
-    def "For finished job do not interact with agent. Clean up response observer"() {
+    def "Kill logic works as expected"() {
+        when: "Job doesn't exist"
+        this.service.killJob(this.jobId, this.reason, null)
 
-        when:
-        service.registerForKillNotification(request, responseObserver)
+        then: "Expected exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> {
+            throw new NotFoundException()
+        }
+        thrown(GenieJobNotFoundException)
 
-        then:
+        when: "The job is already finished"
+        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+
+        then: "Nothing needs to be done"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.SUCCEEDED
+        noExceptionThrown()
+        0 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        0 * this.agentRoutingService.isAgentConnectionLocal(this.jobId)
+
+        when: "The job is active, the agent isn't yet started but status has changed since initial call"
+        this.service.killJob(this.jobId, this.reason, null)
+
+        then: "Only try to set killed in database but is rejected and exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RESERVED
+        1 * this.persistenceService.updateJobStatus(this.jobId, JobStatus.RESERVED, JobStatus.KILLED, this.reason) >> {
+            throw new GenieInvalidStatusException("whoops")
+        }
+        0 * this.agentRoutingService.isAgentConnectionLocal(this.jobId)
+        thrown(GenieInvalidStatusException)
+
+        when: "The job is active, the agent isn't yet started but for some reason db can't find job"
+        this.service.killJob(this.jobId, this.reason, null)
+
+        then: "Correct exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.ACCEPTED
+        1 * this.persistenceService.updateJobStatus(this.jobId, JobStatus.ACCEPTED, JobStatus.KILLED, this.reason) >> {
+            throw new NotFoundException("whoops")
+        }
+        0 * this.agentRoutingService.isAgentConnectionLocal(this.jobId)
+        thrown(GenieJobNotFoundException)
+
+        when: "The job is active, the agent isn't yet started and the db can find the job"
+        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+
+        then: "The database is updated and no exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RESOLVED
+        1 * this.persistenceService.updateJobStatus(this.jobId, JobStatus.RESOLVED, JobStatus.KILLED, this.reason)
+        0 * this.agentRoutingService.isAgentConnectionLocal(this.jobId)
         noExceptionThrown()
 
-        when:
-        service.killJob(jobId, "testing")
+        when: "The job is active, the agent is connected, the job is local but no observer"
+        this.service.killJob(this.jobId, this.reason, this.servletRequest)
 
-        then:
-        1 * persistenceService.getJobStatus(jobId) >> JobStatus.SUCCEEDED
-        0 * responseObserver.onNext(response)
-        0 * responseObserver.onCompleted()
-
-        when:
-        service.killJob(jobId, "testing")
-
-        then:
+        then: "Correct exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.CLAIMED
+        0 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> true
+        0 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
+        0 * this.responseObserver.onCompleted()
         thrown(GenieServerException)
+
+        when: "The job is active, the agent is connected, and there is an observer"
+        this.service.registerForKillNotification(this.request, this.responseObserver)
+        this.service.killJob(this.jobId, this.reason, null)
+
+        then: "Kill message is sent and the observer is removed"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.INIT
+        0 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> true
+        1 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
+        1 * this.responseObserver.onCompleted()
+        this.service.getParkedJobKillResponseObservers().isEmpty()
+
+        when: "The job is active, the agent is connected to another server but we can't determine where"
+        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+
+        then: "An exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RUNNING
+        0 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> false
+        0 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
+        0 * this.responseObserver.onCompleted()
+        1 * this.agentRoutingService.getHostnameForAgentConnection(this.jobId) >> Optional.empty()
+        thrown(GenieServerException)
+
+        when: "The job is active and we try to forward request"
+        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+
+        then: "No exception is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RUNNING
+        0 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> false
+        0 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
+        0 * this.responseObserver.onCompleted()
+        1 * this.agentRoutingService.getHostnameForAgentConnection(this.jobId) >> Optional.of(this.remoteHost)
+        1 * this.requestForwardingService.kill(this.remoteHost, this.jobId, this.servletRequest)
+        noExceptionThrown()
     }
 }

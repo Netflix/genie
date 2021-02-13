@@ -1380,6 +1380,77 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
+    void testKillJobImmediately() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
+
+        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
+        final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
+        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
+        clusterCriteriaList.add(clusterCriteria);
+
+        final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withCommandArgs(SLEEP_60_COMMAND_ARGS)
+            .withDisableLogArchival(true)
+            .build();
+
+        final String jobId = this.getIdFromLocation(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                .when()
+                .port(this.port)
+                .post(JOBS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
+
+//        // Let it run for a couple of seconds
+//        Thread.sleep(2000);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .delete(JOBS_API + "/{id}", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()));
+
+        this.waitForDone(jobId);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+            .body(ID_PATH, Matchers.is(jobId))
+            .body(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString()))
+            .body(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_KILLED_BY_USER));
+
+        // Kill the job again to make sure it doesn't cause a problem.
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .delete(JOBS_API + "/{id}", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()));
+    }
+
+    @Test
     void testSubmitJobMethodFailure() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs;

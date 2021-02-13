@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
@@ -63,6 +64,9 @@ public class JobLaunchServiceImpl implements JobLaunchService {
     private static final String AVAILABLE_LAUNCHERS_TAG = "numAvailableLaunchers";
     private static final String SELECTOR_CLASS_TAG = "agentLauncherSelectorClass";
     private static final String LAUNCHER_CLASS_TAG = "agentLauncherSelectedClass";
+    private static final int MAX_STATUS_UPDATE_ATTEMPTS = 5;
+    private static final int INITIAL_ATTEMPT = 0;
+    private static final String ACCEPTED_MESSAGE = "The job has been accepted by the system for execution";
 
     private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
@@ -127,29 +131,30 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 }
 
                 MetricsUtils.addFailureTagsWithException(tags, t);
-                this.persistenceService.updateJobStatus(
-                    jobId,
-                    JobStatus.RESERVED,
-                    JobStatus.FAILED,
-                    message // TODO: Move somewhere not in genie-common
-                );
                 this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
+                if (this.updateJobStatus(jobId, JobStatus.FAILED, message, INITIAL_ATTEMPT) != JobStatus.FAILED) {
+                    log.error("Updating status to failed didn't succeed");
+                }
                 throw t; // Caught below for metrics gathering
             }
 
             // Job state should be RESOLVED now. Mark it ACCEPTED to avoid race condition with agent starting up
             // before we get return from launchAgent and trying to set it to CLAIMED
             try {
-                this.persistenceService.updateJobStatus(
+                final JobStatus updatedStatus = this.updateJobStatus(
                     jobId,
-                    JobStatus.RESOLVED,
                     JobStatus.ACCEPTED,
-                    "The job has been accepted by the system for execution"
+                    ACCEPTED_MESSAGE,
+                    INITIAL_ATTEMPT
                 );
-            } catch (final Throwable t) {
+                if (updatedStatus != JobStatus.ACCEPTED) {
+                    throw new AgentLaunchException("Unable to mark job accepted. Job state " + updatedStatus);
+                }
+            } catch (final Exception e) {
+                this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
                 // TODO: Failed to update the status to accepted. Try to set it to failed or rely on other cleanup
-                //       mechanism?
-                throw new AgentLaunchException(t);
+                //       mechanism? For now rely on janitor mechanisms
+                throw e;
             }
 
             // TODO: at the moment this is not populated, it's going to be a null node (not null)
@@ -161,9 +166,8 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 tags.add(Tag.of(LAUNCHER_CLASS_TAG, launcher.getClass().getCanonicalName()));
                 launcherExt = launcher.launchAgent(resolvedJob, requestedLauncherExt);
             } catch (final AgentLaunchException e) {
-                // TODO: this could fail as well
-                this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());
                 this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
+                this.updateJobStatus(jobId, JobStatus.FAILED, e.getMessage(), INITIAL_ATTEMPT);
                 // TODO: How will we get the ID back to the user? Should we add it to an exception? We don't get
                 //       We don't get the ID until after saveJobSubmission so if that fails we'd still return nothing
                 //       Probably need multiple exceptions to be thrown from this API (if we go with checked)
@@ -171,7 +175,14 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             }
 
             if (launcherExt.isPresent()) {
-                this.persistenceService.updateLauncherExt(jobId, launcherExt.get());
+                try {
+                    this.persistenceService.updateLauncherExt(jobId, launcherExt.get());
+                } catch (final Exception e) {
+                    // Being unable to update the launcher ext is not optimal however
+                    // it's not worth returning an error to the user at this point as
+                    // the agent has launched and we have all the other pieces in place
+                    log.error("Unable to update the launcher ext for job {}", jobId, e);
+                }
             }
 
             MetricsUtils.addSuccessTags(tags);
@@ -227,6 +238,64 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             this.registry
                 .timer(AGENT_LAUNCHER_SELECTOR_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    /**
+     * Helper method to update the job status ONLY IF the job is not in a final state already. This will maintain the
+     * final state that may have been set elsewhere by another process (e.g. kill request).
+     *
+     * @param jobId                The id of the job to update status for
+     * @param desiredStatus        The {@link JobStatus} that is the status the job should be in the database after
+     *                             exiting this method
+     * @param desiredStatusMessage The status message for the database
+     * @param attemptNumber        The number of attempts that have been made to update this job status
+     * @return The {@link JobStatus} in the database after the final attempt of this method
+     */
+    private JobStatus updateJobStatus(
+        final String jobId,
+        final JobStatus desiredStatus,
+        final String desiredStatusMessage,
+        final int attemptNumber
+    ) throws NotFoundException {
+        final int nextAttemptNumber = attemptNumber + 1;
+        final JobStatus currentStatus = this.persistenceService.getJobStatus(jobId);
+        if (currentStatus.isFinished()) {
+            log.info(
+                "Won't change job status of {} from {} to {} desired status as {} is already a final status",
+                jobId,
+                currentStatus,
+                desiredStatus,
+                currentStatus
+            );
+            return currentStatus;
+        } else {
+            try {
+                this.persistenceService.updateJobStatus(jobId, currentStatus, desiredStatus, desiredStatusMessage);
+                return desiredStatus;
+            } catch (final GenieInvalidStatusException e) {
+                log.error(
+                    "Job {} status changed from expected {}. Couldn't update to {}. Attempt {}",
+                    jobId,
+                    currentStatus,
+                    desiredStatus,
+                    nextAttemptNumber
+                );
+                // Recursive call that should break out if update is successful or job is now in a final state
+                // or if attempts reach the max attempts
+                if (nextAttemptNumber < MAX_STATUS_UPDATE_ATTEMPTS) {
+                    return this.updateJobStatus(jobId, desiredStatus, desiredStatusMessage, attemptNumber + 1);
+                } else {
+                    // breakout condition, stop attempting to update DB
+                    log.error(
+                        "Out of attempts to update job {} status to {}. Unable to complete status update",
+                        jobId,
+                        desiredStatus,
+                        e
+                    );
+                    return currentStatus;
+                }
+            }
         }
     }
 }

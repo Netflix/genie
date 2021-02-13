@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
@@ -36,6 +37,7 @@ import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
+import com.netflix.genie.web.services.RequestForwardingService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
@@ -45,6 +47,9 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.UUID;
 
 /**
  * Tests for {@link ServicesAutoConfiguration} class.
@@ -54,7 +59,7 @@ import org.springframework.core.io.ResourceLoader;
  */
 class ServicesAutoConfigurationTest {
 
-    private ApplicationContextRunner contextRunner =
+    private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
@@ -65,7 +70,6 @@ class ServicesAutoConfigurationTest {
 
     @Test
     void canCreateBeans() {
-
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(JobsForwardingProperties.class);
@@ -80,6 +84,7 @@ class ServicesAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(JobDirectoryServerService.class);
                 Assertions.assertThat(context).hasSingleBean(JobLaunchService.class);
                 Assertions.assertThat(context).hasSingleBean(ArchivedJobService.class);
+                Assertions.assertThat(context).hasSingleBean(RequestForwardingService.class);
             }
         );
     }
@@ -134,6 +139,16 @@ class ServicesAutoConfigurationTest {
         @Bean
         AgentLauncherSelector agentLauncherSelector() {
             return Mockito.mock(AgentLauncherSelector.class);
+        }
+
+        @Bean
+        GenieHostInfo genieHostInfo() {
+            return new GenieHostInfo(UUID.randomUUID().toString());
+        }
+
+        @Bean(name = "genieRestTemplate")
+        RestTemplate genieRestTemplate() {
+            return new RestTemplate();
         }
     }
 }

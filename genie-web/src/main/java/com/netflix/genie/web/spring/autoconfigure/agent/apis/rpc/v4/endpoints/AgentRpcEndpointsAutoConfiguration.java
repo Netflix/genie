@@ -33,9 +33,11 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcPingServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AgentFileStreamProperties;
 import com.netflix.genie.web.properties.HeartBeatProperties;
+import com.netflix.genie.web.services.RequestForwardingService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -134,13 +136,21 @@ public class AgentRpcEndpointsAutoConfiguration {
      * Provide an implementation of {@link com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase}
      * if no other is provided.
      *
-     * @param dataServices The {@link DataServices} instance to use
+     * @param dataServices             The {@link DataServices} instance to use
+     * @param agentRoutingService      The {@link AgentRoutingService} instance to use to find where agents are
+     *                                 connected
+     * @param requestForwardingService The {@link RequestForwardingService} implementation to use to forward requests to
+     *                                 other Genie nodes
      * @return A {@link GRpcJobKillServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobKillServiceGrpc.JobKillServiceImplBase.class)
-    public GRpcJobKillServiceImpl gRpcJobKillService(final DataServices dataServices) {
-        return new GRpcJobKillServiceImpl(dataServices);
+    public GRpcJobKillServiceImpl gRpcJobKillService(
+        final DataServices dataServices,
+        final AgentRoutingService agentRoutingService,
+        final RequestForwardingService requestForwardingService
+    ) {
+        return new GRpcJobKillServiceImpl(dataServices, agentRoutingService, requestForwardingService);
     }
 
     /**

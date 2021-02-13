@@ -68,7 +68,7 @@ class JobRestControllerSpec extends Specification {
         )
     }
 
-    def "Reject jobs due sumbit disabled"() {
+    def "Reject jobs due submit disabled"() {
         when:
         controller.submitJob(Mock(JobRequest), "1.2.3.4", "test-client", Mock(HttpServletRequest))
 

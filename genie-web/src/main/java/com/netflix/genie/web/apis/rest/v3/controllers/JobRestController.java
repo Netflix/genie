@@ -41,7 +41,6 @@ import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -111,7 +110,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -349,7 +347,8 @@ public class JobRestController {
 
     private Map<String, String> getGenieHeaders(final HttpServletRequest httpServletRequest) {
         final ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
-        for (Enumeration<String> headerNames = httpServletRequest.getHeaderNames(); headerNames.hasMoreElements(); ) {
+        final Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
             final String headerName = headerNames.nextElement();
             if (HTTP_HEADER_FILTER_PATTERN.matcher(headerName).matches()) {
                 final String headerValue = httpServletRequest.getHeader(headerName);
@@ -567,10 +566,7 @@ public class JobRestController {
      * @param id            id for job to kill
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
-     * @param response      the servlet response
-     * @throws GenieException    For any error
-     * @throws NotFoundException When no job with {@literal id} exists
-     * @throws IOException       on redirect error
+     * @throws GenieServerException For any error
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -578,65 +574,15 @@ public class JobRestController {
         @PathVariable("id") final String id,
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
         @Nullable final String forwardedFrom,
-        final HttpServletRequest request,
-        final HttpServletResponse response
-    ) throws GenieException, NotFoundException, IOException {
+        final HttpServletRequest request
+    ) throws GenieException {
         log.info(
             "[killJob] Called for job: {}.{}",
             id,
             forwardedFrom == null ? EMPTY_STRING : " Forwarded from " + forwardedFrom
         );
 
-        if (this.persistenceService.getJobStatus(id).isFinished()) {
-            // Job is already done no need to kill
-            return;
-        }
-
-        final String jobHostname;
-        try {
-            jobHostname = this.agentRoutingService
-                .getHostnameForAgentConnection(id)
-                .orElseThrow(() -> new NotFoundException("No hostname found for job - " + id));
-        } catch (final GenieJobNotFoundException e) {
-            throw new GenieNotFoundException("Job " + id + " not found", e);
-        }
-
-        final boolean shouldForward = !this.hostname.equals(jobHostname);
-        final boolean canForward = this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null;
-
-        if (!shouldForward) {
-            log.info("Job {} is connected to this node. Attempting to kill.", id);
-            this.jobKillService.killJob(id, JobStatusMessages.JOB_KILLED_BY_USER);
-            response.setStatus(HttpStatus.ACCEPTED.value());
-
-        } else if (canForward) {
-            log.info("Job {} is not connected to this node. Forwarding kill request to {}", id, jobHostname);
-            final String forwardHost = this.buildForwardHost(jobHostname);
-            try {
-                //Need to forward job
-                this.restTemplate.execute(
-                    forwardHost + JOB_API_BASE_PATH + id,
-                    HttpMethod.DELETE,
-                    forwardRequest -> copyRequestHeaders(request, forwardRequest),
-                    (final ClientHttpResponse forwardResponse) -> {
-                        response.setStatus(HttpStatus.ACCEPTED.value());
-                        copyResponseHeaders(response, forwardResponse);
-                        return null;
-                    }
-                );
-            } catch (HttpStatusCodeException e) {
-                log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
-                response.sendError(e.getStatusCode().value(), e.getStatusText());
-            } catch (Exception e) {
-                log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
-            }
-        } else {
-            throw new GenieServerException(
-                "Cannot forward kill request, "
-                    + (forwardedFrom == null ? "forwarding disabled" : "request is already a forward")
-            );
-        }
+        this.jobKillService.killJob(id, JobStatusMessages.JOB_KILLED_BY_USER, request);
     }
 
     /**

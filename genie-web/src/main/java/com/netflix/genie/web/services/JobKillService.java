@@ -17,9 +17,12 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -34,12 +37,15 @@ public interface JobKillService {
     /**
      * Kill the job with the given id if possible.
      *
-     * @param id     id of job to kill
-     * @param reason brief reason for requesting the job be killed
-     * @throws GenieException if there is an error
+     * @param id      id of job to kill
+     * @param reason  brief reason for requesting the job be killed
+     * @param request The optional {@link HttpServletRequest} information if the request needs to be forwarded
+     * @throws GenieJobNotFoundException When a job identified by {@literal jobId} can't be found in the system
+     * @throws GenieServerException      if there is an unrecoverable error in the internal state of the Genie cluster
      */
     void killJob(
         @NotBlank(message = "No id entered. Unable to kill job.") String id,
-        @NotBlank(message = "No reason provided.") String reason
-    ) throws GenieException;
+        @NotBlank(message = "No reason provided.") String reason,
+        @Nullable HttpServletRequest request
+    ) throws GenieJobNotFoundException, GenieServerException;
 }

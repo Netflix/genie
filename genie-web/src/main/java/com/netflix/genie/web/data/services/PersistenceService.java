@@ -891,7 +891,7 @@ public interface PersistenceService {
     /**
      * Update the launcher extension field for this job.
      *
-     * @param id                The id of the job to update the laucher extension for.
+     * @param id                The id of the job to update the launcher extension for.
      * @param launcherExtension The updated launcher extension JSON blob.
      * @throws NotFoundException If no job with the given {@code id} exists
      */

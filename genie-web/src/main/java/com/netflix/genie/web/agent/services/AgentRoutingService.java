@@ -41,7 +41,7 @@ public interface AgentRoutingService {
     Optional<String> getHostnameForAgentConnection(@NotBlank String jobId);
 
     /**
-     * Tells wether the agent running a given job is connected to the local node.
+     * Tells whether the agent running a given job is connected to the local node.
      *
      * @param jobId the job id
      * @return true if the agent has an active connection to this node
