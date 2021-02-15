@@ -185,4 +185,65 @@ class GRpcJobKillServiceImplSpec extends Specification {
         1 * this.requestForwardingService.kill(this.remoteHost, this.jobId, this.servletRequest)
         noExceptionThrown()
     }
+
+    def "can clean up orphans"() {
+        def jobId0 = UUID.randomUUID().toString()
+        def jobId1 = UUID.randomUUID().toString()
+        def jobId2 = UUID.randomUUID().toString()
+
+        def request0 = JobKillRegistrationRequest.newBuilder().setJobId(jobId0).build()
+        def request1 = JobKillRegistrationRequest.newBuilder().setJobId(jobId1).build()
+        def request2 = JobKillRegistrationRequest.newBuilder().setJobId(jobId2).build()
+
+        def jobObserver0 = Mock(StreamObserver)
+        def jobObserver1 = Mock(StreamObserver)
+        def jobObserver2 = Mock(StreamObserver)
+
+        when: "Nothing is registered"
+        this.service.cleanupOrphanedObservers()
+
+        then: "Nothing happens"
+        this.service.getParkedJobKillResponseObservers().isEmpty()
+
+        when: "Jobs are registered"
+        this.service.registerForKillNotification(request0, jobObserver0)
+        this.service.registerForKillNotification(request1, jobObserver1)
+        this.service.registerForKillNotification(request2, jobObserver2)
+
+        then: "They're saved in map"
+        this.service.getParkedJobKillResponseObservers().size() == 3
+        this.service.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.service.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.service.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+
+        when: "All jobs still attached locally"
+        this.service.cleanupOrphanedObservers()
+
+        then: "Nothing happens"
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> true
+        this.service.getParkedJobKillResponseObservers().size() == 3
+        this.service.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.service.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.service.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+        0 * jobObserver0.onCompleted()
+        0 * jobObserver1.onCompleted()
+        0 * jobObserver2.onCompleted()
+
+        when: "The jobs switch servers or complete"
+        this.service.cleanupOrphanedObservers()
+
+        then: "It is removed from the map and the observer is completed"
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> false
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> false
+        this.service.getParkedJobKillResponseObservers().size() == 1
+        this.service.getParkedJobKillResponseObservers().get(jobId0) == null
+        this.service.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.service.getParkedJobKillResponseObservers().get(jobId2) == null
+        1 * jobObserver0.onCompleted()
+        0 * jobObserver1.onCompleted()
+        1 * jobObserver2.onCompleted()
+    }
 }
