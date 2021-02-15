@@ -1578,6 +1578,68 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 </dl>
 </li>
 </ul>
+<a name="getArchiveStatus--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getArchiveStatus</h4>
+<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getArchiveStatus()</pre>
+<div class="block">Get the archive status for the job if there is one.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getArchiveStatus--">getArchiveStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobExecutionProjection</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The archive status or <code>Optional.empty()</code> if there is none</dd>
+</dl>
+</li>
+</ul>
+<a name="setArchiveStatus-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setArchiveStatus</h4>
+<pre>public&nbsp;void&nbsp;setArchiveStatus(@Nullable
+                             java.lang.String&nbsp;archiveStatus)</pre>
+<div class="block">Set the archive status for this job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>archiveStatus</code> - The new archive status</dd>
+</dl>
+</li>
+</ul>
+<a name="getLauncherExt--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLauncherExt</h4>
+<pre>public&nbsp;java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getLauncherExt()</pre>
+<div class="block">Get any metadata associated with this job pertaining to the launcher that launched it.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getLauncherExt--">getLauncherExt</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobExecutionProjection</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The metadata or <code>Optional.empty()</code> if there isn't any</dd>
+</dl>
+</li>
+</ul>
+<a name="setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setLauncherExt</h4>
+<pre>public&nbsp;void&nbsp;setLauncherExt(@Nullable
+                           com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExt)</pre>
+<div class="block">Set any metadata pertaining to the launcher that launched this job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>launcherExt</code> - The metadata</dd>
+</dl>
+</li>
+</ul>
 <a name="setCommandArgs-java.util.List-">
 <!--   -->
 </a>
@@ -1777,37 +1839,6 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 </dl>
 </li>
 </ul>
-<a name="getArchiveStatus--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getArchiveStatus</h4>
-<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getArchiveStatus()</pre>
-<div class="block">Get the archive status for the job if there is one.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getArchiveStatus--">getArchiveStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobExecutionProjection</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The archive status or <code>Optional.empty()</code> if there is none</dd>
-</dl>
-</li>
-</ul>
-<a name="setArchiveStatus-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setArchiveStatus</h4>
-<pre>public&nbsp;void&nbsp;setArchiveStatus(@Nullable
-                             java.lang.String&nbsp;archiveStatus)</pre>
-<div class="block">Set the archive status for this job.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>archiveStatus</code> - The new archive status</dd>
-</dl>
-</li>
-</ul>
 <a name="getRequestedLauncherExt--">
 <!--   -->
 </a>
@@ -1834,37 +1865,6 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>requestedLauncherExt</code> - The metadata</dd>
-</dl>
-</li>
-</ul>
-<a name="getLauncherExt--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getLauncherExt</h4>
-<pre>public&nbsp;java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getLauncherExt()</pre>
-<div class="block">Get any metadata associated with this job pertaining to the launcher that launched it.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html#getLauncherExt--">getLauncherExt</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobExecutionProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobExecutionProjection</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The metadata or <code>Optional.empty()</code> if there isn't any</dd>
-</dl>
-</li>
-</ul>
-<a name="setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setLauncherExt</h4>
-<pre>public&nbsp;void&nbsp;setLauncherExt(@Nullable
-                           com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExt)</pre>
-<div class="block">Set any metadata pertaining to the launcher that launched this job.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>launcherExt</code> - The metadata</dd>
 </dl>
 </li>
 </ul>

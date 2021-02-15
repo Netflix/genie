@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -119,7 +119,8 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">GRpcJobKillServiceImpl</span>
 extends com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase
 implements <a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></pre>
-<div class="block">Service to kill agent jobs.</div>
+<div class="block">Implementation of <a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services"><code>JobKillService</code></a> which uses parked gRPC requests to tell the agent to
+ shutdown via a user kill request if the job is in an active state.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -142,7 +143,9 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-">GRpcJobKillServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.services.RequestForwardingService-">GRpcJobKillServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+                      <a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                      <a href="../../../../../../../../../com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services">RequestForwardingService</a>&nbsp;requestForwardingService)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -163,12 +166,19 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-">killJob</a></span>(java.lang.String&nbsp;jobId,
-       java.lang.String&nbsp;reason)</code>
-<div class="block">Kill the job with the given id if possible.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#cleanupOrphanedObservers--">cleanupOrphanedObservers</a></span>()</code>
+<div class="block">Remove orphaned kill observers from local map.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob</a></span>(java.lang.String&nbsp;jobId,
+       java.lang.String&nbsp;reason,
+       javax.servlet.http.HttpServletRequest&nbsp;request)</code>
+<div class="block">Kill the job with the given id if possible.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#registerForKillNotification-com.netflix.genie.proto.JobKillRegistrationRequest-io.grpc.stub.StreamObserver-">registerForKillNotification</a></span>(com.netflix.genie.proto.JobKillRegistrationRequest&nbsp;request,
                            io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobKillRegistrationResponse&gt;&nbsp;responseObserver)</code>
@@ -204,17 +214,22 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-">
+<a name="GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.services.RequestForwardingService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GRpcJobKillServiceImpl</h4>
-<pre>public&nbsp;GRpcJobKillServiceImpl(<a href="../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices)</pre>
+<pre>public&nbsp;GRpcJobKillServiceImpl(<a href="../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+                              <a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                              <a href="../../../../../../../../../com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services">RequestForwardingService</a>&nbsp;requestForwardingService)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>dataServices</code> - The <a href="../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
+<dd><code>agentRoutingService</code> - The <a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> instance to use to find where agents are
+                                 connected</dd>
+<dd><code>requestForwardingService</code> - The service to use to forward requests to other Genie nodes</dd>
 </dl>
 </li>
 </ul>
@@ -244,25 +259,54 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 </dl>
 </li>
 </ul>
-<a name="killJob-java.lang.String-java.lang.String-">
+<a name="killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>killJob</h4>
+<pre>@Retryable(value={<a href="../../../../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException.class</a>,<a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException.class</a>},
+           backoff=@Backoff(delay=1000L))
+public&nbsp;void&nbsp;killJob(java.lang.String&nbsp;jobId,
+                                                                                                                                               java.lang.String&nbsp;reason,
+                                                                                                                                               @Nullable
+                                                                                                                                               javax.servlet.http.HttpServletRequest&nbsp;request)
+                                                                                                                                        throws <a href="../../../../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a>,
+                                                                                                                                               <a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></pre>
+<div class="block">Kill the job with the given id if possible.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobId</code> - id of job to kill</dd>
+<dd><code>reason</code> - brief reason for requesting the job be killed</dd>
+<dd><code>request</code> - The optional <code>HttpServletRequest</code> information if the request needs to be forwarded</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a></code> - When a job identified by jobId can't be found in the system</dd>
+<dd><code><a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></code> - if there is an unrecoverable error in the internal state of the Genie cluster</dd>
+</dl>
+</li>
+</ul>
+<a name="cleanupOrphanedObservers--">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>killJob</h4>
-<pre>public&nbsp;void&nbsp;killJob(java.lang.String&nbsp;jobId,
-                    java.lang.String&nbsp;reason)
-             throws <a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="block">Kill the job with the given id if possible.</div>
+<h4>cleanupOrphanedObservers</h4>
+<pre>@Scheduled(fixedDelay=30000L,
+           initialDelay=30000L)
+public&nbsp;void&nbsp;cleanupOrphanedObservers()</pre>
+<div class="block">Remove orphaned kill observers from local map.
+ <p>
+ The logic as currently implemented is to have the Agent, once handshake is complete, open a connection to
+ the server which results in parking a response observer in the map stored in this implementation. Upon receiving
+ a kill request for the correct job this class will use the observer to send the "response" to the agent which
+ will begin shut down process. The issue is that if the agent disconnects from this server the server will never
+ realize it's gone and these observers will build up in the map in memory forever. This method will periodically
+ go through the map and determine if the observers are still valid and remove any that aren't.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html#killJob-java.lang.String-java.lang.String-">killJob</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobId</code> - id of job to kill</dd>
-<dd><code>reason</code> - brief reason for requesting the job be killed</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></code> - in case there is no response observer found to communicate with the agent</dd>
-<dd><code><a href="../../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - if there is an error</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd>"GRpcAgentJobKillServiceImpl"</dd>
 </dl>
 </li>
 </ul>

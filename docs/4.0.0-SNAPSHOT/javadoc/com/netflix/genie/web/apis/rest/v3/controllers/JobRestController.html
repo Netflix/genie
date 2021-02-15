@@ -245,10 +245,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-">killJob</a></span>(java.lang.String&nbsp;id,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob</a></span>(java.lang.String&nbsp;id,
        java.lang.String&nbsp;forwardedFrom,
-       javax.servlet.http.HttpServletRequest&nbsp;request,
-       javax.servlet.http.HttpServletResponse&nbsp;response)</code>
+       javax.servlet.http.HttpServletRequest&nbsp;request)</code>
 <div class="block">Kill job based on given job ID.</div>
 </td>
 </tr>
@@ -519,7 +518,7 @@ public&nbsp;org.springframework.hateoas.PagedModel&lt;org.springframework.hateoa
 </dl>
 </li>
 </ul>
-<a name="killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-">
+<a name="killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -531,22 +530,17 @@ public&nbsp;void&nbsp;killJob(@PathVariable(value="id")
                                                                                    java.lang.String&nbsp;id,
                                                                                    @RequestHeader(name="Genie-Forwarded-From",required=false) @Nullable
                                                                                    java.lang.String&nbsp;forwardedFrom,
-                                                                                   javax.servlet.http.HttpServletRequest&nbsp;request,
-                                                                                   javax.servlet.http.HttpServletResponse&nbsp;response)
-                                                                            throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a>,
-                                                                                   <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
-                                                                                   java.io.IOException</pre>
+                                                                                   javax.servlet.http.HttpServletRequest&nbsp;request)
+                                                                            throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Kill job based on given job ID.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - id for job to kill</dd>
 <dd><code>forwardedFrom</code> - The host this request was forwarded from if present</dd>
 <dd><code>request</code> - the servlet request</dd>
-<dd><code>response</code> - the servlet response</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
-<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When no job with id exists</dd>
-<dd><code>java.io.IOException</code> - on redirect error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code></dd>
 </dl>
 </li>
 </ul>

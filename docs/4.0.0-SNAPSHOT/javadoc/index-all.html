@@ -1667,6 +1667,10 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#cleanupOrphanedObservers--">cleanupOrphanedObservers()</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
+<dd>
+<div class="block">Remove orphaned kill observers from local map.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/CleanupStrategy.html" title="enum in com.netflix.genie.agent.execution"><span class="typeNameLink">CleanupStrategy</span></a> - Enum in <a href="com/netflix/genie/agent/execution/package-summary.html">com.netflix.genie.agent.execution</a></dt>
 <dd>
 <div class="block">Enum to describe the different kind of post-execution cleanup of the job directory.</div>
@@ -7256,16 +7260,17 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcJobKillService-com.netflix.genie.web.data.services.DataServices-">gRpcJobKillService(DataServices)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcJobKillService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.services.RequestForwardingService-">gRpcJobKillService(DataServices, AgentRoutingService, RequestForwardingService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide an implementation of <code>JobKillServiceGrpc.JobKillServiceImplBase</code>
  if no other is provided.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints"><span class="typeNameLink">GRpcJobKillServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/package-summary.html">com.netflix.genie.web.agent.apis.rpc.v4.endpoints</a></dt>
 <dd>
-<div class="block">Service to kill agent jobs.</div>
+<div class="block">Implementation of <a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services"><code>JobKillService</code></a> which uses parked gRPC requests to tell the agent to
+ shutdown via a user kill request if the job is in an active state.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-">GRpcJobKillServiceImpl(DataServices)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentRoutingService-com.netflix.genie.web.services.RequestForwardingService-">GRpcJobKillServiceImpl(DataServices, AgentRoutingService, RequestForwardingService)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -7745,15 +7750,15 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/AgentRoutingService.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal(String)</a></span> - Method in interface com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></dt>
 <dd>
-<div class="block">Tells wether the agent running a given job is connected to the local node.</div>
+<div class="block">Tells whether the agent running a given job is connected to the local node.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl</a></dt>
 <dd>
-<div class="block">Tells wether the agent running a given job is connected to the local node.</div>
+<div class="block">Tells whether the agent running a given job is connected to the local node.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal(String)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentRoutingServiceSingleNodeImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceSingleNodeImpl</a></dt>
 <dd>
-<div class="block">Tells wether the agent running a given job is connected to the local node.</div>
+<div class="block">Tells whether the agent running a given job is connected to the local node.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobApiProjection.html#isApi--">isApi()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/JobApiProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobApiProjection</a></dt>
 <dd>
@@ -8895,6 +8900,14 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#kill-com.netflix.genie.agent.execution.services.KillService.KillSource-">kill(KillService.KillSource)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html#kill-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">kill(String, String, HttpServletRequest)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl">RequestForwardingServiceImpl</a></dt>
+<dd>
+<div class="block">Send a kill request for the given job id to another Genie host.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/RequestForwardingService.html#kill-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">kill(String, String, HttpServletRequest)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services">RequestForwardingService</a></dt>
+<dd>
+<div class="block">Send a kill request for the given job id to another Genie host.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobExecution.html#KILLED_EXIT_CODE">KILLED_EXIT_CODE</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a></dt>
 <dd>
 <div class="block">The exit code that will be set to indicate a job is killed.</div>
@@ -8907,15 +8920,15 @@
 <dd>
 <div class="block">Method to send a kill job request to Genie.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-">killJob(String, String)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob(String, String, HttpServletRequest)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
 <dd>
 <div class="block">Kill the job with the given id if possible.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-">killJob(String, String, HttpServletRequest, HttpServletResponse)</a></span> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob(String, String, HttpServletRequest)</a></span> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Kill job based on given job ID.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/JobKillService.html#killJob-java.lang.String-java.lang.String-">killJob(String, String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/JobKillService.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob(String, String, HttpServletRequest)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></dt>
 <dd>
 <div class="block">Kill the job with the given id if possible.</div>
 </dd>
@@ -10239,6 +10252,22 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#requestedTimeout">requestedTimeout</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">RequestForwardingService</span></a> - Interface in <a href="com/netflix/genie/web/services/package-summary.html">com.netflix.genie.web.services</a></dt>
+<dd>
+<div class="block">A service whose implementation should be responsible for forwarding requests between Genie server nodes.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#requestForwardingService-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.JobsForwardingProperties-">requestForwardingService(RestTemplate, GenieHostInfo, JobsForwardingProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a default implementation of <a href="com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services"><code>RequestForwardingService</code></a> for use by other services.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">RequestForwardingServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
+<dd>
+<div class="block">Default implementation of <a href="com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services"><code>RequestForwardingService</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html#RequestForwardingServiceImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.JobsForwardingProperties-">RequestForwardingServiceImpl(RestTemplate, GenieHostInfo, JobsForwardingProperties)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl">RequestForwardingServiceImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/AgentJobService.html#reserveJobId-com.netflix.genie.common.external.dtos.v4.AgentJobRequest-com.netflix.genie.common.external.dtos.v4.AgentClientMetadata-">reserveJobId(AgentJobRequest, AgentClientMetadata)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a></dt>
 <dd>
 <div class="block">Request a given job id to be reserved for this job, send along the job details, to be persisted by the server.</div>

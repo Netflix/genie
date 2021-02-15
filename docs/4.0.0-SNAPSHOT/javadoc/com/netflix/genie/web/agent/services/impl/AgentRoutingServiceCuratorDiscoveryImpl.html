@@ -211,7 +211,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal</a></span>(@NotBlank java.lang.String&nbsp;jobId)</code>
-<div class="block">Tells wether the agent running a given job is connected to the local node.</div>
+<div class="block">Tells whether the agent running a given job is connected to the local node.</div>
 </td>
 </tr>
 </table>
@@ -268,6 +268,44 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getHostnameForAgentConnection-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHostnameForAgentConnection</h4>
+<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getHostnameForAgentConnection(@NotBlank
+                                                                          @NotBlank java.lang.String&nbsp;jobId)</pre>
+<div class="block">Look up the hostname of the Genie node currently handling the agent connection for a given job.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#getHostnameForAgentConnection-java.lang.String-">getHostnameForAgentConnection</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobId</code> - the job id</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a boxed hostname string, empty if the connection for the given job id is not found</dd>
+</dl>
+</li>
+</ul>
+<a name="isAgentConnectionLocal-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isAgentConnectionLocal</h4>
+<pre>public&nbsp;boolean&nbsp;isAgentConnectionLocal(@NotBlank
+                                      @NotBlank java.lang.String&nbsp;jobId)</pre>
+<div class="block">Tells whether the agent running a given job is connected to the local node.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobId</code> - the job id</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the agent has an active connection to this node</dd>
+</dl>
+</li>
+</ul>
 <a name="handleClientConnected-java.lang.String-">
 <!--   -->
 </a>
@@ -301,44 +339,6 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - the job id the disconnected agent is running</dd>
-</dl>
-</li>
-</ul>
-<a name="getHostnameForAgentConnection-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getHostnameForAgentConnection</h4>
-<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getHostnameForAgentConnection(@NotBlank
-                                                                          @NotBlank java.lang.String&nbsp;jobId)</pre>
-<div class="block">Look up the hostname of the Genie node currently handling the agent connection for a given job.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#getHostnameForAgentConnection-java.lang.String-">getHostnameForAgentConnection</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobId</code> - the job id</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a boxed hostname string, empty if the connection for the given job id is not found</dd>
-</dl>
-</li>
-</ul>
-<a name="isAgentConnectionLocal-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>isAgentConnectionLocal</h4>
-<pre>public&nbsp;boolean&nbsp;isAgentConnectionLocal(@NotBlank
-                                      @NotBlank java.lang.String&nbsp;jobId)</pre>
-<div class="block">Tells wether the agent running a given job is connected to the local node.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobId</code> - the job id</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>true if the agent has an active connection to this node</dd>
 </dl>
 </li>
 </ul>

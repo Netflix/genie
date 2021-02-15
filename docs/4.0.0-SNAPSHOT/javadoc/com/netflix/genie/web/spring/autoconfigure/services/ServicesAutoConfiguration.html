@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -208,6 +208,14 @@ extends java.lang.Object</pre>
 <div class="block">Collection of properties related to job execution.</div>
 </td>
 </tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl">RequestForwardingServiceImpl</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#requestForwardingService-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.JobsForwardingProperties-">requestForwardingService</a></span>(org.springframework.web.client.RestTemplate&nbsp;genieRestTemplate,
+                        <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;hostInfo,
+                        <a href="../../../../../../../com/netflix/genie/web/properties/JobsForwardingProperties.html" title="class in com.netflix.genie.web.properties">JobsForwardingProperties</a>&nbsp;jobsForwardingProperties)</code>
+<div class="block">Provide a default implementation of <a href="../../../../../../../com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services"><code>RequestForwardingService</code></a> for use by other services.</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -382,7 +390,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/Jo
 <a name="archivedJobService-com.netflix.genie.web.data.services.DataServices-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>archivedJobService</h4>
 <pre>@Bean
@@ -398,6 +406,30 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/Ar
 <dd><code>meterRegistry</code> - The <code>MeterRegistry</code> implementation to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><code>ArchivedJobServiceImpl</code></a> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="requestForwardingService-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.JobsForwardingProperties-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>requestForwardingService</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services">RequestForwardingService.class</a>)
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl">RequestForwardingServiceImpl</a>&nbsp;requestForwardingService(@Qualifier(value="genieRestTemplate")
+                                                                                                                                    org.springframework.web.client.RestTemplate&nbsp;genieRestTemplate,
+                                                                                                                                    <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;hostInfo,
+                                                                                                                                    <a href="../../../../../../../com/netflix/genie/web/properties/JobsForwardingProperties.html" title="class in com.netflix.genie.web.properties">JobsForwardingProperties</a>&nbsp;jobsForwardingProperties)</pre>
+<div class="block">Provide a default implementation of <a href="../../../../../../../com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services"><code>RequestForwardingService</code></a> for use by other services.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>genieRestTemplate</code> - The <code>RestTemplate</code> configured to be used to call other Genie nodes</dd>
+<dd><code>hostInfo</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> instance containing introspection information about
+                                 the current node</dd>
+<dd><code>jobsForwardingProperties</code> - The properties for forwarding requests between Genie nodes</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../../../com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><code>RequestForwardingServiceImpl</code></a> instance</dd>
 </dl>
 </li>
 </ul>
