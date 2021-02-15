@@ -37,6 +37,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
@@ -185,6 +186,32 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
             throw new GenieServerException(
                 "Job " + jobId + " is currently in " + currentJobStatus + " status, which isn't currently handled"
             );
+        }
+    }
+
+    /**
+     * Remove orphaned kill observers from local map.
+     * <p>
+     * The logic as currently implemented is to have the Agent, once handshake is complete, open a connection to
+     * the server which results in parking a response observer in the map stored in this implementation. Upon receiving
+     * a kill request for the correct job this class will use the observer to send the "response" to the agent which
+     * will begin shut down process. The issue is that if the agent disconnects from this server the server will never
+     * realize it's gone and these observers will build up in the map in memory forever. This method will periodically
+     * go through the map and determine if the observers are still valid and remove any that aren't.
+     *
+     * @see "GRpcAgentJobKillServiceImpl"
+     */
+    @Scheduled(fixedDelay = 30_000L, initialDelay = 30_000L)
+    public void cleanupOrphanedObservers() {
+        for (final String jobId : this.parkedJobKillResponseObservers.keySet()) {
+            if (!this.agentRoutingService.isAgentConnectionLocal(jobId)) {
+                final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers.remove(
+                    jobId
+                );
+                if (observer != null) {
+                    observer.onCompleted();
+                }
+            }
         }
     }
 }
