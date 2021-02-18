@@ -548,7 +548,6 @@ class JobProcessManagerImplSpec extends Specification {
         threadPoolScheduler.shutdown()
     }
 
-
     def "Force kill diehard process"() {
         def future = Mock(ScheduledFuture)
 
