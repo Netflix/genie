@@ -546,4 +546,45 @@ class JobProcessManagerImplSpec extends Specification {
         cleanup:
         threadPoolScheduler.shutdown()
     }
+
+    def "Force kill diehard process"() {
+        def future = Mock(ScheduledFuture)
+
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        // The job traps kill signals and refuses to die.
+        jobScript.write("trap 'echo DieHard' INT KILL TERM && for i in {1..7}; do sleep 10; done;\n")
+        jobScript.setExecutable(true)
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.toFile(),
+            jobScript,
+            true,
+            59,
+            false
+        )
+
+        then:
+        noExceptionThrown()
+        1 * this.scheduler.schedule(_ as Runnable, _ as Instant) >> future
+
+        when:
+        this.manager.kill(KillService.KillSource.API_KILL_REQUEST)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        JobProcessResult result = this.manager.waitFor()
+
+        then:
+        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        // Don't care what (internal) exit code is, as long as it's above 128 meaning terminated
+        result.getExitCode() >= 128
+        !this.stdErr.exists()
+        !this.stdOut.exists()
+        1 * future.cancel(true)
+    }
+
 }
