@@ -67,7 +67,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      *
      * @param taskScheduler The {@link TaskScheduler} instance to use to run scheduled asynchronous tasks
      */
-    public JobProcessManagerImpl(TaskScheduler taskScheduler) {
+    public JobProcessManagerImpl(final TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
 
