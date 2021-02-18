@@ -384,12 +384,10 @@ class JobProcessManagerImplSpec extends Specification {
         KillService.KillSource.REMOTE_STATUS_MONITOR | JobStatusMessages.JOB_MARKED_FAILED
     }
 
-    // TODO: This test seems to verify incorrect behavior
-    //       Why should a job that is completed successfully be marked as killed instead of successful? we should fix
-    //       this case
     def "Kill completed process"() {
         File jobScript = this.temporaryFolder.resolve("run").toFile()
-        jobScript.write("echo\n")
+        Path touchedFile = temporaryFolder.resolve("touchz")
+        jobScript.write("touch " + touchedFile)
         jobScript.setExecutable(true)
 
         when:
@@ -405,6 +403,12 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
+        // Wait until the process actually completes by checking the existence of the file
+        while (Files.notExists(touchedFile)) {
+            Thread.sleep(100)
+        }
+
+        // Kill after job completion
         when:
         this.manager.kill(KillService.KillSource.SYSTEM_SIGNAL)
 
@@ -415,8 +419,8 @@ class JobProcessManagerImplSpec extends Specification {
         def result = this.manager.waitFor()
 
         then:
-        result.getFinalStatus() == JobStatus.KILLED
-        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
         // To document non-deterministic behavior that needs to be fixed
