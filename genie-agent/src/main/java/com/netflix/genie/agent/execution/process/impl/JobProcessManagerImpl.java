@@ -67,7 +67,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      *
      * @param taskScheduler The {@link TaskScheduler} instance to use to run scheduled asynchronous tasks
      */
-    public JobProcessManagerImpl(final TaskScheduler taskScheduler) {
+    public JobProcessManagerImpl(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
 
@@ -112,8 +112,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
         log.info("Executing job script: {} (working directory: {})",
             jobScript.getAbsolutePath(),
-            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString()
-        );
+            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString());
 
         processBuilder.command(jobScript.getAbsolutePath());
 
@@ -206,7 +205,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public JobProcessResult waitFor() throws InterruptedException {
-        if (!this.launched.get()) {
+        if (!launched.get()) {
             throw new IllegalStateException("Process not launched");
         }
 
