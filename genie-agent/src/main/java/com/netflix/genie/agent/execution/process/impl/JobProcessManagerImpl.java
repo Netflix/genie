@@ -36,6 +36,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -62,7 +63,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      *
      * @param taskScheduler The {@link TaskScheduler} instance to use to run scheduled asynchronous tasks
      */
-    public JobProcessManagerImpl(TaskScheduler taskScheduler) {
+    public JobProcessManagerImpl(final TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
 
@@ -70,11 +71,12 @@ public class JobProcessManagerImpl implements JobProcessManager {
      * {@inheritDoc}
      */
     @Override
-    public void launchProcess(File jobDirectory,
-                              File jobScript,
-                              boolean interactive,
-                              @Nullable final Integer timeout,
-                              boolean launchInJobDirectory) throws JobLaunchException {
+    public void launchProcess(
+        final File jobDirectory,
+        final File jobScript,
+        final boolean interactive,
+        @Nullable final Integer timeout,
+        final boolean launchInJobDirectory) throws JobLaunchException {
         if (!this.launched.compareAndSet(false, true)) {
             throw new IllegalStateException("Job already launched");
         }
@@ -146,19 +148,43 @@ public class JobProcessManagerImpl implements JobProcessManager {
     @Override
     public void kill(final KillService.KillSource source) {
         log.info("Killing job process (kill event source: {})", source);
-        // TODO: These may need to be done atomically as a tandem
         if (!this.killed.compareAndSet(false, true)) {
             // this job was already killed by something else
             return;
         }
         this.killSource.set(source);
-
         final Process process = this.processReference.get();
-
-        // TODO: This probably isn't enough. We need retries with a force at the end
-        if (process != null) {
-            process.destroy();
+        if (process == null) {
+            return;
         }
+
+        try {
+            // Grace killing period
+            final Instant graceKillEnd = Instant.now().plusSeconds(10);
+            process.destroy();
+            while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
+                process.waitFor(100, TimeUnit.MILLISECONDS);
+            }
+
+            if (!process.isAlive()) {
+                log.info("Gracefully killed job process successfully");
+                return;
+            }
+            log.info("Forcefully killing job process");
+            // Force kill period
+            final Instant forceKillEnd = Instant.now().plusSeconds(10);
+            process.destroyForcibly();
+            while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
+                process.waitFor(100, TimeUnit.MILLISECONDS);
+            }
+            if (!process.isAlive()) {
+                log.info("Forcefully killed job process successfully");
+                return;
+            }
+        } catch (Throwable t) {
+            log.warn("Process kill with exception: {}", t.getMessage());
+        }
+        log.warn("Failed to kill job process");
     }
 
     /**
@@ -207,7 +233,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
         }
 
         if (this.killed.get()) {
-            KillService.KillSource source = ObjectUtils.firstNonNull(
+            final KillService.KillSource source = ObjectUtils.firstNonNull(
                 killSource.get(), KillService.KillSource.API_KILL_REQUEST);
             switch (source) {
                 case TIMEOUT:
@@ -231,10 +257,9 @@ public class JobProcessManagerImpl implements JobProcessManager {
             }
         }
 
-        File initFailedFile = initFailedFileRef.get();
-        String statusMessage = (initFailedFile != null && initFailedFile.exists())
-            ? JobStatusMessages.JOB_SETUP_FAILED
-            : JobStatusMessages.JOB_FAILED;
+        final File initFailedFile = initFailedFileRef.get();
+        final String statusMessage = (initFailedFile != null && initFailedFile.exists())
+            ? JobStatusMessages.JOB_SETUP_FAILED : JobStatusMessages.JOB_FAILED;
 
         return new JobProcessResult.Builder(JobStatus.FAILED, statusMessage, exitCode).build();
     }
@@ -270,7 +295,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private static class TimeoutKiller implements Runnable {
         private final JobProcessManager jobProcessManager;
 
-        TimeoutKiller(JobProcessManager jobProcessManager) {
+        TimeoutKiller(final JobProcessManager jobProcessManager) {
             this.jobProcessManager = jobProcessManager;
         }
 
