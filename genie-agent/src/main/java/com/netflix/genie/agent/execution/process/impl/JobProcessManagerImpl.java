@@ -160,23 +160,13 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
         try {
             // Grace killing period
-            final Instant graceKillEnd = Instant.now().plusSeconds(10);
-            process.destroy();
-            while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
-                process.waitFor(100, TimeUnit.MILLISECONDS);
-            }
-
+            gracefullyKill(process);
             if (!process.isAlive()) {
                 log.info("Gracefully killed job process successfully");
                 return;
             }
             log.info("Forcefully killing job process");
-            // Force kill period
-            final Instant forceKillEnd = Instant.now().plusSeconds(10);
-            process.destroyForcibly();
-            while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
-                process.waitFor(100, TimeUnit.MILLISECONDS);
-            }
+            forcefullyKill(process);
             if (!process.isAlive()) {
                 log.info("Forcefully killed job process successfully");
                 return;
@@ -185,6 +175,23 @@ public class JobProcessManagerImpl implements JobProcessManager {
             log.warn("Process kill with exception: {}", t.getMessage());
         }
         log.warn("Failed to kill job process");
+    }
+
+    private void gracefullyKill(final Process process) throws Exception {
+        final Instant graceKillEnd = Instant.now().plusSeconds(10);
+        process.destroy();
+        while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
+            process.waitFor(100, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void forcefullyKill(final Process process) throws Exception {
+        final Instant forceKillEnd = Instant.now().plusSeconds(10);
+        // In Java8, this is exactly destroy(). However, this behavior can be changed in future java.
+        process.destroyForcibly();
+        while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
+            process.waitFor(100, TimeUnit.MILLISECONDS);
+        }
     }
 
     /**

@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
+import org.springframework.core.io.ClassPathResource
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import spock.lang.IgnoreIf
@@ -547,12 +548,19 @@ class JobProcessManagerImplSpec extends Specification {
         threadPoolScheduler.shutdown()
     }
 
+
     def "Force kill diehard process"() {
         def future = Mock(ScheduledFuture)
 
+        Path touchedFile = temporaryFolder.resolve("touchz")
+
+        String script = new ClassPathResource("slowlyDie.test.sh")
+            .getInputStream()
+            .getText()
+            .replaceAll('\\$RUNFILE', touchedFile.toAbsolutePath().toString())
+
         File jobScript = this.temporaryFolder.resolve("run").toFile()
-        // The job traps kill signals and refuses to die.
-        jobScript.write("trap 'echo DieHard' INT KILL TERM && for i in {1..7}; do sleep 10; done;\n")
+        jobScript.write(script)
         jobScript.setExecutable(true)
 
         when:
@@ -567,6 +575,11 @@ class JobProcessManagerImplSpec extends Specification {
         then:
         noExceptionThrown()
         1 * this.scheduler.schedule(_ as Runnable, _ as Instant) >> future
+
+        // Wait until the process actually starts by checking the existence of the runfile
+        while (Files.notExists(touchedFile)) {
+            Thread.sleep(100)
+        }
 
         when:
         this.manager.kill(KillService.KillSource.API_KILL_REQUEST)
