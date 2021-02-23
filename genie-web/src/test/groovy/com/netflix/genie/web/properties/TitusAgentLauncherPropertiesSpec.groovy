@@ -66,6 +66,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getMinimumMemory().toGigabytes() == 4
         p.getMinimumGPU() == 0
         p.getContainerAttributes() == [:]
+        p.getAdditionalJobAttributes() == [:]
 
         when:
         p.setEnabled(true)
@@ -105,6 +106,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.setMinimumMemory(DataSize.ofGigabytes(8))
         p.setMinimumGPU(1)
         p.setContainerAttributes(["hi": "bye"])
+        p.setAdditionalJobAttributes(["new": "attribute"])
 
         then:
         p.isEnabled()
@@ -145,5 +147,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getMinimumMemory().toGigabytes() == 8
         p.getMinimumGPU() == 1
         p.getContainerAttributes() == ["hi": "bye"]
+        p.getAdditionalJobAttributes() == ["new": "attribute"]
     }
 }

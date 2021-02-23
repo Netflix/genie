@@ -172,6 +172,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |0
 |yes
 
+|genie.agent.launcher.titus.additional-job-attributes
+|Map of attributes to send with the Titus request in addition to whatever defaults there are
+|empty
+|yes
+
 |genie.agent.launcher.titus.additional-memory
 |An additional amount of memory that should be added to whatever the job originally requested
 |2GB
