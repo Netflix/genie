@@ -65,6 +65,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getMinimumDiskSize().toGigabytes() == 10
         p.getMinimumMemory().toGigabytes() == 4
         p.getMinimumGPU() == 0
+        p.getContainerAttributes() == [:]
 
         when:
         p.setEnabled(true)
@@ -103,6 +104,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.setMinimumDiskSize(DataSize.ofGigabytes(20))
         p.setMinimumMemory(DataSize.ofGigabytes(8))
         p.setMinimumGPU(1)
+        p.setContainerAttributes(["hi": "bye"])
 
         then:
         p.isEnabled()
@@ -142,5 +144,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getMinimumDiskSize().toGigabytes() == 20
         p.getMinimumMemory().toGigabytes() == 8
         p.getMinimumGPU() == 1
+        p.getContainerAttributes() == ["hi": "bye"]
     }
 }

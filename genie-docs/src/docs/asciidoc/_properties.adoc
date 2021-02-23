@@ -182,6 +182,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |default
 |yes
 
+|genie.agent.launcher.titus.container-attributes
+|Map attributes to send to Titus specific to the container
+|empty
+|yes
+
 |genie.agent.launcher.titus.enabled
 |Whether the Titus agent launcher is active or not
 |false

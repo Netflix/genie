@@ -90,6 +90,11 @@ public class TitusAgentLauncherProperties {
     public static final String CAPACITY_GROUP_PROPERTY = PREFIX + ".capacityGroup";
 
     /**
+     * Any attributes that should be added to the request specifically for the container.
+     */
+    public static final String CONTAINER_ATTRIBUTES_PROPERTY = PREFIX + ".container-attributes";
+
+    /**
      * Name of the property that enables {@link TitusAgentLauncherImpl}.
      */
     public static final String ENABLE_PROPERTY = PREFIX + ".enabled";
@@ -328,4 +333,10 @@ public class TitusAgentLauncherProperties {
      */
     @NotNull
     private DataSize minimumMemory = DataSize.ofGigabytes(4);
+
+    /**
+     * A map of container attributes.
+     */
+    @NotNull
+    private Map<String, String> containerAttributes = new HashMap<>();
 }

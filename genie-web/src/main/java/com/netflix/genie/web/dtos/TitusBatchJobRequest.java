@@ -73,6 +73,7 @@ public class TitusBatchJobRequest {
         private final Image image;
         private final List<String> entryPoint;
         private final Map<String, String> env;
+        private final Map<String, String> attributes;
     }
 
     /**
