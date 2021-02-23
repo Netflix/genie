@@ -710,6 +710,12 @@ class JobSetupServiceImpl implements JobSetupService {
                 .append("# Launch the command")
                 .append(NEWLINE)
                 .append(this.commandLine).append(" <&0 &").append(NEWLINE)
+                // Spawn a new child process to watch if parent process dies, if so kill command forcefully
+                .append("pid=$!").append(NEWLINE)
+                .append("ppid=$$").append(NEWLINE)
+                .append("{ while kill -0 $ppid &> /dev/null; do sleep 30; done; "
+                    + "kill -0 $pid &> /dev/null && kill -9 $pid; } &")
+                .append(NEWLINE)
                 .append("wait %1").append(NEWLINE)
                 .append("exit $?").append(NEWLINE)
                 .append(NEWLINE);

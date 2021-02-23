@@ -55,6 +55,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
     private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
+    private Boolean isInteractiveMode;
 
     private final TaskScheduler taskScheduler;
 
@@ -80,6 +81,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
         if (!this.launched.compareAndSet(false, true)) {
             throw new IllegalStateException("Job already launched");
         }
+
+        this.isInteractiveMode = interactive;
 
         final ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -255,8 +258,15 @@ public class JobProcessManagerImpl implements JobProcessManager {
                     return new JobProcessResult
                         .Builder(JobStatus.KILLED, JobStatusMessages.JOB_MARKED_FAILED, exitCode)
                         .build();
-                case API_KILL_REQUEST:
                 case SYSTEM_SIGNAL:
+                    // In interactive mode, killed by a system signal is mostly likely by a user (e.g. Ctrl-C)
+                    return new JobProcessResult
+                        .Builder(JobStatus.KILLED,
+                        isInteractiveMode
+                        ? JobStatusMessages.JOB_KILLED_BY_USER : JobStatusMessages.JOB_KILLED_BY_SYSTEM,
+                        exitCode)
+                        .build();
+                case API_KILL_REQUEST:
                 default:
                     return new JobProcessResult
                         .Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER, exitCode)
