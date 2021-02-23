@@ -165,7 +165,7 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |genie.agent.launcher.titus.additional-environment
 |Map of additional environment variables to set for the job
 |empty
-|no
+|yes
 
 |genie.agent.launcher.titus.additional-gpu
 |An additional number of GPUs that should be added to whatever the job originally requested

@@ -477,4 +477,66 @@ class TitusAgentLauncherImplSpec extends Specification {
         "genie-agent" | null                  | "latest.release" | null        | 4       | null       | "genie-agent"         | "latest.release" | 4
         "genie-agent" | "genie-agent-tgianos" | "latest.release" | "4.0.82"    | 4       | "1"        | "genie-agent-tgianos" | "4.0.82"         | 1
     }
+
+    def "Check additional environment resolution"() {
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = this.launcher.launchAgent(this.resolvedJob, null)
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getEnv().isEmpty()
+
+        when:
+        def prop1Key = "${UUID.randomUUID()}.${UUID.randomUUID()}.${UUID.randomUUID()}".toString()
+        def prop1Value = UUID.randomUUID().toString()
+        this.environment.withProperty(
+            "${TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY}.${prop1Key}",
+            prop1Value
+        )
+        launcherExt = this.launcher.launchAgent(this.resolvedJob, null)
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getEnv().size() == 1
+        requestCapture.getContainer().getEnv().get(prop1Key) == prop1Value
+
+        when:
+        def prop2Key = UUID.randomUUID().toString()
+        def prop2Value = UUID.randomUUID().toString()
+        this.environment.withProperty(
+            "${TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY}.${prop2Key}".toString(),
+            prop2Value
+        )
+        launcherExt = this.launcher.launchAgent(this.resolvedJob, null)
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getEnv().size() == 2
+        requestCapture.getContainer().getEnv().get(prop1Key) == prop1Value
+        requestCapture.getContainer().getEnv().get(prop2Key) == prop2Value
+    }
 }
