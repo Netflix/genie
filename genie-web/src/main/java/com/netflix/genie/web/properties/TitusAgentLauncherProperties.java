@@ -80,6 +80,11 @@ public class TitusAgentLauncherProperties {
     public static final String ADDITIONAL_GPU_PROPERTY = PREFIX + ".additionalGPU";
 
     /**
+     * Any additional job attributes that should be added to defaults.
+     */
+    public static final String ADDITIONAL_JOB_ATTRIBUTES_PROPERTY = PREFIX + ".additional-job-attributes";
+
+    /**
      * An additional amount of memory that should be added to whatever the job originally requested.
      */
     public static final String ADDITIONAL_MEMORY_PROPERTY = PREFIX + ".additionalMemory";
@@ -339,4 +344,10 @@ public class TitusAgentLauncherProperties {
      */
     @NotNull
     private Map<String, String> containerAttributes = new HashMap<>();
+
+    /**
+     * Additional job attributes.
+     */
+    @NotNull
+    private Map<String, String> additionalJobAttributes = new HashMap<>();
 }

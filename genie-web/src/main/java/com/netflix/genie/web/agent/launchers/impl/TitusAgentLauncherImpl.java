@@ -267,6 +267,20 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         );
         final Duration runtimeLimit = this.titusAgentLauncherProperties.getRuntimeLimit();
 
+        final Map<String, String> jobAttributes = new HashMap<>();
+        jobAttributes.put(GENIE_USER_ATTR, resolvedJob.getJobMetadata().getUser());
+        jobAttributes.put(GENIE_SOURCE_HOST_ATTR, this.genieHostInfo.getHostname());
+        jobAttributes.put(GENIE_ENDPOINT_ATTR, this.titusAgentLauncherProperties.getGenieServerHost());
+        jobAttributes.put(GENIE_JOB_ID_ATTR, jobId);
+        jobAttributes.putAll(
+            this.binder
+                .bind(
+                    TitusAgentLauncherProperties.ADDITIONAL_JOB_ATTRIBUTES_PROPERTY,
+                    Bindable.mapOf(String.class, String.class)
+                )
+                .orElse(new HashMap<>())
+        );
+
         return new TitusBatchJobRequest(
             new TitusBatchJobRequest.Owner(this.titusAgentLauncherProperties.getOwnerEmail()),
             this.titusAgentLauncherProperties.getApplicationName(),
@@ -275,12 +289,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 String.class,
                 this.titusAgentLauncherProperties.getCapacityGroup()
             ),
-            ImmutableMap.of(
-                GENIE_USER_ATTR, resolvedJob.getJobMetadata().getUser(),
-                GENIE_SOURCE_HOST_ATTR, this.genieHostInfo.getHostname(),
-                GENIE_ENDPOINT_ATTR, this.titusAgentLauncherProperties.getGenieServerHost(),
-                GENIE_JOB_ID_ATTR, jobId
-            ),
+            jobAttributes,
             new TitusBatchJobRequest.Container(
                 new TitusBatchJobRequest.Resources(
                     cpu,
