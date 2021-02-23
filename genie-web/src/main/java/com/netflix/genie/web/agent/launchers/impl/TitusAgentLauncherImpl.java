@@ -307,9 +307,17 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     )
                 ),
                 entryPoint,
+                // Environment Variables
                 this.binder
                     .bind(
                         TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
+                        Bindable.mapOf(String.class, String.class)
+                    )
+                    .orElse(new HashMap<>()),
+                // Container Attributes
+                this.binder
+                    .bind(
+                        TitusAgentLauncherProperties.CONTAINER_ATTRIBUTES_PROPERTY,
                         Bindable.mapOf(String.class, String.class)
                     )
                     .orElse(new HashMap<>())
