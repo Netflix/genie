@@ -34,6 +34,8 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -42,6 +44,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +81,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final TitusAgentLauncherProperties titusAgentLauncherProperties;
     private final Environment environment;
     private final boolean hasDataSizeConverters;
+    private final Binder binder;
     private final MeterRegistry registry;
 
     /**
@@ -112,6 +116,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         } else {
             this.hasDataSizeConverters = false;
         }
+        this.binder = Binder.get(this.environment);
         this.registry = registry;
     }
 
@@ -302,7 +307,12 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     )
                 ),
                 entryPoint,
-                this.titusAgentLauncherProperties.getAdditionalEnvironment()
+                this.binder
+                    .bind(
+                        TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
+                        Bindable.mapOf(String.class, String.class)
+                    )
+                    .orElse(new HashMap<>())
             ),
             new TitusBatchJobRequest.Batch(
                 TITUS_JOB_BATCH_SIZE,

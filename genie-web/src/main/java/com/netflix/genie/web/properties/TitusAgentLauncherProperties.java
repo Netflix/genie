@@ -70,6 +70,11 @@ public class TitusAgentLauncherProperties {
     public static final String ADDITIONAL_DISK_SIZE_PROPERTY = PREFIX + ".additionalDiskSize";
 
     /**
+     * Any additional environment variables that should be inserted into the container runtime.
+     */
+    public static final String ADDITIONAL_ENVIRONMENT_PROPERTY = PREFIX + ".additional-environment";
+
+    /**
      * An additional number of GPUs that should be added to whatever the job originally requested.
      */
     public static final String ADDITIONAL_GPU_PROPERTY = PREFIX + ".additionalGPU";
