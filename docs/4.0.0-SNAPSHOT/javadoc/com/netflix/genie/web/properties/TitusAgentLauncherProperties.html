@@ -148,8 +148,20 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#ADDITIONAL_ENVIRONMENT_PROPERTY">ADDITIONAL_ENVIRONMENT_PROPERTY</a></span></code>
+<div class="block">Any additional environment variables that should be inserted into the container runtime.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#ADDITIONAL_GPU_PROPERTY">ADDITIONAL_GPU_PROPERTY</a></span></code>
 <div class="block">An additional number of GPUs that should be added to whatever the job originally requested.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#ADDITIONAL_JOB_ATTRIBUTES_PROPERTY">ADDITIONAL_JOB_ATTRIBUTES_PROPERTY</a></span></code>
+<div class="block">Any additional job attributes that should be added to defaults.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -166,83 +178,89 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#CONTAINER_ATTRIBUTES_PROPERTY">CONTAINER_ATTRIBUTES_PROPERTY</a></span></code>
+<div class="block">Any attributes that should be added to the request specifically for the container.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#ENABLE_PROPERTY">ENABLE_PROPERTY</a></span></code>
 <div class="block">Name of the property that enables <a href="../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a>.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#IMAGE_NAME_PROPERTY">IMAGE_NAME_PROPERTY</a></span></code>
 <div class="block">The name of the property that dictates which image to launch on Titus with.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#IMAGE_TAG_PROPERTY">IMAGE_TAG_PROPERTY</a></span></code>
 <div class="block">The name of the property that dictates which image tag to launch on Titus with.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#JOB_ID_PLACEHOLDER">JOB_ID_PLACEHOLDER</a></span></code>
 <div class="block">Placeholder for job id for use in entry point expression.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_BANDWIDTH_PROPERTY">MINIMUM_BANDWIDTH_PROPERTY</a></span></code>
 <div class="block">The minimum network bandwidth to allocate to the container.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_CPU_PROPERTY">MINIMUM_CPU_PROPERTY</a></span></code>
 <div class="block">The minimum number of CPUs any container should launch with.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_DISK_SIZE_PROPERTY">MINIMUM_DISK_SIZE_PROPERTY</a></span></code>
 <div class="block">The minimum size of the disk volume to attach to the job container.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_GPU_PROPERTY">MINIMUM_GPU_PROPERTY</a></span></code>
 <div class="block">The minimum number of GPUs any container should launch with.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_MEMORY_PROPERTY">MINIMUM_MEMORY_PROPERTY</a></span></code>
 <div class="block">The minimum amount of memory a container should be allocated.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#PREFIX">PREFIX</a></span></code>
 <div class="block">Properties prefix.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#RETRIES_PROPERTY">RETRIES_PROPERTY</a></span></code>
 <div class="block">The number of retries to make on the Titus submission.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#RUNTIME_LIMIT">RUNTIME_LIMIT</a></span></code>
 <div class="block">The max duration a Titus job is allowed to run after Genie has submitted it.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#SERVER_HOST_PLACEHOLDER">SERVER_HOST_PLACEHOLDER</a></span></code>
 <div class="block">Placeholder for Genie server hostname id for use in entry point expression.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#SERVER_PORT_PLACEHOLDER">SERVER_PORT_PLACEHOLDER</a></span></code>
 <div class="block">Placeholder for Genie server port id for use in entry point expression.</div>
@@ -351,6 +369,20 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a name="ADDITIONAL_ENVIRONMENT_PROPERTY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ADDITIONAL_ENVIRONMENT_PROPERTY</h4>
+<pre>public static final&nbsp;java.lang.String ADDITIONAL_ENVIRONMENT_PROPERTY</pre>
+<div class="block">Any additional environment variables that should be inserted into the container runtime.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
 <a name="ADDITIONAL_GPU_PROPERTY">
 <!--   -->
 </a>
@@ -362,6 +394,20 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.ADDITIONAL_GPU_PROPERTY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="ADDITIONAL_JOB_ATTRIBUTES_PROPERTY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ADDITIONAL_JOB_ATTRIBUTES_PROPERTY</h4>
+<pre>public static final&nbsp;java.lang.String ADDITIONAL_JOB_ATTRIBUTES_PROPERTY</pre>
+<div class="block">Any additional job attributes that should be added to defaults.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.ADDITIONAL_JOB_ATTRIBUTES_PROPERTY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -390,6 +436,20 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.CAPACITY_GROUP_PROPERTY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="CONTAINER_ATTRIBUTES_PROPERTY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CONTAINER_ATTRIBUTES_PROPERTY</h4>
+<pre>public static final&nbsp;java.lang.String CONTAINER_ATTRIBUTES_PROPERTY</pre>
+<div class="block">Any attributes that should be added to the request specifically for the container.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.CONTAINER_ATTRIBUTES_PROPERTY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
