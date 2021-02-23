@@ -101,6 +101,9 @@ env | grep -E --regex='.*' | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}
 
 # Launch the command
 presto -v --exec 'select * from table limit 10' <&0 &
+pid=$!
+ppid=$$
+{ while kill -0 $ppid &> /dev/null; do sleep 30; done; kill -0 $pid &> /dev/null && kill -9 $pid; } &
 wait %1
 exit $?
 
