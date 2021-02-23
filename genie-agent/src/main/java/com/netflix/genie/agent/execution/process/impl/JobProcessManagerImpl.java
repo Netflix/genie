@@ -59,6 +59,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
     private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
+
     private final TaskScheduler taskScheduler;
     private boolean isInteractiveMode;
 
@@ -197,23 +198,6 @@ public class JobProcessManagerImpl implements JobProcessManager {
         process.destroyForcibly();
         while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
             process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private void gracefullyKill(final Process process) throws Exception {
-        final Instant graceKillEnd = Instant.now().plusSeconds(10);
-        process.destroy();
-        while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
-            process.waitFor(100, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private void forcefullyKill(final Process process) throws Exception {
-        final Instant forceKillEnd = Instant.now().plusSeconds(10);
-        // In Java8, this is exactly destroy(). However, this behavior can be changed in future java.
-        process.destroyForcibly();
-        while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
-            process.waitFor(100, TimeUnit.MILLISECONDS);
         }
     }
 
