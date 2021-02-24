@@ -34,6 +34,13 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @ToString
+// TODO: This class and the nested classes likely could benefit from a builder pattern but I'm just too busy to tackle
+//       this right now so going to do some hacky things to get migration unblocked. Also it's very hardcoded to be
+//       specifically what is needed for Titus API calls within Netflix and not perhaps Titus api calls in general.
+//       An example of this is iAmRole is required but if the OSS Titus isn't run on AWS or that field isn't actually
+//       required by the API what should someone put here? The API needs to be reviewed and fields that are optional
+//       made optional and those that are required made clear they are required. Right now everything is required
+//       - TJG 2/24/2020
 public class TitusBatchJobRequest {
 
     @NotNull
