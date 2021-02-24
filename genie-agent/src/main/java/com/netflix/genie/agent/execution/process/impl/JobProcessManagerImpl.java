@@ -48,6 +48,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class JobProcessManagerImpl implements JobProcessManager {
+    // Number of seconds to wait before declaring the kill action fails
+    private static final int KILL_WAIT_SECS = 10;
+    // Time interval in milliseconds for checking kill action
+    private static final int KILL_CHECK_INTERVAL_MS = 1000;
     private static final int SUCCESS_EXIT_CODE = 0;
     private final AtomicBoolean launched = new AtomicBoolean(false);
     private final AtomicReference<Process> processReference = new AtomicReference<>();
@@ -55,9 +59,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
     private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
-    private Boolean isInteractiveMode;
-
     private final TaskScheduler taskScheduler;
+    private boolean isInteractiveMode;
 
     /**
      * Constructor.
@@ -109,7 +112,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
         log.info("Executing job script: {} (working directory: {})",
             jobScript.getAbsolutePath(),
-            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString());
+            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString()
+        );
 
         processBuilder.command(jobScript.getAbsolutePath());
 
@@ -174,26 +178,26 @@ public class JobProcessManagerImpl implements JobProcessManager {
                 log.info("Forcefully killed job process successfully");
                 return;
             }
-        } catch (Throwable t) {
-            log.warn("Process kill with exception: {}", t.getMessage());
+        } catch (Exception e) {
+            log.warn("Failed to kill job process with exception: ", e);
         }
-        log.warn("Failed to kill job process");
+        log.error("Failed to kill job process");
     }
 
     private void gracefullyKill(final Process process) throws Exception {
-        final Instant graceKillEnd = Instant.now().plusSeconds(10);
+        final Instant graceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
         process.destroy();
         while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
-            process.waitFor(100, TimeUnit.MILLISECONDS);
+            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
         }
     }
 
     private void forcefullyKill(final Process process) throws Exception {
-        final Instant forceKillEnd = Instant.now().plusSeconds(10);
+        final Instant forceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
         // In Java8, this is exactly destroy(). However, this behavior can be changed in future java.
         process.destroyForcibly();
         while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
-            process.waitFor(100, TimeUnit.MILLISECONDS);
+            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -202,7 +206,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public JobProcessResult waitFor() throws InterruptedException {
-        if (!launched.get()) {
+        if (!this.launched.get()) {
             throw new IllegalStateException("Process not launched");
         }
 
@@ -262,8 +266,9 @@ public class JobProcessManagerImpl implements JobProcessManager {
                     // In interactive mode, killed by a system signal is mostly likely by a user (e.g. Ctrl-C)
                     return new JobProcessResult
                         .Builder(JobStatus.KILLED,
-                        isInteractiveMode
-                        ? JobStatusMessages.JOB_KILLED_BY_USER : JobStatusMessages.JOB_KILLED_BY_SYSTEM,
+                        this.isInteractiveMode
+                            ? JobStatusMessages.JOB_KILLED_BY_USER
+                            : JobStatusMessages.JOB_KILLED_BY_SYSTEM,
                         exitCode)
                         .build();
                 case API_KILL_REQUEST:
