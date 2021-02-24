@@ -2,12 +2,12 @@
 
 This section provides an overview of Genie subsystems and components.
 
-==== Leader election
+=== Leader election
 
 Genie uses Zookeeper to elect an instance to be leader.
 An alternative leader election mechanism can be plugged in instead of Zookeeper.
 
-===== Leader tasks
+==== Leader tasks
 
 The Genie instance elected leader of a given cluster performs different tasks:
 
@@ -15,7 +15,7 @@ The Genie instance elected leader of a given cluster performs different tasks:
  * Mark jobs whose agent is AWOL as failed
  * Collect and publish user metrics about running jobs
 
-==== Execution stages
+=== Execution stages
 
 Every job is executed by a dedicated agent.
 This is true for both API-submitted jobs and CLI-initiated jobs.
@@ -63,11 +63,11 @@ For example, if an agent is rejected by the cluster during the Handshake stage, 
 Some stages may fail due to transient issues, in which case they are retried (for example, Handshake may fail due to a broken connection, but a retry may succeed).
 If a retryable stage runs out of attempts, then execution is aborted, which may skip following stages as appropriate.
 
-==== The `run` script
+=== The `run` script
 
 Every job consists of a `bash` script that the agent composes, forks, and monitors.
 
-This separation allows treating every job the same way, wether they are Spark or Notebook kernels, or anything else.
+This separation allows treating every job the same way, whether they are Spark or Notebook kernels, or anything else.
 
 The structure of a `run` script is as follows:
 
@@ -84,7 +84,7 @@ The structure of a `run` script is as follows:
  * Launch the assembled job command
  * Wait for command termination
 
-==== Agent heartbeat and routing
+=== Agent heartbeat and routing
 
 Each agent that successfully claimed a job maintains a gRPC connection to a server in the cluster and periodically sends heartbeats.
 
@@ -96,12 +96,12 @@ This information is stored in the agent routing table.
 The routing table is used by Genie server instances to dispatch a kill request to the instance where the agent is currently connected.
 That instance then forwards the request to the agent.
 
-==== Agent file streaming
+=== Agent file streaming
 
 Each agent executing a job opens multiple streaming channels on top of a single connection to a server.
 These channels can be used to pull a file from the agent and serve it via REST API
 
-==== Agent logging
+=== Agent logging
 
 Log messages emitted by a genie agent are routed to `agent.log`.
 This file is created at a temporary location when the agent starts, and relocated to the job folder once the latter exists.
@@ -109,7 +109,7 @@ This file is created at a temporary location when the agent starts, and relocate
 Some messages (such as fatal errors and high level execution progress updates) are sent to a special logger that displays them in the console.
 These messages are appended to `stderr` to avoid polluting the job command output (sent to `stdout`) such as query outputs.
 
-==== Interactive mode
+=== Interactive mode
 
 Agent execute by default in non-interactive mode:
 
@@ -126,21 +126,21 @@ Commands that launch REPL interfaces (e.g., `spark-shell`), should be launched v
 
 All jobs launched by the server (as a result of an API job submission) execute in non-interactive mode.
 
-==== Persistence
+=== Persistence
 
-Out of the box, Genie supports MySQL and Postgress persistence via JPA and Hibernate.
+Out of the box, Genie supports MySQL and Postgres persistence via JPA and Hibernate.
 
 H2 in-memory database is also supported for integration tests.
 
 Other kinds of persistence can be plugged in either via JPA or by re-implementing the persistence interface with a different technology.
 
-==== Plug-in Selectors
+=== Plug-in Selectors
 
 Genie provides a mechanism to load and invoke Groovy scripts, and even reload the script if it changes at runtime.
 
-This hooks are provided in order to plug-in custom logic:
+These hooks are provided in order to plug-in custom logic:
 
-====== Command selector script
+==== Command selector script
 
 A job command criteria may be broad enough to match multiple commands (for example, a Spark job may match 10 different Spark commands, one for each Spark version).
 
@@ -149,7 +149,7 @@ The command selector allows custom plug-in logic to choose the most appropriate.
 For example, there may be a 'stable' version which should be picked as default.
 Or the job may be a good candidate to "canary" the newest and unstable version.
 
-====== Cluster selector script
+==== Cluster selector script
 
 Clusters that are eligible to run a given job are filtered down by the command's cluster criteria combined with the job's cluster criteria.
 But the final match set may still contain more than one viable cluster.
@@ -159,7 +159,7 @@ In this kind of situation, the selector script can make advanced decision that g
 For example, the script could poll the clusters and see which one is the least loaded.
 Or route the job based on other attributes or metadata.
 
-====== Agent launcher selector script
+==== Agent launcher selector script
 
 Genie supports multiple agent launcher.
 For example, a launcher that starts the job on bare metal on in the same host, a launcher that starts the job inside a Docker container, a launcher that delegates the job to something like Kubernetes.
@@ -168,26 +168,26 @@ Like in previous examples, making this runtime decisions is beyond the scope of 
 
 Therefore a hook is provided to plug-in a Groovy selector script that can make this decision based on job metadata and pick one of the available launchers.
 
-==== Job State Change Notifications
+=== Job State Change Notifications
 
 Genie emits internal application events whenever a job changes state.
 
 Genie includes 2 built-in components that consume theese events and publish notifications to Amazon SNS.
 
-==== User limits
+=== User limits
 
 Genie can cap the maximum number of jobs that a given user is allowed to run.
 
 The global default can be adjusted, and overrides for individual users can be set higher or lower.
 
-==== Job attachments
+=== Job attachments
 
 Genie allows API job requests to submit one or more attachments (by submitting a multi-part POST).
 These files are placed in the job directory before launch.
 
 Example usage include Presto scripts, and Spark application jars, and additional property files.
 
-==== Job archival
+=== Job archival
 
 After a job is completed, successfully or not, job file outputs and logs can be archived for later access.
 
