@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.dtos;
+package com.netflix.genie.web.agent.launchers.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

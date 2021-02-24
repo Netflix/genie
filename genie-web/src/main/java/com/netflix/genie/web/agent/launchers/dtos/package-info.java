@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2020 Netflix, Inc.
+ *  Copyright 2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,26 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.dtos;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.annotation.Nullable;
 
 /**
- * Titus job response DTO.
+ * Data objects specific to implementations of {@link com.netflix.genie.web.agent.launchers.AgentLauncher}.
  *
- * @author mprimi
+ * @author tgianos
  * @since 4.0.0
  */
-@Getter
-@Setter
-public class TitusBatchJobResponse {
-    @Nullable
-    private String id;
-    @Nullable
-    private Integer statusCode;
-    @Nullable
-    private String message;
-}
+@ParametersAreNonnullByDefault
+package com.netflix.genie.web.agent.launchers.dtos;
+
+import javax.annotation.ParametersAreNonnullByDefault;
