@@ -150,14 +150,16 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 throw new AgentLaunchException("Failed to request creation of Titus job for job " + jobId);
             }
 
-            titusJobId = titusResponse.getId();
-            if (StringUtils.isBlank(titusJobId)) {
-                throw new AgentLaunchException(
-                    "Failed to create titus job for job " + jobId
-                        + " - " + titusResponse.getStatusCode() + ": "
-                        + titusResponse.getMessage()
-                );
-            }
+            titusJobId = titusResponse.getId().orElseThrow(
+                () -> new AgentLaunchException(
+                    "Failed to create titus job for job "
+                        + jobId
+                        + " - Titus Status Code:"
+                        + titusResponse.getStatusCode().orElse(null)
+                        + ", Titus response message:"
+                        + titusResponse.getMessage().orElse("")
+                )
+            );
 
             log.info("Created Titus job {} to execute Genie job {}", titusJobId, jobId);
 

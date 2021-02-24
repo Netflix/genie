@@ -17,24 +17,73 @@
  */
 package com.netflix.genie.web.agent.launchers.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
- * Titus job response DTO.
+ * Titus job response POJO.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@Getter
-@Setter
 public class TitusBatchJobResponse {
-    @Nullable
     private String id;
-    @Nullable
     private Integer statusCode;
-    @Nullable
     private String message;
+
+    /**
+     * Get the ID of the Titus job.
+     *
+     * @return The ID
+     */
+    public Optional<String> getId() {
+        return Optional.ofNullable(this.id);
+    }
+
+    /**
+     * Set the id of the titus job.
+     *
+     * @param id The new id
+     */
+    public void setId(@Nullable final String id) {
+        this.id = StringUtils.isNotBlank(id) ? id : null;
+    }
+
+    /**
+     * Get the status code if there was one.
+     *
+     * @return The status code wrapped in {@link Optional} else {@link Optional#empty()}
+     */
+    public Optional<Integer> getStatusCode() {
+        return Optional.ofNullable(this.statusCode);
+    }
+
+    /**
+     * Set the status code.
+     *
+     * @param statusCode The new status code
+     */
+    public void setStatusCode(@Nullable final Integer statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    /**
+     * Get the message if there was one.
+     *
+     * @return The message wrapped in {@link Optional} else {@link Optional#empty()}
+     */
+    public Optional<String> getMessage() {
+        return Optional.ofNullable(this.message);
+    }
+
+    /**
+     * Set the message if there was one.
+     *
+     * @param message The new message
+     */
+    public void setMessage(@Nullable final String message) {
+        this.message = message;
+    }
 }
