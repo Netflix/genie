@@ -59,7 +59,6 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
     private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
-
     private final TaskScheduler taskScheduler;
     private boolean isInteractiveMode;
 
@@ -113,7 +112,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
         log.info("Executing job script: {} (working directory: {})",
             jobScript.getAbsolutePath(),
-            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString());
+            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString()
+        );
 
         processBuilder.command(jobScript.getAbsolutePath());
 
@@ -206,7 +206,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public JobProcessResult waitFor() throws InterruptedException {
-        if (!launched.get()) {
+        if (!this.launched.get()) {
             throw new IllegalStateException("Process not launched");
         }
 
