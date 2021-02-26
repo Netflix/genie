@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
+import org.springframework.core.io.ClassPathResource
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import spock.lang.IgnoreIf
@@ -384,19 +385,17 @@ class JobProcessManagerImplSpec extends Specification {
         KillService.KillSource.REMOTE_STATUS_MONITOR | JobStatusMessages.JOB_MARKED_FAILED
     }
 
-    // TODO: This test seems to verify incorrect behavior
-    //       Why should a job that is completed successfully be marked as killed instead of successful? we should fix
-    //       this case
-    def "Kill completed process"() {
+    @Unroll
+    def "Kill running process with system signal (source: #interactive)"() {
         File jobScript = this.temporaryFolder.resolve("run").toFile()
-        jobScript.write("echo\n")
+        jobScript.write("sleep 60 \n")
         jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
             this.temporaryFolder.toFile(),
             jobScript,
-            true,
+            interactive,
             null,
             false
         )
@@ -412,11 +411,58 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        def result = this.manager.waitFor()
+        JobProcessResult result = this.manager.waitFor()
 
         then:
         result.getFinalStatus() == JobStatus.KILLED
-        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getFinalStatusMessage() == expectedStatusMessage
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
+        result.getExitCode() == 143
+
+        where:
+        interactive        | expectedStatusMessage
+        true               | JobStatusMessages.JOB_KILLED_BY_USER
+        false              | JobStatusMessages.JOB_KILLED_BY_SYSTEM
+    }
+
+    def "Kill completed process"() {
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        Path touchedFile = temporaryFolder.resolve("touchz")
+        jobScript.write("touch " + touchedFile)
+        jobScript.setExecutable(true)
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.toFile(),
+            jobScript,
+            true,
+            null,
+            false
+        )
+
+        then:
+        noExceptionThrown()
+        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
+
+        // Wait until the process actually completes by checking the existence of the file
+        while (Files.notExists(touchedFile)) {
+            Thread.sleep(100)
+        }
+
+        // Kill after job completion
+        when:
+        this.manager.kill(KillService.KillSource.SYSTEM_SIGNAL)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        def result = this.manager.waitFor()
+
+        then:
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
         // To document non-deterministic behavior that needs to be fixed
@@ -542,4 +588,57 @@ class JobProcessManagerImplSpec extends Specification {
         cleanup:
         threadPoolScheduler.shutdown()
     }
+
+
+    def "Force kill diehard process"() {
+        def future = Mock(ScheduledFuture)
+
+        Path touchedFile = temporaryFolder.resolve("touchz")
+
+        String script = new ClassPathResource("slowlyDie.test.sh")
+            .getInputStream()
+            .getText()
+            .replaceAll('\\$RUNFILE', touchedFile.toAbsolutePath().toString())
+
+        File jobScript = this.temporaryFolder.resolve("run").toFile()
+        jobScript.write(script)
+        jobScript.setExecutable(true)
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.toFile(),
+            jobScript,
+            true,
+            59,
+            false
+        )
+
+        then:
+        noExceptionThrown()
+        1 * this.scheduler.schedule(_ as Runnable, _ as Instant) >> future
+
+        // Wait until the process actually starts by checking the existence of the runfile
+        while (Files.notExists(touchedFile)) {
+            Thread.sleep(100)
+        }
+
+        when:
+        this.manager.kill(KillService.KillSource.API_KILL_REQUEST)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        JobProcessResult result = this.manager.waitFor()
+
+        then:
+        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        // Don't care what (internal) exit code is, as long as it's above 128 meaning terminated
+        result.getExitCode() >= 128
+        !this.stdErr.exists()
+        !this.stdOut.exists()
+        1 * future.cancel(true)
+    }
+
 }
