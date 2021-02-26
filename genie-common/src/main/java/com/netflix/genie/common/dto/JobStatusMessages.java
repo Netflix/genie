@@ -52,6 +52,11 @@ public final class JobStatusMessages {
     public static final String JOB_KILLED_BY_USER = "Job was killed by user.";
 
     /**
+     * Job killed by system.
+     */
+    public static final String JOB_KILLED_BY_SYSTEM = "Job was killed by system.";
+
+    /**
      * Job completed successfully.
      */
     public static final String JOB_FINISHED_SUCCESSFULLY = "Job finished successfully.";

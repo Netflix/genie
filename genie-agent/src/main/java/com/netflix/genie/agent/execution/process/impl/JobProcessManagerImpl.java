@@ -26,6 +26,7 @@ import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.Nullable;
@@ -35,6 +36,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -46,7 +48,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class JobProcessManagerImpl implements JobProcessManager {
-
+    // Number of seconds to wait before declaring the kill action fails
+    private static final int KILL_WAIT_SECS = 10;
+    // Time interval in milliseconds for checking kill action
+    private static final int KILL_CHECK_INTERVAL_MS = 1000;
     private static final int SUCCESS_EXIT_CODE = 0;
     private final AtomicBoolean launched = new AtomicBoolean(false);
     private final AtomicReference<Process> processReference = new AtomicReference<>();
@@ -54,8 +59,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
     private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
-
     private final TaskScheduler taskScheduler;
+    private boolean isInteractiveMode;
 
     /**
      * Constructor.
@@ -75,11 +80,12 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final File jobScript,
         final boolean interactive,
         @Nullable final Integer timeout,
-        final boolean launchInJobDirectory
-    ) throws JobLaunchException {
+        final boolean launchInJobDirectory) throws JobLaunchException {
         if (!this.launched.compareAndSet(false, true)) {
             throw new IllegalStateException("Job already launched");
         }
+
+        this.isInteractiveMode = interactive;
 
         final ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -104,11 +110,9 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
         this.initFailedFileRef.set(PathUtils.jobSetupErrorMarkerFilePath(jobDirectory).toFile());
 
-        log.info(
-            "Executing job script: {} (working directory: {})",
+        log.info("Executing job script: {} (working directory: {})",
             jobScript.getAbsolutePath(),
-            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString()
-        );
+            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString());
 
         processBuilder.command(jobScript.getAbsolutePath());
 
@@ -125,23 +129,23 @@ public class JobProcessManagerImpl implements JobProcessManager {
 
         if (this.killed.get()) {
             log.info("Job aborted, skipping launch");
-        } else {
-            log.info("Launching job");
-            try {
-                this.processReference.set(processBuilder.start());
-                if (timeout != null) {
-                    // NOTE: There is a chance of a SLIGHT delay here between the process launch and the timeout
-                    final Instant timeoutInstant = Instant.now().plusSeconds(timeout);
-                    this.timeoutKillThread.set(
-                        this.taskScheduler.schedule(new TimeoutKiller(this), timeoutInstant)
-                    );
-                    log.info("Scheduled timeout kill to occur {} second(s) from now at {}", timeout, timeoutInstant);
-                }
-            } catch (final IOException | SecurityException e) {
-                throw new JobLaunchException("Failed to launch job: ", e);
-            }
-            log.info("Process launched (pid: {})", this.getPid(this.processReference.get()));
+            return;
         }
+        log.info("Launching job");
+        try {
+            this.processReference.set(processBuilder.start());
+            if (timeout != null) {
+                // NOTE: There is a chance of a SLIGHT delay here between the process launch and the timeout
+                final Instant timeoutInstant = Instant.now().plusSeconds(timeout);
+                this.timeoutKillThread.set(
+                    this.taskScheduler.schedule(new TimeoutKiller(this), timeoutInstant)
+                );
+                log.info("Scheduled timeout kill to occur {} second(s) from now at {}", timeout, timeoutInstant);
+            }
+        } catch (IOException | SecurityException e) {
+            throw new JobLaunchException("Failed to launch job: ", e);
+        }
+        log.info("Process launched (pid: {})", this.getPid(this.processReference.get()));
     }
 
     /**
@@ -150,18 +154,49 @@ public class JobProcessManagerImpl implements JobProcessManager {
     @Override
     public void kill(final KillService.KillSource source) {
         log.info("Killing job process (kill event source: {})", source);
-        // TODO: These may need to be done atomically as a tandem
         if (!this.killed.compareAndSet(false, true)) {
             // this job was already killed by something else
             return;
         }
         this.killSource.set(source);
-
         final Process process = this.processReference.get();
+        if (process == null) {
+            return;
+        }
 
-        // TODO: This probably isn't enough. We need retries with a force at the end
-        if (process != null) {
-            process.destroy();
+        try {
+            // Grace killing period
+            gracefullyKill(process);
+            if (!process.isAlive()) {
+                log.info("Gracefully killed job process successfully");
+                return;
+            }
+            log.info("Forcefully killing job process");
+            forcefullyKill(process);
+            if (!process.isAlive()) {
+                log.info("Forcefully killed job process successfully");
+                return;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to kill job process with exception: ", e);
+        }
+        log.error("Failed to kill job process");
+    }
+
+    private void gracefullyKill(final Process process) throws Exception {
+        final Instant graceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
+        process.destroy();
+        while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
+            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void forcefullyKill(final Process process) throws Exception {
+        final Instant forceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
+        // In Java8, this is exactly destroy(). However, this behavior can be changed in future java.
+        process.destroyForcibly();
+        while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
+            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -170,11 +205,11 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public JobProcessResult waitFor() throws InterruptedException {
-        if (!this.launched.get()) {
+        if (!launched.get()) {
             throw new IllegalStateException("Process not launched");
         }
 
-        final Process process = this.processReference.get();
+        final Process process = processReference.get();
 
         int exitCode = 0;
         if (process != null) {
@@ -200,14 +235,19 @@ public class JobProcessManagerImpl implements JobProcessManager {
             timeoutThreadFuture.cancel(true);
         }
 
-        // TODO: This doesn't seem quite right to me and is confirmed by an existing test. If the job completes
-        //       successfully but then the system calls kill before this method then the final job status will be
-        //       killed instead of successful. We should discuss this - TJG 9/9/2019
-        if (this.killed.get()) {
-            final KillService.KillSource source = this.killSource.get() != null
-                ? this.killSource.get()
-                : KillService.KillSource.API_KILL_REQUEST;
+        // Check exit code first to see if the job finishes successfully and returns SUCCEEDED as status,
+        // even the job gets a KILL request.
+        if (process != null && exitCode == SUCCESS_EXIT_CODE) {
+            return new JobProcessResult.Builder(
+                JobStatus.SUCCEEDED,
+                JobStatusMessages.JOB_FINISHED_SUCCESSFULLY,
+                exitCode
+            ).build();
+        }
 
+        if (this.killed.get()) {
+            final KillService.KillSource source = ObjectUtils.firstNonNull(
+                killSource.get(), KillService.KillSource.API_KILL_REQUEST);
             switch (source) {
                 case TIMEOUT:
                     return new JobProcessResult
@@ -221,28 +261,27 @@ public class JobProcessManagerImpl implements JobProcessManager {
                     return new JobProcessResult
                         .Builder(JobStatus.KILLED, JobStatusMessages.JOB_MARKED_FAILED, exitCode)
                         .build();
-                case API_KILL_REQUEST:
                 case SYSTEM_SIGNAL:
+                    // In interactive mode, killed by a system signal is mostly likely by a user (e.g. Ctrl-C)
+                    return new JobProcessResult
+                        .Builder(JobStatus.KILLED,
+                        this.isInteractiveMode
+                            ? JobStatusMessages.JOB_KILLED_BY_USER
+                            : JobStatusMessages.JOB_KILLED_BY_SYSTEM,
+                        exitCode)
+                        .build();
+                case API_KILL_REQUEST:
                 default:
                     return new JobProcessResult
                         .Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER, exitCode)
                         .build();
             }
-        } else if (exitCode == SUCCESS_EXIT_CODE) {
-            return new JobProcessResult.Builder(
-                JobStatus.SUCCEEDED,
-                JobStatusMessages.JOB_FINISHED_SUCCESSFULLY,
-                exitCode
-            ).build();
-        } else {
-
-            final File initFailedFilex = initFailedFileRef.get();
-            final String statusMessage = (initFailedFilex != null && initFailedFilex.exists())
-                ? JobStatusMessages.JOB_SETUP_FAILED
-                : JobStatusMessages.JOB_FAILED;
-
-            return new JobProcessResult.Builder(JobStatus.FAILED, statusMessage, exitCode).build();
         }
+
+        final File initFailedFile = initFailedFileRef.get();
+        final String statusMessage = (initFailedFile != null && initFailedFile.exists())
+            ? JobStatusMessages.JOB_SETUP_FAILED : JobStatusMessages.JOB_FAILED;
+        return new JobProcessResult.Builder(JobStatus.FAILED, statusMessage, exitCode).build();
     }
 
     /* TODO: HACK, Process does not expose PID in Java 8 API */
