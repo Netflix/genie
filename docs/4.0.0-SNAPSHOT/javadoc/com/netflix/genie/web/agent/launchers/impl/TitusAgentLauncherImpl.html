@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li>Next&nbsp;Class</li>
+<li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" target="_top">Frames</a></li>
@@ -72,7 +72,7 @@ var activeTableTab = "activeTableTab";
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
@@ -114,10 +114,12 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">TitusAgentLauncherImpl</span>
 extends java.lang.Object
 implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a></pre>
-<div class="block">Agent launcher that spawns a job in a dedicated container through Titus (https://netflix.github.io/titus/).</div>
+<div class="block">Agent launcher that spawns a job in a dedicated container through Titus.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="https://netflix.github.io/titus/">Titus OSS Project</a></dd>
 </dl>
 </li>
 </ul>
@@ -125,6 +127,28 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="nested.class.summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Nested Class Summary table, listing nested classes, and an explanation">
+<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static interface&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a></span></code>
+<div class="block">An interface that should be implemented by any class which wants to modify the Titus job request before it is
+ sent.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- =========== FIELD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="field.summary">
@@ -152,7 +176,8 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                      <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;jobRequestAdapter,
                       com.github.benmanes.caffeine.cache.Cache&lt;java.lang.String,java.lang.String&gt;&nbsp;healthIndicatorCache,
                       <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                       <a href="../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
@@ -216,13 +241,14 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
+<a name="TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>TitusAgentLauncherImpl</h4>
 <pre>public&nbsp;TitusAgentLauncherImpl(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                              <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;jobRequestAdapter,
                               com.github.benmanes.caffeine.cache.Cache&lt;java.lang.String,java.lang.String&gt;&nbsp;healthIndicatorCache,
                               <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                               <a href="../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
@@ -232,6 +258,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>restTemplate</code> - the rest template</dd>
+<dd><code>jobRequestAdapter</code> - The implementation of <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code></a> to use</dd>
 <dd><code>healthIndicatorCache</code> - a cache to store metadata about recently launched jobs</dd>
 <dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>
 <dd><code>titusAgentLauncherProperties</code> - the configuration properties</dd>
@@ -313,7 +340,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li>Next&nbsp;Class</li>
+<li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" target="_top">Frames</a></li>
@@ -337,7 +364,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>

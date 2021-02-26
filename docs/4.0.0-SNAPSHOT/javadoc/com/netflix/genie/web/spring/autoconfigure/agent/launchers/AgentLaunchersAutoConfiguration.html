@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -170,13 +170,21 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                  <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;titusJobRequestAdapter,
                   <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                   <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
                   org.springframework.core.env.Environment&nbsp;environment,
                   io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide a <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
  container if enabled via property.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusJobRequestAdapter--">titusJobRequestAdapter</a></span>()</code>
+<div class="block">Provides a default implementation of <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> that is a no-op
+ if no other implementation has been provided elsewhere.</div>
 </td>
 </tr>
 </table>
@@ -218,7 +226,26 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
+<a name="titusJobRequestAdapter--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>titusJobRequestAdapter</h4>
+<pre>@Bean
+ @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
+                       havingValue="true")
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter.class</a>)
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;titusJobRequestAdapter()</pre>
+<div class="block">Provides a default implementation of <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> that is a no-op
+ if no other implementation has been provided elsewhere.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A no-op implementation</dd>
+</dl>
+</li>
+</ul>
+<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -229,6 +256,7 @@ extends java.lang.Object</pre>
                        havingValue="true")
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a>&nbsp;titusAgentLauncher(@Qualifier(value="titusRestTemplate")
                                                                                                                                                                      org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                                                                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;titusJobRequestAdapter,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
                                                                                                                                                                      org.springframework.core.env.Environment&nbsp;environment,
@@ -238,6 +266,8 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>restTemplate</code> - the rest template</dd>
+<dd><code>titusJobRequestAdapter</code> - The <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> implementation to
+                                     use</dd>
 <dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>
 <dd><code>titusAgentLauncherProperties</code> - the configuration properties</dd>
 <dd><code>environment</code> - The application <code>Environment</code> used to pull dynamic properties after

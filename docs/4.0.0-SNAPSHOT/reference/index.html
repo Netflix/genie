@@ -812,8 +812,12 @@ b.conum * { color: inherit !important; }
 </ul>
 </li>
 <li><a href="#_internals">9. Internals</a>
+<ul class="sectlevel2">
+<li><a href="#_leader_election">9.1. Leader election</a>
 <ul class="sectlevel3">
-<li><a href="#_leader_election">9.1. Leader election</a></li>
+<li><a href="#_leader_tasks">9.1.1. Leader tasks</a></li>
+</ul>
+</li>
 <li><a href="#_execution_stages">9.2. Execution stages</a></li>
 <li><a href="#_the_run_script_2">9.3. The <code>run</code> script</a></li>
 <li><a href="#_agent_heartbeat_and_routing">9.4. Agent heartbeat and routing</a></li>
@@ -821,7 +825,13 @@ b.conum * { color: inherit !important; }
 <li><a href="#_agent_logging">9.6. Agent logging</a></li>
 <li><a href="#_interactive_mode">9.7. Interactive mode</a></li>
 <li><a href="#_persistence">9.8. Persistence</a></li>
-<li><a href="#_plug_in_selectors">9.9. Plug-in Selectors</a></li>
+<li><a href="#_plug_in_selectors">9.9. Plug-in Selectors</a>
+<ul class="sectlevel3">
+<li><a href="#_command_selector_script">9.9.1. Command selector script</a></li>
+<li><a href="#_cluster_selector_script">9.9.2. Cluster selector script</a></li>
+<li><a href="#_agent_launcher_selector_script">9.9.3. Agent launcher selector script</a></li>
+</ul>
+</li>
 <li><a href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></li>
 <li><a href="#_user_limits">9.11. User limits</a></li>
 <li><a href="#_job_attachments">9.12. Job attachments</a></li>
@@ -4421,14 +4431,14 @@ administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their ne
 <div class="paragraph">
 <p>This section provides an overview of Genie subsystems and components.</p>
 </div>
-<div class="sect3">
-<h4 id="_leader_election"><a class="anchor" href="#_leader_election"></a><a class="link" href="#_leader_election">9.1. Leader election</a></h4>
+<div class="sect2">
+<h3 id="_leader_election"><a class="anchor" href="#_leader_election"></a><a class="link" href="#_leader_election">9.1. Leader election</a></h3>
 <div class="paragraph">
 <p>Genie uses Zookeeper to elect an instance to be leader.
 An alternative leader election mechanism can be plugged in instead of Zookeeper.</p>
 </div>
-<div class="sect4">
-<h5 id="_leader_tasks"><a class="anchor" href="#_leader_tasks"></a><a class="link" href="#_leader_tasks">9.1.1. Leader tasks</a></h5>
+<div class="sect3">
+<h4 id="_leader_tasks"><a class="anchor" href="#_leader_tasks"></a><a class="link" href="#_leader_tasks">9.1.1. Leader tasks</a></h4>
 <div class="paragraph">
 <p>The Genie instance elected leader of a given cluster performs different tasks:</p>
 </div>
@@ -4447,8 +4457,8 @@ An alternative leader election mechanism can be plugged in instead of Zookeeper.
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_execution_stages"><a class="anchor" href="#_execution_stages"></a><a class="link" href="#_execution_stages">9.2. Execution stages</a></h4>
+<div class="sect2">
+<h3 id="_execution_stages"><a class="anchor" href="#_execution_stages"></a><a class="link" href="#_execution_stages">9.2. Execution stages</a></h3>
 <div class="paragraph">
 <p>Every job is executed by a dedicated agent.
 This is true for both API-submitted jobs and CLI-initiated jobs.</p>
@@ -4588,13 +4598,13 @@ For example, if an agent is rejected by the cluster during the Handshake stage, 
 If a retryable stage runs out of attempts, then execution is aborted, which may skip following stages as appropriate.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_the_run_script_2"><a class="anchor" href="#_the_run_script_2"></a><a class="link" href="#_the_run_script_2">9.3. The <code>run</code> script</a></h4>
+<div class="sect2">
+<h3 id="_the_run_script_2"><a class="anchor" href="#_the_run_script_2"></a><a class="link" href="#_the_run_script_2">9.3. The <code>run</code> script</a></h3>
 <div class="paragraph">
 <p>Every job consists of a <code>bash</code> script that the agent composes, forks, and monitors.</p>
 </div>
 <div class="paragraph">
-<p>This separation allows treating every job the same way, wether they are Spark or Notebook kernels, or anything else.</p>
+<p>This separation allows treating every job the same way, whether they are Spark or Notebook kernels, or anything else.</p>
 </div>
 <div class="paragraph">
 <p>The structure of a <code>run</code> script is as follows:</p>
@@ -4652,8 +4662,8 @@ If a retryable stage runs out of attempts, then execution is aborted, which may 
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_agent_heartbeat_and_routing"><a class="anchor" href="#_agent_heartbeat_and_routing"></a><a class="link" href="#_agent_heartbeat_and_routing">9.4. Agent heartbeat and routing</a></h4>
+<div class="sect2">
+<h3 id="_agent_heartbeat_and_routing"><a class="anchor" href="#_agent_heartbeat_and_routing"></a><a class="link" href="#_agent_heartbeat_and_routing">9.4. Agent heartbeat and routing</a></h3>
 <div class="paragraph">
 <p>Each agent that successfully claimed a job maintains a gRPC connection to a server in the cluster and periodically sends heartbeats.</p>
 </div>
@@ -4668,15 +4678,15 @@ The routing table is used by Genie server instances to dispatch a kill request t
 That instance then forwards the request to the agent.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_agent_file_streaming"><a class="anchor" href="#_agent_file_streaming"></a><a class="link" href="#_agent_file_streaming">9.5. Agent file streaming</a></h4>
+<div class="sect2">
+<h3 id="_agent_file_streaming"><a class="anchor" href="#_agent_file_streaming"></a><a class="link" href="#_agent_file_streaming">9.5. Agent file streaming</a></h3>
 <div class="paragraph">
 <p>Each agent executing a job opens multiple streaming channels on top of a single connection to a server.
 These channels can be used to pull a file from the agent and serve it via REST API</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_agent_logging"><a class="anchor" href="#_agent_logging"></a><a class="link" href="#_agent_logging">9.6. Agent logging</a></h4>
+<div class="sect2">
+<h3 id="_agent_logging"><a class="anchor" href="#_agent_logging"></a><a class="link" href="#_agent_logging">9.6. Agent logging</a></h3>
 <div class="paragraph">
 <p>Log messages emitted by a genie agent are routed to <code>agent.log</code>.
 This file is created at a temporary location when the agent starts, and relocated to the job folder once the latter exists.</p>
@@ -4686,8 +4696,8 @@ This file is created at a temporary location when the agent starts, and relocate
 These messages are appended to <code>stderr</code> to avoid polluting the job command output (sent to <code>stdout</code>) such as query outputs.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_interactive_mode"><a class="anchor" href="#_interactive_mode"></a><a class="link" href="#_interactive_mode">9.7. Interactive mode</a></h4>
+<div class="sect2">
+<h3 id="_interactive_mode"><a class="anchor" href="#_interactive_mode"></a><a class="link" href="#_interactive_mode">9.7. Interactive mode</a></h3>
 <div class="paragraph">
 <p>Agent execute by default in non-interactive mode:</p>
 </div>
@@ -4724,10 +4734,10 @@ These messages are appended to <code>stderr</code> to avoid polluting the job co
 <p>All jobs launched by the server (as a result of an API job submission) execute in non-interactive mode.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_persistence"><a class="anchor" href="#_persistence"></a><a class="link" href="#_persistence">9.8. Persistence</a></h4>
+<div class="sect2">
+<h3 id="_persistence"><a class="anchor" href="#_persistence"></a><a class="link" href="#_persistence">9.8. Persistence</a></h3>
 <div class="paragraph">
-<p>Out of the box, Genie supports MySQL and Postgress persistence via JPA and Hibernate.</p>
+<p>Out of the box, Genie supports MySQL and Postgres persistence via JPA and Hibernate.</p>
 </div>
 <div class="paragraph">
 <p>H2 in-memory database is also supported for integration tests.</p>
@@ -4736,16 +4746,16 @@ These messages are appended to <code>stderr</code> to avoid polluting the job co
 <p>Other kinds of persistence can be plugged in either via JPA or by re-implementing the persistence interface with a different technology.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_plug_in_selectors"><a class="anchor" href="#_plug_in_selectors"></a><a class="link" href="#_plug_in_selectors">9.9. Plug-in Selectors</a></h4>
+<div class="sect2">
+<h3 id="_plug_in_selectors"><a class="anchor" href="#_plug_in_selectors"></a><a class="link" href="#_plug_in_selectors">9.9. Plug-in Selectors</a></h3>
 <div class="paragraph">
 <p>Genie provides a mechanism to load and invoke Groovy scripts, and even reload the script if it changes at runtime.</p>
 </div>
 <div class="paragraph">
-<p>This hooks are provided in order to plug-in custom logic:</p>
+<p>These hooks are provided in order to plug-in custom logic:</p>
 </div>
-<div class="sect5">
-<h6 id="_command_selector_script"><a class="anchor" href="#_command_selector_script"></a><a class="link" href="#_command_selector_script">9.9.1. Command selector script</a></h6>
+<div class="sect3">
+<h4 id="_command_selector_script"><a class="anchor" href="#_command_selector_script"></a><a class="link" href="#_command_selector_script">9.9.1. Command selector script</a></h4>
 <div class="paragraph">
 <p>A job command criteria may be broad enough to match multiple commands (for example, a Spark job may match 10 different Spark commands, one for each Spark version).</p>
 </div>
@@ -4757,8 +4767,8 @@ These messages are appended to <code>stderr</code> to avoid polluting the job co
 Or the job may be a good candidate to "canary" the newest and unstable version.</p>
 </div>
 </div>
-<div class="sect5">
-<h6 id="_cluster_selector_script"><a class="anchor" href="#_cluster_selector_script"></a><a class="link" href="#_cluster_selector_script">9.9.2. Cluster selector script</a></h6>
+<div class="sect3">
+<h4 id="_cluster_selector_script"><a class="anchor" href="#_cluster_selector_script"></a><a class="link" href="#_cluster_selector_script">9.9.2. Cluster selector script</a></h4>
 <div class="paragraph">
 <p>Clusters that are eligible to run a given job are filtered down by the command&#8217;s cluster criteria combined with the job&#8217;s cluster criteria.
 But the final match set may still contain more than one viable cluster.</p>
@@ -4771,8 +4781,8 @@ But the final match set may still contain more than one viable cluster.</p>
 Or route the job based on other attributes or metadata.</p>
 </div>
 </div>
-<div class="sect5">
-<h6 id="_agent_launcher_selector_script"><a class="anchor" href="#_agent_launcher_selector_script"></a><a class="link" href="#_agent_launcher_selector_script">9.9.3. Agent launcher selector script</a></h6>
+<div class="sect3">
+<h4 id="_agent_launcher_selector_script"><a class="anchor" href="#_agent_launcher_selector_script"></a><a class="link" href="#_agent_launcher_selector_script">9.9.3. Agent launcher selector script</a></h4>
 <div class="paragraph">
 <p>Genie supports multiple agent launcher.
 For example, a launcher that starts the job on bare metal on in the same host, a launcher that starts the job inside a Docker container, a launcher that delegates the job to something like Kubernetes.</p>
@@ -4785,8 +4795,8 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_job_state_change_notifications"><a class="anchor" href="#_job_state_change_notifications"></a><a class="link" href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></h4>
+<div class="sect2">
+<h3 id="_job_state_change_notifications"><a class="anchor" href="#_job_state_change_notifications"></a><a class="link" href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></h3>
 <div class="paragraph">
 <p>Genie emits internal application events whenever a job changes state.</p>
 </div>
@@ -4794,8 +4804,8 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 <p>Genie includes 2 built-in components that consume theese events and publish notifications to Amazon SNS.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_user_limits"><a class="anchor" href="#_user_limits"></a><a class="link" href="#_user_limits">9.11. User limits</a></h4>
+<div class="sect2">
+<h3 id="_user_limits"><a class="anchor" href="#_user_limits"></a><a class="link" href="#_user_limits">9.11. User limits</a></h3>
 <div class="paragraph">
 <p>Genie can cap the maximum number of jobs that a given user is allowed to run.</p>
 </div>
@@ -4803,8 +4813,8 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 <p>The global default can be adjusted, and overrides for individual users can be set higher or lower.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_job_attachments"><a class="anchor" href="#_job_attachments"></a><a class="link" href="#_job_attachments">9.12. Job attachments</a></h4>
+<div class="sect2">
+<h3 id="_job_attachments"><a class="anchor" href="#_job_attachments"></a><a class="link" href="#_job_attachments">9.12. Job attachments</a></h3>
 <div class="paragraph">
 <p>Genie allows API job requests to submit one or more attachments (by submitting a multi-part POST).
 These files are placed in the job directory before launch.</p>
@@ -4813,8 +4823,8 @@ These files are placed in the job directory before launch.</p>
 <p>Example usage include Presto scripts, and Spark application jars, and additional property files.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_job_archival"><a class="anchor" href="#_job_archival"></a><a class="link" href="#_job_archival">9.13. Job archival</a></h4>
+<div class="sect2">
+<h3 id="_job_archival"><a class="anchor" href="#_job_archival"></a><a class="link" href="#_job_archival">9.13. Job archival</a></h3>
 <div class="paragraph">
 <p>After a job is completed, successfully or not, job file outputs and logs can be archived for later access.</p>
 </div>
@@ -7247,7 +7257,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2021-02-26 17:17:00 UTC
+Last updated 2021-02-26 20:39:45 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

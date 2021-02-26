@@ -1224,7 +1224,7 @@
 <dd>
 <div class="block">Base class for search results containing common fields.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Batch.html#Batch--">Batch()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Batch.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.Batch</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Batch.html#Batch--">Batch()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Batch.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Batch</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#BATCH_SIZE_PROPERTY">BATCH_SIZE_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a></dt>
 <dd>
@@ -2134,6 +2134,10 @@
 <dd>
 <div class="block">Interfaces and utilities which are used to launch instances of the Genie Agent somewhere to service a job.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a> - package com.netflix.genie.web.agent.launchers.dtos</dt>
+<dd>
+<div class="block">Data objects specific to implementations of <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a>.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/agent/launchers/impl/package-summary.html">com.netflix.genie.web.agent.launchers.impl</a> - package com.netflix.genie.web.agent.launchers.impl</dt>
 <dd>
 <div class="block">Implmentations of interfaces which are used to launch instances of the Genie Agent somewhere to service a job.</div>
@@ -2693,7 +2697,7 @@
 <dd>
 <div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>ConsoleLogListener</code></a> bean.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Container.html#Container--">Container()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Container.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.Container</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Container.html#Container--">Container()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Container.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Container</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#CONTAINER_ATTRIBUTES_PROPERTY">CONTAINER_ATTRIBUTES_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a></dt>
 <dd>
@@ -3263,7 +3267,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.DisruptionBudget.html#DisruptionBudget--">DisruptionBudget()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.DisruptionBudget.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.DisruptionBudget</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.DisruptionBudget.html#DisruptionBudget--">DisruptionBudget()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.DisruptionBudget.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.DisruptionBudget</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#doAction-com.netflix.genie.web.spring.actuators.LeaderElectionActuator.Action-">doAction(LeaderElectionActuator.Action)</a></span> - Method in class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
 <dd>
@@ -5857,6 +5861,10 @@
 <dd>
 <div class="block">Get the id of the resource desired if it exists.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#getId--">getId()</a></span> - Method in class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
+<dd>
+<div class="block">Get the ID of the Titus job.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/IdProjection.html#getId--">getId()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/IdProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">IdProjection</a></dt>
 <dd>
 <div class="block">Get the id from the projection.</div>
@@ -6324,6 +6332,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html#getMemoryUsed--">getMemoryUsed()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/FinishedJobProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">FinishedJobProjection</a></dt>
 <dd>
 <div class="block">Get the amount of memory (in MB) that this job is/was run with.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#getMessage--">getMessage()</a></span> - Method in class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
+<dd>
+<div class="block">Get the message if there was one.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/CommonDTO.html#getMetadata--">getMetadata()</a></span> - Method in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/CommonDTO.html" title="class in com.netflix.genie.common.dto">CommonDTO</a></dt>
 <dd>
@@ -6841,6 +6853,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#getStatus--">getStatus()</a></span> - Method in class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
 <dd>
 <div class="block">Provides the current leader service status: whether the leader service is running and whether the node is leader.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#getStatusCode--">getStatusCode()</a></span> - Method in class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
+<dd>
+<div class="block">Get the status code if there was one.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html#getStatusesBeforeClaimed--">getStatusesBeforeClaimed()</a></span> - Static method in enum com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></dt>
 <dd>
@@ -7589,7 +7605,7 @@
 <dd>
 <div class="block">A projection just for returning the id field of a given entity.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Image.html#Image--">Image()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Image.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.Image</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Image.html#Image--">Image()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Image.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Image</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#IMAGE_NAME_PROPERTY">IMAGE_NAME_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a></dt>
 <dd>
@@ -7599,7 +7615,7 @@
 <dd>
 <div class="block">The name of the property that dictates which image tag to launch on Titus with.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Immediate.html#Immediate--">Immediate()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Immediate.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.Immediate</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Immediate.html#Immediate--">Immediate()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Immediate.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Immediate</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html#includeDirectory-java.nio.file.Path-java.nio.file.attribute.BasicFileAttributes-">includeDirectory(Path, BasicFileAttributes)</a></span> - Method in interface com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter</a></dt>
 <dd>
@@ -9316,6 +9332,12 @@
 <dd>
 <div class="block">A <a href="com/netflix/genie/web/agent/inspectors/AgentMetadataInspector.html" title="interface in com.netflix.genie.web.agent.inspectors"><code>AgentMetadataInspector</code></a> that rejects agents whose version is lower than a given version.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html#modifyJobRequest-com.netflix.genie.web.agent.launchers.dtos.TitusBatchJobRequest-com.netflix.genie.web.dtos.ResolvedJob-">modifyJobRequest(TitusBatchJobRequest, ResolvedJob)</a></span> - Method in interface com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a></dt>
+<dd>
+<div class="block">Given the current <a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><code>TitusBatchJobRequest</code></a> and the <a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> that the agent container
+ is expected to execute this method should manipulate (if necessary) the request as needed for the
+ given Titus installation Genie is calling.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/GenieEventBusImpl.html#multicastEvent-org.springframework.context.ApplicationEvent-">multicastEvent(ApplicationEvent)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBusImpl.html" title="class in com.netflix.genie.web.events">GenieEventBusImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/GenieEventBusImpl.html#multicastEvent-org.springframework.context.ApplicationEvent-org.springframework.core.ResolvableType-">multicastEvent(ApplicationEvent, ResolvableType)</a></span> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBusImpl.html" title="class in com.netflix.genie.web.events">GenieEventBusImpl</a></dt>
 </dl>
@@ -9458,7 +9480,7 @@
 <dd>
 <div class="block">On any update to the entity will update the update time.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Owner.html#Owner--">Owner()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Owner.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.Owner</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Owner.html#Owner--">Owner()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Owner.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Owner</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:P">
@@ -10404,7 +10426,7 @@
 <dd>
 <div class="block">A resource service is the execution of any method defined on a controller.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Resources.html#Resources--">Resources()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Resources.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.Resources</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Resources.html#Resources--">Resources()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Resources.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Resources</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><span class="typeNameLink">ResourceSelectionContext</span></a>&lt;<a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="type parameter in ResourceSelectionContext">R</a>&gt; - Class in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
 <dd>
@@ -10489,7 +10511,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/RetryAutoConfiguration.html#RetryAutoConfiguration--">RetryAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.<a href="com/netflix/genie/web/spring/autoconfigure/RetryAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure">RetryAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.RetryPolicy.html#RetryPolicy--">RetryPolicy()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.RetryPolicy.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.RetryPolicy</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.RetryPolicy.html#RetryPolicy--">RetryPolicy()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.RetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.RetryPolicy</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/properties/RetryProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">RetryProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
@@ -10838,7 +10860,7 @@
 <dd>
 <div class="block">An interface whose implementation is supposed to modify the HTTP Request by adding Security credentials.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.SecurityProfile.html#SecurityProfile--">SecurityProfile()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.SecurityProfile.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.SecurityProfile</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.SecurityProfile.html#SecurityProfile--">SecurityProfile()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.SecurityProfile.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.SecurityProfile</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html#select-com.netflix.genie.web.selectors.AgentLauncherSelectionContext-">select(AgentLauncherSelectionContext)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptAgentLauncherSelectorImpl</a></dt>
 <dd>
@@ -10890,7 +10912,7 @@
 <div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.SelfManaged.html#SelfManaged--">SelfManaged()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.SelfManaged.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest.SelfManaged</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.SelfManaged.html#SelfManaged--">SelfManaged()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.SelfManaged.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.SelfManaged</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#SERVER_HOST_PLACEHOLDER">SERVER_HOST_PLACEHOLDER</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
 <dd>
@@ -11072,6 +11094,10 @@
 <dd>
 <div class="block">Set the finishTime for the job.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#setId-java.lang.String-">setId(String)</a></span> - Method in class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
+<dd>
+<div class="block">Set the id of the titus job.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusFinal.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">SetJobStatusFinal</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>
 <div class="block">Sets the final job status (success/fail/kill).</div>
@@ -11103,6 +11129,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setLauncherExt-com.fasterxml.jackson.databind.JsonNode-">setLauncherExt(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
 <div class="block">Set any metadata pertaining to the launcher that launched this job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#setMessage-java.lang.String-">setMessage(String)</a></span> - Method in class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
+<dd>
+<div class="block">Set the message if there was one.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html#setMetadata-com.fasterxml.jackson.databind.JsonNode-">setMetadata(JsonNode)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity</a></dt>
 <dd>
@@ -11147,6 +11177,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html#setStatus-java.lang.String-">setStatus(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a></dt>
 <dd>
 <div class="block">Set the status this criterion used.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#setStatusCode-java.lang.Integer-">setStatusCode(Integer)</a></span> - Method in class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
+<dd>
+<div class="block">Set the status code.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setStdErrSize-java.lang.Long-">setStdErrSize(Long)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
@@ -11749,18 +11783,23 @@
 <dd>
 <div class="block">Utility methods for dealing with time.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher(RestTemplate, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher(RestTemplate, TitusAgentLauncherImpl.TitusJobRequestAdapter, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
  container if enabled via property.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">TitusAgentLauncherImpl</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/impl/package-summary.html">com.netflix.genie.web.agent.launchers.impl</a></dt>
 <dd>
-<div class="block">Agent launcher that spawns a job in a dedicated container through Titus (https://netflix.github.io/titus/).</div>
+<div class="block">Agent launcher that spawns a job in a dedicated container through Titus.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl(RestTemplate, Cache&lt;String, String&gt;, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl(RestTemplate, TitusAgentLauncherImpl.TitusJobRequestAdapter, Cache&lt;String, String&gt;, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">TitusAgentLauncherImpl.TitusJobRequestAdapter</span></a> - Interface in <a href="com/netflix/genie/web/agent/launchers/impl/package-summary.html">com.netflix.genie.web.agent.launchers.impl</a></dt>
+<dd>
+<div class="block">An interface that should be implemented by any class which wants to modify the Titus job request before it is
+ sent.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">TitusAgentLauncherProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
@@ -11768,58 +11807,63 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#TitusAgentLauncherProperties--">TitusAgentLauncherProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
-<div class="block">Titus job request DTO.</div>
+<div class="block">Titus job request POJO.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.html#TitusBatchJobRequest--">TitusBatchJobRequest()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobRequest</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html#TitusBatchJobRequest--">TitusBatchJobRequest()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Batch.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.Batch</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Batch.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.Batch</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus batch job parameters.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Container.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.Container</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Container.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.Container</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job container DTO.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.DisruptionBudget.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.DisruptionBudget</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.DisruptionBudget.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.DisruptionBudget</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job disruption budget.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Image.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.Image</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Image.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.Image</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job container image.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Immediate.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.Immediate</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Immediate.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.Immediate</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job retry policy detail.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Owner.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.Owner</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Owner.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.Owner</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
-<div class="block">Titus job owner DTO.</div>
+<div class="block">Titus job owner POJO.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.Resources.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.Resources</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Resources.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.Resources</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
-<div class="block">Titus job container resources DTO.</div>
+<div class="block">Titus job container resources POJO.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.RetryPolicy.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.RetryPolicy</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.RetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.RetryPolicy</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job retry policy.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.SecurityProfile.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.SecurityProfile</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.SecurityProfile.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.SecurityProfile</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job security profile.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobRequest.SelfManaged.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobRequest.SelfManaged</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.SelfManaged.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest.SelfManaged</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job disruption budget detail.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">TitusBatchJobResponse</span></a> - Class in <a href="com/netflix/genie/web/dtos/package-summary.html">com.netflix.genie.web.dtos</a></dt>
+<dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobResponse</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
-<div class="block">Titus job response DTO.</div>
+<div class="block">Titus job response POJO.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/TitusBatchJobResponse.html#TitusBatchJobResponse--">TitusBatchJobResponse()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.dtos">TitusBatchJobResponse</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html#TitusBatchJobResponse--">TitusBatchJobResponse()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobResponse.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobResponse</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusJobRequestAdapter--">titusJobRequestAdapter()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provides a default implementation of <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> that is a no-op
+ if no other implementation has been provided elsewhere.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#TO_STATE">TO_STATE</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>
 <div class="block">Key to tag the destination/target state of a state transition.</div>

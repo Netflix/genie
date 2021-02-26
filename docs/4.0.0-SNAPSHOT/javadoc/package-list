@@ -54,6 +54,7 @@ com.netflix.genie.web.agent.apis.rpc.v4.interceptors
 com.netflix.genie.web.agent.inspectors
 com.netflix.genie.web.agent.inspectors.impl
 com.netflix.genie.web.agent.launchers
+com.netflix.genie.web.agent.launchers.dtos
 com.netflix.genie.web.agent.launchers.impl
 com.netflix.genie.web.agent.resources
 com.netflix.genie.web.agent.services
