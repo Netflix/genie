@@ -70,6 +70,7 @@ class AgentLaunchersAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
                     Assertions.assertThat(context).hasSingleBean(ExecutorFactory.class);
                     Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
+                    Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.TitusJobRequestAdapter.class);
                     Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.class);
                 }
             );
@@ -92,6 +93,7 @@ class AgentLaunchersAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
                     Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherImpl.TitusJobRequestAdapter.class);
                     Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherImpl.class);
                     Assertions.assertThat(context).doesNotHaveBean(LocalAgentLauncherImpl.class);
                 }

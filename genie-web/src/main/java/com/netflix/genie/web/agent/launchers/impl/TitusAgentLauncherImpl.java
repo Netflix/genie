@@ -54,9 +54,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Agent launcher that spawns a job in a dedicated container through Titus (https://netflix.github.io/titus/).
+ * Agent launcher that spawns a job in a dedicated container through Titus.
  *
  * @author mprimi
+ * @see <a href="https://netflix.github.io/titus/">Titus OSS Project</a>
  * @since 4.0.0
  */
 @Slf4j
@@ -80,6 +81,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final GenieHostInfo genieHostInfo;
     private final TitusAgentLauncherProperties titusAgentLauncherProperties;
     private final Environment environment;
+    private final TitusJobRequestAdapter jobRequestAdapter;
     private final boolean hasDataSizeConverters;
     private final Binder binder;
     private final MeterRegistry registry;
@@ -88,6 +90,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
      * Constructor.
      *
      * @param restTemplate                 the rest template
+     * @param jobRequestAdapter            The implementation of {@link TitusJobRequestAdapter} to use
      * @param healthIndicatorCache         a cache to store metadata about recently launched jobs
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
@@ -96,6 +99,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
      */
     public TitusAgentLauncherImpl(
         final RestTemplate restTemplate,
+        final TitusJobRequestAdapter jobRequestAdapter,
         final Cache<String, String> healthIndicatorCache,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
@@ -106,6 +110,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         this.healthIndicatorCache = healthIndicatorCache;
         this.genieHostInfo = genieHostInfo;
         this.titusAgentLauncherProperties = titusAgentLauncherProperties;
+        this.jobRequestAdapter = jobRequestAdapter;
         this.environment = environment;
         if (this.environment instanceof ConfigurableEnvironment) {
             final ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) this.environment;
@@ -283,71 +288,115 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 .orElse(new HashMap<>())
         );
 
-        return new TitusBatchJobRequest(
-            new TitusBatchJobRequest.Owner(this.titusAgentLauncherProperties.getOwnerEmail()),
-            this.titusAgentLauncherProperties.getApplicationName(),
-            this.environment.getProperty(
-                TitusAgentLauncherProperties.CAPACITY_GROUP_PROPERTY,
-                String.class,
-                this.titusAgentLauncherProperties.getCapacityGroup()
-            ),
-            jobAttributes,
-            new TitusBatchJobRequest.Container(
-                new TitusBatchJobRequest.Resources(
-                    cpu,
-                    gpus,
-                    memory,
-                    diskSize,
-                    networkMbps
-                ),
-                new TitusBatchJobRequest.SecurityProfile(
-                    this.titusAgentLauncherProperties.getSecurityAttributes(),
-                    this.titusAgentLauncherProperties.getSecurityGroups(),
-                    this.titusAgentLauncherProperties.getIAmRole()
-                ),
-                new TitusBatchJobRequest.Image(
-                    this.environment.getProperty(
-                        TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
-                        String.class,
-                        this.titusAgentLauncherProperties.getImageName()
-                    ),
-                    this.environment.getProperty(
-                        TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
-                        String.class,
-                        this.titusAgentLauncherProperties.getImageTag()
+        final TitusBatchJobRequest request = TitusBatchJobRequest.builder()
+            .owner(
+                TitusBatchJobRequest.Owner
+                    .builder()
+                    .teamEmail(this.titusAgentLauncherProperties.getOwnerEmail())
+                    .build()
+            )
+            .applicationName(this.titusAgentLauncherProperties.getApplicationName())
+            .capacityGroup(
+                this.environment.getProperty(
+                    TitusAgentLauncherProperties.CAPACITY_GROUP_PROPERTY,
+                    String.class,
+                    this.titusAgentLauncherProperties.getCapacityGroup()
+                )
+            )
+            .attributes(jobAttributes)
+            .container(
+                TitusBatchJobRequest.Container
+                    .builder()
+                    .resources(
+                        TitusBatchJobRequest.Resources.builder()
+                            .cpu(cpu)
+                            .gpu(gpus)
+                            .memoryMB(memory)
+                            .diskMB(diskSize)
+                            .networkMbps(networkMbps)
+                            .build()
                     )
-                ),
-                entryPoint,
-                // Environment Variables
-                this.binder
-                    .bind(
-                        TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
-                        Bindable.mapOf(String.class, String.class)
+                    .securityProfile(
+                        TitusBatchJobRequest.SecurityProfile.builder()
+                            .attributes(this.titusAgentLauncherProperties.getSecurityAttributes())
+                            .securityGroups(this.titusAgentLauncherProperties.getSecurityGroups())
+                            .iamRole(this.titusAgentLauncherProperties.getIAmRole())
+                            .build()
                     )
-                    .orElse(new HashMap<>()),
-                // Container Attributes
-                this.binder
-                    .bind(
-                        TitusAgentLauncherProperties.CONTAINER_ATTRIBUTES_PROPERTY,
-                        Bindable.mapOf(String.class, String.class)
+                    .image(
+                        TitusBatchJobRequest.Image.builder()
+                            .name(
+                                this.environment.getProperty(
+                                    TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
+                                    String.class,
+                                    this.titusAgentLauncherProperties.getImageName()
+                                )
+                            )
+                            .tag(
+                                this.environment.getProperty(
+                                    TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
+                                    String.class,
+                                    this.titusAgentLauncherProperties.getImageTag()
+                                )
+                            )
+                            .build()
                     )
-                    .orElse(new HashMap<>())
-            ),
-            new TitusBatchJobRequest.Batch(
-                TITUS_JOB_BATCH_SIZE,
-                new TitusBatchJobRequest.RetryPolicy(
-                    new TitusBatchJobRequest.Immediate(
-                        this.environment.getProperty(
-                            TitusAgentLauncherProperties.RETRIES_PROPERTY,
-                            Integer.class,
-                            this.titusAgentLauncherProperties.getRetries()
-                        )
+                    .entryPoint(entryPoint)
+                    .env(
+                        this.binder
+                            .bind(
+                                TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
+                                Bindable.mapOf(String.class, String.class)
+                            )
+                            .orElse(new HashMap<>())
                     )
-                ),
-                runtimeLimit.getSeconds()
-            ),
-            new TitusBatchJobRequest.DisruptionBudget(new TitusBatchJobRequest.SelfManaged(runtimeLimit.toMillis()))
-        );
+                    .attributes(
+                        this.binder
+                            .bind(
+                                TitusAgentLauncherProperties.CONTAINER_ATTRIBUTES_PROPERTY,
+                                Bindable.mapOf(String.class, String.class)
+                            )
+                            .orElse(new HashMap<>())
+                    )
+                    .build()
+            )
+            .batch(
+                TitusBatchJobRequest.Batch.builder()
+                    .size(TITUS_JOB_BATCH_SIZE)
+                    .retryPolicy(
+                        TitusBatchJobRequest.RetryPolicy.builder()
+                            .immediate(
+                                TitusBatchJobRequest.Immediate
+                                    .builder()
+                                    .retries(
+                                        this.environment.getProperty(
+                                            TitusAgentLauncherProperties.RETRIES_PROPERTY,
+                                            Integer.class,
+                                            this.titusAgentLauncherProperties.getRetries()
+                                        )
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .runtimeLimitSec(runtimeLimit.getSeconds())
+                    .build()
+            )
+            .disruptionBudget(
+                TitusBatchJobRequest.DisruptionBudget.builder()
+                    .selfManaged(
+                        TitusBatchJobRequest.SelfManaged.builder()
+                            .relocationTimeMs(runtimeLimit.toMillis())
+                            .build()
+                    )
+                    .build()
+            )
+            .build();
+
+        // Run the request through the security adapter to add any necessary context
+        this.jobRequestAdapter.modifyJobRequest(request, resolvedJob);
+
+        return request;
     }
 
     /**
@@ -375,6 +424,31 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 }
             }
             return defaultValue;
+        }
+    }
+
+    /**
+     * An interface that should be implemented by any class which wants to modify the Titus job request before it is
+     * sent.
+     * <p>
+     * NOTE: This is a very initial implementation/idea and highly subject to change as we work through additional
+     * security concerns
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    public interface TitusJobRequestAdapter {
+
+        /**
+         * Given the current {@link TitusBatchJobRequest} and the {@link ResolvedJob} that the agent container
+         * is expected to execute this method should manipulate (if necessary) the {@literal request} as needed for the
+         * given Titus installation Genie is calling.
+         *
+         * @param request     The {@link TitusBatchJobRequest} state after everything default has been set and created
+         *                    and is ready to be sent to the Titus jobs API
+         * @param resolvedJob The Genie {@link ResolvedJob} that the Titus request is responsible for executing
+         */
+        default void modifyJobRequest(TitusBatchJobRequest request, ResolvedJob resolvedJob) {
         }
     }
 }

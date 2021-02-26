@@ -59,6 +59,7 @@ class TitusAgentLauncherImplSpec extends Specification {
     SimpleMeterRegistry registry
     TitusAgentLauncherImpl launcher
     MockEnvironment environment
+    TitusAgentLauncherImpl.TitusJobRequestAdapter adapter
 
     int requestedCPU
     long requestedMemory
@@ -85,6 +86,7 @@ class TitusAgentLauncherImplSpec extends Specification {
             getJobMetadata() >> jobMetadata
             getJobEnvironment() >> jobEnvironment
         }
+        this.adapter = Mock(TitusAgentLauncherImpl.TitusJobRequestAdapter)
 
         this.restTemplate = Mock(RestTemplate)
         this.cache = Mock(Cache)
@@ -96,6 +98,7 @@ class TitusAgentLauncherImplSpec extends Specification {
 
         this.launcher = new TitusAgentLauncherImpl(
             this.restTemplate,
+            this.adapter,
             this.cache,
             this.genieHostInfo,
             this.launcherProperties,
@@ -119,6 +122,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 return response
         }
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
 
         expect:
         launcherExt.isPresent()
@@ -167,6 +171,7 @@ class TitusAgentLauncherImplSpec extends Specification {
             return response
         }
         1 * cache.put(JOB_ID, "-")
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         thrown(AgentLaunchException)
 
         where:
@@ -187,6 +192,7 @@ class TitusAgentLauncherImplSpec extends Specification {
             throw exception
         }
         1 * cache.put(JOB_ID, "-")
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         thrown(AgentLaunchException)
 
         where:
@@ -228,6 +234,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -269,6 +276,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -308,6 +316,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -346,6 +355,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -384,6 +394,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -422,6 +433,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -464,6 +476,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
 
         expect:
@@ -492,6 +505,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
@@ -512,6 +526,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
@@ -533,6 +548,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
@@ -554,6 +570,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
@@ -580,6 +597,7 @@ class TitusAgentLauncherImplSpec extends Specification {
                 requestCapture = args[1] as TitusBatchJobRequest
                 return response
         }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
