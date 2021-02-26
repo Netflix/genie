@@ -57,10 +57,27 @@ import java.util.concurrent.TimeUnit;
 public class AgentLaunchersAutoConfiguration {
 
     /**
+     * Provides a default implementation of {@link TitusAgentLauncherImpl.TitusJobRequestAdapter} that is a no-op
+     * if no other implementation has been provided elsewhere.
+     *
+     * @return A no-op implementation
+     */
+    @Bean
+    @ConditionalOnProperty(name = TitusAgentLauncherProperties.ENABLE_PROPERTY, havingValue = "true")
+    @ConditionalOnMissingBean(TitusAgentLauncherImpl.TitusJobRequestAdapter.class)
+    public TitusAgentLauncherImpl.TitusJobRequestAdapter titusJobRequestAdapter() {
+        // No-Op default implementation
+        return new TitusAgentLauncherImpl.TitusJobRequestAdapter() {
+        };
+    }
+
+    /**
      * Provide a {@link TitusAgentLauncherImpl} implementation which launches agent processes in a dedicated Titus
      * container if enabled via property.
      *
      * @param restTemplate                 the rest template
+     * @param titusJobRequestAdapter       The {@link TitusAgentLauncherImpl.TitusJobRequestAdapter} implementation to
+     *                                     use
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
      * @param environment                  The application {@link Environment} used to pull dynamic properties after
@@ -72,6 +89,7 @@ public class AgentLaunchersAutoConfiguration {
     @ConditionalOnProperty(name = TitusAgentLauncherProperties.ENABLE_PROPERTY, havingValue = "true")
     public TitusAgentLauncherImpl titusAgentLauncher(
         @Qualifier("titusRestTemplate") final RestTemplate restTemplate,
+        final TitusAgentLauncherImpl.TitusJobRequestAdapter titusJobRequestAdapter,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
         final Environment environment,
@@ -87,6 +105,7 @@ public class AgentLaunchersAutoConfiguration {
 
         return new TitusAgentLauncherImpl(
             restTemplate,
+            titusJobRequestAdapter,
             healthIndicatorCache,
             genieHostInfo,
             titusAgentLauncherProperties,

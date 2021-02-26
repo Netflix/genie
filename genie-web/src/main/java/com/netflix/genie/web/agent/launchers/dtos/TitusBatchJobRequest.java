@@ -17,159 +17,192 @@
  */
 package com.netflix.genie.web.agent.launchers.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Titus job request DTO.
+ * Titus job request POJO.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@Getter
-@AllArgsConstructor
-@ToString
 // TODO: This class and the nested classes likely could benefit from a builder pattern but I'm just too busy to tackle
 //       this right now so going to do some hacky things to get migration unblocked. Also it's very hardcoded to be
 //       specifically what is needed for Titus API calls within Netflix and not perhaps Titus api calls in general.
 //       An example of this is iAmRole is required but if the OSS Titus isn't run on AWS or that field isn't actually
 //       required by the API what should someone put here? The API needs to be reviewed and fields that are optional
-//       made optional and those that are required made clear they are required. Right now everything is required
-//       - TJG 2/24/2020
+//       made optional and those that are required made clear they are required. Right now everything is required or
+//       unclear. Making everything mutable for now.
+//       - TJG 2/26/2020
+@Data
+@Builder
 public class TitusBatchJobRequest {
 
     @NotNull
-    private final Owner owner;
+    @NonNull
+    private Owner owner;
     @NotNull
-    private final String applicationName;
+    @NonNull
+    private Map<String, String> attributes;
     @NotNull
-    private final String capacityGroup;
+    @NonNull
+    private Container container;
     @NotNull
-    private final Map<String, String> attributes;
+    @NonNull
+    private Batch batch;
     @NotNull
-    private final Container container;
+    @NonNull
+    private DisruptionBudget disruptionBudget;
     @NotNull
-    private final Batch batch;
+    @NonNull
+    private String applicationName;
     @NotNull
-    private final DisruptionBudget disruptionBudget;
+    @NonNull
+    private String capacityGroup;
 
     /**
-     * Titus job owner DTO.
+     * Titus job owner POJO.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class Owner {
-        private final String teamEmail;
+        @NotNull
+        @NonNull
+        private String teamEmail;
     }
 
     /**
      * Titus job container DTO.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class Container {
-        private final Resources resources;
-        private final SecurityProfile securityProfile;
-        private final Image image;
-        private final List<String> entryPoint;
-        private final Map<String, String> env;
-        private final Map<String, String> attributes;
+        @NotNull
+        @NotNull
+        private Resources resources;
+        @NotNull
+        @NonNull
+        private SecurityProfile securityProfile;
+        @NotNull
+        @NonNull
+        private Image image;
+        @NotNull
+        @NotEmpty
+        @NonNull
+        private List<String> entryPoint;
+        @NotNull
+        @NonNull
+        private Map<String, String> env;
+        @NotNull
+        @NonNull
+        private Map<String, String> attributes;
     }
 
     /**
-     * Titus job container resources DTO.
+     * Titus job container resources POJO.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class Resources {
-        private final int cpu;
-        private final int gpu;
-        private final long memoryMB;
-        private final long diskMB;
-        private final long networkMbps;
+        private int cpu;
+        private int gpu;
+        private long memoryMB;
+        private long diskMB;
+        private long networkMbps;
     }
 
     /**
      * Titus job security profile.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class SecurityProfile {
-        private final Map<String, String> attributes;
-        private final List<String> securityGroups;
-        private final String iamRole;
+        @NotNull
+        @NonNull
+        private Map<String, String> attributes;
+        @NotNull
+        @NonNull
+        private List<String> securityGroups;
+        @NotNull
+        @NonNull
+        private String iamRole;
     }
 
     /**
      * Titus job container image.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class Image {
-        private final String name;
-        private final String tag;
+        @NotEmpty
+        @NonNull
+        private String name;
+        @NotEmpty
+        @NonNull
+        private String tag;
     }
 
     /**
      * Titus batch job parameters.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class Batch {
-        private final int size;
-        private final RetryPolicy retryPolicy;
-        private final long runtimeLimitSec;
+        @NotNull
+        @NonNull
+        private RetryPolicy retryPolicy;
+        @Min(1)
+        private int size;
+        private long runtimeLimitSec;
     }
 
     /**
      * Titus job disruption budget.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class DisruptionBudget {
-        private final SelfManaged selfManaged;
+        @NotNull
+        @NonNull
+        private SelfManaged selfManaged;
     }
 
     /**
      * Titus job retry policy.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class RetryPolicy {
-        private final Immediate immediate;
+        @NotNull
+        @NonNull
+        private Immediate immediate;
     }
 
     /**
      * Titus job retry policy detail.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class Immediate {
-        private final int retries;
+        @Min(0)
+        private int retries;
     }
 
     /**
      * Titus job disruption budget detail.
      */
-    @Getter
-    @AllArgsConstructor
-    @ToString
+    @Data
+    @Builder
     public static class SelfManaged {
-        private final long relocationTimeMs;
+        @Min(1)
+        private long relocationTimeMs;
     }
 }
 
