@@ -146,12 +146,10 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         tags.add(CLASS_TAG);
 
         final String jobId = resolvedJob.getJobSpecification().getJob().getId();
-
-        final TitusBatchJobRequest titusJobRequest = this.createJobRequest(resolvedJob);
-
         String titusJobId = null;
 
         try {
+            final TitusBatchJobRequest titusJobRequest = this.createJobRequest(resolvedJob);
             final TitusBatchJobResponse titusResponse = this.restTemplate.postForObject(
                 this.titusAgentLauncherProperties.getEndpoint().toString() + TITUS_API_JOB_PATH,
                 titusJobRequest,
@@ -205,7 +203,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .build();
     }
 
-    private TitusBatchJobRequest createJobRequest(final ResolvedJob resolvedJob) {
+    private TitusBatchJobRequest createJobRequest(final ResolvedJob resolvedJob) throws AgentLaunchException {
         final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
         // Map placeholders in entry point template to their values
@@ -220,9 +218,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
         // Substitute all placeholders with their values
         final List<String> entryPoint = this.titusAgentLauncherProperties.getEntryPointTemplate()
-                .stream()
-                .map(s -> placeholdersMap.getOrDefault(s, s))
-                .collect(Collectors.toList());
+            .stream()
+            .map(s -> placeholdersMap.getOrDefault(s, s))
+            .collect(Collectors.toList());
 
         final long memory = Math.max(
             this.getDataSizeProperty(
@@ -453,8 +451,12 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
          * @param request     The {@link TitusBatchJobRequest} state after everything default has been set and created
          *                    and is ready to be sent to the Titus jobs API
          * @param resolvedJob The Genie {@link ResolvedJob} that the Titus request is responsible for executing
+         * @throws AgentLaunchException For any errors
          */
-        default void modifyJobRequest(TitusBatchJobRequest request, ResolvedJob resolvedJob) {
+        default void modifyJobRequest(
+            TitusBatchJobRequest request,
+            ResolvedJob resolvedJob
+        ) throws AgentLaunchException {
         }
     }
 }
