@@ -66,6 +66,9 @@ public class TitusBatchJobRequest {
     @NotNull
     @NonNull
     private String capacityGroup;
+    @NotNull
+    @NonNull
+    private JobGroupInfo jobGroupInfo;
 
     /**
      * Titus job owner POJO.
@@ -203,6 +206,17 @@ public class TitusBatchJobRequest {
     public static class SelfManaged {
         @Min(1)
         private long relocationTimeMs;
+    }
+
+    /**
+     * Job Group information.
+     */
+    @Data
+    @Builder
+    public static class JobGroupInfo {
+        private String stack;
+        private String detail;
+        private String sequence;
     }
 }
 

@@ -192,6 +192,11 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |empty
 |yes
 
+|genie.agent.launcher.titus.detail
+|The detail (jobGroupInfo) within the application space for Titus request
+|empty string
+|no
+
 |genie.agent.launcher.titus.enabled
 |Whether the Titus agent launcher is active or not
 |false
@@ -290,6 +295,16 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |genie.agent.launcher.titus.security-groups
 |A list of security groups for the job
 |empty list
+|no
+
+|genie.agent.launcher.titus.sequence
+|The sequence (jobGroupInfo) within the application space for Titus request
+|empty string
+|no
+
+|genie.agent.launcher.titus.stack
+|The stack (jobGroupInfo) within the application space for Titus request
+|empty string
 |no
 
 |genie.agent.routing.refresh-interval
