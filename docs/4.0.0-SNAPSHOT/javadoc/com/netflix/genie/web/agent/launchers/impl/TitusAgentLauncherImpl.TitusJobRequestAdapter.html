@@ -162,7 +162,8 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>modifyJobRequest</h4>
 <pre>default&nbsp;void&nbsp;modifyJobRequest(<a href="../../../../../../../com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest</a>&nbsp;request,
-                              <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)</pre>
+                              <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)
+                       throws <a href="../../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></pre>
 <div class="block">Given the current <a href="../../../../../../../com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><code>TitusBatchJobRequest</code></a> and the <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> that the agent container
  is expected to execute this method should manipulate (if necessary) the request as needed for the
  given Titus installation Genie is calling.</div>
@@ -171,6 +172,8 @@ var activeTableTab = "activeTableTab";
 <dd><code>request</code> - The <a href="../../../../../../../com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><code>TitusBatchJobRequest</code></a> state after everything default has been set and created
                     and is ready to be sent to the Titus jobs API</dd>
 <dd><code>resolvedJob</code> - The Genie <a href="../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> that the Titus request is responsible for executing</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></code> - For any errors</dd>
 </dl>
 </li>
 </ul>
