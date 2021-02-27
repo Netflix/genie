@@ -350,4 +350,19 @@ public class TitusAgentLauncherProperties {
      */
     @NotNull
     private Map<String, String> additionalJobAttributes = new HashMap<>();
+
+    /**
+     * The stack (jobGroupInfo) within the application space for Titus request.
+     */
+    private String stack = "";
+
+    /**
+     * The detail (jobGroupInfo) within the application space for Titus request.
+     */
+    private String detail = "";
+
+    /**
+     * The sequence (jobGroupInfo) within the application space for Titus request.
+     */
+    private String sequence = "";
 }
