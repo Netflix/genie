@@ -114,3 +114,6 @@ node-v4.4.0-darwin-x64
 env
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+# publishing secrets
+secrets/signing-key
