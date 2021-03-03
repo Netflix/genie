@@ -145,7 +145,9 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getContainer().getImage().getName() == launcherProperties.getImageName()
         requestCapture.getContainer().getImage().getTag() == launcherProperties.getImageTag()
         requestCapture.getContainer().getEntryPoint() == [
-            "/bin/genie-agent",
+            "/bin/genie-agent"
+        ]
+        requestCapture.getContainer().getCommand() == [
             "exec",
             "--api-job",
             "--launchInJobDirectory",
