@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +77,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private static final Tag CLASS_TAG = Tag.of(LAUNCHER_CLASS_KEY, THIS_CLASS);
     private static final int TITUS_JOB_BATCH_SIZE = 1;
     private static final int ZERO = 0;
+    private static final BiFunction<List<String>, Map<String, String>, List<String>> REPLACE_PLACEHOLDERS =
+        (template, placeholders) -> template
+            .stream()
+            .map(s -> placeholders.getOrDefault(s, s))
+            .collect(Collectors.toList());
     private final RestTemplate restTemplate;
     private final Cache<String, String> healthIndicatorCache;
     private final GenieHostInfo genieHostInfo;
@@ -216,11 +222,15 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             String.valueOf(this.titusAgentLauncherProperties.getGenieServerPort())
         );
 
-        // Substitute all placeholders with their values
-        final List<String> entryPoint = this.titusAgentLauncherProperties.getEntryPointTemplate()
-            .stream()
-            .map(s -> placeholdersMap.getOrDefault(s, s))
-            .collect(Collectors.toList());
+        // Substitute all placeholders with their values for the container entry point and command
+        final List<String> entryPoint = REPLACE_PLACEHOLDERS.apply(
+            this.titusAgentLauncherProperties.getEntryPointTemplate(),
+            placeholdersMap
+        );
+        final List<String> command = REPLACE_PLACEHOLDERS.apply(
+            this.titusAgentLauncherProperties.getCommandTemplate(),
+            placeholdersMap
+        );
 
         final long memory = Math.max(
             this.getDataSizeProperty(
@@ -278,19 +288,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         );
         final Duration runtimeLimit = this.titusAgentLauncherProperties.getRuntimeLimit();
 
-        final Map<String, String> jobAttributes = new HashMap<>();
-        jobAttributes.put(GENIE_USER_ATTR, resolvedJob.getJobMetadata().getUser());
-        jobAttributes.put(GENIE_SOURCE_HOST_ATTR, this.genieHostInfo.getHostname());
-        jobAttributes.put(GENIE_ENDPOINT_ATTR, this.titusAgentLauncherProperties.getGenieServerHost());
-        jobAttributes.put(GENIE_JOB_ID_ATTR, jobId);
-        jobAttributes.putAll(
-            this.binder
-                .bind(
-                    TitusAgentLauncherProperties.ADDITIONAL_JOB_ATTRIBUTES_PROPERTY,
-                    Bindable.mapOf(String.class, String.class)
-                )
-                .orElse(new HashMap<>())
-        );
+        final Map<String, String> jobAttributes = this.createJobAttributes(jobId, resolvedJob);
 
         final TitusBatchJobRequest request = TitusBatchJobRequest.builder()
             .owner(
@@ -346,6 +344,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                             .build()
                     )
                     .entryPoint(entryPoint)
+                    .command(command)
                     .env(
                         this.binder
                             .bind(
@@ -429,6 +428,23 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             }
             return defaultValue;
         }
+    }
+
+    private Map<String, String> createJobAttributes(final String jobId, final ResolvedJob resolvedJob) {
+        final Map<String, String> jobAttributes = new HashMap<>();
+        jobAttributes.put(GENIE_USER_ATTR, resolvedJob.getJobMetadata().getUser());
+        jobAttributes.put(GENIE_SOURCE_HOST_ATTR, this.genieHostInfo.getHostname());
+        jobAttributes.put(GENIE_ENDPOINT_ATTR, this.titusAgentLauncherProperties.getGenieServerHost());
+        jobAttributes.put(GENIE_JOB_ID_ATTR, jobId);
+        jobAttributes.putAll(
+            this.binder
+                .bind(
+                    TitusAgentLauncherProperties.ADDITIONAL_JOB_ATTRIBUTES_PROPERTY,
+                    Bindable.mapOf(String.class, String.class)
+                )
+                .orElse(new HashMap<>())
+        );
+        return jobAttributes;
     }
 
     /**

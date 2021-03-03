@@ -31,15 +31,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         expect:
         !p.isEnabled()
         p.getEndpoint() == URI.create("https://example-titus-endpoint.tld:1234")
-        p.getEntryPointTemplate() == [
-            "/bin/genie-agent",
-            "exec",
-            "--api-job",
-            "--launchInJobDirectory",
-            "--job-id", TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
-            "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
-            "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER
-        ]
+        p.getEntryPointTemplate() == ["/bin/genie-agent"]
         p.getOwnerEmail() == "owners@genie.tld"
         p.getApplicationName() == "genie"
         p.getCapacityGroup() == "default"
@@ -70,19 +62,24 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getStack() == ""
         p.getDetail() == ""
         p.getSequence() == ""
+        p.getCommandTemplate() == [
+            "exec",
+            "--api-job",
+            "--launchInJobDirectory",
+            "--job-id", TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
+            "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
+            "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER
+        ]
 
         when:
         p.setEnabled(true)
         p.setEndpoint(URI.create("https://test-titus-endpoint.tld:4321"))
-        p.setEntryPointTemplate([
-            "/usr/local/bin/genie-agent",
-            "exec",
-            "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
-            "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER,
-            "--job-id", TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
-            "--api-job",
-            "--launchInJobDirectory",
-        ])
+        p.setEntryPointTemplate(
+            [
+                "/usr/local/bin/genie-agent",
+                "exec"
+            ]
+        )
         p.setOwnerEmail("genie@genie.tld")
         p.setApplicationName("genie-foo")
         p.setCapacityGroup("genie-cg")
@@ -113,18 +110,22 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.setStack("stack")
         p.setDetail("detail")
         p.setSequence("sequence")
+        p.setCommandTemplate(
+            [
+                "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
+                "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER,
+                "--job-id", TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
+                "--api-job",
+                "--launchInJobDirectory"
+            ]
+        )
 
         then:
         p.isEnabled()
         p.getEndpoint() == URI.create("https://test-titus-endpoint.tld:4321")
         p.getEntryPointTemplate() == [
             "/usr/local/bin/genie-agent",
-            "exec",
-            "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
-            "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER,
-            "--job-id", TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
-            "--api-job",
-            "--launchInJobDirectory",
+            "exec"
         ]
         p.getOwnerEmail() == "genie@genie.tld"
         p.getApplicationName() == "genie-foo"
@@ -157,5 +158,12 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
         p.getStack() == "stack"
         p.getDetail() == "detail"
         p.getSequence() == "sequence"
+        p.getCommandTemplate() == [
+            "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
+            "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER,
+            "--job-id", TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
+            "--api-job",
+            "--launchInJobDirectory"
+        ]
     }
 }

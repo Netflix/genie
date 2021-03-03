@@ -178,9 +178,13 @@ public class TitusAgentLauncherProperties {
      * The Titus job container entry point.
      * Placeholder values are substituted before submission
      */
-    @NotEmpty(message = "The command-line launch template cannot be empty")
-    private List<@NotBlank String> entryPointTemplate = Arrays.asList(
-        "/bin/genie-agent",
+    private List<@NotBlank String> entryPointTemplate = Arrays.asList("/bin/genie-agent");
+
+    /**
+     * The Titus job container command array.
+     * Placeholder values are substituted before submission
+     */
+    private List<@NotBlank String> commandTemplate = Arrays.asList(
         "exec",
         "--api-job",
         "--launchInJobDirectory",

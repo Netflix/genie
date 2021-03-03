@@ -97,9 +97,11 @@ public class TitusBatchJobRequest {
         @NonNull
         private Image image;
         @NotNull
-        @NotEmpty
         @NonNull
         private List<String> entryPoint;
+        @NotNull
+        @NonNull
+        private List<String> command;
         @NotNull
         @NonNull
         private Map<String, String> env;
