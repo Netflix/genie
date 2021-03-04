@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2021-03-03</span>
+<span id="revdate">2021-03-04</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5409,6 +5409,12 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.command-template</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The container command array, placeholder values are substituted at runtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[exec, --api-job, --launchInJobDirectory, --job-id, &lt;JOB_ID&gt;, --server-host, &lt;SERVER_HOST&gt;, --server-port, &lt;SERVER_PORT&gt;]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.container-attributes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Map attributes to send to Titus specific to the container</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">empty</p></td>
@@ -5434,8 +5440,8 @@ data source. See
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.entry-point-template</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The container entry point expression, placeholder values are substituted at runtime</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">[/bin/genie-agent, exec, --api-job, --launchInJobDirectory, --job-id, &lt;JOB_ID&gt;, --server-host, &lt;SERVER_HOST&gt;, --server-port, &lt;SERVER_PORT&gt;]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The container entry point array, placeholder values are substituted at runtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[/bin/genie-agent]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -7275,7 +7281,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2021-03-03 00:09:46 UTC
+Last updated 2021-03-04 17:34:01 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
