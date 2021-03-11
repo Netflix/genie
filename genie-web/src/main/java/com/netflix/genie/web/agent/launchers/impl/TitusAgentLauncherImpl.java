@@ -88,7 +88,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final TitusAgentLauncherProperties titusAgentLauncherProperties;
     private final Environment environment;
     private final TitusJobRequestAdapter jobRequestAdapter;
-    private final TitusBatchJobRequest.JobGroupInfo jobGroupInfo;
     private final boolean hasDataSizeConverters;
     private final Binder binder;
     private final MeterRegistry registry;
@@ -130,12 +129,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         }
         this.binder = Binder.get(this.environment);
         this.registry = registry;
-
-        this.jobGroupInfo = TitusBatchJobRequest.JobGroupInfo.builder()
-            .stack(this.titusAgentLauncherProperties.getStack())
-            .detail(this.titusAgentLauncherProperties.getDetail())
-            .sequence(this.titusAgentLauncherProperties.getSequence())
-            .build();
     }
 
     /**
@@ -394,7 +387,13 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     )
                     .build()
             )
-            .jobGroupInfo(this.jobGroupInfo)
+            .jobGroupInfo(
+                TitusBatchJobRequest.JobGroupInfo.builder()
+                    .stack(this.titusAgentLauncherProperties.getStack())
+                    .detail(this.titusAgentLauncherProperties.getDetail())
+                    .sequence(this.titusAgentLauncherProperties.getSequence())
+                    .build()
+            )
             .build();
 
         // Run the request through the security adapter to add any necessary context
