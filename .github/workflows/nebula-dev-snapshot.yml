@@ -3,7 +3,7 @@ name: "Publish snapshot to NetflixOSS and Maven Central"
 on:
   push:
     branches:
-      - gha-test
+      - dev-snapshot
 
 jobs:
   build:
@@ -29,9 +29,11 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
       - name: Build
-        run: ./gradlew build snapshot --debug -x check
+        run: ./gradlew --debug build snapshot dockerPush -x check
         env:
           NETFLIX_OSS_SIGNING_KEY: ${{ secrets.ORG_SIGNING_KEY }}
           NETFLIX_OSS_SIGNING_PASSWORD: ${{ secrets.ORG_SIGNING_PASSWORD }}
           NETFLIX_OSS_REPO_USERNAME: ${{ secrets.ORG_NETFLIXOSS_USERNAME }}
           NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
+          DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
