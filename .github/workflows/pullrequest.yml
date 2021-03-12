@@ -1,9 +1,6 @@
-name: "Publish snapshot to NetflixOSS and Maven Central"
-
+name: ci
 on:
-  push:
-    branches:
-      - master
+  pull_request:
 
 jobs:
   build:
@@ -12,22 +9,24 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Set up JDK
+      - name: Setup jdk 8
         uses: actions/setup-java@v1
         with:
-          java-version: 8
-      - uses: actions/cache@v2
+          java-version: 1.8
+      - uses: actions/cache@v1
         id: gradle-cache
         with:
-          path: |
-            ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-      - uses: actions/cache@v2
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/dependency-locks/*.lockfile') }}
+          restore-keys: |
+            - ${{ runner.os }}-gradle-
+      - uses: actions/cache@v1
         id: gradle-wrapper-cache
         with:
-          path: |
-            ~/.gradle/wrapper
+          path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-gradlewrapper-
       - uses: actions/cache@v1
         id: genie-ui-node-modules
         with:
@@ -49,15 +48,13 @@ jobs:
           key: ${{ runner.os }}-genie-ui-gradle-npm-${{ hashFiles('genie-ui/.gradle/npm/*') }}
           restore-keys: |
             - ${{ runner.os }}-genie-ui-gradle-npm-
-      - name: Build
-        run: ./gradlew --debug build snapshot codeCoverageReport coveralls gitPublishPush dockerPush
-        env:
-          NETFLIX_OSS_SIGNING_KEY: ${{ secrets.ORG_SIGNING_KEY }}
-          NETFLIX_OSS_SIGNING_PASSWORD: ${{ secrets.ORG_SIGNING_PASSWORD }}
-          NETFLIX_OSS_REPO_USERNAME: ${{ secrets.ORG_NETFLIXOSS_USERNAME }}
-          NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
-          DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew --stacktrace build codeCoverageReport coveralls
+          INTEGRATION_TEST_DB=mysql ./gradlew --stacktrace genie-web:integrationTest
+          INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest
+          ./gradlew --stacktrace javadoc asciidoc dockerBuildAllImages
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:

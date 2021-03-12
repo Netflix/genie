@@ -28,6 +28,27 @@ jobs:
           path: |
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
+      - uses: actions/cache@v1
+        id: genie-ui-node-modules
+        with:
+          path: genie-ui/node_modules/
+          key: ${{ runner.os }}-genie-ui-node-modules-${{ hashFiles('genie-ui/node_modules/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-genie-ui-node-modules-
+      - uses: actions/cache@v1
+        id: genie-ui-gradle-nodejs
+        with:
+          path: genie-ui/.gradle/nodejs
+          key: ${{ runner.os }}-genie-ui-gradle-nodejs-${{ hashFiles('genie-ui/.gradle/nodejs/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-genie-ui-gradle-nodejs-
+      - uses: actions/cache@v1
+        id: genie-ui-gradle-npm
+        with:
+          path: genie-ui/.gradle/npm
+          key: ${{ runner.os }}-genie-ui-gradle-npm-${{ hashFiles('genie-ui/.gradle/npm/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-genie-ui-gradle-npm-
       - name: Build
         run: ./gradlew --debug build snapshot dockerPush -x check
         env:
@@ -37,3 +58,7 @@ jobs:
           NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
           DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
