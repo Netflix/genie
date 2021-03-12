@@ -83,5 +83,5 @@ jobs:
           INTEGRATION_TEST_DB=mysql ./gradlew --stacktrace genie-web:integrationTest
           INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest
           ./gradlew --stacktrace javadoc asciidoc dockerBuildAllImages
-      - name: Coveralls
+      - name: Codecov
         uses: codecov/codecov-action@v1
