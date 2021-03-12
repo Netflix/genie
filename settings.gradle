@@ -1,3 +1,6 @@
+plugins {
+    id "com.gradle.enterprise" version "3.5.2"
+}
 rootProject.name = "genie"
 
 include "genie-test",
