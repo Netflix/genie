@@ -84,6 +84,4 @@ jobs:
           INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest
           ./gradlew --stacktrace javadoc asciidoc dockerBuildAllImages
       - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        uses: codecov/codecov-action@v1
