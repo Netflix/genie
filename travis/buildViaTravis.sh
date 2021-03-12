@@ -19,10 +19,10 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   ${GRADLE} ${GRADLE_OPTIONS} javadoc asciidoc dockerBuildAllImages
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_BRANCH" == "dev-snapshot" ]; then
   echo -e 'Build Development Snapshot'
-  ${GRADLE} ${GRADLE_OPTIONS} --debug -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PnetflixOss.username=$NETFLIX_OSS_REPO_USERNAME -PnetflixOss.password=$NETFLIX_OSS_REPO_PASSWORD  -Psonatype.signingPassword=$NETFLIX_OSS_SIGNING_PASSWORD snapshot dockerPush -x check
+  ${GRADLE} ${GRADLE_OPTIONS} --info -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PnetflixOss.username=$NETFLIX_OSS_REPO_USERNAME -PnetflixOss.password=$NETFLIX_OSS_REPO_PASSWORD  -Psonatype.signingPassword=$NETFLIX_OSS_SIGNING_PASSWORD snapshot dockerPush -x check
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then
   echo -e 'Build Branch with Snapshot => Branch ['$TRAVIS_BRANCH']'
-  ${GRADLE} ${GRADLE_OPTIONS} --debug -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PnetflixOss.username=$NETFLIX_OSS_REPO_USERNAME -PnetflixOss.password=$NETFLIX_OSS_REPO_PASSWORD  -Psonatype.signingPassword=$NETFLIX_OSS_SIGNING_PASSWORD snapshot codeCoverageReport coveralls gitPublishPush dockerPush
+  ${GRADLE} ${GRADLE_OPTIONS} --info -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PnetflixOss.username=$NETFLIX_OSS_REPO_USERNAME -PnetflixOss.password=$NETFLIX_OSS_REPO_PASSWORD  -Psonatype.signingPassword=$NETFLIX_OSS_SIGNING_PASSWORD snapshot codeCoverageReport coveralls gitPublishPush dockerPush
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" != "" ]; then
   echo -e 'Build Branch for Release => Branch ['$TRAVIS_BRANCH']  Tag ['$TRAVIS_TAG']'
   case "$TRAVIS_TAG" in
