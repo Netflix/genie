@@ -44,6 +44,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -313,8 +314,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     )
                     .securityProfile(
                         TitusBatchJobRequest.SecurityProfile.builder()
-                            .attributes(this.titusAgentLauncherProperties.getSecurityAttributes())
-                            .securityGroups(this.titusAgentLauncherProperties.getSecurityGroups())
+                            .attributes(new HashMap<>(this.titusAgentLauncherProperties.getSecurityAttributes()))
+                            .securityGroups(new ArrayList<>(this.titusAgentLauncherProperties.getSecurityGroups()))
                             .iamRole(this.titusAgentLauncherProperties.getIAmRole())
                             .build()
                     )
