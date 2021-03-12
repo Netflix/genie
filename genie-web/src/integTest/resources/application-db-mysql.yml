@@ -20,7 +20,7 @@ spring:
   datasource:
     url: jdbc:mariadb://127.0.0.1/genie
     username: root
-    password:
+    password: password
     hikari:
       data-source-properties:
         cachePrepStmts: true

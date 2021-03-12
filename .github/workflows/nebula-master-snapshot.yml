@@ -37,6 +37,9 @@ jobs:
           mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "SET GLOBAL innodb_file_per_table = 'on';"
           mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "SET GLOBAL innodb_large_prefix = 'on'"
           mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "show variables like '%innodb_file%';"
+      - name: Configure Genie temp folders
+        run: |
+          mkdir -p /tmp/genie/cache /tmp/genie/archives /tmp/genie/jobs
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
