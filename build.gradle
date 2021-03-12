@@ -482,3 +482,11 @@ task dockerBuildAllImages(group: "Docker", description: "Container task for all 
     dependsOn ":genie-demo:dockerBuildApacheImage"
     dependsOn ":genie-demo:dockerBuildClientImage"
 }
+
+gradleEnterprise {
+    buildScan {
+        publishAlways()
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+    }
+}
