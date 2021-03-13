@@ -1,9 +1,12 @@
-name: "Publish candidate/release to NetflixOSS and Maven Central"
+name: Nebula Build
 on:
   push:
+    branches:
+      - '*'
     tags:
       - v*.*.*
       - v*.*.*-rc.*
+  pull_request:
 
 jobs:
   build:
@@ -26,6 +29,16 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    name: Gradle Build
+    env:
+      NETFLIX_OSS_SONATYPE_USERNAME: ${{ secrets.ORG_SONATYPE_USERNAME }}
+      NETFLIX_OSS_SONATYPE_PASSWORD: ${{ secrets.ORG_SONATYPE_PASSWORD }}
+      NETFLIX_OSS_SIGNING_KEY: ${{ secrets.ORG_SIGNING_KEY }}
+      NETFLIX_OSS_SIGNING_PASSWORD: ${{ secrets.ORG_SIGNING_PASSWORD }}
+      NETFLIX_OSS_REPO_USERNAME: ${{ secrets.ORG_NETFLIXOSS_USERNAME }}
+      NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
+      DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v1
       - name: Configure MySQL database
@@ -77,29 +90,36 @@ jobs:
           key: ${{ runner.os }}-genie-ui-gradle-npm-${{ hashFiles('genie-ui/.gradle/npm/*') }}
           restore-keys: |
             - ${{ runner.os }}-genie-ui-gradle-npm-
+      - name: Build pull request
+        if: |
+          github.event_name == 'pull_request' ||
+          ((!startsWith(github.ref, 'refs/tags/v')) && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev-snapshot')
+        run: |
+          ./gradlew --stacktrace build codeCoverageReport coveralls
+          INTEGRATION_TEST_DB=mysql ./gradlew --stacktrace genie-web:integrationTest
+          INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest
+          ./gradlew --stacktrace javadoc asciidoc dockerBuildAllImages
+      - name: Publish snapshot
+        if: |
+          (!startsWith(github.ref, 'refs/tags/v')) &&
+          github.event_name != 'pull_request' &&
+          github.ref == 'refs/heads/master'
+        run: ./gradlew build snapshot codeCoverageReport coveralls gitPublishPush dockerPush
+      - name: Publish snapshot (dev-snapshot branch)
+        if: |
+          (!startsWith(github.ref, 'refs/tags/v')) &&
+          github.event_name != 'pull_request' &&
+          github.ref == 'refs/heads/dev-snapshot'
+        run: ./gradlew build snapshot dockerPush -x check
       - name: Publish candidate
-        if: contains(github.ref, '-rc.')
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          contains(github.ref, '-rc.')
         run: ./gradlew --stacktrace -Prelease.useLastTag=true candidate codeCoverageReport coveralls gitPublishPush dockerPush
-        env:
-          NETFLIX_OSS_SONATYPE_USERNAME: ${{ secrets.ORG_SONATYPE_USERNAME }}
-          NETFLIX_OSS_SONATYPE_PASSWORD: ${{ secrets.ORG_SONATYPE_PASSWORD }}
-          NETFLIX_OSS_SIGNING_KEY: ${{ secrets.ORG_SIGNING_KEY }}
-          NETFLIX_OSS_SIGNING_PASSWORD: ${{ secrets.ORG_SIGNING_PASSWORD }}
-          NETFLIX_OSS_REPO_USERNAME: ${{ secrets.ORG_NETFLIXOSS_USERNAME }}
-          NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
-          DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
       - name: Publish release
-        if: (!contains(github.ref, '-rc.'))
-        run: ./gradlew --stacktrace -Prelease.useLastTag=true final codeCoverageReport coveralls gitPublishPush dockerPush
-        env:
-          NETFLIX_OSS_SONATYPE_USERNAME: ${{ secrets.ORG_SONATYPE_USERNAME }}
-          NETFLIX_OSS_SONATYPE_PASSWORD: ${{ secrets.ORG_SONATYPE_PASSWORD }}
-          NETFLIX_OSS_SIGNING_KEY: ${{ secrets.ORG_SIGNING_KEY }}
-          NETFLIX_OSS_SIGNING_PASSWORD: ${{ secrets.ORG_SIGNING_PASSWORD }}
-          NETFLIX_OSS_REPO_USERNAME: ${{ secrets.ORG_NETFLIXOSS_USERNAME }}
-          NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
-          DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          (!contains(github.ref, '-rc.'))
+        run: --stacktrace -Prelease.useLastTag=true final codeCoverageReport coveralls gitPublishPush dockerPush
       - name: Codecov
         uses: codecov/codecov-action@v1
