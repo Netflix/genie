@@ -23,6 +23,7 @@ import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.internal.util.HostnameUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.task.TaskExecutorCustomizer;
@@ -95,9 +96,9 @@ public class AgentAutoConfiguration {
      * @param agentProperties the agent properties
      * @return A {@link ThreadPoolTaskExecutor} instance
      */
-    @Bean
+    @Bean("sharedAgentTaskExecutor")
     @Lazy
-    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = AsyncTaskExecutor.class)
+    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor")
     public AsyncTaskExecutor sharedAgentTaskExecutor(final AgentProperties agentProperties) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
@@ -115,7 +116,7 @@ public class AgentAutoConfiguration {
      * @param agentProperties the agent properties
      * @return A {@link ThreadPoolTaskScheduler} instance
      */
-    @Bean
+    @Bean(name = "sharedAgentTaskScheduler")
     @Lazy
     @ConditionalOnMissingBean(name = "sharedAgentTaskScheduler")
     public TaskScheduler sharedAgentTaskScheduler(final AgentProperties agentProperties) {
