@@ -23,7 +23,6 @@ import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.internal.util.HostnameUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.task.TaskExecutorCustomizer;
