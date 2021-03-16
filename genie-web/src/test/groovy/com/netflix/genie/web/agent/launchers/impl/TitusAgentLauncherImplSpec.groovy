@@ -30,8 +30,14 @@ import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.properties.TitusAgentLauncherProperties
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.springframework.http.HttpStatus
 import org.springframework.mock.env.MockEnvironment
+import org.springframework.retry.backoff.FixedBackOffPolicy
+import org.springframework.retry.policy.NeverRetryPolicy
+import org.springframework.retry.support.RetryTemplate
 import org.springframework.util.unit.DataSize
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
@@ -96,8 +102,18 @@ class TitusAgentLauncherImplSpec extends Specification {
         this.registry = new SimpleMeterRegistry()
         this.environment = new MockEnvironment()
 
+        /*
+         *  Note: The retry template used here is "transparent" in the sense it doesn't do
+         *        Anything. We don't really want to test how retries work as that is up to
+         *        the configured retry policy and backoff not so much the business logic
+         *        of this class. For now this is fine
+         */
+        def retryTemplate = new RetryTemplate()
+        retryTemplate.setRetryPolicy(new NeverRetryPolicy())
+
         this.launcher = new TitusAgentLauncherImpl(
             this.restTemplate,
+            retryTemplate,
             this.adapter,
             this.cache,
             this.genieHostInfo,
@@ -606,5 +622,80 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getContainer().getAttributes().size() == 2
         requestCapture.getContainer().getAttributes().get(prop1Key) == prop1Value
         requestCapture.getContainer().getAttributes().get(prop2Key) == prop2Value
+    }
+
+    def "Retry policy works as expected"() {
+        def retryCodes = EnumSet.of(HttpStatus.REQUEST_TIMEOUT, HttpStatus.SERVICE_UNAVAILABLE)
+        def maxRetries = 2
+        def policy = new TitusAgentLauncherImpl.TitusAPIRetryPolicy(retryCodes, maxRetries)
+        def retryTemplate = new RetryTemplate()
+        def backoffPolicy = new FixedBackOffPolicy()
+        backoffPolicy.setBackOffPeriod(1L)
+        retryTemplate.setRetryPolicy(policy)
+        retryTemplate.setBackOffPolicy(backoffPolicy)
+        def mockResponse = Mock(TitusBatchJobResponse)
+
+        when:
+        retryTemplate.execute(
+            { arg ->
+                this.restTemplate.postForObject(TITUS_ENDPOINT, Mock(TitusBatchJobRequest), TitusBatchJobResponse.class)
+            }
+        )
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+        thrown(HttpServerErrorException)
+
+        when:
+        retryTemplate.execute(
+            { arg ->
+                this.restTemplate.postForObject(TITUS_ENDPOINT, Mock(TitusBatchJobRequest), TitusBatchJobResponse.class)
+            }
+        )
+
+        then:
+        2 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT)
+        }
+        thrown(HttpClientErrorException)
+
+        when:
+        def response = retryTemplate.execute(
+            { arg ->
+                this.restTemplate.postForObject(TITUS_ENDPOINT, Mock(TitusBatchJobRequest), TitusBatchJobResponse.class)
+            }
+        )
+
+        then:
+        2 * this.restTemplate.postForObject(
+            TITUS_ENDPOINT,
+            _ as TitusBatchJobRequest,
+            TitusBatchJobResponse.class
+        ) >>> [] >> { throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT) } >> mockResponse
+        response == mockResponse
+        noExceptionThrown()
+
+        when:
+        retryTemplate.execute(
+            { arg ->
+                this.restTemplate.postForObject(TITUS_ENDPOINT, Mock(TitusBatchJobRequest), TitusBatchJobResponse.class)
+            }
+        )
+
+        then:
+        2 * this.restTemplate.postForObject(
+            TITUS_ENDPOINT,
+            _ as TitusBatchJobRequest,
+            TitusBatchJobResponse.class
+        ) >>> [
+
+        ] >> {
+            throw new HttpServerErrorException(HttpStatus.SERVICE_UNAVAILABLE)
+        } >> {
+            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT)
+        }
+        thrown(HttpClientErrorException)
     }
 }
