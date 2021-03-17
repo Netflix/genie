@@ -91,7 +91,7 @@ configure(javaProjects) {
             mavenBom "org.testcontainers:testcontainers-bom:1.15.0"
         }
         dependencies {
-            dependency("com.beust:jcommander:1.78")
+            dependency("com.beust:jcommander:1.81")
             dependency("cglib:cglib-nodep:3.3.0")
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.ppodgorsek:spring-test-dbunit-core:5.2.0")
