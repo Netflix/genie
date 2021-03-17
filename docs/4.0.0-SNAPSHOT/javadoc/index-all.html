@@ -613,7 +613,7 @@
 </dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers"><span class="typeNameLink">AgentLaunchersAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/package-summary.html">com.netflix.genie.web.spring.autoconfigure.agent.launchers</a></dt>
 <dd>
-<div class="block">Auto configuration for beans responsible ofor launching Genie Agent instances.</div>
+<div class="block">Auto configuration for beans responsible for launching Genie Agent instances.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#AgentLaunchersAutoConfiguration--">AgentLaunchersAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
@@ -11785,7 +11785,7 @@
 <dd>
 <div class="block">Utility methods for dealing with time.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher(RestTemplate, TitusAgentLauncherImpl.TitusJobRequestAdapter, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher(RestTemplate, RetryTemplate, TitusAgentLauncherImpl.TitusJobRequestAdapter, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a> implementation which launches agent processes in a dedicated Titus
  container if enabled via property.</div>
@@ -11794,9 +11794,14 @@
 <dd>
 <div class="block">Agent launcher that spawns a job in a dedicated container through Titus.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl(RestTemplate, TitusAgentLauncherImpl.TitusJobRequestAdapter, Cache&lt;String, String&gt;, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl(RestTemplate, RetryTemplate, TitusAgentLauncherImpl.TitusJobRequestAdapter, Cache&lt;String, String&gt;, GenieHostInfo, TitusAgentLauncherProperties, Environment, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">TitusAgentLauncherImpl.TitusAPIRetryPolicy</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/impl/package-summary.html">com.netflix.genie.web.agent.launchers.impl</a></dt>
+<dd>
+<div class="block">A retry policy that has different behavior based on the type of exception thrown by the rest client during
+ calls to the Titus API.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">TitusAgentLauncherImpl.TitusJobRequestAdapter</span></a> - Interface in <a href="com/netflix/genie/web/agent/launchers/impl/package-summary.html">com.netflix.genie.web.agent.launchers.impl</a></dt>
 <dd>
@@ -11809,6 +11814,25 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#TitusAgentLauncherProperties--">TitusAgentLauncherProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAPIBackoffPolicy--">titusAPIBackoffPolicy()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provides a default implementation of <code>BackOffPolicy</code> if no other has
+ been defined in the context.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html#TitusAPIRetryPolicy-java.util.Set-int-">TitusAPIRetryPolicy(Set&lt;HttpStatus&gt;, int)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusAPIRetryPolicy</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAPIRetryPolicy--">titusAPIRetryPolicy()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provides a default implementation of <code>RetryPolicy</code> that retries based on a set
+ of HTTP status codes.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAPIRetryTemplate-org.springframework.retry.RetryPolicy-org.springframework.retry.backoff.BackOffPolicy-">titusAPIRetryTemplate(RetryPolicy, BackOffPolicy)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provides a default implementation of <code>RetryTemplate</code> that will be used to retry failed Titus api calls
+ based on the retry policy and backoff policies defined in the application context.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.html" title="class in com.netflix.genie.web.agent.launchers.dtos"><span class="typeNameLink">TitusBatchJobRequest</span></a> - Class in <a href="com/netflix/genie/web/agent/launchers/dtos/package-summary.html">com.netflix.genie.web.agent.launchers.dtos</a></dt>
 <dd>
 <div class="block">Titus job request POJO.</div>
@@ -11869,6 +11893,10 @@
 <dd>
 <div class="block">Provides a default implementation of <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> that is a no-op
  if no other implementation has been provided elsewhere.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusRestTemplate-org.springframework.boot.web.client.RestTemplateBuilder-">titusRestTemplate(RestTemplateBuilder)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a <code>RestTemplate</code> instance used for calling the Titus REST API if no other instance is provided.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#TO_STATE">TO_STATE</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -109,9 +109,10 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>@Configuration
  @EnableConfigurationProperties(value={<a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties.class</a>,<a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties.class</a>})
+ @AutoConfigureAfter(value=org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration.class)
 public class <span class="typeNameLabel">AgentLaunchersAutoConfiguration</span>
 extends java.lang.Object</pre>
-<div class="block">Auto configuration for beans responsible ofor launching Genie Agent instances.</div>
+<div class="block">Auto configuration for beans responsible for launching Genie Agent instances.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -170,7 +171,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAgentLauncher-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">titusAgentLauncher</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                  org.springframework.retry.support.RetryTemplate&nbsp;retryTemplate,
                   <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;titusJobRequestAdapter,
                   <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                   <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
@@ -181,10 +183,38 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
+<td class="colFirst"><code>org.springframework.retry.backoff.ExponentialBackOffPolicy</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAPIBackoffPolicy--">titusAPIBackoffPolicy</a></span>()</code>
+<div class="block">Provides a default implementation of <code>BackOffPolicy</code> if no other has
+ been defined in the context.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusAPIRetryPolicy</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAPIRetryPolicy--">titusAPIRetryPolicy</a></span>()</code>
+<div class="block">Provides a default implementation of <code>RetryPolicy</code> that retries based on a set
+ of HTTP status codes.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>org.springframework.retry.support.RetryTemplate</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusAPIRetryTemplate-org.springframework.retry.RetryPolicy-org.springframework.retry.backoff.BackOffPolicy-">titusAPIRetryTemplate</a></span>(org.springframework.retry.RetryPolicy&nbsp;retryPolicy,
+                     org.springframework.retry.backoff.BackOffPolicy&nbsp;backOffPolicy)</code>
+<div class="block">Provides a default implementation of <code>RetryTemplate</code> that will be used to retry failed Titus api calls
+ based on the retry policy and backoff policies defined in the application context.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusJobRequestAdapter--">titusJobRequestAdapter</a></span>()</code>
 <div class="block">Provides a default implementation of <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> that is a no-op
  if no other implementation has been provided elsewhere.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>org.springframework.web.client.RestTemplate</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#titusRestTemplate-org.springframework.boot.web.client.RestTemplateBuilder-">titusRestTemplate</a></span>(org.springframework.boot.web.client.RestTemplateBuilder&nbsp;restTemplateBuilder)</code>
+<div class="block">Provide a <code>RestTemplate</code> instance used for calling the Titus REST API if no other instance is provided.</div>
 </td>
 </tr>
 </table>
@@ -226,6 +256,26 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="titusRestTemplate-org.springframework.boot.web.client.RestTemplateBuilder-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>titusRestTemplate</h4>
+<pre>@Bean
+ @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
+                       havingValue="true")
+ @ConditionalOnMissingBean(name="titusRestTemplate")
+public&nbsp;org.springframework.web.client.RestTemplate&nbsp;titusRestTemplate(org.springframework.boot.web.client.RestTemplateBuilder&nbsp;restTemplateBuilder)</pre>
+<div class="block">Provide a <code>RestTemplate</code> instance used for calling the Titus REST API if no other instance is provided.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>restTemplateBuilder</code> - The Spring <code>RestTemplateBuilder</code> instance to use</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The rest template to use</dd>
+</dl>
+</li>
+</ul>
 <a name="titusJobRequestAdapter--">
 <!--   -->
 </a>
@@ -245,7 +295,74 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
 </dl>
 </li>
 </ul>
-<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
+<a name="titusAPIRetryPolicy--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>titusAPIRetryPolicy</h4>
+<pre>@Bean
+ @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
+                       havingValue="true")
+ @ConditionalOnMissingBean(name="titusAPIRetryPolicy",
+                          value=org.springframework.retry.RetryPolicy.class)
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusAPIRetryPolicy</a>&nbsp;titusAPIRetryPolicy()</pre>
+<div class="block">Provides a default implementation of <code>RetryPolicy</code> that retries based on a set
+ of HTTP status codes. Currently just <code>HttpStatus.SERVICE_UNAVAILABLE</code> and
+ <code>HttpStatus.REQUEST_TIMEOUT</code>. Max retries set to 3.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <code>TitusAgentLauncherImpl.TitusAPIRetryPolicy</code> instance with the default settings applied</dd>
+</dl>
+</li>
+</ul>
+<a name="titusAPIBackoffPolicy--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>titusAPIBackoffPolicy</h4>
+<pre>@Bean
+ @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
+                       havingValue="true")
+ @ConditionalOnMissingBean(name="titusAPIBackoffPolicy",
+                          value=org.springframework.retry.backoff.BackOffPolicy.class)
+public&nbsp;org.springframework.retry.backoff.ExponentialBackOffPolicy&nbsp;titusAPIBackoffPolicy()</pre>
+<div class="block">Provides a default implementation of <code>BackOffPolicy</code> if no other has
+ been defined in the context.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A default <code>ExponentialBackOffPolicy</code> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="titusAPIRetryTemplate-org.springframework.retry.RetryPolicy-org.springframework.retry.backoff.BackOffPolicy-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>titusAPIRetryTemplate</h4>
+<pre>@Bean
+ @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
+                       havingValue="true")
+ @ConditionalOnMissingBean(name="titusAPIRetryTemplate",
+                          value=org.springframework.retry.support.RetryTemplate.class)
+public&nbsp;org.springframework.retry.support.RetryTemplate&nbsp;titusAPIRetryTemplate(@Qualifier(value="titusAPIRetryPolicy")
+                                                                                                                                                                                                                                                                                                                                                 org.springframework.retry.RetryPolicy&nbsp;retryPolicy,
+                                                                                                                                                                                                                                                                                                                                                 @Qualifier(value="titusAPIBackoffPolicy")
+                                                                                                                                                                                                                                                                                                                                                 org.springframework.retry.backoff.BackOffPolicy&nbsp;backOffPolicy)</pre>
+<div class="block">Provides a default implementation of <code>RetryTemplate</code> that will be used to retry failed Titus api calls
+ based on the retry policy and backoff policies defined in the application context.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>retryPolicy</code> - The <code>RetryPolicy</code> to use for Titus API call failures</dd>
+<dd><code>backOffPolicy</code> - The <code>BackOffPolicy</code> to use for Titus API call failures</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <code>RetryTemplate</code> instance configured with the supplied retry and backoff policies</dd>
+</dl>
+</li>
+</ul>
+<a name="titusAgentLauncher-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -256,6 +373,8 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
                        havingValue="true")
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl</a>&nbsp;titusAgentLauncher(@Qualifier(value="titusRestTemplate")
                                                                                                                                                                      org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                                                                                                                                                                     @Qualifier(value="titusAPIRetryTemplate")
+                                                                                                                                                                     org.springframework.retry.support.RetryTemplate&nbsp;retryTemplate,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;titusJobRequestAdapter,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                                                                                                                                                                      <a href="../../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
@@ -266,6 +385,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>restTemplate</code> - the rest template</dd>
+<dd><code>retryTemplate</code> - The <code>RetryTemplate</code> instance to use to retry failed Titus API calls</dd>
 <dd><code>titusJobRequestAdapter</code> - The <code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code> implementation to
                                      use</dd>
 <dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>

@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" target="_top">Frames</a></li>
@@ -140,6 +140,13 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <th class="colLast" scope="col">Class and Description</th>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusAPIRetryPolicy</a></span></code>
+<div class="block">A retry policy that has different behavior based on the type of exception thrown by the rest client during
+ calls to the Titus API.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>static interface&nbsp;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a></span></code>
 <div class="block">An interface that should be implemented by any class which wants to modify the Titus job request before it is
@@ -176,7 +183,8 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                      org.springframework.retry.support.RetryTemplate&nbsp;retryTemplate,
                       <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;jobRequestAdapter,
                       com.github.benmanes.caffeine.cache.Cache&lt;java.lang.String,java.lang.String&gt;&nbsp;healthIndicatorCache,
                       <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
@@ -241,13 +249,14 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
+<a name="TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>TitusAgentLauncherImpl</h4>
 <pre>public&nbsp;TitusAgentLauncherImpl(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+                              org.springframework.retry.support.RetryTemplate&nbsp;retryTemplate,
                               <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;jobRequestAdapter,
                               com.github.benmanes.caffeine.cache.Cache&lt;java.lang.String,java.lang.String&gt;&nbsp;healthIndicatorCache,
                               <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
@@ -258,6 +267,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>restTemplate</code> - the rest template</dd>
+<dd><code>retryTemplate</code> - The <code>RetryTemplate</code> to use when making Titus API calls</dd>
 <dd><code>jobRequestAdapter</code> - The implementation of <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl.TitusJobRequestAdapter</code></a> to use</dd>
 <dd><code>healthIndicatorCache</code> - a cache to store metadata about recently launched jobs</dd>
 <dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>
@@ -340,7 +350,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusAPIRetryPolicy.html" title="class in com.netflix.genie.web.agent.launchers.impl"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html" target="_top">Frames</a></li>
