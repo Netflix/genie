@@ -85,7 +85,7 @@ configure(javaProjects) {
             mavenBom SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
-            mavenBom "com.squareup.okhttp3:okhttp-bom:4.6.0"
+            mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.0"
             mavenBom "io.grpc:grpc-bom:1.21.1"
             mavenBom "org.spockframework:spock-bom:2.0-M4-groovy-2.5"
             mavenBom "org.testcontainers:testcontainers-bom:1.15.0"
