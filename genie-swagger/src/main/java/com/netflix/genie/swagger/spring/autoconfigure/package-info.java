@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,28 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.properties
-
-import spock.lang.Specification
 
 /**
- * Specifications for {@link SwaggerProperties}.
+ * Auto configuration for Spring applications relating to Swagger.
  *
  * @author tgianos
+ * @since 4.0.0
  */
-class SwaggerPropertiesSpec extends Specification {
+@ParametersAreNonnullByDefault
+package com.netflix.genie.swagger.spring.autoconfigure;
 
-    def "Can get and set values"() {
-        when:
-        def properties = new SwaggerProperties()
-
-        then:
-        !properties.isEnabled()
-
-        when:
-        properties.setEnabled(true)
-
-        then:
-        properties.isEnabled()
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

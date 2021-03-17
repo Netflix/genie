@@ -89,8 +89,6 @@ genie:
   scripts-manager:
     refresh-interval: 300000
   smoke: true
-  swagger:
-    enabled: false
   tasks:
     agent-cleanup:
       enabled: true

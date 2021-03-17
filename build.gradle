@@ -103,11 +103,7 @@ configure(javaProjects) {
             dependency("com.google.guava:guava:20.0")
             dependency("commons-io:commons-io:2.6")
             dependency("commons-validator:commons-validator:1.7")
-            dependencySet(group: "io.springfox", version: "2.9.2") {
-                entry "springfox-swagger2"
-                entry "springfox-swagger-ui"
-                entry "springfox-bean-validators"
-            }
+            dependency("io.springfox:springfox-boot-starter:3.0.0")
             dependency("jakarta.el:jakarta.el-api:3.0.3")
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("net.jcip:jcip-annotations:1.0")

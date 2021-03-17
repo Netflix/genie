@@ -1,6 +1,7 @@
 plugins {
     id "com.gradle.enterprise" version "3.5.2"
 }
+
 rootProject.name = "genie"
 
 include "genie-test",
@@ -10,6 +11,7 @@ include "genie-test",
         "genie-common-external",
         "genie-proto",
         "genie-ui",
+        "genie-swagger",
         "genie-web",
         "genie-app",
         "genie-client",
