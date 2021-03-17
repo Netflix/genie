@@ -70,8 +70,6 @@ dependencies {
     implementation("commons-validator:commons-validator")
     implementation("io.grpc:grpc-netty")
     implementation("io.grpc:grpc-protobuf")
-    implementation("io.springfox:springfox-bean-validators")
-    implementation("io.springfox:springfox-swagger2")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.glassfish.jaxb:jaxb-runtime")
     implementation("org.hibernate.validator:hibernate-validator")
@@ -107,7 +105,6 @@ dependencies {
     runtimeOnly("com.github.ben-manes.caffeine:caffeine")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.flywaydb:flyway-core")
-    runtimeOnly("io.springfox:springfox-swagger-ui")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.postgresql:postgresql")
 

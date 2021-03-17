@@ -60,31 +60,40 @@ Self-contained Genie CLI job executor.
 Genie client interact with the service via REST API.
 
 ### `genie-web`
-The main server library, can be rewrapped to inject and override server components.
+The main server library, can be re-wrapped to inject and override server components.
 
 ### `genie-agent`
-The main agent library, can be rewrapped to inject and override components.
+The main agent library, can be re-wrapped to inject and override components.
 
 ### `genie-common`, `genie-common-internal`, `genie-common-external`
 
-Internal components libraries shared by server, agent, and client modules.
+Internal components libraries shared by the server, agent, and client modules.
 
 ### `genie-proto`
+
 Protobuf messages and gRPC services definition shared by server and agent.
 This is not a public API meant for use by other clients.
 
 ### `genie-docs`, `genie-demo`
+
 Documentation and demo application.
 
 ### `genie-test`, `genie-test-web`
+
 Testing classes and utilities shared by other modules.
 
 ### `genie-ui`
+
 JavaScript UI to search and visualize jobs, clusters, commands.
+
+### `genie-swagger`
+
+Auto-configuration of [Swagger](https://swagger.io/) via [Spring Fox](https://springfox.github.io/springfox/). Add
+to final deployment artifact of server to enable.
 
 ## Artifacts
 
-Genie publishes to [Bintray Maven](https://bintray.com/netflixoss/maven/genie/_latestVersion) and [Docker Hub](https://hub.docker.com/r/netflixoss/genie-app/)
+Genie publishes to [Maven Central](https://search.maven.org/) and [Docker Hub](https://hub.docker.com/r/netflixoss/genie-app/)
 
 Refer to the [demo]() section of the documentations for examples.
 And to the [setup]() section for more detailed instructions to set up Genie.

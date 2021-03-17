@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,28 +15,32 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.spring.autoconfigure;
+package com.netflix.genie.swagger.spring.autoconfigure;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import springfox.documentation.spi.DocumentationType;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import springfox.documentation.spring.web.plugins.Docket;
 
 /**
- * Unit tests for the SwaggerConfig class.
+ * Unit tests for the {@link SwaggerAutoConfiguration} class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 class SwaggerAutoConfigurationTest {
 
-    /**
-     * Test to make sure the Swagger SpringFox docket is created properly.
-     */
+    private final ApplicationContextRunner contextRunner =
+        new ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    SwaggerAutoConfiguration.class
+                )
+            );
+
     @Test
-    void canCreateDocket() {
-        final SwaggerAutoConfiguration config = new SwaggerAutoConfiguration();
-        final Docket docket = config.genieApi();
-        Assertions.assertThat(docket.getDocumentationType()).isEqualTo(DocumentationType.SWAGGER_2);
+    void expectedBeansExist() {
+        this.contextRunner.run(context -> Assertions.assertThat(context).hasSingleBean(Docket.class));
     }
 }

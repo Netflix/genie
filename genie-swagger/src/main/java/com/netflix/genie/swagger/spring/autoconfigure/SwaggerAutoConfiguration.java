@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,17 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.spring.autoconfigure;
+package com.netflix.genie.swagger.spring.autoconfigure;
 
-import com.google.common.collect.Lists;
-import com.netflix.genie.web.properties.SwaggerProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -34,32 +28,27 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.ArrayList;
+
 /**
  * Spring configuration for Swagger via SpringFox.
- * <p>
- * see: https://github.com/springfox/springfox
  *
  * @author tgianos
+ * @see <a href="https://github.com/springfox/springfox">Spring Fox</a>
  * @since 3.0.0
  */
 @Configuration
-@ConditionalOnProperty(value = SwaggerProperties.ENABLED_PROPERTY, havingValue = "true")
 @EnableSwagger2
-@Import(BeanValidatorPluginsConfiguration.class)
-@EnableConfigurationProperties(
-    {
-        SwaggerProperties.class
-    }
-)
 public class SwaggerAutoConfiguration {
+
     /**
      * Configure Spring Fox.
      *
      * @return The spring fox docket.
      */
     @Bean
-    @ConditionalOnMissingBean(name = "genieApi", value = Docket.class)
-    public Docket genieApi() {
+    @ConditionalOnMissingBean(Docket.class)
+    public Docket genieApiDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(
                 new ApiInfo(
@@ -72,7 +61,7 @@ public class SwaggerAutoConfiguration {
                     new Contact("Netflix, Inc.", "https://jobs.netflix.com/", null),
                     "Apache 2.0",
                     "http://www.apache.org/licenses/LICENSE-2.0",
-                    Lists.newArrayList()
+                    new ArrayList<>()
                 )
             )
             .select()
@@ -82,7 +71,4 @@ public class SwaggerAutoConfiguration {
             .pathMapping("/")
             .useDefaultResponseMessages(false);
     }
-
-    //TODO: Update with more detailed swagger configurations
-    //      see: http://tinyurl.com/glla6vc
 }

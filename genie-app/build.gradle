@@ -9,6 +9,7 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
+    implementation(project(":genie-swagger"))
     implementation(project(":genie-web"))
     implementation(project(":genie-ui"))
     implementation("org.springframework.boot:spring-boot-starter")
