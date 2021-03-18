@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         gradlePluginPortal()
     }
 
@@ -40,7 +40,7 @@ allprojects {
     apply plugin: "eclipse"
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
