@@ -47,11 +47,11 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/web/spring/autoconfigure/RetryAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/web/spring/autoconfigure/ValidationAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Prev&nbsp;Class</li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
-<li><a href="../../../../../../index.html?com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html" target="_top">Frames</a></li>
+<li><a href="../../../../../../index.html?com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html" target="_top">Frames</a></li>
 <li><a href="SwaggerAutoConfiguration.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_top">
@@ -90,7 +90,7 @@ var activeTableTab = "activeTableTab";
 <!-- ========= END OF TOP NAVBAR ========= -->
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="subTitle">com.netflix.genie.web.spring.autoconfigure</div>
+<div class="subTitle">com.netflix.genie.swagger.spring.autoconfigure</div>
 <h2 title="Class SwaggerAutoConfiguration" class="title">Class SwaggerAutoConfiguration</h2>
 </div>
 <div class="contentContainer">
@@ -98,7 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>com.netflix.genie.web.spring.autoconfigure.SwaggerAutoConfiguration</li>
+<li>com.netflix.genie.swagger.spring.autoconfigure.SwaggerAutoConfiguration</li>
 </ul>
 </li>
 </ul>
@@ -108,19 +108,15 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @ConditionalOnProperty(value="genie.swagger.enabled",
-                       havingValue="true")
  @EnableSwagger2
- @Import(value=springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration.class)
- @EnableConfigurationProperties(value=<a href="../../../../../../com/netflix/genie/web/properties/SwaggerProperties.html" title="class in com.netflix.genie.web.properties">SwaggerProperties.class</a>)
 public class <span class="typeNameLabel">SwaggerAutoConfiguration</span>
 extends java.lang.Object</pre>
-<div class="block">Spring configuration for Swagger via SpringFox.
- <p>
- see: https://github.com/springfox/springfox</div>
+<div class="block">Spring configuration for Swagger via SpringFox.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>3.0.0</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="https://github.com/springfox/springfox">Spring Fox</a></dd>
 </dl>
 </li>
 </ul>
@@ -140,7 +136,7 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html#SwaggerAutoConfiguration--">SwaggerAutoConfiguration</a></span>()</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html#SwaggerAutoConfiguration--">SwaggerAutoConfiguration</a></span>()</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -159,7 +155,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>springfox.documentation.spring.web.plugins.Docket</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html#genieApi--">genieApi</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html#genieApiDocket--">genieApiDocket</a></span>()</code>
 <div class="block">Configure Spring Fox.</div>
 </td>
 </tr>
@@ -202,16 +198,15 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="genieApi--">
+<a name="genieApiDocket--">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>genieApi</h4>
+<h4>genieApiDocket</h4>
 <pre>@Bean
- @ConditionalOnMissingBean(name="genieApi",
-                          value=springfox.documentation.spring.web.plugins.Docket.class)
-public&nbsp;springfox.documentation.spring.web.plugins.Docket&nbsp;genieApi()</pre>
+ @ConditionalOnMissingBean(value=springfox.documentation.spring.web.plugins.Docket.class)
+public&nbsp;springfox.documentation.spring.web.plugins.Docket&nbsp;genieApiDocket()</pre>
 <div class="block">Configure Spring Fox.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -246,11 +241,11 @@ public&nbsp;springfox.documentation.spring.web.plugins.Docket&nbsp;genieApi()</p
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/web/spring/autoconfigure/RetryAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/web/spring/autoconfigure/ValidationAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Prev&nbsp;Class</li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
-<li><a href="../../../../../../index.html?com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html" target="_top">Frames</a></li>
+<li><a href="../../../../../../index.html?com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html" target="_top">Frames</a></li>
 <li><a href="SwaggerAutoConfiguration.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_bottom">

@@ -2098,6 +2098,10 @@
 <dd>
 <div class="block">Classes that have common Genie utilities.</div>
 </dd>
+<dt><a href="com/netflix/genie/swagger/spring/autoconfigure/package-summary.html">com.netflix.genie.swagger.spring.autoconfigure</a> - package com.netflix.genie.swagger.spring.autoconfigure</dt>
+<dd>
+<div class="block">Auto configuration for Spring applications relating to Swagger.</div>
+</dd>
 <dt><a href="com/netflix/genie/test/suppliers/package-summary.html">com.netflix.genie.test.suppliers</a> - package com.netflix.genie.test.suppliers</dt>
 <dd>
 <div class="block">Functional interfaces for suppliers.</div>
@@ -3410,10 +3414,6 @@
 <dd>
 <div class="block">The property that determines if the SNS publishing is enabled.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/SwaggerProperties.html#ENABLED_PROPERTY">ENABLED_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/SwaggerProperties.html" title="class in com.netflix.genie.web.properties">SwaggerProperties</a></dt>
-<dd>
-<div class="block">The property that reflects whether this feature is enabled or not.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/UserMetricsProperties.html#ENABLED_PROPERTY">ENABLED_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/UserMetricsProperties.html" title="class in com.netflix.genie.web.properties">UserMetricsProperties</a></dt>
 <dd>
 <div class="block">The property that determines if the <a href="com/netflix/genie/web/tasks/leader/UserMetricsTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>UserMetricsTask</code></a> is enabled.</div>
@@ -4177,7 +4177,7 @@
 <dd>
 <div class="block">Main entry point for execution after the application is initialized.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html#genieApi--">genieApi()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.<a href="com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure">SwaggerAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html#genieApiDocket--">genieApiDocket()</a></span> - Method in class com.netflix.genie.swagger.spring.autoconfigure.<a href="com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html" title="class in com.netflix.genie.swagger.spring.autoconfigure">SwaggerAutoConfiguration</a></dt>
 <dd>
 <div class="block">Configure Spring Fox.</div>
 </dd>
@@ -9768,10 +9768,6 @@
 <dd>
 <div class="block">The property prefix for all properties in this group.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/SwaggerProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/SwaggerProperties.html" title="class in com.netflix.genie.web.properties">SwaggerProperties</a></dt>
-<dd>
-<div class="block">The property prefix for all properties in this group.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/TasksExecutorPoolProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/TasksExecutorPoolProperties.html" title="class in com.netflix.genie.web.properties">TasksExecutorPoolProperties</a></dt>
 <dd>
 <div class="block">The property prefix for this group.</div>
@@ -11668,17 +11664,11 @@
 <dd>
 <div class="block">The exit code that will be set to indicate a job has succeeded.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure"><span class="typeNameLink">SwaggerAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/web/spring/autoconfigure/package-summary.html">com.netflix.genie.web.spring.autoconfigure</a></dt>
+<dt><a href="com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html" title="class in com.netflix.genie.swagger.spring.autoconfigure"><span class="typeNameLink">SwaggerAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/swagger/spring/autoconfigure/package-summary.html">com.netflix.genie.swagger.spring.autoconfigure</a></dt>
 <dd>
 <div class="block">Spring configuration for Swagger via SpringFox.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html#SwaggerAutoConfiguration--">SwaggerAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.<a href="com/netflix/genie/web/spring/autoconfigure/SwaggerAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure">SwaggerAutoConfiguration</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/properties/SwaggerProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">SwaggerProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
-<dd>
-<div class="block">Properties related to Genie and swagger.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/SwaggerProperties.html#SwaggerProperties--">SwaggerProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/SwaggerProperties.html" title="class in com.netflix.genie.web.properties">SwaggerProperties</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html#SwaggerAutoConfiguration--">SwaggerAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.swagger.spring.autoconfigure.<a href="com/netflix/genie/swagger/spring/autoconfigure/SwaggerAutoConfiguration.html" title="class in com.netflix.genie.swagger.spring.autoconfigure">SwaggerAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#sync-io.grpc.stub.StreamObserver-">sync(StreamObserver&lt;ServerControlMessage&gt;)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
 <dt><a href="com/netflix/genie/web/aspects/SystemArchitecture.html" title="class in com.netflix.genie.web.aspects"><span class="typeNameLink">SystemArchitecture</span></a> - Class in <a href="com/netflix/genie/web/aspects/package-summary.html">com.netflix.genie.web.aspects</a></dt>

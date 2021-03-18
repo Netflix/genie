@@ -45,6 +45,7 @@ com.netflix.genie.common.internal.services
 com.netflix.genie.common.internal.services.impl
 com.netflix.genie.common.internal.util
 com.netflix.genie.common.util
+com.netflix.genie.swagger.spring.autoconfigure
 com.netflix.genie.test.suppliers
 com.netflix.genie.test.web.configs
 com.netflix.genie.ui.controllers
