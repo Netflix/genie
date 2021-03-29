@@ -264,7 +264,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
                 case SYSTEM_SIGNAL:
                     // In interactive mode, killed by a system signal is mostly likely by a user (e.g. Ctrl-C)
                     return new JobProcessResult
-                        .Builder(JobStatus.KILLED,
+                        .Builder(JobStatus.FAILED,
                         this.isInteractiveMode
                             ? JobStatusMessages.JOB_KILLED_BY_USER
                             : JobStatusMessages.JOB_KILLED_BY_SYSTEM,
