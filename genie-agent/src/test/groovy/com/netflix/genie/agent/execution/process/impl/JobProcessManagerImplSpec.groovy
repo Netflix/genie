@@ -381,7 +381,6 @@ class JobProcessManagerImplSpec extends Specification {
         KillService.KillSource.TIMEOUT               | JobStatusMessages.JOB_EXCEEDED_TIMEOUT
         KillService.KillSource.FILES_LIMIT           | JobStatusMessages.JOB_EXCEEDED_FILES_LIMIT
         KillService.KillSource.API_KILL_REQUEST      | JobStatusMessages.JOB_KILLED_BY_USER
-        KillService.KillSource.SYSTEM_SIGNAL         | JobStatusMessages.JOB_KILLED_BY_USER
         KillService.KillSource.REMOTE_STATUS_MONITOR | JobStatusMessages.JOB_MARKED_FAILED
     }
 
@@ -414,7 +413,7 @@ class JobProcessManagerImplSpec extends Specification {
         JobProcessResult result = this.manager.waitFor()
 
         then:
-        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatus() == JobStatus.FAILED
         result.getFinalStatusMessage() == expectedStatusMessage
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
