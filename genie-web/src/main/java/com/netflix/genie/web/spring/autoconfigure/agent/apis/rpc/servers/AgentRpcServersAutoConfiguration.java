@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers;
 
+import brave.Tracing;
+import brave.grpc.GrpcTracing;
 import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerManager;
 import com.netflix.genie.web.properties.GRpcServerProperties;
 import io.grpc.BindableService;
@@ -32,6 +34,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -61,6 +64,7 @@ public class AgentRpcServersAutoConfiguration {
      * @param port               The port this server should listen on
      * @param services           The gRPC services this server should serve
      * @param serverInterceptors The {@link ServerInterceptor} implementations that should be applied to all services
+     * @param tracing            The Brave {@link Tracing} instance to use
      * @return A Netty server instance based on the provided information
      */
     @Bean
@@ -68,15 +72,19 @@ public class AgentRpcServersAutoConfiguration {
     public Server gRpcServer(
         @Value("${grpc.server.port:0}") final int port,  // TODO: finalize how to get configure this property
         final Set<BindableService> services,
-        final List<ServerInterceptor> serverInterceptors
+        final List<ServerInterceptor> serverInterceptors,
+        final Tracing tracing
     ) {
         final NettyServerBuilder builder = NettyServerBuilder.forPort(port);
+
+        final List<ServerInterceptor> finalServerInterceptors = new ArrayList<>(serverInterceptors);
+        finalServerInterceptors.add(GrpcTracing.create(tracing).newServerInterceptor());
 
         // Add Service interceptors and add services to the server
         services
             .stream()
             .map(BindableService::bindService)
-            .map(serviceDefinition -> ServerInterceptors.intercept(serviceDefinition, serverInterceptors))
+            .map(serviceDefinition -> ServerInterceptors.intercept(serviceDefinition, finalServerInterceptors))
             .forEach(builder::addService);
 
         return builder.build();

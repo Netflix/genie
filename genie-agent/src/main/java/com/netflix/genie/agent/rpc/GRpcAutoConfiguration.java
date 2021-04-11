@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.agent.rpc;
 
+import brave.Tracing;
+import brave.grpc.GrpcTracing;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
@@ -131,5 +133,18 @@ public class GRpcAutoConfiguration {
     @Scope("prototype")
     public FileStreamServiceGrpc.FileStreamServiceStub fileStreamClient(final ManagedChannel channel) {
         return FileStreamServiceGrpc.newStub(channel);
+    }
+
+    /**
+     * Provide a {@link ClientInterceptor} which adds tracing information to gRPC calls.
+     *
+     * @param tracing The Brave {@link Tracing} instance
+     * @return A {@link ClientInterceptor} for trace propagation
+     */
+    @Bean
+    @ConditionalOnMissingBean(name = "genieGrpcTracingClientInterceptor")
+    @Lazy
+    public ClientInterceptor genieGrpcTracingClientInterceptor(final Tracing tracing) {
+        return GrpcTracing.create(tracing).newClientInterceptor();
     }
 }
