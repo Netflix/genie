@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.properties.AgentProperties;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.proto.PingServiceGrpc;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -142,18 +143,20 @@ public class CliAutoConfiguration {
      * The main {@link GenieAgentRunner} entry point bean which implements
      * {@link org.springframework.boot.CommandLineRunner}.
      *
-     * @param argumentParser The argument parser to use
-     * @param commandFactory The command factory to use
-     * @param environment    The spring environment
+     * @param argumentParser    The argument parser to use
+     * @param commandFactory    The command factory to use
+     * @param tracingComponents The {@link BraveTracingComponents} to use
+     * @param environment       The spring environment
      * @return An instance of {@link GenieAgentRunner} if one hasn't already been provided
      */
     @Bean
     public GenieAgentRunner genieAgentRunner(
         final ArgumentParser argumentParser,
         final CommandFactory commandFactory,
+        final BraveTracingComponents tracingComponents,
         final Environment environment
     ) {
-        return new GenieAgentRunner(argumentParser, commandFactory, environment);
+        return new GenieAgentRunner(argumentParser, commandFactory, tracingComponents, environment);
     }
 
     /**
