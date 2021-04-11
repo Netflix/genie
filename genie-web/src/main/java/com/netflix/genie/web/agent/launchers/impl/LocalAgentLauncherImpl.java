@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.agent.launchers.impl;
 
+import brave.Span;
+import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -27,6 +29,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
@@ -101,6 +105,9 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private final AtomicLong numActiveJobs;
     private final AtomicLong usedMemory;
 
+    private final Tracer tracer;
+    private final BraveTracePropagator tracePropagator;
+
     /**
      * Constructor.
      *
@@ -110,6 +117,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
      * @param launcherProperties The properties from the configuration that control agent behavior
      * @param executorFactory    A {@link ExecutorFactory} to create {@link org.apache.commons.exec.Executor}
      *                           instances
+     * @param tracingComponents  The {@link BraveTracingComponents} instance to use
      * @param registry           Metrics repository
      */
     public LocalAgentLauncherImpl(
@@ -118,6 +126,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         final DataServices dataServices,
         final LocalAgentLauncherProperties launcherProperties,
         final ExecutorFactory executorFactory,
+        final BraveTracingComponents tracingComponents,
         final MeterRegistry registry
     ) {
         this.hostname = hostInfo.getHostname();
@@ -130,6 +139,9 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
         this.numActiveJobs = new AtomicLong(0L);
         this.usedMemory = new AtomicLong(0L);
+
+        this.tracer = tracingComponents.getTracer();
+        this.tracePropagator = tracingComponents.getTracePropagator();
 
         final Set<Tag> tags = Sets.newHashSet(
             Tag.of("launcherClass", this.getClass().getSimpleName())
@@ -257,6 +269,11 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
             final Map<String, String> environment = Maps.newHashMap(System.getenv());
             // Add extra environment from configuration, if any
             environment.putAll(this.launcherProperties.getAdditionalEnvironment());
+            // Add tracing context so agent continues trace
+            final Span currentSpan = this.tracer.currentSpan();
+            if (currentSpan != null) {
+                environment.putAll(this.tracePropagator.injectForAgent(currentSpan.context()));
+            }
             log.debug("Launching agent: {}, env: {}", commandLine, environment);
 
             // TODO: What happens if the server crashes? Does the process live on? Make sure this is totally detached

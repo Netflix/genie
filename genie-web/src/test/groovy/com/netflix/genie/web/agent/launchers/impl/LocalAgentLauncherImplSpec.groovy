@@ -17,10 +17,17 @@
  */
 package com.netflix.genie.web.agent.launchers.impl
 
+import brave.Span
+import brave.Tracer
+import brave.propagation.TraceContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate
@@ -81,6 +88,9 @@ class LocalAgentLauncherImplSpec extends Specification {
     Executor executor
     Map<String, String> additionalEnvironment
     JsonNode requestedLauncherExt
+    Tracer tracer
+    BraveTracePropagator tracePropagator
+    BraveTracingComponents tracingComponents
 
     def setup() {
         this.hostname = UUID.randomUUID().toString()
@@ -108,6 +118,14 @@ class LocalAgentLauncherImplSpec extends Specification {
         }
         this.requestedLauncherExt = null
         this.launchProperties.setServerHostname(HOSTNAME)
+        this.tracer = Mock(Tracer)
+        this.tracePropagator = Mock(BraveTracePropagator)
+        this.tracingComponents = new BraveTracingComponents(
+            this.tracer,
+            this.tracePropagator,
+            Mock(BraveTracingCleanup),
+            Mock(BraveTagAdapter)
+        )
     }
 
     @Unroll
@@ -115,6 +133,14 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.launchProperties.setRunAsUserEnabled(runAsUser)
         this.launchProperties.setAdditionalEnvironment(this.additionalEnvironment)
         def jobInfo = Mock(JobInfoAggregate)
+        def currentSpan = Mock(Span) {
+            context() >> TraceContext.newBuilder()
+                .traceId(UUID.randomUUID().getLeastSignificantBits())
+                .traceIdHigh(UUID.randomUUID().getMostSignificantBits())
+                .spanId(UUID.randomUUID().getLeastSignificantBits())
+                .sampled(true)
+                .build()
+        }
 
         expectedCommandLine = (SystemUtils.IS_OS_LINUX ? ["setsid"] : []) + expectedCommandLine
 
@@ -125,6 +151,7 @@ class LocalAgentLauncherImplSpec extends Specification {
             this.dataServices,
             this.launchProperties,
             this.executorFactory,
+            this.tracingComponents,
             this.meterRegistry
         )
 
@@ -136,7 +163,7 @@ class LocalAgentLauncherImplSpec extends Specification {
         0 * jobInfo.getTotalMemoryUsed()
 
         when:
-        Optional<JsonNode> launcherExt = this.launcher.launchAgent(this.resolvedJob, requestedLauncherExt)
+        Optional<JsonNode> launcherExt = this.launcher.launchAgent(this.resolvedJob, this.requestedLauncherExt)
 
         then:
         1 * this.resolvedJob.getJobMetadata() >> this.jobMetadata
@@ -153,7 +180,9 @@ class LocalAgentLauncherImplSpec extends Specification {
         1 * this.jobSpec.getJob() >> this.job
         1 * this.job.getId() >> JOB_ID
         1 * this.persistenceService.getUsedMemoryOnHost(this.hostname)
-        1 * this.executorFactory.newInstance(true) >> executor
+        1 * this.tracer.currentSpan() >> currentSpan
+        1 * this.tracePropagator.injectForAgent(_ as TraceContext) >> new HashMap<>()
+        1 * this.executorFactory.newInstance(true) >> this.executor
         1 * this.executor.execute(_ as CommandLine, _ as Map, _ as LocalAgentLauncherImpl.AgentResultHandler) >> {
             args ->
                 CommandLine commandLine = args[0] as CommandLine
@@ -184,6 +213,7 @@ class LocalAgentLauncherImplSpec extends Specification {
             this.dataServices,
             properties,
             this.executorFactory,
+            this.tracingComponents,
             this.meterRegistry
         )
         def health = healthIndicator.health()
@@ -207,6 +237,7 @@ class LocalAgentLauncherImplSpec extends Specification {
             this.dataServices,
             properties,
             this.executorFactory,
+            this.tracingComponents,
             this.meterRegistry
         )
         def health = healthIndicator.health()
@@ -236,6 +267,7 @@ class LocalAgentLauncherImplSpec extends Specification {
             this.dataServices,
             properties,
             this.executorFactory,
+            this.tracingComponents,
             this.meterRegistry
         )
         def health = healthIndicator.health()

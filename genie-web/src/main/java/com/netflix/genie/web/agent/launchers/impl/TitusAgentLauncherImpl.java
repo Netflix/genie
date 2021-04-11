@@ -17,10 +17,15 @@
  */
 package com.netflix.genie.web.agent.launchers.impl;
 
+import brave.Span;
+import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.ImmutableMap;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.launchers.dtos.TitusBatchJobRequest;
@@ -92,6 +97,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .stream()
             .map(s -> placeholders.getOrDefault(s, s))
             .collect(Collectors.toList());
+
     private final RestTemplate restTemplate;
     private final RetryTemplate retryTemplate;
     private final Cache<String, String> healthIndicatorCache;
@@ -102,6 +108,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final boolean hasDataSizeConverters;
     private final Binder binder;
     private final MeterRegistry registry;
+    private final Tracer tracer;
+    private final BraveTracePropagator tracePropagator;
+    private final BraveTagAdapter tagAdapter;
 
     /**
      * Constructor.
@@ -112,6 +121,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
      * @param healthIndicatorCache         a cache to store metadata about recently launched jobs
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
+     * @param tracingComponents            The {@link BraveTracingComponents} instance to use for distributed tracing
      * @param environment                  The application environment to pull dynamic properties from
      * @param registry                     the metric registry
      */
@@ -122,6 +132,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         final Cache<String, String> healthIndicatorCache,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
+        final BraveTracingComponents tracingComponents,
         final Environment environment,
         final MeterRegistry registry
     ) {
@@ -131,6 +142,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         this.genieHostInfo = genieHostInfo;
         this.titusAgentLauncherProperties = titusAgentLauncherProperties;
         this.jobRequestAdapter = jobRequestAdapter;
+        this.tracer = tracingComponents.getTracer();
+        this.tracePropagator = tracingComponents.getTracePropagator();
+        this.tagAdapter = tracingComponents.getTagAdapter();
         this.environment = environment;
         if (this.environment instanceof ConfigurableEnvironment) {
             final ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) this.environment;
@@ -354,14 +368,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     )
                     .entryPoint(entryPoint)
                     .command(command)
-                    .env(
-                        this.binder
-                            .bind(
-                                TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
-                                Bindable.mapOf(String.class, String.class)
-                            )
-                            .orElse(new HashMap<>())
-                    )
+                    .env(this.createJobEnvironment())
                     .attributes(
                         this.binder
                             .bind(
@@ -460,6 +467,22 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 .orElse(new HashMap<>())
         );
         return jobAttributes;
+    }
+
+    private Map<String, String> createJobEnvironment() {
+        final Map<String, String> jobEnvironment = this.binder
+            .bind(
+                TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
+                Bindable.mapOf(String.class, String.class)
+            )
+            .orElse(new HashMap<>());
+
+        final Span currentSpan = this.tracer.currentSpan();
+        if (currentSpan != null) {
+            jobEnvironment.putAll(this.tracePropagator.injectForAgent(currentSpan.context()));
+        }
+
+        return jobEnvironment;
     }
 
     /**

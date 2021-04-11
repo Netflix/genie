@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import brave.SpanCustomizer;
+import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -24,6 +26,9 @@ import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.tracing.TracingConstants;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
@@ -58,6 +63,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class JobLaunchServiceImpl implements JobLaunchService {
+    static final String BEGIN_LAUNCH_JOB_ANNOTATION = "Beginning to Launch Job";
+    static final String SAVED_JOB_SUBMISSION_ANNOTATION = "Saved Job Submission";
+    static final String RESOLVED_JOB_ANNOTATION = "Resolved Job";
+    static final String MARKED_JOB_ACCEPTED_ANNOTATION = "Marked Job Accepted";
+    static final String LAUNCHED_AGENT_ANNOTATION = "Launched Agent";
+    static final String SAVED_LAUNCHER_EXT_ANNOTATION = "Saved Launcher Ext Data";
+    static final String END_LAUNCH_JOB_ANNOTATION = "Completed Launching Job";
 
     private static final String LAUNCH_JOB_TIMER = "genie.services.jobLaunch.launchJob.timer";
     private static final String AGENT_LAUNCHER_SELECTOR_TIMER = "genie.services.jobLaunch.selectLauncher.timer";
@@ -71,6 +83,8 @@ public class JobLaunchServiceImpl implements JobLaunchService {
     private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
     private final AgentLauncherSelector agentLauncherSelector;
+    private final Tracer tracer;
+    private final BraveTagAdapter tagAdapter;
     private final MeterRegistry registry;
 
     /**
@@ -79,17 +93,21 @@ public class JobLaunchServiceImpl implements JobLaunchService {
      * @param dataServices          The {@link DataServices} instance to use
      * @param jobResolverService    {@link JobResolverService} implementation used to resolve job details
      * @param agentLauncherSelector {@link AgentLauncher} implementation to launch agents
+     * @param tracingComponents     {@link BraveTracingComponents} instance to use to get access to instrumentation
      * @param registry              {@link MeterRegistry} metrics repository
      */
     public JobLaunchServiceImpl(
         final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentLauncherSelector agentLauncherSelector,
+        final BraveTracingComponents tracingComponents,
         final MeterRegistry registry
     ) {
         this.persistenceService = dataServices.getPersistenceService();
         this.jobResolverService = jobResolverService;
         this.agentLauncherSelector = agentLauncherSelector;
+        this.tracer = tracingComponents.getTracer();
+        this.tagAdapter = tracingComponents.getTagAdapter();
         this.registry = registry;
     }
 
@@ -106,6 +124,8 @@ public class JobLaunchServiceImpl implements JobLaunchService {
         IdAlreadyExistsException,
         NotFoundException {
         final long start = System.nanoTime();
+        final SpanCustomizer span = this.tracer.currentSpanCustomizer();
+        span.annotate(BEGIN_LAUNCH_JOB_ANNOTATION);
         final Set<Tag> tags = Sets.newHashSet();
         try {
             /*
@@ -118,6 +138,8 @@ public class JobLaunchServiceImpl implements JobLaunchService {
              * 5. If the agent launch fails mark the job failed else return
              */
             final String jobId = this.persistenceService.saveJobSubmission(jobSubmission);
+            span.annotate(SAVED_JOB_SUBMISSION_ANNOTATION);
+            this.tagAdapter.tag(span, TracingConstants.JOB_ID_TAG, jobId);
 
             final ResolvedJob resolvedJob;
             try {
@@ -137,6 +159,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 }
                 throw t; // Caught below for metrics gathering
             }
+            span.annotate(RESOLVED_JOB_ANNOTATION);
 
             // Job state should be RESOLVED now. Mark it ACCEPTED to avoid race condition with agent starting up
             // before we get return from launchAgent and trying to set it to CLAIMED
@@ -156,6 +179,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 //       mechanism? For now rely on janitor mechanisms
                 throw e;
             }
+            span.annotate(MARKED_JOB_ACCEPTED_ANNOTATION);
 
             // TODO: at the moment this is not populated, it's going to be a null node (not null)
             final JsonNode requestedLauncherExt = this.persistenceService.getRequestedLauncherExt(jobId);
@@ -173,6 +197,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 //       Probably need multiple exceptions to be thrown from this API (if we go with checked)
                 throw e;
             }
+            span.annotate(LAUNCHED_AGENT_ANNOTATION);
 
             if (launcherExt.isPresent()) {
                 try {
@@ -184,6 +209,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                     log.error("Unable to update the launcher ext for job {}", jobId, e);
                 }
             }
+            span.annotate(SAVED_LAUNCHER_EXT_ANNOTATION);
 
             MetricsUtils.addSuccessTags(tags);
             return jobId;
@@ -191,6 +217,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
+            span.annotate(END_LAUNCH_JOB_ANNOTATION);
             this.registry
                 .timer(LAUNCH_JOB_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);

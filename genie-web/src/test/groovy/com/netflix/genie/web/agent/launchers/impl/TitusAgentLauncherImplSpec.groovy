@@ -17,12 +17,19 @@
  */
 package com.netflix.genie.web.agent.launchers.impl
 
+import brave.Span
+import brave.Tracer
+import brave.propagation.TraceContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.benmanes.caffeine.cache.Cache
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.agent.launchers.dtos.TitusBatchJobRequest
 import com.netflix.genie.web.agent.launchers.dtos.TitusBatchJobResponse
@@ -67,6 +74,10 @@ class TitusAgentLauncherImplSpec extends Specification {
     MockEnvironment environment
     TitusAgentLauncherImpl.TitusJobRequestAdapter adapter
 
+    Tracer tracer
+    BraveTracePropagator tracePropagator
+    Span currentSpan
+
     int requestedCPU
     long requestedMemory
 
@@ -101,6 +112,20 @@ class TitusAgentLauncherImplSpec extends Specification {
         this.launcherProperties.setEndpoint(URI.create(TITUS_ENDPOINT_PREFIX))
         this.registry = new SimpleMeterRegistry()
         this.environment = new MockEnvironment()
+        this.tracer = Mock(Tracer)
+        this.tracePropagator = Mock(BraveTracePropagator)
+
+        this.tracer = Mock(Tracer)
+        this.tracePropagator = Mock(BraveTracePropagator)
+        UUID trace = UUID.randomUUID()
+        this.currentSpan = Mock(Span) {
+            context() >> TraceContext.newBuilder()
+                .traceIdHigh(trace.getMostSignificantBits())
+                .traceId(trace.getLeastSignificantBits())
+                .spanId(UUID.randomUUID().getLeastSignificantBits())
+                .sampled(true)
+                .build()
+        }
 
         /*
          *  Note: The retry template used here is "transparent" in the sense it doesn't do
@@ -118,6 +143,12 @@ class TitusAgentLauncherImplSpec extends Specification {
             this.cache,
             this.genieHostInfo,
             this.launcherProperties,
+            new BraveTracingComponents(
+                this.tracer,
+                this.tracePropagator,
+                Mock(BraveTracingCleanup),
+                Mock(BraveTagAdapter)
+            ),
             this.environment,
             this.registry
         )
@@ -139,6 +170,8 @@ class TitusAgentLauncherImplSpec extends Specification {
         }
         1 * cache.put(JOB_ID, TITUS_JOB_ID)
         1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
+        1 * this.tracer.currentSpan() >> this.currentSpan
+        1 * this.tracePropagator.injectForAgent(_ as TraceContext) >> new HashMap<>()
 
         expect:
         launcherExt.isPresent()
