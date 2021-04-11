@@ -63,7 +63,7 @@ public class GRpcServicesAutoConfiguration {
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentHeartBeatService.class)
-    public AgentHeartBeatService agentHeartBeatService(
+    public GrpcAgentHeartBeatServiceImpl agentHeartBeatService(
         final HeartBeatServiceGrpc.HeartBeatServiceStub heartBeatServiceStub,
         @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
         final AgentProperties agentProperties
@@ -87,7 +87,7 @@ public class GRpcServicesAutoConfiguration {
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentJobKillService.class)
-    public AgentJobKillService agentJobKillService(
+    public GRpcAgentJobKillServiceImpl agentJobKillService(
         final JobKillServiceGrpc.JobKillServiceFutureStub jobKillServiceFutureStub,
         final KillService killService,
         @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
@@ -111,7 +111,7 @@ public class GRpcServicesAutoConfiguration {
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentJobService.class)
-    public AgentJobService agentJobService(
+    public GRpcAgentJobServiceImpl agentJobService(
         final JobServiceGrpc.JobServiceFutureStub jobServiceFutureStub,
         final JobServiceProtoConverter jobServiceProtoConverter
     ) {
@@ -131,7 +131,7 @@ public class GRpcServicesAutoConfiguration {
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentFileStreamService.class)
-    public AgentFileStreamService agentFileStreamService(
+    public GRpcAgentFileStreamServiceImpl agentFileStreamService(
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
         final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter,

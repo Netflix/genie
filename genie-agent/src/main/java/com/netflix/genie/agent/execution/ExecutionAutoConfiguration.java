@@ -30,7 +30,6 @@ import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
@@ -127,9 +126,19 @@ public class ExecutionAutoConfiguration {
         return new ExecutionContext(agentProperties);
     }
 
+    /**
+     * Provide the default job execution state machine instance which will handle the entire lifecycle of the job
+     * this agent instance is responsible for.
+     *
+     * @param executionStages   The available stages
+     * @param executionContext  The context object for sharing state
+     * @param listeners         Any listeners that may be in the system to react to events
+     * @param jobProcessManager The process manager for the actual client job
+     * @return a {@link JobExecutionStateMachineImpl} instance
+     */
     @Bean
     @Lazy
-    JobExecutionStateMachine jobExecutionStateMachine(
+    JobExecutionStateMachineImpl jobExecutionStateMachine(
         @NotEmpty final List<ExecutionStage> executionStages,
         final ExecutionContext executionContext,
         final Collection<JobExecutionListener> listeners,

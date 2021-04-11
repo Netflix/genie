@@ -45,9 +45,7 @@ public abstract class ExecutionStage {
      *
      * @param state the state machine state associated with this stage
      */
-    protected ExecutionStage(
-        final States state
-    ) {
+    protected ExecutionStage(final States state) {
         this.state = state;
     }
 

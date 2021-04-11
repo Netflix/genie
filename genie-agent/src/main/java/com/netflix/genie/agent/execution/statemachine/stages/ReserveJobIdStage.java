@@ -57,7 +57,6 @@ public class ReserveJobIdStage extends ExecutionStage {
     protected void attemptStageAction(
         final ExecutionContext executionContext
     ) throws RetryableJobExecutionException, FatalJobExecutionException {
-
         final String requestedJobId = executionContext.getRequestedJobId();
         final String reservedJobId;
 
@@ -80,7 +79,6 @@ public class ReserveJobIdStage extends ExecutionStage {
 
             executionContext.setCurrentJobStatus(JobStatus.ACCEPTED);
             reservedJobId = requestedJobId;
-
         } else {
             log.info("Requesting job id reservation");
 

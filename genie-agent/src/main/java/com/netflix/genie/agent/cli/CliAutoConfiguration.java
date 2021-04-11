@@ -46,9 +46,11 @@ import javax.validation.Validator;
  * @since 4.0.0
  */
 @Configuration
-@EnableConfigurationProperties({
-    AgentProperties.class
-})
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 public class CliAutoConfiguration {
     /**
      * Provide a bean for cache command line arguments.
@@ -56,7 +58,7 @@ public class CliAutoConfiguration {
      * @return a {@link CacheArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.CacheArguments cacheArgumentsDelegate() {
+    public CacheArgumentsImpl cacheArgumentsDelegate() {
         return new CacheArgumentsImpl();
     }
 
@@ -250,7 +252,7 @@ public class CliAutoConfiguration {
      * @return An instance of {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments}
      */
     @Bean
-    public ArgumentDelegates.JobRequestArguments jobRequestArguments(final MainCommandArguments mainCommandArguments) {
+    public JobRequestArgumentsImpl jobRequestArguments(final MainCommandArguments mainCommandArguments) {
         return new JobRequestArgumentsImpl(mainCommandArguments);
     }
 
@@ -336,7 +338,7 @@ public class CliAutoConfiguration {
      * @return A {@link ServerArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.ServerArguments serverArguments() {
+    public ServerArgumentsImpl serverArguments() {
         return new ServerArgumentsImpl();
     }
 
@@ -346,7 +348,7 @@ public class CliAutoConfiguration {
      * @return A {@link CleanupArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.CleanupArguments cleanupArguments() {
+    public CleanupArgumentsImpl cleanupArguments() {
         return new CleanupArgumentsImpl();
     }
 
@@ -356,7 +358,7 @@ public class CliAutoConfiguration {
      * @return A {@link RuntimeConfigurationArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments() {
+    public RuntimeConfigurationArgumentsImpl runtimeConfigurationArguments() {
         return new RuntimeConfigurationArgumentsImpl();
     }
 
@@ -368,7 +370,7 @@ public class CliAutoConfiguration {
     @Bean
     @ConditionalOnClass(name = {"org.apache.logging.log4j.core.LoggerContext"})
     @ConditionalOnMissingBean(AgentLogManager.class)
-    public AgentLogManager agentLogManagerLog4j2() {
+    public AgentLogManagerLog4j2Impl agentLogManagerLog4j2() {
         return new AgentLogManagerLog4j2Impl(
             (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false)
         );
