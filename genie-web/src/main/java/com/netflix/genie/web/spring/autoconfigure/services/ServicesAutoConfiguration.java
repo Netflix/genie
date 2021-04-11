@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -207,6 +208,7 @@ public class ServicesAutoConfiguration {
      * @param dataServices          The {@link DataServices} instance to use
      * @param jobResolverService    The {@link JobResolverService} implementation to use
      * @param agentLauncherSelector The {@link AgentLauncherSelector} implementation to use
+     * @param tracingComponents     The {@link BraveTracingComponents} instance to use
      * @param registry              The metrics registry to use
      * @return A {@link JobLaunchServiceImpl} instance
      */
@@ -216,9 +218,16 @@ public class ServicesAutoConfiguration {
         final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentLauncherSelector agentLauncherSelector,
+        final BraveTracingComponents tracingComponents,
         final MeterRegistry registry
     ) {
-        return new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncherSelector, registry);
+        return new JobLaunchServiceImpl(
+            dataServices,
+            jobResolverService,
+            agentLauncherSelector,
+            tracingComponents,
+            registry
+        );
     }
 
     /**

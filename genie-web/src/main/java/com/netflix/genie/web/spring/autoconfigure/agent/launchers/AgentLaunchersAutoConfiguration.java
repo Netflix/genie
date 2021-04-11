@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
@@ -159,6 +160,7 @@ public class AgentLaunchersAutoConfiguration {
      *                                     use
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
+     * @param tracingComponents            The {@link BraveTracingComponents} instance to use
      * @param environment                  The application {@link Environment} used to pull dynamic properties after
      *                                     launch
      * @param registry                     the metric registry
@@ -172,6 +174,7 @@ public class AgentLaunchersAutoConfiguration {
         final TitusAgentLauncherImpl.TitusJobRequestAdapter titusJobRequestAdapter,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
+        final BraveTracingComponents tracingComponents,
         final Environment environment,
         final MeterRegistry registry
     ) {
@@ -190,6 +193,7 @@ public class AgentLaunchersAutoConfiguration {
             healthIndicatorCache,
             genieHostInfo,
             titusAgentLauncherProperties,
+            tracingComponents,
             environment,
             registry
         );
@@ -214,6 +218,7 @@ public class AgentLaunchersAutoConfiguration {
      * @param dataServices       The {@link DataServices} instance to use
      * @param launcherProperties The properties related to launching an agent locally
      * @param executorFactory    The {@link ExecutorFactory} to use to launch agent processes
+     * @param tracingComponents  The {@link BraveTracingComponents} instance to use
      * @param registry           The {@link MeterRegistry} to register metrics
      * @return A {@link LocalAgentLauncherImpl} instance
      */
@@ -225,6 +230,7 @@ public class AgentLaunchersAutoConfiguration {
         final DataServices dataServices,
         final LocalAgentLauncherProperties launcherProperties,
         final ExecutorFactory executorFactory,
+        final BraveTracingComponents tracingComponents,
         final MeterRegistry registry
     ) {
         return new LocalAgentLauncherImpl(
@@ -233,6 +239,7 @@ public class AgentLaunchersAutoConfiguration {
             dataServices,
             launcherProperties,
             executorFactory,
+            tracingComponents,
             registry
         );
     }

@@ -17,6 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
+import brave.Tracer;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl;
 import com.netflix.genie.web.data.services.DataServices;
@@ -138,6 +143,16 @@ class AgentLaunchersAutoConfigurationTest {
         @Bean
         RestTemplateBuilder restTemplateBuilder() {
             return new RestTemplateBuilder();
+        }
+
+        @Bean
+        BraveTracingComponents genieTracingComponents() {
+            return new BraveTracingComponents(
+                Mockito.mock(Tracer.class),
+                Mockito.mock(BraveTracePropagator.class),
+                Mockito.mock(BraveTracingCleanup.class),
+                Mockito.mock(BraveTagAdapter.class)
+            );
         }
     }
 }
