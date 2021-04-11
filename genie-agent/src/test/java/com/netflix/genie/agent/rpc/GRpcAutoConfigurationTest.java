@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.rpc;
 
+import brave.Tracing;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
@@ -55,6 +56,7 @@ class GRpcAutoConfigurationTest {
                 .hasSingleBean(HeartBeatServiceGrpc.HeartBeatServiceStub.class)
                 .hasSingleBean(JobKillServiceGrpc.JobKillServiceFutureStub.class)
                 .hasSingleBean(FileStreamServiceGrpc.FileStreamServiceStub.class)
+                .hasBean("genieGrpcTracingClientInterceptor")
         );
     }
 
@@ -66,6 +68,11 @@ class GRpcAutoConfigurationTest {
             Mockito.when(mock.getServerPort()).thenReturn(1234);
             Mockito.when(mock.getRpcTimeout()).thenReturn(3L);
             return mock;
+        }
+
+        @Bean
+        Tracing tracing() {
+            return Tracing.newBuilder().build();
         }
     }
 }

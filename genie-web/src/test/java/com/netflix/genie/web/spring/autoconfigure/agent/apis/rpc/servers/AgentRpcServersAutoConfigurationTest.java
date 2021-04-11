@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers;
 
+import brave.Tracing;
 import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerManager;
 import com.netflix.genie.web.properties.GRpcServerProperties;
 import io.grpc.Server;
@@ -26,7 +27,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Tests for {@link AgentRpcServersAutoConfiguration}.
@@ -36,13 +36,14 @@ import org.springframework.context.annotation.Configuration;
  */
 class AgentRpcServersAutoConfigurationTest {
 
-    private ApplicationContextRunner contextRunner =
+    private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
                     AgentRpcServersAutoConfiguration.class
                 )
-            );
+            )
+            .withUserConfiguration(ExternalBeans.class);
 
     /**
      * Default beans should be created.
@@ -80,27 +81,19 @@ class AgentRpcServersAutoConfigurationTest {
             );
     }
 
-    /**
-     * Dummy user configuration.
-     */
-    @Configuration
-    static class UserConfig {
+    private static class ExternalBeans {
+        @Bean
+        Tracing tracing() {
+            return Tracing.newBuilder().build();
+        }
+    }
 
-        /**
-         * Mocked Server.
-         *
-         * @return mock gRPC server
-         */
+    private static class UserConfig {
         @Bean
         Server userServer() {
             return Mockito.mock(Server.class);
         }
 
-        /**
-         * Mocked manager.
-         *
-         * @return user manager
-         */
         @Bean
         GRpcServerManager userServerManager() {
             return Mockito.mock(GRpcServerManager.class);
