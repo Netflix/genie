@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.cli;
 
+import brave.Tracer;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.logging.AgentLogManager;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
@@ -25,6 +26,10 @@ import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl;
 import com.netflix.genie.agent.properties.AgentProperties;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -132,6 +137,16 @@ class CliAutoConfigurationTest {
         @Bean
         AgentLogManager agentLogManager() {
             return Mockito.mock(AgentLogManager.class);
+        }
+
+        @Bean
+        BraveTracingComponents braveTracingComponents() {
+            return new BraveTracingComponents(
+                Mockito.mock(Tracer.class),
+                Mockito.mock(BraveTracePropagator.class),
+                Mockito.mock(BraveTracingCleanup.class),
+                Mockito.mock(BraveTagAdapter.class)
+            );
         }
     }
 }

@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages
 
+import brave.SpanCustomizer
+import brave.Tracer
 import com.netflix.genie.agent.execution.exceptions.GetJobStatusException
 import com.netflix.genie.agent.execution.exceptions.JobReservationException
 import com.netflix.genie.agent.execution.services.AgentJobService
@@ -28,8 +30,14 @@ import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
+import com.netflix.genie.common.internal.tracing.TracingConstants
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents
 import spock.lang.Specification
 
+@SuppressWarnings("GroovyAccessibility")
 class ReserveJobIdStageSpec extends Specification {
     ExecutionStage stage
     ExecutionContext executionContext
@@ -37,6 +45,9 @@ class ReserveJobIdStageSpec extends Specification {
     AgentJobRequest jobRequest
     AgentClientMetadata agentClientMetadata
     AgentJobService agentJobService
+    Tracer tracer
+    BraveTagAdapter tagAdapter
+    SpanCustomizer spanCustomizer
 
     void setup() {
         this.agentJobService = Mock(AgentJobService)
@@ -44,7 +55,18 @@ class ReserveJobIdStageSpec extends Specification {
         this.agentClientMetadata = Mock(AgentClientMetadata)
         this.jobId = UUID.randomUUID().toString()
         this.executionContext = Mock(ExecutionContext)
-        this.stage = new ReserveJobIdStage(agentJobService)
+        this.tracer = Mock(Tracer)
+        this.tagAdapter = Mock(BraveTagAdapter)
+        this.spanCustomizer = Mock(SpanCustomizer)
+        this.stage = new ReserveJobIdStage(
+            this.agentJobService,
+            new BraveTracingComponents(
+                this.tracer,
+                Mock(BraveTracePropagator),
+                Mock(BraveTracingCleanup),
+                this.tagAdapter
+            )
+        )
     }
 
     def "AttemptTransition -- pre-reserved job"() {
@@ -57,9 +79,11 @@ class ReserveJobIdStageSpec extends Specification {
         1 * agentJobService.getJobStatus(jobId) >> JobStatus.ACCEPTED
         1 * executionContext.setCurrentJobStatus(JobStatus.ACCEPTED)
         1 * executionContext.setReservedJobId(jobId)
+        1 * this.tracer.currentSpanCustomizer() >> this.spanCustomizer
+        1 * this.tagAdapter.tag(this.spanCustomizer, TracingConstants.JOB_ID_TAG, this.jobId)
     }
 
-    def "AttemptTransition -- pre-reserved job, retriable error"() {
+    def "AttemptTransition -- pre-reserved job, retry-able error"() {
         when:
         stage.attemptStageAction(executionContext)
 
@@ -67,6 +91,8 @@ class ReserveJobIdStageSpec extends Specification {
         1 * executionContext.isPreResolved() >> true
         1 * executionContext.getRequestedJobId() >> jobId
         1 * agentJobService.getJobStatus(jobId) >> { throw new GetJobStatusException("...") }
+        0 * this.tracer.currentSpanCustomizer()
+        0 * this.tagAdapter.tag(this.spanCustomizer, _ as String, _ as String)
         thrown(RetryableJobExecutionException)
     }
 
@@ -78,6 +104,8 @@ class ReserveJobIdStageSpec extends Specification {
         1 * executionContext.isPreResolved() >> true
         1 * executionContext.getRequestedJobId() >> jobId
         1 * agentJobService.getJobStatus(jobId) >> JobStatus.RUNNING
+        0 * this.tracer.currentSpanCustomizer()
+        0 * this.tagAdapter.tag(_ as SpanCustomizer, _ as String, _ as String)
         thrown(FatalJobExecutionException)
     }
 
@@ -93,6 +121,8 @@ class ReserveJobIdStageSpec extends Specification {
         1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> jobId
         1 * executionContext.setCurrentJobStatus(JobStatus.RESERVED)
         1 * executionContext.setReservedJobId(jobId)
+        1 * this.tracer.currentSpanCustomizer() >> this.spanCustomizer
+        1 * this.tagAdapter.tag(this.spanCustomizer, TracingConstants.JOB_ID_TAG, this.jobId)
     }
 
     def "AttemptTransition -- new job, fatal error"() {
@@ -110,11 +140,13 @@ class ReserveJobIdStageSpec extends Specification {
         1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> { throw reservationException }
         0 * executionContext.setCurrentJobStatus(JobStatus.RESERVED)
         0 * executionContext.setReservedJobId(jobId)
+        0 * this.tracer.currentSpanCustomizer()
+        0 * this.tagAdapter.tag(this.spanCustomizer, _ as String, _ as String)
         def e = thrown(FatalJobExecutionException)
         e.getCause() == reservationException
     }
 
-    def "AttemptTransition -- new job, retryable error"() {
+    def "AttemptTransition -- new job, retry-able error"() {
         setup:
         Throwable reservationException = Mock(GenieRuntimeException)
 
@@ -129,6 +161,8 @@ class ReserveJobIdStageSpec extends Specification {
         1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> { throw reservationException }
         0 * executionContext.setCurrentJobStatus(JobStatus.RESERVED)
         0 * executionContext.setReservedJobId(jobId)
+        0 * this.tracer.currentSpanCustomizer()
+        0 * this.tagAdapter.tag(this.spanCustomizer, _ as String, _ as String)
         def e = thrown(RetryableJobExecutionException)
         e.getCause() == reservationException
     }

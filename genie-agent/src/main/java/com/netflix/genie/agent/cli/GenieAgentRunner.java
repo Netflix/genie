@@ -17,14 +17,25 @@
  */
 package com.netflix.genie.agent.cli;
 
+import brave.ScopedSpan;
+import brave.Span;
+import brave.SpanCustomizer;
+import brave.Tracer;
+import brave.propagation.TraceContext;
 import com.beust.jcommander.ParameterException;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
+import com.netflix.genie.common.internal.tracing.TracingConstants;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.core.env.Environment;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -36,54 +47,75 @@ import java.util.Set;
 @Slf4j
 public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
 
+    static final String INIT_SPAN_NAME = "genie-agent-init";
+    static final String RUN_SPAN_NAME = "genie-agent-run";
+    static final String COMMAND_NAME_TAG = TracingConstants.AGENT_TAG_BASE + ".command.name";
+
     private final ArgumentParser argumentParser;
     private final CommandFactory commandFactory;
     private final Environment environment;
+    private final BraveTracePropagator tracePropagator;
+    private final BraveTracingCleanup tracingCleanup;
+    private final Tracer tracer;
+    private final BraveTagAdapter tagAdapter;
     private ExitCode exitCode = ExitCode.INIT_FAIL;
 
     GenieAgentRunner(
         final ArgumentParser argumentParser,
         final CommandFactory commandFactory,
+        final BraveTracingComponents tracingComponents,
         final Environment environment
     ) {
         this.argumentParser = argumentParser;
         this.commandFactory = commandFactory;
+        this.tracePropagator = tracingComponents.getTracePropagator();
+        this.tracingCleanup = tracingComponents.getTracingCleaner();
+        this.tracer = tracingComponents.getTracer();
+        this.tagAdapter = tracingComponents.getTagAdapter();
         this.environment = environment;
     }
 
     @Override
     public void run(final String... args) throws Exception {
-        ConsoleLog.printBanner(environment);
+        final ScopedSpan runSpan = this.initializeTracing();
         try {
-            internalRun(args);
-        } catch (final Throwable t) {
-            final Throwable userConsoleException = t.getCause() != null ? t.getCause() : t;
-            ConsoleLog.getLogger().error(
-                "Command execution failed: {}",
-                userConsoleException.getMessage()
-            );
+            ConsoleLog.printBanner(this.environment);
+            try {
+                internalRun(args);
+            } catch (final Throwable t) {
+                final Throwable userConsoleException = t.getCause() != null ? t.getCause() : t;
+                ConsoleLog.getLogger().error(
+                    "Command execution failed: {}",
+                    userConsoleException.getMessage()
+                );
 
-            log.error("Command execution failed", t);
+                log.error("Command execution failed", t);
+                runSpan.error(t);
+            }
+        } finally {
+            runSpan.finish();
+            this.tracingCleanup.cleanup();
         }
     }
 
     private void internalRun(final String[] args) {
+        final SpanCustomizer span = this.tracer.currentSpanCustomizer();
         log.info("Parsing arguments: {}", Arrays.toString(args));
 
-        exitCode = ExitCode.INVALID_ARGS;
+        this.exitCode = ExitCode.INVALID_ARGS;
 
         //TODO: workaround for https://jira.spring.io/browse/SPR-17416
         final String[] originalArgs = Util.unmangleBareDoubleDash(args);
         log.debug("Arguments: {}", Arrays.toString(originalArgs));
 
         try {
-            argumentParser.parse(originalArgs);
+            this.argumentParser.parse(originalArgs);
         } catch (ParameterException e) {
             throw new IllegalArgumentException("Failed to parse arguments: " + e.getMessage(), e);
         }
 
-        final String commandName = argumentParser.getSelectedCommand();
-        final Set<String> availableCommands = argumentParser.getCommandNames();
+        final String commandName = this.argumentParser.getSelectedCommand();
+        final Set<String> availableCommands = this.argumentParser.getCommandNames();
         final String availableCommandsString = Arrays.toString(availableCommands.toArray());
 
         if (commandName == null) {
@@ -91,20 +123,46 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
         } else if (!availableCommands.contains(commandName)) {
             throw new IllegalArgumentException("Invalid command -- commands available: " + availableCommandsString);
         }
+        this.tagAdapter.tag(span, COMMAND_NAME_TAG, commandName);
 
         ConsoleLog.getLogger().info("Preparing agent to execute command: '{}'", commandName);
 
         log.info("Initializing command: {}", commandName);
-        exitCode = ExitCode.COMMAND_INIT_FAIL;
-        final AgentCommand command = commandFactory.get(commandName);
+        this.exitCode = ExitCode.COMMAND_INIT_FAIL;
+        final AgentCommand command = this.commandFactory.get(commandName);
 
-        exitCode = ExitCode.EXEC_FAIL;
-        exitCode = command.run();
+        this.exitCode = ExitCode.EXEC_FAIL;
+        this.exitCode = command.run();
     }
 
     @Override
     public int getExitCode() {
-        ConsoleLog.getLogger().info("Terminating with code: {} ({})", exitCode.getCode(), exitCode.getMessage());
-        return exitCode.getCode();
+        ConsoleLog.getLogger().info(
+            "Terminating with code: {} ({})",
+            this.exitCode.getCode(),
+            this.exitCode.getMessage()
+        );
+        return this.exitCode.getCode();
+    }
+
+    private ScopedSpan initializeTracing() {
+        // Attempt to extract any existing trace information from the environment
+        final Optional<TraceContext> existingTraceContext = this.tracePropagator.extract(System.getenv());
+        final Span initSpan = existingTraceContext.isPresent()
+            ? this.tracer.joinSpan(existingTraceContext.get())
+            : this.tracer.nextSpan();
+        // Quickly create and report an initial span
+        final TraceContext initContext = initSpan.context();
+        final String traceId = initContext.traceIdString();
+        log.info("Trace ID: {}", traceId);
+        ConsoleLog.getLogger().info("Trace ID: {}", traceId);
+        try {
+            initSpan.name(INIT_SPAN_NAME);
+            initSpan.start();
+        } finally {
+            initSpan.finish();
+        }
+        // Create a new span that will represent the potentially long running action the agent will execute
+        return this.tracer.startScopedSpanWithParent(RUN_SPAN_NAME, initContext);
     }
 }
