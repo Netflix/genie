@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2019 Netflix, Inc.
+ *  Copyright 2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
  */
 
 /**
- * Integration tests for this package.
+ * Tests for this package.
  *
  * @author tgianos
  * @since 4.0.0
  */
-package com.netflix.genie.agent.cli;
+@ParametersAreNonnullByDefault
+package com.netflix.genie.agent.rpc;
+
+import javax.annotation.ParametersAreNonnullByDefault;

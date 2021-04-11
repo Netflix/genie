@@ -77,7 +77,7 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
 
         this.listener.stateMachineStarted();
 
-        for (final ExecutionStage executionStage : executionStages) {
+        for (final ExecutionStage executionStage : this.executionStages) {
             final States state = executionStage.getState();
 
             log.debug("Execution stage: {} for state {} ({}, {}, {} retries)",

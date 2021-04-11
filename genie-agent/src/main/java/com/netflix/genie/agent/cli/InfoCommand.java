@@ -63,19 +63,18 @@ class InfoCommand implements AgentCommand {
 
     @Override
     public ExitCode run() {
-
         final StringBuilder messageBuilder = new StringBuilder();
 
         messageBuilder
             .append("Agent info:")
             .append(NEWLINE)
-            .append("  version:")
+            .append("  version: ")
             .append(agentMetadata.getAgentVersion())
             .append(NEWLINE)
-            .append("  host:")
+            .append("  host: ")
             .append(agentMetadata.getAgentHostName())
             .append(NEWLINE)
-            .append("  pid:")
+            .append("  pid: ")
             .append(agentMetadata.getAgentPid())
             .append(NEWLINE);
 
@@ -208,7 +207,7 @@ class InfoCommand implements AgentCommand {
             createStateMachineDotGraph(stages, messageBuilder);
         }
 
-        System.out.println(messageBuilder.toString());
+        System.out.println(messageBuilder);
 
         return ExitCode.SUCCESS;
     }
@@ -217,7 +216,6 @@ class InfoCommand implements AgentCommand {
         final List<ExecutionStage> stages,
         final StringBuilder messageBuilder
     ) {
-
         final List<States> states = Lists.newArrayList();
 
         states.add(States.INITIAL_STATE);

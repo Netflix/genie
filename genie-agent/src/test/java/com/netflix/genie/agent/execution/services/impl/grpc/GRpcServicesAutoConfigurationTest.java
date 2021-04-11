@@ -23,56 +23,47 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
-import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Test for {@link GRpcAutoConfiguration}.
+ * Tests for {@link GRpcAutoConfiguration}.
  */
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(
-    classes = {
-        CommonServicesAutoConfiguration.class,
-        GRpcAutoConfiguration.class,
-        GRpcServicesAutoConfiguration.class,
-        GRpcServicesAutoConfigurationIntegrationTest.MockConfig.class
-    }
-)
-// TODO: Perhaps this should be using the context runner?
-// TODO: Use mockbean instead of the whole configuration?
-class GRpcServicesAutoConfigurationIntegrationTest {
+class GRpcServicesAutoConfigurationTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+        .withConfiguration(
+            AutoConfigurations.of(
+                GRpcServicesAutoConfiguration.class,
+                GRpcAutoConfiguration.class
+            )
+        )
+        .withUserConfiguration(ExternalBeans.class);
 
     @Test
-    void getServicesBeans() {
-        final Class<?>[] serviceClasses = {
-            AgentHeartBeatService.class,
-            AgentJobKillService.class,
-            AgentJobService.class,
-            AgentFileStreamService.class,
-        };
-
-        for (final Class<?> serviceClass : serviceClasses) {
-            Assertions.assertThat(this.applicationContext.getBean(serviceClass)).isNotNull();
-        }
+    void expectedBeansExist() {
+        this.contextRunner.run(
+            context -> Assertions
+                .assertThat(context)
+                .hasSingleBean(AgentProperties.class)
+                .hasSingleBean(AgentHeartBeatService.class)
+                .hasSingleBean(AgentJobKillService.class)
+                .hasSingleBean(AgentJobService.class)
+                .hasSingleBean(AgentFileStreamService.class)
+        );
     }
 
-    static class MockConfig {
+    private static class ExternalBeans {
         @Bean
         ArgumentDelegates.ServerArguments serverArguments() {
             final ArgumentDelegates.ServerArguments mock = Mockito.mock(ArgumentDelegates.ServerArguments.class);

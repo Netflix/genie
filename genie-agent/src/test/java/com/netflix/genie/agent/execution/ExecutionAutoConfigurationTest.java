@@ -81,7 +81,7 @@ import java.util.Set;
  */
 class ExecutionAutoConfigurationTest {
 
-    private ApplicationContextRunner contextRunner =
+    private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
@@ -90,7 +90,7 @@ class ExecutionAutoConfigurationTest {
             )
             .withUserConfiguration(MocksConfiguration.class);
 
-    private Set<Class<? extends ExecutionStage>> uniqueExecutionStages = ImmutableSet.of(
+    private final Set<Class<? extends ExecutionStage>> uniqueExecutionStages = ImmutableSet.of(
         ArchiveJobOutputsStage.class,
         ClaimJobStage.class,
         CleanupJobDirectoryStage.class,
@@ -120,7 +120,7 @@ class ExecutionAutoConfigurationTest {
         WaitJobCompletionStage.class
     );
 
-    private Map<Class<? extends ExecutionStage>, Integer> repeatedExecutionStages = ImmutableMap.of(
+    private final Map<Class<? extends ExecutionStage>, Integer> repeatedExecutionStages = ImmutableMap.of(
         RefreshManifestStage.class, 3
     );
 

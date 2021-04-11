@@ -18,7 +18,7 @@
 package com.netflix.genie.agent.cli;
 
 /**
- * Interface for argument classes used by {@ref ArgumentParser}.
+ * Interface for argument classes used by {@link ArgumentParser}.
  *
  * @author mprimi
  * @since 4.0.0
