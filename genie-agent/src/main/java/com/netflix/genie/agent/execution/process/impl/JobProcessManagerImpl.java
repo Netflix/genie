@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.agent.execution.process.impl;
 
+import brave.Span;
+import brave.Tracer;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
@@ -25,6 +27,8 @@ import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.scheduling.TaskScheduler;
@@ -60,15 +64,20 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
     private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
     private final TaskScheduler taskScheduler;
+    private final Tracer tracer;
+    private final BraveTracePropagator tracePropagator;
     private boolean isInteractiveMode;
 
     /**
      * Constructor.
      *
-     * @param taskScheduler The {@link TaskScheduler} instance to use to run scheduled asynchronous tasks
+     * @param taskScheduler     The {@link TaskScheduler} instance to use to run scheduled asynchronous tasks
+     * @param tracingComponents The {@link BraveTracingComponents} instance to use for propagating trace information
      */
-    public JobProcessManagerImpl(final TaskScheduler taskScheduler) {
+    public JobProcessManagerImpl(final TaskScheduler taskScheduler, final BraveTracingComponents tracingComponents) {
         this.taskScheduler = taskScheduler;
+        this.tracer = tracingComponents.getTracer();
+        this.tracePropagator = tracingComponents.getTracePropagator();
     }
 
     /**
@@ -80,7 +89,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final File jobScript,
         final boolean interactive,
         @Nullable final Integer timeout,
-        final boolean launchInJobDirectory) throws JobLaunchException {
+        final boolean launchInJobDirectory
+    ) throws JobLaunchException {
         if (!this.launched.compareAndSet(false, true)) {
             throw new IllegalStateException("Job already launched");
         }
@@ -125,6 +135,11 @@ public class JobProcessManagerImpl implements JobProcessManager {
         } else {
             processBuilder.redirectError(PathUtils.jobStdErrPath(jobDirectory).toFile());
             processBuilder.redirectOutput(PathUtils.jobStdOutPath(jobDirectory).toFile());
+        }
+
+        final Span currentSpan = this.tracer.currentSpan();
+        if (currentSpan != null) {
+            processBuilder.environment().putAll(this.tracePropagator.injectForJob(currentSpan.context()));
         }
 
         if (this.killed.get()) {
@@ -181,23 +196,6 @@ public class JobProcessManagerImpl implements JobProcessManager {
             log.warn("Failed to kill job process with exception: ", e);
         }
         log.error("Failed to kill job process");
-    }
-
-    private void gracefullyKill(final Process process) throws Exception {
-        final Instant graceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
-        process.destroy();
-        while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
-            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private void forcefullyKill(final Process process) throws Exception {
-        final Instant forceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
-        // In Java8, this is exactly destroy(). However, this behavior can be changed in future java.
-        process.destroyForcibly();
-        while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
-            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
-        }
     }
 
     /**
@@ -282,6 +280,23 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final String statusMessage = (initFailedFile != null && initFailedFile.exists())
             ? JobStatusMessages.JOB_SETUP_FAILED : JobStatusMessages.JOB_FAILED;
         return new JobProcessResult.Builder(JobStatus.FAILED, statusMessage, exitCode).build();
+    }
+
+    private void gracefullyKill(final Process process) throws Exception {
+        final Instant graceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
+        process.destroy();
+        while (process.isAlive() && Instant.now().isBefore(graceKillEnd)) {
+            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void forcefullyKill(final Process process) throws Exception {
+        final Instant forceKillEnd = Instant.now().plusSeconds(KILL_WAIT_SECS);
+        // In Java8, this is exactly destroy(). However, this behavior can be changed in future java.
+        process.destroyForcibly();
+        while (process.isAlive() && Instant.now().isBefore(forceKillEnd)) {
+            process.waitFor(KILL_CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        }
     }
 
     /* TODO: HACK, Process does not expose PID in Java 8 API */

@@ -17,12 +17,19 @@
  */
 package com.netflix.genie.agent.spring.autoconfigure;
 
+import brave.Tracer;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.impl.JobProcessManagerImpl;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Tests for {@link ProcessAutoConfiguration}.
@@ -37,7 +44,8 @@ class ProcessAutoConfigurationTest {
                 AgentAutoConfiguration.class,
                 ProcessAutoConfiguration.class
             )
-        );
+        )
+        .withUserConfiguration(ExternalBeans.class);
 
     @Test
     void expectedBeansExist() {
@@ -47,5 +55,17 @@ class ProcessAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(JobProcessManager.class);
             }
         );
+    }
+
+    private static class ExternalBeans {
+        @Bean
+        BraveTracingComponents tracingComponents() {
+            return new BraveTracingComponents(
+                Mockito.mock(Tracer.class),
+                Mockito.mock(BraveTracePropagator.class),
+                Mockito.mock(BraveTracingCleanup.class),
+                Mockito.mock(BraveTagAdapter.class)
+            );
+        }
     }
 }

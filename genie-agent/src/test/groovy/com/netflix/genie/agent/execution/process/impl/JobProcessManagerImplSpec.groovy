@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.agent.execution.process.impl
 
+import brave.Span
+import brave.Tracer
+import brave.propagation.TraceContext
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.process.JobProcessResult
@@ -24,6 +27,10 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents
 import org.springframework.core.io.ClassPathResource
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
@@ -49,6 +56,10 @@ class JobProcessManagerImplSpec extends Specification {
     File stdErr
     TaskScheduler scheduler
     JobProcessManager manager
+    Tracer tracer
+    BraveTracePropagator tracePropagator
+    Span span
+    TraceContext traceContext
 
     def setup() {
         this.stdOut = PathUtils.jobStdOutPath(temporaryFolder.toFile()).toFile()
@@ -56,7 +67,25 @@ class JobProcessManagerImplSpec extends Specification {
         Files.createDirectories(this.stdOut.getParentFile().toPath())
         Files.createDirectories(this.stdErr.getParentFile().toPath())
         this.scheduler = Mock(TaskScheduler)
-        this.manager = new JobProcessManagerImpl(this.scheduler)
+        this.tracer = Mock(Tracer)
+        this.tracePropagator = Mock(BraveTracePropagator)
+        UUID uuid = UUID.randomUUID()
+        this.traceContext = TraceContext.newBuilder()
+            .traceId(uuid.getLeastSignificantBits())
+            .traceIdHigh(uuid.getMostSignificantBits())
+            .spanId(UUID.randomUUID().getLeastSignificantBits())
+            .sampled(true)
+            .build()
+        this.span = Mock(Span)
+        this.manager = new JobProcessManagerImpl(
+            this.scheduler,
+            new BraveTracingComponents(
+                this.tracer,
+                this.tracePropagator,
+                Mock(BraveTracingCleanup),
+                Mock(BraveTagAdapter)
+            )
+        )
     }
 
     def cleanup() {
@@ -84,6 +113,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -125,6 +157,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> ["HI": "bye"]
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -157,6 +192,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> null
+        0 * this.span.context()
+        0 * this.tracePropagator.injectForJob(this.traceContext)
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -192,6 +230,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -218,6 +259,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         thrown(JobLaunchException)
+        0 * this.tracer.currentSpan()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
@@ -248,6 +290,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         thrown(JobLaunchException)
+        0 * this.tracer.currentSpan()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
@@ -263,6 +306,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         thrown(JobLaunchException)
+        0 * this.tracer.currentSpan()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
@@ -280,6 +324,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         thrown(JobLaunchException)
+        0 * this.tracer.currentSpan()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
@@ -298,6 +343,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         thrown(JobLaunchException)
+        0 * this.tracer.currentSpan()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
@@ -319,6 +365,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         1 * this.scheduler.schedule(_ as Runnable, _ as Instant) >> future
 
         when:
@@ -356,6 +405,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -401,6 +453,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -420,9 +475,9 @@ class JobProcessManagerImplSpec extends Specification {
         result.getExitCode() == 143
 
         where:
-        interactive        | expectedStatusMessage
-        true               | JobStatusMessages.JOB_KILLED_BY_USER
-        false              | JobStatusMessages.JOB_KILLED_BY_SYSTEM
+        interactive | expectedStatusMessage
+        true        | JobStatusMessages.JOB_KILLED_BY_USER
+        false       | JobStatusMessages.JOB_KILLED_BY_SYSTEM
     }
 
     def "Kill completed process"() {
@@ -442,6 +497,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         // Wait until the process actually completes by checking the existence of the file
@@ -492,6 +550,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -523,6 +584,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
@@ -536,6 +600,7 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         thrown(IllegalStateException)
+        0 * this.tracer.currentSpan()
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
@@ -558,7 +623,15 @@ class JobProcessManagerImplSpec extends Specification {
         threadPoolScheduler.setThreadNamePrefix("job-process-manager-impl-spec-")
         threadPoolScheduler.setWaitForTasksToCompleteOnShutdown(false)
         threadPoolScheduler.initialize()
-        def realManager = new JobProcessManagerImpl(threadPoolScheduler)
+        def realManager = new JobProcessManagerImpl(
+            threadPoolScheduler,
+            new BraveTracingComponents(
+                this.tracer,
+                this.tracePropagator,
+                Mock(BraveTracingCleanup),
+                Mock(BraveTagAdapter)
+            )
+        )
 
         when:
         realManager.launchProcess(
@@ -571,6 +644,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
 
         when:
         def result = realManager.waitFor()
@@ -614,6 +690,9 @@ class JobProcessManagerImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+        1 * this.tracer.currentSpan() >> this.span
+        1 * this.span.context() >> this.traceContext
+        1 * this.tracePropagator.injectForJob(this.traceContext) >> new HashMap<>()
         1 * this.scheduler.schedule(_ as Runnable, _ as Instant) >> future
 
         // Wait until the process actually starts by checking the existence of the runfile
