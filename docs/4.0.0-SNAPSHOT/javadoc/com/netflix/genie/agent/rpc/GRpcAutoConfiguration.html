@@ -152,20 +152,21 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>io.grpc.ManagedChannel</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html#channel-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-">channel</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html#channel-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-java.util.List-">channel</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments,
+       java.util.List&lt;io.grpc.ClientInterceptor&gt;&nbsp;clientInterceptors)</code>
 <div class="block">Provide a lazy <code>ManagedChannel</code> bean if none was already defined for communicating with the Genie server.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>com.netflix.genie.agent.rpc.ChannelLoggingInterceptor</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html#channelLoggingInterceptor--">channelLoggingInterceptor</a></span>()</code>
-<div class="block">Provide a lazy <code>ChannelLoggingInterceptor</code> bean.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html#fileStreamClient-io.grpc.ManagedChannel-">fileStreamClient</a></span>(io.grpc.ManagedChannel&nbsp;channel)</code>
 <div class="block">Provide a prototype bean definition for a <code>FileStreamServiceGrpc.FileStreamServiceStub</code>.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>io.grpc.ClientInterceptor</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html#genieGrpcTracingClientInterceptor-brave.Tracing-">genieGrpcTracingClientInterceptor</a></span>(brave.Tracing&nbsp;tracing)</code>
+<div class="block">Provide a <code>ClientInterceptor</code> which adds tracing information to gRPC calls.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
@@ -234,23 +235,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="channelLoggingInterceptor--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>channelLoggingInterceptor</h4>
-<pre>@Bean
- @Lazy
-public&nbsp;com.netflix.genie.agent.rpc.ChannelLoggingInterceptor&nbsp;channelLoggingInterceptor()</pre>
-<div class="block">Provide a lazy <code>ChannelLoggingInterceptor</code> bean.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A <code>ChannelLoggingInterceptor</code> instance</dd>
-</dl>
-</li>
-</ul>
-<a name="channel-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-">
+<a name="channel-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-java.util.List-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -259,11 +244,13 @@ public&nbsp;com.netflix.genie.agent.rpc.ChannelLoggingInterceptor&nbsp;channelLo
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=io.grpc.ManagedChannel.class)
-public&nbsp;io.grpc.ManagedChannel&nbsp;channel(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments)</pre>
+public&nbsp;io.grpc.ManagedChannel&nbsp;channel(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments,
+                                                                                                                  java.util.List&lt;io.grpc.ClientInterceptor&gt;&nbsp;clientInterceptors)</pre>
 <div class="block">Provide a lazy <code>ManagedChannel</code> bean if none was already defined for communicating with the Genie server.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>serverArguments</code> - The server arguments to use</dd>
+<dd><code>clientInterceptors</code> - The list of available client interceptors that should be added to the generated channel</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>ManagedChannel</code> instance configured to use plain text over the wire</dd>
 </dl>
@@ -347,7 +334,7 @@ public&nbsp;com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&
 <a name="fileStreamClient-io.grpc.ManagedChannel-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>fileStreamClient</h4>
 <pre>@Bean
@@ -359,6 +346,25 @@ public&nbsp;com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub&
 <dd><code>channel</code> - The managed channel to use to connect to the Genie server</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>FileStreamServiceGrpc.FileStreamServiceStub</code> instance per use</dd>
+</dl>
+</li>
+</ul>
+<a name="genieGrpcTracingClientInterceptor-brave.Tracing-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>genieGrpcTracingClientInterceptor</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(name="genieGrpcTracingClientInterceptor")
+ @Lazy
+public&nbsp;io.grpc.ClientInterceptor&nbsp;genieGrpcTracingClientInterceptor(brave.Tracing&nbsp;tracing)</pre>
+<div class="block">Provide a <code>ClientInterceptor</code> which adds tracing information to gRPC calls.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>tracing</code> - The Brave <code>Tracing</code> instance</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <code>ClientInterceptor</code> for trace propagation</dd>
 </dl>
 </li>
 </ul>

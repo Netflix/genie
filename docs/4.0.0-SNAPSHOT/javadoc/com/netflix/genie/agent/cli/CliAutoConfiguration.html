@@ -152,19 +152,19 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a></code></td>
+<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html" title="class in com.netflix.genie.agent.cli.logging">AgentLogManagerLog4j2Impl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#agentLogManagerLog4j2--">agentLogManagerLog4j2</a></span>()</code>
 <div class="block">Provide an <a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a> implementation that can relocate the agent log file created by log4j2.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CacheArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CacheArguments</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.cli.CacheArgumentsImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#cacheArgumentsDelegate--">cacheArgumentsDelegate</a></span>()</code>
 <div class="block">Provide a bean for cache command line arguments.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CleanupArguments</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.cli.CleanupArgumentsImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#cleanupArguments--">cleanupArguments</a></span>()</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.CleanupArguments</code></a>.</div>
 </td>
@@ -203,8 +203,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli">GenieAgentRunner</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#genieAgentRunner-com.netflix.genie.agent.cli.ArgumentParser-com.netflix.genie.agent.cli.CommandFactory-org.springframework.core.env.Environment-">genieAgentRunner</a></span>(com.netflix.genie.agent.cli.ArgumentParser&nbsp;argumentParser,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#genieAgentRunner-com.netflix.genie.agent.cli.ArgumentParser-com.netflix.genie.agent.cli.CommandFactory-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-org.springframework.core.env.Environment-">genieAgentRunner</a></span>(com.netflix.genie.agent.cli.ArgumentParser&nbsp;argumentParser,
                 com.netflix.genie.agent.cli.CommandFactory&nbsp;commandFactory,
+                <a href="../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents,
                 org.springframework.core.env.Environment&nbsp;environment)</code>
 <div class="block">The main <a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli"><code>GenieAgentRunner</code></a> entry point bean which implements
  <code>CommandLineRunner</code>.</div>
@@ -250,7 +251,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i14" class="altColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.cli.JobRequestArgumentsImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#jobRequestArguments-com.netflix.genie.agent.cli.MainCommandArguments-">jobRequestArguments</a></span>(com.netflix.genie.agent.cli.MainCommandArguments&nbsp;mainCommandArguments)</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.JobRequestArguments</code></a>.</div>
 </td>
@@ -297,13 +298,13 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i21" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.RuntimeConfigurationArguments</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.cli.RuntimeConfigurationArgumentsImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#runtimeConfigurationArguments--">runtimeConfigurationArguments</a></span>()</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.RuntimeConfigurationArguments</code></a>.</div>
 </td>
 </tr>
 <tr id="i22" class="altColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.cli.ServerArgumentsImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#serverArguments--">serverArguments</a></span>()</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.ServerArguments</code></a>.</div>
 </td>
@@ -354,7 +355,7 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>cacheArgumentsDelegate</h4>
 <pre>@Bean
-public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CacheArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CacheArguments</a>&nbsp;cacheArgumentsDelegate()</pre>
+public&nbsp;com.netflix.genie.agent.cli.CacheArgumentsImpl&nbsp;cacheArgumentsDelegate()</pre>
 <div class="block">Provide a bean for cache command line arguments.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -448,7 +449,7 @@ public&nbsp;com.netflix.genie.agent.cli.ExecCommand&nbsp;execCommand(com.netflix
 </dl>
 </li>
 </ul>
-<a name="genieAgentRunner-com.netflix.genie.agent.cli.ArgumentParser-com.netflix.genie.agent.cli.CommandFactory-org.springframework.core.env.Environment-">
+<a name="genieAgentRunner-com.netflix.genie.agent.cli.ArgumentParser-com.netflix.genie.agent.cli.CommandFactory-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-org.springframework.core.env.Environment-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -457,6 +458,7 @@ public&nbsp;com.netflix.genie.agent.cli.ExecCommand&nbsp;execCommand(com.netflix
 <pre>@Bean
 public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli">GenieAgentRunner</a>&nbsp;genieAgentRunner(com.netflix.genie.agent.cli.ArgumentParser&nbsp;argumentParser,
                                                com.netflix.genie.agent.cli.CommandFactory&nbsp;commandFactory,
+                                               <a href="../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents,
                                                org.springframework.core.env.Environment&nbsp;environment)</pre>
 <div class="block">The main <a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli"><code>GenieAgentRunner</code></a> entry point bean which implements
  <code>CommandLineRunner</code>.</div>
@@ -464,6 +466,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>argumentParser</code> - The argument parser to use</dd>
 <dd><code>commandFactory</code> - The command factory to use</dd>
+<dd><code>tracingComponents</code> - The <a href="../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> to use</dd>
 <dd><code>environment</code> - The spring environment</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An instance of <a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli"><code>GenieAgentRunner</code></a> if one hasn't already been provided</dd>
@@ -599,7 +602,7 @@ public&nbsp;com.netflix.genie.agent.cli.MainCommandArguments&nbsp;mainCommandArg
 <li class="blockList">
 <h4>jobRequestArguments</h4>
 <pre>@Bean
-public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a>&nbsp;jobRequestArguments(com.netflix.genie.agent.cli.MainCommandArguments&nbsp;mainCommandArguments)</pre>
+public&nbsp;com.netflix.genie.agent.cli.JobRequestArgumentsImpl&nbsp;jobRequestArguments(com.netflix.genie.agent.cli.MainCommandArguments&nbsp;mainCommandArguments)</pre>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.JobRequestArguments</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -714,7 +717,7 @@ public&nbsp;com.netflix.genie.agent.cli.ResolveJobSpecCommand&nbsp;resolveJobSpe
 <li class="blockList">
 <h4>serverArguments</h4>
 <pre>@Bean
-public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments()</pre>
+public&nbsp;com.netflix.genie.agent.cli.ServerArgumentsImpl&nbsp;serverArguments()</pre>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.ServerArguments</code></a>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -729,7 +732,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegate
 <li class="blockList">
 <h4>cleanupArguments</h4>
 <pre>@Bean
-public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CleanupArguments</a>&nbsp;cleanupArguments()</pre>
+public&nbsp;com.netflix.genie.agent.cli.CleanupArgumentsImpl&nbsp;cleanupArguments()</pre>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.CleanupArguments</code></a>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -744,7 +747,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegate
 <li class="blockList">
 <h4>runtimeConfigurationArguments</h4>
 <pre>@Bean
-public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.RuntimeConfigurationArguments</a>&nbsp;runtimeConfigurationArguments()</pre>
+public&nbsp;com.netflix.genie.agent.cli.RuntimeConfigurationArgumentsImpl&nbsp;runtimeConfigurationArguments()</pre>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.RuntimeConfigurationArguments</code></a>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -761,7 +764,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegate
 <pre>@Bean
  @ConditionalOnClass(name="org.apache.logging.log4j.core.LoggerContext")
  @ConditionalOnMissingBean(value=<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager.class</a>)
-public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a>&nbsp;agentLogManagerLog4j2()</pre>
+public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html" title="class in com.netflix.genie.agent.cli.logging">AgentLogManagerLog4j2Impl</a>&nbsp;agentLogManagerLog4j2()</pre>
 <div class="block">Provide an <a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a> implementation that can relocate the agent log file created by log4j2.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>

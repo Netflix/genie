@@ -43,6 +43,10 @@ com.netflix.genie.common.internal.jobs
 com.netflix.genie.common.internal.properties
 com.netflix.genie.common.internal.services
 com.netflix.genie.common.internal.services.impl
+com.netflix.genie.common.internal.spring.autoconfigure
+com.netflix.genie.common.internal.tracing
+com.netflix.genie.common.internal.tracing.brave
+com.netflix.genie.common.internal.tracing.brave.impl
 com.netflix.genie.common.internal.util
 com.netflix.genie.common.util
 com.netflix.genie.swagger.spring.autoconfigure

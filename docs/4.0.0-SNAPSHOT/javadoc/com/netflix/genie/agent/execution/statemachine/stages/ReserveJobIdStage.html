@@ -137,7 +137,8 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html#ReserveJobIdStage-com.netflix.genie.agent.execution.services.AgentJobService-">ReserveJobIdStage</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html#ReserveJobIdStage-com.netflix.genie.agent.execution.services.AgentJobService-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">ReserveJobIdStage</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService,
+                 <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -191,17 +192,19 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="ReserveJobIdStage-com.netflix.genie.agent.execution.services.AgentJobService-">
+<a name="ReserveJobIdStage-com.netflix.genie.agent.execution.services.AgentJobService-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ReserveJobIdStage</h4>
-<pre>public&nbsp;ReserveJobIdStage(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService)</pre>
+<pre>public&nbsp;ReserveJobIdStage(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService,
+                         <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentJobService</code> - agent job service.</dd>
+<dd><code>tracingComponents</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance</dd>
 </dl>
 </li>
 </ul>

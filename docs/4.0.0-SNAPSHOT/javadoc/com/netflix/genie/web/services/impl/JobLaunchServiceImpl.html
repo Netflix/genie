@@ -137,9 +137,10 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                     <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                     <a href="../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector,
+                    <a href="../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents,
                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -187,7 +188,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-io.micrometer.core.instrument.MeterRegistry-">
+<a name="JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.selectors.AgentLauncherSelector-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -196,6 +197,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <pre>public&nbsp;JobLaunchServiceImpl(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                             <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                             <a href="../../../../../../com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>&nbsp;agentLauncherSelector,
+                            <a href="../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents,
                             io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
@@ -203,6 +205,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> implementation used to resolve job details</dd>
 <dd><code>agentLauncherSelector</code> - <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation to launch agents</dd>
+<dd><code>tracingComponents</code> - <a href="../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance to use to get access to instrumentation</dd>
 <dd><code>registry</code> - <code>MeterRegistry</code> metrics repository</dd>
 </dl>
 </li>

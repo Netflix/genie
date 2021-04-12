@@ -152,7 +152,7 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService</a></code></td>
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentFileStreamServiceImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentFileStreamService-com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub-org.springframework.scheduling.TaskScheduler-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.agent.properties.AgentProperties-">agentFileStreamService</a></span>(com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub&nbsp;fileStreamServiceStub,
                       org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                       <a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;jobDirectoryManifestProtoConverter,
@@ -162,7 +162,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentHeartBeatService.html" title="interface in com.netflix.genie.agent.execution.services">AgentHeartBeatService</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.execution.services.impl.grpc.GrpcAgentHeartBeatServiceImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentHeartBeatService-com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">agentHeartBeatService</a></span>(com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub&nbsp;heartBeatServiceStub,
                      org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                      <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</code>
@@ -170,7 +170,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService</a></code></td>
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-com.netflix.genie.agent.properties.AgentProperties-">agentJobKillService</a></span>(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;jobKillServiceFutureStub,
                    <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
                    org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
@@ -179,7 +179,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a></code></td>
+<td class="colFirst"><code>com.netflix.genie.agent.execution.services.impl.grpc.GRpcAgentJobServiceImpl</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentJobService-com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub-com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter-">agentJobService</a></span>(com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub&nbsp;jobServiceFutureStub,
                <a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter)</code>
 <div class="block">Provide a lazy gRPC agent job service bean if one isn't already defined.</div>
@@ -233,10 +233,10 @@ extends java.lang.Object</pre>
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentHeartBeatService.html" title="interface in com.netflix.genie.agent.execution.services">AgentHeartBeatService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentHeartBeatService.html" title="interface in com.netflix.genie.agent.execution.services">AgentHeartBeatService</a>&nbsp;agentHeartBeatService(com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub&nbsp;heartBeatServiceStub,
-                                                                                                                              @Qualifier(value="heartBeatServiceTaskScheduler")
-                                                                                                                              org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
-                                                                                                                              <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
+public&nbsp;com.netflix.genie.agent.execution.services.impl.grpc.GrpcAgentHeartBeatServiceImpl&nbsp;agentHeartBeatService(com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub&nbsp;heartBeatServiceStub,
+                                                                                                                                                                                           @Qualifier(value="heartBeatServiceTaskScheduler")
+                                                                                                                                                                                           org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                                                                           <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy gRPC agent heart beat service if one isn't already defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -257,11 +257,11 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/s
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService</a>&nbsp;agentJobKillService(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;jobKillServiceFutureStub,
-                                                                                                                        <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
-                                                                                                                        @Qualifier(value="sharedAgentTaskScheduler")
-                                                                                                                        org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
-                                                                                                                        <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a>&nbsp;agentJobKillService(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;jobKillServiceFutureStub,
+                                                                                                                                <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
+                                                                                                                                @Qualifier(value="sharedAgentTaskScheduler")
+                                                                                                                                org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy gRPC agent job kill service bean if one isn't already defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -283,8 +283,8 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/s
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService(com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub&nbsp;jobServiceFutureStub,
-                                                                                                            <a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter)</pre>
+public&nbsp;com.netflix.genie.agent.execution.services.impl.grpc.GRpcAgentJobServiceImpl&nbsp;agentJobService(com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub&nbsp;jobServiceFutureStub,
+                                                                                                                                                                         <a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter)</pre>
 <div class="block">Provide a lazy gRPC agent job service bean if one isn't already defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -304,12 +304,12 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/s
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService</a>&nbsp;agentFileStreamService(com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub&nbsp;fileStreamServiceStub,
-                                                                                                                                 @Qualifier(value="sharedAgentTaskScheduler")
-                                                                                                                                 org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
-                                                                                                                                 <a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;jobDirectoryManifestProtoConverter,
-                                                                                                                                 <a href="../../../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService,
-                                                                                                                                 <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentFileStreamServiceImpl</a>&nbsp;agentFileStreamService(com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceStub&nbsp;fileStreamServiceStub,
+                                                                                                                                         @Qualifier(value="sharedAgentTaskScheduler")
+                                                                                                                                         org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                         <a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;jobDirectoryManifestProtoConverter,
+                                                                                                                                         <a href="../../../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService,
+                                                                                                                                         <a href="../../../../../../../../com/netflix/genie/agent/properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</pre>
 <div class="block">Provide a lazy gRPC agent file stream service if one isn't already defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

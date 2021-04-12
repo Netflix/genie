@@ -154,9 +154,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>io.grpc.Server</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/servers/AgentRpcServersAutoConfiguration.html#gRpcServer-int-java.util.Set-java.util.List-">gRpcServer</a></span>(int&nbsp;port,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/servers/AgentRpcServersAutoConfiguration.html#gRpcServer-int-java.util.Set-java.util.List-brave.Tracing-">gRpcServer</a></span>(int&nbsp;port,
           java.util.Set&lt;io.grpc.BindableService&gt;&nbsp;services,
-          java.util.List&lt;io.grpc.ServerInterceptor&gt;&nbsp;serverInterceptors)</code>
+          java.util.List&lt;io.grpc.ServerInterceptor&gt;&nbsp;serverInterceptors,
+          brave.Tracing&nbsp;tracing)</code>
 <div class="block">Create a <code>Server</code> if one isn't already present in the context.</div>
 </td>
 </tr>
@@ -206,7 +207,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="gRpcServer-int-java.util.Set-java.util.List-">
+<a name="gRpcServer-int-java.util.Set-java.util.List-brave.Tracing-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -217,13 +218,15 @@ extends java.lang.Object</pre>
 public&nbsp;io.grpc.Server&nbsp;gRpcServer(@Value(value="${grpc.server.port:0}")
                                                                                               int&nbsp;port,
                                                                                               java.util.Set&lt;io.grpc.BindableService&gt;&nbsp;services,
-                                                                                              java.util.List&lt;io.grpc.ServerInterceptor&gt;&nbsp;serverInterceptors)</pre>
+                                                                                              java.util.List&lt;io.grpc.ServerInterceptor&gt;&nbsp;serverInterceptors,
+                                                                                              brave.Tracing&nbsp;tracing)</pre>
 <div class="block">Create a <code>Server</code> if one isn't already present in the context.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>port</code> - The port this server should listen on</dd>
 <dd><code>services</code> - The gRPC services this server should serve</dd>
 <dd><code>serverInterceptors</code> - The <code>ServerInterceptor</code> implementations that should be applied to all services</dd>
+<dd><code>tracing</code> - The Brave <code>Tracing</code> instance to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A Netty server instance based on the provided information</dd>
 </dl>

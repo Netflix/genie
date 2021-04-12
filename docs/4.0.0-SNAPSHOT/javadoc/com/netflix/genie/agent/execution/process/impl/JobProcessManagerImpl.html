@@ -137,7 +137,8 @@ implements <a href="../../../../../../../com/netflix/genie/agent/execution/proce
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#JobProcessManagerImpl-org.springframework.scheduling.TaskScheduler-">JobProcessManagerImpl</a></span>(org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#JobProcessManagerImpl-org.springframework.scheduling.TaskScheduler-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">JobProcessManagerImpl</a></span>(org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                     <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -200,17 +201,19 @@ implements <a href="../../../../../../../com/netflix/genie/agent/execution/proce
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobProcessManagerImpl-org.springframework.scheduling.TaskScheduler-">
+<a name="JobProcessManagerImpl-org.springframework.scheduling.TaskScheduler-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JobProcessManagerImpl</h4>
-<pre>public&nbsp;JobProcessManagerImpl(org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+<pre>public&nbsp;JobProcessManagerImpl(org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                             <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>taskScheduler</code> - The <code>TaskScheduler</code> instance to use to run scheduled asynchronous tasks</dd>
+<dd><code>tracingComponents</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance to use for propagating trace information</dd>
 </dl>
 </li>
 </ul>

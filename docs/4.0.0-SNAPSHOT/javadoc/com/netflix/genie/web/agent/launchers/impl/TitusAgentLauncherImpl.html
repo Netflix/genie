@@ -183,12 +183,13 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.html#TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">TitusAgentLauncherImpl</a></span>(org.springframework.web.client.RestTemplate&nbsp;restTemplate,
                       org.springframework.retry.support.RetryTemplate&nbsp;retryTemplate,
                       <a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/TitusAgentLauncherImpl.TitusJobRequestAdapter.html" title="interface in com.netflix.genie.web.agent.launchers.impl">TitusAgentLauncherImpl.TitusJobRequestAdapter</a>&nbsp;jobRequestAdapter,
                       com.github.benmanes.caffeine.cache.Cache&lt;java.lang.String,java.lang.String&gt;&nbsp;healthIndicatorCache,
                       <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                       <a href="../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
+                      <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents,
                       org.springframework.core.env.Environment&nbsp;environment,
                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
@@ -249,7 +250,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
+<a name="TitusAgentLauncherImpl-org.springframework.web.client.RestTemplate-org.springframework.retry.support.RetryTemplate-com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl.TitusJobRequestAdapter-com.github.benmanes.caffeine.cache.Cache-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.TitusAgentLauncherProperties-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-org.springframework.core.env.Environment-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -261,6 +262,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
                               com.github.benmanes.caffeine.cache.Cache&lt;java.lang.String,java.lang.String&gt;&nbsp;healthIndicatorCache,
                               <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                               <a href="../../../../../../../com/netflix/genie/web/properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties</a>&nbsp;titusAgentLauncherProperties,
+                              <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents,
                               org.springframework.core.env.Environment&nbsp;environment,
                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
@@ -272,6 +274,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/launchers/A
 <dd><code>healthIndicatorCache</code> - a cache to store metadata about recently launched jobs</dd>
 <dd><code>genieHostInfo</code> - the metadata about the local server and host</dd>
 <dd><code>titusAgentLauncherProperties</code> - the configuration properties</dd>
+<dd><code>tracingComponents</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance to use for distributed tracing</dd>
 <dd><code>environment</code> - The application environment to pull dynamic properties from</dd>
 <dd><code>registry</code> - the metric registry</dd>
 </dl>
