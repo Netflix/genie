@@ -54,7 +54,7 @@ class EnvVarBraveTracePropagatorImplSpec extends Specification {
         noExceptionThrown()
         !context.isPresent()
 
-        when: "Trace id is present but no parent span"
+        when: "Trace id is present but no span id"
         environment.put(
             EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_TRACE_ID_LOW_KEY,
             Long.toString(UUID.randomUUID().getMostSignificantBits())
@@ -69,6 +69,7 @@ class EnvVarBraveTracePropagatorImplSpec extends Specification {
     def "Can inject and extract for agent propagation"() {
         def traceIdLow = UUID.randomUUID().getMostSignificantBits()
         def traceIdHigh = UUID.randomUUID().getLeastSignificantBits()
+        def spanId = UUID.randomUUID().getLeastSignificantBits()
         def sampled = true
         def parentSpanId = UUID.randomUUID().getMostSignificantBits()
 
@@ -76,8 +77,8 @@ class EnvVarBraveTracePropagatorImplSpec extends Specification {
             .traceId(traceIdLow)
             .traceIdHigh(traceIdHigh)
             .sampled(sampled)
-            .parentId(UUID.randomUUID().getMostSignificantBits())
-            .spanId(parentSpanId)
+            .parentId(parentSpanId)
+            .spanId(spanId)
             .build()
 
         when:
@@ -86,6 +87,7 @@ class EnvVarBraveTracePropagatorImplSpec extends Specification {
         then:
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_TRACE_ID_LOW_KEY) == Long.toString(traceIdLow)
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_TRACE_ID_HIGH_KEY) == Long.toString(traceIdHigh)
+        environment.get(EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_SPAN_ID_KEY) == Long.toString(spanId)
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_PARENT_SPAN_ID_KEY) == Long.toString(parentSpanId)
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_SAMPLED_KEY) == Boolean.toString(sampled)
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_TRACE_ID_LOW_KEY) == null
@@ -99,20 +101,20 @@ class EnvVarBraveTracePropagatorImplSpec extends Specification {
         then:
         childTraceContext != null
         childTraceContext.traceIdString() == parentTraceContext.traceIdString()
-        childTraceContext.parentIdString() == parentTraceContext.spanIdString()
+        childTraceContext.spanIdString() == parentTraceContext.spanIdString()
+        childTraceContext.parentIdString() == parentTraceContext.parentIdString()
         childTraceContext.sampled() == parentTraceContext.sampled()
     }
 
     def "Can inject for job propagation"() {
         def traceIdLow = UUID.randomUUID().getMostSignificantBits()
         def sampled = false
-        def parentSpanId = UUID.randomUUID().getMostSignificantBits()
+        def spanId = UUID.randomUUID().getLeastSignificantBits()
 
         def parentTraceContext = TraceContext.newBuilder()
             .traceId(traceIdLow)
             .sampled(sampled)
-            .parentId(UUID.randomUUID().getMostSignificantBits())
-            .spanId(parentSpanId)
+            .spanId(spanId)
             .build()
 
         when:
@@ -125,7 +127,8 @@ class EnvVarBraveTracePropagatorImplSpec extends Specification {
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_AGENT_B3_SAMPLED_KEY) == null
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_TRACE_ID_LOW_KEY) == Long.toString(traceIdLow)
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_TRACE_ID_HIGH_KEY) == null
-        environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_PARENT_SPAN_ID_KEY) == Long.toString(parentSpanId)
+        environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_SPAN_ID_KEY) == Long.toString(spanId)
+        environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_PARENT_SPAN_ID_KEY) == null
         environment.get(EnvVarBraveTracePropagatorImpl.GENIE_JOB_B3_SAMPLED_KEY) == Boolean.toString(sampled)
     }
 }

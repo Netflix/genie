@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Implementation of {@link TracePropagator} based on <a href="https://github.com/openzipkin/brave">Brave</a> and
@@ -56,6 +55,13 @@ public class EnvVarBraveTracePropagatorImpl implements BraveTracePropagator {
     static final String GENIE_AGENT_B3_TRACE_ID_HIGH_KEY = "GENIE_AGENT_B3_TRACE_ID_HIGH";
 
     /**
+     * The key for the span id.
+     *
+     * @see TraceContext.Builder#spanId(long)
+     */
+    static final String GENIE_AGENT_B3_SPAN_ID_KEY = "GENIE_AGENT_B3_SPAN_ID";
+
+    /**
      * The key for the parent span.
      *
      * @see TraceContext.Builder#parentId(long)
@@ -82,6 +88,13 @@ public class EnvVarBraveTracePropagatorImpl implements BraveTracePropagator {
      * @see TraceContext.Builder#traceIdHigh(long)
      */
     static final String GENIE_JOB_B3_TRACE_ID_HIGH_KEY = "GENIE_B3_TRACE_ID_HIGH";
+
+    /**
+     * The key for the span id.
+     *
+     * @see TraceContext.Builder#spanId(long)
+     */
+    static final String GENIE_JOB_B3_SPAN_ID_KEY = "GENIE_B3_SPAN_ID";
 
     /**
      * The key for the parent span of the job.
@@ -117,30 +130,32 @@ public class EnvVarBraveTracePropagatorImpl implements BraveTracePropagator {
                 LOG.debug("No trace id low found in the supplied set of key value pairs. Can't extract trace context");
                 return Optional.empty();
             }
-            final String parentSpanId = environment.get(GENIE_AGENT_B3_PARENT_SPAN_ID_KEY);
-            if (StringUtils.isBlank(parentSpanId)) {
+            final String spanId = environment.get(GENIE_AGENT_B3_SPAN_ID_KEY);
+            if (StringUtils.isBlank(spanId)) {
                 LOG.debug(
-                    "No parent span id found in the supplied set of key value pairs. Can't extract trace context"
+                    "No span id found in the supplied set of key value pairs. Can't extract trace context"
                 );
                 return Optional.empty();
             }
 
             final TraceContext.Builder builder = TraceContext.newBuilder();
             builder.traceId(Long.parseLong(traceIdLow));
-            builder.parentId(Long.parseLong(parentSpanId));
+            builder.spanId(Long.parseLong(spanId));
 
             final String traceIdHigh = environment.get(GENIE_AGENT_B3_TRACE_ID_HIGH_KEY);
             if (StringUtils.isNotBlank(traceIdHigh)) {
                 builder.traceIdHigh(Long.parseLong(traceIdHigh));
             }
 
+            final String parentSpanId = environment.get(GENIE_AGENT_B3_PARENT_SPAN_ID_KEY);
+            if (StringUtils.isNotBlank(parentSpanId)) {
+                builder.parentId(Long.parseLong(parentSpanId));
+            }
+
             final String sampled = environment.get(GENIE_AGENT_B3_SAMPLED_KEY);
             if (StringUtils.isNotBlank(sampled)) {
                 builder.sampled(Boolean.parseBoolean(sampled));
             }
-
-            final long spanId = UUID.randomUUID().getMostSignificantBits();
-            builder.spanId(spanId);
 
             LOG.debug(
                 "Extracted trace context: "
@@ -191,12 +206,12 @@ public class EnvVarBraveTracePropagatorImpl implements BraveTracePropagator {
                 Long.toString(traceContext.traceId())
             );
             propagationContext.put(
-                isForAgent ? GENIE_AGENT_B3_SAMPLED_KEY : GENIE_JOB_B3_SAMPLED_KEY,
-                traceContext.sampled().toString()
+                isForAgent ? GENIE_AGENT_B3_SPAN_ID_KEY : GENIE_JOB_B3_SPAN_ID_KEY,
+                Long.toString(traceContext.spanId())
             );
             propagationContext.put(
-                isForAgent ? GENIE_AGENT_B3_PARENT_SPAN_ID_KEY : GENIE_JOB_B3_PARENT_SPAN_ID_KEY,
-                Long.toString(traceContext.spanId())
+                isForAgent ? GENIE_AGENT_B3_SAMPLED_KEY : GENIE_JOB_B3_SAMPLED_KEY,
+                traceContext.sampled().toString()
             );
 
             // only propagate high bits of trace id if they're non-zero
@@ -205,6 +220,14 @@ public class EnvVarBraveTracePropagatorImpl implements BraveTracePropagator {
                 propagationContext.put(
                     isForAgent ? GENIE_AGENT_B3_TRACE_ID_HIGH_KEY : GENIE_JOB_B3_TRACE_ID_HIGH_KEY,
                     Long.toString(traceIdHigh)
+                );
+            }
+
+            final Long parentSpanId = traceContext.parentId();
+            if (parentSpanId != null) {
+                propagationContext.put(
+                    isForAgent ? GENIE_AGENT_B3_PARENT_SPAN_ID_KEY : GENIE_JOB_B3_PARENT_SPAN_ID_KEY,
+                    Long.toString(parentSpanId)
                 );
             }
 

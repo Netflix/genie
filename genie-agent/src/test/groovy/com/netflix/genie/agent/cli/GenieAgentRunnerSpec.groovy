@@ -18,7 +18,6 @@
 package com.netflix.genie.agent.cli
 
 import brave.ScopedSpan
-import brave.Span
 import brave.Tracer
 import brave.propagation.TraceContext
 import com.beust.jcommander.ParameterException
@@ -41,7 +40,7 @@ class GenieAgentRunnerSpec extends Specification {
     BraveTracePropagator tracePropagator
     BraveTracingCleanup traceCleaner
     BraveTagAdapter tagAdapter
-    Span initSpan
+    ScopedSpan initSpan
     ScopedSpan runSpan
     TraceContext initContext
 
@@ -55,7 +54,7 @@ class GenieAgentRunnerSpec extends Specification {
         this.traceCleaner = Mock(BraveTracingCleanup)
         this.tagAdapter = Mock(BraveTagAdapter)
         this.args = new String[0]
-        this.initSpan = Mock(Span)
+        this.initSpan = Mock(ScopedSpan)
         this.runSpan = Mock(ScopedSpan)
         this.runner = new GenieAgentRunner(
             this.argsParser,
@@ -77,11 +76,9 @@ class GenieAgentRunnerSpec extends Specification {
 
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
-        0 * this.tracer.joinSpan(_ as TraceContext)
-        1 * this.tracer.nextSpan() >> this.initSpan
+        0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
         1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.name(GenieAgentRunner.INIT_SPAN_NAME)
-        1 * this.initSpan.start()
         1 * this.initSpan.finish()
         1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
         1 * this.runSpan.finish()
@@ -106,11 +103,9 @@ class GenieAgentRunnerSpec extends Specification {
 
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
-        0 * this.tracer.joinSpan(_ as TraceContext)
-        1 * this.tracer.nextSpan() >> this.initSpan
+        0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
         1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.name(GenieAgentRunner.INIT_SPAN_NAME)
-        1 * this.initSpan.start()
         1 * this.initSpan.finish()
         1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
         1 * this.runSpan.error(_ as Throwable)
@@ -134,11 +129,9 @@ class GenieAgentRunnerSpec extends Specification {
 
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
-        0 * this.tracer.joinSpan(_ as TraceContext)
-        1 * this.tracer.nextSpan() >> this.initSpan
+        0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
         1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.name(GenieAgentRunner.INIT_SPAN_NAME)
-        1 * this.initSpan.start()
         1 * this.initSpan.finish()
         1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
         1 * this.runSpan.error(_ as Throwable)
@@ -162,11 +155,9 @@ class GenieAgentRunnerSpec extends Specification {
 
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
-        0 * this.tracer.joinSpan(_ as TraceContext)
-        1 * this.tracer.nextSpan() >> this.initSpan
+        0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
         1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.name(GenieAgentRunner.INIT_SPAN_NAME)
-        1 * this.initSpan.start()
         1 * this.initSpan.finish()
         1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
         1 * this.runSpan.error(_ as Throwable)
@@ -190,11 +181,9 @@ class GenieAgentRunnerSpec extends Specification {
 
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
-        0 * this.tracer.joinSpan(_ as TraceContext)
-        1 * this.tracer.nextSpan() >> this.initSpan
+        0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
         1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.name(GenieAgentRunner.INIT_SPAN_NAME)
-        1 * this.initSpan.start()
         1 * this.initSpan.finish()
         1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
         1 * this.runSpan.error(_ as Throwable)
@@ -218,11 +207,9 @@ class GenieAgentRunnerSpec extends Specification {
 
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
-        0 * this.tracer.joinSpan(_ as TraceContext)
-        1 * this.tracer.nextSpan() >> this.initSpan
+        0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
         1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.name(GenieAgentRunner.INIT_SPAN_NAME)
-        1 * this.initSpan.start()
         1 * this.initSpan.finish()
         1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
         1 * this.runSpan.error(_ as Throwable)
