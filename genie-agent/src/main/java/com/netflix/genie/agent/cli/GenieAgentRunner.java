@@ -18,7 +18,6 @@
 package com.netflix.genie.agent.cli;
 
 import brave.ScopedSpan;
-import brave.Span;
 import brave.SpanCustomizer;
 import brave.Tracer;
 import brave.propagation.TraceContext;
@@ -148,17 +147,15 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
     private ScopedSpan initializeTracing() {
         // Attempt to extract any existing trace information from the environment
         final Optional<TraceContext> existingTraceContext = this.tracePropagator.extract(System.getenv());
-        final Span initSpan = existingTraceContext.isPresent()
-            ? this.tracer.joinSpan(existingTraceContext.get())
-            : this.tracer.nextSpan();
+        final ScopedSpan initSpan = existingTraceContext.isPresent()
+            ? this.tracer.startScopedSpanWithParent(INIT_SPAN_NAME, existingTraceContext.get())
+            : this.tracer.startScopedSpan(INIT_SPAN_NAME);
         // Quickly create and report an initial span
         final TraceContext initContext = initSpan.context();
-        final String traceId = initContext.traceIdString();
-        log.info("Trace ID: {}", traceId);
-        ConsoleLog.getLogger().info("Trace ID: {}", traceId);
         try {
-            initSpan.name(INIT_SPAN_NAME);
-            initSpan.start();
+            final String traceId = initContext.traceIdString();
+            log.info("Trace ID: {}", traceId);
+            ConsoleLog.getLogger().info("Trace ID: {}", traceId);
         } finally {
             initSpan.finish();
         }
