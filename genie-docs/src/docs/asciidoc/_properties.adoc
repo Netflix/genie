@@ -982,7 +982,7 @@ This section describes the various properties that can be set to control the beh
 Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
 The server also has a chance to override them during the 'Agent Configuration' execution stage.
 
-==== Properties forwarding
+=== Properties forwarding
 
 Server-side properties that match a given prefix are forwarded to all agents during agent configuration stage.
 For a property to be forwarded, it needs to be prefixed with `genie.agent.configuration.dynamic.`.
