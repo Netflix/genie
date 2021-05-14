@@ -128,38 +128,86 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#AGENT_CLI_COMMAND_NAME_TAG">AGENT_CLI_COMMAND_NAME_TAG</a></span></code>
+<div class="block">The command that was entered on the CLI for the agent to execute.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#AGENT_TAG_BASE">AGENT_TAG_BASE</a></span></code>
 <div class="block">The root for all tags related to spans occurring in the Genie agent.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#GLOBAL_TAG_BASE">GLOBAL_TAG_BASE</a></span></code>
 <div class="block">The root of all tags related to Genie on spans.</div>
 </td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_CLUSTER_ID_TAG">JOB_CLUSTER_ID_TAG</a></span></code>
+<div class="block">The tag for the job command id.</div>
+</td>
+</tr>
 <tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_CLUSTER_NAME_TAG">JOB_CLUSTER_NAME_TAG</a></span></code>
+<div class="block">The tag for the job command id.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_COMMAND_ID_TAG">JOB_COMMAND_ID_TAG</a></span></code>
+<div class="block">The tag for the job command id.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_COMMAND_NAME_TAG">JOB_COMMAND_NAME_TAG</a></span></code>
+<div class="block">The tag for the job command id.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_ID_TAG">JOB_ID_TAG</a></span></code>
 <div class="block">The tag for the unique job id.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_NAME_TAG">JOB_NAME_TAG</a></span></code>
 <div class="block">The tag for the job name.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_TAG_BASE">JOB_TAG_BASE</a></span></code>
 <div class="block">The root of all tags related to spans operating on a genie job.</div>
 </td>
 </tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_USER_TAG">JOB_USER_TAG</a></span></code>
+<div class="block">The tag for the job user.</div>
+</td>
+</tr>
 <tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#NEW_JOB_TAG">NEW_JOB_TAG</a></span></code>
+<div class="block">The tag to represent that this span contains a new job submission.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#SERVER_TAG_BASE">SERVER_TAG_BASE</a></span></code>
 <div class="block">The root for all tags related to spans occurring in the Genie server.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/tracing/TracingConstants.html#TRUE_VALUE">TRUE_VALUE</a></span></code>
+<div class="block">Convenience constant for representing a flag tag with a value of true.</div>
 </td>
 </tr>
 </table>
@@ -220,6 +268,20 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a name="AGENT_CLI_COMMAND_NAME_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>AGENT_CLI_COMMAND_NAME_TAG</h4>
+<pre>public static final&nbsp;java.lang.String AGENT_CLI_COMMAND_NAME_TAG</pre>
+<div class="block">The command that was entered on the CLI for the agent to execute.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.AGENT_CLI_COMMAND_NAME_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
 <a name="SERVER_TAG_BASE">
 <!--   -->
 </a>
@@ -262,10 +324,24 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a name="NEW_JOB_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>NEW_JOB_TAG</h4>
+<pre>public static final&nbsp;java.lang.String NEW_JOB_TAG</pre>
+<div class="block">The tag to represent that this span contains a new job submission.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.NEW_JOB_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
 <a name="JOB_NAME_TAG">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>JOB_NAME_TAG</h4>
 <pre>public static final&nbsp;java.lang.String JOB_NAME_TAG</pre>
@@ -273,6 +349,90 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.JOB_NAME_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="JOB_USER_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>JOB_USER_TAG</h4>
+<pre>public static final&nbsp;java.lang.String JOB_USER_TAG</pre>
+<div class="block">The tag for the job user.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.JOB_USER_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="JOB_CLUSTER_ID_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>JOB_CLUSTER_ID_TAG</h4>
+<pre>public static final&nbsp;java.lang.String JOB_CLUSTER_ID_TAG</pre>
+<div class="block">The tag for the job command id.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.JOB_CLUSTER_ID_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="JOB_CLUSTER_NAME_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>JOB_CLUSTER_NAME_TAG</h4>
+<pre>public static final&nbsp;java.lang.String JOB_CLUSTER_NAME_TAG</pre>
+<div class="block">The tag for the job command id.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.JOB_CLUSTER_NAME_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="JOB_COMMAND_ID_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>JOB_COMMAND_ID_TAG</h4>
+<pre>public static final&nbsp;java.lang.String JOB_COMMAND_ID_TAG</pre>
+<div class="block">The tag for the job command id.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.JOB_COMMAND_ID_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="JOB_COMMAND_NAME_TAG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>JOB_COMMAND_NAME_TAG</h4>
+<pre>public static final&nbsp;java.lang.String JOB_COMMAND_NAME_TAG</pre>
+<div class="block">The tag for the job command id.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.JOB_COMMAND_NAME_TAG">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="TRUE_VALUE">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>TRUE_VALUE</h4>
+<pre>public static final&nbsp;java.lang.String TRUE_VALUE</pre>
+<div class="block">Convenience constant for representing a flag tag with a value of true.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../constant-values.html#com.netflix.genie.common.internal.tracing.TracingConstants.TRUE_VALUE">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>

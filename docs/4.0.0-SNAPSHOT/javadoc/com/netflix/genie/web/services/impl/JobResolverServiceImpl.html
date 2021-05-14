@@ -138,12 +138,13 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">JobResolverServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">JobResolverServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                       @NotEmpty java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>&gt;&nbsp;clusterSelectors,
                       <a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>&nbsp;commandSelector,
                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                       <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
-                      org.springframework.core.env.Environment&nbsp;environment)</code>
+                      org.springframework.core.env.Environment&nbsp;environment,
+                      <a href="../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -199,7 +200,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">
+<a name="JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -211,7 +212,8 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
                               <a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>&nbsp;commandSelector,
                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                               <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
-                              org.springframework.core.env.Environment&nbsp;environment)</pre>
+                              org.springframework.core.env.Environment&nbsp;environment,
+                              <a href="../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -221,6 +223,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
 <dd><code>registry</code> - The <code>MeterRegistry</code>metrics repository to use</dd>
 <dd><code>jobsProperties</code> - The properties for running a job set by the user</dd>
 <dd><code>environment</code> - The Spring application <code>Environment</code> for dynamic property resolution</dd>
+<dd><code>tracingComponents</code> - The <a href="../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance to use</dd>
 </dl>
 </li>
 </ul>

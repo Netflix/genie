@@ -364,6 +364,10 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#AGENT_CLI_COMMAND_NAME_TAG">AGENT_CLI_COMMAND_NAME_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The command that was entered on the CLI for the agent to execute.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#AGENT_HOSTNAME">AGENT_HOSTNAME</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#AGENT_JAR_PLACEHOLDER">AGENT_JAR_PLACEHOLDER</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
@@ -4648,7 +4652,7 @@
 <div class="block">A singleton for sharing a Jackson Object Mapper instance across Genie and not having to redefine the Object Mapper
  everywhere.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">geniePersistenceService(EntityManager, JpaRepositories)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">geniePersistenceService(EntityManager, JpaRepositories, BraveTracingComponents)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a default implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> if no other has been defined.</div>
 </dd>
@@ -8041,10 +8045,26 @@
 <div class="block">The name of the <code>EntityGraph</code> which will load all the data needed to get the
  cluster for a job.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_CLUSTER_ID_TAG">JOB_CLUSTER_ID_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The tag for the job command id.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_CLUSTER_NAME_TAG">JOB_CLUSTER_NAME_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The tag for the job command id.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#JOB_COMMAND_DTO_ENTITY_GRAPH">JOB_COMMAND_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
 <div class="block">The name of the <code>EntityGraph</code> which will load all the data needed to get the
  command for a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_COMMAND_ID_TAG">JOB_COMMAND_ID_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The tag for the job command id.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_COMMAND_NAME_TAG">JOB_COMMAND_NAME_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The tag for the job command id.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#JOB_CREATION_THRESHOLD_PROPERTY">JOB_CREATION_THRESHOLD_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
 <dd>
@@ -8129,6 +8149,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_TAG_BASE">JOB_TAG_BASE</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
 <dd>
 <div class="block">The root of all tags related to spans operating on a genie job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#JOB_USER_TAG">JOB_USER_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The tag for the job user.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/PathUtils.html#jobAgentLogFilePath-java.io.File-">jobAgentLogFilePath(File)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" title="class in com.netflix.genie.agent.utils">PathUtils</a></dt>
 <dd>
@@ -8739,7 +8763,7 @@
 <div class="block">Service API for taking inputs from a user and resolving them to concrete information that the Genie system will use
  to execute the users job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobResolverService-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">jobResolverService(DataServices, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobResolverService-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">jobResolverService(DataServices, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment, BraveTracingComponents)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> if one hasn't already been defined.</div>
 </dd>
@@ -8747,7 +8771,7 @@
 <dd>
 <div class="block">Implementation of the <a href="com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> APIs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">JobResolverServiceImpl(DataServices, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">JobResolverServiceImpl(DataServices, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment, BraveTracingComponents)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9011,7 +9035,7 @@
 <dd>
 <div class="block">Implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> using JPA.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">JpaPersistenceServiceImpl(EntityManager, JpaRepositories)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">JpaPersistenceServiceImpl(EntityManager, JpaRepositories, BraveTracingComponents)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9486,6 +9510,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity_.html#NAME">NAME</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#NEW_JOB_TAG">NEW_JOB_TAG</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">The tag to represent that this span contains a new job submission.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/inspectors/InspectionReport.html#newAcceptance-java.lang.String-">newAcceptance(String)</a></span> - Static method in class com.netflix.genie.web.agent.inspectors.<a href="com/netflix/genie/web/agent/inspectors/InspectionReport.html" title="class in com.netflix.genie.web.agent.inspectors">InspectionReport</a></dt>
 <dd>
 <div class="block">Factory method for <a href="com/netflix/genie/web/agent/inspectors/InspectionReport.html" title="class in com.netflix.genie.web.agent.inspectors"><code>InspectionReport</code></a>.</div>
@@ -12341,6 +12369,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html#TransitionExceptionRecord--">TransitionExceptionRecord()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext.TransitionExceptionRecord</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#transmit-io.grpc.stub.StreamObserver-">transmit(StreamObserver&lt;ServerAckMessage&gt;)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/tracing/TracingConstants.html#TRUE_VALUE">TRUE_VALUE</a></span> - Static variable in class com.netflix.genie.common.internal.tracing.<a href="com/netflix/genie/common/internal/tracing/TracingConstants.html" title="class in com.netflix.genie.common.internal.tracing">TracingConstants</a></dt>
+<dd>
+<div class="block">Convenience constant for representing a flag tag with a value of true.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/StreamBuffer.html#tryWrite-com.google.protobuf.ByteString-">tryWrite(ByteString)</a></span> - Method in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/StreamBuffer.html" title="class in com.netflix.genie.web.util">StreamBuffer</a></dt>
 <dd>
 <div class="block">Try to append a chunk of data for consumption.</div>

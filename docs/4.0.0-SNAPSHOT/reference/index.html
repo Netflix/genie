@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2021-04-30</span>
+<span id="revdate">2021-05-14</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -763,10 +763,8 @@ b.conum * { color: inherit !important; }
 <li><a href="#_concepts">7. Concepts</a>
 <ul class="sectlevel2">
 <li><a href="#_job_overview">7.1. Job overview</a>
-<ul class="sectlevel4">
+<ul class="sectlevel3">
 <li><a href="#_api_jobs_vs_agent_cli_jobs">7.1.1. API jobs vs agent CLI jobs</a></li>
-<li><a href="#_job_lifecycle">7.1.2. Job Lifecycle</a></li>
-<li><a href="#_status_transitions">7.1.3. Status Transitions</a></li>
 </ul>
 </li>
 <li><a href="#_data_model">7.2. Data Model</a>
@@ -871,7 +869,7 @@ b.conum * { color: inherit !important; }
 </ul>
 </li>
 <li><a href="#_genie_agent">13. Genie Agent</a>
-<ul class="sectlevel3">
+<ul class="sectlevel2">
 <li><a href="#_properties_forwarding">13.1. Properties forwarding</a></li>
 </ul>
 </li>
@@ -1136,14 +1134,14 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 2.3.6.RELEASE</p>
+<p>Upgrade Spring Boot to 2.3.9.RELEASE</p>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Hoxton.SR9 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Hoxton.SR10 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR9/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR10/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1436,7 +1434,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -1603,8 +1601,8 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 <p>This section provides an high level overview of what a Genie job is.
 More details on the concepts covered here are provided in later sections.</p>
 </div>
-<div class="sect4">
-<h5 id="_api_jobs_vs_agent_cli_jobs"><a class="anchor" href="#_api_jobs_vs_agent_cli_jobs"></a><a class="link" href="#_api_jobs_vs_agent_cli_jobs">7.1.1. API jobs vs agent CLI jobs</a></h5>
+<div class="sect3">
+<h4 id="_api_jobs_vs_agent_cli_jobs"><a class="anchor" href="#_api_jobs_vs_agent_cli_jobs"></a><a class="link" href="#_api_jobs_vs_agent_cli_jobs">7.1.1. API jobs vs agent CLI jobs</a></h4>
 <div class="paragraph">
 <p>Genie provides 2 ways to execute a job:</p>
 </div>
@@ -1681,9 +1679,8 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </li>
 </ul>
 </div>
-</div>
 <div class="sect4">
-<h5 id="_job_lifecycle"><a class="anchor" href="#_job_lifecycle"></a><a class="link" href="#_job_lifecycle">7.1.2. Job Lifecycle</a></h5>
+<h5 id="_job_lifecycle"><a class="anchor" href="#_job_lifecycle"></a><a class="link" href="#_job_lifecycle">7.1.1.1. Job Lifecycle</a></h5>
 <div class="paragraph">
 <p>Regardless of how a job is launched, it will leverage Genie to:</p>
 </div>
@@ -1774,7 +1771,7 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_status_transitions"><a class="anchor" href="#_status_transitions"></a><a class="link" href="#_status_transitions">7.1.3. Status Transitions</a></h5>
+<h5 id="_status_transitions"><a class="anchor" href="#_status_transitions"></a><a class="link" href="#_status_transitions">7.1.1.2. Status Transitions</a></h5>
 <div class="paragraph">
 <p>Possible statuses of a job:</p>
 </div>
@@ -1887,6 +1884,7 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -4893,7 +4891,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -4910,7 +4908,7 @@ docs for an example of how to do this.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4918,7 +4916,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -5178,7 +5176,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR9/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR10/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -6108,7 +6106,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">12.1.2. Spring Properties</a></h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -6250,7 +6248,7 @@ returned</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.3.9.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
@@ -6414,8 +6412,8 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <p>Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
 The server also has a chance to override them during the 'Agent Configuration' execution stage.</p>
 </div>
-<div class="sect3">
-<h4 id="_properties_forwarding"><a class="anchor" href="#_properties_forwarding"></a><a class="link" href="#_properties_forwarding">13.1. Properties forwarding</a></h4>
+<div class="sect2">
+<h3 id="_properties_forwarding"><a class="anchor" href="#_properties_forwarding"></a><a class="link" href="#_properties_forwarding">13.1. Properties forwarding</a></h3>
 <div class="paragraph">
 <p>Server-side properties that match a given prefix are forwarded to all agents during agent configuration stage.
 For a property to be forwarded, it needs to be prefixed with <code>genie.agent.configuration.dynamic.</code>.</p>
@@ -7274,7 +7272,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2021-04-29 23:53:58 UTC
+Last updated 2021-05-14 16:50:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

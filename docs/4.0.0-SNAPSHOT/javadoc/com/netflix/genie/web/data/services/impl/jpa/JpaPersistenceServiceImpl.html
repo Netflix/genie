@@ -138,8 +138,9 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">JpaPersistenceServiceImpl</a></span>(javax.persistence.EntityManager&nbsp;entityManager,
-                         <a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">JpaPersistenceServiceImpl</a></span>(javax.persistence.EntityManager&nbsp;entityManager,
+                         <a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories,
+                         <a href="../../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -805,19 +806,21 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">
+<a name="JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JpaPersistenceServiceImpl</h4>
 <pre>public&nbsp;JpaPersistenceServiceImpl(javax.persistence.EntityManager&nbsp;entityManager,
-                                 <a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories)</pre>
+                                 <a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories,
+                                 <a href="../../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>entityManager</code> - The <code>EntityManager</code> to use</dd>
 <dd><code>jpaRepositories</code> - All the repositories in the Genie application</dd>
+<dd><code>tracingComponents</code> - All the Brave related tracing components needed to add metadata to Spans</dd>
 </dl>
 </li>
 </ul>

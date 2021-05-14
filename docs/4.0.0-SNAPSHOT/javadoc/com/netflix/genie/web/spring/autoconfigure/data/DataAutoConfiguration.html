@@ -172,8 +172,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">geniePersistenceService</a></span>(javax.persistence.EntityManager&nbsp;entityManager,
-                       <a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">geniePersistenceService</a></span>(javax.persistence.EntityManager&nbsp;entityManager,
+                       <a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories,
+                       <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code>
 <div class="block">Provide a default implementation of <a href="../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> if no other has been defined.</div>
 </td>
 </tr>
@@ -264,7 +265,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/data/services/im
 </dl>
 </li>
 </ul>
-<a name="geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-">
+<a name="geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -273,12 +274,14 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/data/services/im
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService.class</a>)
 public&nbsp;<a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a>&nbsp;geniePersistenceService(javax.persistence.EntityManager&nbsp;entityManager,
-                                                                                                                          <a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories)</pre>
+                                                                                                                          <a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories,
+                                                                                                                          <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</pre>
 <div class="block">Provide a default implementation of <a href="../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> if no other has been defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>entityManager</code> - The <code>EntityManager</code> for this application</dd>
 <dd><code>jpaRepositories</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories"><code>JpaRepositories</code></a> for Genie</dd>
+<dd><code>tracingComponents</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa"><code>JpaPersistenceServiceImpl</code></a> instance which implements <a href="../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> backed by
  JPA and a relational database</dd>
