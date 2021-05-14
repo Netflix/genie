@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.data;
 
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl;
@@ -96,8 +97,9 @@ public class DataAutoConfiguration {
     /**
      * Provide a default implementation of {@link PersistenceService} if no other has been defined.
      *
-     * @param entityManager   The {@link EntityManager} for this application
-     * @param jpaRepositories The {@link JpaRepositories} for Genie
+     * @param entityManager     The {@link EntityManager} for this application
+     * @param jpaRepositories   The {@link JpaRepositories} for Genie
+     * @param tracingComponents The {@link BraveTracingComponents} instance to use
      * @return A {@link JpaPersistenceServiceImpl} instance which implements {@link PersistenceService} backed by
      * JPA and a relational database
      */
@@ -105,8 +107,9 @@ public class DataAutoConfiguration {
     @ConditionalOnMissingBean(PersistenceService.class)
     public JpaPersistenceServiceImpl geniePersistenceService(
         final EntityManager entityManager,
-        final JpaRepositories jpaRepositories
+        final JpaRepositories jpaRepositories,
+        final BraveTracingComponents tracingComponents
     ) {
-        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories);
+        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories, tracingComponents);
     }
 }

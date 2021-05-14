@@ -46,9 +46,7 @@ import java.util.Set;
 @Slf4j
 public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
 
-    static final String INIT_SPAN_NAME = "genie-agent-init";
     static final String RUN_SPAN_NAME = "genie-agent-run";
-    static final String COMMAND_NAME_TAG = TracingConstants.AGENT_TAG_BASE + ".command.name";
 
     private final ArgumentParser argumentParser;
     private final CommandFactory commandFactory;
@@ -122,7 +120,7 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
         } else if (!availableCommands.contains(commandName)) {
             throw new IllegalArgumentException("Invalid command -- commands available: " + availableCommandsString);
         }
-        this.tagAdapter.tag(span, COMMAND_NAME_TAG, commandName);
+        this.tagAdapter.tag(span, TracingConstants.AGENT_CLI_COMMAND_NAME_TAG, commandName);
 
         ConsoleLog.getLogger().info("Preparing agent to execute command: '{}'", commandName);
 
@@ -147,19 +145,14 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
     private ScopedSpan initializeTracing() {
         // Attempt to extract any existing trace information from the environment
         final Optional<TraceContext> existingTraceContext = this.tracePropagator.extract(System.getenv());
-        final ScopedSpan initSpan = existingTraceContext.isPresent()
-            ? this.tracer.startScopedSpanWithParent(INIT_SPAN_NAME, existingTraceContext.get())
-            : this.tracer.startScopedSpan(INIT_SPAN_NAME);
+        final ScopedSpan runSpan = existingTraceContext.isPresent()
+            ? this.tracer.startScopedSpanWithParent(RUN_SPAN_NAME, existingTraceContext.get())
+            : this.tracer.startScopedSpan(RUN_SPAN_NAME);
         // Quickly create and report an initial span
-        final TraceContext initContext = initSpan.context();
-        try {
-            final String traceId = initContext.traceIdString();
-            log.info("Trace ID: {}", traceId);
-            ConsoleLog.getLogger().info("Trace ID: {}", traceId);
-        } finally {
-            initSpan.finish();
-        }
-        // Create a new span that will represent the potentially long running action the agent will execute
-        return this.tracer.startScopedSpanWithParent(RUN_SPAN_NAME, initContext);
+        final TraceContext initContext = runSpan.context();
+        final String traceId = initContext.traceIdString();
+        log.info("Trace ID: {}", traceId);
+        ConsoleLog.getLogger().info("Trace ID: {}", traceId);
+        return runSpan;
     }
 }

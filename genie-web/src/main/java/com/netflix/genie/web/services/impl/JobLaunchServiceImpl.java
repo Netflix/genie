@@ -26,8 +26,6 @@ import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
-import com.netflix.genie.common.internal.tracing.TracingConstants;
-import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
@@ -84,7 +82,6 @@ public class JobLaunchServiceImpl implements JobLaunchService {
     private final JobResolverService jobResolverService;
     private final AgentLauncherSelector agentLauncherSelector;
     private final Tracer tracer;
-    private final BraveTagAdapter tagAdapter;
     private final MeterRegistry registry;
 
     /**
@@ -107,7 +104,6 @@ public class JobLaunchServiceImpl implements JobLaunchService {
         this.jobResolverService = jobResolverService;
         this.agentLauncherSelector = agentLauncherSelector;
         this.tracer = tracingComponents.getTracer();
-        this.tagAdapter = tracingComponents.getTagAdapter();
         this.registry = registry;
     }
 
@@ -139,7 +135,6 @@ public class JobLaunchServiceImpl implements JobLaunchService {
              */
             final String jobId = this.persistenceService.saveJobSubmission(jobSubmission);
             span.annotate(SAVED_JOB_SUBMISSION_ANNOTATION);
-            this.tagAdapter.tag(span, TracingConstants.JOB_ID_TAG, jobId);
 
             final ResolvedJob resolvedJob;
             try {

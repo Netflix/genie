@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import brave.SpanCustomizer;
+import brave.Tracer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -28,12 +30,16 @@ import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.tracing.TracingConstants;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
@@ -147,6 +153,8 @@ public class JobResolverServiceImpl implements JobResolverService {
     // TODO: Switch to path
     private final File defaultJobDirectory;
     private final String defaultArchiveLocation;
+    private final Tracer tracer;
+    private final BraveTagAdapter tagAdapter;
     //endregion
 
     //region Public APIs
@@ -154,12 +162,13 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * Constructor.
      *
-     * @param dataServices     The {@link DataServices} encapsulation instance to use
-     * @param clusterSelectors The {@link ClusterSelector} implementations to use
-     * @param commandSelector  The {@link CommandSelector} implementation to use
-     * @param registry         The {@link MeterRegistry }metrics repository to use
-     * @param jobsProperties   The properties for running a job set by the user
-     * @param environment      The Spring application {@link Environment} for dynamic property resolution
+     * @param dataServices      The {@link DataServices} encapsulation instance to use
+     * @param clusterSelectors  The {@link ClusterSelector} implementations to use
+     * @param commandSelector   The {@link CommandSelector} implementation to use
+     * @param registry          The {@link MeterRegistry }metrics repository to use
+     * @param jobsProperties    The properties for running a job set by the user
+     * @param environment       The Spring application {@link Environment} for dynamic property resolution
+     * @param tracingComponents The {@link BraveTracingComponents} instance to use
      */
     public JobResolverServiceImpl(
         final DataServices dataServices,
@@ -167,7 +176,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         final CommandSelector commandSelector, // TODO: For now this is a single value but maybe support List
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
-        final Environment environment
+        final Environment environment,
+        final BraveTracingComponents tracingComponents
     ) {
         this.persistenceService = dataServices.getPersistenceService();
         this.clusterSelectors = clusterSelectors;
@@ -183,6 +193,10 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         // Metrics
         this.registry = registry;
+
+        // tracing
+        this.tracer = tracingComponents.getTracer();
+        this.tagAdapter = tracingComponents.getTagAdapter();
     }
 
     /**
@@ -208,7 +222,12 @@ public class JobResolverServiceImpl implements JobResolverService {
             // TODO: Possible improvement to combine this query with a few others to save DB trips but for now...
             final boolean apiJob = this.persistenceService.isApiJob(id);
 
-            final JobResolutionContext context = new JobResolutionContext(id, jobRequest, apiJob);
+            final JobResolutionContext context = new JobResolutionContext(
+                id,
+                jobRequest,
+                apiJob,
+                this.tracer.currentSpanCustomizer()
+            );
 
             final ResolvedJob resolvedJob = this.resolve(context);
 
@@ -256,7 +275,12 @@ public class JobResolverServiceImpl implements JobResolverService {
                 jobRequest
             );
 
-            final JobResolutionContext context = new JobResolutionContext(id, jobRequest, apiJob);
+            final JobResolutionContext context = new JobResolutionContext(
+                id,
+                jobRequest,
+                apiJob,
+                this.tracer.currentSpanCustomizer()
+            );
 
             final ResolvedJob resolvedJob = this.resolve(context);
             MetricsUtils.addSuccessTags(tags);
@@ -279,6 +303,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private ResolvedJob resolve(
         final JobResolutionContext context
     ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
+        this.tagSpanWithJobMetadata(context);
         this.resolveCommand(context);
         this.resolveCluster(context);
         this.resolveApplications(context);
@@ -383,8 +408,13 @@ public class JobResolverServiceImpl implements JobResolverService {
             );
 
             MetricsUtils.addSuccessTags(tags);
-            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, command.getId()));
-            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getMetadata().getName()));
+            final String commandId = command.getId();
+            final String commandName = command.getMetadata().getName();
+            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, commandId));
+            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, commandName));
+            final SpanCustomizer spanCustomizer = context.getSpanCustomizer();
+            this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_COMMAND_ID_TAG, commandId);
+            this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_COMMAND_NAME_TAG, commandName);
             context.setCommand(command);
         } catch (final GenieJobResolutionException e) {
             // No candidates or selector choose none
@@ -506,8 +536,13 @@ public class JobResolverServiceImpl implements JobResolverService {
 
             context.setCluster(cluster);
             MetricsUtils.addSuccessTags(tags);
-            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
-            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()));
+            final String clusterId = cluster.getId();
+            final String clusterName = cluster.getMetadata().getName();
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, clusterId));
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, clusterName));
+            final SpanCustomizer spanCustomizer = context.getSpanCustomizer();
+            this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_CLUSTER_ID_TAG, clusterId);
+            this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_CLUSTER_NAME_TAG, clusterName);
         } catch (final GenieJobResolutionException e) {
             tags.add(NO_CLUSTER_RESOLVED_ID);
             tags.add(NO_CLUSTER_RESOLVED_NAME);
@@ -885,6 +920,14 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
         return className;
     }
+
+    private void tagSpanWithJobMetadata(final JobResolutionContext context) {
+        final SpanCustomizer spanCustomizer = this.tracer.currentSpanCustomizer();
+        this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_ID_TAG, context.getJobId());
+        final JobMetadata jobMetadata = context.getJobRequest().getMetadata();
+        this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_NAME_TAG, jobMetadata.getName());
+        this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_USER_TAG, jobMetadata.getUser());
+    }
     //endregion
 
     //region Helper Classes
@@ -903,6 +946,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         private final String jobId;
         private final JobRequest jobRequest;
         private final boolean apiJob;
+        private final SpanCustomizer spanCustomizer;
 
         private Command command;
         private Cluster cluster;

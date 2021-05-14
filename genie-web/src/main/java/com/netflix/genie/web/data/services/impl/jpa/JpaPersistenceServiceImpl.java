@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
+import brave.SpanCustomizer;
+import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.google.common.annotations.VisibleForTesting;
@@ -62,6 +64,9 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedExceptio
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.common.internal.tracing.TracingConstants;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.data.services.impl.jpa.converters.EntityV3DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.converters.EntityV4DtoConverters;
@@ -129,7 +134,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -201,15 +205,20 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     private final JpaJobRepository jobRepository;
     private final JpaTagRepository tagRepository;
 
+    private final Tracer tracer;
+    private final BraveTagAdapter tagAdapter;
+
     /**
      * Constructor.
      *
-     * @param entityManager   The {@link EntityManager} to use
-     * @param jpaRepositories All the repositories in the Genie application
+     * @param entityManager     The {@link EntityManager} to use
+     * @param jpaRepositories   All the repositories in the Genie application
+     * @param tracingComponents All the Brave related tracing components needed to add metadata to Spans
      */
     public JpaPersistenceServiceImpl(
         final EntityManager entityManager,
-        final JpaRepositories jpaRepositories
+        final JpaRepositories jpaRepositories,
+        final BraveTracingComponents tracingComponents
     ) {
         this.entityManager = entityManager;
         this.applicationRepository = jpaRepositories.getApplicationRepository();
@@ -219,6 +228,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         this.fileRepository = jpaRepositories.getFileRepository();
         this.jobRepository = jpaRepositories.getJobRepository();
         this.tagRepository = jpaRepositories.getTagRepository();
+
+        this.tracer = tracingComponents.getTracer();
+        this.tagAdapter = tracingComponents.getTagAdapter();
     }
 
     //region Application APIs
@@ -1540,9 +1552,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Nonnull
-    public String saveJobSubmission(
-        @Valid final JobSubmission jobSubmission
-    ) throws IdAlreadyExistsException {
+    public String saveJobSubmission(@Valid final JobSubmission jobSubmission) throws IdAlreadyExistsException {
         log.debug("[saveJobSubmission] Attempting to save job submission {}", jobSubmission);
         // TODO: Metrics
         final JobEntity jobEntity = new JobEntity();
@@ -1585,6 +1595,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 jobSubmission,
                 id
             );
+            final SpanCustomizer spanCustomizer = this.addJobIdTag(id);
+            // This is a new job so add flag representing that fact
+            this.tagAdapter.tag(spanCustomizer, TracingConstants.NEW_JOB_TAG, TracingConstants.TRUE_VALUE);
             return id;
         } catch (final DataIntegrityViolationException e) {
             throw new IdAlreadyExistsException(
@@ -2720,10 +2733,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         job.setApplications(applications);
     }
 
-    private int toTimeoutUsed(final Instant started, final Instant timeout) {
-        return (int) started.until(timeout, ChronoUnit.SECONDS);
-    }
-
     private <E extends BaseEntity> Optional<E> getEntityOrNullForFindJobs(
         final JpaBaseRepository<E> repository,
         final String id,
@@ -2741,6 +2750,12 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         }
 
         return optionalEntity;
+    }
+
+    private SpanCustomizer addJobIdTag(final String jobId) {
+        final SpanCustomizer spanCustomizer = this.tracer.currentSpanCustomizer();
+        this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_ID_TAG, jobId);
+        return spanCustomizer;
     }
     //endregion
 }

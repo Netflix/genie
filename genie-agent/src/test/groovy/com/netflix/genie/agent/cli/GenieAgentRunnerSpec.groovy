@@ -21,6 +21,7 @@ import brave.ScopedSpan
 import brave.Tracer
 import brave.propagation.TraceContext
 import com.beust.jcommander.ParameterException
+import com.netflix.genie.common.internal.tracing.TracingConstants
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
@@ -40,7 +41,6 @@ class GenieAgentRunnerSpec extends Specification {
     BraveTracePropagator tracePropagator
     BraveTracingCleanup traceCleaner
     BraveTagAdapter tagAdapter
-    ScopedSpan initSpan
     ScopedSpan runSpan
     TraceContext initContext
 
@@ -54,7 +54,6 @@ class GenieAgentRunnerSpec extends Specification {
         this.traceCleaner = Mock(BraveTracingCleanup)
         this.tagAdapter = Mock(BraveTagAdapter)
         this.args = new String[0]
-        this.initSpan = Mock(ScopedSpan)
         this.runSpan = Mock(ScopedSpan)
         this.runner = new GenieAgentRunner(
             this.argsParser,
@@ -77,14 +76,16 @@ class GenieAgentRunnerSpec extends Specification {
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
         0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
-        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
-        1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.finish()
-        1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.RUN_SPAN_NAME) >> this.runSpan
+        1 * this.runSpan.context() >> this.initContext
         1 * this.runSpan.finish()
         1 * this.traceCleaner.cleanup()
         1 * this.tracer.currentSpanCustomizer() >> this.runSpan
-        1 * this.tagAdapter.tag(this.runSpan, GenieAgentRunner.COMMAND_NAME_TAG, TestCommands.ExampleCommand1.NAME)
+        1 * this.tagAdapter.tag(
+            this.runSpan,
+            TracingConstants.AGENT_CLI_COMMAND_NAME_TAG,
+            TestCommands.ExampleCommand1.NAME
+        )
         1 * this.argsParser.parse(this.args)
         1 * this.argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         1 * this.argsParser.getCommandNames() >> TestCommands.allCommandNames()
@@ -104,15 +105,17 @@ class GenieAgentRunnerSpec extends Specification {
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
         0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
-        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
-        1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.finish()
-        1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.RUN_SPAN_NAME) >> this.runSpan
+        1 * this.runSpan.context() >> this.initContext
         1 * this.runSpan.error(_ as Throwable)
         1 * this.runSpan.finish()
         1 * this.traceCleaner.cleanup()
         1 * this.tracer.currentSpanCustomizer() >> this.runSpan
-        0 * this.tagAdapter.tag(this.runSpan, GenieAgentRunner.COMMAND_NAME_TAG, TestCommands.ExampleCommand1.NAME)
+        0 * this.tagAdapter.tag(
+            this.runSpan,
+            TracingConstants.AGENT_CLI_COMMAND_NAME_TAG,
+            TestCommands.ExampleCommand1.NAME
+        )
         1 * this.argsParser.parse(this.args) >> { throw exception }
         0 * this.argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         0 * this.argsParser.getCommandNames() >> TestCommands.allCommandNames()
@@ -130,15 +133,17 @@ class GenieAgentRunnerSpec extends Specification {
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
         0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
-        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
-        1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.finish()
-        1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
-        1 * this.runSpan.error(_ as Throwable)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.RUN_SPAN_NAME) >> this.runSpan
+        1 * this.runSpan.context() >> this.initContext
         1 * this.runSpan.finish()
+        1 * this.runSpan.error(_ as Throwable)
         1 * this.traceCleaner.cleanup()
         1 * this.tracer.currentSpanCustomizer() >> this.runSpan
-        0 * this.tagAdapter.tag(this.runSpan, GenieAgentRunner.COMMAND_NAME_TAG, TestCommands.ExampleCommand1.NAME)
+        0 * this.tagAdapter.tag(
+            this.runSpan,
+            TracingConstants.AGENT_CLI_COMMAND_NAME_TAG,
+            TestCommands.ExampleCommand1.NAME
+        )
         1 * this.argsParser.parse(this.args)
         1 * this.argsParser.getSelectedCommand() >> null
         1 * this.argsParser.getCommandNames() >> TestCommands.allCommandNames()
@@ -156,15 +161,17 @@ class GenieAgentRunnerSpec extends Specification {
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
         0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
-        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
-        1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.finish()
-        1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
-        1 * this.runSpan.error(_ as Throwable)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.RUN_SPAN_NAME) >> this.runSpan
+        1 * this.runSpan.context() >> this.initContext
         1 * this.runSpan.finish()
+        1 * this.runSpan.error(_ as Throwable)
         1 * this.traceCleaner.cleanup()
         1 * this.tracer.currentSpanCustomizer() >> this.runSpan
-        0 * this.tagAdapter.tag(this.runSpan, GenieAgentRunner.COMMAND_NAME_TAG, "foo")
+        0 * this.tagAdapter.tag(
+            this.runSpan,
+            TracingConstants.AGENT_CLI_COMMAND_NAME_TAG,
+            "foo"
+        )
         1 * this.argsParser.parse(this.args)
         1 * this.argsParser.getSelectedCommand() >> "foo"
         1 * this.argsParser.getCommandNames() >> TestCommands.allCommandNames()
@@ -182,15 +189,17 @@ class GenieAgentRunnerSpec extends Specification {
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
         0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
-        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
-        1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.finish()
-        1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
-        1 * this.runSpan.error(_ as Throwable)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.RUN_SPAN_NAME) >> this.runSpan
+        1 * this.runSpan.context() >> this.initContext
         1 * this.runSpan.finish()
+        1 * this.runSpan.error(_ as Throwable)
         1 * this.traceCleaner.cleanup()
         1 * this.tracer.currentSpanCustomizer() >> this.runSpan
-        1 * this.tagAdapter.tag(this.runSpan, GenieAgentRunner.COMMAND_NAME_TAG, TestCommands.ExampleCommand1.NAME)
+        1 * this.tagAdapter.tag(
+            this.runSpan,
+            TracingConstants.AGENT_CLI_COMMAND_NAME_TAG,
+            TestCommands.ExampleCommand1.NAME
+        )
         1 * this.argsParser.parse(this.args)
         1 * this.argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         1 * this.argsParser.getCommandNames() >> TestCommands.allCommandNames()
@@ -208,15 +217,17 @@ class GenieAgentRunnerSpec extends Specification {
         then:
         1 * this.tracePropagator.extract(_ as Map) >> Optional.empty()
         0 * this.tracer.startScopedSpanWithParent(_ as String, _ as TraceContext)
-        1 * this.tracer.startScopedSpan(GenieAgentRunner.INIT_SPAN_NAME) >> this.initSpan
-        1 * this.initSpan.context() >> this.initContext
-        1 * this.initSpan.finish()
-        1 * this.tracer.startScopedSpanWithParent(GenieAgentRunner.RUN_SPAN_NAME, this.initContext) >> this.runSpan
-        1 * this.runSpan.error(_ as Throwable)
+        1 * this.tracer.startScopedSpan(GenieAgentRunner.RUN_SPAN_NAME) >> this.runSpan
+        1 * this.runSpan.context() >> this.initContext
         1 * this.runSpan.finish()
+        1 * this.runSpan.error(_ as Throwable)
         1 * this.traceCleaner.cleanup()
         1 * this.tracer.currentSpanCustomizer() >> this.runSpan
-        1 * this.tagAdapter.tag(this.runSpan, GenieAgentRunner.COMMAND_NAME_TAG, TestCommands.ExampleCommand1.NAME)
+        1 * this.tagAdapter.tag(
+            this.runSpan,
+            TracingConstants.AGENT_CLI_COMMAND_NAME_TAG,
+            TestCommands.ExampleCommand1.NAME
+        )
         1 * argsParser.parse(args)
         1 * argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         1 * argsParser.getCommandNames() >> TestCommands.allCommandNames()
