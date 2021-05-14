@@ -31,6 +31,7 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
@@ -78,8 +79,6 @@ class JpaPersistenceServiceImplJobsTest {
     private JpaApplicationRepository applicationRepository;
     private JpaClusterRepository clusterRepository;
     private JpaCommandRepository commandRepository;
-    private JpaFileRepository fileRepository;
-    private JpaTagRepository tagRepository;
 
     private JpaPersistenceServiceImpl persistenceService;
 
@@ -89,20 +88,21 @@ class JpaPersistenceServiceImplJobsTest {
         this.applicationRepository = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.commandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.tagRepository = Mockito.mock(JpaTagRepository.class);
-        this.fileRepository = Mockito.mock(JpaFileRepository.class);
+        final JpaTagRepository tagRepository = Mockito.mock(JpaTagRepository.class);
+        final JpaFileRepository fileRepository = Mockito.mock(JpaFileRepository.class);
 
         final JpaRepositories jpaRepositories = Mockito.mock(JpaRepositories.class);
         Mockito.when(jpaRepositories.getApplicationRepository()).thenReturn(this.applicationRepository);
         Mockito.when(jpaRepositories.getClusterRepository()).thenReturn(this.clusterRepository);
         Mockito.when(jpaRepositories.getCommandRepository()).thenReturn(this.commandRepository);
         Mockito.when(jpaRepositories.getJobRepository()).thenReturn(this.jobRepository);
-        Mockito.when(jpaRepositories.getFileRepository()).thenReturn(this.fileRepository);
-        Mockito.when(jpaRepositories.getTagRepository()).thenReturn(this.tagRepository);
+        Mockito.when(jpaRepositories.getFileRepository()).thenReturn(fileRepository);
+        Mockito.when(jpaRepositories.getTagRepository()).thenReturn(tagRepository);
 
         this.persistenceService = new JpaPersistenceServiceImpl(
             Mockito.mock(EntityManager.class),
-            jpaRepositories
+            jpaRepositories,
+            Mockito.mock(BraveTracingComponents.class)
         );
     }
 
@@ -517,7 +517,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void canGetJobHost() throws GenieCheckedException {
+    void canGetJobHost() {
         final String jobId = UUID.randomUUID().toString();
         final String hostName = UUID.randomUUID().toString();
         Mockito

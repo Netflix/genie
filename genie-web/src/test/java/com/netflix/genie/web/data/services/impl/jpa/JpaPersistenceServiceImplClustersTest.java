@@ -23,6 +23,7 @@ import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
@@ -69,7 +70,8 @@ class JpaPersistenceServiceImplClustersTest {
         Mockito.when(jpaRepositories.getFileRepository()).thenReturn(this.jpaFileRepository);
         this.service = new JpaPersistenceServiceImpl(
             Mockito.mock(EntityManager.class),
-            jpaRepositories
+            jpaRepositories,
+            Mockito.mock(BraveTracingComponents.class)
         );
     }
 

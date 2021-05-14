@@ -28,7 +28,6 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException
-import com.netflix.genie.common.internal.tracing.TracingConstants
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
@@ -62,7 +61,6 @@ class JobLaunchServiceImplSpec extends Specification {
     JobResolverService jobResolverService
     AgentLauncherSelector agentLauncherSelector
     Tracer tracer
-    BraveTagAdapter tagAdapter
     SpanCustomizer span
     JobLaunchServiceImpl service
 
@@ -71,7 +69,6 @@ class JobLaunchServiceImplSpec extends Specification {
         this.jobResolverService = Mock(JobResolverService)
         this.agentLauncherSelector = Mock(AgentLauncherSelector)
         this.tracer = Mock(Tracer)
-        this.tagAdapter = Mock(BraveTagAdapter)
         this.span = Mock(SpanCustomizer)
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
@@ -84,7 +81,7 @@ class JobLaunchServiceImplSpec extends Specification {
                 this.tracer,
                 Mock(BraveTracePropagator),
                 Mock(BraveTracingCleanup),
-                this.tagAdapter
+                Mock(BraveTagAdapter)
             ),
             new SimpleMeterRegistry()
         )
@@ -94,7 +91,6 @@ class JobLaunchServiceImplSpec extends Specification {
     def "Successful launch (requestedLauncherExt: #requestedLauncherExt launcherExt: #launcherExt)"() {
         def agentLauncher = Mock(AgentLauncher)
         def jobId = UUID.randomUUID().toString()
-        def jobName = UUID.randomUUID().toString()
         def resolvedJob = Mock(ResolvedJob)
         def jobSubmission = Mock(JobSubmission)
         def jobRequest = Mock(JobRequest)
@@ -108,7 +104,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
@@ -163,7 +158,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> {
             throw new IllegalStateException("fail")
         }
-        0 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         0 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         0 * this.jobResolverService.resolveJob(_ as String)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
@@ -180,7 +174,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> {
             throw new IdAlreadyExistsException("try again")
         }
-        0 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         0 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         0 * this.jobResolverService.resolveJob(_ as String)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
@@ -196,7 +189,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> {
             throw new GenieJobResolutionException("fail")
@@ -222,7 +214,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> {
             throw new GenieJobResolutionRuntimeException("fail")
@@ -248,7 +239,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
@@ -267,7 +257,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
@@ -292,7 +281,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
@@ -316,7 +304,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
@@ -342,7 +329,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
@@ -369,7 +355,6 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.tracer.currentSpanCustomizer() >> this.span
         1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
-        1 * this.tagAdapter.tag(this.span, TracingConstants.JOB_ID_TAG, jobId)
         1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
         1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)

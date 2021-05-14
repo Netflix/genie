@@ -24,6 +24,7 @@ import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata;
 import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
@@ -64,7 +65,8 @@ class JpaPersistenceServiceImplApplicationsTest {
         Mockito.when(jpaRepositories.getApplicationRepository()).thenReturn(this.jpaApplicationRepository);
         this.persistenceService = new JpaPersistenceServiceImpl(
             Mockito.mock(EntityManager.class),
-            jpaRepositories
+            jpaRepositories,
+            Mockito.mock(BraveTracingComponents.class)
         );
     }
 
