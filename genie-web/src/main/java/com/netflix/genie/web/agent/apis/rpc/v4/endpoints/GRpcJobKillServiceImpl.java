@@ -204,13 +204,21 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
     @Scheduled(fixedDelay = 30_000L, initialDelay = 30_000L)
     public void cleanupOrphanedObservers() {
         for (final String jobId : this.parkedJobKillResponseObservers.keySet()) {
-            if (!this.agentRoutingService.isAgentConnectionLocal(jobId)) {
-                final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers.remove(
-                    jobId
-                );
-                if (observer != null) {
-                    observer.onCompleted();
+            try {
+                if (!this.agentRoutingService.isAgentConnectionLocal(jobId)) {
+                    final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers.remove(
+                        jobId
+                    );
+                    if (observer != null) {
+                        try {
+                            observer.onCompleted();
+                        } catch (final Exception observerException) {
+                            log.error("Got exception while trying to complete streamObserver during cleanup for jobID {}. Exception: {}", jobId, observerException);
+                        }
+                    }
                 }
+            } catch (Exception unexpectedException) {
+                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. Exception: {}", jobId, unexpectedException);
             }
         }
     }
