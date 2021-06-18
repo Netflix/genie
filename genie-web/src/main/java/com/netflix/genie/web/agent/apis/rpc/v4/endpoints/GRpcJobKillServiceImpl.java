@@ -32,6 +32,7 @@ import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.RequestForwardingService;
 import io.grpc.stub.StreamObserver;
+import io.grpc.stub.ServerCallStreamObserver;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -206,20 +207,27 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
         for (final String jobId : this.parkedJobKillResponseObservers.keySet()) {
             try {
                 if (!this.agentRoutingService.isAgentConnectionLocal(jobId)) {
-                    final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers.remove(
-                        jobId
-                    );
-                    if (observer != null) {
+                    final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers
+                        .remove(jobId);
+
+                    if (observer != null && !isStreamObserverCancelled(observer)) {
                         try {
                             observer.onCompleted();
                         } catch (final Exception observerException) {
-                            log.error("Got exception while trying to complete streamObserver during cleanup for jobID {}. Exception: {}", jobId, observerException);
+                            log.error("Got exception while trying to complete streamObserver during cleanup" +
+                                "for jobID {}. Exception: {}", jobId, observerException);
                         }
                     }
                 }
             } catch (Exception unexpectedException) {
-                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. Exception: {}", jobId, unexpectedException);
+                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. " +
+                    "Exception: {}", jobId, unexpectedException);
             }
         }
+    }
+
+    @VisibleForTesting
+    protected boolean isStreamObserverCancelled(StreamObserver<JobKillRegistrationResponse> observer) {
+        return ((ServerCallStreamObserver<JobKillRegistrationResponse>)observer).isCancelled();
     }
 }
