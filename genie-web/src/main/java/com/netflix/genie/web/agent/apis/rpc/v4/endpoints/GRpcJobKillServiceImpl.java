@@ -214,20 +214,27 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
                         try {
                             observer.onCompleted();
                         } catch (final Exception observerException) {
-                            log.error("Got exception while trying to complete streamObserver during cleanup" +
-                                "for jobID {}. Exception: {}", jobId, observerException);
+                            log.error("Got exception while trying to complete streamObserver during cleanup"
+                                + "for jobID {}. Exception: {}", jobId, observerException);
                         }
                     }
                 }
-            } catch (Exception unexpectedException) {
-                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. " +
-                    "Exception: {}", jobId, unexpectedException);
+            } catch (final Exception unexpectedException) {
+                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. "
+                    + "Exception: {}", jobId, unexpectedException);
             }
         }
     }
 
+    /**
+     * Converts StreamObserver into ServerCallStreamObserver in order to tell
+     * whether the observer is cancelled or not.
+     *
+     * @param observer Observer for which we would check the status
+     * @return         Boolean value: true if observer has status CANCELLED
+     */
     @VisibleForTesting
-    protected boolean isStreamObserverCancelled(StreamObserver<JobKillRegistrationResponse> observer) {
-        return ((ServerCallStreamObserver<JobKillRegistrationResponse>)observer).isCancelled();
+    protected boolean isStreamObserverCancelled(final StreamObserver<JobKillRegistrationResponse> observer) {
+        return ((ServerCallStreamObserver<JobKillRegistrationResponse>) observer).isCancelled();
     }
 }
