@@ -32,6 +32,7 @@ import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.RequestForwardingService;
 import io.grpc.stub.StreamObserver;
+import io.grpc.stub.ServerCallStreamObserver;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -204,13 +205,44 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
     @Scheduled(fixedDelay = 30_000L, initialDelay = 30_000L)
     public void cleanupOrphanedObservers() {
         for (final String jobId : this.parkedJobKillResponseObservers.keySet()) {
-            if (!this.agentRoutingService.isAgentConnectionLocal(jobId)) {
-                final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers.remove(
-                    jobId
-                );
-                if (observer != null) {
-                    observer.onCompleted();
+            try {
+                if (!this.agentRoutingService.isAgentConnectionLocal(jobId)) {
+                    final StreamObserver<JobKillRegistrationResponse> observer = this.parkedJobKillResponseObservers
+                        .remove(jobId);
+
+                    cancelObserverIfNecessary(observer);
                 }
+            } catch (final Exception unexpectedException) {
+                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. "
+                    + "Exception: {}", jobId, unexpectedException);
+            }
+        }
+    }
+
+    /**
+     * Converts StreamObserver into ServerCallStreamObserver in order to tell
+     * whether the observer is cancelled or not.
+     *
+     * @param observer Observer for which we would check the status
+     * @return         Boolean value: true if observer has status CANCELLED
+     */
+    @VisibleForTesting
+    protected boolean isStreamObserverCancelled(final StreamObserver<JobKillRegistrationResponse> observer) {
+        return ((ServerCallStreamObserver<JobKillRegistrationResponse>) observer).isCancelled();
+    }
+
+    /**
+     * If observer is null or already cancelled - do nothing.
+     * Otherwise call onCompleted.
+     * @param observer
+     */
+    private void cancelObserverIfNecessary(final StreamObserver<JobKillRegistrationResponse> observer) {
+        if (observer != null && !isStreamObserverCancelled(observer)) {
+            try {
+                observer.onCompleted();
+            } catch (final Exception observerException) {
+                log.error("Got exception while trying to complete streamObserver during cleanup"
+                    + "for jobID {}. Exception: {}", "jobId", observerException);
             }
         }
     }

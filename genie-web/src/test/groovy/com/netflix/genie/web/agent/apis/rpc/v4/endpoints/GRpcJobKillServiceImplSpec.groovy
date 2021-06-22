@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletRequest
  */
 class GRpcJobKillServiceImplSpec extends Specification {
 
-    GRpcJobKillServiceImpl service
+    GRpcJobKillServiceImpl serviceSpy
     String jobId
     String reason
     String remoteHost
@@ -64,32 +64,40 @@ class GRpcJobKillServiceImplSpec extends Specification {
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
-        this.service = new GRpcJobKillServiceImpl(dataServices, this.agentRoutingService, this.requestForwardingService)
+        def service = new GRpcJobKillServiceImpl(dataServices, this.agentRoutingService, this.requestForwardingService)
+
+        this.serviceSpy = Spy(service);
         this.servletRequest = Mock(HttpServletRequest)
     }
 
     def "Can register for kill notification"() {
+        setup:
+        serviceSpy.isStreamObserverCancelled(_) >> false
+
         when:
-        this.service.registerForKillNotification(this.request, this.responseObserver)
+        this.serviceSpy.registerForKillNotification(this.request, this.responseObserver)
 
         then:
         noExceptionThrown()
-        this.service.getParkedJobKillResponseObservers().size() == 1
-        this.service.getParkedJobKillResponseObservers().get(this.jobId) == this.responseObserver
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(this.jobId) == this.responseObserver
 
         when: "A new registration occurs for the same job id"
-        this.service.registerForKillNotification(this.request, Mock(StreamObserver))
+        this.serviceSpy.registerForKillNotification(this.request, Mock(StreamObserver))
 
         then: "The old one is removed and closed"
         noExceptionThrown()
-        this.service.getParkedJobKillResponseObservers().size() == 1
-        this.service.getParkedJobKillResponseObservers().get(this.jobId) != this.responseObserver
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(this.jobId) != this.responseObserver
         1 * this.responseObserver.onCompleted()
     }
 
     def "Kill logic works as expected"() {
+        setup:
+        serviceSpy.isStreamObserverCancelled(_) >> false
+
         when: "Job doesn't exist"
-        this.service.killJob(this.jobId, this.reason, null)
+        this.serviceSpy.killJob(this.jobId, this.reason, null)
 
         then: "Expected exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> {
@@ -98,7 +106,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         thrown(GenieJobNotFoundException)
 
         when: "The job is already finished"
-        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
 
         then: "Nothing needs to be done"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.SUCCEEDED
@@ -107,7 +115,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         0 * this.agentRoutingService.isAgentConnectionLocal(this.jobId)
 
         when: "The job is active, the agent isn't yet started but status has changed since initial call"
-        this.service.killJob(this.jobId, this.reason, null)
+        this.serviceSpy.killJob(this.jobId, this.reason, null)
 
         then: "Only try to set killed in database but is rejected and exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RESERVED
@@ -118,7 +126,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         thrown(GenieInvalidStatusException)
 
         when: "The job is active, the agent isn't yet started but for some reason db can't find job"
-        this.service.killJob(this.jobId, this.reason, null)
+        this.serviceSpy.killJob(this.jobId, this.reason, null)
 
         then: "Correct exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.ACCEPTED
@@ -129,7 +137,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         thrown(GenieJobNotFoundException)
 
         when: "The job is active, the agent isn't yet started and the db can find the job"
-        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
 
         then: "The database is updated and no exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RESOLVED
@@ -138,7 +146,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when: "The job is active, the agent is connected, the job is local but no observer"
-        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
 
         then: "Correct exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.CLAIMED
@@ -149,8 +157,8 @@ class GRpcJobKillServiceImplSpec extends Specification {
         thrown(GenieServerException)
 
         when: "The job is active, the agent is connected, and there is an observer"
-        this.service.registerForKillNotification(this.request, this.responseObserver)
-        this.service.killJob(this.jobId, this.reason, null)
+        this.serviceSpy.registerForKillNotification(this.request, this.responseObserver)
+        this.serviceSpy.killJob(this.jobId, this.reason, null)
 
         then: "Kill message is sent and the observer is removed"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.INIT
@@ -158,10 +166,10 @@ class GRpcJobKillServiceImplSpec extends Specification {
         1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> true
         1 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
         1 * this.responseObserver.onCompleted()
-        this.service.getParkedJobKillResponseObservers().isEmpty()
+        this.serviceSpy.getParkedJobKillResponseObservers().isEmpty()
 
         when: "The job is active, the agent is connected to another server but we can't determine where"
-        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
 
         then: "An exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RUNNING
@@ -173,7 +181,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         thrown(GenieServerException)
 
         when: "The job is active and we try to forward request"
-        this.service.killJob(this.jobId, this.reason, this.servletRequest)
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
 
         then: "No exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.RUNNING
@@ -187,6 +195,9 @@ class GRpcJobKillServiceImplSpec extends Specification {
     }
 
     def "can clean up orphans"() {
+        setup:
+        serviceSpy.isStreamObserverCancelled(_) >> false
+
         def jobId0 = UUID.randomUUID().toString()
         def jobId1 = UUID.randomUUID().toString()
         def jobId2 = UUID.randomUUID().toString()
@@ -200,50 +211,183 @@ class GRpcJobKillServiceImplSpec extends Specification {
         def jobObserver2 = Mock(StreamObserver)
 
         when: "Nothing is registered"
-        this.service.cleanupOrphanedObservers()
+        this.serviceSpy.cleanupOrphanedObservers()
 
         then: "Nothing happens"
-        this.service.getParkedJobKillResponseObservers().isEmpty()
+        this.serviceSpy.getParkedJobKillResponseObservers().isEmpty()
 
         when: "Jobs are registered"
-        this.service.registerForKillNotification(request0, jobObserver0)
-        this.service.registerForKillNotification(request1, jobObserver1)
-        this.service.registerForKillNotification(request2, jobObserver2)
+        this.serviceSpy.registerForKillNotification(request0, jobObserver0)
+        this.serviceSpy.registerForKillNotification(request1, jobObserver1)
+        this.serviceSpy.registerForKillNotification(request2, jobObserver2)
 
         then: "They're saved in map"
-        this.service.getParkedJobKillResponseObservers().size() == 3
-        this.service.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
-        this.service.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
-        this.service.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 3
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
 
         when: "All jobs still attached locally"
-        this.service.cleanupOrphanedObservers()
+        this.serviceSpy.cleanupOrphanedObservers()
 
         then: "Nothing happens"
         1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> true
-        this.service.getParkedJobKillResponseObservers().size() == 3
-        this.service.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
-        this.service.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
-        this.service.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 3
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
         0 * jobObserver0.onCompleted()
         0 * jobObserver1.onCompleted()
         0 * jobObserver2.onCompleted()
 
         when: "The jobs switch servers or complete"
-        this.service.cleanupOrphanedObservers()
+        this.serviceSpy.cleanupOrphanedObservers()
 
         then: "It is removed from the map and the observer is completed"
         1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> false
         1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> false
-        this.service.getParkedJobKillResponseObservers().size() == 1
-        this.service.getParkedJobKillResponseObservers().get(jobId0) == null
-        this.service.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
-        this.service.getParkedJobKillResponseObservers().get(jobId2) == null
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == null
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == null
         1 * jobObserver0.onCompleted()
         0 * jobObserver1.onCompleted()
         1 * jobObserver2.onCompleted()
+        noExceptionThrown()
+    }
+
+    def "cleans up orphans but does not complete cancelled"() {
+        setup:
+        serviceSpy.isStreamObserverCancelled(_) >> true
+
+        def jobId0 = UUID.randomUUID().toString()
+        def jobId1 = UUID.randomUUID().toString()
+        def jobId2 = UUID.randomUUID().toString()
+
+        def request0 = JobKillRegistrationRequest.newBuilder().setJobId(jobId0).build()
+        def request1 = JobKillRegistrationRequest.newBuilder().setJobId(jobId1).build()
+        def request2 = JobKillRegistrationRequest.newBuilder().setJobId(jobId2).build()
+
+        def jobObserver0 = Mock(StreamObserver)
+        def jobObserver1 = Mock(StreamObserver)
+        def jobObserver2 = Mock(StreamObserver)
+
+        when: "Jobs are registered"
+        this.serviceSpy.registerForKillNotification(request0, jobObserver0)
+        this.serviceSpy.registerForKillNotification(request1, jobObserver1)
+        this.serviceSpy.registerForKillNotification(request2, jobObserver2)
+
+        then: "They're saved in map"
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 3
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+
+        when: "The jobs switch servers or complete"
+        this.serviceSpy.cleanupOrphanedObservers()
+
+        then: "It is removed from the map but the observers are cancelled so no onCompleted"
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> false
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> false
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == null
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == null
+        0 * jobObserver0.onCompleted()
+        0 * jobObserver1.onCompleted()
+        0 * jobObserver2.onCompleted()
+        noExceptionThrown()
+    }
+
+    def "clean up orphans and no exceptions thrown when onComplete throws"() {
+        setup:
+        serviceSpy.isStreamObserverCancelled(_) >> false
+
+        def jobId0 = UUID.randomUUID().toString()
+        def jobId1 = UUID.randomUUID().toString()
+        def jobId2 = UUID.randomUUID().toString()
+
+        def request0 = JobKillRegistrationRequest.newBuilder().setJobId(jobId0).build()
+        def request1 = JobKillRegistrationRequest.newBuilder().setJobId(jobId1).build()
+        def request2 = JobKillRegistrationRequest.newBuilder().setJobId(jobId2).build()
+
+        def jobObserver0 = Mock(StreamObserver)
+        def jobObserver1 = Mock(StreamObserver)
+        def jobObserver2 = Mock(StreamObserver)
+
+        when: "Jobs are registered"
+        this.serviceSpy.registerForKillNotification(request0, jobObserver0)
+        this.serviceSpy.registerForKillNotification(request1, jobObserver1)
+        this.serviceSpy.registerForKillNotification(request2, jobObserver2)
+
+        then: "They're saved in map"
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 3
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+
+        when: "The jobs switch servers or complete"
+        this.serviceSpy.cleanupOrphanedObservers()
+
+        then: "It is removed from the map and onComplete throws exception we catch"
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> false
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> false
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == null
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == null
+        1 * jobObserver0.onCompleted() >> { throw new RuntimeException("Mock exception") }
+        0 * jobObserver1.onCompleted()
+        1 * jobObserver2.onCompleted() >> { throw new RuntimeException("Mock exception") }
+        noExceptionThrown()
+    }
+
+    def "clean up orphans and no exceptions thrown when loop body throws"() {
+        setup:
+        serviceSpy.isStreamObserverCancelled(_) >> false
+
+        def jobId0 = UUID.randomUUID().toString()
+        def jobId1 = UUID.randomUUID().toString()
+        def jobId2 = UUID.randomUUID().toString()
+
+        def request0 = JobKillRegistrationRequest.newBuilder().setJobId(jobId0).build()
+        def request1 = JobKillRegistrationRequest.newBuilder().setJobId(jobId1).build()
+        def request2 = JobKillRegistrationRequest.newBuilder().setJobId(jobId2).build()
+
+        def jobObserver0 = Mock(StreamObserver)
+        def jobObserver1 = Mock(StreamObserver)
+        def jobObserver2 = Mock(StreamObserver)
+
+        when: "Jobs are registered"
+        this.serviceSpy.registerForKillNotification(request0, jobObserver0)
+        this.serviceSpy.registerForKillNotification(request1, jobObserver1)
+        this.serviceSpy.registerForKillNotification(request2, jobObserver2)
+
+        then: "They're saved in map"
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 3
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == jobObserver1
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+
+        when: "The jobs switch servers or complete"
+        this.serviceSpy.cleanupOrphanedObservers()
+
+        then: "It is removed from the map and onComplete throws exception we catch"
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId0) >> { throw new RuntimeException("Mock exception") }
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId1) >> false
+        1 * this.agentRoutingService.isAgentConnectionLocal(jobId2) >> { throw new RuntimeException("Mock exception") }
+        this.serviceSpy.getParkedJobKillResponseObservers().size() == 2
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId0) == jobObserver0
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId1) == null
+        this.serviceSpy.getParkedJobKillResponseObservers().get(jobId2) == jobObserver2
+        0 * jobObserver0.onCompleted()
+        1 * jobObserver1.onCompleted()
+        0 * jobObserver2.onCompleted()
+        noExceptionThrown()
     }
 }
