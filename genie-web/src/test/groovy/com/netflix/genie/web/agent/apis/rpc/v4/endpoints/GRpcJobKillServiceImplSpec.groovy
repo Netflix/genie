@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletRequest
  */
 class GRpcJobKillServiceImplSpec extends Specification {
 
-    GRpcJobKillServiceImpl service
     GRpcJobKillServiceImpl serviceSpy
     String jobId
     String reason
@@ -65,7 +64,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
-        this.service = new GRpcJobKillServiceImpl(dataServices, this.agentRoutingService, this.requestForwardingService)
+        def service = new GRpcJobKillServiceImpl(dataServices, this.agentRoutingService, this.requestForwardingService)
 
         this.serviceSpy = Spy(service);
         this.servletRequest = Mock(HttpServletRequest)
