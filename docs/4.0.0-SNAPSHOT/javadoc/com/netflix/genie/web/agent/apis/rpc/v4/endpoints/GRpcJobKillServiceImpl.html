@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -171,6 +171,13 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#isStreamObserverCancelled-io.grpc.stub.StreamObserver-">isStreamObserverCancelled</a></span>(io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobKillRegistrationResponse&gt;&nbsp;observer)</code>
+<div class="block">Converts StreamObserver into ServerCallStreamObserver in order to tell
+ whether the observer is cancelled or not.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob-java.lang.String-java.lang.String-javax.servlet.http.HttpServletRequest-">killJob</a></span>(java.lang.String&nbsp;jobId,
        java.lang.String&nbsp;reason,
@@ -178,7 +185,7 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/services/Jo
 <div class="block">Kill the job with the given id if possible.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#registerForKillNotification-com.netflix.genie.proto.JobKillRegistrationRequest-io.grpc.stub.StreamObserver-">registerForKillNotification</a></span>(com.netflix.genie.proto.JobKillRegistrationRequest&nbsp;request,
                            io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobKillRegistrationResponse&gt;&nbsp;responseObserver)</code>
@@ -290,7 +297,7 @@ public&nbsp;void&nbsp;killJob(java.lang.String&nbsp;jobId,
 <a name="cleanupOrphanedObservers--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>cleanupOrphanedObservers</h4>
 <pre>@Scheduled(fixedDelay=30000L,
@@ -307,6 +314,23 @@ public&nbsp;void&nbsp;cleanupOrphanedObservers()</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd>"GRpcAgentJobKillServiceImpl"</dd>
+</dl>
+</li>
+</ul>
+<a name="isStreamObserverCancelled-io.grpc.stub.StreamObserver-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>isStreamObserverCancelled</h4>
+<pre>protected&nbsp;boolean&nbsp;isStreamObserverCancelled(io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobKillRegistrationResponse&gt;&nbsp;observer)</pre>
+<div class="block">Converts StreamObserver into ServerCallStreamObserver in order to tell
+ whether the observer is cancelled or not.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>observer</code> - Observer for which we would check the status</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Boolean value: true if observer has status CANCELLED</dd>
 </dl>
 </li>
 </ul>
