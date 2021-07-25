@@ -21,11 +21,9 @@ import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.GenieAgentRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Tests that ensure the app comes up correctly with default values.
@@ -33,7 +31,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author tgianos
  * @since 4.0.0
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = GenieAgentApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE
