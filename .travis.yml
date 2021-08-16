@@ -9,7 +9,7 @@ services:
 - postgresql
 - docker
 git:
-  depth: false
+  depth: 3
 install: "./travis/installViaTravis.sh"
 before_script:
 - cat "$TRAVIS_BUILD_DIR/travis/config/mysql/my.cnf" | sudo tee -a /etc/mysql/my.cnf
