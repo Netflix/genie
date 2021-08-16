@@ -11,7 +11,7 @@ Genie is a federated Big Data orchestration and execution engine developed by Ne
 
 Genie’s value is best described in terms of the problem it solves.
 
-Big Data infrastructure is complex and ever-evolving.
+Big Data infrastructure is complex and ever-evolving. 
 
 Data consumers (Data Scientists or other applications) need to jump over a lot of hurdles in order to run a simple query:
  - Find, download, install and configure a number of binaries, libraries and tools
@@ -100,7 +100,7 @@ And to the [setup]() section for more detailed instructions to set up Genie.
 
 ## Python Client
 
-The [Genie Python client](https://github.com/Netflix/pygenie) is hosted in a different repository.
+The [Genie Python client](https://github.com/Netflix/pygenie) is hosted in a different repository. 
 
 ## Further info
 For a detailed explanation of Genie architecture, use cases, API documentation, demos, deployment and customization guides, and more, visit the
