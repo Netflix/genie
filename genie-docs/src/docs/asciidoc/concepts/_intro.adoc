@@ -3,7 +3,7 @@
 This section provides an high level overview of what a Genie job is.
 More details on the concepts covered here are provided in later sections.
 
-===== API jobs vs agent CLI jobs
+==== API jobs vs agent CLI jobs
 
 Genie provides 2 ways to execute a job:
 
@@ -16,7 +16,8 @@ The server takes care of all the details, the user can sit back, wait for the jo
 
 A job request via API may look something like this:
 
-```
+[source]
+----
 {
   "command" : ["type:spark-sql", "version:2.1.1"],
   "cluster" : ["data:production"],
@@ -24,7 +25,7 @@ A job request via API may look something like this:
   "memory" : 1024,
   "user" : "jdoe"
 }
-```
+----
 
 The advantages of API jobs are:
 
@@ -38,12 +39,13 @@ Genie for configuration, monitoring, audit, archival, etc.
 
 An agent job launched via CLI may look something like this:
 
-```
+[source]
+----
 $ genie-agent exec  \
   --command='type:spark-shell'
   --cluster='data:test' \
   -- --shell-color=true'
-```
+----
 
 There are two primary reasons for choosing agent CLI over API job request:
 
@@ -82,7 +84,7 @@ image::4.0.0/cli-job.png[CLI Job, link="{imagesdir}/4.0.0/cli-job.png"]
 1. The user launches a job via CLI (this job execute locally, wherever the agent is invoked)
 2. The agent connects to the Genie cluster and creates the job record, resolves resources (cluster, command). It also keeps the server informed of its progress.
 3. The agent sets up the job (downloads dependencies, runs setup scripts, ...), then launches it, all while regularly updating the server. After the job is done, the agent archives outputs and logs.
-6. While the job is running and after completion, the user can retrieve job status and download outputs and logs (and even kill the job).
+4. While the job is running and after completion, the user can retrieve job status and download outputs and logs (and even kill the job).
 
 ===== Status Transitions
 

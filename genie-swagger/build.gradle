@@ -1,0 +1,41 @@
+apply plugin: "java-library"
+
+dependencies {
+    /*******************************
+     * API Dependencies
+     *******************************/
+
+    api("io.springfox:springfox-boot-starter")
+
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    runtimeOnly(project(":genie-web"))
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testImplementation(project(":genie-test"))
+    testImplementation(project(":genie-test-web"))
+}
+
+jar {
+    manifest {
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+        )
+    }
+}

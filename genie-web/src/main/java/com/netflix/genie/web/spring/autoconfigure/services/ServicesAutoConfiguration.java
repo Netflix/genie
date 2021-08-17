@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -141,12 +142,13 @@ public class ServicesAutoConfiguration {
     /**
      * Get an implementation of {@link JobResolverService} if one hasn't already been defined.
      *
-     * @param dataServices     The {@link DataServices} encapsulation instance to use
-     * @param clusterSelectors The {@link ClusterSelector} implementations to use
-     * @param commandSelector  The {@link CommandSelector} implementation to use
-     * @param registry         The metrics repository to use
-     * @param jobsProperties   The properties for running a job set by the user
-     * @param environment      The Spring application {@link Environment} for dynamic property resolution
+     * @param dataServices      The {@link DataServices} encapsulation instance to use
+     * @param clusterSelectors  The {@link ClusterSelector} implementations to use
+     * @param commandSelector   The {@link CommandSelector} implementation to use
+     * @param registry          The metrics repository to use
+     * @param jobsProperties    The properties for running a job set by the user
+     * @param environment       The Spring application {@link Environment} for dynamic property resolution
+     * @param tracingComponents The {@link BraveTracingComponents} to use
      * @return A {@link JobResolverServiceImpl} instance
      */
     @Bean
@@ -157,7 +159,8 @@ public class ServicesAutoConfiguration {
         final CommandSelector commandSelector,
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
-        final Environment environment
+        final Environment environment,
+        final BraveTracingComponents tracingComponents
     ) {
         return new JobResolverServiceImpl(
             dataServices,
@@ -165,7 +168,8 @@ public class ServicesAutoConfiguration {
             commandSelector,
             registry,
             jobsProperties,
-            environment
+            environment,
+            tracingComponents
         );
     }
 
@@ -207,6 +211,7 @@ public class ServicesAutoConfiguration {
      * @param dataServices          The {@link DataServices} instance to use
      * @param jobResolverService    The {@link JobResolverService} implementation to use
      * @param agentLauncherSelector The {@link AgentLauncherSelector} implementation to use
+     * @param tracingComponents     The {@link BraveTracingComponents} instance to use
      * @param registry              The metrics registry to use
      * @return A {@link JobLaunchServiceImpl} instance
      */
@@ -216,9 +221,16 @@ public class ServicesAutoConfiguration {
         final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentLauncherSelector agentLauncherSelector,
+        final BraveTracingComponents tracingComponents,
         final MeterRegistry registry
     ) {
-        return new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncherSelector, registry);
+        return new JobLaunchServiceImpl(
+            dataServices,
+            jobResolverService,
+            agentLauncherSelector,
+            tracingComponents,
+            registry
+        );
     }
 
     /**

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution;
 
+import brave.Tracer;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
@@ -30,12 +31,12 @@ import com.netflix.genie.agent.execution.services.JobMonitorService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.TracingListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
@@ -66,6 +67,7 @@ import com.netflix.genie.agent.execution.statemachine.stages.StopKillServiceStag
 import com.netflix.genie.agent.execution.statemachine.stages.WaitJobCompletionStage;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -116,6 +118,20 @@ public class ExecutionAutoConfiguration {
     }
 
     /**
+     * Provide an instance of {@link TracingListener} which will add metadata to spans based on events through the
+     * execution state machine.
+     *
+     * @param tracer The {@link Tracer} to use to get active spans
+     * @return A {@link TracingListener} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(TracingListener.class)
+    public TracingListener jobExecutionTracingListener(final Tracer tracer) {
+        return new TracingListener(tracer);
+    }
+
+    /**
      * Provide the {@link ExecutionContext} bean.
      *
      * @return A {@link ExecutionContext}.
@@ -127,9 +143,19 @@ public class ExecutionAutoConfiguration {
         return new ExecutionContext(agentProperties);
     }
 
+    /**
+     * Provide the default job execution state machine instance which will handle the entire lifecycle of the job
+     * this agent instance is responsible for.
+     *
+     * @param executionStages   The available stages
+     * @param executionContext  The context object for sharing state
+     * @param listeners         Any listeners that may be in the system to react to events
+     * @param jobProcessManager The process manager for the actual client job
+     * @return a {@link JobExecutionStateMachineImpl} instance
+     */
     @Bean
     @Lazy
-    JobExecutionStateMachine jobExecutionStateMachine(
+    JobExecutionStateMachineImpl jobExecutionStateMachine(
         @NotEmpty final List<ExecutionStage> executionStages,
         final ExecutionContext executionContext,
         final Collection<JobExecutionListener> listeners,
@@ -210,14 +236,18 @@ public class ExecutionAutoConfiguration {
     /**
      * Create a {@link ReserveJobIdStage} bean if one is not already defined.
      *
-     * @param agentJobService the agent job service
+     * @param agentJobService   the agent job service
+     * @param tracingComponents The {@link BraveTracingComponents} instance
      */
     @Bean
     @Lazy
     @Order(40)
     @ConditionalOnMissingBean(ReserveJobIdStage.class)
-    ReserveJobIdStage reserveJobIdStage(final AgentJobService agentJobService) {
-        return new ReserveJobIdStage(agentJobService);
+    ReserveJobIdStage reserveJobIdStage(
+        final AgentJobService agentJobService,
+        final BraveTracingComponents tracingComponents
+    ) {
+        return new ReserveJobIdStage(agentJobService, tracingComponents);
     }
 
     /**

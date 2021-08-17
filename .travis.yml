@@ -1,8 +1,0 @@
-dist: xenial
-language: java
-jdk:
-  - openjdk8
-git:
-  depth: false
-script:
-  - echo "hello world!"

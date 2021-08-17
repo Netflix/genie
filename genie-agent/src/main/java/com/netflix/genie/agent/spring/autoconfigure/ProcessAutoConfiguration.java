@@ -19,6 +19,7 @@ package com.netflix.genie.agent.spring.autoconfigure;
 
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.impl.JobProcessManagerImpl;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -38,15 +39,17 @@ public class ProcessAutoConfiguration {
     /**
      * Provide a lazy {@link JobProcessManager} bean if one hasn't already been defined.
      *
-     * @param taskScheduler The {@link TaskScheduler} instance to use
+     * @param taskScheduler     The {@link TaskScheduler} instance to use
+     * @param tracingComponents The {@link BraveTracingComponents} instance to use
      * @return A {@link JobProcessManagerImpl} instance
      */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(JobProcessManager.class)
     public JobProcessManagerImpl jobProcessManager(
-        @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
+        final BraveTracingComponents tracingComponents
     ) {
-        return new JobProcessManagerImpl(taskScheduler);
+        return new JobProcessManagerImpl(taskScheduler, tracingComponents);
     }
 }

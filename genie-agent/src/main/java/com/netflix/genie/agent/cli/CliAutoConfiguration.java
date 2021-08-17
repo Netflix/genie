@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.properties.AgentProperties;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.proto.PingServiceGrpc;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -46,9 +47,11 @@ import javax.validation.Validator;
  * @since 4.0.0
  */
 @Configuration
-@EnableConfigurationProperties({
-    AgentProperties.class
-})
+@EnableConfigurationProperties(
+    {
+        AgentProperties.class
+    }
+)
 public class CliAutoConfiguration {
     /**
      * Provide a bean for cache command line arguments.
@@ -56,7 +59,7 @@ public class CliAutoConfiguration {
      * @return a {@link CacheArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.CacheArguments cacheArgumentsDelegate() {
+    public CacheArgumentsImpl cacheArgumentsDelegate() {
         return new CacheArgumentsImpl();
     }
 
@@ -140,18 +143,20 @@ public class CliAutoConfiguration {
      * The main {@link GenieAgentRunner} entry point bean which implements
      * {@link org.springframework.boot.CommandLineRunner}.
      *
-     * @param argumentParser The argument parser to use
-     * @param commandFactory The command factory to use
-     * @param environment    The spring environment
+     * @param argumentParser    The argument parser to use
+     * @param commandFactory    The command factory to use
+     * @param tracingComponents The {@link BraveTracingComponents} to use
+     * @param environment       The spring environment
      * @return An instance of {@link GenieAgentRunner} if one hasn't already been provided
      */
     @Bean
     public GenieAgentRunner genieAgentRunner(
         final ArgumentParser argumentParser,
         final CommandFactory commandFactory,
+        final BraveTracingComponents tracingComponents,
         final Environment environment
     ) {
-        return new GenieAgentRunner(argumentParser, commandFactory, environment);
+        return new GenieAgentRunner(argumentParser, commandFactory, tracingComponents, environment);
     }
 
     /**
@@ -250,7 +255,7 @@ public class CliAutoConfiguration {
      * @return An instance of {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments}
      */
     @Bean
-    public ArgumentDelegates.JobRequestArguments jobRequestArguments(final MainCommandArguments mainCommandArguments) {
+    public JobRequestArgumentsImpl jobRequestArguments(final MainCommandArguments mainCommandArguments) {
         return new JobRequestArgumentsImpl(mainCommandArguments);
     }
 
@@ -336,7 +341,7 @@ public class CliAutoConfiguration {
      * @return A {@link ServerArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.ServerArguments serverArguments() {
+    public ServerArgumentsImpl serverArguments() {
         return new ServerArgumentsImpl();
     }
 
@@ -346,7 +351,7 @@ public class CliAutoConfiguration {
      * @return A {@link CleanupArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.CleanupArguments cleanupArguments() {
+    public CleanupArgumentsImpl cleanupArguments() {
         return new CleanupArgumentsImpl();
     }
 
@@ -356,7 +361,7 @@ public class CliAutoConfiguration {
      * @return A {@link RuntimeConfigurationArgumentsImpl} instance
      */
     @Bean
-    public ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments() {
+    public RuntimeConfigurationArgumentsImpl runtimeConfigurationArguments() {
         return new RuntimeConfigurationArgumentsImpl();
     }
 
@@ -368,7 +373,7 @@ public class CliAutoConfiguration {
     @Bean
     @ConditionalOnClass(name = {"org.apache.logging.log4j.core.LoggerContext"})
     @ConditionalOnMissingBean(AgentLogManager.class)
-    public AgentLogManager agentLogManagerLog4j2() {
+    public AgentLogManagerLog4j2Impl agentLogManagerLog4j2() {
         return new AgentLogManagerLog4j2Impl(
             (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false)
         );

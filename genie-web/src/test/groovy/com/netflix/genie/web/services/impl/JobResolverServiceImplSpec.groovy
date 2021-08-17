@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.services.impl
 
+import brave.SpanCustomizer
+import brave.Tracer
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
@@ -41,6 +43,8 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException
 import com.netflix.genie.common.internal.jobs.JobConstants
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
@@ -69,12 +73,14 @@ import java.util.stream.Stream
 @SuppressWarnings("GroovyAccessibility")
 class JobResolverServiceImplSpec extends Specification {
 
-    PersistenceService persistenceService
-    ClusterSelector clusterSelector
-    CommandSelector commandSelector
-    JobsProperties jobsProperties
+    private PersistenceService persistenceService
+    private ClusterSelector clusterSelector
+    private CommandSelector commandSelector
+    private JobsProperties jobsProperties
+    private Tracer tracer
+    private BraveTagAdapter tagAdapter
 
-    JobResolverServiceImpl service
+    private JobResolverServiceImpl service
 
     def setup() {
         this.persistenceService = Mock(PersistenceService)
@@ -84,13 +90,22 @@ class JobResolverServiceImplSpec extends Specification {
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
+        this.tagAdapter = Mock(BraveTagAdapter)
+        this.tracer = Mock(Tracer) {
+            currentSpanCustomizer() >> Mock(SpanCustomizer)
+        }
+        def tracingComponents = Mock(BraveTracingComponents) {
+            getTagAdapter() >> this.tagAdapter
+            getTracer() >> this.tracer
+        }
         this.service = new JobResolverServiceImpl(
             dataServices,
             Lists.newArrayList(this.clusterSelector),
             this.commandSelector,
             new SimpleMeterRegistry(),
             this.jobsProperties,
-            Mock(Environment)
+            Mock(Environment),
+            tracingComponents
         )
     }
 
@@ -380,12 +395,10 @@ class JobResolverServiceImplSpec extends Specification {
         def commandName = UUID.randomUUID().toString()
         def commandTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def clusterCriteria = Lists.newArrayList(
-            new Criterion
-                .Builder()
+            new Criterion.Builder()
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
                 .build(),
-            new Criterion
-                .Builder()
+            new Criterion.Builder()
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
         )
@@ -396,13 +409,12 @@ class JobResolverServiceImplSpec extends Specification {
             null,
             null,
             null,
-            new JobMetadata
-                .Builder(jobName, user)
+            new JobMetadata.Builder(jobName, user)
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .withGrouping(grouping)
                 .withGroupingInstance(groupingInstance)
                 .build(),
-            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+            new ExecutionResourceCriteria(clusterCriteria as List<Criterion>, commandCriterion, null),
             null,
             null
         )
@@ -434,7 +446,7 @@ class JobResolverServiceImplSpec extends Specification {
             100L,
             null
         )
-        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         context.setCluster(cluster)
         context.setCommand(command)
         context.setJobMemory(this.jobsProperties.getMemory().getDefaultJobMemory())
@@ -596,7 +608,7 @@ class JobResolverServiceImplSpec extends Specification {
         allClusters.addAll(command2Clusters)
 
         when: "No commands are found in the database which match the users criterion"
-        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
 
         then: "An exception is thrown"
@@ -606,7 +618,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Only a single command is found which matches the criterion but it has no clusters"
-        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, false)
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, false, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
 
         then: "The selector is not invoked as no command is selected"
@@ -616,7 +628,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Only a single command is found but it is filtered out by in memory cluster matching"
-        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
 
         then: "The selector is not invoked as no command is selected"
@@ -628,7 +640,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Only a single command is found"
-        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
         def resolvedCommand = context.getCommand().orElseThrow({ new IllegalStateException() })
 
@@ -653,7 +665,7 @@ class JobResolverServiceImplSpec extends Specification {
         resolvedCommand == command1
 
         when: "Many commands are found which match the criterion but nothing is selected by the selectors"
-        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, false)
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, false, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
 
         then: "An exception is thrown"
@@ -679,7 +691,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "The selectors throw an exception"
-        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
 
         then: "It is propagated"
@@ -702,7 +714,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionRuntimeException)
 
         when: "The selectors select a command"
-        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         this.service.resolveCommand(context)
         resolvedCommand = context.getCommand().orElseThrow({ new IllegalStateException() })
 
@@ -1027,9 +1039,10 @@ class JobResolverServiceImplSpec extends Specification {
             (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
         ]
         def cpu = 5
+        def spanCustomizer = Mock(SpanCustomizer)
 
         when:
-        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob)
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob, spanCustomizer)
 
         then:
         context.getJobId() == jobId
@@ -1045,6 +1058,7 @@ class JobResolverServiceImplSpec extends Specification {
         !context.getJobDirectory().isPresent()
         !context.getCommandClusters().isPresent()
         !context.getCpu().isPresent()
+        context.getSpanCustomizer() == spanCustomizer
 
         when:
         context.build()
@@ -1193,12 +1207,10 @@ class JobResolverServiceImplSpec extends Specification {
         @Nullable Integer requestedCpu
     ) {
         def clusterCriteria = Lists.newArrayList(
-            new Criterion
-                .Builder()
+            new Criterion.Builder()
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
                 .build(),
-            new Criterion
-                .Builder()
+            new Criterion.Builder()
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
         )
@@ -1208,7 +1220,7 @@ class JobResolverServiceImplSpec extends Specification {
             null,
             commandArgs,
             new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build(),
-            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+            new ExecutionResourceCriteria(clusterCriteria as List<Criterion>, commandCriterion, null),
             new JobEnvironmentRequest.Builder()
                 .withRequestedJobMemory(requestedMemory)
                 .withRequestedJobCpu(requestedCpu)

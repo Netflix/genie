@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.services.impl
 
+import brave.SpanCustomizer
+import brave.Tracer
 import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
@@ -26,6 +28,10 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents
 import com.netflix.genie.web.agent.launchers.AgentLauncher
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -54,12 +60,16 @@ class JobLaunchServiceImplSpec extends Specification {
     PersistenceService persistenceService
     JobResolverService jobResolverService
     AgentLauncherSelector agentLauncherSelector
+    Tracer tracer
+    SpanCustomizer span
     JobLaunchServiceImpl service
 
     def setup() {
         this.persistenceService = Mock(PersistenceService)
         this.jobResolverService = Mock(JobResolverService)
         this.agentLauncherSelector = Mock(AgentLauncherSelector)
+        this.tracer = Mock(Tracer)
+        this.span = Mock(SpanCustomizer)
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> this.persistenceService
         }
@@ -67,6 +77,12 @@ class JobLaunchServiceImplSpec extends Specification {
             dataServices,
             this.jobResolverService,
             this.agentLauncherSelector,
+            new BraveTracingComponents(
+                this.tracer,
+                Mock(BraveTracePropagator),
+                Mock(BraveTracingCleanup),
+                Mock(BraveTagAdapter)
+            ),
             new SimpleMeterRegistry()
         )
     }
@@ -85,10 +101,15 @@ class JobLaunchServiceImplSpec extends Specification {
         def savedJobId = this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESOLVED
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.agentLauncherSelector.getAgentLaunchers() >> [agentLauncher]
         1 * jobSubmission.getJobRequest() >> jobRequest
         1 * jobSubmission.getJobRequestMetadata() >> jobRequestMetadata
@@ -96,11 +117,14 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(agentLauncher)
         1 * agentLauncher.launchAgent(resolvedJob, requestedLauncherExt) >> Optional.ofNullable(launcherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.LAUNCHED_AGENT_ANNOTATION)
         if (launcherExt != null) {
             1 * this.persistenceService.updateLauncherExt(jobId, launcherExt)
         } else {
             0 * this.persistenceService.updateLauncherExt(_, _)
         }
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_LAUNCHER_EXT_ANNOTATION)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         savedJobId == jobId
 
         where:
@@ -129,35 +153,47 @@ class JobLaunchServiceImplSpec extends Specification {
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> {
             throw new IllegalStateException("fail")
         }
+        0 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         0 * this.jobResolverService.resolveJob(_ as String)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * this.persistenceService.updateJobArchiveStatus(_, _)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(IllegalStateException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> {
             throw new IdAlreadyExistsException("try again")
         }
+        0 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         0 * this.jobResolverService.resolveJob(_ as String)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * this.persistenceService.updateJobArchiveStatus(_, _)
         0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(IdAlreadyExistsException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> {
             throw new GenieJobResolutionException("fail")
         }
+        0 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
         1 * this.persistenceService.updateJobStatus(
             jobId,
@@ -168,16 +204,21 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(GenieJobResolutionException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> {
             throw new GenieJobResolutionRuntimeException("fail")
         }
+        0 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
         1 * this.persistenceService.updateJobStatus(
             jobId,
@@ -188,26 +229,37 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(GenieJobResolutionRuntimeException)
 
         when: "Job was killed during submission"
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.KILLED
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(AgentLaunchException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         JobLaunchServiceImpl.MAX_STATUS_UPDATE_ATTEMPTS * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESOLVED
         JobLaunchServiceImpl.MAX_STATUS_UPDATE_ATTEMPTS * this.persistenceService.updateJobStatus(
             jobId,
@@ -215,19 +267,26 @@ class JobLaunchServiceImplSpec extends Specification {
             JobStatus.ACCEPTED,
             _ as String
         ) >> { throw new GenieInvalidStatusException() }
+        0 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * agentLauncher.launchAgent(_ as ResolvedJob, requestedLauncherExt)
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(AgentLaunchException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         2 * this.persistenceService.getJobStatus(jobId) >>> [JobStatus.RESOLVED, JobStatus.ACCEPTED]
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.persistenceService.getRequestedLauncherExt(jobId) >> requestedLauncherExt
         1 * this.agentLauncherSelector.getAgentLaunchers() >> [agentLauncher]
         1 * this.agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> {
@@ -235,34 +294,47 @@ class JobLaunchServiceImplSpec extends Specification {
         }
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
         0 * agentLauncher.launchAgent(resolvedJob, requestedLauncherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(AgentLaunchException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         2 * this.persistenceService.getJobStatus(jobId) >>> [JobStatus.RESOLVED, JobStatus.ACCEPTED]
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.persistenceService.getRequestedLauncherExt(jobId) >> requestedLauncherExt
         1 * this.agentLauncherSelector.getAgentLaunchers() >> [agentLauncher]
         1 * this.agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
         1 * selectionResult.getSelectionRationale() >> Optional.empty()
+        0 * this.span.annotate(JobLaunchServiceImpl.LAUNCHED_AGENT_ANNOTATION)
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
         1 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
         0 * agentLauncher.launchAgent(resolvedJob, requestedLauncherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(AgentLaunchException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         2 * this.persistenceService.getJobStatus(jobId) >>> [JobStatus.RESOLVED, JobStatus.ACCEPTED]
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.persistenceService.getRequestedLauncherExt(jobId) >> requestedLauncherExt
         1 * this.agentLauncherSelector.getAgentLaunchers() >> [agentLauncher]
         1 * this.agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
@@ -270,26 +342,35 @@ class JobLaunchServiceImplSpec extends Specification {
         1 * agentLauncher.launchAgent(resolvedJob, requestedLauncherExt) >> {
             throw new AgentLaunchException("that didn't work")
         }
+        0 * this.span.annotate(JobLaunchServiceImpl.LAUNCHED_AGENT_ANNOTATION)
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
         1 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         thrown(AgentLaunchException)
 
         when:
         this.service.launchJob(jobSubmission)
 
         then:
+        1 * this.tracer.currentSpanCustomizer() >> this.span
+        1 * this.span.annotate(JobLaunchServiceImpl.BEGIN_LAUNCH_JOB_ANNOTATION)
         1 * this.persistenceService.saveJobSubmission(jobSubmission) >> jobId
+        1 * this.span.annotate(JobLaunchServiceImpl.SAVED_JOB_SUBMISSION_ANNOTATION)
         1 * this.jobResolverService.resolveJob(jobId) >> resolvedJob
+        1 * this.span.annotate(JobLaunchServiceImpl.RESOLVED_JOB_ANNOTATION)
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESOLVED
         1 * this.persistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        1 * this.span.annotate(JobLaunchServiceImpl.MARKED_JOB_ACCEPTED_ANNOTATION)
         1 * this.persistenceService.getRequestedLauncherExt(jobId) >> requestedLauncherExt
         1 * this.agentLauncherSelector.getAgentLaunchers() >> [agentLauncher]
         1 * this.agentLauncherSelector.select(_ as AgentLauncherSelectionContext) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(agentLauncher)
         1 * agentLauncher.launchAgent(resolvedJob, requestedLauncherExt) >> Optional.of(launcherExt)
+        1 * this.span.annotate(JobLaunchServiceImpl.LAUNCHED_AGENT_ANNOTATION)
         1 * this.persistenceService.updateLauncherExt(jobId, launcherExt) >> { throw new NotFoundException("...") }
         0 * this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, _ as String)
         0 * this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES)
+        1 * this.span.annotate(JobLaunchServiceImpl.END_LAUNCH_JOB_ANNOTATION)
         noExceptionThrown()
     }
 

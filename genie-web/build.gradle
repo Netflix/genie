@@ -70,8 +70,8 @@ dependencies {
     implementation("commons-validator:commons-validator")
     implementation("io.grpc:grpc-netty")
     implementation("io.grpc:grpc-protobuf")
-    implementation("io.springfox:springfox-bean-validators")
-    implementation("io.springfox:springfox-swagger2")
+    implementation("io.zipkin.brave:brave")
+    implementation("io.zipkin.brave:brave-instrumentation-grpc")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.glassfish.jaxb:jaxb-runtime")
     implementation("org.hibernate.validator:hibernate-validator")
@@ -90,6 +90,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-aws")
     implementation("org.springframework.cloud:spring-cloud-starter-aws-messaging")
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
     implementation("org.springframework.cloud:spring-cloud-starter-zookeeper")
     implementation("org.springframework.integration:spring-integration-zookeeper")
     implementation("org.apache.maven:maven-artifact") {
@@ -107,7 +108,6 @@ dependencies {
     runtimeOnly("com.github.ben-manes.caffeine:caffeine")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.flywaydb:flyway-core")
-    runtimeOnly("io.springfox:springfox-swagger-ui")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.postgresql:postgresql")
 

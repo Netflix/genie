@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         gradlePluginPortal()
     }
 
@@ -40,7 +40,7 @@ allprojects {
     apply plugin: "eclipse"
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -85,13 +85,13 @@ configure(javaProjects) {
             mavenBom SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
-            mavenBom "com.squareup.okhttp3:okhttp-bom:4.6.0"
-            mavenBom "io.grpc:grpc-bom:1.21.1"
+            mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.0"
+            mavenBom "io.grpc:grpc-bom:1.33.1"
             mavenBom "org.spockframework:spock-bom:2.0-M4-groovy-2.5"
             mavenBom "org.testcontainers:testcontainers-bom:1.15.0"
         }
         dependencies {
-            dependency("com.beust:jcommander:1.78")
+            dependency("com.beust:jcommander:1.81")
             dependency("cglib:cglib-nodep:3.3.0")
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.ppodgorsek:spring-test-dbunit-core:5.2.0")
@@ -103,11 +103,7 @@ configure(javaProjects) {
             dependency("com.google.guava:guava:20.0")
             dependency("commons-io:commons-io:2.6")
             dependency("commons-validator:commons-validator:1.7")
-            dependencySet(group: "io.springfox", version: "2.9.2") {
-                entry "springfox-swagger2"
-                entry "springfox-swagger-ui"
-                entry "springfox-bean-validators"
-            }
+            dependency("io.springfox:springfox-boot-starter:3.0.0")
             dependency("jakarta.el:jakarta.el-api:3.0.3")
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("net.jcip:jcip-annotations:1.0")

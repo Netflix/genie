@@ -17,6 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
+import brave.Tracer;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.launchers.impl.TitusAgentLauncherImpl;
 import com.netflix.genie.web.data.services.DataServices;
@@ -33,8 +38,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
@@ -72,6 +77,11 @@ class AgentLaunchersAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
                     Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.TitusJobRequestAdapter.class);
                     Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.class);
+                    Assertions.assertThat(context).doesNotHaveBean("titusAPIRetryPolicy");
+                    Assertions.assertThat(context).doesNotHaveBean(TitusAgentLauncherImpl.TitusAPIRetryPolicy.class);
+                    Assertions.assertThat(context).doesNotHaveBean("titusAPIBackoffPolicy");
+                    Assertions.assertThat(context).doesNotHaveBean("titusAPIRetryTemplate");
+                    Assertions.assertThat(context).doesNotHaveBean("titusRestTemplate");
                 }
             );
     }
@@ -82,9 +92,6 @@ class AgentLaunchersAutoConfigurationTest {
     @Test
     void testTitusAgentLauncherOnlyBean() {
         this.contextRunner
-            .withUserConfiguration(
-                TitusRestTemplateConfig.class
-            )
             .withPropertyValues(
                 "genie.agent.launcher.titus.enabled=true",
                 "genie.agent.launcher.local.enabled=false"
@@ -93,6 +100,11 @@ class AgentLaunchersAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
                     Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherProperties.class);
+                    Assertions.assertThat(context).hasBean("titusAPIRetryPolicy");
+                    Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherImpl.TitusAPIRetryPolicy.class);
+                    Assertions.assertThat(context).hasBean("titusAPIBackoffPolicy");
+                    Assertions.assertThat(context).hasBean("titusAPIRetryTemplate");
+                    Assertions.assertThat(context).hasBean("titusRestTemplate");
                     Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherImpl.TitusJobRequestAdapter.class);
                     Assertions.assertThat(context).hasSingleBean(TitusAgentLauncherImpl.class);
                     Assertions.assertThat(context).doesNotHaveBean(LocalAgentLauncherImpl.class);
@@ -127,12 +139,20 @@ class AgentLaunchersAutoConfigurationTest {
         MeterRegistry meterRegistry() {
             return new SimpleMeterRegistry();
         }
-    }
 
-    static class TitusRestTemplateConfig {
-        @Bean(name = "titusRestTemplate")
-        RestTemplate restTemplate() {
-            return Mockito.mock(RestTemplate.class);
+        @Bean
+        RestTemplateBuilder restTemplateBuilder() {
+            return new RestTemplateBuilder();
+        }
+
+        @Bean
+        BraveTracingComponents genieTracingComponents() {
+            return new BraveTracingComponents(
+                Mockito.mock(Tracer.class),
+                Mockito.mock(BraveTracePropagator.class),
+                Mockito.mock(BraveTracingCleanup.class),
+                Mockito.mock(BraveTagAdapter.class)
+            );
         }
     }
 }

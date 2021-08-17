@@ -21,6 +21,7 @@ dependencies {
     api("com.amazonaws:aws-java-sdk-sts")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.github.ben-manes.caffeine:caffeine")
+    api("io.zipkin.brave:brave")
     api("jakarta.validation:jakarta.validation-api")
     api("org.springframework:spring-context")
     api("org.springframework:spring-core")
@@ -34,8 +35,8 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
-    implementation("org.springframework:spring-context")
     implementation("org.springframework.cloud:spring-cloud-starter-aws")
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 
     /*******************************
      * Compile Only Dependencies

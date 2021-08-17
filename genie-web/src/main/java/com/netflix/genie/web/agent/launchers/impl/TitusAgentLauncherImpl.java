@@ -17,10 +17,15 @@
  */
 package com.netflix.genie.web.agent.launchers.impl;
 
+import brave.Span;
+import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.ImmutableMap;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.launchers.dtos.TitusBatchJobRequest;
@@ -36,10 +41,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.classify.Classifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
+import org.springframework.retry.policy.NeverRetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nullable;
@@ -83,7 +97,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .stream()
             .map(s -> placeholders.getOrDefault(s, s))
             .collect(Collectors.toList());
+
     private final RestTemplate restTemplate;
+    private final RetryTemplate retryTemplate;
     private final Cache<String, String> healthIndicatorCache;
     private final GenieHostInfo genieHostInfo;
     private final TitusAgentLauncherProperties titusAgentLauncherProperties;
@@ -92,32 +108,43 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final boolean hasDataSizeConverters;
     private final Binder binder;
     private final MeterRegistry registry;
+    private final Tracer tracer;
+    private final BraveTracePropagator tracePropagator;
+    private final BraveTagAdapter tagAdapter;
 
     /**
      * Constructor.
      *
      * @param restTemplate                 the rest template
+     * @param retryTemplate                The {@link RetryTemplate} to use when making Titus API calls
      * @param jobRequestAdapter            The implementation of {@link TitusJobRequestAdapter} to use
      * @param healthIndicatorCache         a cache to store metadata about recently launched jobs
      * @param genieHostInfo                the metadata about the local server and host
      * @param titusAgentLauncherProperties the configuration properties
+     * @param tracingComponents            The {@link BraveTracingComponents} instance to use for distributed tracing
      * @param environment                  The application environment to pull dynamic properties from
      * @param registry                     the metric registry
      */
     public TitusAgentLauncherImpl(
         final RestTemplate restTemplate,
+        final RetryTemplate retryTemplate,
         final TitusJobRequestAdapter jobRequestAdapter,
         final Cache<String, String> healthIndicatorCache,
         final GenieHostInfo genieHostInfo,
         final TitusAgentLauncherProperties titusAgentLauncherProperties,
+        final BraveTracingComponents tracingComponents,
         final Environment environment,
         final MeterRegistry registry
     ) {
         this.restTemplate = restTemplate;
+        this.retryTemplate = retryTemplate;
         this.healthIndicatorCache = healthIndicatorCache;
         this.genieHostInfo = genieHostInfo;
         this.titusAgentLauncherProperties = titusAgentLauncherProperties;
         this.jobRequestAdapter = jobRequestAdapter;
+        this.tracer = tracingComponents.getTracer();
+        this.tracePropagator = tracingComponents.getTracePropagator();
+        this.tagAdapter = tracingComponents.getTagAdapter();
         this.environment = environment;
         if (this.environment instanceof ConfigurableEnvironment) {
             final ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) this.environment;
@@ -150,10 +177,12 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
         try {
             final TitusBatchJobRequest titusJobRequest = this.createJobRequest(resolvedJob);
-            final TitusBatchJobResponse titusResponse = this.restTemplate.postForObject(
-                this.titusAgentLauncherProperties.getEndpoint().toString() + TITUS_API_JOB_PATH,
-                titusJobRequest,
-                TitusBatchJobResponse.class
+            final TitusBatchJobResponse titusResponse = this.retryTemplate.execute(
+                (RetryCallback<TitusBatchJobResponse, Throwable>) context -> restTemplate.postForObject(
+                    titusAgentLauncherProperties.getEndpoint().toString() + TITUS_API_JOB_PATH,
+                    titusJobRequest,
+                    TitusBatchJobResponse.class
+                )
             );
 
             if (titusResponse == null) {
@@ -183,10 +212,10 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     .putPOJO(TITUS_JOB_REQUEST_EXT_FIELD, titusJobRequest)
                     .putPOJO(TITUS_JOB_RESPONSE_EXT_FIELD, titusResponse)
             );
-        } catch (Exception e) {
-            log.error("Failed to launch job on Titus", e);
-            MetricsUtils.addFailureTagsWithException(tags, e);
-            throw new AgentLaunchException("Failed to create titus job for job " + jobId, e);
+        } catch (Throwable t) {
+            log.error("Failed to launch job on Titus", t);
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw new AgentLaunchException("Failed to create titus job for job " + jobId, t);
         } finally {
             this.registry.timer(LAUNCH_TIMER, tags).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
             this.healthIndicatorCache.put(jobId, StringUtils.isBlank(titusJobId) ? "-" : titusJobId);
@@ -339,14 +368,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     )
                     .entryPoint(entryPoint)
                     .command(command)
-                    .env(
-                        this.binder
-                            .bind(
-                                TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
-                                Bindable.mapOf(String.class, String.class)
-                            )
-                            .orElse(new HashMap<>())
-                    )
+                    .env(this.createJobEnvironment())
                     .attributes(
                         this.binder
                             .bind(
@@ -447,6 +469,22 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         return jobAttributes;
     }
 
+    private Map<String, String> createJobEnvironment() {
+        final Map<String, String> jobEnvironment = this.binder
+            .bind(
+                TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
+                Bindable.mapOf(String.class, String.class)
+            )
+            .orElse(new HashMap<>());
+
+        final Span currentSpan = this.tracer.currentSpan();
+        if (currentSpan != null) {
+            jobEnvironment.putAll(this.tracePropagator.injectForAgent(currentSpan.context()));
+        }
+
+        return jobEnvironment;
+    }
+
     /**
      * An interface that should be implemented by any class which wants to modify the Titus job request before it is
      * sent.
@@ -473,6 +511,43 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             TitusBatchJobRequest request,
             ResolvedJob resolvedJob
         ) throws AgentLaunchException {
+        }
+    }
+
+    /**
+     * A retry policy that has different behavior based on the type of exception thrown by the rest client during
+     * calls to the Titus API.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    public static class TitusAPIRetryPolicy extends ExceptionClassifierRetryPolicy {
+
+        private static final long serialVersionUID = -7978685711081275362L;
+
+        /**
+         * Constructor.
+         *
+         * @param retryCodes  The {@link HttpStatus} codes which should be retried if an API call to Titus fails
+         * @param maxAttempts The maximum number of retry attempts that should be made upon call failure
+         */
+        public TitusAPIRetryPolicy(final Set<HttpStatus> retryCodes, final int maxAttempts) {
+            final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+            final SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(maxAttempts);
+
+            this.setExceptionClassifier(
+                (Classifier<Throwable, RetryPolicy>) classifiable -> {
+                    if (classifiable instanceof HttpStatusCodeException) {
+                        final HttpStatusCodeException httpException = (HttpStatusCodeException) classifiable;
+                        final HttpStatus status = httpException.getStatusCode();
+                        if (retryCodes.contains(status)) {
+                            return simpleRetryPolicy;
+                        }
+                    }
+
+                    return neverRetryPolicy;
+                }
+            );
         }
     }
 }

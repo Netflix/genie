@@ -17,7 +17,12 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.services;
 
+import brave.Tracer;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -149,6 +154,16 @@ class ServicesAutoConfigurationTest {
         @Bean(name = "genieRestTemplate")
         RestTemplate genieRestTemplate() {
             return new RestTemplate();
+        }
+
+        @Bean
+        BraveTracingComponents tracingComponents() {
+            return new BraveTracingComponents(
+                Mockito.mock(Tracer.class),
+                Mockito.mock(BraveTracePropagator.class),
+                Mockito.mock(BraveTracingCleanup.class),
+                Mockito.mock(BraveTagAdapter.class)
+            );
         }
     }
 }

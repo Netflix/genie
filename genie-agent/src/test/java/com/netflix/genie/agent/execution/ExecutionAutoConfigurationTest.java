@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution;
 
+import brave.Tracer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.agent.AgentMetadata;
@@ -65,6 +66,10 @@ import com.netflix.genie.agent.execution.statemachine.stages.StopKillServiceStag
 import com.netflix.genie.agent.execution.statemachine.stages.WaitJobCompletionStage;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -81,7 +86,7 @@ import java.util.Set;
  */
 class ExecutionAutoConfigurationTest {
 
-    private ApplicationContextRunner contextRunner =
+    private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
@@ -90,7 +95,7 @@ class ExecutionAutoConfigurationTest {
             )
             .withUserConfiguration(MocksConfiguration.class);
 
-    private Set<Class<? extends ExecutionStage>> uniqueExecutionStages = ImmutableSet.of(
+    private final Set<Class<? extends ExecutionStage>> uniqueExecutionStages = ImmutableSet.of(
         ArchiveJobOutputsStage.class,
         ClaimJobStage.class,
         CleanupJobDirectoryStage.class,
@@ -120,7 +125,7 @@ class ExecutionAutoConfigurationTest {
         WaitJobCompletionStage.class
     );
 
-    private Map<Class<? extends ExecutionStage>, Integer> repeatedExecutionStages = ImmutableMap.of(
+    private final Map<Class<? extends ExecutionStage>, Integer> repeatedExecutionStages = ImmutableMap.of(
         RefreshManifestStage.class, 3
     );
 
@@ -218,6 +223,16 @@ class ExecutionAutoConfigurationTest {
         @Bean
         JobMonitorService jobMonitorService() {
             return Mockito.mock(JobMonitorService.class);
+        }
+
+        @Bean
+        BraveTracingComponents genieTracingComponents() {
+            return new BraveTracingComponents(
+                Mockito.mock(Tracer.class),
+                Mockito.mock(BraveTracePropagator.class),
+                Mockito.mock(BraveTracingCleanup.class),
+                Mockito.mock(BraveTagAdapter.class)
+            );
         }
     }
 }

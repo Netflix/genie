@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
+import brave.Tracer;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.GetJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
@@ -31,6 +32,9 @@ import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.common.internal.tracing.TracingConstants;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,22 +46,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ReserveJobIdStage extends ExecutionStage {
     private final AgentJobService agentJobService;
+    private final Tracer tracer;
+    private final BraveTagAdapter tagAdapter;
 
     /**
      * Constructor.
      *
-     * @param agentJobService agent job service.
+     * @param agentJobService   agent job service.
+     * @param tracingComponents The {@link BraveTracingComponents} instance
      */
-    public ReserveJobIdStage(final AgentJobService agentJobService) {
+    public ReserveJobIdStage(
+        final AgentJobService agentJobService,
+        final BraveTracingComponents tracingComponents
+    ) {
         super(States.RESERVE_JOB_ID);
         this.agentJobService = agentJobService;
+        this.tracer = tracingComponents.getTracer();
+        this.tagAdapter = tracingComponents.getTagAdapter();
     }
 
     @Override
     protected void attemptStageAction(
         final ExecutionContext executionContext
     ) throws RetryableJobExecutionException, FatalJobExecutionException {
-
         final String requestedJobId = executionContext.getRequestedJobId();
         final String reservedJobId;
 
@@ -80,7 +91,6 @@ public class ReserveJobIdStage extends ExecutionStage {
 
             executionContext.setCurrentJobStatus(JobStatus.ACCEPTED);
             reservedJobId = requestedJobId;
-
         } else {
             log.info("Requesting job id reservation");
 
@@ -104,5 +114,6 @@ public class ReserveJobIdStage extends ExecutionStage {
         }
 
         executionContext.setReservedJobId(reservedJobId);
+        this.tagAdapter.tag(this.tracer.currentSpanCustomizer(), TracingConstants.JOB_ID_TAG, reservedJobId);
     }
 }
