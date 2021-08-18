@@ -1,4 +1,4 @@
-name: Nebula Build
+name: Genie Build
 on:
   push:
     branches:
@@ -43,11 +43,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Configure MySQL database
         run: |
-          sudo apt-get install -y mysql-client
-          mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "SET GLOBAL innodb_file_format = barracuda;"
-          mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "SET GLOBAL innodb_file_per_table = 'on';"
-          mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "SET GLOBAL innodb_large_prefix = 'on'"
-          mysql --host 127.0.0.1 --port 3306 -uroot -ppassword -e "show variables like '%innodb_file%';"
+          "${{ format('{0}/.github/setup-mysql.sh', github.workspace) }}"
       - name: Configure Genie temp folders
         run: |
           mkdir -p /tmp/genie/cache /tmp/genie/archives /tmp/genie/jobs
