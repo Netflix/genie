@@ -20,4 +20,4 @@ spring:
   datasource:
     url: jdbc:postgresql://127.0.0.1/genie
     username: postgres
-    password:
+    password: password
