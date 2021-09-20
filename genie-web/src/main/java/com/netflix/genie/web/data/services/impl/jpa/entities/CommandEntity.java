@@ -275,6 +275,7 @@ public class CommandEntity extends BaseEntity {
         }
     )
     @OrderColumn(name = "priority_order", nullable = false)
+    @ToString.Exclude
     private List<CriterionEntity> clusterCriteria = new ArrayList<>();
 
     /**
