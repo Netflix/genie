@@ -3902,6 +3902,10 @@
 <dd>
 <div class="block">Get a predicate using the specified parameters.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#FIND_OLD_COMMANDS_QUERY">FIND_OLD_COMMANDS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">The query to find the id's of commands that should be marked inactive due to not being used.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#FIND_OLD_JOBS_QUERY">FIND_OLD_JOBS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block">The query used to find batches of jobs before a certain time.</div>
@@ -4019,6 +4023,11 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findJobsCreatedBefore-java.time.Instant-java.util.Set-int-">findJobsCreatedBefore(Instant, Set&lt;String&gt;, int)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
 <div class="block">Find a batch of jobs that were created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#findOldCommands-java.time.Instant-java.util.Set-java.time.Instant-int-">findOldCommands(Instant, Set&lt;String&gt;, Instant, int)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Find any commands that aren't currently attached to a job newer than a certain threshold and the command itself
+ was created before a given time.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html#findUnusedApplications-java.time.Instant-int-">findUnusedApplications(Instant, int)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaApplicationRepository</a></dt>
 <dd>
@@ -11383,7 +11392,7 @@
 <dd>
 <div class="block">Set the unique id this criterion used.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#setUnusedStatus-java.lang.String-java.time.Instant-java.util.Set-java.time.Instant-">setUnusedStatus(String, Instant, Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#setUnusedStatus-java.lang.String-java.util.Set-">setUnusedStatus(String, Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
 <dd>
 <div class="block">Bulk set the status of commands which match the given inputs.</div>
 </dd>
@@ -12648,13 +12657,13 @@
 <dd>
 <div class="block">Update the requested launcher extension field for this job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-int-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant, int)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
  it was created before commandCreatedThreshold and it hasn't been used in any job that was created
  in the Genie system after jobCreatedThreshold.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-int-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant, int)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
  it was created before commandCreatedThreshold and it hasn't been used in any job that was created
