@@ -176,10 +176,11 @@ class DatabaseCleanupTaskTest {
                     Mockito.eq(CommandStatus.INACTIVE),
                     Mockito.any(Instant.class),
                     Mockito.eq(EnumSet.of(CommandStatus.DEPRECATED, CommandStatus.ACTIVE)),
-                    Mockito.any(Instant.class)
+                    Mockito.any(Instant.class),
+                    Mockito.anyInt()
                 )
             )
-            .thenReturn(50, 242);
+            .thenReturn(50, 0, 242, 0);
         Mockito
             .when(
                 this.persistenceService.deleteUnusedCommands(
@@ -234,12 +235,13 @@ class DatabaseCleanupTaskTest {
                     Mockito.eq(batchSize)
                 );
             Mockito
-                .verify(this.persistenceService, Mockito.times(2))
+                .verify(this.persistenceService, Mockito.times(4))
                 .updateStatusForUnusedCommands(
                     Mockito.eq(CommandStatus.INACTIVE),
                     Mockito.any(Instant.class),
                     Mockito.eq(EnumSet.of(CommandStatus.DEPRECATED, CommandStatus.ACTIVE)),
-                    Mockito.any(Instant.class)
+                    Mockito.any(Instant.class),
+                    Mockito.anyInt()
                 );
         }
     }
@@ -311,7 +313,8 @@ class DatabaseCleanupTaskTest {
                 Mockito.any(CommandStatus.class),
                 Mockito.any(Instant.class),
                 Mockito.anySet(),
-                Mockito.any(Instant.class)
+                Mockito.any(Instant.class),
+                Mockito.anyInt()
             );
         Mockito
             .verify(this.persistenceService, Mockito.never())

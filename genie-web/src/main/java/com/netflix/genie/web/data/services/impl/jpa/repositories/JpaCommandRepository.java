@@ -48,6 +48,23 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + ")";
 
     /**
+     * The query to find the id's of commands that should be marked inactive due to not being used.
+     */
+    // NOTE TO FUTURE SELF: JPQL does not support limit and wants you to use page size etc. Not worth hassle.
+    String FIND_OLD_COMMANDS_QUERY =
+        "SELECT id"
+            + " FROM commands"
+            + " WHERE status IN (:currentStatuses)"
+            + " AND created < :commandCreatedThreshold"
+            + " AND id NOT IN ("
+            + "SELECT DISTINCT(command_id)"
+            + " FROM jobs"
+            + " WHERE command_id IS NOT NULL"
+            + " AND created >= :jobCreatedThreshold"
+            + ")"
+            + " LIMIT :limit";
+
+    /**
      * The query used to find commands that are unused to delete.
      */
     String FIND_UNUSED_COMMANDS_QUERY =
@@ -62,25 +79,39 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + ")"
             + " LIMIT :limit";
 
+
     /**
-     * Bulk set the status of commands which match the given inputs. Considers whether a command was used in some
-     * period of time till now.
+     * Find any commands that aren't currently attached to a job newer than a certain threshold and the command itself
+     * was created before a given time.
      *
-     * @param desiredStatus           The new status the matching commands should have
      * @param commandCreatedThreshold The instant in time which a command must have been created before to be
      *                                considered for update. Exclusive
      * @param currentStatuses         The set of current statuses a command must have to be considered for update
      * @param jobCreatedThreshold     The instant in time after which a command must not have been used in a Genie job
      *                                for it to be considered for update. Inclusive.
+     * @param limit                   The maximum number of commands to retrieve
+     * @return The ids of the commands that matched the predicate
+     */
+    @Query(value = FIND_OLD_COMMANDS_QUERY, nativeQuery = true)
+    Set<Long> findOldCommands(
+        @Param("commandCreatedThreshold") Instant commandCreatedThreshold,
+        @Param("currentStatuses") Set<String> currentStatuses,
+        @Param("jobCreatedThreshold") Instant jobCreatedThreshold,
+        @Param("limit") int limit
+    );
+
+    /**
+     * Bulk set the status of commands which match the given inputs.
+     *
+     * @param desiredStatus The new status the matching commands should have
+     * @param commandIds    The ids which should be updated
      * @return The number of commands that were updated by the query
      */
-    @Query(value = SET_UNUSED_STATUS_QUERY, nativeQuery = true)
+    @Query(value = "UPDATE CommandEntity c SET c.status = :desiredStatus WHERE c.id IN (:commandIds)")
     @Modifying
     int setUnusedStatus(
         @Param("desiredStatus") String desiredStatus,
-        @Param("commandCreatedThreshold") Instant commandCreatedThreshold,
-        @Param("currentStatuses") Set<String> currentStatuses,
-        @Param("jobCreatedThreshold") Instant jobCreatedThreshold
+        @Param("commandIds") Set<Long> commandIds
     );
 
     /**
