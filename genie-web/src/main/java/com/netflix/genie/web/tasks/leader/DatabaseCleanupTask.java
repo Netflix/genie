@@ -429,6 +429,12 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping command deactivation");
                 this.numDeactivatedCommands.set(0);
             } else {
+                final int batchSize = this.environment.getProperty(
+                    DatabaseCleanupProperties.BATCH_SIZE_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getBatchSize()
+                );
+
                 final Instant commandCreationThreshold = runtime.minus(
                     this.environment.getProperty(
                         DatabaseCleanupProperties
@@ -449,19 +455,31 @@ public class DatabaseCleanupTask extends LeaderTask {
                     ),
                     ChronoUnit.DAYS
                 );
-                final int deactivatedCommandCount = this.persistenceService.updateStatusForUnusedCommands(
+                log.info(
+                    "Attempting to set commands to status {} that were previously in one of {} in batches of {}",
                     CommandStatus.INACTIVE,
-                    commandCreationThreshold,
                     TO_DEACTIVATE_COMMAND_STATUSES,
-                    jobCreationThreshold
+                    batchSize
                 );
+                long totalDeactivatedCommands = 0;
+                long batchedDeactivated;
+                do {
+                    batchedDeactivated = this.persistenceService.updateStatusForUnusedCommands(
+                        CommandStatus.INACTIVE,
+                        commandCreationThreshold,
+                        TO_DEACTIVATE_COMMAND_STATUSES,
+                        jobCreationThreshold,
+                        batchSize
+                    );
+                    totalDeactivatedCommands += batchedDeactivated;
+                } while (batchedDeactivated > 0);
                 log.info(
                     "Set {} commands to status {} that were previously in one of {}",
-                    deactivatedCommandCount,
+                    totalDeactivatedCommands,
                     CommandStatus.INACTIVE,
                     TO_DEACTIVATE_COMMAND_STATUSES
                 );
-                this.numDeactivatedCommands.set(deactivatedCommandCount);
+                this.numDeactivatedCommands.set(totalDeactivatedCommands);
             }
         } catch (final Exception e) {
             log.error("Unable to disable commands in database", e);
