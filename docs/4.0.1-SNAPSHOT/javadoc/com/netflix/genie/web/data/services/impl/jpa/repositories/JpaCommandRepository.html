@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -126,11 +126,17 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#FIND_OLD_COMMANDS_QUERY">FIND_OLD_COMMANDS_QUERY</a></span></code>
+<div class="block">The query to find the id's of commands that should be marked inactive due to not being used.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#FIND_UNUSED_COMMANDS_QUERY">FIND_UNUSED_COMMANDS_QUERY</a></span></code>
 <div class="block">The query used to find commands that are unused to delete.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#SET_UNUSED_STATUS_QUERY">SET_UNUSED_STATUS_QUERY</a></span></code>
 <div class="block">The query used to set commands to a given status given input parameters.</div>
@@ -153,6 +159,16 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#findOldCommands-java.time.Instant-java.util.Set-java.time.Instant-int-">findOldCommands</a></span>(java.time.Instant&nbsp;commandCreatedThreshold,
+               java.util.Set&lt;java.lang.String&gt;&nbsp;currentStatuses,
+               java.time.Instant&nbsp;jobCreatedThreshold,
+               int&nbsp;limit)</code>
+<div class="block">Find any commands that aren't currently attached to a job newer than a certain threshold and the command itself
+ was created before a given time.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#findUnusedCommands-java.util.Set-java.time.Instant-int-">findUnusedCommands</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
                   java.time.Instant&nbsp;commandCreatedThreshold,
                   int&nbsp;limit)</code>
@@ -160,36 +176,34 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndApplications-java.lang.String-">getCommandAndApplications</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Find the command with the given id but also eagerly load that commands applications.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndApplicationsDto-java.lang.String-">getCommandAndApplicationsDto</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Find the command with the given id but also eagerly load that commands applications full dto contents.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndClusterCriteria-java.lang.String-">getCommandAndClusterCriteria</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Find the command with the given id but also eagerly load that commands cluster criteria.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandDto-java.lang.String-">getCommandDto</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Find the command with the given id but also eagerly load all data needed for a command DTO.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#setUnusedStatus-java.lang.String-java.time.Instant-java.util.Set-java.time.Instant-">setUnusedStatus</a></span>(java.lang.String&nbsp;desiredStatus,
-               java.time.Instant&nbsp;commandCreatedThreshold,
-               java.util.Set&lt;java.lang.String&gt;&nbsp;currentStatuses,
-               java.time.Instant&nbsp;jobCreatedThreshold)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#setUnusedStatus-java.lang.String-java.util.Set-">setUnusedStatus</a></span>(java.lang.String&nbsp;desiredStatus,
+               java.util.Set&lt;java.lang.Long&gt;&nbsp;commandIds)</code>
 <div class="block">Bulk set the status of commands which match the given inputs.</div>
 </td>
 </tr>
@@ -264,6 +278,20 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </dl>
 </li>
 </ul>
+<a name="FIND_OLD_COMMANDS_QUERY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FIND_OLD_COMMANDS_QUERY</h4>
+<pre>static final&nbsp;java.lang.String FIND_OLD_COMMANDS_QUERY</pre>
+<div class="block">The query to find the id's of commands that should be marked inactive due to not being used.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository.FIND_OLD_COMMANDS_QUERY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
 <a name="FIND_UNUSED_COMMANDS_QUERY">
 <!--   -->
 </a>
@@ -286,33 +314,54 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="setUnusedStatus-java.lang.String-java.time.Instant-java.util.Set-java.time.Instant-">
+<a name="findOldCommands-java.time.Instant-java.util.Set-java.time.Instant-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setUnusedStatus</h4>
-<pre>@Query(value="UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold)",
+<h4>findOldCommands</h4>
+<pre>@Query(value="SELECT id FROM commands WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold) LIMIT :limit",
        nativeQuery=true)
- @Modifying
-int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
-                                                                                                                                                                                                                                                                                                                      java.lang.String&nbsp;desiredStatus,
-                                                                                                                                                                                                                                                                                                                      @Param(value="commandCreatedThreshold")
-                                                                                                                                                                                                                                                                                                                      java.time.Instant&nbsp;commandCreatedThreshold,
-                                                                                                                                                                                                                                                                                                                      @Param(value="currentStatuses")
-                                                                                                                                                                                                                                                                                                                      java.util.Set&lt;java.lang.String&gt;&nbsp;currentStatuses,
-                                                                                                                                                                                                                                                                                                                      @Param(value="jobCreatedThreshold")
-                                                                                                                                                                                                                                                                                                                      java.time.Instant&nbsp;jobCreatedThreshold)</pre>
-<div class="block">Bulk set the status of commands which match the given inputs. Considers whether a command was used in some
- period of time till now.</div>
+java.util.Set&lt;java.lang.Long&gt;&nbsp;findOldCommands(@Param(value="commandCreatedThreshold")
+                                                                                                                                                                                                                                                                                                                             java.time.Instant&nbsp;commandCreatedThreshold,
+                                                                                                                                                                                                                                                                                                                             @Param(value="currentStatuses")
+                                                                                                                                                                                                                                                                                                                             java.util.Set&lt;java.lang.String&gt;&nbsp;currentStatuses,
+                                                                                                                                                                                                                                                                                                                             @Param(value="jobCreatedThreshold")
+                                                                                                                                                                                                                                                                                                                             java.time.Instant&nbsp;jobCreatedThreshold,
+                                                                                                                                                                                                                                                                                                                             @Param(value="limit")
+                                                                                                                                                                                                                                                                                                                             int&nbsp;limit)</pre>
+<div class="block">Find any commands that aren't currently attached to a job newer than a certain threshold and the command itself
+ was created before a given time.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>desiredStatus</code> - The new status the matching commands should have</dd>
 <dd><code>commandCreatedThreshold</code> - The instant in time which a command must have been created before to be
                                 considered for update. Exclusive</dd>
 <dd><code>currentStatuses</code> - The set of current statuses a command must have to be considered for update</dd>
 <dd><code>jobCreatedThreshold</code> - The instant in time after which a command must not have been used in a Genie job
                                 for it to be considered for update. Inclusive.</dd>
+<dd><code>limit</code> - The maximum number of commands to retrieve</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The ids of the commands that matched the predicate</dd>
+</dl>
+</li>
+</ul>
+<a name="setUnusedStatus-java.lang.String-java.util.Set-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setUnusedStatus</h4>
+<pre>@Query(value="UPDATE CommandEntity c SET c.status = :desiredStatus WHERE c.id IN (:commandIds)")
+ @Modifying
+int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
+                                                                                                                                 java.lang.String&nbsp;desiredStatus,
+                                                                                                                                 @Param(value="commandIds")
+                                                                                                                                 java.util.Set&lt;java.lang.Long&gt;&nbsp;commandIds)</pre>
+<div class="block">Bulk set the status of commands which match the given inputs.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>desiredStatus</code> - The new status the matching commands should have</dd>
+<dd><code>commandIds</code> - The ids which should be updated</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of commands that were updated by the query</dd>
 </dl>
