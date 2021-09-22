@@ -671,13 +671,7 @@ of 2.0
 |genie.tasks.database-cleanup.command-deactivation.commandCreationThreshold
 |The number of days before the current cleanup run that a command must have been created before in the system to be
 considered for deactivation.
-|false
-|yes
-
-|genie.tasks.database-cleanup.command-deactivation.jobCreationThreshold
-|The number of days before the current cleanup run that command must not have been used in a job for that command to be
-considered for deactivation.
-|false
+|60
 |yes
 
 |genie.tasks.database-cleanup.command-deactivation.skip
