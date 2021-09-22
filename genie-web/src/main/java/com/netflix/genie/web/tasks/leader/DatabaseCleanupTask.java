@@ -180,8 +180,8 @@ public class DatabaseCleanupTask extends LeaderTask {
             final Instant creationThreshold = runtime.minus(1L, ChronoUnit.HOURS);
 
             this.deleteClusters(creationThreshold);
-            this.deactivateCommands(runtime);
             this.deleteCommands(creationThreshold);
+            this.deactivateCommands(runtime);
             this.deleteApplications(creationThreshold);
             this.deleteFiles(creationThreshold);
             this.deleteTags(creationThreshold);
@@ -445,16 +445,6 @@ public class DatabaseCleanupTask extends LeaderTask {
                     ),
                     ChronoUnit.DAYS
                 );
-                final Instant jobCreationThreshold = runtime.minus(
-                    this.environment.getProperty(
-                        DatabaseCleanupProperties
-                            .CommandDeactivationDatabaseCleanupProperties
-                            .JOB_CREATION_THRESHOLD_PROPERTY,
-                        Integer.class,
-                        this.cleanupProperties.getCommandDeactivation().getJobCreationThreshold()
-                    ),
-                    ChronoUnit.DAYS
-                );
                 log.info(
                     "Attempting to set commands to status {} that were previously in one of {} in batches of {}",
                     CommandStatus.INACTIVE,
@@ -468,7 +458,6 @@ public class DatabaseCleanupTask extends LeaderTask {
                         CommandStatus.INACTIVE,
                         commandCreationThreshold,
                         TO_DEACTIVATE_COMMAND_STATUSES,
-                        jobCreationThreshold,
                         batchSize
                     );
                     totalDeactivatedCommands += batchedDeactivated;

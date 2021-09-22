@@ -47,7 +47,6 @@ class DatabaseCleanupPropertiesTest {
         Assertions.assertThat(this.properties.getCommandCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getCommandDeactivation().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getCommandDeactivation().getCommandCreationThreshold()).isEqualTo(60);
-        Assertions.assertThat(this.properties.getCommandDeactivation().getJobCreationThreshold()).isEqualTo(30);
         Assertions.assertThat(this.properties.getJobCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getJobCleanup().getRetention()).isEqualTo(90);
         Assertions.assertThat(this.properties.getJobCleanup().getMaxDeletedPerTransaction()).isEqualTo(1000);
@@ -147,15 +146,6 @@ class DatabaseCleanupPropertiesTest {
         this.properties.getCommandDeactivation().setCommandCreationThreshold(newThreshold);
         Assertions
             .assertThat(this.properties.getCommandDeactivation().getCommandCreationThreshold())
-            .isEqualTo(newThreshold);
-    }
-
-    @Test
-    void canSetCommandDeactivationJobCreationThreshold() {
-        final int newThreshold = this.properties.getCommandDeactivation().getJobCreationThreshold() + 1;
-        this.properties.getCommandDeactivation().setJobCreationThreshold(newThreshold);
-        Assertions
-            .assertThat(this.properties.getCommandDeactivation().getJobCreationThreshold())
             .isEqualTo(newThreshold);
     }
 }

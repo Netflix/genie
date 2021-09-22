@@ -226,13 +226,6 @@ public class DatabaseCleanupProperties {
             = COMMAND_DEACTIVATION_PROPERTY_PREFIX + ".commandCreationThreshold";
 
         /**
-         * The number of days before the current cleanup run that command must not have been used in a job for that
-         * command to be considered for deactivation.
-         */
-        public static final String JOB_CREATION_THRESHOLD_PROPERTY
-            = COMMAND_DEACTIVATION_PROPERTY_PREFIX + ".jobCreationThreshold";
-
-        /**
          * Skip deactivating commands when performing database cleanup.
          */
         private boolean skip;
@@ -243,13 +236,6 @@ public class DatabaseCleanupProperties {
          */
         @Min(1)
         private int commandCreationThreshold = 60;
-
-        /**
-         * The number of days before the current cleanup run that command must not have been used in a job for that
-         * command to be considered for deactivation.
-         */
-        @Min(1)
-        private int jobCreationThreshold = 30;
     }
 
     /**
