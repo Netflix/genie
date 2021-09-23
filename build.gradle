@@ -248,7 +248,7 @@ configure((Set<Project>) ext.javaProjects) {
                 }
             }
 
-            if (System.env."GITHUB_ACTION" == "true") {
+            if (System.env."GITHUB_ACTIONS" == "true" || System.env."GITHUB_ACTION") {
                 systemProperty "spring.profiles.include", "githubactions"
             }
 

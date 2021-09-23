@@ -50,10 +50,14 @@ class JobsLocationsPropertiesTest {
     void canConstruct() {
         Assertions
             .assertThat(this.properties.getArchives())
-            .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/"));
+            .isEqualTo(URI.create("file://" + (SYSTEM_TMP_DIR.endsWith("/")
+                ? SYSTEM_TMP_DIR
+                : SYSTEM_TMP_DIR + "/") + "genie/archives/"));
         Assertions
             .assertThat(this.properties.getJobs())
-            .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/jobs/"));
+            .isEqualTo(URI.create("file://" + (SYSTEM_TMP_DIR.endsWith("/")
+                ? SYSTEM_TMP_DIR
+                : SYSTEM_TMP_DIR + "/") + "genie/jobs/"));
     }
 
     /**

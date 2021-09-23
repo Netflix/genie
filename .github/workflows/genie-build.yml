@@ -39,6 +39,7 @@ jobs:
       NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
       DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
+      GRADLE_OPTS: -Djava.io.tmpdir=/tmp/
     steps:
       - uses: actions/checkout@v1
       - name: Configure MySQL database
@@ -46,13 +47,8 @@ jobs:
           "${{ format('{0}/.github/configure-mysql.sh', github.workspace) }}"
       - name: Configure Genie temp folders
         run: |
-<<<<<<< HEAD
           mkdir -p /tmp/genie/cache /tmp/genie/archives /tmp/genie/jobs
       - name: Setup jdk 11
-=======
-          mkdir -p /tmp/genie/cache /tmp/genie/archives /tmp/genie/jobs 
-      - name: Setup jdk 8
->>>>>>> 78f4aafd9 (add more tmp folders for creation)
         uses: actions/setup-java@v1
         with:
           java-version: 11

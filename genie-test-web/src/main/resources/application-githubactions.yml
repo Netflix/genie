@@ -24,3 +24,7 @@ genie:
     locations:
       archives: file:///tmp/genie/archives/
       jobs: file:///tmp/genie/jobs/
+
+local:
+  server:
+    port: 0

@@ -447,7 +447,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 
 |genie.jobs.locations.jobs
 |The default root location where job working directories will be placed. Created by system if doesn't exist.
-|file://${java.io.tmpdir}genie/jobs/
+|file://${java.io.tmpdir}/genie/jobs/
 |no
 
 |genie.jobs.memory.maxSystemMemory
