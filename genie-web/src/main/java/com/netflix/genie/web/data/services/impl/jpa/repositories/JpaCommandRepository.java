@@ -33,44 +33,12 @@ import java.util.Set;
 public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
 
     /**
-     * The query used to set commands to a given status given input parameters.
+     * The query used to find commands that are in a certain status, not used in jobs and created some time ago.
      */
-    String SET_UNUSED_STATUS_QUERY =
-        "UPDATE commands"
-            + " SET status = :desiredStatus"
-            + " WHERE status IN (:currentStatuses)"
-            + " AND created < :commandCreatedThreshold"
-            + " AND id NOT IN ("
-            + "SELECT DISTINCT(command_id)"
-            + " FROM jobs"
-            + " WHERE command_id IS NOT NULL"
-            + " AND created >= :jobCreatedThreshold"
-            + ")";
-
-    /**
-     * The query to find the id's of commands that should be marked inactive due to not being used.
-     */
-    // NOTE TO FUTURE SELF: JPQL does not support limit and wants you to use page size etc. Not worth hassle.
-    String FIND_OLD_COMMANDS_QUERY =
+    String FIND_UNUSED_COMMANDS_IN_STATUS_CREATED_BEFORE_QUERY =
         "SELECT id"
             + " FROM commands"
-            + " WHERE status IN (:currentStatuses)"
-            + " AND created < :commandCreatedThreshold"
-            + " AND id NOT IN ("
-            + "SELECT DISTINCT(command_id)"
-            + " FROM jobs"
-            + " WHERE command_id IS NOT NULL"
-            + " AND created >= :jobCreatedThreshold"
-            + ")"
-            + " LIMIT :limit";
-
-    /**
-     * The query used to find commands that are unused to delete.
-     */
-    String FIND_UNUSED_COMMANDS_QUERY =
-        "SELECT id"
-            + " FROM commands"
-            + " WHERE status IN (:unusedStatuses)"
+            + " WHERE status IN (:statuses)"
             + " AND created < :commandCreatedThreshold"
             + " AND id NOT IN ("
             + "SELECT DISTINCT(command_id)"
@@ -78,27 +46,6 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + " WHERE command_id IS NOT NULL"
             + ")"
             + " LIMIT :limit";
-
-
-    /**
-     * Find any commands that aren't currently attached to a job newer than a certain threshold and the command itself
-     * was created before a given time.
-     *
-     * @param commandCreatedThreshold The instant in time which a command must have been created before to be
-     *                                considered for update. Exclusive
-     * @param currentStatuses         The set of current statuses a command must have to be considered for update
-     * @param jobCreatedThreshold     The instant in time after which a command must not have been used in a Genie job
-     *                                for it to be considered for update. Inclusive.
-     * @param limit                   The maximum number of commands to retrieve
-     * @return The ids of the commands that matched the predicate
-     */
-    @Query(value = FIND_OLD_COMMANDS_QUERY, nativeQuery = true)
-    Set<Long> findOldCommands(
-        @Param("commandCreatedThreshold") Instant commandCreatedThreshold,
-        @Param("currentStatuses") Set<String> currentStatuses,
-        @Param("jobCreatedThreshold") Instant jobCreatedThreshold,
-        @Param("limit") int limit
-    );
 
     /**
      * Bulk set the status of commands which match the given inputs.
@@ -109,24 +56,24 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
      */
     @Query(value = "UPDATE CommandEntity c SET c.status = :desiredStatus WHERE c.id IN (:commandIds)")
     @Modifying
-    int setUnusedStatus(
+    int setStatusWhereIdIn(
         @Param("desiredStatus") String desiredStatus,
         @Param("commandIds") Set<Long> commandIds
     );
 
     /**
-     * Find commands from the database where their status is in {@literal deleteStatuses} they were created
+     * Find commands from the database where their status is in {@literal statuses} and they were created
      * before {@literal commandCreatedThreshold} and they aren't attached to any jobs still in the database.
      *
-     * @param unusedStatuses          The set of statuses a command must be in in order to be considered unused
+     * @param statuses                The set of statuses a command must be in for it to be considered unused
      * @param commandCreatedThreshold The instant in time a command must have been created before to be considered
      *                                unused. Exclusive.
      * @param limit                   Maximum number of IDs to return
      * @return The ids of the commands that are considered unused
      */
-    @Query(value = FIND_UNUSED_COMMANDS_QUERY, nativeQuery = true)
-    Set<Long> findUnusedCommands(
-        @Param("unusedStatuses") Set<String> unusedStatuses,
+    @Query(value = FIND_UNUSED_COMMANDS_IN_STATUS_CREATED_BEFORE_QUERY, nativeQuery = true)
+    Set<Long> findUnusedCommandsByStatusesCreatedBefore(
+        @Param("statuses") Set<String> statuses,
         @Param("commandCreatedThreshold") Instant commandCreatedThreshold,
         @Param("limit") int limit
     );
