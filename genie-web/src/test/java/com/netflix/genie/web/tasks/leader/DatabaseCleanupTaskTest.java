@@ -132,7 +132,6 @@ class DatabaseCleanupTaskTest {
         Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
         Mockito.when(this.commandDeactivationProperties.getCommandCreationThreshold()).thenReturn(60);
-        Mockito.when(this.commandDeactivationProperties.getJobCreationThreshold()).thenReturn(30);
 
         final ArgumentCaptor<Instant> argument = ArgumentCaptor.forClass(Instant.class);
 
@@ -176,10 +175,10 @@ class DatabaseCleanupTaskTest {
                     Mockito.eq(CommandStatus.INACTIVE),
                     Mockito.any(Instant.class),
                     Mockito.eq(EnumSet.of(CommandStatus.DEPRECATED, CommandStatus.ACTIVE)),
-                    Mockito.any(Instant.class)
+                    Mockito.anyInt()
                 )
             )
-            .thenReturn(50, 242);
+            .thenReturn(50, 0, 242, 0);
         Mockito
             .when(
                 this.persistenceService.deleteUnusedCommands(
@@ -234,12 +233,12 @@ class DatabaseCleanupTaskTest {
                     Mockito.eq(batchSize)
                 );
             Mockito
-                .verify(this.persistenceService, Mockito.times(2))
+                .verify(this.persistenceService, Mockito.times(4))
                 .updateStatusForUnusedCommands(
                     Mockito.eq(CommandStatus.INACTIVE),
                     Mockito.any(Instant.class),
                     Mockito.eq(EnumSet.of(CommandStatus.DEPRECATED, CommandStatus.ACTIVE)),
-                    Mockito.any(Instant.class)
+                    Mockito.anyInt()
                 );
         }
     }
@@ -311,7 +310,7 @@ class DatabaseCleanupTaskTest {
                 Mockito.any(CommandStatus.class),
                 Mockito.any(Instant.class),
                 Mockito.anySet(),
-                Mockito.any(Instant.class)
+                Mockito.anyInt()
             );
         Mockito
             .verify(this.persistenceService, Mockito.never())

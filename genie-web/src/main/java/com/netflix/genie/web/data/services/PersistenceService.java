@@ -492,22 +492,20 @@ public interface PersistenceService {
 
     /**
      * Update the status of a command to the {@literal desiredStatus} if its status is in {@literal currentStatuses},
-     * it was created before {@literal commandCreatedThreshold} and it hasn't been used in any job that was created
-     * in the Genie system after {@literal jobCreatedThreshold}.
+     * it was created before {@literal commandCreatedThreshold} and it hasn't been used in any job.
      *
      * @param desiredStatus           The new status the matching commands should have
      * @param commandCreatedThreshold The instant in time which a command must have been created before to be
      *                                considered for update. Exclusive
      * @param currentStatuses         The set of current statuses a command must have to be considered for update
-     * @param jobCreatedThreshold     The instant in time after which a command must not have been used in a Genie job
-     *                                for it to be considered for update. Inclusive.
+     * @param batchSize               The maximum number of commands to update in a single transaction
      * @return The number of commands whose statuses were updated to {@literal desiredStatus}
      */
     int updateStatusForUnusedCommands(
         CommandStatus desiredStatus,
         Instant commandCreatedThreshold,
         Set<CommandStatus> currentStatuses,
-        Instant jobCreatedThreshold
+        int batchSize
     );
 
     /**

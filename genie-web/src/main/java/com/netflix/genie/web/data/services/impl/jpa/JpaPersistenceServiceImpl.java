@@ -1257,22 +1257,33 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final CommandStatus desiredStatus,
         final Instant commandCreatedThreshold,
         final Set<CommandStatus> currentStatuses,
-        final Instant jobCreatedThreshold
+        final int batchSize
     ) {
         log.info(
-            "Updating any commands with statuses {} "
-                + "that were created before {} and haven't been used in jobs created after {} to new status {}",
+            "Attempting to update at most {} commands with statuses {} "
+                + "which were created before {} and haven't been used in jobs to new status {}",
+            batchSize,
             currentStatuses,
             commandCreatedThreshold,
-            jobCreatedThreshold,
             desiredStatus
         );
-        return this.commandRepository.setUnusedStatus(
+        final int updateCount = this.commandRepository.setStatusWhereIdIn(
             desiredStatus.name(),
-            commandCreatedThreshold,
-            currentStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
-            jobCreatedThreshold
+            this.commandRepository.findUnusedCommandsByStatusesCreatedBefore(
+                currentStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+                commandCreatedThreshold,
+                batchSize
+            )
         );
+        log.info(
+            "Updated {} commands with statuses {} "
+                + "which were created before {} and haven't been used in any jobs to new status {}",
+            updateCount,
+            currentStatuses,
+            commandCreatedThreshold,
+            desiredStatus
+        );
+        return updateCount;
     }
 
     /**
@@ -1291,7 +1302,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             commandCreatedThreshold
         );
         return this.commandRepository.deleteByIdIn(
-            this.commandRepository.findUnusedCommands(
+            this.commandRepository.findUnusedCommandsByStatusesCreatedBefore(
                 deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
                 commandCreatedThreshold,
                 batchSize

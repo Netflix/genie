@@ -13,16 +13,16 @@ buildscript {
 }
 
 plugins {
-    id "com.github.kt3k.coveralls" version "2.10.2"
-    id "nebula.netflixoss" version "9.2.2"
+    id "com.github.kt3k.coveralls" version "2.12.0"
+    id "nebula.netflixoss" version "10.3.0"
     id "org.ajoberstar.grgit" version "4.1.0"
     id "org.ajoberstar.git-publish" version "3.0.0"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
-    id "org.asciidoctor.jvm.convert" version "3.3.0" apply false
-    id "com.gorylenko.gradle-git-properties" version "2.2.4" apply false
+    id "org.asciidoctor.jvm.convert" version "3.3.2" apply false
+    id "com.gorylenko.gradle-git-properties" version "2.3.1" apply false
     id "com.google.protobuf" version "0.8.14" apply false
     id "io.franzbecker.gradle-lombok" version "4.0.0" apply false
-    id "nebula.node" version "1.4.1" apply false
+    id "nebula.node" version "2.0.1" apply false
     id "com.github.spotbugs" version "4.6.0" apply false
 }
 
@@ -30,7 +30,7 @@ apply plugin: "nebula-aggregate-javadocs"
 
 ext.githubProjectName = rootProject.name
 
-def javaProjects = subprojects.findAll {
+ext.javaProjects = subprojects.findAll {
     it.name != "genie-demo" && it.name != "genie-ddl" && it.name != "genie-docs"
 }
 
@@ -52,7 +52,7 @@ idea {
     }
 }
 
-configure(javaProjects) {
+configure((Set<Project>) ext.javaProjects) {
     apply plugin: "nebula.netflixoss"
     apply plugin: "java"
     apply plugin: "checkstyle"
@@ -63,7 +63,7 @@ configure(javaProjects) {
     apply plugin: "io.franzbecker.gradle-lombok"
     apply plugin: "nebula.facet"
 
-    group = "com.netflix.${githubProjectName}"
+    group = (String) "com.netflix.${githubProjectName}"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -202,7 +202,7 @@ configure(javaProjects) {
     }
 
     compileJava {
-        options.annotationProcessorGeneratedSourcesDirectory = project.generatedSourcesJavaDir
+        options.getGeneratedSourceOutputDirectory().set((File) project.generatedSourcesJavaDir)
         options.compilerArgs += [
                 "-Xlint:unchecked",
                 "-Xlint:deprecation",
@@ -240,8 +240,8 @@ configure(javaProjects) {
                 systemProperty "spring.profiles.include", "githubactions"
             }
 
-            reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
-            jacocoTestReport.getExecutionData().plus(files("$buildDir/jacoco/${task.name}.exec"))
+            reports.html.destination(new File("${reporting.baseDir}/test/${task.name}"))
+            (jacocoTestReport.getExecutionData() + files("$buildDir/jacoco/${task.name}.exec"))
 
             // Customize test logging on CI and everywhere else
             testLogging {
@@ -278,9 +278,9 @@ configure(javaProjects) {
 
     jacocoTestReport {
         reports {
-            html.enabled = true
-            xml.enabled = true
-            csv.enabled = false
+            html.getRequired().set(true)
+            xml.getRequired().set(true)
+            csv.getRequired().set(false)
         }
     }
 }
@@ -295,15 +295,15 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     dependsOn javaProjects*.test
 
     javaProjects.each {
-        sourceSets it.sourceSets.main
+        sourceSets ((SourceSet) it.sourceSets.main)
     }
 
     reports {
-        xml.enabled = true
+        xml.getRequired().set(true)
         xml.destination new File("${buildDir}/reports/jacoco/report.xml")
-        html.enabled = true
+        html.getRequired().set(true)
         html.destination new File("${buildDir}/reports/jacoco/html")
-        csv.enabled = false
+        csv.getRequired().set(false)
     }
     afterEvaluate {
         // Exclude generated files from top-level coverage report
@@ -324,8 +324,8 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
 }
 
 coveralls {
-    sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${project.buildDir}/reports/jacoco/report.xml"
+    sourceDirs = project.javaProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = (String) "${project.buildDir}/reports/jacoco/report.xml"
 }
 
 tasks.coveralls {
@@ -391,7 +391,7 @@ gitPublish {
         into("_releases") {
             from new File(project(":genie-docs").projectDir, "src/templates/releaseTemplate.md")
             rename {
-                String fileName -> fileName.replace("releaseTemplate", "${project.version}")
+                String fileName -> fileName.replace("releaseTemplate", (String) "${project.version}")
             }
             filter {
                 it.replace("GENIE_VERSION", project.version.toString())

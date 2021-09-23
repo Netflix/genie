@@ -946,15 +946,15 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     )
     void testUpdateStatusForUnusedCommands() {
         final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
-        final Instant jobThreshold = present.minus(30, ChronoUnit.DAYS);
         final Instant commandThreshold = present.minus(60, ChronoUnit.DAYS);
+        final int batchSize = 100;
         Assertions
             .assertThat(
                 this.service.updateStatusForUnusedCommands(
                     CommandStatus.INACTIVE,
                     commandThreshold,
                     EnumSet.of(CommandStatus.ACTIVE, CommandStatus.DEPRECATED),
-                    jobThreshold
+                    batchSize
                 )
             )
             .isEqualTo(3);
