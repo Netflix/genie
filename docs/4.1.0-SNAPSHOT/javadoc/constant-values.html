@@ -2066,25 +2066,11 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository.FIND_OLD_COMMANDS_QUERY">
+<td class="colFirst"><a name="com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository.FIND_UNUSED_COMMANDS_IN_STATUS_CREATED_BEFORE_QUERY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#FIND_OLD_COMMANDS_QUERY">FIND_OLD_COMMANDS_QUERY</a></code></td>
-<td class="colLast"><code>"SELECT id FROM commands WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold) LIMIT :limit"</code></td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><a name="com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository.FIND_UNUSED_COMMANDS_QUERY">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#FIND_UNUSED_COMMANDS_QUERY">FIND_UNUSED_COMMANDS_QUERY</a></code></td>
-<td class="colLast"><code>"SELECT id FROM commands WHERE status IN (:unusedStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) LIMIT :limit"</code></td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository.SET_UNUSED_STATUS_QUERY">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#SET_UNUSED_STATUS_QUERY">SET_UNUSED_STATUS_QUERY</a></code></td>
-<td class="colLast"><code>"UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold)"</code></td>
+<td><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#FIND_UNUSED_COMMANDS_IN_STATUS_CREATED_BEFORE_QUERY">FIND_UNUSED_COMMANDS_IN_STATUS_CREATED_BEFORE_QUERY</a></code></td>
+<td class="colLast"><code>"SELECT id FROM commands WHERE status IN (:statuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) LIMIT :limit"</code></td>
 </tr>
 </tbody>
 </table>
@@ -2536,13 +2522,6 @@
 <td class="colLast"><code>"genie.tasks.database-cleanup.command-deactivation"</code></td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.JOB_CREATION_THRESHOLD_PROPERTY">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#JOB_CREATION_THRESHOLD_PROPERTY">JOB_CREATION_THRESHOLD_PROPERTY</a></code></td>
-<td class="colLast"><code>"genie.tasks.database-cleanup.command-deactivation.jobCreationThreshold"</code></td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.SKIP_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>

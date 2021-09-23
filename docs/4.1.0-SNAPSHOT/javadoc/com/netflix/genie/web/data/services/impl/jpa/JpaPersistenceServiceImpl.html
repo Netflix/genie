@@ -767,14 +767,12 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i85" class="rowColor">
 <td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-int-">updateStatusForUnusedCommands</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-int-">updateStatusForUnusedCommands</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
                              java.time.Instant&nbsp;commandCreatedThreshold,
                              java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
-                             java.time.Instant&nbsp;jobCreatedThreshold,
                              int&nbsp;batchSize)</code>
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
- it was created before commandCreatedThreshold and it hasn't been used in any job that was created
- in the Genie system after jobCreatedThreshold.</div>
+ it was created before commandCreatedThreshold and it hasn't been used in any job.</div>
 </td>
 </tr>
 <tr id="i86" class="altColor">
@@ -1683,7 +1681,7 @@ public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/
 </dl>
 </li>
 </ul>
-<a name="updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-int-">
+<a name="updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-int-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1693,21 +1691,17 @@ public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/
 public&nbsp;int&nbsp;updateStatusForUnusedCommands(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
                                                                                   java.time.Instant&nbsp;commandCreatedThreshold,
                                                                                   java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
-                                                                                  java.time.Instant&nbsp;jobCreatedThreshold,
                                                                                   int&nbsp;batchSize)</pre>
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
- it was created before commandCreatedThreshold and it hasn't been used in any job that was created
- in the Genie system after jobCreatedThreshold.</div>
+ it was created before commandCreatedThreshold and it hasn't been used in any job.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-int-">updateStatusForUnusedCommands</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-int-">updateStatusForUnusedCommands</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>desiredStatus</code> - The new status the matching commands should have</dd>
 <dd><code>commandCreatedThreshold</code> - The instant in time which a command must have been created before to be
                                 considered for update. Exclusive</dd>
 <dd><code>currentStatuses</code> - The set of current statuses a command must have to be considered for update</dd>
-<dd><code>jobCreatedThreshold</code> - The instant in time after which a command must not have been used in a Genie job
-                                for it to be considered for update. Inclusive.</dd>
 <dd><code>batchSize</code> - The maximum number of commands to update in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of commands whose statuses were updated to desiredStatus</dd>
