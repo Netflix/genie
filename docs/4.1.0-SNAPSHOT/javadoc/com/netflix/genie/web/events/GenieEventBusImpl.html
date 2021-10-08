@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -200,9 +200,17 @@ implements <a href="../../../../../com/netflix/genie/web/events/GenieEventBus.ht
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/GenieEventBusImpl.html#setBeanClassLoader-java.lang.ClassLoader-">setBeanClassLoader</a></span>(java.lang.ClassLoader&nbsp;classLoader)</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/GenieEventBusImpl.html#removeApplicationListenerBeans-java.util.function.Predicate-">removeApplicationListenerBeans</a></span>(java.util.function.Predicate&lt;java.lang.String&gt;&nbsp;predicate)</code></td>
 </tr>
 <tr id="i10" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/GenieEventBusImpl.html#removeApplicationListeners-java.util.function.Predicate-">removeApplicationListeners</a></span>(java.util.function.Predicate&lt;org.springframework.context.ApplicationListener&lt;?&gt;&gt;&nbsp;predicate)</code></td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/GenieEventBusImpl.html#setBeanClassLoader-java.lang.ClassLoader-">setBeanClassLoader</a></span>(java.lang.ClassLoader&nbsp;classLoader)</code></td>
+</tr>
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/GenieEventBusImpl.html#setBeanFactory-org.springframework.beans.factory.BeanFactory-">setBeanFactory</a></span>(org.springframework.beans.factory.BeanFactory&nbsp;beanFactory)</code></td>
 </tr>
@@ -337,6 +345,32 @@ implements <a href="../../../../../com/netflix/genie/web/events/GenieEventBus.ht
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>removeApplicationListenerBean</code>&nbsp;in interface&nbsp;<code>org.springframework.context.event.ApplicationEventMulticaster</code></dd>
+</dl>
+</li>
+</ul>
+<a name="removeApplicationListeners-java.util.function.Predicate-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeApplicationListeners</h4>
+<pre>public&nbsp;void&nbsp;removeApplicationListeners(java.util.function.Predicate&lt;org.springframework.context.ApplicationListener&lt;?&gt;&gt;&nbsp;predicate)</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>removeApplicationListeners</code>&nbsp;in interface&nbsp;<code>org.springframework.context.event.ApplicationEventMulticaster</code></dd>
+</dl>
+</li>
+</ul>
+<a name="removeApplicationListenerBeans-java.util.function.Predicate-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeApplicationListenerBeans</h4>
+<pre>public&nbsp;void&nbsp;removeApplicationListenerBeans(java.util.function.Predicate&lt;java.lang.String&gt;&nbsp;predicate)</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>removeApplicationListenerBeans</code>&nbsp;in interface&nbsp;<code>org.springframework.context.event.ApplicationEventMulticaster</code></dd>
 </dl>
 </li>
 </ul>

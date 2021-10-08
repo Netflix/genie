@@ -101,7 +101,7 @@ var activeTableTab = "activeTableTab";
 <li>org.springframework.core.io.AbstractResource</li>
 <li>
 <ul class="inheritance">
-<li>org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</li>
+<li>io.awspring.cloud.core.io.s3.SimpleStorageResource</li>
 <li>
 <ul class="inheritance">
 <li>com.netflix.genie.common.internal.aws.s3.SimpleStorageRangeResource</li>
@@ -122,7 +122,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public final class <span class="typeNameLabel">SimpleStorageRangeResource</span>
-extends org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</pre>
+extends io.awspring.cloud.core.io.s3.SimpleStorageResource</pre>
 <div class="block">This class extends <code>SimpleStorageResource</code> in order to efficiently handle range requests.
  Rather than fetching the entire object and let the web tier skip, it only downloads the relevant object region and
  returns a composite input stream that skips the unrequested bytes.</div>
@@ -158,10 +158,10 @@ extends org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</pre>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.org.springframework.cloud.aws.core.io.s3.SimpleStorageResource">
+<li class="blockList"><a name="methods.inherited.from.class.io.awspring.cloud.core.io.s3.SimpleStorageResource">
 <!--   -->
 </a>
-<h3>Methods inherited from class&nbsp;org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</h3>
+<h3>Methods inherited from class&nbsp;io.awspring.cloud.core.io.s3.SimpleStorageResource</h3>
 <code>contentLength, createRelative, getAmazonS3, getDescription, getFile, getFilename, getOutputStream, getS3Uri, getURL, isWritable, lastModified</code></li>
 </ul>
 <ul class="blockList">
@@ -218,7 +218,7 @@ extends org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</pre>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>getInputStream</code>&nbsp;in interface&nbsp;<code>org.springframework.core.io.InputStreamSource</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>getInputStream</code>&nbsp;in class&nbsp;<code>org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</code></dd>
+<dd><code>getInputStream</code>&nbsp;in class&nbsp;<code>io.awspring.cloud.core.io.s3.SimpleStorageResource</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
 </dl>
@@ -235,7 +235,7 @@ extends org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</pre>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>exists</code>&nbsp;in interface&nbsp;<code>org.springframework.core.io.Resource</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>exists</code>&nbsp;in class&nbsp;<code>org.springframework.cloud.aws.core.io.s3.SimpleStorageResource</code></dd>
+<dd><code>exists</code>&nbsp;in class&nbsp;<code>io.awspring.cloud.core.io.s3.SimpleStorageResource</code></dd>
 </dl>
 </li>
 </ul>

@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>@Configuration
  @EnableConfigurationProperties
- @AutoConfigureAfter(value={org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration.class,org.springframework.cloud.aws.autoconfigure.context.ContextInstanceDataAutoConfiguration.class,org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration.class,org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration.class,org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration.class})
+ @AutoConfigureAfter(value={io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextInstanceDataAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextStackAutoConfiguration.class})
  @ConditionalOnBean(value=com.amazonaws.auth.AWSCredentialsProvider.class)
 public class <span class="typeNameLabel">AwsAutoConfiguration</span>
 extends java.lang.Object</pre>
@@ -177,12 +177,12 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>com.amazonaws.regions.AwsRegionProvider</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#awsRegionProvider-org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties-">awsRegionProvider</a></span>(org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties&nbsp;awsRegionProperties)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#awsRegionProvider-io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties-">awsRegionProvider</a></span>(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties&nbsp;awsRegionProperties)</code>
 <div class="block">Get an AWS region provider instance.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties</code></td>
+<td class="colFirst"><code>io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#awsS3ResourceLoaderProperties--">awsS3ResourceLoaderProperties</a></span>()</code>
 <div class="block">Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
  the <code>ContextResourceLoaderAutoConfiguration</code> isn't applied by the agent app.</div>
@@ -205,7 +205,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3ProtocolResolver-org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-">s3ProtocolResolver</a></span>(org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;resourceLoaderProperties,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3ProtocolResolver-io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-">s3ProtocolResolver</a></span>(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;resourceLoaderProperties,
                   <a href="../../../../../../com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</code>
 <div class="block">Provide an protocol resolver which will allow resources with s3:// prefixes to be resolved by the
  application <code>ResourceLoader</code> provided this bean is eventually added to the
@@ -283,7 +283,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="awsRegionProvider-org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties-">
+<a name="awsRegionProvider-io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -291,7 +291,7 @@ extends java.lang.Object</pre>
 <h4>awsRegionProvider</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=com.amazonaws.regions.AwsRegionProvider.class)
-public&nbsp;com.amazonaws.regions.AwsRegionProvider&nbsp;awsRegionProvider(org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties&nbsp;awsRegionProperties)</pre>
+public&nbsp;com.amazonaws.regions.AwsRegionProvider&nbsp;awsRegionProvider(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties&nbsp;awsRegionProperties)</pre>
 <div class="block">Get an AWS region provider instance. The rules for this basically follow what Spring Cloud AWS does but uses
  the interface from the AWS SDK instead and provides a sensible default.
  <p>
@@ -333,9 +333,9 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/aws/s3/
 <li class="blockList">
 <h4>awsS3ResourceLoaderProperties</h4>
 <pre>@Bean
- @ConditionalOnMissingBean(value=org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties.class)
+ @ConditionalOnMissingBean(value=io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties.class)
  @ConfigurationProperties(value="cloud.aws.loader")
-public&nbsp;org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;awsS3ResourceLoaderProperties()</pre>
+public&nbsp;io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;awsS3ResourceLoaderProperties()</pre>
 <div class="block">Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
  the <code>ContextResourceLoaderAutoConfiguration</code> isn't applied by the agent app.</div>
 <dl>
@@ -344,7 +344,7 @@ public&nbsp;org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3
 </dl>
 </li>
 </ul>
-<a name="s3ProtocolResolver-org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-">
+<a name="s3ProtocolResolver-io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties-com.netflix.genie.common.internal.aws.s3.S3ClientFactory-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -352,7 +352,7 @@ public&nbsp;org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3
 <h4>s3ProtocolResolver</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver.class</a>)
-public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a>&nbsp;s3ProtocolResolver(org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;resourceLoaderProperties,
+public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a>&nbsp;s3ProtocolResolver(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;resourceLoaderProperties,
                                                                                                               <a href="../../../../../../com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</pre>
 <div class="block">Provide an protocol resolver which will allow resources with s3:// prefixes to be resolved by the
  application <code>ResourceLoader</code> provided this bean is eventually added to the
