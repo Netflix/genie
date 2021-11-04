@@ -1,7 +1,8 @@
 === Data Model
 
-The Genie 4 data model contains several modifications and additions to the
-https://netflix.github.io/genie/concepts/3/DataModel.html[Genie 3 data model] to enable even more flexibility,
+The Genie 4 data model contains several modifications and additions to the data models from Genie
+https://netflix.github.io/genie/concepts/2/DataModel.html[2] and
+https://netflix.github.io/genie/docs/3.3.9/reference/#_data_model[3] to enable even more flexibility,
 modularity and meta data retention. This section will go over the purpose of the various resources available from the
 Genie API and how they interact.
 
