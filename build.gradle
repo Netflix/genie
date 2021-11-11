@@ -35,6 +35,10 @@ ext.javaProjects = subprojects.findAll {
 }
 
 allprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
     apply plugin: "jacoco"
     apply plugin: "idea"
     apply plugin: "eclipse"
