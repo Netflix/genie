@@ -67,6 +67,10 @@ public class JobClient {
     private static final String STATUS = "status";
     private static final String ATTACHMENT = "attachment";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+    private static final String EMPTY_STRING = "";
+    private static final int ZERO = 0;
+    private static final String STDOUT = "stdout";
+    private static final String STDERR = "stderr";
 
     private final JobService jobService;
     private final int maxStatusRetries;
@@ -536,7 +540,35 @@ public class JobClient {
      * @throws IOException          For Network and other IO issues.
      */
     public InputStream getJobStdout(final String jobId) throws IOException, GenieClientException {
-        return getJobOutputFile(jobId, "stdout");
+        return this.getJobStdout(jobId, null, null);
+    }
+
+    /**
+     * Method to fetch the stdout of a job from Genie.
+     *
+     * <p>
+     * Range Logic:
+     * <p>
+     * {@literal rangeStart} but no {@literal rangeEnd} then go from the start byte to the end of available content
+     * <p>
+     * {@literal rangeStart} and {@literal rangeEnd} return that range of bytes from the file if they exist
+     * <p>
+     * If only {@literal rangeEnd} then return the last number of those bytes from the file if they exist
+     *
+     * @param jobId      The id of the job whose output is desired.
+     * @param rangeStart The start byte of the file to retrieve. Optional. Greater than or equal to 0.
+     * @param rangeEnd   The end byte of the file to retrieve. Optional. Greater than or equal to 0. Must be
+     *                   greater than {@literal rangeStart}.
+     * @return An input stream to the output contents.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public InputStream getJobStdout(
+        final String jobId,
+        @Nullable final Long rangeStart,
+        @Nullable final Long rangeEnd
+    ) throws IOException, GenieClientException {
+        return this.getJobOutputFile(jobId, STDOUT, rangeStart, rangeEnd);
     }
 
     /**
@@ -547,10 +579,36 @@ public class JobClient {
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
+    public InputStream getJobStderr(final String jobId) throws IOException, GenieClientException {
+        return this.getJobStderr(jobId, null, null);
+    }
+
+    /**
+     * Method to fetch the stderr of a job from Genie.
+     *
+     * <p>
+     * Range Logic:
+     * <p>
+     * {@literal rangeStart} but no {@literal rangeEnd} then go from the start byte to the end of available content
+     * <p>
+     * {@literal rangeStart} and {@literal rangeEnd} return that range of bytes from the file if they exist
+     * <p>
+     * If only {@literal rangeEnd} then return the last number of those bytes from the file if they exist
+     *
+     * @param jobId      The id of the job whose stderr is desired.
+     * @param rangeStart The start byte of the file to retrieve. Optional. Greater than or equal to 0.
+     * @param rangeEnd   The end byte of the file to retrieve. Optional. Greater than or equal to 0. Must be
+     *                   greater than {@literal rangeStart}.
+     * @return An input stream to the stderr contents.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
     public InputStream getJobStderr(
-        final String jobId
+        final String jobId,
+        @Nullable final Long rangeStart,
+        @Nullable final Long rangeEnd
     ) throws IOException, GenieClientException {
-        return getJobOutputFile(jobId, "stderr");
+        return this.getJobOutputFile(jobId, STDERR, rangeStart, rangeEnd);
     }
 
     /**
@@ -568,16 +626,74 @@ public class JobClient {
      * @throws IOException          For Network and other IO issues.
      */
     public InputStream getJobOutputFile(
-        final String jobId, final String outputFilePath
+        final String jobId,
+        final String outputFilePath
+    ) throws IOException, GenieClientException {
+        return this.getJobOutputFile(jobId, outputFilePath, null, null);
+    }
+
+    /**
+     * Method to fetch an output file for a job from Genie and accepting an range of bytes to return.
+     *
+     * <p>
+     * <b>NOTE</b>: If the specified outputFilePath is a directory, then the directory
+     * manifest is returned.
+     * </p>
+     *
+     * <p>
+     * Range Logic:
+     * <p>
+     * {@literal rangeStart} but no {@literal rangeEnd} then go from the start byte to the end of available content
+     * <p>
+     * {@literal rangeStart} and {@literal rangeEnd} return that range of bytes from the file if they exist
+     * <p>
+     * If only {@literal rangeEnd} then return the last number of those bytes from the file if they exist
+     *
+     * @param jobId          The id of the job whose output file is desired.
+     * @param outputFilePath The path to the file within output directory.
+     * @param rangeStart     The start byte of the file to retrieve. Optional. Greater than or equal to 0.
+     * @param rangeEnd       The end byte of the file to retrieve. Optional. Greater than or equal to 0. Must be
+     *                       greater than {@literal rangeStart}.
+     * @return An input stream to the output file contents.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range">Range Header Documentation</a>
+     */
+    public InputStream getJobOutputFile(
+        final String jobId,
+        final String outputFilePath,
+        @Nullable final Long rangeStart,
+        @Nullable final Long rangeEnd
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
-        final String pathArg = StringUtils.isEmpty(outputFilePath) ? "" : outputFilePath;
-        final ResponseBody body = this.jobService.getJobOutputFile(jobId, pathArg).execute().body();
+        if (rangeStart != null && rangeStart < ZERO) {
+            throw new IllegalArgumentException("Range start must be greater than or equal to 0");
+        }
+        if (rangeEnd != null && rangeEnd < ZERO) {
+            throw new IllegalArgumentException("Range end must be greater than or equal to 0");
+        }
+
+        String rangeHeader = null;
+        if (rangeStart != null || rangeEnd != null) {
+            if (rangeStart != null && rangeEnd != null) {
+                if (rangeEnd < rangeStart) {
+                    throw new IllegalArgumentException("Range end must be greater than range start");
+                }
+                rangeHeader = "bytes=" + rangeStart + "-" + rangeEnd;
+            } else if (rangeStart != null) {
+                rangeHeader = "bytes=" + rangeStart + "-";
+            } else {
+                rangeHeader = "bytes=-" + rangeEnd;
+            }
+        }
+        final String pathArg = StringUtils.isEmpty(outputFilePath) ? EMPTY_STRING : outputFilePath;
+        final ResponseBody body = rangeHeader == null
+            ? this.jobService.getJobOutputFile(jobId, pathArg).execute().body()
+            : this.jobService.getJobOutputFile(jobId, pathArg, rangeHeader).execute().body();
         if (body == null) {
-            throw new GenieClientException(
-                String.format("No data for %s returned", outputFilePath));
+            throw new GenieClientException(String.format("No data for %s returned", outputFilePath));
         }
         return body.byteStream();
     }

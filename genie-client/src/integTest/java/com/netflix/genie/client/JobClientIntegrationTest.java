@@ -192,6 +192,18 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
             .assertThat(IOUtils.toString(this.jobClient.getJobStdout(echoJobId), StandardCharsets.UTF_8))
             .isEqualTo("hello\n");
         Assertions
+            .assertThat(IOUtils.toString(this.jobClient.getJobStdout(echoJobId, null, null), StandardCharsets.UTF_8))
+            .isEqualTo("hello\n");
+        Assertions
+            .assertThat(IOUtils.toString(this.jobClient.getJobStdout(echoJobId, 4L, null), StandardCharsets.UTF_8))
+            .isEqualTo("o\n");
+        Assertions
+            .assertThat(IOUtils.toString(this.jobClient.getJobStdout(echoJobId, 0L, 3L), StandardCharsets.UTF_8))
+            .isEqualTo("hell");
+        Assertions
+            .assertThat(IOUtils.toString(this.jobClient.getJobStdout(echoJobId, null, 2L), StandardCharsets.UTF_8))
+            .isEqualTo("o\n");
+        Assertions
             .assertThat(IOUtils.toString(this.jobClient.getJobStderr(echoJobId), StandardCharsets.UTF_8))
             .isBlank();
         Assertions
