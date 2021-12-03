@@ -31,6 +31,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -74,7 +75,8 @@ public interface JobService {
     @POST(JOBS_URL_SUFFIX)
     Call<Void> submitJobWithAttachments(
         @Part("request") JobRequest request,
-        @Part List<MultipartBody.Part> attachments);
+        @Part List<MultipartBody.Part> attachments
+    );
 
     /**
      * Method to get all jobs from Genie.
@@ -147,7 +149,29 @@ public interface JobService {
     @GET(JOBS_URL_SUFFIX + "/{id}/output/{path}")
     Call<ResponseBody> getJobOutputFile(
         @Path("id") String jobId,
-        @Path(value = "path", encoded = true) String outputFilePath);
+        @Path(value = "path", encoded = true) String outputFilePath
+    );
+
+    /**
+     * Method to fetch partial output file for a job from Genie.
+     *
+     * <p>
+     * <b>NOTE</b>: If the specified outputFilePath is a directory, then the directory
+     * manifest is returned.
+     * </p>
+     *
+     * @param jobId          The id of the job whose output file is desired.
+     * @param outputFilePath The path to the file within output directory.
+     * @param range          The range header value
+     * @return A callable object.
+     */
+    @Streaming
+    @GET(JOBS_URL_SUFFIX + "/{id}/output/{path}")
+    Call<ResponseBody> getJobOutputFile(
+        @Path("id") String jobId,
+        @Path(value = "path", encoded = true) String outputFilePath,
+        @Header("Range") String range
+    );
 
     /**
      * Method to get Job status.
