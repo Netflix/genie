@@ -64,7 +64,7 @@ abstract class GenieClientIntegrationTestBase {
     //       is faster as in agent mode the tests are much slower than embedded. Also once we move to boot 2.3 we can
     //       leverage their layered jars to produce less changing images.
     @Container
-    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.candidate")
+    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.release")
         .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
         .withExposedPorts(8080);
 
