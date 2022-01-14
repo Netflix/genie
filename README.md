@@ -1,6 +1,5 @@
 # Genie
 
-[![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)](https://bintray.com/netflixoss/maven/genie/_latestVersion)
 [![License](https://img.shields.io/github/license/Netflix/genie.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Issues](https://img.shields.io/github/issues/Netflix/genie.svg)](https://github.com/Netflix/genie/issues)
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/genie.svg)]()
@@ -43,10 +42,11 @@ For more details visit the [official documentation](https://netflix.github.io/ge
 
 Genie builds are run on Travis CI [here](https://travis-ci.com/Netflix/genie).
 
-| Branch |                                                     Build                                                     |                                                                 Coverage (coveralls.io)                                                                |
-|:------:|:-------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| master (4.0.x) | [![Build Status](https://travis-ci.com/Netflix/genie.svg?branch=master)](https://travis-ci.com/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master) |
-|  3.3.x |  [![Build Status](https://travis-ci.com/Netflix/genie.svg?branch=3.3.x)](https://travis-ci.com/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=3.3.x)](https://coveralls.io/github/Netflix/genie?branch=3.3.x) |
+|     Branch     |                                                     Build                                                     |                                                                Coverage (coveralls.io)                                                                 |
+|:--------------:|:-------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| master (4.2.x) | [![Build Status](https://travis-ci.com/Netflix/genie.svg?branch=master)](https://travis-ci.com/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master) |
+|     4.1.x      | [![Build Status](https://travis-ci.com/Netflix/genie.svg?branch=4.1.x)](https://travis-ci.com/Netflix/genie)  |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=4.1.x)](https://coveralls.io/github/Netflix/genie?branch=4.1.x)  |
+|     4.0.x      | [![Build Status](https://travis-ci.com/Netflix/genie.svg?branch=4.0.x)](https://travis-ci.com/Netflix/genie)  |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=4.0.x)](https://coveralls.io/github/Netflix/genie?branch=4.0.x)  |
 
 ## Project structure
 
