@@ -263,7 +263,7 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
         @Valid @RequestPart("request") final JobRequest jobRequest,
-        @RequestPart("attachment") final MultipartFile[] attachments,
+        @RequestPart(value = "attachment", required = false) @Nullable final MultipartFile[] attachments,
         @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) @Nullable final String clientHost,
         @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
@@ -271,7 +271,7 @@ public class JobRestController {
         log.info(
             "[submitJob] Called multipart method to submit job: {}, with {} attachments",
             jobRequest,
-            attachments.length
+            attachments == null ? 0 : attachments.length
         );
         this.submitJobWithAttachmentsRate.increment();
         return this.handleSubmitJob(jobRequest, attachments, clientHost, userAgent, httpServletRequest);
