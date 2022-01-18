@@ -380,7 +380,7 @@ public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;s
  @ResponseStatus(value=ACCEPTED)
 public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;submitJob(@Valid @RequestPart(value="request")
                                                                                                                                                        @Valid <a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
-                                                                                                                                                       @RequestPart(value="attachment")
+                                                                                                                                                       @RequestPart(value="attachment",required=false) @Nullable
                                                                                                                                                        org.springframework.web.multipart.MultipartFile[]&nbsp;attachments,
                                                                                                                                                        @RequestHeader(value="X-Forwarded-For",required=false) @Nullable
                                                                                                                                                        java.lang.String&nbsp;clientHost,
