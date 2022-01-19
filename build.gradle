@@ -14,16 +14,16 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.12.0"
-    id "nebula.netflixoss" version "10.3.0"
-    id "org.ajoberstar.grgit" version "4.1.0"
+    id "nebula.netflixoss" version "10.5.1"
+    id "org.ajoberstar.grgit" version "4.1.1"
     id "org.ajoberstar.git-publish" version "3.0.0"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
     id "org.asciidoctor.jvm.convert" version "3.3.2" apply false
-    id "com.gorylenko.gradle-git-properties" version "2.3.1" apply false
-    id "com.google.protobuf" version "0.8.14" apply false
-    id "io.franzbecker.gradle-lombok" version "4.0.0" apply false
+    id "com.gorylenko.gradle-git-properties" version "2.3.2" apply false
+    id "com.google.protobuf" version "0.8.18" apply false
+    id "io.franzbecker.gradle-lombok" version "5.0.0" apply false
     id "nebula.node" version "2.0.1" apply false
-    id "com.github.spotbugs" version "4.6.0" apply false
+    id "com.github.spotbugs" version "5.0.4" apply false
 }
 
 apply plugin: "nebula-aggregate-javadocs"
@@ -65,18 +65,19 @@ configure((Set<Project>) ext.javaProjects) {
 
     group = (String) "com.netflix.${githubProjectName}"
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(8)
+        }
+    }
 
     facets {
         smokeTest {
             parentSourceSet = "test"
-            // includeInCheckLifecycle = false
         }
         integTest {
             parentSourceSet = "test"
             testTaskName = "integrationTest"
-            // includeInCheckLifecycle = false
         }
     }
 
@@ -205,17 +206,17 @@ configure((Set<Project>) ext.javaProjects) {
     compileJava {
         options.getGeneratedSourceOutputDirectory().set((File) project.generatedSourcesJavaDir)
         options.compilerArgs += [
-                "-Xlint:unchecked",
-                "-Xlint:deprecation",
-                "-s",
-                project.generatedSourcesJavaDir
+            "-Xlint:unchecked",
+            "-Xlint:deprecation",
+            "-s",
+            project.generatedSourcesJavaDir
         ]
     }
 
     compileTestJava {
         options.compilerArgs += [
-                "-Xlint:unchecked",
-                "-Xlint:deprecation"
+            "-Xlint:unchecked",
+            "-Xlint:deprecation"
         ]
     }
 
@@ -229,8 +230,8 @@ configure((Set<Project>) ext.javaProjects) {
 
             // Environment properties to be forwarded to the test runtime
             [
-                    "CI",
-                    "INTEGRATION_TEST_DB",
+                "CI",
+                "INTEGRATION_TEST_DB",
             ].each { envVariableName ->
                 if (System.getenv(envVariableName) != null) {
                     systemProperty envVariableName, System.getenv(envVariableName)
@@ -264,6 +265,7 @@ configure((Set<Project>) ext.javaProjects) {
     }
 
     spotbugs {
+        toolVersion = "4.2.1"
         excludeFilter = new File("$rootProject.projectDir/config/spotbugs/excludeFilter.xml")
     }
     spotbugsTest.enabled = false
@@ -272,8 +274,8 @@ configure((Set<Project>) ext.javaProjects) {
 
     tasks.withType(SpotBugsTask) {
         reports {
-            xml.enabled = false
-            html.enabled = true
+            xml.getRequired().set(false)
+            html.getRequired().set(true)
         }
     }
 
@@ -296,7 +298,7 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     dependsOn javaProjects*.test
 
     javaProjects.each {
-        sourceSets ((SourceSet) it.sourceSets.main)
+        sourceSets((SourceSet) it.sourceSets.main)
     }
 
     reports {
@@ -309,17 +311,17 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     afterEvaluate {
         // Exclude generated files from top-level coverage report
         classDirectories.setFrom(
-                files(
-                        classDirectories.files.collect {
-                            fileTree(
-                                    dir: it,
-                                    exclude: [
-                                            "**/com/netflix/genie/proto/**",
-                                            "**/com/netflix/genie/web/data/entities/*_*",
-                                    ]
-                            )
-                        }
-                )
+            files(
+                classDirectories.files.collect {
+                    fileTree(
+                        dir: it,
+                        exclude: [
+                            "**/com/netflix/genie/proto/**",
+                            "**/com/netflix/genie/web/data/entities/*_*",
+                        ]
+                    )
+                }
+            )
         )
     }
 }
