@@ -20,6 +20,7 @@ package com.netflix.genie.web.agent.resources;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import org.springframework.core.io.Resource;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,12 +48,12 @@ public final class AgentFileResourceImpl implements AgentFileStreamService.Agent
 
     private AgentFileResourceImpl(
         final boolean exists,
-        final URI uri,
+        @Nullable final URI uri,
         final long contentLength,
         final long lastModified,
-        final String filename,
+        @Nullable final String filename,
         final String description,
-        final InputStream inputStream
+        @Nullable final InputStream inputStream
     ) {
         this.exists = exists;
         this.uri = uri;
@@ -106,7 +107,7 @@ public final class AgentFileResourceImpl implements AgentFileStreamService.Agent
         final String description = AgentFileResourceImpl.class.getSimpleName()
             + " ["
             + " jobId:" + jobId + ", "
-            + " relativePath: " + relativePath.toString()
+            + " relativePath: " + relativePath
             + " ]";
 
         final Path filenamePath = relativePath.getFileName();
