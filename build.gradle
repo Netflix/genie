@@ -1,4 +1,5 @@
 import com.github.spotbugs.snom.SpotBugsTask
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
@@ -46,9 +47,14 @@ allprojects {
 
 idea {
     project {
-        jdkName = "1.8"
-        languageLevel = "8"
+        jdkName = "11"
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_1_8)
         vcs = "Git"
+    }
+    module {
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_1_8)
+        downloadJavadoc true
+        downloadSources true
     }
 }
 
@@ -329,6 +335,9 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
 coveralls {
     sourceDirs = project.javaProjects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = (String) "${project.buildDir}/reports/jacoco/report.xml"
+    // https://github.com/kt3k/coveralls-gradle-plugin/issues/85#issuecomment-475958699
+    saveAsFile = true
+    sendToCoveralls = false
 }
 
 tasks.coveralls {
@@ -487,11 +496,5 @@ gradleEnterprise {
         publishAlways()
         termsOfServiceUrl = "https://gradle.com/terms-of-service"
         termsOfServiceAgree = "yes"
-    }
-}
-
-task printOsDetector {
-    doLast {
-        println "${osdetector.os}"
     }
 }

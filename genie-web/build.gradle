@@ -1,7 +1,20 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
 apply plugin: "java-library"
 apply plugin: "org.asciidoctor.jvm.convert"
+
+idea {
+    module {
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_11)
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
 
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 
@@ -122,7 +135,7 @@ dependencies {
     testImplementation("org.dbunit:dbunit")
     testImplementation("org.springframework.boot:spring-boot-starter-jetty")
     integTestImplementation("com.github.ppodgorsek:spring-test-dbunit-core")
-    integTestImplementation("org.apache.curator:curator-test:2.13.0")
+    integTestImplementation("org.apache.curator:curator-test:5.1.0")
     integTestImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-core")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-restassured")
@@ -169,7 +182,7 @@ asciidoctor {
         logging.removeStandardErrorListener(listener)
         capturedOutput.join('').with { output ->
             if (output =~ /include file not found:/) {
-                throw new RuntimeException("Include file(s) not found.\n" + output)
+                throw new RuntimeException((String) ("Include file(s) not found.\n" + output))
             }
         }
     }
@@ -182,8 +195,8 @@ asciidoctorj {
 jar {
     manifest {
         attributes(
-                "Implementation-Title": project.name,
-                "Implementation-Version": project.version,
+            "Implementation-Title": project.name,
+            "Implementation-Version": project.version,
         )
     }
 }
@@ -200,7 +213,7 @@ tasks.withType(Pmd) {
 processResources {
     filesMatching("**/*.yml") {
         filter ReplaceTokens, tokens: [
-                "genie.version": project.version.toString()
+            "genie.version": project.version.toString()
         ]
     }
 }
