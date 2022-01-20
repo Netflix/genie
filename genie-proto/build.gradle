@@ -40,7 +40,12 @@ protobuf {
     protoc {
         // Download the protoc compiler
         // This particular protobuf dependency isn't in the BOM for some reason
-        artifact = "com.google.protobuf:protoc:${protobuf_version}"
+        // workaround for no native M1 support https://github.com/grpc/grpc-java/issues/7690#issuecomment-760332746
+        if (osdetector.os == "osx") {
+            artifact = "com.google.protobuf:protoc:${protobuf_version}:osx-x86_64"
+        } else {
+            artifact = "com.google.protobuf:protoc:${protobuf_version}"
+        }
         // Use project convention for generated files
         generatedFilesBaseDir = project.generatedSourcesDir
     }
@@ -48,7 +53,7 @@ protobuf {
     plugins {
         grpc {
             // Download the grpc compiler
-            artifact = "io.grpc:protoc-gen-grpc-java"
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpc_version}"
         }
     }
 
