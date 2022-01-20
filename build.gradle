@@ -88,7 +88,7 @@ configure((Set<Project>) ext.javaProjects) {
             mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.2"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
-            mavenBom "io.grpc:grpc-bom:1.33.1"
+            mavenBom "io.grpc:grpc-bom:${grpc_version}"
             mavenBom "org.spockframework:spock-bom:2.0-groovy-3.0"
             mavenBom "org.testcontainers:testcontainers-bom:1.16.2"
         }
@@ -487,5 +487,11 @@ gradleEnterprise {
         publishAlways()
         termsOfServiceUrl = "https://gradle.com/terms-of-service"
         termsOfServiceAgree = "yes"
+    }
+}
+
+task printOsDetector {
+    doLast {
+        println "${osdetector.os}"
     }
 }
