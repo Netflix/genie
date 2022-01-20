@@ -12,12 +12,12 @@ asciidoctor {
 
 asciidoctorj {
     attributes(
-            [
-                    "revnumber"         : genieVersion,
-                    "docinfo1"          : "",
-                    "isSnapshot"        : isSnapshot,
-                    "springBootVersion" : "${spring_boot_version}",
-                    "springCloudVersion": "${spring_cloud_version}"
-            ]
+        [
+            "revnumber"         : genieVersion,
+            "docinfo1"          : "",
+            "isSnapshot"        : isSnapshot,
+            "springBootVersion" : "${spring_boot_version}",
+            "springCloudVersion": "${spring_cloud_version}"
+        ]
     )
 }
