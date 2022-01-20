@@ -1,6 +1,19 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
 apply plugin: "java-library"
+
+idea {
+    module {
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_11)
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
 
 dependencies {
     /*******************************
@@ -33,7 +46,7 @@ dependencies {
 processResources {
     filesMatching("**/*.yml") {
         filter ReplaceTokens, tokens: [
-                "genie.version": project.version.toString()
+            "genie.version": project.version.toString()
         ]
     }
 }

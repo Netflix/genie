@@ -69,15 +69,6 @@ dependencies {
 
 def genieVersion = project.version.toString()
 
-compileJava {
-    if (JavaVersion.current().isJava9Compatible() && project.targetCompatibility != JavaVersion.VERSION_1_8) {
-        options.compilerArgs += [
-                "--add-exports",
-                "jdk.unsupported/sun.misc=ALL-UNNAMED"
-        ]
-    }
-}
-
 jar {
     manifest {
         attributes("Implementation-Version": genieVersion)
@@ -93,7 +84,7 @@ javadoc {
 processResources {
     filesMatching("**/*.txt") {
         filter ReplaceTokens, tokens: [
-                "genie.version": genieVersion
+            "genie.version": genieVersion
         ]
     }
 }

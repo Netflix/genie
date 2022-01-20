@@ -1,15 +1,15 @@
 dist: xenial
 addons:
-  postgresql: '9.6'
+  postgresql: "9.6"
 language: java
 jdk:
-- openjdk8
+- openjdk11
 services:
 - mysql
 - postgresql
 - docker
 git:
-  depth: false
+  depth: 100
 install: "./travis/installViaTravis.sh"
 before_script:
 - cat "$TRAVIS_BUILD_DIR/travis/config/mysql/my.cnf" | sudo tee -a /etc/mysql/my.cnf
@@ -30,6 +30,9 @@ cache:
   - genie-ui/.gradle/nodejs
   - genie-ui/.gradle/npm
   timeout: 1000
+after_success:
+  # https://github.com/kt3k/coveralls-gradle-plugin/issues/85#issuecomment-475958699
+  - curl -F 'json_file=@build/coveralls/report.json' 'https://coveralls.io/api/v1/jobs'
 env:
   global:
   - secure: a5QmXCWR7wwEf/poWSj3PDAb6VICKqTTw3qbNjQwSvCzaCYtZZmxLbruQQlKOyR6W4j2VMrp2Ip5xrBjlCrOTvkFymPY3L+EwbPxsXbO4uhzs43BNFLhDon/Duv3TRhnedkqP0s8hN1ylxCbcID0UUPXQGrhnu8mb5QlDUx2mr8=

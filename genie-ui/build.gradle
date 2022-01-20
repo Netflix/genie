@@ -1,5 +1,19 @@
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
+
 apply plugin: "java-library"
 apply plugin: "nebula.node"
+
+idea {
+    module {
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_11)
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
 
 dependencies {
     /*******************************
@@ -70,8 +84,8 @@ jar {
 
     manifest {
         attributes(
-                "Implementation-Title": project.name,
-                "Implementation-Version": project.version,
+            "Implementation-Title": project.name,
+            "Implementation-Version": project.version,
         )
     }
 }
