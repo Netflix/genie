@@ -53,7 +53,11 @@ protobuf {
     plugins {
         grpc {
             // Download the grpc compiler
-            artifact = "io.grpc:protoc-gen-grpc-java:${grpc_version}"
+            if (osdetector.os == "osx") {
+                artifact = "io.grpc:protoc-gen-grpc-java:${grpc_version}:osx-x86_64"
+            } else {
+                artifact = "io.grpc:protoc-gen-grpc-java:${grpc_version}"
+            }
         }
     }
 
