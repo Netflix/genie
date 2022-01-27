@@ -17,8 +17,11 @@
  */
 package com.netflix.genie.common.util;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
@@ -29,8 +32,11 @@ import org.apache.commons.text.matcher.StringMatcherFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -123,6 +129,52 @@ public final class JsonUtils {
                 .stream()
                 .map(argument -> '\'' + argument + '\'')
                 .collect(Collectors.joining(StringUtils.SPACE));
+        }
+    }
+
+    /**
+     * Truncate instants to millisecond precision during ISO 8601 serialization to string for backwards compatibility.
+     *
+     * @author tgianos
+     * @since 4.1.2
+     */
+    public static class InstantMillisecondSerializer extends JsonSerializer<Instant> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void serialize(
+            final Instant value,
+            final JsonGenerator gen,
+            final SerializerProvider serializers
+        ) throws IOException {
+            gen.writeString(value.truncatedTo(ChronoUnit.MILLIS).toString());
+        }
+    }
+
+    /**
+     * Truncate instants to millisecond precision during ISO 8601 serialization to string for backwards compatibility.
+     *
+     * @author tgianos
+     * @since 4.1.2
+     */
+    public static class OptionalInstantMillisecondSerializer extends JsonSerializer<Optional<Instant>> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void serialize(
+            final Optional<Instant> value,
+            final JsonGenerator gen,
+            final SerializerProvider serializers
+        ) throws IOException {
+            if (value.isPresent()) {
+                gen.writeString(value.get().truncatedTo(ChronoUnit.MILLIS).toString());
+            } else {
+                gen.writeNull();
+            }
         }
     }
 }
