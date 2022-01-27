@@ -17,8 +17,12 @@
  */
 package com.netflix.genie.common.util
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.SerializerProvider
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.time.Instant
 
 /**
  * Specifications for {@link JsonUtils}.
@@ -58,5 +62,51 @@ class JsonUtilsSpec extends Specification {
         ["/bin/bash", "-xc", "echo \"hello\" world!"] | "'/bin/bash' '-xc' 'echo \"hello\" world!'"
         ["arg1", "arg2", "arg3", "arg4", "arg5", "'"] | "'arg1' 'arg2' 'arg3' 'arg4' 'arg5' '''"
         ["foo/bar", "--hello", "\$world"]             | "'foo/bar' '--hello' '\$world'"
+    }
+
+    @Unroll
+    def "Can serialize instant #instant to millisecond precision string #instantString"() {
+        def generator = Mock(JsonGenerator)
+        def serializer = new JsonUtils.InstantMillisecondSerializer()
+
+        when:
+        serializer.serialize(instant, generator, Mock(SerializerProvider))
+
+        then:
+        1 * generator.writeString(instantString)
+
+        where:
+        instant                                  | instantString
+        Instant.ofEpochMilli(52)                 | "1970-01-01T00:00:00.052Z"
+        Instant.ofEpochMilli(52000)              | "1970-01-01T00:00:52Z"
+        Instant.ofEpochMilli(52000).plusNanos(7) | "1970-01-01T00:00:52Z"
+        Instant.ofEpochMilli(52001)              | "1970-01-01T00:00:52.001Z"
+        Instant.ofEpochMilli(52001).plusNanos(1) | "1970-01-01T00:00:52.001Z"
+    }
+
+    @Unroll
+    def "Can serialize optional instant #instant to millisecond precision string #instantString"() {
+        def generator = Mock(JsonGenerator)
+        def serializer = new JsonUtils.OptionalInstantMillisecondSerializer()
+
+        when:
+        serializer.serialize((Optional<Instant>) instant, generator, Mock(SerializerProvider))
+
+        then:
+        if (instant.isPresent()) {
+            1 * generator.writeString(instantString)
+        }
+        else {
+            1 * generator.writeNull()
+        }
+
+        where:
+        instant                                               | instantString
+        Optional.of(Instant.ofEpochMilli(52))                 | "1970-01-01T00:00:00.052Z"
+        Optional.of(Instant.ofEpochMilli(52000))              | "1970-01-01T00:00:52Z"
+        Optional.of(Instant.ofEpochMilli(52000).plusNanos(7)) | "1970-01-01T00:00:52Z"
+        Optional.of(Instant.ofEpochMilli(52001))              | "1970-01-01T00:00:52.001Z"
+        Optional.of(Instant.ofEpochMilli(52001).plusNanos(1)) | "1970-01-01T00:00:52.001Z"
+        Optional.empty()                                      | "blah"
     }
 }

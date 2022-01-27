@@ -20,7 +20,9 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
+import com.netflix.genie.common.util.JsonUtils;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
@@ -64,6 +66,7 @@ public class JobExecution extends BaseDTO {
         message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
     )
     private final Long checkDelay;
+    @JsonSerialize(using = JsonUtils.OptionalInstantMillisecondSerializer.class)
     private final Instant timeout;
     private final Integer exitCode;
     @Min(

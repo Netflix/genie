@@ -18,7 +18,9 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.util.JsonUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -41,7 +43,9 @@ public abstract class BaseDTO implements Serializable {
 
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
+    @JsonSerialize(using = JsonUtils.OptionalInstantMillisecondSerializer.class)
     private final Instant created;
+    @JsonSerialize(using = JsonUtils.OptionalInstantMillisecondSerializer.class)
     private final Instant updated;
 
     /**
