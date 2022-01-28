@@ -43,7 +43,7 @@ public interface JobResolverService {
      * details are determined they are persisted and the job is marked as {@link JobStatus#RESOLVED}.
      *
      * @param id The id of the job to resolve. The job must exist and its status must return {@literal true} from
-     *           {@link JobStatus#isResolvable()}
+     *           {@link JobStatus}{@literal #isResolvable()}
      * @return A {@link ResolvedJob} instance containing all the concrete information needed to execute the job
      * @throws GenieJobResolutionException        When the job cannot resolved due to unsatisfiable constraints
      * @throws GenieJobResolutionRuntimeException When the job fails to resolve due to a runtime error.

@@ -76,9 +76,7 @@ jar {
 }
 
 javadoc {
-    // Lombok problems with no fix in sight
-    // https://stackoverflow.com/questions/59062830/unable-to-generate-javadoc-on-lombok-setters-getters-with-onmethod-attribute
-    failOnError false
+    exclude "**/**/ExecutionContext*"
 }
 
 processResources {
