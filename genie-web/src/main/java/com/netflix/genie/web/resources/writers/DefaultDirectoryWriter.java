@@ -17,8 +17,10 @@
  */
 package com.netflix.genie.web.resources.writers;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.util.JsonUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.catalina.util.ServerInfo;
@@ -268,6 +270,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         @Min(0)
         private long size;
         @NotNull
+        @JsonSerialize(using = JsonUtils.InstantMillisecondSerializer.class)
         private Instant lastModified;
     }
 }
