@@ -422,20 +422,15 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.CLAIMED.name());
 
-        // status won't match so it will throw exception
+        // status won't match so it won't update
         Assertions
-            .assertThatExceptionOfType(GenieInvalidStatusException.class)
-            .isThrownBy(
-                () -> this.service.updateJobStatus(
-                    jobId,
-                    JobStatus.RUNNING,
-                    JobStatus.FAILED,
-                    null
-                )
-            );
+            .assertThat(this.service.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.FAILED, null))
+            .isEqualTo(JobStatus.CLAIMED);
 
         final String initStatusMessage = "Job is initializing";
-        this.service.updateJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, initStatusMessage);
+        Assertions
+            .assertThat(this.service.updateJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, initStatusMessage))
+            .isEqualTo(JobStatus.INIT);
 
         jobEntity = this.jobRepository
             .findByUniqueId(jobId)
@@ -448,7 +443,9 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(jobEntity.getFinished()).isNotPresent();
 
         final String runningStatusMessage = "Job is running";
-        this.service.updateJobStatus(jobId, JobStatus.INIT, JobStatus.RUNNING, runningStatusMessage);
+        Assertions
+            .assertThat(this.service.updateJobStatus(jobId, JobStatus.INIT, JobStatus.RUNNING, runningStatusMessage))
+            .isEqualTo(JobStatus.RUNNING);
 
         jobEntity = this.jobRepository
             .findByUniqueId(jobId)
@@ -459,15 +456,17 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(jobEntity.getStarted()).isPresent();
         Assertions.assertThat(jobEntity.getFinished()).isNotPresent();
 
-        final String successStatusMessage = "Job completed successfully";
-        this.service.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.SUCCEEDED, successStatusMessage);
+        final String successMessage = "Job completed successfully";
+        Assertions
+            .assertThat(this.service.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.SUCCEEDED, successMessage))
+            .isEqualTo(JobStatus.SUCCEEDED);
 
         jobEntity = this.jobRepository
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.SUCCEEDED.name());
-        Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(successStatusMessage);
+        Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(successMessage);
         Assertions.assertThat(jobEntity.getStarted()).isPresent();
         Assertions.assertThat(jobEntity.getFinished()).isPresent();
     }
