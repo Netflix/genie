@@ -1765,12 +1765,12 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void updateJobStatus(
+    public JobStatus updateJobStatus(
         @NotBlank final String id,
         @NotNull final JobStatus currentStatus,
         @NotNull final JobStatus newStatus,
         @Nullable final String newStatusMessage
-    ) throws NotFoundException, GenieInvalidStatusException {
+    ) throws NotFoundException {
         log.debug(
             "[updateJobStatus] Requested to change the status of job {} from {} to {} with message {}",
             id,
@@ -1779,41 +1779,61 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             newStatusMessage
         );
         if (currentStatus == newStatus) {
-            throw new GenieInvalidStatusException(
-                "Can't update the status of job " + id + " because both current and new status are " + currentStatus
+            log.debug(
+                "[updateJobStatus] Requested new status for {} is same as current status: {}. Skipping update.",
+                id,
+                currentStatus
             );
+            return newStatus;
         }
 
         final JobEntity jobEntity = this.getJobEntity(id);
 
         final JobStatus actualCurrentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
         if (actualCurrentStatus != currentStatus) {
-            throw new GenieInvalidStatusException(
-                "Job "
-                    + id
-                    + " current status is "
-                    + actualCurrentStatus
-                    + " but API caller expected it to be "
-                    + currentStatus
-                    + ". Unable to update status due to inconsistent state."
+            log.warn(
+                "[updateJobStatus] Job {} actual status {} differs from expected status {}. Skipping update.",
+                id,
+                actualCurrentStatus,
+                currentStatus
             );
+            return actualCurrentStatus;
         }
-
-        // TODO: Should we throw an exception if the job is already in a terminal state and someone is trying to
-        //       further update it? In the private method below used in Genie 3 it's just swallowed and is a no-op
 
         // TODO: Should we prevent updating status for statuses already covered by "reserveJobId" and
         //      "saveResolvedJob"?
 
-        this.updateJobStatus(jobEntity, newStatus, newStatusMessage);
+        // Only change the status if the entity isn't already in a terminal state
+        if (actualCurrentStatus.isActive()) {
+            jobEntity.setStatus(newStatus.name());
+            jobEntity.setStatusMsg(StringUtils.truncate(newStatusMessage, MAX_STATUS_MESSAGE_LENGTH));
 
-        log.debug(
-            "[updateJobStatus] Changed the status of job {} from {} to {} with message {}",
-            id,
-            currentStatus,
-            newStatus,
-            newStatusMessage
-        );
+            if (newStatus.equals(JobStatus.RUNNING)) {
+                // Status being changed to running so set start date.
+                jobEntity.setStarted(Instant.now());
+            } else if (jobEntity.getStarted().isPresent() && newStatus.isFinished()) {
+                // Since start date is set the job was running previously and now has finished
+                // with status killed, failed or succeeded. So we set the job finish time.
+                jobEntity.setFinished(Instant.now());
+            }
+
+            log.debug(
+                "[updateJobStatus] Changed the status of job {} from {} to {} with message {}",
+                id,
+                currentStatus,
+                newStatus,
+                newStatusMessage
+            );
+
+            return newStatus;
+        } else {
+            log.warn(
+                "[updateJobStatus] Job status for {} is already terminal state {}. Skipping update.",
+                id,
+                actualCurrentStatus
+            );
+            return actualCurrentStatus;
+        }
     }
 
     /**
@@ -2613,28 +2633,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 .map(this::toCriterionEntity)
                 .collect(Collectors.toList())
         );
-    }
-
-    private void updateJobStatus(
-        final JobEntity jobEntity,
-        final JobStatus newStatus,
-        @Nullable final String statusMsg
-    ) {
-        final JobStatus currentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
-        // Only change the status if the entity isn't already in a terminal state
-        if (currentStatus.isActive()) {
-            jobEntity.setStatus(newStatus.name());
-            jobEntity.setStatusMsg(StringUtils.truncate(statusMsg, MAX_STATUS_MESSAGE_LENGTH));
-
-            if (newStatus.equals(JobStatus.RUNNING)) {
-                // Status being changed to running so set start date.
-                jobEntity.setStarted(Instant.now());
-            } else if (jobEntity.getStarted().isPresent() && newStatus.isFinished()) {
-                // Since start date is set the job was running previously and now has finished
-                // with status killed, failed or succeeded. So we set the job finish time.
-                jobEntity.setFinished(Instant.now());
-            }
-        }
     }
 
     private void setJobMetadataFields(

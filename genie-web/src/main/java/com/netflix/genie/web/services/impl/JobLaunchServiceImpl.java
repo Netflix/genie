@@ -25,7 +25,6 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
@@ -149,7 +148,10 @@ public class JobLaunchServiceImpl implements JobLaunchService {
 
                 MetricsUtils.addFailureTagsWithException(tags, t);
                 this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
-                if (this.updateJobStatus(jobId, JobStatus.FAILED, message, INITIAL_ATTEMPT) != JobStatus.FAILED) {
+                if (
+                    this.updateJobStatus(jobId, JobStatus.RESERVED, JobStatus.FAILED, message, INITIAL_ATTEMPT)
+                        != JobStatus.FAILED
+                ) {
                     log.error("Updating status to failed didn't succeed");
                 }
                 throw t; // Caught below for metrics gathering
@@ -161,6 +163,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             try {
                 final JobStatus updatedStatus = this.updateJobStatus(
                     jobId,
+                    JobStatus.RESOLVED,
                     JobStatus.ACCEPTED,
                     ACCEPTED_MESSAGE,
                     INITIAL_ATTEMPT
@@ -186,7 +189,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 launcherExt = launcher.launchAgent(resolvedJob, requestedLauncherExt);
             } catch (final AgentLaunchException e) {
                 this.persistenceService.updateJobArchiveStatus(jobId, ArchiveStatus.NO_FILES);
-                this.updateJobStatus(jobId, JobStatus.FAILED, e.getMessage(), INITIAL_ATTEMPT);
+                this.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage(), INITIAL_ATTEMPT);
                 // TODO: How will we get the ID back to the user? Should we add it to an exception? We don't get
                 //       We don't get the ID until after saveJobSubmission so if that fails we'd still return nothing
                 //       Probably need multiple exceptions to be thrown from this API (if we go with checked)
@@ -276,12 +279,18 @@ public class JobLaunchServiceImpl implements JobLaunchService {
      */
     private JobStatus updateJobStatus(
         final String jobId,
+        final JobStatus expectedStatus,
         final JobStatus desiredStatus,
         final String desiredStatusMessage,
         final int attemptNumber
     ) throws NotFoundException {
         final int nextAttemptNumber = attemptNumber + 1;
-        final JobStatus currentStatus = this.persistenceService.getJobStatus(jobId);
+        final JobStatus currentStatus = this.persistenceService.updateJobStatus(
+            jobId,
+            expectedStatus,
+            desiredStatus,
+            desiredStatusMessage
+        );
         if (currentStatus.isFinished()) {
             log.info(
                 "Won't change job status of {} from {} to {} desired status as {} is already a final status",
@@ -291,32 +300,36 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 currentStatus
             );
             return currentStatus;
+        } else if (currentStatus == desiredStatus) {
+            log.debug("Successfully updated status of {} from {} to {}", jobId, expectedStatus, desiredStatus);
+            return currentStatus;
         } else {
-            try {
-                this.persistenceService.updateJobStatus(jobId, currentStatus, desiredStatus, desiredStatusMessage);
-                return desiredStatus;
-            } catch (final GenieInvalidStatusException e) {
-                log.error(
-                    "Job {} status changed from expected {}. Couldn't update to {}. Attempt {}",
+            log.error(
+                "Job {} status changed from expected {} to {}. Couldn't update to {}. Attempt {}",
+                jobId,
+                expectedStatus,
+                currentStatus,
+                desiredStatus,
+                nextAttemptNumber
+            );
+            // Recursive call that should break out if update is successful or job is now in a final state
+            // or if attempts reach the max attempts
+            if (nextAttemptNumber < MAX_STATUS_UPDATE_ATTEMPTS) {
+                return this.updateJobStatus(
                     jobId,
                     currentStatus,
                     desiredStatus,
+                    desiredStatusMessage,
                     nextAttemptNumber
                 );
-                // Recursive call that should break out if update is successful or job is now in a final state
-                // or if attempts reach the max attempts
-                if (nextAttemptNumber < MAX_STATUS_UPDATE_ATTEMPTS) {
-                    return this.updateJobStatus(jobId, desiredStatus, desiredStatusMessage, attemptNumber + 1);
-                } else {
-                    // breakout condition, stop attempting to update DB
-                    log.error(
-                        "Out of attempts to update job {} status to {}. Unable to complete status update",
-                        jobId,
-                        desiredStatus,
-                        e
-                    );
-                    return currentStatus;
-                }
+            } else {
+                // breakout condition, stop attempting to update DB
+                log.error(
+                    "Out of attempts to update job {} status to {}. Unable to complete status update",
+                    jobId,
+                    desiredStatus
+                );
+                return currentStatus;
             }
         }
     }
