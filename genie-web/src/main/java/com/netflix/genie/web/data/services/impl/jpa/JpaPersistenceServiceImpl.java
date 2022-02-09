@@ -259,7 +259,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Application getApplication(@NotBlank final String id) throws NotFoundException {
         log.debug("[getApplication] Called for {}", id);
         return EntityV4DtoConverters.toV4ApplicationDto(
@@ -446,7 +445,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<Command> getCommandsForApplication(
         @NotBlank final String id,
         @Nullable final Set<CommandStatus> statuses
@@ -501,7 +499,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Cluster getCluster(@NotBlank final String id) throws NotFoundException {
         log.debug("[getCluster] Called for {}", id);
         return EntityV4DtoConverters.toV4ClusterDto(
@@ -812,7 +809,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Command getCommand(@NotBlank final String id) throws NotFoundException {
         log.debug("[getCommand] Called for {}", id);
         return EntityV4DtoConverters.toV4CommandDto(
@@ -1042,7 +1038,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public List<Application> getApplicationsForCommand(final String id) throws NotFoundException {
         log.debug("[getApplicationsForCommand] Called for {}", id);
         return this.commandRepository
@@ -1091,7 +1086,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<Cluster> getClustersForCommand(
         @NotBlank final String id,
         @Nullable final Set<ClusterStatus> statuses
@@ -1109,7 +1103,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public List<Criterion> getClusterCriteriaForCommand(final String id) throws NotFoundException {
         log.debug("[getClusterCriteriaForCommand] Called to get cluster criteria for command {}", id);
         return this.commandRepository
@@ -1221,7 +1214,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<Command> findCommandsMatchingCriterion(
         @Valid final Criterion criterion,
         final boolean addDefaultStatus
@@ -1319,7 +1311,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     @Deprecated
     public com.netflix.genie.common.dto.JobRequest getV3JobRequest(@NotBlank final String id) throws GenieException {
         log.debug("[getV3JobRequest] Called with id {}", id);
@@ -1334,7 +1325,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Job getJob(@NotBlank final String id) throws GenieException {
         log.debug("[getJob] Called with id {}", id);
         return EntityV3DtoConverters.toJobDto(
@@ -1348,7 +1338,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JobExecution getJobExecution(@NotBlank final String id) throws GenieException {
         log.debug("[getJobExecution] Called with id {}", id);
         return EntityV3DtoConverters.toJobExecutionDto(
@@ -1362,7 +1351,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public com.netflix.genie.common.dto.JobMetadata getJobMetadata(@NotBlank final String id) throws GenieException {
         log.debug("[getJobMetadata] Called with id {}", id);
         return EntityV3DtoConverters.toJobMetadataDto(
@@ -1622,7 +1610,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JobRequest getJobRequest(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobRequest] Requested for id {}", id);
         return this.jobRepository
@@ -1700,7 +1687,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Optional<JobSpecification> getJobSpecification(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobSpecification] Requested to get job specification for job {}", id);
         final JobSpecificationProjection projection = this.jobRepository
@@ -1866,7 +1852,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JobStatus getJobStatus(@NotBlank final String id) throws NotFoundException {
         return DtoConverters.toV4JobStatus(
             this.jobRepository
@@ -1879,7 +1864,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public ArchiveStatus getJobArchiveStatus(@NotBlank final String id) throws NotFoundException {
         try {
             return ArchiveStatus.valueOf(
@@ -1896,7 +1880,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Optional<String> getJobArchiveLocation(@NotBlank final String id) throws NotFoundException {
         final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<String> query = criteriaBuilder.createQuery(String.class);
@@ -1918,7 +1901,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public FinishedJob getFinishedJob(@NotBlank final String id) throws NotFoundException, GenieInvalidStatusException {
         // TODO
         return this.jobRepository.findByUniqueId(id, FinishedJobProjection.class)
@@ -1930,7 +1912,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public boolean isApiJob(@NotBlank final String id) throws NotFoundException {
         return this.jobRepository
             .isAPI(id)
@@ -1941,7 +1922,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Cluster getJobCluster(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobCluster] Called for job {}", id);
         return EntityV4DtoConverters.toV4ClusterDto(
@@ -1956,7 +1936,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Command getJobCommand(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobCommand] Called for job {}", id);
         return EntityV4DtoConverters.toV4CommandDto(
@@ -1971,7 +1950,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public List<Application> getJobApplications(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobApplications] Called for job {}", id);
         return this.jobRepository.getJobApplications(id)
@@ -2020,7 +1998,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public long getUsedMemoryOnHost(@NotBlank final String hostname) {
         log.debug("[getUsedMemoryOnHost] Called for hostname {}", hostname);
         return this.jobRepository.getTotalMemoryUsedOnHost(hostname, USING_MEMORY_JOB_SET);
@@ -2030,7 +2007,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<String> getActiveJobs() {
         log.debug("[getActiveJobs] Called");
         return this.jobRepository.getJobIdsWithStatusIn(ACTIVE_STATUS_SET);
@@ -2040,7 +2016,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<String> getUnclaimedJobs() {
         log.debug("[getUnclaimedJobs] Called");
         return this.jobRepository.getJobIdsWithStatusIn(UNCLAIMED_STATUS_SET);
@@ -2050,7 +2025,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JobInfoAggregate getHostJobInformation(@NotBlank final String hostname) {
         log.debug("[getHostJobInformation] Called for hostname {}", hostname);
         return this.jobRepository.getHostJobInfo(hostname, ACTIVE_STATUS_SET, USING_MEMORY_JOB_SET);
@@ -2060,7 +2034,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public Set<String> getJobsWithStatusAndArchiveStatusUpdatedBefore(
         @NotEmpty final Set<JobStatus> statuses,
         @NotEmpty final Set<ArchiveStatus> archiveStatuses,
@@ -2102,7 +2075,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JsonNode getRequestedLauncherExt(@NotBlank final String id) throws NotFoundException {
         log.debug("[getRequestedLauncherExt] Requested for job {}", id);
         return this.jobRepository.getRequestedLauncherExt(id).orElse(NullNode.getInstance());
@@ -2130,7 +2102,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public JsonNode getLauncherExt(@NotBlank final String id) throws NotFoundException {
         log.debug("[getLauncherExt] Requested for job {}", id);
         return this.jobRepository.getLauncherExt(id).orElse(NullNode.getInstance());
@@ -2157,7 +2128,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public <R extends CommonResource> Set<String> getConfigsForResource(
         @NotBlank final String id,
         final Class<R> resourceClass
@@ -2222,7 +2192,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public <R extends CommonResource> Set<String> getDependenciesForResource(
         @NotBlank final String id,
         final Class<R> resourceClass
@@ -2287,7 +2256,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public <R extends CommonResource> Set<String> getTagsForResource(
         @NotBlank final String id,
         final Class<R> resourceClass
