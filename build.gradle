@@ -9,9 +9,6 @@ buildscript {
 
     dependencies {
         classpath "com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1"
-        classpath("org.ajoberstar:gradle-git-publish:3.0.0") {
-            exclude module: "grgit-core"
-        }
     }
 }
 
@@ -19,6 +16,7 @@ plugins {
     id "com.github.kt3k.coveralls" version "2.12.0"
     id "nebula.netflixoss" version "10.3.0"
     id "org.ajoberstar.grgit" version "4.1.1"
+    id "org.ajoberstar.git-publish" version "3.0.1"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
     id "org.asciidoctor.jvm.convert" version "3.3.2" apply false
     id "com.gorylenko.gradle-git-properties" version "2.3.1" apply false
@@ -29,7 +27,6 @@ plugins {
 }
 
 apply plugin: "nebula-aggregate-javadocs"
-apply plugin: "org.ajoberstar.git-publish"
 
 ext.githubProjectName = rootProject.name
 
