@@ -854,7 +854,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 </td>
 </tr>
 <tr id="i82" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code><a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">updateJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                @NotNull <a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
                @NotNull <a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
@@ -2179,21 +2179,21 @@ public&nbsp;java.util.Optional&lt;<a href="../../../../../common/external/dtos/v
 <ul class="blockList">
 <li class="blockList">
 <h4>updateJobStatus</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;updateJobStatus&#8203;(@NotBlank
-                            @NotBlank java.lang.String&nbsp;id,
-                            @NotNull
-                            @NotNull <a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
-                            @NotNull
-                            @NotNull <a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
-                            @Nullable
-                            java.lang.String&nbsp;newStatusMessage)
-                     throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
-                            <a href="../../../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></pre>
+<pre class="methodSignature">public&nbsp;<a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;updateJobStatus&#8203;(@NotBlank
+                                 @NotBlank java.lang.String&nbsp;id,
+                                 @NotNull
+                                 @NotNull <a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
+                                 @NotNull
+                                 @NotNull <a href="../../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
+                                 @Nullable
+                                 java.lang.String&nbsp;newStatusMessage)
+                          throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Update the status of the job identified with <code>id</code> to be <code>newStatus</code> provided that the current status
  of the job matches <code>newStatus</code>. Optionally a status message can be provided to provide more details to
  users. If the <code>newStatus</code> is <a href="../../../../../common/external/dtos/v4/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a> the start time will be set. If the <code>newStatus</code>
  is a member of <a href="../../../../../common/external/dtos/v4/JobStatus.html#getFinishedStatuses()"><code>JobStatus.getFinishedStatuses()</code></a> and the job had a started time set the finished time of
- the job will be set.</div>
+ the job will be set. If the currentStatus is different from what the source of truth thinks this
+ function will skip the update and just return the current source of truth value.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../PersistenceService.html#updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">updateJobStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../../PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
@@ -2202,11 +2202,10 @@ public&nbsp;java.util.Optional&lt;<a href="../../../../../common/external/dtos/v
 <dd><code>currentStatus</code> - The status the caller to this API thinks the job currently has</dd>
 <dd><code>newStatus</code> - The new status the caller would like to update the status to</dd>
 <dd><code>newStatusMessage</code> - An optional status message to associate with this change</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The job status in the source of truth</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - if no job with the given <code>id</code> exists</dd>
-<dd><code><a href="../../../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></code> - if the current status of the job identified by <code>id</code> in the system
-                                     doesn't match the supplied <code>currentStatus</code>.
-                                     Also if the <code>currentStatus</code> equals the <code>newStatus</code>.</dd>
 </dl>
 </li>
 </ul>
