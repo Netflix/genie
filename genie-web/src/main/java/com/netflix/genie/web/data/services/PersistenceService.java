@@ -695,23 +695,22 @@ public interface PersistenceService {
      * of the job matches {@code newStatus}. Optionally a status message can be provided to provide more details to
      * users. If the {@code newStatus} is {@link JobStatus#RUNNING} the start time will be set. If the {@code newStatus}
      * is a member of {@link JobStatus#getFinishedStatuses()} and the job had a started time set the finished time of
-     * the job will be set.
+     * the job will be set. If the {@literal currentStatus} is different from what the source of truth thinks this
+     * function will skip the update and just return the current source of truth value.
      *
      * @param id               The id of the job to update status for. Must exist in the system.
      * @param currentStatus    The status the caller to this API thinks the job currently has
      * @param newStatus        The new status the caller would like to update the status to
      * @param newStatusMessage An optional status message to associate with this change
-     * @throws NotFoundException           if no job with the given {@code id} exists
-     * @throws GenieInvalidStatusException if the current status of the job identified by {@code id} in the system
-     *                                     doesn't match the supplied {@code currentStatus}.
-     *                                     Also if the {@code currentStatus} equals the {@code newStatus}.
+     * @return The job status in the source of truth
+     * @throws NotFoundException if no job with the given {@code id} exists
      */
-    void updateJobStatus(
+    JobStatus updateJobStatus(
         @NotBlank String id,
         @NotNull JobStatus currentStatus,
         @NotNull JobStatus newStatus,
         @Nullable String newStatusMessage
-    ) throws NotFoundException, GenieInvalidStatusException;
+    ) throws NotFoundException;
 
     /**
      * Update the status and status message of the job.
