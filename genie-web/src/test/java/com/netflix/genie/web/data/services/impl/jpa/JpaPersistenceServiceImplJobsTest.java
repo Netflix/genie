@@ -307,16 +307,11 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testUpdateJobStatusErrorCases() {
+    void testUpdateJobStatusErrorCases() throws NotFoundException {
         final String id = UUID.randomUUID().toString();
         Assertions
-            .assertThatExceptionOfType(GenieInvalidStatusException.class)
-            .isThrownBy(() -> this.persistenceService.updateJobStatus(
-                id,
-                JobStatus.CLAIMED,
-                JobStatus.CLAIMED,
-                null)
-            );
+            .assertThat(this.persistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.CLAIMED, null))
+            .isEqualTo(JobStatus.CLAIMED);
 
         Mockito
             .when(this.jobRepository.findByUniqueId(id))
@@ -325,10 +320,10 @@ class JpaPersistenceServiceImplJobsTest {
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.persistenceService.updateJobStatus(
-                id,
-                JobStatus.CLAIMED,
-                JobStatus.INIT,
-                null
+                    id,
+                    JobStatus.CLAIMED,
+                    JobStatus.INIT,
+                    null
                 )
             );
 
@@ -338,17 +333,9 @@ class JpaPersistenceServiceImplJobsTest {
             .thenReturn(Optional.of(jobEntity));
 
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT.name());
-
         Assertions
-            .assertThatExceptionOfType(GenieInvalidStatusException.class)
-            .isThrownBy(
-                () -> this.persistenceService.updateJobStatus(
-                    id,
-                    JobStatus.CLAIMED,
-                    JobStatus.INIT,
-                    null
-                )
-            );
+            .assertThat(this.persistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, null))
+            .isEqualTo(JobStatus.INIT);
     }
 
     @Test
