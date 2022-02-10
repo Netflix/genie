@@ -859,10 +859,9 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <ul class="blockList">
 <li class="blockList">
 <h4>getApplication</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;getApplication(@NotBlank
-                                                                @NotBlank java.lang.String&nbsp;id)
-                                                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;getApplication(@NotBlank
+                                  @NotBlank java.lang.String&nbsp;id)
+                           throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the application metadata for given id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -978,12 +977,11 @@ public&nbsp;org.springframework.data.domain.Page&lt;<a href="../../../../../../.
 <ul class="blockList">
 <li class="blockList">
 <h4>getCommandsForApplication</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;getCommandsForApplication(@NotBlank
-                                                                                      @NotBlank java.lang.String&nbsp;id,
-                                                                                      @Nullable
-                                                                                      java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses)
-                                                                               throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;getCommandsForApplication(@NotBlank
+                                                        @NotBlank java.lang.String&nbsp;id,
+                                                        @Nullable
+                                                        java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses)
+                                                 throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the commands the application with given id is associated with.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1051,10 +1049,9 @@ public&nbsp;long&nbsp;deleteUnusedApplications(java.time.Instant&nbsp;createdThr
 <ul class="blockList">
 <li class="blockList">
 <h4>getCluster</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;getCluster(@NotBlank
-                                                        @NotBlank java.lang.String&nbsp;id)
-                                                 throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;getCluster(@NotBlank
+                          @NotBlank java.lang.String&nbsp;id)
+                   throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> identified by the given id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1263,10 +1260,9 @@ public&nbsp;long&nbsp;deleteUnusedClusters(java.util.Set&lt;<a href="../../../..
 <ul class="blockList">
 <li class="blockList">
 <h4>getCommand</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;getCommand(@NotBlank
-                                                        @NotBlank java.lang.String&nbsp;id)
-                                                 throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;getCommand(@NotBlank
+                          @NotBlank java.lang.String&nbsp;id)
+                   throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the metadata for the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> identified by the id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1431,9 +1427,8 @@ public&nbsp;org.springframework.data.domain.Page&lt;<a href="../../../../../../.
 <ul class="blockList">
 <li class="blockList">
 <h4>getApplicationsForCommand</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;getApplicationsForCommand(java.lang.String&nbsp;id)
-                                                                                    throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;getApplicationsForCommand(java.lang.String&nbsp;id)
+                                                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the applications for a given command.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1498,12 +1493,11 @@ public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie
 <ul class="blockList">
 <li class="blockList">
 <h4>getClustersForCommand</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;getClustersForCommand(@NotBlank
-                                                                                  @NotBlank java.lang.String&nbsp;id,
-                                                                                  @Nullable
-                                                                                  java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses)
-                                                                           throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;getClustersForCommand(@NotBlank
+                                                    @NotBlank java.lang.String&nbsp;id,
+                                                    @Nullable
+                                                    java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses)
+                                             throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the clusters the command with given id is associated with.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1524,9 +1518,8 @@ public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/
 <ul class="blockList">
 <li class="blockList">
 <h4>getClusterCriteriaForCommand</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;getClusterCriteriaForCommand(java.lang.String&nbsp;id)
-                                                                                     throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;getClusterCriteriaForCommand(java.lang.String&nbsp;id)
+                                                       throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">For the given command id return the Cluster <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order that is currently
  associated with this command if any.</div>
 <dl>
@@ -1664,10 +1657,9 @@ public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie
 <ul class="blockList">
 <li class="blockList">
 <h4>findCommandsMatchingCriterion</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;findCommandsMatchingCriterion(@Valid
-                                                                                          @Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
-                                                                                          boolean&nbsp;addDefaultStatus)</pre>
+<pre>public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;findCommandsMatchingCriterion(@Valid
+                                                            @Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+                                                            boolean&nbsp;addDefaultStatus)</pre>
 <div class="block">Find all the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1739,11 +1731,10 @@ public&nbsp;long&nbsp;deleteUnusedCommands(java.util.Set&lt;<a href="../../../..
 <ul class="blockList">
 <li class="blockList">
 <h4>getV3JobRequest</h4>
-<pre>@Transactional(readOnly=true)
- @Deprecated
+<pre>@Deprecated
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;getV3JobRequest(@NotBlank
-                                                                             @NotBlank java.lang.String&nbsp;id)
-                                                                      throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                              @NotBlank java.lang.String&nbsp;id)
+                                       throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 <div class="block">Get job request for given job id.</div>
 <dl>
@@ -1764,10 +1755,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobReq
 <ul class="blockList">
 <li class="blockList">
 <h4>getJob</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a>&nbsp;getJob(@NotBlank
-                                                @NotBlank java.lang.String&nbsp;id)
-                                         throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a>&nbsp;getJob(@NotBlank
+                  @NotBlank java.lang.String&nbsp;id)
+           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get job information for given job id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1787,10 +1777,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/Job.ht
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobExecution</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a>&nbsp;getJobExecution(@NotBlank
-                                                                  @NotBlank java.lang.String&nbsp;id)
-                                                           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a>&nbsp;getJobExecution(@NotBlank
+                                    @NotBlank java.lang.String&nbsp;id)
+                             throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get job execution for given job id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1810,10 +1799,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobExe
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobMetadata</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobMetadata.html" title="class in com.netflix.genie.common.dto">JobMetadata</a>&nbsp;getJobMetadata(@NotBlank
-                                                                @NotBlank java.lang.String&nbsp;id)
-                                                         throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/dto/JobMetadata.html" title="class in com.netflix.genie.common.dto">JobMetadata</a>&nbsp;getJobMetadata(@NotBlank
+                                  @NotBlank java.lang.String&nbsp;id)
+                           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the metadata about a job.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -1958,10 +1946,9 @@ public&nbsp;java.lang.String&nbsp;saveJobSubmission(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobRequest</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;getJobRequest(@NotBlank
-                                                              @NotBlank java.lang.String&nbsp;id)
-                                                       throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;getJobRequest(@NotBlank
+                                @NotBlank java.lang.String&nbsp;id)
+                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the original request for a job.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2006,10 +1993,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/d
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobSpecification</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Optional&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&gt;&nbsp;getJobSpecification(@NotBlank
-                                                                                              @NotBlank java.lang.String&nbsp;id)
-                                                                                       throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.Optional&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&gt;&nbsp;getJobSpecification(@NotBlank
+                                                                @NotBlank java.lang.String&nbsp;id)
+                                                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the saved job specification for the given job. If the job hasn't had a job specification resolved an empty
  <code>Optional</code> will be returned.</div>
 <dl>
@@ -2117,10 +2103,9 @@ public&nbsp;java.util.Optional&lt;<a href="../../../../../../../../com/netflix/g
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobStatus</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus(@NotBlank
-                                                            @NotBlank java.lang.String&nbsp;id)
-                                                     throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus(@NotBlank
+                              @NotBlank java.lang.String&nbsp;id)
+                       throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the status for a job with the given <code>id</code>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2140,10 +2125,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/d
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobArchiveStatus</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;getJobArchiveStatus(@NotBlank
-                                                                       @NotBlank java.lang.String&nbsp;id)
-                                                                throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;getJobArchiveStatus(@NotBlank
+                                         @NotBlank java.lang.String&nbsp;id)
+                                  throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the archive status for a job with the given <code>id</code>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2163,10 +2147,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/d
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobArchiveLocation</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getJobArchiveLocation(@NotBlank
-                                                                                                @NotBlank java.lang.String&nbsp;id)
-                                                                                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getJobArchiveLocation(@NotBlank
+                                                                  @NotBlank java.lang.String&nbsp;id)
+                                                           throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the location a job directory was archived to if at all.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2186,11 +2169,10 @@ public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getJobArchiveLocatio
 <ul class="blockList">
 <li class="blockList">
 <h4>getFinishedJob</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a>&nbsp;getFinishedJob(@NotBlank
-                                                                @NotBlank java.lang.String&nbsp;id)
-                                                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
-                                                                <a href="../../../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a>&nbsp;getFinishedJob(@NotBlank
+                                  @NotBlank java.lang.String&nbsp;id)
+                           throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
+                                  <a href="../../../../../../../../com/netflix/genie/common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></pre>
 <div class="block">Get a DTO representing a finished job.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2211,10 +2193,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/internal/d
 <ul class="blockList">
 <li class="blockList">
 <h4>isApiJob</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;boolean&nbsp;isApiJob(@NotBlank
-                                                      @NotBlank java.lang.String&nbsp;id)
-                                               throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;boolean&nbsp;isApiJob(@NotBlank
+                        @NotBlank java.lang.String&nbsp;id)
+                 throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get whether the job with the given ID was submitted via the REST API or other mechanism.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2234,10 +2215,9 @@ public&nbsp;boolean&nbsp;isApiJob(@NotBlank
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobCluster</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;getJobCluster(@NotBlank
-                                                           @NotBlank java.lang.String&nbsp;id)
-                                                    throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;getJobCluster(@NotBlank
+                             @NotBlank java.lang.String&nbsp;id)
+                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the cluster the job used or is using.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2257,10 +2237,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/d
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobCommand</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;getJobCommand(@NotBlank
-                                                           @NotBlank java.lang.String&nbsp;id)
-                                                    throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;getJobCommand(@NotBlank
+                             @NotBlank java.lang.String&nbsp;id)
+                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the command the job used or is using.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2280,10 +2259,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/d
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobApplications</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;getJobApplications(@NotBlank
-                                                                                    @NotBlank java.lang.String&nbsp;id)
-                                                                             throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;getJobApplications(@NotBlank
+                                                      @NotBlank java.lang.String&nbsp;id)
+                                               throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the applications the job used or is currently using.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2344,9 +2322,8 @@ public&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../../../../../c
 <ul class="blockList">
 <li class="blockList">
 <h4>getUsedMemoryOnHost</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;long&nbsp;getUsedMemoryOnHost(@NotBlank
-                                                              @NotBlank java.lang.String&nbsp;hostname)</pre>
+<pre>public&nbsp;long&nbsp;getUsedMemoryOnHost(@NotBlank
+                                @NotBlank java.lang.String&nbsp;hostname)</pre>
 <div class="block">Get the amount of memory currently used on the given host by Genie jobs in any of the following states.
  <p>
  <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html#CLAIMED"><code>JobStatus.CLAIMED</code></a>
@@ -2368,8 +2345,7 @@ public&nbsp;long&nbsp;getUsedMemoryOnHost(@NotBlank
 <ul class="blockList">
 <li class="blockList">
 <h4>getActiveJobs</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveJobs()</pre>
+<pre>public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveJobs()</pre>
 <div class="block">Get the set of active jobs.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2385,8 +2361,7 @@ public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveJobs()</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getUnclaimedJobs</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getUnclaimedJobs()</pre>
+<pre>public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getUnclaimedJobs()</pre>
 <div class="block">Get the set of jobs in that have not reached CLAIMED state.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2402,9 +2377,8 @@ public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getUnclaimedJobs()</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getHostJobInformation</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a>&nbsp;getHostJobInformation(@NotBlank
-                                                                            @NotBlank java.lang.String&nbsp;hostname)</pre>
+<pre>public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/JobInfoAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">JobInfoAggregate</a>&nbsp;getHostJobInformation(@NotBlank
+                                              @NotBlank java.lang.String&nbsp;hostname)</pre>
 <div class="block">Get all the aggregate metadata information about jobs running on a given hostname.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2422,13 +2396,12 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/data/services
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobsWithStatusAndArchiveStatusUpdatedBefore</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getJobsWithStatusAndArchiveStatusUpdatedBefore(@NotEmpty
-                                                                                                                    @NotEmpty java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
-                                                                                                                    @NotEmpty
-                                                                                                                    @NotEmpty java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&gt;&nbsp;archiveStatuses,
-                                                                                                                    @NotNull
-                                                                                                                    @NotNull java.time.Instant&nbsp;updated)</pre>
+<pre>public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getJobsWithStatusAndArchiveStatusUpdatedBefore(@NotEmpty
+                                                                                      @NotEmpty java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
+                                                                                      @NotEmpty
+                                                                                      @NotEmpty java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&gt;&nbsp;archiveStatuses,
+                                                                                      @NotNull
+                                                                                      @NotNull java.time.Instant&nbsp;updated)</pre>
 <div class="block">Get the set of jobs (agent only) whose state is in <code>statuses</code> and archive status is in
  <code>archiveStatuses</code> and last updated before <code>updated</code>.</div>
 <dl>
@@ -2472,10 +2445,9 @@ public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getJobsWithStatusAndArchi
 <ul class="blockList">
 <li class="blockList">
 <h4>getRequestedLauncherExt</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getRequestedLauncherExt(@NotBlank
-                                                                                                     @NotBlank java.lang.String&nbsp;id)
-                                                                                              throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getRequestedLauncherExt(@NotBlank
+                                                                       @NotBlank java.lang.String&nbsp;id)
+                                                                throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the command the job used or is using.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2519,10 +2491,9 @@ public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getRequestedLauncherExt
 <ul class="blockList">
 <li class="blockList">
 <h4>getLauncherExt</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getLauncherExt(@NotBlank
-                                                                                            @NotBlank java.lang.String&nbsp;id)
-                                                                                     throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getLauncherExt(@NotBlank
+                                                              @NotBlank java.lang.String&nbsp;id)
+                                                       throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the job requested launcher extension.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2568,11 +2539,10 @@ public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getLauncherExt(@NotBlan
 <ul class="blockList">
 <li class="blockList">
 <h4>getConfigsForResource</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getConfigsForResource(@NotBlank
-                                                                                                                      @NotBlank java.lang.String&nbsp;id,
-                                                                                                                      java.lang.Class&lt;R&gt;&nbsp;resourceClass)
-                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getConfigsForResource(@NotBlank
+                                                                                        @NotBlank java.lang.String&nbsp;id,
+                                                                                        java.lang.Class&lt;R&gt;&nbsp;resourceClass)
+                                                                                 throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the set of configuration files associated with the resource with the given id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2698,11 +2668,10 @@ public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/com
 <ul class="blockList">
 <li class="blockList">
 <h4>getDependenciesForResource</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getDependenciesForResource(@NotBlank
-                                                                                                                           @NotBlank java.lang.String&nbsp;id,
-                                                                                                                           java.lang.Class&lt;R&gt;&nbsp;resourceClass)
-                                                                                                                    throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getDependenciesForResource(@NotBlank
+                                                                                             @NotBlank java.lang.String&nbsp;id,
+                                                                                             java.lang.Class&lt;R&gt;&nbsp;resourceClass)
+                                                                                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the set of dependency files associated with the resource with the given id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -2828,11 +2797,10 @@ public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/com
 <ul class="blockList">
 <li class="blockList">
 <h4>getTagsForResource</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getTagsForResource(@NotBlank
-                                                                                                                   @NotBlank java.lang.String&nbsp;id,
-                                                                                                                   java.lang.Class&lt;R&gt;&nbsp;resourceClass)
-                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
+<pre>public&nbsp;&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getTagsForResource(@NotBlank
+                                                                                     @NotBlank java.lang.String&nbsp;id,
+                                                                                     java.lang.Class&lt;R&gt;&nbsp;resourceClass)
+                                                                              throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the set of tags associated with the resource with the given id.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
