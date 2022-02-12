@@ -6,7 +6,7 @@
 #
 layout: frontpage
 header:
-#  title: Genie
+#  title: Genie Super Koomi SamSan
 #  image_fullwidth: https://source.unsplash.com/Ji_G7Bu1MoM
   image_fullwidth: https://source.unsplash.com/44se2xSCo00
   caption: Source
