@@ -17,58 +17,59 @@
  */
 package com.netflix.genie.swagger.spring.autoconfigure;
 
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.ArrayList;
 
 /**
- * Spring configuration for Swagger via SpringFox.
+ * Spring configuration for Swagger via Spring Doc.
  *
  * @author tgianos
- * @see <a href="https://github.com/springfox/springfox">Spring Fox</a>
- * @since 3.0.0
+ * @see <a href="https://springdoc.org/">Spring Doc</a>
+ * @since 4.2.0
  */
 @Configuration
-@EnableSwagger2
 public class SwaggerAutoConfiguration {
 
     /**
-     * Configure Spring Fox.
+     * Bean for the V3 API documentation.
      *
-     * @return The spring fox docket.
+     * @return Instance of {@link GroupedOpenApi} for the V3 endpoints
      */
     @Bean
-    @ConditionalOnMissingBean(Docket.class)
-    public Docket genieApiDocket() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .apiInfo(
-                new ApiInfo(
-                    "Genie REST API",
-                    "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more "
-                        + "documentation.<br/>Post any issues found "
-                        + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
-                    "4.0.0",
-                    null,
-                    new Contact("Netflix, Inc.", "https://jobs.netflix.com/", null),
-                    "Apache 2.0",
-                    "http://www.apache.org/licenses/LICENSE-2.0",
-                    new ArrayList<>()
-                )
+    @ConditionalOnMissingBean(name = "genieV3ApiGroup")
+    public GroupedOpenApi genieV3ApiGroup() {
+        return GroupedOpenApi.builder()
+            .group("V3")
+            .pathsToMatch("/api/v3/**")
+            .build();
+    }
+
+    /**
+     * Configure OpenAPI specification.
+     *
+     * @return The {@link OpenAPI} instance and description
+     */
+    @Bean
+    @ConditionalOnMissingBean(OpenAPI.class)
+    public OpenAPI springShopOpenAPI() {
+        return new OpenAPI()
+            .info(
+                new Info()
+                    .title("Genie REST API")
+                    .description("Spring shop sample application")
+                    .version("v4.2.x")
+                    .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0"))
             )
-            .select()
-            .apis(RequestHandlerSelectors.basePackage("com.netflix.genie.web.apis.rest.v3.controllers"))
-            .paths(PathSelectors.any())
-            .build()
-            .pathMapping("/")
-            .useDefaultResponseMessages(false);
+            .externalDocs(
+                new ExternalDocumentation()
+                    .description("Documentation Site")
+                    .url("https://netflix.github.io/genie")
+            );
     }
 }

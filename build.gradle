@@ -111,7 +111,6 @@ configure((Set<Project>) ext.javaProjects) {
             dependency("com.google.guava:guava:20.0")
             dependency("commons-io:commons-io:2.11.0")
             dependency("commons-validator:commons-validator:1.7")
-            dependency("io.springfox:springfox-boot-starter:3.0.0")
             dependency("jakarta.el:jakarta.el-api:3.0.3")
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("net.jcip:jcip-annotations:1.0")
@@ -124,6 +123,11 @@ configure((Set<Project>) ext.javaProjects) {
             dependency("org.codehaus.groovy:groovy-all:3.0.9")
             dependency("org.codehaus.janino:janino:3.1.6")
             dependency("org.dbunit:dbunit:2.7.3")
+            dependencySet(group: "org.springdoc", version: "1.6.6") {
+                entry "springdoc-openapi-hateoas"
+                entry "springdoc-openapi-ui"
+                entry "springdoc-openapi-webmvc-core"
+            }
         }
     }
 
