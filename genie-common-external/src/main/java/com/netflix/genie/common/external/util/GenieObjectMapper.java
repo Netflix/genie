@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -72,14 +73,15 @@ public final class GenieObjectMapper {
      */
     public static final FilterProvider FILTER_PROVIDER = new SimpleFilterProvider(FILTERS_MAP);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-        .registerModule(new Jdk8Module())
-        .registerModule(new JavaTimeModule())
+    private static final ObjectMapper MAPPER = JsonMapper.builder()
+        .addModule(new Jdk8Module())
+        .addModule(new JavaTimeModule())
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-        .setTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")))
-        .setFilterProvider(FILTER_PROVIDER);
+        .defaultTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")))
+        .filterProvider(FILTER_PROVIDER)
+        .build();
 
     private GenieObjectMapper() {
     }

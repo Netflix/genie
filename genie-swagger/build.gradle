@@ -19,12 +19,13 @@ dependencies {
      * API Dependencies
      *******************************/
 
-    api("io.springfox:springfox-boot-starter")
+    api("org.springdoc:springdoc-openapi-hateoas")
+    api("org.springdoc:springdoc-openapi-ui")
+    api("org.springdoc:springdoc-openapi-webmvc-core")
 
     /*******************************
      * Implementation Dependencies
      *******************************/
-
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     /*******************************
