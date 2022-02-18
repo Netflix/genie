@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10};
+var data = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -132,15 +132,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <hr>
 <pre>@Configuration
-@EnableSwagger2
 public class <span class="typeNameLabel">SwaggerAutoConfiguration</span>
 extends java.lang.Object</pre>
-<div class="block">Spring configuration for Swagger via SpringFox.</div>
+<div class="block">Spring configuration for Swagger via Spring Doc.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
-<dd>3.0.0</dd>
+<dd>4.2.0</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="https://github.com/springfox/springfox">Spring Fox</a></dd>
+<dd><a href="https://springdoc.org/">Spring Doc</a></dd>
 </dl>
 </li>
 </ul>
@@ -184,10 +183,17 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>springfox.documentation.spring.web.plugins.Docket</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#genieApiDocket()">genieApiDocket</a></span>()</code></th>
+<td class="colFirst"><code>org.springdoc.core.GroupedOpenApi</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#genieV3ApiGroup()">genieV3ApiGroup</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Configure Spring Fox.</div>
+<div class="block">Bean for the V3 API documentation.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>io.swagger.v3.oas.models.OpenAPI</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#springShopOpenAPI()">springShopOpenAPI</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Configure OpenAPI specification.</div>
 </td>
 </tr>
 </table>
@@ -233,19 +239,35 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="genieApiDocket()">
+<a id="genieV3ApiGroup()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>genieV3ApiGroup</h4>
+<pre class="methodSignature">@Bean
+@ConditionalOnMissingBean(name="genieV3ApiGroup")
+public&nbsp;org.springdoc.core.GroupedOpenApi&nbsp;genieV3ApiGroup()</pre>
+<div class="block">Bean for the V3 API documentation.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Instance of <code>GroupedOpenApi</code> for the V3 endpoints</dd>
+</dl>
+</li>
+</ul>
+<a id="springShopOpenAPI()">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>genieApiDocket</h4>
+<h4>springShopOpenAPI</h4>
 <pre class="methodSignature">@Bean
-@ConditionalOnMissingBean(springfox.documentation.spring.web.plugins.Docket.class)
-public&nbsp;springfox.documentation.spring.web.plugins.Docket&nbsp;genieApiDocket()</pre>
-<div class="block">Configure Spring Fox.</div>
+@ConditionalOnMissingBean(io.swagger.v3.oas.models.OpenAPI.class)
+public&nbsp;io.swagger.v3.oas.models.OpenAPI&nbsp;springShopOpenAPI()</pre>
+<div class="block">Configure OpenAPI specification.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The spring fox docket.</dd>
+<dd>The <code>OpenAPI</code> instance and description</dd>
 </dl>
 </li>
 </ul>
