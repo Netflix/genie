@@ -125,6 +125,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -313,11 +314,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         final Root<ApplicationEntity> countQueryRoot = countQuery.from(ApplicationEntity.class);
-        countQuery.select(criteriaBuilder.count(countQueryRoot));
-        countQuery.where(
+        final Subquery<Long> countIdSubQuery = countQuery.subquery(Long.class);
+        final Root<ApplicationEntity> countIdSubQueryRoot = countIdSubQuery.from(ApplicationEntity.class);
+        countIdSubQuery.select(countIdSubQueryRoot.get(ApplicationEntity_.id));
+        countIdSubQuery.where(
             ApplicationPredicates.find(
-                countQueryRoot,
-                countQuery,
+                countIdSubQueryRoot,
+                countIdSubQuery,
                 criteriaBuilder,
                 name,
                 user,
@@ -326,15 +329,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 type
             )
         );
+        countQuery.select(criteriaBuilder.count(countQueryRoot));
+        countQuery.where(countQueryRoot.get(ApplicationEntity_.id).in(countIdSubQuery));
 
-        final List<Long> applicationsCount = this.entityManager.createQuery(countQuery).getResultList();
-        if (applicationsCount.isEmpty()) {
-            // SELECT COUNT ... GROUP BY ... HAVING ... may return NULL
-            return new PageImpl<>(new ArrayList<>(0));
-        }
-
-        final Long totalCount = applicationsCount.get(0);
-        if (totalCount == 0) {
+        final Long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == null || totalCount == 0) {
             // short circuit for no results
             return new PageImpl<>(new ArrayList<>(0));
         }
@@ -552,11 +551,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         final Root<ClusterEntity> countQueryRoot = countQuery.from(ClusterEntity.class);
-        countQuery.select(criteriaBuilder.count(countQueryRoot));
-        countQuery.where(
+        final Subquery<Long> countIdSubQuery = countQuery.subquery(Long.class);
+        final Root<ClusterEntity> countIdSubQueryRoot = countIdSubQuery.from(ClusterEntity.class);
+        countIdSubQuery.select(countIdSubQueryRoot.get(ClusterEntity_.id));
+        countIdSubQuery.where(
             ClusterPredicates.find(
-                countQueryRoot,
-                countQuery,
+                countIdSubQueryRoot,
+                countIdSubQuery,
                 criteriaBuilder,
                 name,
                 statusStrings,
@@ -565,15 +566,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 maxUpdateTime
             )
         );
+        countQuery.select(criteriaBuilder.count(countQueryRoot));
+        countQuery.where(countQueryRoot.get(ClusterEntity_.id).in(countIdSubQuery));
 
-        final List<Long> clustersCount = this.entityManager.createQuery(countQuery).getResultList();
-        if (clustersCount.isEmpty()) {
-            // SELECT COUNT ... GROUP BY ... HAVING ... may return NULL
-            return new PageImpl<>(new ArrayList<>(0));
-        }
-
-        final Long totalCount = clustersCount.get(0);
-        if (totalCount == 0) {
+        final Long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == null || totalCount == 0) {
             // short circuit for no results
             return new PageImpl<>(new ArrayList<>(0));
         }
@@ -860,11 +857,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         final Root<CommandEntity> countQueryRoot = countQuery.from(CommandEntity.class);
-        countQuery.select(criteriaBuilder.count(countQueryRoot));
-        countQuery.where(
+        final Subquery<Long> countIdSubQuery = countQuery.subquery(Long.class);
+        final Root<CommandEntity> countIdSubQueryRoot = countIdSubQuery.from(CommandEntity.class);
+        countIdSubQuery.select(countIdSubQueryRoot.get(CommandEntity_.id));
+        countIdSubQuery.where(
             CommandPredicates.find(
-                countQueryRoot,
-                countQuery,
+                countIdSubQueryRoot,
+                countIdSubQuery,
                 criteriaBuilder,
                 name,
                 user,
@@ -872,16 +871,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 tagEntities
             )
         );
+        countQuery.select(criteriaBuilder.count(countQueryRoot));
+        countQuery.where(countQueryRoot.get(CommandEntity_.id).in(countIdSubQuery));
 
-        final List<Long> commandsCount = this.entityManager.createQuery(countQuery).getResultList();
-
-        if (commandsCount.isEmpty()) {
-            // SELECT COUNT ... GROUP BY ... HAVING ... may return NULL
-            return new PageImpl<>(new ArrayList<>(0));
-        }
-
-        final Long totalCount = commandsCount.get(0);
-        if (totalCount == 0) {
+        final Long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == null || totalCount == 0) {
             // short circuit for no results
             return new PageImpl<>(new ArrayList<>(0));
         }
