@@ -22,6 +22,7 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -60,7 +61,7 @@ public final class CommandPredicates {
      */
     public static Predicate find(
         final Root<CommandEntity> root,
-        final CriteriaQuery<?> cq,
+        final AbstractQuery<?> cq,
         final CriteriaBuilder cb,
         @Nullable final String name,
         @Nullable final String user,
