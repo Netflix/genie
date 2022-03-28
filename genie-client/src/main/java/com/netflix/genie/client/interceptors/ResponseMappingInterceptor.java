@@ -20,6 +20,7 @@ package com.netflix.genie.client.interceptors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.client.exceptions.GenieClientException;
+import com.netflix.genie.client.exceptions.GenieClientTooManyRequestsException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import okhttp3.Interceptor;
 import okhttp3.Response;
@@ -38,6 +39,7 @@ public class ResponseMappingInterceptor implements Interceptor {
 
     private static final String NO_MESSAGE_FALLBACK = "No error detailed message in server response";
     private static final String ERROR_MESSAGE_KEY = "message";
+    private static final int HTTP_TOO_MANY_REQUESTS = 429;
 
     /**
      * Constructor.
@@ -66,8 +68,12 @@ public class ResponseMappingInterceptor implements Interceptor {
                             responseBody == null || !responseBody.has(ERROR_MESSAGE_KEY)
                                 ? NO_MESSAGE_FALLBACK
                                 : responseBody.get(ERROR_MESSAGE_KEY).asText();
+                        final int responseCode = response.code();
+                        if (responseCode == HTTP_TOO_MANY_REQUESTS) {
+                            throw new GenieClientTooManyRequestsException(errorMessage);
+                        }
                         throw new GenieClientException(
-                            response.code(),
+                            responseCode,
                             errorMessage
                         );
                     } catch (final JsonProcessingException jpe) {

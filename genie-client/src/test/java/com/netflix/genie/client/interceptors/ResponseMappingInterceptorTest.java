@@ -18,6 +18,7 @@
 package com.netflix.genie.client.interceptors;
 
 import com.netflix.genie.client.exceptions.GenieClientException;
+import com.netflix.genie.client.exceptions.GenieClientTooManyRequestsException;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -102,5 +103,14 @@ class ResponseMappingInterceptorTest {
             .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(-1))
             .withMessage("Failed to parse server response as JSON");
 
+    }
+
+    @Test
+    void canIntercept429() {
+        this.server.enqueue(new MockResponse().setResponseCode(429));
+        final Request request = new Request.Builder().url(this.baseUrl).get().build();
+        Assertions
+            .assertThatExceptionOfType(GenieClientTooManyRequestsException.class)
+            .isThrownBy(() -> this.client.newCall(request).execute());
     }
 }
