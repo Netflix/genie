@@ -74,14 +74,14 @@ LOGGER.info(f"Set applications for HDFS command to = {hadoop_application_id}")
 genie.set_application_for_command(yarn_command_id, [hadoop_application_id])
 LOGGER.info(f"Set applications for Yarn command to = {hadoop_application_id}")
 
-presto_application_id: str = genie.create_application(load_yaml("applications/presto337.yml"))
-LOGGER.info(f"Created Presto 337 application with id = {presto_application_id}")
+trino_application_id: str = genie.create_application(load_yaml("applications/trino374.yml"))
+LOGGER.info(f"Created Trino 374 application with id = {trino_application_id}")
 
-presto_command_id: str = genie.create_command(load_yaml("commands/presto337.yml"))
-LOGGER.info(f"Created Presto 337 command with id = {presto_command_id}")
+trino_command_id: str = genie.create_command(load_yaml("commands/trino374.yml"))
+LOGGER.info(f"Created Trino 374 command with id = {trino_command_id}")
 
-genie.set_application_for_command(presto_command_id, [presto_application_id])
-LOGGER.info(f"Set applications for presto command to = {presto_application_id}")
+genie.set_application_for_command(trino_command_id, [trino_application_id])
+LOGGER.info(f"Set applications for Trino command to = {trino_application_id}")
 
 create_spark_version(genie, "201", hadoop_application_id)
 create_spark_version(genie, "213", hadoop_application_id)
@@ -96,5 +96,5 @@ LOGGER.info(f"Created prod yarn cluster with id = {prod_cluster_id}")
 test_cluster_id = genie.create_cluster(load_yaml("clusters/test.yml"))
 LOGGER.info(f"Created test yarn cluster with id = {test_cluster_id}")
 
-presto_cluster_id = genie.create_cluster(load_yaml("clusters/presto.yml"))
-LOGGER.info(f"Created presto cluster with id = {presto_cluster_id}")
+trino_cluster_id = genie.create_cluster(load_yaml("clusters/trino.yml"))
+LOGGER.info(f"Created Trino cluster with id = {trino_cluster_id}")
