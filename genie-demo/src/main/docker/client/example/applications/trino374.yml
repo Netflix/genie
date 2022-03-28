@@ -1,0 +1,13 @@
+name: trino
+user: genieDemo
+status: ACTIVE
+description: Trino CLI
+setupFile: http://genie-apache/applications/trino/374/setup.sh
+configs: []
+version: 374
+type: trino
+tags:
+  - type:trino
+  - ver:374
+dependencies:
+  - http://genie-apache/applications/trino/374/trino-cli-374-executable.jar
