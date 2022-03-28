@@ -1,0 +1,15 @@
+name: trino
+user: genieDemo
+description: Trino CLI
+status: ACTIVE
+setupFile:
+configs: []
+executable: ${TRINO_CLI} --server genie-trino:8080
+version: 337
+tags:
+  - type:trino
+  - ver:374
+checkDelay: 500
+clusterCriteria:
+  - tags:
+      - type:trino

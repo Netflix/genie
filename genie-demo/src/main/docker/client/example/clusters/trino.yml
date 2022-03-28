@@ -1,0 +1,9 @@
+name: GenieDemoTrino
+user: genieDemo
+version: 374
+status: UP
+tags:
+  - sched:adhoc
+  - type:trino
+  - ver:374
+configs: []
