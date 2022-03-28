@@ -29,25 +29,25 @@ LOGGER = logging.getLogger(__name__)
 pygenie.conf.DEFAULT_GENIE_URL = "http://genie:8080"
 
 # Create a job instance and fill in the required parameters
-# TODO: The Presto executable ends up executing in a different working directory and can't find the script file
+# TODO: The Trino executable ends up executing in a different working directory and can't find the script file
 #       too tired to fix it right now so just go back to using the --execute for now
 # job = pygenie.jobs.PrestoJob() \
-#     .job_name("Genie Demo Presto Job") \
+#     .job_name("Genie Demo Trino Job") \
 #     .genie_username("root") \
 #     .job_version("3.0.0") \
 #     .script("select * from tpcds.sf1.item limit 100;")
 
 job = pygenie.jobs.PrestoJob() \
-    .job_name("Genie Demo Presto Job") \
+    .job_name("Genie Demo Trino Job") \
     .genie_username("root") \
     .job_version("3.0.0") \
     .command_arguments("--execute \"select * from tpcds.sf1.item limit 100;\"")
 
 # Set cluster criteria which determine the cluster to run the job on
-job.cluster_tags(["sched:adhoc", "type:presto"])
+job.cluster_tags(["sched:adhoc", "type:trino"])
 
 # Set command criteria which will determine what command Genie executes for the job
-job.command_tags(["type:presto"])
+job.command_tags(["type:trino"])
 
 # Submit the job to Genie
 running_job = job.execute()

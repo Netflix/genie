@@ -43,7 +43,7 @@ https://netflix.github.io/genie/docs/{revnumber}/rest[API Guide].
 ** 8080 (Genie)
 ** 8088, 19888, 50070, 50075, 8042 (YARN Prod Cluster)
 ** 8089, 19889, 50071, 50076, 8043 (YARN Test Cluster)
-** 9090 (Presto Cluster)
+** 9090 (Trino Cluster)
 
 === Development Environment
 
@@ -108,7 +108,7 @@ Sometimes if you click a link in the UI and it doesn't work try swapping in loca
 | `http://localhost:8043`
 |===
 
-.Presto Interfaces
+.Trino Interfaces
 |===
 |Endpoint
 |URL
@@ -148,11 +148,6 @@ Sometimes if you click a link in the UI and it doesn't work try swapping in loca
 |`./run_hdfs_job.py {sla\|test}`
 |Runs a `dfs -ls` on the input directory on HDFS and stores results in stdout
 
-|Presto
-|`./run_presto_job.py`
-|Sends query (`select * from tpcds.sf1.item limit 100;`) as attachment file to Presto cluster and dumps results to
-stdout
-
 |Spark Shell
 |`./run_spark_shell_job.py {sla\|test}`
 |Simply prints the Spark Shell help output to stdout
@@ -164,6 +159,11 @@ stdout
 |Spark Submit 3.0.x
 |`./run_spark_submit_job.py {sla\|test} 3.0.0`
 |Runs the SparkPi example for Spark 3.0.x with input of 10. Results stored in stdout
+
+|Trino
+|`./run_trino_job.py`
+|Sends query (`select * from tpcds.sf1.item limit 100;`) as attachment file to Trino cluster and dumps results to
+stdout
 
 |YARN
 |`./run_yarn_job.py {sla\|test}`
@@ -186,7 +186,7 @@ stdout
 .... https://hub.docker.com/r/netflixoss/genie-demo-apache[netflixoss/genie-demo-apache:{revnumber}]
 .... https://hub.docker.com/r/netflixoss/genie-client[netflixoss/genie-demo-client:{revnumber}]
 .... https://hub.docker.com/r/sequenceiq/hadoop-docker[sequenceiq/hadoop-docker:2.7.1]
-.... https://hub.docker.com/r/prestosql/presto[prestosql/presto:337]
+.... https://hub.docker.com/r/trinodb/trino[trinodb/trino:374]
 ... This will use docker compose to bring up 6 containers
 .... `genie_demo_app_{revnumber}`
 ..... Instantiation of `netflixoss/genie-app:{revnumber}`
@@ -202,9 +202,9 @@ stdout
 ..... Instantiations of `sequenceiq/hadoop-docker:2.7.1`
 ..... Simulates having two clusters available and registered with Genie with roles as a production and a test cluster
 ..... See `Hadoop Interfaces` table for list of available ports
-.... `genie_demo_presto_{revnumber}`
-..... Instantiation of `prestosql/presto:337`
-..... Single node Presto cluster
+.... `genie_demo_trino_{revnumber}`
+..... Instantiation of `trinodb/trino:374`
+..... Single node Trino cluster
 ..... Web UI bound to `localhost` port `9090`
 . Wait for all services to start
 .. Verify Genie UI and both Resource Manager UI's are available via your browser
@@ -228,10 +228,10 @@ stdout
 ... `./run_yarn_job.py test`
 ... `./run_hdfs_job.py test`
 ... `./run_spark_submit_job.py sla 2.1.3`
-... `./run_presto_job.py`
+... `./run_trino_job.py`
 .. Replace `test` with, `sla` to run the jobs against the Prod cluster
 .. If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences.
-The current default for a fresh install is 2GB, which is not sufficient for this demo.
+The current default for a fresh installation is 2GB, which is not sufficient for this demo.
 Use `docker stats`
 to verify the limit is 4GB or higher.
 . For each of these jobs you can see their status, output and other information via the UI's
@@ -266,7 +266,7 @@ Move the `sched:sla` tag back
 . Verify the agent can connect to the local Genie server
 .. `java -jar /usr/local/bin/genie-agent.jar ping --serverHost localhost --serverPort 9090`
 . Launch a Genie job, similar to the ones above
-.. `java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Presto Job' --commandCriterion 'TAGS=type:presto' --clusterCriterion 'TAGS=sched:adhoc,type:presto' -- --execute 'select * from tpcds.sf1.item limit 100;'`
+.. `java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Trino Job' --commandCriterion 'TAGS=type:trino' --clusterCriterion 'TAGS=sched:adhoc,type:trino' -- --execute 'select * from tpcds.sf1.item limit 100;'`
 .. `java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Spark Shell Interactive Job' --commandCriterion 'TAGS=type:spark-shell' --clusterCriterion 'TAGS=sched:sla,type:yarn' --interactive`
 ... This starts an interactive Spark shell. Hit `ctrl-d` to exit gracefully
 . In the http://localhost:8080[Genie UI], explore the two jobs

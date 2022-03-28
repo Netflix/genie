@@ -6,8 +6,8 @@ MAINTAINER NetflixOSS <netflixoss@netflix.com>
 #       and Travis still is on too old a version of docker to enable BuildKit
 RUN mkdir -p /usr/local/apache2/htdocs/applications/hadoop/2.7.1/ && \
     wget -P /usr/local/apache2/htdocs/applications/hadoop/2.7.1/ https://archive.apache.org/dist/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz && \
-    mkdir -p /usr/local/apache2/htdocs/applications/presto/337/ && \
-    wget -P /usr/local/apache2/htdocs/applications/presto/337/ https://repo1.maven.org/maven2/io/prestosql/presto-cli/337/presto-cli-337-executable.jar && \
+    mkdir -p /usr/local/apache2/htdocs/applications/trino/374/ && \
+    wget -P /usr/local/apache2/htdocs/applications/trino/374/ https://repo1.maven.org/maven2/io/trino/trino-cli/374/trino-cli-374-executable.jar && \
     mkdir -p /usr/local/apache2/htdocs/applications/spark/2.0.1/ && \
     wget -P /usr/local/apache2/htdocs/applications/spark/2.0.1/ https://archive.apache.org/dist/spark/spark-2.0.1/spark-2.0.1-bin-hadoop2.7.tgz && \
     mkdir -p /usr/local/apache2/htdocs/applications/spark/2.1.3/ && \
