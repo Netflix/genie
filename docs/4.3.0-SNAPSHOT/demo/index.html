@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.3.0-SNAPSHOT,</span>
-<span id="revdate">2022-03-25</span>
+<span id="revdate">2022-03-28</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -834,7 +834,7 @@ For documentation of the REST API for this version of Genie please see the
 <p>8089, 19889, 50071, 50076, 8043 (YARN Test Cluster)</p>
 </li>
 <li>
-<p>9090 (Presto Cluster)</p>
+<p>9090 (Trino Cluster)</p>
 </li>
 </ul>
 </div>
@@ -983,7 +983,7 @@ Sometimes if you click a link in the UI and it doesn&#8217;t work try swapping i
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. Presto Interfaces</caption>
+<caption class="title">Table 3. Trino Interfaces</caption>
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -1063,12 +1063,6 @@ Sometimes if you click a link in the UI and it doesn&#8217;t work try swapping i
 <td class="tableblock halign-left valign-top"><p class="tableblock">Runs a <code>dfs -ls</code> on the input directory on HDFS and stores results in stdout</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Presto</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_presto_job.py</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sends query (<code>select * from tpcds.sf1.item limit 100;</code>) as attachment file to Presto cluster and dumps results to
-stdout</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Spark Shell</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_shell_job.py {sla|test}</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Simply prints the Spark Shell help output to stdout</p></td>
@@ -1082,6 +1076,12 @@ stdout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 3.0.x</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test} 3.0.0</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Runs the SparkPi example for Spark 3.0.x with input of 10. Results stored in stdout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Trino</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_trino_job.py</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sends query (<code>select * from tpcds.sf1.item limit 100;</code>) as attachment file to Trino cluster and dumps results to
+stdout</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">YARN</p></td>
@@ -1152,7 +1152,7 @@ stdout</p></td>
 <p><a href="https://hub.docker.com/r/sequenceiq/hadoop-docker">sequenceiq/hadoop-docker:2.7.1</a></p>
 </li>
 <li>
-<p><a href="https://hub.docker.com/r/prestosql/presto">prestosql/presto:337</a></p>
+<p><a href="https://hub.docker.com/r/trinodb/trino">trinodb/trino:374</a></p>
 </li>
 </ol>
 </div>
@@ -1220,14 +1220,14 @@ stdout</p></td>
 </div>
 </li>
 <li>
-<p><code>genie_demo_presto_4.3.0-SNAPSHOT</code></p>
+<p><code>genie_demo_trino_4.3.0-SNAPSHOT</code></p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of <code>prestosql/presto:337</code></p>
+<p>Instantiation of <code>trinodb/trino:374</code></p>
 </li>
 <li>
-<p>Single node Presto cluster</p>
+<p>Single node Trino cluster</p>
 </li>
 <li>
 <p>Web UI bound to <code>localhost</code> port <code>9090</code></p>
@@ -1335,7 +1335,7 @@ stdout</p></td>
 <p><code>./run_spark_submit_job.py sla 2.1.3</code></p>
 </li>
 <li>
-<p><code>./run_presto_job.py</code></p>
+<p><code>./run_trino_job.py</code></p>
 </li>
 </ol>
 </div>
@@ -1345,7 +1345,7 @@ stdout</p></td>
 </li>
 <li>
 <p>If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences.
-The current default for a fresh install is 2GB, which is not sufficient for this demo.
+The current default for a fresh installation is 2GB, which is not sufficient for this demo.
 Use <code>docker stats</code>
 to verify the limit is 4GB or higher.</p>
 </li>
@@ -1492,7 +1492,7 @@ Move the <code>sched:sla</code> tag back</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p><code>java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Presto Job' --commandCriterion 'TAGS=type:presto' --clusterCriterion 'TAGS=sched:adhoc,type:presto'&#8201;&#8212;&#8201;--execute 'select * from tpcds.sf1.item limit 100;'</code></p>
+<p><code>java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Trino Job' --commandCriterion 'TAGS=type:trino' --clusterCriterion 'TAGS=sched:adhoc,type:trino'&#8201;&#8212;&#8201;--execute 'select * from tpcds.sf1.item limit 100;'</code></p>
 </li>
 <li>
 <p><code>java -jar /usr/local/bin/genie-agent.jar exec --serverHost localhost --serverPort 9090 --jobName 'Genie Demo CLI Spark Shell Interactive Job' --commandCriterion 'TAGS=type:spark-shell' --clusterCriterion 'TAGS=sched:sla,type:yarn' --interactive</code></p>
@@ -1560,7 +1560,7 @@ The images will remain on disk and if you run the demo again it will startup muc
 <div id="footer">
 <div id="footer-text">
 Version 4.3.0-SNAPSHOT<br>
-Last updated 2022-03-25 21:46:38 UTC
+Last updated 2022-03-28 20:51:52 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
