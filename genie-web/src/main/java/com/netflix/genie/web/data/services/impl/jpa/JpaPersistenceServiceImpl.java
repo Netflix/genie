@@ -175,7 +175,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         .collect(Collectors.toSet());
 
     /**
-     * The a set containing statuses that come before CLAIMED.
+     * The set containing statuses that come before CLAIMED.
      */
     @VisibleForTesting
     static final Set<String> UNCLAIMED_STATUS_SET = JobStatus
@@ -432,8 +432,8 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public void deleteApplication(@NotBlank final String id) throws PreconditionFailedException {
         log.debug("[deleteApplication] Called for {}", id);
         final Optional<ApplicationEntity> entity = this.applicationRepository.getApplicationAndCommands(id);
-        if (!entity.isPresent()) {
-            // There's nothing to do as the caller wants to delete it and it already doesn't exist.
+        if (entity.isEmpty()) {
+            // There's nothing to do as the caller wants to delete something that doesn't exist.
             return;
         }
 
@@ -669,8 +669,8 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public void deleteCluster(@NotBlank final String id) throws PreconditionFailedException {
         log.debug("[deleteCluster] Called for {}", id);
         final Optional<ClusterEntity> entity = this.clusterRepository.findByUniqueId(id);
-        if (!entity.isPresent()) {
-            // There's nothing to do as the caller wants to delete it and it already doesn't exist.
+        if (entity.isEmpty()) {
+            // There's nothing to do as the caller wants to delete something that doesn't exist.
             return;
         }
 
@@ -710,7 +710,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final boolean addDefaultStatus
     ) {
         final Criterion finalCriterion;
-        if (addDefaultStatus && !criterion.getStatus().isPresent()) {
+        if (addDefaultStatus && criterion.getStatus().isEmpty()) {
             finalCriterion = new Criterion(criterion, ClusterStatus.UP.name());
         } else {
             finalCriterion = criterion;
@@ -1213,7 +1213,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final boolean addDefaultStatus
     ) {
         final Criterion finalCriterion;
-        if (addDefaultStatus && !criterion.getStatus().isPresent()) {
+        if (addDefaultStatus && criterion.getStatus().isEmpty()) {
             finalCriterion = new Criterion(criterion, CommandStatus.ACTIVE.name());
         } else {
             finalCriterion = criterion;
@@ -1569,9 +1569,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         this.setRequestedJobEnvironmentFields(jobEntity, jobRequest.getRequestedJobEnvironment());
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
         this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
-
-        // Flag to signal to rest of system that this job is V4. Temporary until everything moved to v4
-        jobEntity.setV4(true);
 
         // Set archive status
         jobEntity.setArchiveStatus(
@@ -2503,7 +2500,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         this.setBaseEntityMetadata(entity, metadata, resources.getSetupFile().orElse(null));
     }
 
-    // Compiler keeps complaining about `executable` being marked nullable but it isn't
+    // Compiler keeps complaining about `executable` being marked nullable, it isn't
     @SuppressFBWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     private void updateCommandEntity(
         final CommandEntity entity,
@@ -2572,7 +2569,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final List<CriterionEntity> entitiesToDelete = Lists.newArrayList(persistedEntities);
         persistedEntities.clear();
         // Ensure Criterion aren't left dangling
-        entitiesToDelete.forEach(this.criterionRepository::delete);
+        this.criterionRepository.deleteAll(entitiesToDelete);
     }
 
     private CriterionEntity toCriterionEntity(final Criterion criterion) {

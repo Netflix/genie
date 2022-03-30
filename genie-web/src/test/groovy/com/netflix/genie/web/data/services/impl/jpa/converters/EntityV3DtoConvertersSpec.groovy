@@ -112,8 +112,6 @@ class EntityV3DtoConvertersSpec extends Specification {
         entity.setAgentHostname(hostName)
         def processId = 29038
         entity.setProcessId(processId)
-        def checkDelay = 1890347L
-        entity.setCheckDelay(checkDelay)
         def exitCode = 2084390
         entity.setExitCode(exitCode)
         def started = Instant.now()
@@ -134,7 +132,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         execution.getExitCode().orElseGet(RandomSuppliers.INT) == exitCode
         execution.getHostName() == hostName
         execution.getProcessId().orElseGet(RandomSuppliers.INT) == processId
-        execution.getCheckDelay().orElseGet(RandomSuppliers.LONG) == checkDelay
+        execution.getCheckDelay().isEmpty()
         execution.getTimeout().orElseGet(RandomSuppliers.INSTANT) == timeout
         execution.getMemory().orElseGet(RandomSuppliers.INT) == memory
         execution.getArchiveStatus().orElse(null) == ArchiveStatus.ARCHIVED
