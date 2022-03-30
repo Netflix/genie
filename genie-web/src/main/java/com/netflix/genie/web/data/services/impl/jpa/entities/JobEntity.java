@@ -98,7 +98,7 @@ import java.util.Set;
     }
 )
 @Table(name = "jobs")
-// Note: We're using hibernate by default and it ignores fetch graphs and just loads basic fields anyway without
+// Note: We're using hibernate by default it ignores fetch graphs and just loads basic fields anyway without
 //       bytecode enhancement. For now just use this to load relationships and not worry too much about optimizing
 //       column projection on large entity fetches
 //       See:
@@ -365,7 +365,6 @@ public class JobEntity extends BaseEntity implements
     @Setter(AccessLevel.NONE)
     private String tagSearchString;
 
-    // TODO: Drop this column once all jobs run via Agent
     @Basic
     @Column(name = "genie_user_group", updatable = false)
     @Size(max = 255, message = "Max length in database is 255 characters")
@@ -387,14 +386,59 @@ public class JobEntity extends BaseEntity implements
     private Integer requestedCpu;
 
     @Basic
+    @Column(name = "cpu_used")
+    @Min(value = 1, message = "Can't have less than 1 CPU")
+    private Integer cpuUsed;
+
+    @Basic
+    @Column(name = "requested_gpu", updatable = false)
+    @Min(value = 1, message = "Can't have less than 1 GPU")
+    private Integer requestedGpu;
+
+    @Basic
+    @Column(name = "gpu_used")
+    @Min(value = 1, message = "Can't have less than 1 GPU")
+    private Integer gpuUsed;
+
+    @Basic
     @Column(name = "requested_memory", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
     private Integer requestedMemory;
 
     @Basic
+    @Column(name = "memory_used")
+    @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
+    private Integer memoryUsed;
+
+    @Basic
+    @Column(name = "requested_disk_mb", updatable = false)
+    @Min(value = 1, message = "Can't have less than 1 MB of disk space")
+    private Integer requestedDiskMb;
+
+    @Basic
+    @Column(name = "disk_mb_used")
+    @Min(value = 1, message = "Can't have less than 1 MB of disk space")
+    private Integer diskMbUsed;
+
+    @Basic
+    @Column(name = "requested_network_mbps", updatable = false)
+    @Min(value = 1, message = "Can't have less than 1 MBPS of network")
+    private Integer requestedNetworkMbps;
+
+    @Basic
+    @Column(name = "network_mbps_used")
+    @Min(value = 1, message = "Can't have less than 1 MBPS of network")
+    private Integer networkMbpsUsed;
+
+    @Basic
     @Column(name = "requested_timeout", updatable = false)
     @Min(value = 1)
     private Integer requestedTimeout;
+
+    @Basic
+    @Column(name = "timeout_used")
+    @Min(value = 1)
+    private Integer timeoutUsed;
 
     @Basic
     @Column(name = "grouping", updatable = false)
@@ -494,17 +538,8 @@ public class JobEntity extends BaseEntity implements
     private Integer processId;
 
     @Basic
-    @Column(name = "check_delay")
-    @Min(1)
-    private Long checkDelay;
-
-    @Basic
     @Column(name = "exit_code")
     private Integer exitCode;
-
-    @Basic
-    @Column(name = "memory_used")
-    private Integer memoryUsed;
 
     @Basic
     @Column(name = "archive_location", length = 1024)
@@ -522,10 +557,6 @@ public class JobEntity extends BaseEntity implements
     @Basic(optional = false)
     @Column(name = "claimed", nullable = false)
     private boolean claimed;
-
-    @Basic(optional = false)
-    @Column(name = "v4", nullable = false)
-    private boolean v4;
 
     @Basic
     @Column(name = "requested_job_directory_location", length = 1024, updatable = false)
@@ -549,10 +580,6 @@ public class JobEntity extends BaseEntity implements
     @ToString.Exclude
     private JsonNode requestedAgentEnvironmentExt;
 
-    @Basic
-    @Column(name = "timeout_used")
-    private Integer timeoutUsed;
-
     @Basic(optional = false)
     @Column(name = "api", nullable = false)
     private boolean api = true;
@@ -560,6 +587,26 @@ public class JobEntity extends BaseEntity implements
     @Basic
     @Column(name = "archive_status", length = 20)
     private String archiveStatus;
+
+    @Basic
+    @Column(name = "requested_image_name", length = 1024, updatable = false)
+    @Size(max = 1024, message = "Maximum image name length is 1024 characters")
+    private String requestedImageName;
+
+    @Basic
+    @Column(name = "image_name_used", length = 1024)
+    @Size(max = 1024, message = "Maximum image name length is 1024 characters")
+    private String imageNameUsed;
+
+    @Basic
+    @Column(name = "requested_image_tag", length = 1024, updatable = false)
+    @Size(max = 1024, message = "Maximum image tag length is 1024 characters")
+    private String requestedImageTag;
+
+    @Basic
+    @Column(name = "image_tag_used", length = 1024)
+    @Size(max = 1024, message = "Maximum image tag length is 1024 characters")
+    private String imageTagUsed;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -719,7 +766,7 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Before a job is created create the job search string.
+     * Before a job is created, create the job search string.
      */
     @PrePersist
     void onCreateJob() {
@@ -760,6 +807,69 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Integer> getRequestedTimeout() {
         return Optional.ofNullable(this.requestedTimeout);
+    }
+
+    /**
+     * Get the number of CPU's used by the job.
+     *
+     * @return The number of CPU's used or {@link Optional#empty()}
+     */
+    public Optional<Integer> getCpuUsed() {
+        return Optional.ofNullable(this.cpuUsed);
+    }
+
+    /**
+     * Get the number of GPUs requested by the job.
+     *
+     * @return The number of GPUs requested or {@link Optional#empty()}
+     */
+    public Optional<Integer> getRequestedGpu() {
+        return Optional.ofNullable(this.requestedGpu);
+    }
+
+    /**
+     * Get the number of GPUs used by the job.
+     *
+     * @return The number of GPUs used or {@link Optional#empty()}
+     */
+    public Optional<Integer> getGpuUsed() {
+        return Optional.ofNullable(this.gpuUsed);
+    }
+
+    /**
+     * Get the requested disk space for the job if any.
+     *
+     * @return The requested amount of disk space in MB or {@link Optional#empty()}
+     */
+    public Optional<Integer> getRequestedDiskMb() {
+        return Optional.ofNullable(this.requestedDiskMb);
+    }
+
+    /**
+     * Get the amount of disk space used for a job.
+     *
+     * @return The amount of disk space in MB or {@link Optional#empty()}
+     */
+    public Optional<Integer> getDiskMbUsed() {
+        return Optional.ofNullable(this.diskMbUsed);
+    }
+
+    /**
+     * Get the requested network mbps for the job if any.
+     *
+     * @return The requested network bandwidth in mbps or {@link Optional#empty()}
+     */
+    public Optional<Integer> getRequestedNetworkMbps() {
+        return Optional.ofNullable(this.requestedNetworkMbps);
+    }
+
+    /**
+     * Get network bandwidth used for a job if any.
+     *
+     * @return The network bandwidth in mbps or {@link Optional#empty()}
+     */
+    public Optional<Integer> getNetworkMbpsUsed() {
+        return Optional.ofNullable(this.networkMbpsUsed);
     }
 
     /**
@@ -818,15 +928,6 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Instant> getFinished() {
         return Optional.ofNullable(this.finished);
-    }
-
-    /**
-     * Set the finishTime for the job.
-     *
-     * @param finished The finished time.
-     */
-    public void setFinished(@Nullable final Instant finished) {
-        this.finished = finished;
     }
 
     /**
@@ -954,6 +1055,15 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
+     * Set the finishTime for the job.
+     *
+     * @param finished The finished time.
+     */
+    public void setFinished(@Nullable final Instant finished) {
+        this.finished = finished;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -972,7 +1082,7 @@ public class JobEntity extends BaseEntity implements
     /**
      * Set the total size in bytes of the std out file for this job.
      *
-     * @param stdOutSize The size. Null empties database field
+     * @param stdOutSize The size. Null empty's database field
      */
     public void setStdOutSize(@Nullable final Long stdOutSize) {
         this.stdOutSize = stdOutSize;
@@ -989,7 +1099,7 @@ public class JobEntity extends BaseEntity implements
     /**
      * Set the total size in bytes of the std err file for this job.
      *
-     * @param stdErrSize The size. Null empties database field
+     * @param stdErrSize The size. Null empty's database field
      */
     public void setStdErrSize(@Nullable final Long stdErrSize) {
         this.stdErrSize = stdErrSize;
@@ -1054,14 +1164,6 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Integer> getProcessId() {
         return Optional.ofNullable(this.processId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<Long> getCheckDelay() {
-        return Optional.ofNullable(this.checkDelay);
     }
 
     /**
@@ -1219,6 +1321,42 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getJobDirectoryLocation() {
         return Optional.ofNullable(this.jobDirectoryLocation);
+    }
+
+    /**
+     * Get the requested container image name if there was one.
+     *
+     * @return The requested image name or {@link Optional#empty()}
+     */
+    public Optional<String> getRequestedImageName() {
+        return Optional.ofNullable(this.requestedImageName);
+    }
+
+    /**
+     * Get the image name used for the job if there was one.
+     *
+     * @return The image name used or {@link Optional#empty()}
+     */
+    public Optional<String> getImageNameUsed() {
+        return Optional.ofNullable(this.imageNameUsed);
+    }
+
+    /**
+     * Get the requested container image tag if there was one.
+     *
+     * @return The requested image tag or {@link Optional#empty()}
+     */
+    public Optional<String> getRequestedImageTag() {
+        return Optional.ofNullable(this.requestedImageTag);
+    }
+
+    /**
+     * Get the container image tag used for the job if there was one.
+     *
+     * @return The image tag used or {@link Optional#empty()}
+     */
+    public Optional<String> getImageTagUsed() {
+        return Optional.ofNullable(this.imageTagUsed);
     }
 
     /**

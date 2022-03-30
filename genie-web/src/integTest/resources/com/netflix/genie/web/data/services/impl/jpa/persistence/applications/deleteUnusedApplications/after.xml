@@ -125,7 +125,6 @@
         agent_hostname="b.netflix.com"
         exit_code="-1"
         process_id="319"
-        check_delay="12000"
         timeout_used="608400"
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/3"

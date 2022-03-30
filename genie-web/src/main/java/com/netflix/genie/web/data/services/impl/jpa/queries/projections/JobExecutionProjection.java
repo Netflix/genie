@@ -52,13 +52,6 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
     Optional<Integer> getProcessId();
 
     /**
-     * Get the amount of time (in milliseconds) to delay the check for the job status.
-     *
-     * @return Could be null so return optional of the Long
-     */
-    Optional<Long> getCheckDelay();
-
-    /**
      * Get the exit code from the process that ran the job.
      *
      * @return The exit code or -1 if the job hasn't finished yet

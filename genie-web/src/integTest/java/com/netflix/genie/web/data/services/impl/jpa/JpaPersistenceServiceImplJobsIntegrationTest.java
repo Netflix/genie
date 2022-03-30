@@ -247,7 +247,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .assertThat(savedJobRequest.getResources().getDependencies())
             .containsAll(jobRequest.getResources().getDependencies());
 
-        // Filter out the original dependencies so we're left with just the attachments
+        // Filter out the original dependencies so that we're left with just the attachments
         final Set<URI> savedAttachmentURIs = savedJobRequest
             .getResources()
             .getDependencies()
@@ -580,7 +580,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/init.xml")
-    void canSetJobArchiveStatus() throws GenieCheckedException, GenieException {
+    void canSetJobArchiveStatus() throws GenieCheckedException {
         Assertions.assertThat(this.service.getJobArchiveStatus(JOB_2_ID)).isEqualTo(ArchiveStatus.PENDING);
         this.service.updateJobArchiveStatus(JOB_2_ID, ArchiveStatus.ARCHIVED);
         Assertions.assertThat(this.service.getJobArchiveStatus(JOB_2_ID)).isEqualTo(ArchiveStatus.ARCHIVED);
@@ -1240,7 +1240,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .orElseThrow(() -> new NotFoundException("No job with id " + id + " found when one was expected"));
 
         Assertions.assertThat(jobEntity.isResolved()).isFalse();
-        Assertions.assertThat(jobEntity.isV4()).isTrue();
 
         // Job Request Metadata Fields
         jobRequestMetadata.getApiClientMetadata().ifPresent(
@@ -1276,11 +1275,11 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         @Nullable final String requestedId,
         @Nullable final String requestedArchivalLocationPrefix
     ) throws IOException {
-        final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final String metadata = "{\"" + UUID.randomUUID() + "\": \"" + UUID.randomUUID() + "\"}";
         final JobMetadata jobMetadata = new JobMetadata
             .Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
             .withMetadata(metadata)
-            .withEmail(UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com")
+            .withEmail(UUID.randomUUID() + "@" + UUID.randomUUID() + ".com")
             .withGroup(UUID.randomUUID().toString())
             .withGrouping(UUID.randomUUID().toString())
             .withGroupingInstance(UUID.randomUUID().toString())
@@ -1336,8 +1335,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         );
         final String agentEnvironmentExt
             = "{"
-            + "\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\", "
-            + "\"" + UUID.randomUUID().toString() + "\": \"\""
+            + "\"" + UUID.randomUUID() + "\": \"" + UUID.randomUUID() + "\", "
+            + "\"" + UUID.randomUUID() + "\": \"\""
             + "}";
         final JobEnvironmentRequest jobEnvironmentRequest = new JobEnvironmentRequest
             .Builder()
@@ -1348,8 +1347,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .build();
 
         final String agentConfigExt
-            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
-        final String requestedJobDirectoryLocation = "/tmp/" + UUID.randomUUID().toString();
+            = "{\"" + UUID.randomUUID() + "\": \"" + UUID.randomUUID() + "\"}";
+        final String requestedJobDirectoryLocation = "/tmp/" + UUID.randomUUID();
         final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
             .Builder()
             .withExt(GenieObjectMapper.getMapper().readTree(agentConfigExt))

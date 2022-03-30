@@ -51,7 +51,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Utility class to help converting between V3 and V4 DTOs during migration period.
+ * Utility class to help convert between V3 and V4 DTOs during migration period.
  *
  * @author tgianos
  * @since 4.0.0

@@ -155,7 +155,6 @@ public final class EntityV3DtoConverters {
             .withUpdated(jobExecutionProjection.getUpdated());
 
         jobExecutionProjection.getProcessId().ifPresent(builder::withProcessId);
-        jobExecutionProjection.getCheckDelay().ifPresent(builder::withCheckDelay);
         // Calculate the timeout as it used to be represented pre-timeoutUsed
         if (jobExecutionProjection.getStarted().isPresent() && jobExecutionProjection.getTimeoutUsed().isPresent()) {
             final Instant started = jobExecutionProjection.getStarted().get();
