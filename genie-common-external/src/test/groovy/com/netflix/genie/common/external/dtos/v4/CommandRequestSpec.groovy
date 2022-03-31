@@ -40,7 +40,6 @@ class CommandRequestSpec extends Specification {
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def memory = 3_820
-        def checkDelay = 380_324L
         def clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
@@ -55,7 +54,6 @@ class CommandRequestSpec extends Specification {
             .withRequestedId(requestedId)
             .withResources(resources)
             .withMemory(memory)
-            .withCheckDelay(checkDelay)
             .withClusterCriteria(clusterCriteria)
             .build()
 
@@ -65,7 +63,6 @@ class CommandRequestSpec extends Specification {
         request.getResources() == resources
         request.getExecutable() == executable
         request.getMemory().orElse(-1) == memory
-        request.getCheckDelay().orElse(null) == checkDelay
         request.getClusterCriteria() == clusterCriteria
 
         when:
@@ -77,7 +74,6 @@ class CommandRequestSpec extends Specification {
         request.getResources() != null
         request.getExecutable() == executable
         !request.getMemory().isPresent()
-        !request.getCheckDelay().isPresent()
         request.getClusterCriteria().isEmpty()
 
         when: "Optional fields are blank they're ignored"
@@ -89,7 +85,6 @@ class CommandRequestSpec extends Specification {
             .withRequestedId(" ")
             .withResources(resources)
             .withMemory(memory)
-            .withCheckDelay(checkDelay)
             .withClusterCriteria(null)
             .build()
 
@@ -99,7 +94,6 @@ class CommandRequestSpec extends Specification {
         request.getResources() == resources
         request.getExecutable() == executable
         request.getMemory().orElse(-1) == memory
-        request.getCheckDelay().orElse(null) == checkDelay
         request.getClusterCriteria().isEmpty()
     }
 
@@ -227,7 +221,6 @@ class CommandRequestSpec extends Specification {
             .withRequestedId(requestedId)
             .withResources(resources)
             .withMemory(RandomSuppliers.INT.get())
-            .withCheckDelay(RandomSuppliers.LONG.get())
             .withClusterCriteria(
                 Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build())
             )

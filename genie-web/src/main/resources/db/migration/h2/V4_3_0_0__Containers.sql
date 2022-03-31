@@ -42,3 +42,6 @@ ALTER TABLE `jobs`
   DROP COLUMN `check_delay`;
 ALTER TABLE `jobs`
   DROP COLUMN `v4`;
+
+ALTER TABLE `commands`
+  DROP COLUMN `check_delay`;

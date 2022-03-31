@@ -58,7 +58,6 @@ class JpaPersistenceServiceImplCommandsTest {
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
     private static final List<String> COMMAND_1_EXECUTABLE = Lists.newArrayList("pig");
-    private static final long COMMAND_1_CHECK_DELAY = 18000L;
 
     private static final String COMMAND_2_ID = "command2";
 
@@ -103,7 +102,6 @@ class JpaPersistenceServiceImplCommandsTest {
             COMMAND_1_EXECUTABLE
         )
             .withRequestedId(COMMAND_1_ID)
-            .withCheckDelay(COMMAND_1_CHECK_DELAY)
             .build();
 
         Mockito
@@ -136,7 +134,6 @@ class JpaPersistenceServiceImplCommandsTest {
                         ).build(),
                         Lists.newArrayList(UUID.randomUUID().toString()),
                         null,
-                        1803L,
                         null
                     )
                 )

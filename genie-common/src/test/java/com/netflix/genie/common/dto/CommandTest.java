@@ -46,11 +46,33 @@ class CommandTest {
     private static final String EXECUTABLE = StringUtils.join(EXECUTABLE_AND_ARGS, " ");
     private static final int MEMORY = 10_255;
 
-    /**
-     * Test to make sure we can build a command using the default builder constructor.
-     */
+    @SuppressWarnings("deprecation")
     @Test
     void canBuildCommand() {
+        final Command command
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS).build();
+        Assertions.assertThat(command.getName()).isEqualTo(NAME);
+        Assertions.assertThat(command.getUser()).isEqualTo(USER);
+        Assertions.assertThat(command.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(command.getStatus()).isEqualTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command.getExecutable()).isEqualTo(EXECUTABLE);
+        Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(EXECUTABLE_AND_ARGS);
+        Assertions.assertThat(command.getSetupFile().isPresent()).isFalse();
+        Assertions.assertThat(command.getConfigs()).isEmpty();
+        Assertions.assertThat(command.getDependencies()).isEmpty();
+        Assertions.assertThat(command.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(command.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(command.getId().isPresent()).isFalse();
+        Assertions.assertThat(command.getTags()).isEmpty();
+        Assertions.assertThat(command.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(command.getMemory().isPresent()).isFalse();
+        Assertions.assertThat(command.getClusterCriteria()).isEmpty();
+        Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    void canBuildCommandWithDeprecatedCheckDelayConstructor() {
         final Command command
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY).build();
         Assertions.assertThat(command.getName()).isEqualTo(NAME);
@@ -69,13 +91,12 @@ class CommandTest {
         Assertions.assertThat(command.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(command.getMemory().isPresent()).isFalse();
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
+        Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
     }
 
-    /**
-     * Test to make sure we can build a command using the deprecated builder constructor.
-     */
+    @SuppressWarnings("deprecation")
     @Test
-    void canBuildCommandWithDeprecatedConstructor() {
+    void canBuildCommandWithDeprecatedExecutableConstructor() {
         final Command command
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).build();
         Assertions.assertThat(command.getName()).isEqualTo(NAME);
@@ -94,15 +115,14 @@ class CommandTest {
         Assertions.assertThat(command.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(command.getMemory().isPresent()).isFalse();
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
+        Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
     }
 
-    /**
-     * Test to make sure we can build a command with all optional parameters.
-     */
+    @SuppressWarnings("deprecation")
     @Test
     void canBuildCommandWithOptionals() {
         final Command.Builder builder
-            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS);
 
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
@@ -130,6 +150,8 @@ class CommandTest {
 
         builder.withMemory(MEMORY);
 
+        builder.withCheckDelay(CHECK_DELAY);
+
         final List<Criterion> clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
@@ -146,7 +168,7 @@ class CommandTest {
         Assertions.assertThat(command.getStatus()).isEqualTo(CommandStatus.ACTIVE);
         Assertions.assertThat(command.getExecutable()).isEqualTo(EXECUTABLE);
         Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(EXECUTABLE_AND_ARGS);
-        Assertions.assertThat(command.getCheckDelay()).isEqualTo(CHECK_DELAY);
+        Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
         Assertions.assertThat(command.getSetupFile()).isPresent().contains(setupFile);
         Assertions.assertThat(command.getConfigs()).isEqualTo(configs);
         Assertions.assertThat(command.getDependencies()).isEqualTo(dependencies);
@@ -159,13 +181,10 @@ class CommandTest {
         Assertions.assertThat(command.getClusterCriteria()).isEqualTo(clusterCriteria);
     }
 
-    /**
-     * Test to make sure we can build a command with null collection parameters.
-     */
     @Test
     void canBuildCommandNullOptionals() {
         final Command.Builder builder
-            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withDependencies(null);
@@ -176,6 +195,7 @@ class CommandTest {
         builder.withUpdated(null);
         builder.withMemory(null);
         builder.withClusterCriteria(null);
+        builder.withCheckDelay(null);
 
         final Command command = builder.build();
         Assertions.assertThat(command.getName()).isEqualTo(NAME);
@@ -196,13 +216,10 @@ class CommandTest {
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
     }
 
-    /**
-     * Test equals.
-     */
     @Test
     void canFindEquality() {
         final Command.Builder builder
-            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withDependencies(null);
@@ -220,13 +237,10 @@ class CommandTest {
         Assertions.assertThat(command1).isNotEqualTo(command3);
     }
 
-    /**
-     * Test hash code.
-     */
     @Test
     void canUseHashCode() {
         final Command.Builder builder
-            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withDependencies(null);
@@ -244,19 +258,14 @@ class CommandTest {
         Assertions.assertThat(command1.hashCode()).isNotEqualTo(command3.hashCode());
     }
 
-    /**
-     * Test creation fails without an executable.
-     */
     @Test
     void cantBuildWithoutExecutable() {
         Assertions
             .assertThatIllegalArgumentException()
-            .isThrownBy(() -> new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, CHECK_DELAY).build());
+            .isThrownBy(() -> new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE).build());
     }
 
-    /**
-     * Test to make sure we if both executable fields are set, the new one takes precedence.
-     */
+    @SuppressWarnings("deprecation")
     @Test
     void canBuildWithConflictingExecutableFields() {
         final ArrayList<String> expectedExecutable = Lists.newArrayList("exec", "arg1", "arg2");

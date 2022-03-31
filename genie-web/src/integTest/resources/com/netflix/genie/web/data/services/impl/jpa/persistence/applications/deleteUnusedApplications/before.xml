@@ -101,7 +101,6 @@
         genie_user="tgianos"
         name="sparksql"
         version="1.2.3"
-        check_delay="10000"
         status="ACTIVE"
     />
 

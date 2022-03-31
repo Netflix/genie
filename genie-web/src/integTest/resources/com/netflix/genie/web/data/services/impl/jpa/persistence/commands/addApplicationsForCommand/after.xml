@@ -37,7 +37,6 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        check_delay="18000"
         status="ACTIVE"
     />
     <command_executable_arguments
@@ -55,7 +54,6 @@
         genie_user="amsharma"
         name="hive_11_prod"
         version="4.5.6"
-        check_delay="19000"
         status="INACTIVE"
     />
     <command_executable_arguments

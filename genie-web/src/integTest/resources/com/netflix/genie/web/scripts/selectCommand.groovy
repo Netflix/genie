@@ -58,7 +58,6 @@ switch (jobId) {
             ).build(),
             [UUID.randomUUID().toString()],
             null,
-            1234L,
             null
         )
         break

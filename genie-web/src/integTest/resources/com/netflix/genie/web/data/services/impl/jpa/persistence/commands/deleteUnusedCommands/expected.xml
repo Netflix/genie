@@ -24,7 +24,6 @@
         genie_user="tgianos"
         name="sparksql"
         version="1.2.3"
-        check_delay="18000"
         status="INACTIVE"
     />
     <commands
@@ -36,7 +35,6 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        check_delay="18000"
         status="ACTIVE"
     />
     <commands
@@ -48,7 +46,6 @@
         genie_user="mprimi"
         name="hive_11_prod"
         version="4.5.6"
-        check_delay="19000"
         status="INACTIVE"
     />
     <commands
@@ -60,7 +57,6 @@
         genie_user="tgianos"
         name="pig_11_prod"
         version="7.8.9"
-        check_delay="20000"
         status="DEPRECATED"
         metadata=
             "{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: 65, &quot;key3&quot;: [], &quot;key4&quot;: {}}"
@@ -74,7 +70,6 @@
         genie_user="tgianos"
         name="oldspark"
         version="7.8.9"
-        check_delay="20000"
         status="ACTIVE"
     />
 

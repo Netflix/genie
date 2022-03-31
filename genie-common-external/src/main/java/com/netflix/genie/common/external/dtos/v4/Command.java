@@ -56,12 +56,6 @@ public class Command extends CommonResource {
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
     )
     private final Integer memory;
-    @Min(
-        value = 1,
-        message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
-    )
-    // TODO: This is here for Genie 3 backwards compatibility while Genie 4 agent is still in development
-    private final long checkDelay;
     private final ImmutableList<Criterion> clusterCriteria;
 
     /**
@@ -76,8 +70,6 @@ public class Command extends CommonResource {
      *                        this will start with the binary and be followed optionally by default arguments. Must
      *                        have at least one. Blanks will be removed
      * @param memory          The default memory that should be used to run a job with this command
-     * @param checkDelay      The amount of time (in milliseconds) to delay between checks of job status for jobs run
-     *                        using this command. Min 1 but preferably much more
      * @param clusterCriteria The ordered list of cluster {@link Criterion} that should be used to resolve which
      *                        clusters this command can run on at job execution time
      */
@@ -90,7 +82,6 @@ public class Command extends CommonResource {
         @JsonProperty(value = "metadata", required = true) final CommandMetadata metadata,
         @JsonProperty(value = "executable", required = true) final List<String> executable,
         @JsonProperty(value = "memory") @Nullable final Integer memory,
-        @JsonProperty(value = "checkDelay", required = true) final long checkDelay,
         @JsonProperty(value = "clusterCriteria") @Nullable final List<Criterion> clusterCriteria
     ) {
         super(id, created, updated, resources);
@@ -102,7 +93,6 @@ public class Command extends CommonResource {
                 .collect(Collectors.toList())
         );
         this.memory = memory;
-        this.checkDelay = checkDelay;
         this.clusterCriteria = clusterCriteria != null ? ImmutableList.copyOf(clusterCriteria) : ImmutableList.of();
     }
 

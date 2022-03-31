@@ -62,7 +62,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
     private static final List<String> COMMAND_1_EXECUTABLE = Lists.newArrayList("pig");
-    private static final long COMMAND_1_CHECK_DELAY = 18000L;
     private static final CommandStatus COMMAND_1_STATUS = CommandStatus.ACTIVE;
 
     private static final String COMMAND_2_ID = "command2";
@@ -250,7 +249,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             COMMAND_1_EXECUTABLE
         )
             .withRequestedId(id)
-            .withCheckDelay(COMMAND_1_CHECK_DELAY)
             .build();
         final String createdId = this.service.saveCommand(command);
         Assertions.assertThat(createdId).isEqualTo(id);
@@ -261,7 +259,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(created.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
-        Assertions.assertThat(created.getCheckDelay()).isEqualTo(COMMAND_1_CHECK_DELAY);
         Assertions.assertThat(created.getMemory()).isNotPresent();
         Assertions.assertThat(created.getClusterCriteria()).isEmpty();
         this.service.deleteCommand(id);
@@ -291,7 +288,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             COMMAND_1_EXECUTABLE
         )
             .withMemory(memory)
-            .withCheckDelay(COMMAND_1_CHECK_DELAY)
             .withClusterCriteria(clusterCriteria)
             .build();
         final String id = this.service.saveCommand(command);
@@ -301,7 +297,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(created.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
-        Assertions.assertThat(created.getCheckDelay()).isEqualTo(COMMAND_1_CHECK_DELAY);
         Assertions.assertThat(created.getMemory()).isPresent().contains(memory);
         Assertions.assertThat(created.getClusterCriteria()).isEqualTo(clusterCriteria);
         this.service.deleteCommand(created.getId());
@@ -339,7 +334,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .build(),
             command.getExecutable(),
             memory,
-            command.getCheckDelay(),
             null
         );
 
@@ -428,7 +422,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .build(),
             command.getExecutable(),
             null,
-            command.getCheckDelay(),
             null
         );
 
@@ -452,7 +445,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             init.getMetadata(),
             init.getExecutable(),
             init.getMemory().orElse(null),
-            init.getCheckDelay(),
             init.getClusterCriteria()
         );
 
@@ -647,8 +639,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final Set<Command> preCommands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions
             .assertThat(preCommands)
-            .hasSize(1)
-            .hasOnlyOneElementSatisfying(command -> Assertions.assertThat(command.getId()).isEqualTo(COMMAND_1_ID));
+            .singleElement()
+            .extracting(Command::getId)
+            .isEqualTo(COMMAND_1_ID);
 
         this.service.setApplicationsForCommand(COMMAND_2_ID, appIds);
 
@@ -656,7 +649,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(savedCommands).hasSize(2);
         Assertions
             .assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID))
-            .hasOnlyOneElementSatisfying(application -> Assertions.assertThat(application.getId()).isEqualTo(APP_1_ID));
+            .singleElement()
+            .extracting(Application::getId)
+            .isEqualTo(APP_1_ID);
     }
 
     @Test
@@ -664,7 +659,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     void testGetApplicationsForCommand() throws GenieCheckedException {
         Assertions
             .assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID))
-            .hasOnlyOneElementSatisfying(application -> Assertions.assertThat(application.getId()).isEqualTo(APP_1_ID));
+            .singleElement()
+            .extracting(Application::getId)
+            .isEqualTo(APP_1_ID);
     }
 
     @Test
@@ -794,7 +791,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .build(),
             Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         )
-            .withCheckDelay(1000L)
             .withClusterCriteria(clusterCriteria)
             .build();
 
@@ -1035,7 +1031,6 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .build(),
             command.getExecutable(),
             command.getMemory().orElse(null),
-            command.getCheckDelay(),
             clusterCriteria
         );
     }

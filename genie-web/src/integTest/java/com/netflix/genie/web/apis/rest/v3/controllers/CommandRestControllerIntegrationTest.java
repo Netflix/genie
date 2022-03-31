@@ -70,7 +70,6 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     private static final String VERSION = "1.0.0";
     private static final String EXECUTABLE = "/apps/hive/bin/hive";
     private static final ImmutableList<String> EXECUTABLE_AND_ARGS = ImmutableList.of("/apps/hive/bin/hive");
-    private static final long CHECK_DELAY = 10000L;
     private static final String DESCRIPTION = "Hive command v" + VERSION;
     private static final int MEMORY = 1024;
     private static final String CONFIG_1 = "s3:///path/to/config-foo";
@@ -131,7 +130,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         );
 
         final String id = this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withDescription(DESCRIPTION)
                 .withMemory(MEMORY)
                 .withConfigs(CONFIGS)
@@ -167,7 +166,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
             .body(VERSION_PATH, Matchers.is(VERSION))
             .body(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString()))
             .body(EXECUTABLE_PATH, Matchers.is(EXECUTABLE))
-            .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
+            .body(CHECK_DELAY_PATH, Matchers.is((int) Command.DEFAULT_CHECK_DELAY))
             .body(DESCRIPTION_PATH, Matchers.is(DESCRIPTION))
             .body(MEMORY_PATH, Matchers.is(MEMORY))
             .body(CONFIGS_PATH, Matchers.hasSize(2))
@@ -248,7 +247,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     @Test
     void canCreateCommandWithId() throws Exception {
         this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .withDescription(DESCRIPTION)
                 .withMemory(MEMORY)
@@ -276,7 +275,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
             .body(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString()))
             .body(EXECUTABLE_PATH, Matchers.is(EXECUTABLE))
             .body(EXECUTABLE_AND_ARGS_PATH, Matchers.is(EXECUTABLE_AND_ARGS))
-            .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
+            .body(CHECK_DELAY_PATH, Matchers.is((int) Command.DEFAULT_CHECK_DELAY))
             .body(DESCRIPTION_PATH, Matchers.is(DESCRIPTION))
             .body(MEMORY_PATH, Matchers.is(MEMORY))
             .body(CONFIGS_PATH, Matchers.hasSize(2))
@@ -317,7 +316,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     @Test
     void canHandleBadInputToCreateCommand() throws Exception {
         final Command cluster =
-            new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, Lists.newArrayList(""), -1L).build();
+            new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, Lists.newArrayList("")).build();
         RestAssured
             .given(this.getRequestSpecification())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -354,7 +353,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
 
         this.createConfigResource(
             new Command
-                .Builder(name1, user1, version1, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(name1, user1, version1, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(id1)
                 .build(),
             null
@@ -362,7 +361,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         Thread.sleep(1000);
         this.createConfigResource(
             new Command
-                .Builder(name2, user2, version2, CommandStatus.DEPRECATED, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(name2, user2, version2, CommandStatus.DEPRECATED, EXECUTABLE_AND_ARGS)
                 .withId(id2)
                 .build(),
             null
@@ -370,7 +369,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         Thread.sleep(1000);
         this.createConfigResource(
             new Command
-                .Builder(name3, user3, version3, CommandStatus.INACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(name3, user3, version3, CommandStatus.INACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(id3)
                 .build(),
             null
@@ -496,7 +495,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canUpdateCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -525,8 +524,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
             createdCommand.getUser(),
             createdCommand.getVersion(),
             CommandStatus.INACTIVE,
-            createdCommand.getExecutableAndArguments(),
-            createdCommand.getCheckDelay()
+            createdCommand.getExecutableAndArguments()
         )
             .withId(createdCommand.getId().orElseThrow(IllegalArgumentException::new))
             .withCreated(createdCommand.getCreated().orElseThrow(IllegalArgumentException::new))
@@ -573,7 +571,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canPatchCommand() throws Exception {
         final String id = this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -628,19 +626,19 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canDeleteAllCommands() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.DEPRECATED, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.DEPRECATED, EXECUTABLE_AND_ARGS)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.INACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.INACTIVE, EXECUTABLE_AND_ARGS)
                 .build(),
             null
         );
@@ -679,21 +677,21 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
 
         this.createConfigResource(
             new Command
-                .Builder(name1, user1, version1, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(name1, user1, version1, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(id1)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(name2, user2, version2, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(name2, user2, version2, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(id2)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(name3, user3, version3, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(name3, user3, version3, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(id3)
                 .build(),
             null
@@ -735,7 +733,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canAddConfigsToCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -760,7 +758,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canUpdateConfigsForCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -779,7 +777,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canDeleteConfigsForCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -795,7 +793,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     @Test
     void canAddDependenciesToCommand() throws Exception {
         this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -824,7 +822,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     @Test
     void canUpdateDependenciesForCommand() throws Exception {
         this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -846,7 +844,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     @Test
     void canDeleteDependenciesForCommand() throws Exception {
         this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -867,7 +865,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canAddTagsToCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -893,7 +891,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canUpdateTagsForCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -913,7 +911,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canDeleteTagsForCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -931,7 +929,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canDeleteTagForCommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -951,7 +949,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canAddApplicationsForACommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -1088,7 +1086,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canSetApplicationsForACommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -1242,7 +1240,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canRemoveApplicationsFromACommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -1306,7 +1304,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     void canRemoveApplicationFromACommand() throws Exception {
         this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(ID)
                 .build(),
             null
@@ -1437,7 +1435,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
 
         final String commandId = this.createConfigResource(
             new Command
-                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withClusterCriteria(
                     Lists.newArrayList(
                         new Criterion.Builder().withId(cluster1Id).build(),
@@ -1517,23 +1515,22 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
 
         final List<Command> invalidCommandResources = Lists.newArrayList(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(UUID.randomUUID().toString())
                 .withSetupFile(" ")
                 .build(),
 
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(UUID.randomUUID().toString())
                 .withConfigs(stringSetWithBlank)
                 .build(),
 
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(UUID.randomUUID().toString())
                 .withDependencies(stringSetWithBlank)
-
                 .build(),
 
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withId(UUID.randomUUID().toString())
                 .withTags(stringSetWithBlank)
                 .build()
@@ -1806,7 +1803,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         final String cluster2Id = this.createConfigResource(cluster2, null);
 
         final Command command = new Command
-            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
             .withClusterCriteria(
                 Lists.newArrayList(
                     new Criterion.Builder().withId(cluster0Id).build(),
@@ -1850,7 +1847,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
                 .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
                 .extract()
                 .asString(),
-            new TypeReference<List<ResolvedResources<Cluster>>>() {
+            new TypeReference<>() {
             }
         );
 
@@ -1898,7 +1895,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
 
     private String createCommandWithDefaultClusterCriteria() throws Exception {
         return this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
                 .withClusterCriteria(CLUSTER_CRITERIA)
                 .build(),
             null

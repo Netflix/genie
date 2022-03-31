@@ -67,6 +67,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         Assertions.assertThat(cmd.getStatus()).isEqualByComparingTo(command.getStatus());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     void testGetCommandsUsingParams() throws Exception {
         final Set<String> command1Tags = Sets.newHashSet("foo", "pi");
@@ -91,8 +92,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
                 "command2user",
                 "2.0",
                 CommandStatus.INACTIVE,
-                executableAndArgs,
-                1000
+                executableAndArgs
             )
                 .withTags(command2Tags)
                 .build();
@@ -102,7 +102,11 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
 
         // Test get by tags
         Assertions
-            .assertThat(this.commandClient.getCommands(null, null, null, Lists.newArrayList("foo")))
+            .assertThat(
+                this.commandClient.getCommands(
+                    null, null, null, Lists.newArrayList("foo"), null, null, null, null
+                )
+            )
             .hasSize(1)
             .extracting(Command::getId)
             .filteredOn(Optional::isPresent)
@@ -110,7 +114,11 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
             .containsExactly(command1Id);
 
         Assertions
-            .assertThat(this.commandClient.getCommands(null, null, null, Lists.newArrayList("pi")))
+            .assertThat(
+                this.commandClient.getCommands(
+                    null, null, null, Lists.newArrayList("pi"), null, null, null, null
+                )
+            )
             .hasSize(2)
             .extracting(Command::getId)
             .filteredOn(Optional::isPresent)
@@ -119,7 +127,11 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
 
         // Test get by name
         Assertions
-            .assertThat(this.commandClient.getCommands("command1name", null, null, null))
+            .assertThat(
+                this.commandClient.getCommands(
+                    "command1name", null, null, null, null, null, null, null
+                )
+            )
             .hasSize(1)
             .extracting(Command::getId)
             .filteredOn(Optional::isPresent)
@@ -129,7 +141,9 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         // Test get by status
         Assertions
             .assertThat(
-                this.commandClient.getCommands(null, null, Lists.newArrayList(CommandStatus.ACTIVE.toString()), null)
+                this.commandClient.getCommands(
+                    null, null, Lists.newArrayList(CommandStatus.ACTIVE.toString()), null, null, null, null, null
+                )
             )
             .hasSize(1)
             .extracting(Command::getId)
@@ -142,7 +156,11 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
             CommandStatus.INACTIVE.toString()
         );
         Assertions
-            .assertThat(this.commandClient.getCommands(null, null, statuses, null))
+            .assertThat(
+                this.commandClient.getCommands(
+                    null, null, statuses, null, null, null, null, null
+                )
+            )
             .hasSize(2)
             .extracting(Command::getId)
             .filteredOn(Optional::isPresent)
@@ -151,7 +169,11 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
 
         // Test find by user
         Assertions
-            .assertThat(this.commandClient.getCommands(null, "command2user", null, null))
+            .assertThat(
+                this.commandClient.getCommands(
+                    null, "command2user", null, null
+                )
+            )
             .hasSize(1)
             .extracting(Command::getId)
             .filteredOn(Optional::isPresent)
@@ -161,9 +183,9 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
 
     @Test
     void testGetCommandsUsingPagination() throws Exception {
-        final String id1 = UUID.randomUUID().toString() + "_1";
-        final String id2 = UUID.randomUUID().toString() + "_2";
-        final String id3 = UUID.randomUUID().toString() + "_3";
+        final String id1 = UUID.randomUUID() + "_1";
+        final String id2 = UUID.randomUUID() + "_2";
+        final String id3 = UUID.randomUUID() + "_3";
 
         final List<String> ids = Lists.newArrayList(id1, id2, id3);
 
@@ -173,8 +195,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
                 "user",
                 "1.0",
                 CommandStatus.ACTIVE,
-                Lists.newArrayList("echo"),
-                1000
+                Lists.newArrayList("echo")
             )
                 .withId(id)
                 .withTags(Sets.newHashSet("foo", "bar"))
@@ -197,6 +218,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         Assertions.assertThat(
             results.stream()
                 .map(Command::getId)
+                .filter(Optional::isPresent)
                 .map(Optional::get)
         ).containsExactlyInAnyOrder(id1, id2, id3);
 
@@ -305,8 +327,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
             "newuser",
             "new version",
             CommandStatus.ACTIVE,
-            executableAndArgs,
-            1000
+            executableAndArgs
         )
             .withId(commandId)
             .build();
@@ -331,7 +352,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable)
             .withTags(initialTags)
             .build();
 
@@ -364,7 +385,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable)
             .withConfigs(initialConfigs)
             .build();
 
@@ -396,7 +417,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable)
             .withDependencies(initialDependencies)
             .build();
 
@@ -526,8 +547,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(), UUID.randomUUID().toString(),
             CommandStatus.ACTIVE,
-            Lists.newArrayList(UUID.randomUUID().toString()),
-            100L
+            Lists.newArrayList(UUID.randomUUID().toString())
         )
             .withClusterCriteria(
                 Lists.newArrayList(

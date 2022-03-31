@@ -550,7 +550,6 @@ class DtoConvertersSpec extends Specification {
             UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
-        def checkDelay = 380_234L
         def clusterCriteria = Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build())
         com.netflix.genie.common.dto.Command v3Command
         CommandRequest commandRequest
@@ -561,8 +560,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            executableAndArgs,
-            checkDelay
+            executableAndArgs
         )
             .withId(id)
             .withTags(tags)
@@ -592,7 +590,6 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
-        commandRequest.getCheckDelay().orElse(null) == checkDelay
         commandRequest.getClusterCriteria() == clusterCriteria
 
         when:
@@ -601,8 +598,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            executableAndArgs,
-            checkDelay
+            executableAndArgs
         ).build()
         commandRequest = DtoConverters.toV4CommandRequest(v3Command)
 
@@ -622,7 +618,6 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
-        commandRequest.getCheckDelay().orElse(null) == checkDelay
         commandRequest.getClusterCriteria().isEmpty()
     }
 
@@ -656,7 +651,6 @@ class DtoConvertersSpec extends Specification {
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
         def updated = Instant.now()
-        def checkDelay = 987_345L
         def clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
         )
@@ -669,8 +663,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            executableAndArgs,
-            checkDelay
+            executableAndArgs
         )
             .withId(id)
             .withCreated(created)
@@ -690,7 +683,6 @@ class DtoConvertersSpec extends Specification {
         v4Command.getId() == id
         v4Command.getCreated() == created
         v4Command.getUpdated() == updated
-        v4Command.getCheckDelay() == checkDelay
         v4Command.getMemory().orElse(null) == memory
         v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
@@ -713,8 +705,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            executableAndArgs,
-            checkDelay
+            executableAndArgs
         )
             .withId(id)
             .build()
@@ -724,7 +715,6 @@ class DtoConvertersSpec extends Specification {
         v4Command.getId() == id
         v4Command.getCreated() != null
         v4Command.getUpdated() != null
-        v4Command.getCheckDelay() == checkDelay
         !v4Command.getMemory().isPresent()
         v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
@@ -769,7 +759,6 @@ class DtoConvertersSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def clusterCriteria = Lists.newArrayList(new Criterion.Builder().withName(UUID.randomUUID().toString()).build())
-        def checkDelay = 987_345L
         Command v4Command
         com.netflix.genie.common.dto.Command v3Command
 
@@ -790,7 +779,6 @@ class DtoConvertersSpec extends Specification {
                 .build(),
             executable,
             memory,
-            checkDelay,
             clusterCriteria
         )
         v3Command = DtoConverters.toV3Command(v4Command)
@@ -812,7 +800,6 @@ class DtoConvertersSpec extends Specification {
         v3Command.getDependencies() == dependencies
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         v3Command.getMemory().orElse(-1) == memory
-        v3Command.getCheckDelay() == checkDelay
         v3Command.getClusterCriteria() == clusterCriteria
 
         when:
@@ -824,7 +811,6 @@ class DtoConvertersSpec extends Specification {
             new CommandMetadata.Builder(name, user, version, status).build(),
             executable,
             null,
-            checkDelay,
             null
         )
         v3Command = DtoConverters.toV3Command(v4Command)
@@ -845,7 +831,6 @@ class DtoConvertersSpec extends Specification {
         v3Command.getDependencies().isEmpty()
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         !v3Command.getMemory().isPresent()
-        v3Command.getCheckDelay() == checkDelay
         v3Command.getClusterCriteria().isEmpty()
     }
 
@@ -896,8 +881,7 @@ class DtoConvertersSpec extends Specification {
                 .build(),
             new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
             null,
-            new AgentConfigRequest
-                .Builder()
+            new AgentConfigRequest.Builder()
                 .withTimeoutRequested(timeout)
                 .withInteractive(true)
                 .withArchivingDisabled(true)

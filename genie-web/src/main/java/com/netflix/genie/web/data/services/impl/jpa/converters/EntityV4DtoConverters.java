@@ -164,7 +164,6 @@ public final class EntityV4DtoConverters {
             metadataBuilder.build(),
             commandEntity.getExecutable(),
             commandEntity.getMemory().orElse(null),
-            commandEntity.getCheckDelay(),
             commandEntity
                 .getClusterCriteria()
                 .stream()

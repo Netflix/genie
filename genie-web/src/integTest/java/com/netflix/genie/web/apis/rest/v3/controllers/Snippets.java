@@ -806,9 +806,7 @@ final class Snippets {
             PayloadDocumentation
                 .fieldWithPath("checkDelay")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "checkDelay"))
-                .description(
-                    "The amount of time (in milliseconds) to delay between checks of the jobs using this command"
-                )
+                .description("Deprecated as of 4.3.0. Now is a no-op on the server side.")
                 .type(JsonFieldType.NUMBER),
             PayloadDocumentation
                 .fieldWithPath("memory")
