@@ -354,7 +354,6 @@
         genie_user="tgianos"
         name="spark"
         version="1.6.0"
-        check_delay="10000"
         status="ACTIVE"
     />
 

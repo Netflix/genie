@@ -113,7 +113,6 @@ class CommandSelectorManagedScriptIntegrationTest {
             ).build(),
             Lists.newArrayList(UUID.randomUUID().toString()),
             null,
-            0L,
             null
         );
     }

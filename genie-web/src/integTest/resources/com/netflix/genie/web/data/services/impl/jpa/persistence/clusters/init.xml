@@ -131,7 +131,6 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        check_delay="15000"
         status="ACTIVE"
     />
     <commands_configs
@@ -169,7 +168,6 @@
         genie_user="amsharma"
         name="hive_11_prod"
         version="4.5.6"
-        check_delay="16000"
         status="INACTIVE"
     />
     <commands_configs
@@ -199,7 +197,6 @@
         genie_user="tgianos"
         name="pig_11_prod"
         version="7.8.9"
-        check_delay="17000"
         status="DEPRECATED"
     />
     <commands_configs
@@ -233,7 +230,6 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        check_delay="15000"
         status="ACTIVE"
     />
     <commands_configs

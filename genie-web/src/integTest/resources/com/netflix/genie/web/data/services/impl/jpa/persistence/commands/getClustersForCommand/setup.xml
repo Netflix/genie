@@ -84,7 +84,6 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        check_delay="18000"
         status="ACTIVE"
     />
     <commands_tags

@@ -31,11 +31,8 @@ import javax.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -678,17 +675,5 @@ class JobEntityTest extends EntityTestBase {
     @Test
     void testToString() {
         Assertions.assertThat(this.entity.toString()).isNotBlank();
-    }
-
-    private <T> void testOptionalField(
-        final Supplier<Optional<T>> getter,
-        final Consumer<T> setter,
-        final T testValue
-    ) {
-        Assertions.assertThat(getter.get()).isNotPresent();
-        setter.accept(null);
-        Assertions.assertThat(getter.get()).isNotPresent();
-        setter.accept(testValue);
-        Assertions.assertThat(getter.get()).isPresent().contains(testValue);
     }
 }

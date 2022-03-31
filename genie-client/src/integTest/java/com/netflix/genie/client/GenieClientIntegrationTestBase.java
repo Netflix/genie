@@ -147,7 +147,7 @@ abstract class GenieClientIntegrationTestBase {
         final Set<String> dependenciesList = Sets.newHashSet("command-dep1", "command-dep2");
         final List<String> executableAndArgs = Lists.newArrayList("exec");
 
-        return new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executableAndArgs, 1000)
+        return new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executableAndArgs)
             .withId(commandId)
             .withDescription("client Test")
             .withSetupFile("path to set up file")

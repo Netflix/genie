@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
 import javax.validation.ConstraintViolation;
@@ -24,7 +25,10 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Base class for all test classes for entities in the model package.
@@ -55,5 +59,17 @@ class EntityTestBase {
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
+    }
+
+    <T> void testOptionalField(
+        final Supplier<Optional<T>> getter,
+        final Consumer<T> setter,
+        final T testValue
+    ) {
+        Assertions.assertThat(getter.get()).isNotPresent();
+        setter.accept(null);
+        Assertions.assertThat(getter.get()).isNotPresent();
+        setter.accept(testValue);
+        Assertions.assertThat(getter.get()).isPresent().contains(testValue);
     }
 }

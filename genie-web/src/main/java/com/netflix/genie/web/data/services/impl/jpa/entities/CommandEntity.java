@@ -18,7 +18,6 @@
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.Getter;
@@ -193,11 +192,6 @@ public class CommandEntity extends BaseEntity {
     @OrderColumn(name = "argument_order", nullable = false)
     @NotEmpty(message = "No executable arguments entered. At least one is required.")
     private List<@NotBlank @Size(max = 1024) String> executable = new ArrayList<>();
-
-    @Basic(optional = false)
-    @Column(name = "check_delay", nullable = false)
-    @Min(1)
-    private long checkDelay = Command.DEFAULT_CHECK_DELAY;
 
     @Basic
     @Column(name = "memory")

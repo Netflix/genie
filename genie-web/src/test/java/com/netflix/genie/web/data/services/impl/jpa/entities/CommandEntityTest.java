@@ -20,7 +20,6 @@ package com.netflix.genie.web.data.services.impl.jpa.entities;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
@@ -68,7 +67,6 @@ class CommandEntityTest extends EntityTestBase {
     private static final String USER = "tgianos";
     private static final List<String> EXECUTABLE = Lists.newArrayList("/bin/pig13", "-Dblah");
     private static final String VERSION = "1.0";
-    private static final long CHECK_DELAY = 18083L;
     private static final int MEMORY = 10_240;
 
     private CommandEntity c;
@@ -81,7 +79,6 @@ class CommandEntityTest extends EntityTestBase {
         this.c.setVersion(VERSION);
         this.c.setStatus(CommandStatus.ACTIVE.name());
         this.c.setExecutable(EXECUTABLE);
-        this.c.setCheckDelay(CHECK_DELAY);
         this.c.setMemory(MEMORY);
     }
 
@@ -90,7 +87,6 @@ class CommandEntityTest extends EntityTestBase {
         final CommandEntity entity = new CommandEntity();
         Assertions.assertThat(entity.getSetupFile()).isNotPresent();
         Assertions.assertThat(entity.getExecutable()).isEmpty();
-        Assertions.assertThat(entity.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
         Assertions.assertThat(entity.getName()).isNull();
         Assertions.assertThat(entity.getStatus()).isNull();
         Assertions.assertThat(entity.getUser()).isNull();
@@ -157,14 +153,6 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateBadCheckDelay() {
-        this.c.setCheckDelay(0L);
-        Assertions
-            .assertThatExceptionOfType(ConstraintViolationException.class)
-            .isThrownBy(() -> this.validate(this.c));
-    }
-
-    @Test
     void testSetStatus() {
         this.c.setStatus(CommandStatus.ACTIVE.name());
         Assertions.assertThat(this.c.getStatus()).isEqualTo(CommandStatus.ACTIVE.name());
@@ -183,14 +171,6 @@ class CommandEntityTest extends EntityTestBase {
     void testSetExecutable() {
         this.c.setExecutable(EXECUTABLE);
         Assertions.assertThat(this.c.getExecutable()).isEqualTo(EXECUTABLE);
-    }
-
-    @Test
-    void testSetCheckDelay() {
-        final long newDelay = 108327L;
-        Assertions.assertThat(this.c.getCheckDelay()).isEqualTo(CHECK_DELAY);
-        this.c.setCheckDelay(newDelay);
-        Assertions.assertThat(this.c.getCheckDelay()).isEqualTo(newDelay);
     }
 
     @Test

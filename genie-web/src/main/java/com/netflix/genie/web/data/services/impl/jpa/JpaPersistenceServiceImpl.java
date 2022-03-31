@@ -786,7 +786,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             entity,
             commandRequest.getResources(),
             commandRequest.getMetadata(),
-            commandRequest.getCheckDelay().orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY),
             commandRequest.getExecutable(),
             commandRequest.getMemory().orElse(null),
             commandRequest.getClusterCriteria()
@@ -952,7 +951,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists")),
             updateCommand.getResources(),
             updateCommand.getMetadata(),
-            updateCommand.getCheckDelay(),
             updateCommand.getExecutable(),
             updateCommand.getMemory().orElse(null),
             updateCommand.getClusterCriteria()
@@ -2506,7 +2504,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final CommandEntity entity,
         final ExecutionEnvironment resources,
         final CommandMetadata metadata,
-        final long checkDelay,
         final List<String> executable,
         @Nullable final Integer memory,
         final List<Criterion> clusterCriteria
@@ -2516,7 +2513,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         this.setBaseEntityMetadata(entity, metadata, resources.getSetupFile().orElse(null));
 
         entity.setStatus(metadata.getStatus().name());
-        entity.setCheckDelay(checkDelay);
         entity.setExecutable(executable);
         entity.setMemory(memory);
 

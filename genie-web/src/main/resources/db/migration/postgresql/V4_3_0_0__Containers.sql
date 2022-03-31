@@ -30,3 +30,6 @@ ALTER TABLE jobs
   ADD COLUMN network_mbps_used      INT           DEFAULT NULL,
   DROP COLUMN check_delay,
   DROP COLUMN v4;
+
+ALTER TABLE commands
+  DROP COLUMN check_delay;

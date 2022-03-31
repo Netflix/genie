@@ -236,8 +236,6 @@ class EntityV4DtoConvertersSpec extends Specification {
             UUID.randomUUID().toString()
         )
         entity.setExecutable(executable)
-        def checkDelay = 2180234L
-        entity.setCheckDelay(checkDelay)
         def memory = 10_241
         entity.setMemory(memory)
         def clusterCriteria = Lists.newArrayList(
@@ -280,7 +278,6 @@ class EntityV4DtoConvertersSpec extends Specification {
         command.getMemory().orElseGet(RandomSuppliers.INT) == memory
         command.getMetadata().getMetadata().isPresent()
         command.getMetadata().getMetadata().get() == metadata
-        command.getCheckDelay() == checkDelay
         command.getClusterCriteria() == clusterCriteria
     }
 

@@ -443,7 +443,6 @@ class JobResolverServiceImplSpec extends Specification {
             ).withTags(commandTags).build(),
             Lists.newArrayList(UUID.randomUUID().toString()),
             null,
-            100L,
             null
         )
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
@@ -1192,7 +1191,6 @@ class JobResolverServiceImplSpec extends Specification {
                 .build(),
             executable,
             null,
-            100L,
             Lists.newArrayList(
                 new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build(),
                 new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()

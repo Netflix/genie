@@ -59,10 +59,7 @@ public class Command extends ExecutionEnvironmentDTO {
     private final String executable;
     @NotEmpty(message = "An executable is required")
     private final List<@NotEmpty @Size(max = 1024) String> executableAndArguments;
-    @Min(
-        value = 1,
-        message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
-    )
+    @Deprecated
     private final long checkDelay;
     @Min(
         value = 1,
@@ -79,7 +76,7 @@ public class Command extends ExecutionEnvironmentDTO {
     protected Command(@Valid final Builder builder) {
         super(builder);
         this.status = builder.bStatus;
-        this.checkDelay = builder.bCheckDelay;
+        this.checkDelay = DEFAULT_CHECK_DELAY;
         this.memory = builder.bMemory;
         if (!builder.bExecutableAndArguments.isEmpty()) {
             this.executableAndArguments = ImmutableList.copyOf(builder.bExecutableAndArguments);
@@ -111,7 +108,6 @@ public class Command extends ExecutionEnvironmentDTO {
     public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
         private final CommandStatus bStatus;
-        private final long bCheckDelay;
         private final List<String> bExecutableAndArguments = Lists.newArrayList();
         private final List<Criterion> bClusterCriteria = Lists.newArrayList();
         private String bExecutable;
@@ -120,14 +116,13 @@ public class Command extends ExecutionEnvironmentDTO {
         /**
          * Constructor which has required fields.
          *
-         * @param name       The name to use for the Command
-         * @param user       The user to use for the Command
-         * @param version    The version to use for the Command
-         * @param status     The status of the Command
-         * @param executable The executable for the command
-         * @param checkDelay How long the system should go between checking the status of jobs run with this command.
-         *                   In milliseconds.
-         * @deprecated Use {@link #Builder(String, String, String, CommandStatus, List, long)}
+         * @param name              The name to use for the Command
+         * @param user              The user to use for the Command
+         * @param version           The version to use for the Command
+         * @param status            The status of the Command
+         * @param executable        The executable for the command
+         * @param ignoredCheckDelay Ignored. Here for backwards compatibility.
+         * @deprecated Use {@link #Builder(String, String, String, CommandStatus, List)}
          */
         @Deprecated
         public Builder(
@@ -136,12 +131,11 @@ public class Command extends ExecutionEnvironmentDTO {
             final String version,
             final CommandStatus status,
             final String executable,
-            final long checkDelay
+            final long ignoredCheckDelay
         ) {
             super(name, user, version);
             this.bStatus = status;
             this.bExecutable = executable;
-            this.bCheckDelay = checkDelay;
         }
 
         /**
@@ -152,21 +146,42 @@ public class Command extends ExecutionEnvironmentDTO {
          * @param version                The version to use for the Command
          * @param status                 The status of the Command
          * @param executableAndArguments The executable for the command and its fixed arguments
-         * @param checkDelay             How long the system should go between checking the status of jobs run with this
-         *                               command. In milliseconds.
+         * @param ignoredCheckDelay      Ignored. Here for backwards compatibility.
+         * @deprecated Use {@link #Builder(String, String, String, CommandStatus, List)}
          */
+        @Deprecated
         public Builder(
             final String name,
             final String user,
             final String version,
             final CommandStatus status,
             final List<String> executableAndArguments,
-            final long checkDelay
+            final long ignoredCheckDelay
         ) {
             super(name, user, version);
             this.bStatus = status;
             this.bExecutableAndArguments.addAll(executableAndArguments);
-            this.bCheckDelay = checkDelay;
+        }
+
+        /**
+         * Constructor with required fields.
+         *
+         * @param name                   The name to use for the Command
+         * @param user                   The user to use for the Command
+         * @param version                The version to use for the Command
+         * @param status                 The status of the Command
+         * @param executableAndArguments The executable for the command and its fixed arguments
+         */
+        public Builder(
+            final String name,
+            final String user,
+            final String version,
+            final CommandStatus status,
+            final List<String> executableAndArguments
+        ) {
+            super(name, user, version);
+            this.bStatus = status;
+            this.bExecutableAndArguments.addAll(executableAndArguments);
         }
 
         /*
@@ -178,12 +193,10 @@ public class Command extends ExecutionEnvironmentDTO {
             @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty(value = "user", required = true) final String user,
             @JsonProperty(value = "version", required = true) final String version,
-            @JsonProperty(value = "status", required = true) final CommandStatus status,
-            @JsonProperty(value = "checkDelay", required = true) final long checkDelay
+            @JsonProperty(value = "status", required = true) final CommandStatus status
         ) {
             super(name, user, version);
             this.bStatus = status;
-            this.bCheckDelay = checkDelay;
         }
 
         /**
@@ -230,6 +243,19 @@ public class Command extends ExecutionEnvironmentDTO {
             if (executableAndArguments != null) {
                 this.bExecutableAndArguments.addAll(executableAndArguments);
             }
+            return this;
+        }
+
+        /**
+         * The check delay for pre-4.x.x Genie backends. This no longer has any impact on the system and is here
+         * to maintain backwards compatibility. Will always be set to -1.
+         *
+         * @param ignoredCheckDelay The check delay but this value is ignored
+         * @return The current {@link Builder} instance
+         */
+        @Deprecated
+        public Builder withCheckDelay(@Nullable final Long ignoredCheckDelay) {
+            // No-Op for backwards compatibility
             return this;
         }
 

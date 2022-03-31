@@ -44,7 +44,6 @@ class CommandSpec extends Specification {
         def updated = Instant.now()
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def memory = 280
-        def checkDelay = 389_132L
         def clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
@@ -63,7 +62,6 @@ class CommandSpec extends Specification {
             metadata,
             executable,
             memory,
-            checkDelay,
             clusterCriteria
         )
 
@@ -75,7 +73,6 @@ class CommandSpec extends Specification {
         command.getMetadata() == metadata
         command.getExecutable() == executable
         command.getMemory().orElse(-1) == memory
-        command.getCheckDelay() == checkDelay
         command.getClusterCriteria() == clusterCriteria
 
         when:
@@ -87,7 +84,6 @@ class CommandSpec extends Specification {
             metadata,
             executable,
             null,
-            checkDelay,
             null
         )
 
@@ -99,7 +95,6 @@ class CommandSpec extends Specification {
         command.getMetadata() == metadata
         command.getExecutable() == executable
         !command.getMemory().isPresent()
-        command.getCheckDelay() == checkDelay
         command.getClusterCriteria().isEmpty()
 
         when: "Executables contain blank strings they are removed"
@@ -114,7 +109,6 @@ class CommandSpec extends Specification {
             metadata,
             newExecutable,
             null,
-            checkDelay,
             null
         )
 
@@ -126,7 +120,6 @@ class CommandSpec extends Specification {
         command.getMetadata() == metadata
         command.getExecutable() == executable
         !command.getMemory().isPresent()
-        command.getCheckDelay() == checkDelay
         command.getClusterCriteria().isEmpty()
     }
 
@@ -155,7 +148,6 @@ class CommandSpec extends Specification {
             Mock(CommandMetadata),
             Lists.newArrayList(UUID.randomUUID().toString()),
             RandomSuppliers.INT.get(),
-            RandomSuppliers.LONG.get(),
             null
         )
 
@@ -180,7 +172,6 @@ class CommandSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def memory = RandomSuppliers.INT.get()
-        def checkDelay = RandomSuppliers.LONG.get()
         base = new Command(
             id,
             created,
@@ -189,7 +180,6 @@ class CommandSpec extends Specification {
             baseMetadata,
             Lists.newArrayList(binary),
             memory,
-            checkDelay,
             null
         )
         comparable = new Command(
@@ -200,7 +190,6 @@ class CommandSpec extends Specification {
             comparableMetadata,
             Lists.newArrayList(binary),
             memory,
-            checkDelay,
             null
         )
 
@@ -238,7 +227,6 @@ class CommandSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def memory = RandomSuppliers.INT.get()
-        def checkDelay = RandomSuppliers.LONG.get()
         one = new Command(
             id,
             created,
@@ -247,7 +235,6 @@ class CommandSpec extends Specification {
             baseMetadata,
             Lists.newArrayList(binary),
             memory,
-            checkDelay,
             null
         )
         two = new Command(
@@ -258,7 +245,6 @@ class CommandSpec extends Specification {
             comparableMetadata,
             Lists.newArrayList(binary),
             memory,
-            checkDelay,
             null
         )
 
@@ -296,7 +282,6 @@ class CommandSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def memory = RandomSuppliers.INT.get()
-        def checkDelay = RandomSuppliers.LONG.get()
         one = new Command(
             id,
             created,
@@ -305,7 +290,6 @@ class CommandSpec extends Specification {
             baseMetadata,
             Lists.newArrayList(binary),
             memory,
-            checkDelay,
             null
         )
         two = new Command(
@@ -316,7 +300,6 @@ class CommandSpec extends Specification {
             comparableMetadata,
             Lists.newArrayList(binary),
             memory,
-            checkDelay,
             null
         )
 
@@ -336,7 +319,6 @@ class CommandSpec extends Specification {
         def updated = Instant.now()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def memory = RandomSuppliers.INT.get()
-        def checkDelay = RandomSuppliers.LONG.get()
         def clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         )
@@ -348,7 +330,6 @@ class CommandSpec extends Specification {
             metadata,
             Lists.newArrayList(UUID.randomUUID().toString()),
             memory,
-            checkDelay,
             clusterCriteria
         )
     }

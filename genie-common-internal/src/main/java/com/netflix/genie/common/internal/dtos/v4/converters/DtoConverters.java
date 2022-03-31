@@ -296,9 +296,7 @@ public final class DtoConverters {
         v3Command.getDescription().ifPresent(metadataBuilder::withDescription);
 
         final List<String> executable = v3Command.getExecutableAndArguments();
-        final CommandRequest.Builder builder = new CommandRequest
-            .Builder(metadataBuilder.build(), executable)
-            .withCheckDelay(v3Command.getCheckDelay());
+        final CommandRequest.Builder builder = new CommandRequest.Builder(metadataBuilder.build(), executable);
         v3Command.getId().ifPresent(builder::withRequestedId);
         v3Command.getMemory().ifPresent(builder::withMemory);
         builder.withResources(
@@ -354,7 +352,6 @@ public final class DtoConverters {
             metadataBuilder.build(),
             v3Command.getExecutableAndArguments(),
             v3Command.getMemory().orElse(null),
-            v3Command.getCheckDelay(),
             v3Command
                 .getClusterCriteria()
                 .stream()
@@ -380,8 +377,7 @@ public final class DtoConverters {
             commandMetadata.getUser(),
             commandMetadata.getVersion(),
             toV3CommandStatus(commandMetadata.getStatus()),
-            v4Command.getExecutable(),
-            v4Command.getCheckDelay()
+            v4Command.getExecutable()
         )
             .withId(v4Command.getId())
             .withTags(toV3Tags(v4Command.getId(), commandMetadata.getName(), commandMetadata.getTags()))
