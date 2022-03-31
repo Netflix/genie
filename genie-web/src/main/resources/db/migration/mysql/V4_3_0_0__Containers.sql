@@ -32,4 +32,10 @@ ALTER TABLE `jobs`
   DROP COLUMN `v4`;
 
 ALTER TABLE `commands`
-  DROP COLUMN `check_delay`;
+  DROP COLUMN `check_delay`,
+  ADD COLUMN `cpu`          INT(11)       DEFAULT NULL,
+  ADD COLUMN `gpu`          INT(11)       DEFAULT NULL,
+  ADD COLUMN `disk_mb`      INT(11)       DEFAULT NULL,
+  ADD COLUMN `network_mbps` INT(11)       DEFAULT NULL,
+  ADD COLUMN `image_name`   VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN `image_tag`    VARCHAR(1024) DEFAULT NULL;

@@ -45,3 +45,15 @@ ALTER TABLE `jobs`
 
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`;
+ALTER TABLE `commands`
+  ADD COLUMN `cpu` INT(11) DEFAULT NULL;
+ALTER TABLE `commands`
+  ADD COLUMN `gpu` INT(11) DEFAULT NULL;
+ALTER TABLE `commands`
+  ADD COLUMN `disk_mb` INT(11) DEFAULT NULL;
+ALTER TABLE `commands`
+  ADD COLUMN `network_mbps` INT(11) DEFAULT NULL;
+ALTER TABLE `commands`
+  ADD COLUMN `image_name` VARCHAR(1024) DEFAULT NULL;
+ALTER TABLE `commands`
+  ADD COLUMN `image_tag` VARCHAR(1024) DEFAULT NULL;

@@ -194,9 +194,39 @@ public class CommandEntity extends BaseEntity {
     private List<@NotBlank @Size(max = 1024) String> executable = new ArrayList<>();
 
     @Basic
+    @Column(name = "cpu")
+    @Min(1)
+    private Integer cpu;
+
+    @Basic
+    @Column(name = "gpu")
+    @Min(1)
+    private Integer gpu;
+
+    @Basic
     @Column(name = "memory")
     @Min(1)
     private Integer memory;
+
+    @Basic
+    @Column(name = "disk_mb")
+    @Min(1)
+    private Integer diskMb;
+
+    @Basic
+    @Column(name = "network_mbps")
+    @Min(1)
+    private Integer networkMbps;
+
+    @Basic
+    @Column(name = "image_name", length = 1024)
+    @Size(max = 1024, message = "Image name can be no longer than 1024 characters")
+    private String imageName;
+
+    @Basic
+    @Column(name = "image_tag", length = 1024)
+    @Size(max = 1024, message = "Image tag can be no longer than 1024 characters")
+    private String imageTag;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -326,12 +356,66 @@ public class CommandEntity extends BaseEntity {
     }
 
     /**
+     * Get the default number of CPUs for a job using this command.
+     *
+     * @return The number of CPUs or {@link Optional#empty()}
+     */
+    public Optional<Integer> getCpu() {
+        return Optional.ofNullable(this.cpu);
+    }
+
+    /**
+     * Get the default number of GPUs for a job using this command.
+     *
+     * @return The number of GPUs or {@link Optional#empty()}
+     */
+    public Optional<Integer> getGpu() {
+        return Optional.ofNullable(this.gpu);
+    }
+
+    /**
      * Get the default memory for a job using this command.
      *
      * @return Optional of Integer as it could be null
      */
     public Optional<Integer> getMemory() {
         return Optional.ofNullable(this.memory);
+    }
+
+    /**
+     * Get the default amount of disk space for the job using this command in MB.
+     *
+     * @return The amount of disk space in MB or {@link Optional#empty()}
+     */
+    public Optional<Integer> getDiskMb() {
+        return Optional.ofNullable(this.diskMb);
+    }
+
+    /**
+     * Get the default amount of network bandwidth to allocate to the job using this command in mbps.
+     *
+     * @return The amount of network bandwidth in mbps or {@link Optional#empty()}
+     */
+    public Optional<Integer> getNetworkMbps() {
+        return Optional.ofNullable(this.networkMbps);
+    }
+
+    /**
+     * Get the default name of the image to run the job with if this command is selected.
+     *
+     * @return The default name of the image or {@link Optional#empty()}
+     */
+    public Optional<String> getImageName() {
+        return Optional.ofNullable(this.imageName);
+    }
+
+    /**
+     * Get the default tag of the image to run the job with if this command is selected.
+     *
+     * @return The default tag of the image or {@link Optional#empty()}
+     */
+    public Optional<String> getImageTag() {
+        return Optional.ofNullable(this.imageTag);
     }
 
     /**

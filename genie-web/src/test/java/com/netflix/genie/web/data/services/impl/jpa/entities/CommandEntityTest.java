@@ -182,6 +182,44 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
+    void testCpu() {
+        this.testOptionalField(this.c::getCpu, this.c::setCpu, 12);
+    }
+
+    @Test
+    void testGpu() {
+        this.testOptionalField(this.c::getGpu, this.c::setGpu, 123);
+    }
+
+    @Test
+    void testDiskMb() {
+        this.testOptionalField(this.c::getDiskMb, this.c::setDiskMb, 123_000);
+    }
+
+    @Test
+    void testNetworkMbps() {
+        this.testOptionalField(this.c::getNetworkMbps, this.c::setNetworkMbps, 123_456);
+    }
+
+    @Test
+    void testImageName() {
+        this.testOptionalField(
+            this.c::getImageName,
+            this.c::setImageName,
+            UUID.randomUUID().toString()
+        );
+    }
+
+    @Test
+    void testImageTag() {
+        this.testOptionalField(
+            this.c::getImageTag,
+            this.c::setImageTag,
+            UUID.randomUUID().toString()
+        );
+    }
+
+    @Test
     void testSetConfigs() {
         Assertions.assertThat(this.c.getConfigs()).isEmpty();
         final Set<FileEntity> configs = Sets.newHashSet(new FileEntity("s3://netflix.configFile"));
