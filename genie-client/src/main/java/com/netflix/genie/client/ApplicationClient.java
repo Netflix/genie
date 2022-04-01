@@ -47,7 +47,7 @@ import java.util.Set;
 @Slf4j
 public class ApplicationClient {
 
-    private ApplicationService applicationService;
+    private final ApplicationService applicationService;
 
     /**
      * Constructor.

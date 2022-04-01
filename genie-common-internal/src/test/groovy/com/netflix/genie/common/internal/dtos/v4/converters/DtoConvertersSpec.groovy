@@ -550,7 +550,9 @@ class DtoConvertersSpec extends Specification {
             UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
-        def clusterCriteria = Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build())
+        def clusterCriteria = Lists.newArrayList(
+            new com.netflix.genie.common.dto.Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        )
         com.netflix.genie.common.dto.Command v3Command
         CommandRequest commandRequest
 
@@ -590,7 +592,9 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
-        commandRequest.getClusterCriteria() == clusterCriteria
+        commandRequest.getClusterCriteria() == clusterCriteria.collect {
+            it -> DtoConverters.toV4CommandClusterCriterion(it)
+        }
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
@@ -652,7 +656,9 @@ class DtoConvertersSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def clusterCriteria = Lists.newArrayList(
-            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+            new com.netflix.genie.common.dto.Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .build()
         )
         Command v4Command
         com.netflix.genie.common.dto.Command v3Command
@@ -697,7 +703,9 @@ class DtoConvertersSpec extends Specification {
         v4Command.getResources().getConfigs() == configs
         v4Command.getResources().getDependencies() == dependencies
         v4Command.getResources().getSetupFile().orElse(null) == setupFile
-        v4Command.getClusterCriteria() == clusterCriteria
+        v4Command.getClusterCriteria() == clusterCriteria.collect {
+            it -> DtoConverters.toV4CommandClusterCriterion(it)
+        }
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
@@ -800,7 +808,7 @@ class DtoConvertersSpec extends Specification {
         v3Command.getDependencies() == dependencies
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         v3Command.getMemory().orElse(-1) == memory
-        v3Command.getClusterCriteria() == clusterCriteria
+        v3Command.getClusterCriteria() == clusterCriteria.collect { it -> DtoConverters.toV3Criterion(it) }
 
         when:
         v4Command = new Command(
@@ -1412,6 +1420,26 @@ class DtoConvertersSpec extends Specification {
         UUID.randomUUID().toString() | _
     }
 
+    def "can convert internal criterion to v3 api criterion"() {
+        def criterion = new Criterion.Builder()
+            .withId(UUID.randomUUID().toString())
+            .withName(UUID.randomUUID().toString())
+            .withStatus(UUID.randomUUID().toString())
+            .withVersion(UUID.randomUUID().toString())
+            .withTags([UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString()] as Set)
+            .build()
+
+        when:
+        def v3 = DtoConverters.toV3Criterion(criterion)
+
+        then:
+        v3.getId() == criterion.getId()
+        v3.getName() == criterion.getName()
+        v3.getStatus() == criterion.getStatus()
+        v3.getVersion() == criterion.getVersion()
+        v3.getTags() == criterion.getTags()
+    }
+
     @Unroll
     def "Can convert command cluster criterion #v3 to #v4"() {
         expect:
@@ -1419,7 +1447,7 @@ class DtoConvertersSpec extends Specification {
 
         where:
         v3           | v4
-        new Criterion.Builder()
+        new com.netflix.genie.common.dto.Criterion.Builder()
             .withId("hi")
             .withName("bye")
             .withVersion("1.2.3")
@@ -1433,7 +1461,7 @@ class DtoConvertersSpec extends Specification {
             .withTags(["one", "two", "three"] as Set)
             .build()
 
-        new Criterion.Builder()
+        new com.netflix.genie.common.dto.Criterion.Builder()
             .withId(UUID.randomUUID().toString())
             .withName(UUID.randomUUID().toString())
             .withVersion("1.2.3")

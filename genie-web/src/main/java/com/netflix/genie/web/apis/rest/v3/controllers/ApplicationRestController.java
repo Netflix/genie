@@ -187,7 +187,7 @@ public class ApplicationRestController {
         }
 
         final Page<Application> applications;
-        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX)).count() >= 1L) {
+        if (tags != null && tags.stream().anyMatch(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX))) {
             // TODO: This doesn't take into account others as compounded find...not sure if good or bad
             final List<Application> applicationList = Lists.newArrayList();
             final int prefixLength = DtoConverters.GENIE_ID_PREFIX.length();

@@ -210,8 +210,7 @@ public class ClusterRestController {
                     }
                 );
             clusters = new PageImpl<>(clusterList);
-        } else if (tags != null
-            && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX)).count() >= 1L) {
+        } else if (tags != null && tags.stream().anyMatch(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))) {
             final Set<String> finalTags = tags
                 .stream()
                 .filter(tag -> !tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))

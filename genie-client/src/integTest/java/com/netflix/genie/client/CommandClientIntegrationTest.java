@@ -28,7 +28,7 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.dto.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

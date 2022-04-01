@@ -48,7 +48,7 @@ import java.util.Set;
 @Slf4j
 public class CommandClient {
 
-    private CommandService commandService;
+    private final CommandService commandService;
 
     /**
      * Constructor.
@@ -128,6 +128,7 @@ public class CommandClient {
      * @throws IOException          For Network and other IO issues.
      * @deprecated Use {@link #getCommands(String, String, List, List, Integer, SortAttribute, SortDirection, Integer)}
      */
+    @Deprecated
     public List<Command> getCommands(
         final String name,
         final String user,

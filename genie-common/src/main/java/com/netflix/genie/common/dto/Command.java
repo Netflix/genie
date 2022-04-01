@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
