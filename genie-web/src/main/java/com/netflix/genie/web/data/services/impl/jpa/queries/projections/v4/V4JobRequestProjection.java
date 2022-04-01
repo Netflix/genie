@@ -18,7 +18,7 @@
 package com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.dtos.JobRequest;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;

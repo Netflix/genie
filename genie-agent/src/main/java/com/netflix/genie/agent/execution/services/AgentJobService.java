@@ -25,11 +25,11 @@ import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
-import com.netflix.genie.common.external.dtos.v4.JobSpecification;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.AgentJobRequest;
+import com.netflix.genie.common.internal.dtos.ArchiveStatus;
+import com.netflix.genie.common.internal.dtos.JobSpecification;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;

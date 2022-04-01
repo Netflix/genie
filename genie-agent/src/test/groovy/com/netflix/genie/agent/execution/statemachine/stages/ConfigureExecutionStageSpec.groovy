@@ -23,7 +23,7 @@ import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
+import com.netflix.genie.common.internal.dtos.AgentJobRequest
 import spock.lang.Specification
 
 class ConfigureExecutionStageSpec extends Specification {

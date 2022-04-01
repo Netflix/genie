@@ -29,19 +29,19 @@ class CriterionSpec extends Specification {
 
     def "Exception thrown when invalid criterion creation is attempted"() {
         when:
-        new com.netflix.genie.common.external.dtos.v4.Criterion.Builder().withId(null).withName(null).withVersion(null).withStatus(null).withTags(null).build()
+        new Criterion.Builder().withId(null).withName(null).withVersion(null).withStatus(null).withTags(null).build()
 
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new com.netflix.genie.common.external.dtos.v4.Criterion.Builder().withId("").withName("").withVersion("").withStatus("").withTags(Sets.newHashSet()).build()
+        new Criterion.Builder().withId("").withName("").withVersion("").withStatus("").withTags(Sets.newHashSet()).build()
 
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new com.netflix.genie.common.external.dtos.v4.Criterion.Builder().build()
+        new Criterion.Builder().build()
 
         then:
         thrown(IllegalArgumentException)
@@ -53,10 +53,10 @@ class CriterionSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = UUID.randomUUID().toString()
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        com.netflix.genie.common.external.dtos.v4.Criterion criterion
+        Criterion criterion
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withId(id)
             .withName(name)
             .withVersion(version)
@@ -72,7 +72,7 @@ class CriterionSpec extends Specification {
         criterion.getTags() == tags
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withName(name)
             .withVersion(version)
             .withStatus(status)
@@ -87,7 +87,7 @@ class CriterionSpec extends Specification {
         criterion.getTags() == tags
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withId(id)
             .withVersion(version)
             .withStatus(status)
@@ -102,7 +102,7 @@ class CriterionSpec extends Specification {
         criterion.getTags() == tags
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withId(id)
             .withName(name)
             .withStatus(status)
@@ -117,7 +117,7 @@ class CriterionSpec extends Specification {
         criterion.getTags() == tags
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withId(id)
             .withName(name)
             .withVersion(version)
@@ -132,7 +132,7 @@ class CriterionSpec extends Specification {
         criterion.getTags() == tags
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withId(id)
             .withName(name)
             .withVersion(version)
@@ -147,7 +147,7 @@ class CriterionSpec extends Specification {
         criterion.getTags().isEmpty()
 
         when:
-        criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        criterion = new Criterion.Builder()
             .withId(id)
             .withName(name)
             .withVersion(version)
@@ -166,7 +166,7 @@ class CriterionSpec extends Specification {
 
     def "Empty strings and blank tags are treated as not present"() {
         when:
-        new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        new Criterion.Builder()
             .withId("\t")
             .withName(" ")
             .withVersion("\n\t")
@@ -178,7 +178,7 @@ class CriterionSpec extends Specification {
         thrown(IllegalArgumentException)
 
         when:
-        def criterion = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        def criterion = new Criterion.Builder()
             .withId("\t")
             .withName(" ")
             .withVersion("\n\t")
@@ -211,7 +211,7 @@ class CriterionSpec extends Specification {
         base != comparable
 
         when:
-        comparable = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        comparable = new Criterion.Builder()
             .withName(UUID.randomUUID().toString())
             .withStatus(UUID.randomUUID().toString())
             .withVersion(UUID.randomUUID().toString())
@@ -234,14 +234,14 @@ class CriterionSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def id = UUID.randomUUID().toString()
         def tag = UUID.randomUUID().toString()
-        base = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        base = new Criterion.Builder()
             .withName(name)
             .withStatus(status)
             .withVersion(version)
             .withId(id)
             .withTags(Sets.newHashSet(tag))
             .build()
-        comparable = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        comparable = new Criterion.Builder()
             .withName(name)
             .withStatus(status)
             .withVersion(version)
@@ -254,8 +254,8 @@ class CriterionSpec extends Specification {
     }
 
     def "Test hashCode"() {
-        com.netflix.genie.common.external.dtos.v4.Criterion one
-        com.netflix.genie.common.external.dtos.v4.Criterion two
+        Criterion one
+        Criterion two
 
         when:
         one = createCriterion()
@@ -277,14 +277,14 @@ class CriterionSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def id = UUID.randomUUID().toString()
         def tag = UUID.randomUUID().toString()
-        one = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        one = new Criterion.Builder()
             .withName(name)
             .withStatus(status)
             .withVersion(version)
             .withId(id)
             .withTags(Sets.newHashSet(tag))
             .build()
-        two = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        two = new Criterion.Builder()
             .withName(name)
             .withStatus(status)
             .withVersion(version)
@@ -297,8 +297,8 @@ class CriterionSpec extends Specification {
     }
 
     def "Test toString"() {
-        com.netflix.genie.common.external.dtos.v4.Criterion one
-        com.netflix.genie.common.external.dtos.v4.Criterion two
+        Criterion one
+        Criterion two
 
         when:
         one = createCriterion()
@@ -320,14 +320,14 @@ class CriterionSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def id = UUID.randomUUID().toString()
         def tag = UUID.randomUUID().toString()
-        one = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        one = new Criterion.Builder()
             .withName(name)
             .withStatus(status)
             .withVersion(version)
             .withId(id)
             .withTags(Sets.newHashSet(tag))
             .build()
-        two = new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+        two = new Criterion.Builder()
             .withName(name)
             .withStatus(status)
             .withVersion(version)
@@ -344,7 +344,7 @@ class CriterionSpec extends Specification {
         def newStatus = UUID.randomUUID().toString()
 
         when:
-        def copyCriterion = new com.netflix.genie.common.external.dtos.v4.Criterion(sourceCriterion, newStatus)
+        def copyCriterion = new Criterion(sourceCriterion, newStatus)
 
         then:
         newStatus != sourceCriterion.getStatus().orElseThrow({ -> new IllegalArgumentException() })
@@ -354,8 +354,8 @@ class CriterionSpec extends Specification {
         copyCriterion.getStatus().orElseThrow({ -> new IllegalArgumentException() }) == newStatus
     }
 
-    com.netflix.genie.common.external.dtos.v4.Criterion createCriterion() {
-        return new com.netflix.genie.common.external.dtos.v4.Criterion.Builder()
+    Criterion createCriterion() {
+        return new Criterion.Builder()
             .withName(UUID.randomUUID().toString())
             .withStatus(UUID.randomUUID().toString())
             .withVersion(UUID.randomUUID().toString())

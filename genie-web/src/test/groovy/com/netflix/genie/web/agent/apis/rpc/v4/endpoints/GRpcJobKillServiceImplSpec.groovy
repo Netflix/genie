@@ -18,7 +18,7 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.netflix.genie.common.exceptions.GenieServerException
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.proto.JobKillRegistrationRequest

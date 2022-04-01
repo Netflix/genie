@@ -18,12 +18,12 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.common.external.dtos.v4.JobSpecification;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
-import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.ArchiveStatus;
+import com.netflix.genie.common.internal.dtos.JobRequest;
+import com.netflix.genie.common.internal.dtos.JobSpecification;
+import com.netflix.genie.common.internal.dtos.JobStatus;
+import com.netflix.genie.common.internal.dtos.converters.JobServiceProtoConverter;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.proto.ChangeJobArchiveStatusRequest;
 import com.netflix.genie.proto.ChangeJobArchiveStatusResponse;

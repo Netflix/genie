@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.dtos.Criterion;
 import lombok.Getter;
 
 import java.io.File;

@@ -18,7 +18,7 @@
 package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;

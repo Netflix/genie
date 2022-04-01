@@ -26,8 +26,8 @@ import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.common.dto.JobStatusMessages;
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 

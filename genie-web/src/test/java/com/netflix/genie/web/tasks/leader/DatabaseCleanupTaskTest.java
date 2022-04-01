@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
-import com.netflix.genie.common.external.dtos.v4.CommandStatus;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.ClusterStatus;
+import com.netflix.genie.common.internal.dtos.CommandStatus;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;

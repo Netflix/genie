@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.leader
 
 import com.netflix.genie.common.dto.UserResourcesSummary
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.properties.UserMetricsProperties

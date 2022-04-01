@@ -18,8 +18,8 @@
 package com.netflix.genie.web.scripts;
 
 import com.google.common.collect.ImmutableMap;
-import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.internal.dtos.Cluster;
+import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.web.selectors.AgentLauncherSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelectionContext;

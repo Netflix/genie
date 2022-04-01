@@ -15,10 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.internal.tracing.brave;
+package com.netflix.genie.common.internal.tracing.brave
 
 import spock.lang.Specification
-import zipkin2.reporter.AsyncReporter;
+import zipkin2.reporter.AsyncReporter
 
 /**
  * Specifications for {@link BraveTracingCleanup}.

@@ -28,7 +28,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.internal.dtos.Criterion;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -267,6 +267,133 @@ final class Snippets {
             .attributes(EMPTY_CONSTRAINTS)
             .optional()
     );
+    static final ResponseFieldsSnippet APPLICATION_SEARCH_RESULT_FIELDS = PayloadDocumentation
+        .responseFields(
+            ArrayUtils.addAll(
+                getSearchResultFields(),
+                PayloadDocumentation
+                    .subsectionWithPath("_embedded.applicationList")
+                    .description("The found applications.")
+                    .type(JsonFieldType.ARRAY)
+                    .attributes(EMPTY_CONSTRAINTS)
+            )
+        );
+    static final ResponseFieldsSnippet CLUSTER_SEARCH_RESULT_FIELDS = PayloadDocumentation
+        .responseFields(
+            ArrayUtils.addAll(
+                getSearchResultFields(),
+                PayloadDocumentation
+                    .subsectionWithPath("_embedded.clusterList")
+                    .description("The found clusters.")
+                    .type(JsonFieldType.ARRAY)
+                    .attributes(EMPTY_CONSTRAINTS)
+            )
+        );
+    static final ResponseFieldsSnippet COMMAND_SEARCH_RESULT_FIELDS = PayloadDocumentation
+        .responseFields(
+            ArrayUtils.addAll(
+                getSearchResultFields(),
+                PayloadDocumentation
+                    .subsectionWithPath("_embedded.commandList")
+                    .description("The found commands.")
+                    .type(JsonFieldType.ARRAY)
+                    .attributes(EMPTY_CONSTRAINTS)
+            )
+        );
+    static final ResponseFieldsSnippet JOB_SEARCH_RESULT_FIELDS = PayloadDocumentation
+        .responseFields(
+            ArrayUtils.addAll(
+                getSearchResultFields(),
+                PayloadDocumentation
+                    .subsectionWithPath("_embedded.jobSearchResultList")
+                    .description("The found jobs.")
+                    .type(JsonFieldType.ARRAY)
+                    .attributes(EMPTY_CONSTRAINTS)
+            )
+        );
+    static final ResponseFieldsSnippet OUTPUT_DIRECTORY_FIELDS = PayloadDocumentation
+        .responseFields(
+            PayloadDocumentation
+                .fieldWithPath("parent")
+                .description("Information about the parent of this directory")
+                .attributes(EMPTY_CONSTRAINTS)
+                .type(JsonFieldType.OBJECT)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("parent.name")
+                .description("The name of the parent directory")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("parent.url")
+                .description("The url to get the parent")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("parent.size")
+                .description("The size of the parent in bytes")
+                .type(JsonFieldType.NUMBER)
+                .attributes(EMPTY_CONSTRAINTS)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("parent.lastModified")
+                .description("The last time the parent was modified in ISO8601 UTC with milliseconds included")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("directories")
+                .description("All the subdirectories of this directory")
+                .type(JsonFieldType.ARRAY)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("directories[].name")
+                .description("The name of the directory")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("directories[].url")
+                .description("The url to get the directory")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("directories[].size")
+                .description("The size of the directory in bytes")
+                .type(JsonFieldType.NUMBER)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("directories[].lastModified")
+                .description("The last time the directory was modified in ISO8601 UTC with milliseconds included")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("files")
+                .description("All the files in this directory")
+                .type(JsonFieldType.ARRAY)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("files[].name")
+                .description("The name of the file")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("files[].url")
+                .description("The url to get the file")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("files[].size")
+                .description("The size of the file in bytes")
+                .type(JsonFieldType.NUMBER)
+                .attributes(EMPTY_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("files[].lastModified")
+                .description("The last time the file was modified in ISO8601 UTC with milliseconds included")
+                .type(JsonFieldType.STRING)
+                .attributes(EMPTY_CONSTRAINTS)
+        );
     static final RequestParametersSnippet APPLICATION_SEARCH_QUERY_PARAMETERS = RequestDocumentation.requestParameters(
         ArrayUtils.addAll(
             getCommonSearchParameters(),
@@ -417,133 +544,6 @@ final class Snippets {
                 .optional()
         )
     );
-    static final ResponseFieldsSnippet APPLICATION_SEARCH_RESULT_FIELDS = PayloadDocumentation
-        .responseFields(
-            ArrayUtils.addAll(
-                getSearchResultFields(),
-                PayloadDocumentation
-                    .subsectionWithPath("_embedded.applicationList")
-                    .description("The found applications.")
-                    .type(JsonFieldType.ARRAY)
-                    .attributes(EMPTY_CONSTRAINTS)
-            )
-        );
-    static final ResponseFieldsSnippet CLUSTER_SEARCH_RESULT_FIELDS = PayloadDocumentation
-        .responseFields(
-            ArrayUtils.addAll(
-                getSearchResultFields(),
-                PayloadDocumentation
-                    .subsectionWithPath("_embedded.clusterList")
-                    .description("The found clusters.")
-                    .type(JsonFieldType.ARRAY)
-                    .attributes(EMPTY_CONSTRAINTS)
-            )
-        );
-    static final ResponseFieldsSnippet COMMAND_SEARCH_RESULT_FIELDS = PayloadDocumentation
-        .responseFields(
-            ArrayUtils.addAll(
-                getSearchResultFields(),
-                PayloadDocumentation
-                    .subsectionWithPath("_embedded.commandList")
-                    .description("The found commands.")
-                    .type(JsonFieldType.ARRAY)
-                    .attributes(EMPTY_CONSTRAINTS)
-            )
-        );
-    static final ResponseFieldsSnippet JOB_SEARCH_RESULT_FIELDS = PayloadDocumentation
-        .responseFields(
-            ArrayUtils.addAll(
-                getSearchResultFields(),
-                PayloadDocumentation
-                    .subsectionWithPath("_embedded.jobSearchResultList")
-                    .description("The found jobs.")
-                    .type(JsonFieldType.ARRAY)
-                    .attributes(EMPTY_CONSTRAINTS)
-            )
-        );
-    static final ResponseFieldsSnippet OUTPUT_DIRECTORY_FIELDS = PayloadDocumentation
-        .responseFields(
-            PayloadDocumentation
-                .fieldWithPath("parent")
-                .description("Information about the parent of this directory")
-                .attributes(EMPTY_CONSTRAINTS)
-                .type(JsonFieldType.OBJECT)
-                .optional(),
-            PayloadDocumentation
-                .fieldWithPath("parent.name")
-                .description("The name of the parent directory")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS)
-                .optional(),
-            PayloadDocumentation
-                .fieldWithPath("parent.url")
-                .description("The url to get the parent")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS)
-                .optional(),
-            PayloadDocumentation
-                .fieldWithPath("parent.size")
-                .description("The size of the parent in bytes")
-                .type(JsonFieldType.NUMBER)
-                .attributes(EMPTY_CONSTRAINTS)
-                .optional(),
-            PayloadDocumentation
-                .fieldWithPath("parent.lastModified")
-                .description("The last time the parent was modified in ISO8601 UTC with milliseconds included")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS)
-                .optional(),
-            PayloadDocumentation
-                .fieldWithPath("directories")
-                .description("All the subdirectories of this directory")
-                .type(JsonFieldType.ARRAY)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("directories[].name")
-                .description("The name of the directory")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("directories[].url")
-                .description("The url to get the directory")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("directories[].size")
-                .description("The size of the directory in bytes")
-                .type(JsonFieldType.NUMBER)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("directories[].lastModified")
-                .description("The last time the directory was modified in ISO8601 UTC with milliseconds included")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("files")
-                .description("All the files in this directory")
-                .type(JsonFieldType.ARRAY)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("files[].name")
-                .description("The name of the file")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("files[].url")
-                .description("The url to get the file")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("files[].size")
-                .description("The size of the file in bytes")
-                .type(JsonFieldType.NUMBER)
-                .attributes(EMPTY_CONSTRAINTS),
-            PayloadDocumentation
-                .fieldWithPath("files[].lastModified")
-                .description("The last time the file was modified in ISO8601 UTC with milliseconds included")
-                .type(JsonFieldType.STRING)
-                .attributes(EMPTY_CONSTRAINTS)
-        );
     private static final ConstraintDescriptions COMMAND_CONSTRAINTS = new ConstraintDescriptions(Command.class);
     private static final ConstraintDescriptions JOB_REQUEST_CONSTRAINTS = new ConstraintDescriptions(JobRequest.class);
     private static final ConstraintDescriptions JOB_CONSTRAINTS = new ConstraintDescriptions(Job.class);

@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.scripts
 
-import com.netflix.genie.common.external.dtos.v4.Cluster
-import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
-import com.netflix.genie.common.external.dtos.v4.ClusterStatus
-import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.internal.dtos.Cluster
+import com.netflix.genie.common.internal.dtos.ClusterMetadata
+import com.netflix.genie.common.internal.dtos.ClusterStatus
+import com.netflix.genie.common.internal.dtos.JobRequest
 import com.netflix.genie.web.selectors.ClusterSelectionContext
 
 import java.time.Instant

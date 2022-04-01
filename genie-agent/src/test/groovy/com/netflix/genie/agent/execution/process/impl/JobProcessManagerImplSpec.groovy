@@ -26,7 +26,7 @@ import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup

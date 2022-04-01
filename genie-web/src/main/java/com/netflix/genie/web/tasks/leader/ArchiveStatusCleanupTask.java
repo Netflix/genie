@@ -19,8 +19,8 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.ArchiveStatus;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;

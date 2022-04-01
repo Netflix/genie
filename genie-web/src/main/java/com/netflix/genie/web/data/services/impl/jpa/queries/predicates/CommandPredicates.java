@@ -15,7 +15,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
-import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;

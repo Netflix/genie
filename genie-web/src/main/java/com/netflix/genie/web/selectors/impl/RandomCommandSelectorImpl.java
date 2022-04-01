@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.selectors.impl;
 
-import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.web.selectors.CommandSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelector;
 

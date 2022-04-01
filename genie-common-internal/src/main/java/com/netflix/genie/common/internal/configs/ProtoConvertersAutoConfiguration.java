@@ -18,8 +18,8 @@
 package com.netflix.genie.common.internal.configs;
 
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
-import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.dtos.converters.JobDirectoryManifestProtoConverter;
+import com.netflix.genie.common.internal.dtos.converters.JobServiceProtoConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

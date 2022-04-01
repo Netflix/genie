@@ -20,9 +20,9 @@ package com.netflix.genie.agent.cli
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.util.GenieObjectMapper
+import com.netflix.genie.common.internal.dtos.AgentJobRequest
+import com.netflix.genie.common.internal.dtos.JobSpecification
 import spock.lang.Specification
 import spock.lang.TempDir
 

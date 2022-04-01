@@ -42,8 +42,8 @@ import java.util.UUID;
 class DefaultDirectoryWriterTest {
 
     private static final String REQUEST_URL_BASE
-        = "http://genie.netflix.com:8080/api/v3/jobs/" + UUID.randomUUID().toString() + "/output";
-    private static final String REQUEST_URL_WITH_PARENT = REQUEST_URL_BASE + "/" + UUID.randomUUID().toString();
+        = "https://genie.netflix.com:8080/api/v3/jobs/" + UUID.randomUUID() + "/output";
+    private static final String REQUEST_URL_WITH_PARENT = REQUEST_URL_BASE + "/" + UUID.randomUUID();
 
     private static final long PARENT_SIZE = 0L;
     private static final Instant PARENT_LAST_MODIFIED = Instant.now().truncatedTo(ChronoUnit.MILLIS);

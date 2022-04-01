@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.netflix.genie.common.dto.UserResourcesSummary;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.UserMetricsProperties;
@@ -135,15 +135,15 @@ public class UserMetricsTask extends LeaderTask {
                     // Gauge creation is idempotent so it doesn't matter if the user is new or seen before.
                     // Registry holds a reference to the gauge so no need to save it.
                     Gauge.builder(
-                        USER_ACTIVE_JOBS_METRIC_NAME,
-                        () -> this.getUserJobCount(userName)
-                    )
+                            USER_ACTIVE_JOBS_METRIC_NAME,
+                            () -> this.getUserJobCount(userName)
+                        )
                         .tags(MetricsConstants.TagKeys.USER, userName)
                         .register(registry);
                     Gauge.builder(
-                        USER_ACTIVE_MEMORY_METRIC_NAME,
-                        () -> this.getUserMemoryAmount(userName)
-                    )
+                            USER_ACTIVE_MEMORY_METRIC_NAME,
+                            () -> this.getUserMemoryAmount(userName)
+                        )
                         .tags(MetricsConstants.TagKeys.USER, userName)
                         .register(registry);
 

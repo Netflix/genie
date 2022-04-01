@@ -16,7 +16,7 @@
 package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.internal.dtos.CommandStatus;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;

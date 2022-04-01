@@ -22,8 +22,8 @@ import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.JobMonitorService
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.properties.AgentProperties
-import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.util.unit.DataSize
