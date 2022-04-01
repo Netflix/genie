@@ -1450,21 +1450,21 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         Assertions
             .assertThat(
                 Arrays.stream(
-                    GenieObjectMapper.getMapper().readValue(
-                        RestAssured
-                            .given(this.getRequestSpecification())
-                            .when()
-                            .port(this.port)
-                            .get(COMMANDS_API + "/{id}/clusters", commandId)
-                            .then()
-                            .statusCode(Matchers.is(HttpStatus.OK.value()))
-                            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
-                            .extract()
-                            .asByteArray(),
-                        new TypeReference<EntityModel<Cluster>[]>() {
-                        }
+                        GenieObjectMapper.getMapper().readValue(
+                            RestAssured
+                                .given(this.getRequestSpecification())
+                                .when()
+                                .port(this.port)
+                                .get(COMMANDS_API + "/{id}/clusters", commandId)
+                                .then()
+                                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                                .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+                                .extract()
+                                .asByteArray(),
+                            new TypeReference<EntityModel<Cluster>[]>() {
+                            }
+                        )
                     )
-                )
                     .map(EntityModel::getContent)
                     .filter(Objects::nonNull)
                     .map(Cluster::getId)

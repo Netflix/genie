@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.listeners
 
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity
 import spock.lang.Specification

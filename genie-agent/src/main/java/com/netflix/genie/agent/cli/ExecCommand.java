@@ -27,7 +27,7 @@ import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.properties.ShutdownProperties;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

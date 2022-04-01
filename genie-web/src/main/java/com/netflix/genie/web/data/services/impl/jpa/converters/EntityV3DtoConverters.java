@@ -23,7 +23,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.UserResourcesSummary;
-import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
+import com.netflix.genie.common.internal.dtos.converters.DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate;

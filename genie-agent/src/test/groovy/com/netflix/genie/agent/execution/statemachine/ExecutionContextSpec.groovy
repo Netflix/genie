@@ -21,10 +21,10 @@ package com.netflix.genie.agent.execution.statemachine
 import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.properties.AgentProperties
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.AgentJobRequest
+import com.netflix.genie.common.internal.dtos.JobSpecification
+import com.netflix.genie.common.internal.dtos.JobStatus
 import spock.lang.Specification
 
 class ExecutionContextSpec extends Specification {

@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.internal.dtos.JobMetadata;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;

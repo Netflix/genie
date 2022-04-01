@@ -18,7 +18,7 @@
 package com.netflix.genie.web.scripts
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.internal.dtos.JobRequest
 import com.netflix.genie.web.agent.launchers.AgentLauncher
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException

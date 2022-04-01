@@ -18,7 +18,7 @@
 package com.netflix.genie.web.dtos
 
 
-import com.netflix.genie.common.external.dtos.v4.Command
+import com.netflix.genie.common.internal.dtos.Command
 import spock.lang.Specification
 
 /**

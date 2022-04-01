@@ -83,10 +83,10 @@ class AWSAutoConfigurationTest {
             .withPropertyValues(
                 "genie.notifications.sns.enabled=false"
             ).run(
-            (context) -> {
-                Assertions.assertThat(context).doesNotHaveBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
-            }
-        );
+                (context) -> {
+                    Assertions.assertThat(context).doesNotHaveBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
+                }
+            );
     }
 
     /**

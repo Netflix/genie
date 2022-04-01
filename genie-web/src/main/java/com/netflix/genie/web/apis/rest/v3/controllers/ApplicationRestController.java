@@ -26,10 +26,10 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
-import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
+import com.netflix.genie.common.internal.dtos.ApplicationStatus;
+import com.netflix.genie.common.internal.dtos.CommandStatus;
+import com.netflix.genie.common.internal.dtos.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
@@ -343,7 +343,7 @@ public class ApplicationRestController {
         this.persistenceService.addConfigsToResource(
             id,
             configs,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -361,7 +361,7 @@ public class ApplicationRestController {
         log.info("Called with id {}", id);
         return this.persistenceService.getConfigsForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -384,7 +384,7 @@ public class ApplicationRestController {
         this.persistenceService.updateConfigsForResource(
             id,
             configs,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -401,7 +401,7 @@ public class ApplicationRestController {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllConfigsForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -423,7 +423,7 @@ public class ApplicationRestController {
         this.persistenceService.addDependenciesToResource(
             id,
             dependencies,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -441,7 +441,7 @@ public class ApplicationRestController {
         log.info("Called with id {}", id);
         return this.persistenceService.getDependenciesForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -464,7 +464,7 @@ public class ApplicationRestController {
         this.persistenceService.updateDependenciesForResource(
             id,
             dependencies,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -481,7 +481,7 @@ public class ApplicationRestController {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllDependenciesForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -503,7 +503,7 @@ public class ApplicationRestController {
         this.persistenceService.addTagsToResource(
             id,
             tags,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -542,7 +542,7 @@ public class ApplicationRestController {
         this.persistenceService.updateTagsForResource(
             id,
             tags,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -559,7 +559,7 @@ public class ApplicationRestController {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllTagsForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 
@@ -581,7 +581,7 @@ public class ApplicationRestController {
         this.persistenceService.removeTagForResource(
             id,
             tag,
-            com.netflix.genie.common.external.dtos.v4.Application.class
+            com.netflix.genie.common.internal.dtos.Application.class
         );
     }
 

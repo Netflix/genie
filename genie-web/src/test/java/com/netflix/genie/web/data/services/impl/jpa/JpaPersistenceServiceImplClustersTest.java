@@ -18,11 +18,11 @@
 package com.netflix.genie.web.data.services.impl.jpa;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
-import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
-import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
-import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dtos.Cluster;
+import com.netflix.genie.common.internal.dtos.ClusterMetadata;
+import com.netflix.genie.common.internal.dtos.ClusterRequest;
+import com.netflix.genie.common.internal.dtos.ClusterStatus;
+import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;

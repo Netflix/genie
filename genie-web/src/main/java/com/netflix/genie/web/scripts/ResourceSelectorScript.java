@@ -18,7 +18,7 @@
 package com.netflix.genie.web.scripts;
 
 import com.google.common.collect.Maps;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.dtos.JobRequest;
 import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;

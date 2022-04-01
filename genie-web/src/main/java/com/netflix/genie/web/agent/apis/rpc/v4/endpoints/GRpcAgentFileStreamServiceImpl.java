@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
-import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
+import com.netflix.genie.common.internal.dtos.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.proto.AgentFileMessage;
 import com.netflix.genie.proto.AgentManifestMessage;

@@ -27,8 +27,8 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.properties.AgentProperties
 import com.netflix.genie.agent.properties.JobSetupServiceProperties
 import com.netflix.genie.agent.utils.PathUtils
-import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
+import com.netflix.genie.common.internal.dtos.JobSpecification
 import com.netflix.genie.common.internal.jobs.JobConstants
 import org.springframework.core.io.ClassPathResource
 import spock.lang.Specification

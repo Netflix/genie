@@ -18,7 +18,7 @@
 package com.netflix.genie.agent.execution.statemachine.stages
 
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.JobStatus
 
 class SetJobStatusRunningSpec extends UpdateJobStatusStageSpec {
     void setup() {

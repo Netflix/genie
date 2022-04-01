@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.JobRequest;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.web.dtos.ResolvedJob;

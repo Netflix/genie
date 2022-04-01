@@ -27,7 +27,6 @@ public class GenieClientTooManyRequestsException extends GenieClientException {
 
     /**
      * Constructor.
-     *
      */
     public GenieClientTooManyRequestsException() {
         super(429, "");
@@ -36,7 +35,7 @@ public class GenieClientTooManyRequestsException extends GenieClientException {
     /**
      * Constructor.
      *
-     * @param msg       human readable message
+     * @param msg human readable message
      */
     public GenieClientTooManyRequestsException(final String msg) {
         super(429, msg);

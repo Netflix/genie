@@ -25,7 +25,7 @@ import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.properties.AgentProperties;
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;

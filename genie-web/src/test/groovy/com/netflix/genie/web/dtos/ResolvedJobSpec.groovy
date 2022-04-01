@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.dtos
 
-import com.netflix.genie.common.external.dtos.v4.JobEnvironment
-import com.netflix.genie.common.external.dtos.v4.JobMetadata
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.JobEnvironment
+import com.netflix.genie.common.internal.dtos.JobMetadata
+import com.netflix.genie.common.internal.dtos.JobSpecification
 import spock.lang.Specification
 
 /**

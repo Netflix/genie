@@ -95,8 +95,7 @@ class JsonUtilsSpec extends Specification {
         then:
         if (instant.isPresent()) {
             1 * generator.writeString(instantString)
-        }
-        else {
+        } else {
             1 * generator.writeNull()
         }
 

@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.scripts
 
-import com.netflix.genie.common.external.dtos.v4.Command
-import com.netflix.genie.common.external.dtos.v4.CommandMetadata
-import com.netflix.genie.common.external.dtos.v4.CommandStatus
-import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.internal.dtos.Command
+import com.netflix.genie.common.internal.dtos.CommandMetadata
+import com.netflix.genie.common.internal.dtos.CommandStatus
+import com.netflix.genie.common.internal.dtos.JobRequest
 import com.netflix.genie.web.selectors.CommandSelectionContext
 
 import java.time.Instant

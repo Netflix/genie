@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.exceptions.ChangeJobArchiveStatusExcept
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.ArchiveStatus
+import com.netflix.genie.common.internal.dtos.JobSpecification
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import spock.lang.Specification

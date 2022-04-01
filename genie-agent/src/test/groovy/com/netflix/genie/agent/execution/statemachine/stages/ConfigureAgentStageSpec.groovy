@@ -24,7 +24,7 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.agent.properties.AgentProperties
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata
 import spock.lang.Specification
 
 import java.time.Duration

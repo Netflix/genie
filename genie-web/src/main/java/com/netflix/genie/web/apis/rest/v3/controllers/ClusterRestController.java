@@ -25,9 +25,9 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
+import com.netflix.genie.common.internal.dtos.ClusterStatus;
+import com.netflix.genie.common.internal.dtos.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.DataServices;
@@ -368,7 +368,7 @@ public class ClusterRestController {
         this.persistenceService.addConfigsToResource(
             id,
             configs,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -385,7 +385,7 @@ public class ClusterRestController {
         log.info("[getConfigsForCluster] Called with id {}", id);
         return this.persistenceService.getConfigsForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -406,7 +406,7 @@ public class ClusterRestController {
         this.persistenceService.updateConfigsForResource(
             id,
             configs,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -422,7 +422,7 @@ public class ClusterRestController {
         log.info("[removeAllConfigsForCluster] Called with id {}", id);
         this.persistenceService.removeAllConfigsForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -443,7 +443,7 @@ public class ClusterRestController {
         this.persistenceService.addDependenciesToResource(
             id,
             dependencies,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -460,7 +460,7 @@ public class ClusterRestController {
         log.info("[getDependenciesForCluster] Called with id {}", id);
         return this.persistenceService.getDependenciesForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -481,7 +481,7 @@ public class ClusterRestController {
         this.persistenceService.updateDependenciesForResource(
             id,
             dependencies,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -497,7 +497,7 @@ public class ClusterRestController {
         log.info("[removeAllDependenciesForCluster] Called with id {}", id);
         this.persistenceService.removeAllDependenciesForResource(
             id,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -515,7 +515,7 @@ public class ClusterRestController {
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("[addTagsForCluster] Called with id {} and tags {}", id, tags);
-        this.persistenceService.addTagsToResource(id, tags, com.netflix.genie.common.external.dtos.v4.Cluster.class);
+        this.persistenceService.addTagsToResource(id, tags, com.netflix.genie.common.internal.dtos.Cluster.class);
     }
 
     /**
@@ -550,7 +550,7 @@ public class ClusterRestController {
         this.persistenceService.updateTagsForResource(
             id,
             tags,
-            com.netflix.genie.common.external.dtos.v4.Cluster.class
+            com.netflix.genie.common.internal.dtos.Cluster.class
         );
     }
 
@@ -564,7 +564,7 @@ public class ClusterRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("[removeAllTagsForCluster] Called with id {}", id);
-        this.persistenceService.removeAllTagsForResource(id, com.netflix.genie.common.external.dtos.v4.Cluster.class);
+        this.persistenceService.removeAllTagsForResource(id, com.netflix.genie.common.internal.dtos.Cluster.class);
     }
 
     /**
@@ -581,7 +581,7 @@ public class ClusterRestController {
         @PathVariable("tag") final String tag
     ) throws NotFoundException {
         log.info("[removeTagForCluster] Called with id {} and tag {}", id, tag);
-        this.persistenceService.removeTagForResource(id, tag, com.netflix.genie.common.external.dtos.v4.Cluster.class);
+        this.persistenceService.removeTagForResource(id, tag, com.netflix.genie.common.internal.dtos.Cluster.class);
     }
 
     /**

@@ -19,12 +19,12 @@ package com.netflix.genie.web.data.services.impl.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
-import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
-import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
-import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dtos.Cluster;
+import com.netflix.genie.common.internal.dtos.ClusterMetadata;
+import com.netflix.genie.common.internal.dtos.ClusterRequest;
+import com.netflix.genie.common.internal.dtos.ClusterStatus;
+import com.netflix.genie.common.internal.dtos.Criterion;
+import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.assertj.core.api.Assertions;

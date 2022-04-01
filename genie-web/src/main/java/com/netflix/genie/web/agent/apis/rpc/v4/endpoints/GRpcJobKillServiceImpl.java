@@ -19,7 +19,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
@@ -31,8 +31,8 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.RequestForwardingService;
-import io.grpc.stub.StreamObserver;
 import io.grpc.stub.ServerCallStreamObserver;
+import io.grpc.stub.StreamObserver;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -224,7 +224,7 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
      * whether the observer is cancelled or not.
      *
      * @param observer Observer for which we would check the status
-     * @return         Boolean value: true if observer has status CANCELLED
+     * @return Boolean value: true if observer has status CANCELLED
      */
     @VisibleForTesting
     protected boolean isStreamObserverCancelled(final StreamObserver<JobKillRegistrationResponse> observer) {
@@ -234,6 +234,7 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
     /**
      * If observer is null or already cancelled - do nothing.
      * Otherwise call onCompleted.
+     *
      * @param observer
      */
     private void cancelObserverIfNecessary(final StreamObserver<JobKillRegistrationResponse> observer) {

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.selectors;
 
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.dtos.JobRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;

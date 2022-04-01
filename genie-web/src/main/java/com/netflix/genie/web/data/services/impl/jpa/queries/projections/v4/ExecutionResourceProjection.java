@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4;
 
-import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.internal.dtos.JobSpecification;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 
 import java.util.Optional;

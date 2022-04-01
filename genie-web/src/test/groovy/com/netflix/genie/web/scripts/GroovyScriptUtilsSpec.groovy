@@ -20,10 +20,10 @@ package com.netflix.genie.web.scripts
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import com.google.common.collect.Sets
-import com.netflix.genie.common.external.dtos.v4.Cluster
-import com.netflix.genie.common.external.dtos.v4.Command
-import com.netflix.genie.common.external.dtos.v4.JobRequest
-import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
+import com.netflix.genie.common.internal.dtos.Cluster
+import com.netflix.genie.common.internal.dtos.Command
+import com.netflix.genie.common.internal.dtos.JobRequest
+import com.netflix.genie.common.internal.dtos.JobRequestMetadata
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.selectors.AgentLauncherSelectionContext
 import com.netflix.genie.web.selectors.ClusterSelectionContext

@@ -21,12 +21,11 @@ import brave.SpanCustomizer
 import brave.Tracer
 import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.common.dto.JobStatusMessages
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
-import com.netflix.genie.common.external.dtos.v4.JobRequest
-import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.ArchiveStatus
+import com.netflix.genie.common.internal.dtos.JobRequest
+import com.netflix.genie.common.internal.dtos.JobRequestMetadata
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator

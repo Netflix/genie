@@ -23,7 +23,7 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import spock.lang.Specification
 

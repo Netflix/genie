@@ -26,9 +26,9 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.AgentJobRequest
+import com.netflix.genie.common.internal.dtos.JobStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.internal.tracing.TracingConstants
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter

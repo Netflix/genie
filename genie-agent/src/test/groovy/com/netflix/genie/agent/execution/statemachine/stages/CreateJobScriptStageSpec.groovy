@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.JobSpecification
 import spock.lang.Specification
 
 class CreateJobScriptStageSpec extends Specification {

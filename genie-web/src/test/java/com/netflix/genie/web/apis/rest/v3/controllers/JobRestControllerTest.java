@@ -23,8 +23,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.ArchiveStatus;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
@@ -382,13 +382,13 @@ class JobRestControllerTest {
         Mockito.when(request.getHeaderNames()).thenReturn(null);
 
         Mockito.when(
-            this.restTemplate.execute(
-                Mockito.anyString(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any()
+                this.restTemplate.execute(
+                    Mockito.anyString(),
+                    Mockito.any(),
+                    Mockito.any(),
+                    Mockito.any()
+                )
             )
-        )
             .thenThrow(forwardingException);
 
         Assertions.assertThatThrownBy(

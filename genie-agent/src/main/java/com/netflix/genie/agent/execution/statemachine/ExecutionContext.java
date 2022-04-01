@@ -31,10 +31,10 @@ import com.netflix.genie.agent.execution.statemachine.stages.ObtainJobSpecificat
 import com.netflix.genie.agent.execution.statemachine.stages.ReserveJobIdStage;
 import com.netflix.genie.agent.execution.statemachine.stages.WaitJobCompletionStage;
 import com.netflix.genie.agent.properties.AgentProperties;
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
-import com.netflix.genie.common.external.dtos.v4.JobSpecification;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.AgentJobRequest;
+import com.netflix.genie.common.internal.dtos.JobSpecification;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

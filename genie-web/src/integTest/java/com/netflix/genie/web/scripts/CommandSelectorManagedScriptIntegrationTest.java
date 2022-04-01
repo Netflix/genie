@@ -19,15 +19,15 @@ package com.netflix.genie.web.scripts;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.external.dtos.v4.Command;
-import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
-import com.netflix.genie.common.external.dtos.v4.CommandStatus;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
-import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.external.dtos.v4.JobMetadata;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.internal.dtos.Cluster;
+import com.netflix.genie.common.internal.dtos.Command;
+import com.netflix.genie.common.internal.dtos.CommandMetadata;
+import com.netflix.genie.common.internal.dtos.CommandStatus;
+import com.netflix.genie.common.internal.dtos.Criterion;
+import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dtos.JobMetadata;
+import com.netflix.genie.common.internal.dtos.JobRequest;
 import com.netflix.genie.common.internal.util.PropertiesMapCache;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
@@ -97,7 +97,6 @@ class CommandSelectorManagedScriptIntegrationTest {
     private CommandSelectorManagedScript commandSelectorManagedScript;
     private MeterRegistry meterRegistry;
     private ExecutorService executorService;
-    private PropertiesMapCache cache;
 
     private static Command createTestCommand(final String id) {
         return new Command(
@@ -142,12 +141,11 @@ class CommandSelectorManagedScriptIntegrationTest {
             this.meterRegistry
         );
         this.scriptProperties = new CommandSelectorManagedScriptProperties();
-        this.cache = Mockito.mock(PropertiesMapCache.class);
         this.commandSelectorManagedScript = new CommandSelectorManagedScript(
             scriptManager,
             this.scriptProperties,
             this.meterRegistry,
-            this.cache
+            Mockito.mock(PropertiesMapCache.class)
         );
     }
 

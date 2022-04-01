@@ -23,9 +23,9 @@ import brave.propagation.TraceContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.benmanes.caffeine.cache.Cache
-import com.netflix.genie.common.external.dtos.v4.JobEnvironment
-import com.netflix.genie.common.external.dtos.v4.JobMetadata
-import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.JobEnvironment
+import com.netflix.genie.common.internal.dtos.JobMetadata
+import com.netflix.genie.common.internal.dtos.JobSpecification
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingCleanup

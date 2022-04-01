@@ -18,12 +18,12 @@
 package com.netflix.genie.web.agent.services.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
-import com.netflix.genie.common.external.dtos.v4.JobSpecification;
-import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.ArchiveStatus;
+import com.netflix.genie.common.internal.dtos.JobRequest;
+import com.netflix.genie.common.internal.dtos.JobRequestMetadata;
+import com.netflix.genie.common.internal.dtos.JobSpecification;
+import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;

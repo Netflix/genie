@@ -23,7 +23,7 @@ import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.properties.AgentProperties
-import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.dtos.JobStatus
 import spock.lang.Specification
 import spock.lang.Unroll
 
