@@ -27,10 +27,10 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.Criterion;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
@@ -375,8 +375,7 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE,
-                Lists.newArrayList("sleep"),
-                100
+                Lists.newArrayList("sleep")
             )
                 .withTags(Sets.newHashSet(SLEEP_TAG, UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .withMemory(128)
@@ -396,15 +395,12 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE,
-                Lists.newArrayList("date"),
-                100
+                Lists.newArrayList("date")
             )
                 .withTags(Sets.newHashSet(DATE_TAG, UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .withMemory(128)
                 .withClusterCriteria(
-                    Lists.newArrayList(
-                        new Criterion.Builder().withTags(Sets.newHashSet(DUMMY_TAG)).build()
-                    )
+                    Lists.newArrayList(new Criterion.Builder().withTags(Sets.newHashSet(DUMMY_TAG)).build())
                 )
                 .build()
         );
@@ -423,9 +419,7 @@ abstract class JobClientIntegrationTest extends ClusterClientIntegrationTest {
                 .withTags(Sets.newHashSet(ECHO_TAG, UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .withMemory(128)
                 .withClusterCriteria(
-                    Lists.newArrayList(
-                        new Criterion.Builder().withTags(Sets.newHashSet(DUMMY_TAG)).build()
-                    )
+                    Lists.newArrayList(new Criterion.Builder().withTags(Sets.newHashSet(DUMMY_TAG)).build())
                 )
                 .build()
         );

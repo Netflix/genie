@@ -20,10 +20,10 @@ package com.netflix.genie.web.data.services.impl.jpa.converters
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
+import com.netflix.genie.common.dto.ArchiveStatus
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.UserResourcesSummary
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity

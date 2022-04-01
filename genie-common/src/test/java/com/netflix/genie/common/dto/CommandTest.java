@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

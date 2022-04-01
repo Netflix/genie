@@ -22,16 +22,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.ArchiveStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.Criterion;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
-import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
@@ -51,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -71,7 +70,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,7 +131,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
-    private static final long CHECK_DELAY = 250L;
     private static final String BASE_DIR
         = "com/netflix/genie/web/apis/rest/v3/controllers/JobRestControllerIntegrationTests/";
     private static final String FILE_DELIMITER = "/";
@@ -184,9 +181,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
 
     @Autowired
     private GenieWebHostInfo genieHostInfo;
-
-    @Autowired
-    private Resource jobDirResource;
 
     @BeforeEach
     void beforeJobs() throws Exception {
@@ -589,10 +583,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         );
 
         final String setupFile = this.getResourceURI(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile");
-        final String setupFileContents = new String(
-            Files.readAllBytes(Paths.get(new URI(setupFile))),
-            StandardCharsets.UTF_8
-        );
+        final String setupFileContents = Files.readString(Paths.get(new URI(setupFile)));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -611,10 +602,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         // Validate content of 'run' file
         final String expectedFilename = "runsh-agent.txt";
         final String runFile = this.getResourceURI(BASE_DIR + expectedFilename);
-        final String runFileContent = new String(
-            Files.readAllBytes(Paths.get(new URI(runFile))),
-            StandardCharsets.UTF_8
-        );
+        final String runFileContent = Files.readString(Paths.get(new URI(runFile)));
 
         final String testJobsDir = this.jobsLocationsProperties.getJobs().getPath();
         final String expectedRunFileContent = this.getExpectedRunContents(
@@ -1661,7 +1649,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .accept(MediaType.ALL_VALUE)
             .when()
             .port(this.port)
-            .get(JOBS_API + "/" + jobId + "/output/" + UUID.randomUUID().toString())
+            .get(JOBS_API + "/" + jobId + "/output/" + UUID.randomUUID())
             .then()
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
     }
@@ -1810,8 +1798,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             CMD1_USER,
             CMD1_VERSION,
             CommandStatus.ACTIVE,
-            CMD1_EXECUTABLE_AND_ARGS,
-            CHECK_DELAY
+            CMD1_EXECUTABLE_AND_ARGS
         )
             .withId(CMD1_ID)
             .withSetupFile(setUpFile)

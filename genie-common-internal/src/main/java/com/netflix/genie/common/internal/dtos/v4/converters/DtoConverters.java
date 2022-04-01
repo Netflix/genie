@@ -385,7 +385,13 @@ public final class DtoConverters {
             .withDependencies(resources.getDependencies())
             .withCreated(v4Command.getCreated())
             .withUpdated(v4Command.getUpdated())
-            .withClusterCriteria(v4Command.getClusterCriteria());
+            .withClusterCriteria(
+                v4Command
+                    .getClusterCriteria()
+                    .stream()
+                    .map(DtoConverters::toV3Criterion)
+                    .collect(Collectors.toList())
+            );
 
         commandMetadata.getDescription().ifPresent(builder::withDescription);
         commandMetadata.getMetadata().ifPresent(builder::withMetadata);
@@ -876,18 +882,38 @@ public final class DtoConverters {
     }
 
     /**
-     * This utility takes a pre-existing {@link Criterion} that would have been submitted by a call to the V3
-     * command APIs (create/update/patch) and makes sure it doesn't contain any {@code genie.id} or {@code genie.name}
-     * tags. If it does it puts their values in the proper place within the new {@link Criterion} which is returned.
-     * This exists in case people take the tags returned in a V3 resource call (from a cluster) and just copy them
-     * into their tags for a {@link Command} cluster criterion. If we don't check this the criterion will never match.
+     * Convert an internal {@link Criterion} to a v3 {@link com.netflix.genie.common.dto.Criterion}.
+     *
+     * @param criterion The internal criterion representation to convert
+     * @return The v3 API representation
+     */
+    public static com.netflix.genie.common.dto.Criterion toV3Criterion(final Criterion criterion) {
+        final com.netflix.genie.common.dto.Criterion.Builder builder
+            = new com.netflix.genie.common.dto.Criterion.Builder();
+        criterion.getId().ifPresent(builder::withId);
+        criterion.getName().ifPresent(builder::withName);
+        criterion.getStatus().ifPresent(builder::withStatus);
+        criterion.getVersion().ifPresent(builder::withVersion);
+        builder.withTags(criterion.getTags());
+        return builder.build();
+    }
+
+    /**
+     * This utility takes a pre-existing {@link com.netflix.genie.common.dto.Criterion} that would have been submitted
+     * by a call to the V3 command APIs (create/update/patch) and makes sure it doesn't contain any {@code genie.id} or
+     * {@code genie.name} tags. If it does it puts their values in the proper place within the new {@link Criterion}
+     * which is returned. This exists in case people take the tags returned in a V3 resource call (from a cluster) and
+     * just copy them into their tags for a {@link Command} cluster criterion. If we don't check this the criterion
+     * will never match.
      *
      * @param criterion The originally {@link Criterion} from the user in the V3 command API
      * @return A new correct V4 {@link Criterion} which should be used for subsequent processing
      * @throws IllegalArgumentException If the resulting criterion is invalid
      */
     @VisibleForTesting
-    static Criterion toV4CommandClusterCriterion(final Criterion criterion) throws IllegalArgumentException {
+    static Criterion toV4CommandClusterCriterion(
+        final com.netflix.genie.common.dto.Criterion criterion
+    ) throws IllegalArgumentException {
         final Criterion.Builder builder = new Criterion.Builder();
         criterion.getId().ifPresent(builder::withId);
         criterion.getName().ifPresent(builder::withName);

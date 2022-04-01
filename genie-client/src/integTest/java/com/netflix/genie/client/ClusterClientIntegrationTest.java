@@ -47,9 +47,9 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
 
     @Test
     void testGetClustersUsingPagination() throws Exception {
-        final String id1 = UUID.randomUUID().toString() + "_1";
-        final String id2 = UUID.randomUUID().toString() + "_2";
-        final String id3 = UUID.randomUUID().toString() + "_3";
+        final String id1 = UUID.randomUUID() + "_1";
+        final String id2 = UUID.randomUUID() + "_2";
+        final String id3 = UUID.randomUUID() + "_3";
 
         final List<String> ids = Lists.newArrayList(id1, id2, id3);
 
@@ -82,6 +82,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
         Assertions.assertThat(
             results.stream()
                 .map(Cluster::getId)
+                .filter(Optional::isPresent)
                 .map(Optional::get)
         ).containsExactlyInAnyOrder(id1, id2, id3);
 
@@ -278,8 +279,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
             "user",
             "version",
             CommandStatus.ACTIVE,
-            executableAndArgs,
-            5
+            executableAndArgs
         ).build();
 
         final String fooId = this.commandClient.createCommand(foo);
@@ -289,8 +289,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
             "user",
             "version",
             CommandStatus.ACTIVE,
-            executableAndArgs,
-            5
+            executableAndArgs
         ).build();
 
         final String barId = this.commandClient.createCommand(bar);
@@ -300,8 +299,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
             "user",
             "version",
             CommandStatus.ACTIVE,
-            executableAndArgs,
-            5
+            executableAndArgs
         ).build();
 
         final String piId = this.commandClient.createCommand(pi);

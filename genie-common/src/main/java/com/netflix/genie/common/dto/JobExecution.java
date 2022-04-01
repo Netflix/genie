@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import com.netflix.genie.common.util.JsonUtils;
 import lombok.Getter;
 

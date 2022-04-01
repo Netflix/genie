@@ -24,13 +24,13 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.ResolvedResources;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
-import com.netflix.genie.common.external.dtos.v4.ResolvedResources;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
@@ -196,7 +196,7 @@ public class CommandRestController {
         }
 
         final Page<Command> commands;
-        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX)).count() >= 1L) {
+        if (tags != null && tags.stream().anyMatch(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX))) {
             // TODO: This doesn't take into account others as compounded find...not sure if good or bad
             final List<Command> commandList = Lists.newArrayList();
             final int prefixLength = DtoConverters.GENIE_ID_PREFIX.length();
@@ -214,8 +214,7 @@ public class CommandRestController {
                     }
                 );
             commands = new PageImpl<>(commandList);
-        } else if (tags != null
-            && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX)).count() >= 1L) {
+        } else if (tags != null && tags.stream().anyMatch(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))) {
             final Set<String> finalTags = tags
                 .stream()
                 .filter(tag -> !tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))
@@ -847,7 +846,7 @@ public class CommandRestController {
         for (final Criterion criterion : criteria) {
             resolvedResources.add(
                 new ResolvedResources<>(
-                    criterion,
+                    DtoConverters.toV3Criterion(criterion),
                     this.persistenceService
                         .findClustersMatchingCriterion(criterion, addDefaultStatus)
                         .stream()

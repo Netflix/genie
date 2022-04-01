@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.netflix.genie.common.external.dtos.v4.ArchiveStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -47,7 +47,7 @@ import java.util.Set;
 @Slf4j
 public class ClusterClient {
 
-    private ClusterService clusterService;
+    private final ClusterService clusterService;
 
     /**
      * Constructor.
