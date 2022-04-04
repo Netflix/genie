@@ -104,7 +104,7 @@
         </module>
 
         <!-- Checks that class which has only private ctors is declared as final. -->
-        <module name="FinalClass"/>
+<!--        <module name="FinalClass"/>-->
 
         <!-- Ensures that local variables that never get their values changed, must be declared final. -->
         <module name="FinalLocalVariable"/>
