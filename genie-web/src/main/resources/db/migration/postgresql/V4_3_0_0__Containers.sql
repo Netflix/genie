@@ -24,12 +24,14 @@ ALTER TABLE jobs
   ADD COLUMN image_tag_used         VARCHAR(1024) DEFAULT NULL,
   ADD COLUMN requested_gpu          INT           DEFAULT NULL,
   ADD COLUMN gpu_used               INT           DEFAULT NULL,
-  ADD COLUMN requested_disk_mb      INT           DEFAULT NULL,
-  ADD COLUMN disk_mb_used           INT           DEFAULT NULL,
-  ADD COLUMN requested_network_mbps INT           DEFAULT NULL,
-  ADD COLUMN network_mbps_used      INT           DEFAULT NULL,
+  ADD COLUMN requested_disk_mb      BIGINT        DEFAULT NULL,
+  ADD COLUMN disk_mb_used           BIGINT        DEFAULT NULL,
+  ADD COLUMN requested_network_mbps BIGINT        DEFAULT NULL,
+  ADD COLUMN network_mbps_used      BIGINT        DEFAULT NULL,
   DROP COLUMN check_delay,
-  DROP COLUMN v4;
+  DROP COLUMN v4,
+  ALTER COLUMN requested_memory TYPE BIGINT,
+  ALTER COLUMN memory_used TYPE BIGINT;
 
 ALTER TABLE commands
   DROP COLUMN check_delay,
@@ -38,4 +40,5 @@ ALTER TABLE commands
   ADD COLUMN disk_mb      INT           DEFAULT NULL,
   ADD COLUMN network_mbps INT           DEFAULT NULL,
   ADD COLUMN image_name   VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN image_tag    VARCHAR(1024) DEFAULT NULL;
+  ADD COLUMN image_tag    VARCHAR(1024) DEFAULT NULL,
+  ALTER COLUMN memory TYPE BIGINT;

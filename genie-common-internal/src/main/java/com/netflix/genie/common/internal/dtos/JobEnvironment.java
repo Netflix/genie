@@ -20,17 +20,16 @@ package com.netflix.genie.common.internal.dtos;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,15 +43,9 @@ import java.util.Optional;
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 @JsonDeserialize(builder = JobEnvironment.Builder.class)
-@SuppressWarnings("checkstyle:finalclass")
 public class JobEnvironment implements Serializable {
 
     private static final long serialVersionUID = 8478136461571895069L;
-    private static final int DEFAULT_NUM_CPU = 1;
-    @Min(value = 1, message = "Number of CPU's can't be less than 1")
-    private final int cpu;
-    @Min(value = 1, message = "Amount of memory has to be greater than 1 MB and preferably much more")
-    private final int memory;
     private final ImmutableMap<
         @NotBlank(message = "Environment variable key can't be blank")
         @Size(max = 255, message = "Max environment variable name length is 255 characters") String,
@@ -60,12 +53,14 @@ public class JobEnvironment implements Serializable {
         @Size(max = 1024, message = "Max environment variable value length is 1024 characters") String>
         environmentVariables;
     private final JsonNode ext;
+    private final ComputeResources computeResources;
+    private final Image image;
 
     private JobEnvironment(final Builder builder) {
-        this.cpu = builder.bCpu == null ? DEFAULT_NUM_CPU : builder.bCpu;
-        this.memory = builder.bMemory;
         this.environmentVariables = ImmutableMap.copyOf(builder.bEnvironmentVariables);
         this.ext = builder.bExt;
+        this.computeResources = builder.bComputeResources;
+        this.image = builder.bImage;
     }
 
     /**
@@ -87,46 +82,42 @@ public class JobEnvironment implements Serializable {
     }
 
     /**
+     * Get the computation resources for the job if any were defined.
+     *
+     * @return The {@link ComputeResources}
+     */
+    public ComputeResources getComputeResources() {
+        return this.computeResources;
+    }
+
+    /**
+     * Get the image for the job if any was defined.
+     *
+     * @return The {@link Image}
+     */
+    public Image getImage() {
+        return this.image;
+    }
+
+    /**
      * Builder to create an immutable {@link JobEnvironment} instance.
      *
      * @author tgianos
      * @since 4.0.0
      */
     public static class Builder {
-        private final Map<String, String> bEnvironmentVariables = Maps.newHashMap();
-        private Integer bCpu;
-        private int bMemory;
+        private final Map<String, String> bEnvironmentVariables;
         private JsonNode bExt;
+        private ComputeResources bComputeResources;
+        private Image bImage;
 
         /**
          * Constructor.
-         *
-         * @param memory The amount of memory (in MB) to allocate for the job
          */
-        public Builder(final int memory) {
-            this.bMemory = memory;
-        }
-
-        /**
-         * Set the number of CPU cores that should be allocated to run the associated job.
-         *
-         * @param cpu The number of CPU's. Must be greater than or equal to 1.
-         * @return The builder
-         */
-        public Builder withCpu(@Nullable final Integer cpu) {
-            this.bCpu = cpu;
-            return this;
-        }
-
-        /**
-         * Set the amount of memory (in MB) that should be allocated for the job processes.
-         *
-         * @param memory The memory. Must be greater than or equal to 1 but preferably much more
-         * @return The builder
-         */
-        public Builder withMemory(final int memory) {
-            this.bMemory = memory;
-            return this;
+        public Builder() {
+            this.bEnvironmentVariables = new HashMap<>();
+            this.bComputeResources = new ComputeResources.Builder().build();
+            this.bImage = new Image.Builder().build();
         }
 
         /**
@@ -152,6 +143,28 @@ public class JobEnvironment implements Serializable {
          */
         public Builder withExt(@Nullable final JsonNode ext) {
             this.bExt = ext;
+            return this;
+        }
+
+        /**
+         * Set the computation resources for the job.
+         *
+         * @param computeResources The {@link ComputeResources}
+         * @return This {@link Builder} instance
+         */
+        public Builder withComputeResources(final ComputeResources computeResources) {
+            this.bComputeResources = computeResources;
+            return this;
+        }
+
+        /**
+         * Set the image the job should use.
+         *
+         * @param image The {@link Image}
+         * @return This {@link Builder} instance
+         */
+        public Builder withImage(final Image image) {
+            this.bImage = image;
             return this;
         }
 

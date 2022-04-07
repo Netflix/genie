@@ -18,9 +18,10 @@
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.IdProjection;
-import lombok.EqualsAndHashCode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Base class which only provides an ID. For use cases when we don't care about audit fields like
@@ -40,7 +42,6 @@ import java.io.Serializable;
 @ToString(
     doNotUseGetters = true
 )
-@EqualsAndHashCode(of = {"id"})
 @MappedSuperclass
 public class IdEntity implements IdProjection, Serializable {
 
@@ -50,4 +51,28 @@ public class IdEntity implements IdProjection, Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressFBWarnings({"BC_EQUALS_METHOD_SHOULD_WORK_FOR_ALL_OBJECTS"})
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
+        final IdEntity idEntity = (IdEntity) o;
+        return Objects.equals(this.id, idEntity.id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

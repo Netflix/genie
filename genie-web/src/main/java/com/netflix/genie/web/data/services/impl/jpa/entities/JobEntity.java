@@ -403,32 +403,32 @@ public class JobEntity extends BaseEntity implements
     @Basic
     @Column(name = "requested_memory", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private Integer requestedMemory;
+    private Long requestedMemory;
 
     @Basic
     @Column(name = "memory_used")
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private Integer memoryUsed;
+    private Long memoryUsed;
 
     @Basic
     @Column(name = "requested_disk_mb", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of disk space")
-    private Integer requestedDiskMb;
+    private Long requestedDiskMb;
 
     @Basic
     @Column(name = "disk_mb_used")
     @Min(value = 1, message = "Can't have less than 1 MB of disk space")
-    private Integer diskMbUsed;
+    private Long diskMbUsed;
 
     @Basic
     @Column(name = "requested_network_mbps", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 MBPS of network")
-    private Integer requestedNetworkMbps;
+    private Long requestedNetworkMbps;
 
     @Basic
     @Column(name = "network_mbps_used")
     @Min(value = 1, message = "Can't have less than 1 MBPS of network")
-    private Integer networkMbpsUsed;
+    private Long networkMbpsUsed;
 
     @Basic
     @Column(name = "requested_timeout", updatable = false)
@@ -819,15 +819,6 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the number of GPUs requested by the job.
-     *
-     * @return The number of GPUs requested or {@link Optional#empty()}
-     */
-    public Optional<Integer> getRequestedGpu() {
-        return Optional.ofNullable(this.requestedGpu);
-    }
-
-    /**
      * Get the number of GPUs used by the job.
      *
      * @return The number of GPUs used or {@link Optional#empty()}
@@ -837,30 +828,12 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the requested disk space for the job if any.
-     *
-     * @return The requested amount of disk space in MB or {@link Optional#empty()}
-     */
-    public Optional<Integer> getRequestedDiskMb() {
-        return Optional.ofNullable(this.requestedDiskMb);
-    }
-
-    /**
      * Get the amount of disk space used for a job.
      *
      * @return The amount of disk space in MB or {@link Optional#empty()}
      */
-    public Optional<Integer> getDiskMbUsed() {
+    public Optional<Long> getDiskMbUsed() {
         return Optional.ofNullable(this.diskMbUsed);
-    }
-
-    /**
-     * Get the requested network mbps for the job if any.
-     *
-     * @return The requested network bandwidth in mbps or {@link Optional#empty()}
-     */
-    public Optional<Integer> getRequestedNetworkMbps() {
-        return Optional.ofNullable(this.requestedNetworkMbps);
     }
 
     /**
@@ -868,7 +841,7 @@ public class JobEntity extends BaseEntity implements
      *
      * @return The network bandwidth in mbps or {@link Optional#empty()}
      */
-    public Optional<Integer> getNetworkMbpsUsed() {
+    public Optional<Long> getNetworkMbpsUsed() {
         return Optional.ofNullable(this.networkMbpsUsed);
     }
 
@@ -934,7 +907,7 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<Integer> getRequestedMemory() {
+    public Optional<Long> getRequestedMemory() {
         return Optional.ofNullable(this.requestedMemory);
     }
 
@@ -1000,7 +973,7 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<Integer> getMemoryUsed() {
+    public Optional<Long> getMemoryUsed() {
         return Optional.ofNullable(this.memoryUsed);
     }
 
@@ -1319,17 +1292,48 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getJobDirectoryLocation() {
-        return Optional.ofNullable(this.jobDirectoryLocation);
+    public Optional<Integer> getRequestedGpu() {
+        return Optional.ofNullable(this.requestedGpu);
     }
 
     /**
-     * Get the requested container image name if there was one.
-     *
-     * @return The requested image name or {@link Optional#empty()}
+     * {@inheritDoc}
      */
+    @Override
+    public Optional<Long> getRequestedDiskMb() {
+        return Optional.ofNullable(this.requestedDiskMb);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<Long> getRequestedNetworkMbps() {
+        return Optional.ofNullable(this.requestedNetworkMbps);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<String> getRequestedImageName() {
         return Optional.ofNullable(this.requestedImageName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getRequestedImageTag() {
+        return Optional.ofNullable(this.requestedImageTag);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getJobDirectoryLocation() {
+        return Optional.ofNullable(this.jobDirectoryLocation);
     }
 
     /**
@@ -1339,15 +1343,6 @@ public class JobEntity extends BaseEntity implements
      */
     public Optional<String> getImageNameUsed() {
         return Optional.ofNullable(this.imageNameUsed);
-    }
-
-    /**
-     * Get the requested container image tag if there was one.
-     *
-     * @return The requested image tag or {@link Optional#empty()}
-     */
-    public Optional<String> getRequestedImageTag() {
-        return Optional.ofNullable(this.requestedImageTag);
     }
 
     /**

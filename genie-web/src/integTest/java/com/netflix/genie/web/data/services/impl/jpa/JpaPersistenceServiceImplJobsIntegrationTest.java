@@ -41,6 +41,7 @@ import com.netflix.genie.common.internal.dtos.Application;
 import com.netflix.genie.common.internal.dtos.ArchiveStatus;
 import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.Command;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
@@ -107,7 +108,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     // Job Request fields
     private static final int CPU_REQUESTED = 2;
-    private static final int MEMORY_REQUESTED = 1024;
+    private static final long MEMORY_REQUESTED = 1024L;
     private static final int TIMEOUT_REQUESTED = 84500;
 
     // Job Metadata fields
@@ -288,7 +289,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
-            new JobEnvironment.Builder(1_512).build(),
+            new JobEnvironment.Builder().build(),
             jobRequest.getMetadata()
         );
 
@@ -316,7 +317,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         final ResolvedJob resolvedJob1 = new ResolvedJob(
             jobSpecification2,
-            new JobEnvironment.Builder(1_1512).build(),
+            new JobEnvironment.Builder().build(),
             jobRequest2.getMetadata()
         );
         this.service.saveResolvedJob(jobId2, resolvedJob1);
@@ -347,7 +348,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
-            new JobEnvironment.Builder(1_512).build(),
+            new JobEnvironment.Builder().build(),
             jobRequest.getMetadata()
         );
         this.service.saveResolvedJob(jobId, resolvedJob);
@@ -404,7 +405,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
-            new JobEnvironment.Builder(1_512).build(),
+            new JobEnvironment.Builder().build(),
             jobRequest.getMetadata()
         );
         this.service.saveResolvedJob(jobId, resolvedJob);
@@ -532,7 +533,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(finishedJob.getGrouping()).isNotPresent();
         Assertions.assertThat(finishedJob.getGroupingInstance()).isNotPresent();
         Assertions.assertThat(finishedJob.getStatusMessage()).isNotPresent();
-        Assertions.assertThat(finishedJob.getRequestedMemory()).isPresent().contains(1560);
+        Assertions.assertThat(finishedJob.getRequestedMemory()).isPresent().contains(1560L);
         Assertions.assertThat(finishedJob.getRequestApiClientHostname()).isNotPresent();
         Assertions.assertThat(finishedJob.getRequestApiClientUserAgent()).isNotPresent();
         Assertions.assertThat(finishedJob.getRequestAgentClientHostname()).isNotPresent();
@@ -1342,8 +1343,12 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .Builder()
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
             .withExt(GenieObjectMapper.getMapper().readTree(agentEnvironmentExt))
-            .withRequestedJobCpu(CPU_REQUESTED)
-            .withRequestedJobMemory(MEMORY_REQUESTED)
+            .withRequestedComputeResources(
+                new ComputeResources.Builder()
+                    .withCpu(CPU_REQUESTED)
+                    .withMemoryMb(MEMORY_REQUESTED)
+                    .build()
+            )
             .build();
 
         final String agentConfigExt

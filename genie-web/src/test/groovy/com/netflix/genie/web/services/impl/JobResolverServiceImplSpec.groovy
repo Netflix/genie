@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.dtos.ClusterStatus
 import com.netflix.genie.common.internal.dtos.Command
 import com.netflix.genie.common.internal.dtos.CommandMetadata
 import com.netflix.genie.common.internal.dtos.CommandStatus
+import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
@@ -132,7 +133,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         def jobRequest0 = createJobRequest(arguments, null, null, null)
         def jobRequest1 = createJobRequest(arguments, null, 5_002, null)
-        def requestedMemory = 6_323
+        def requestedMemory = 6_323L
         def requestedCpu = 5
         def jobRequest2 = createJobRequest(arguments, requestedMemory, null, requestedCpu)
 
@@ -196,8 +197,9 @@ class JobResolverServiceImplSpec extends Specification {
                     : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
-        jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
-        jobEnvironment.getCpu() == 1
+        jobEnvironment.getComputeResources().getMemoryMb()
+            == Optional.of(this.jobsProperties.getMemory().getDefaultJobMemory())
+        jobEnvironment.getComputeResources().getCpu() == Optional.of(1)
         !jobEnvironment.getExt().isPresent()
         jobSpec.getTimeout().orElse(null) == com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION
 
@@ -239,8 +241,9 @@ class JobResolverServiceImplSpec extends Specification {
                     : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
-        jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
-        jobEnvironment.getCpu() == 1
+        jobEnvironment.getComputeResources().getMemoryMb()
+            == Optional.of(this.jobsProperties.getMemory().getDefaultJobMemory())
+        jobEnvironment.getComputeResources().getCpu() == Optional.of(1)
         !jobEnvironment.getExt().isPresent()
         jobSpec.getTimeout().orElse(null) == 5_002
 
@@ -285,8 +288,8 @@ class JobResolverServiceImplSpec extends Specification {
                     : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
-        jobEnvironment.getMemory() == requestedMemory
-        jobEnvironment.getCpu() == requestedCpu
+        jobEnvironment.getComputeResources().getMemoryMb() == Optional.of(requestedMemory)
+        jobEnvironment.getComputeResources().getCpu() == Optional.of(requestedCpu)
         !jobEnvironment.getExt().isPresent()
         !jobSpec.getTimeout().isPresent()
     }
@@ -442,6 +445,7 @@ class JobResolverServiceImplSpec extends Specification {
                 CommandStatus.ACTIVE
             ).withTags(commandTags).build(),
             Lists.newArrayList(UUID.randomUUID().toString()),
+            null,
             null,
             null
         )
@@ -1190,17 +1194,18 @@ class JobResolverServiceImplSpec extends Specification {
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build(),
             executable,
-            null,
             Lists.newArrayList(
                 new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build(),
                 new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-            )
+            ),
+            null,
+            null
         )
     }
 
     private static JobRequest createJobRequest(
         List<String> commandArgs,
-        @Nullable Integer requestedMemory,
+        @Nullable Long requestedMemory,
         @Nullable Integer requestedTimeout,
         @Nullable Integer requestedCpu
     ) {
@@ -1220,8 +1225,12 @@ class JobResolverServiceImplSpec extends Specification {
             new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build(),
             new ExecutionResourceCriteria(clusterCriteria as List<Criterion>, commandCriterion, null),
             new JobEnvironmentRequest.Builder()
-                .withRequestedJobMemory(requestedMemory)
-                .withRequestedJobCpu(requestedCpu)
+                .withRequestedComputeResources(
+                    new ComputeResources.Builder()
+                        .withCpu(requestedCpu)
+                        .withMemoryMb(requestedMemory)
+                        .build()
+                )
                 .build(),
             requestedTimeout == null
                 ? null
@@ -1229,11 +1238,10 @@ class JobResolverServiceImplSpec extends Specification {
         )
     }
 
-    /*
+    /**
      * Helper method which creates clusters based on the criteria of the inputted command/job request.
      * Necessary to ensure in memory matching of criterion to clusters succeeds.
      */
-
     private static Set<Cluster> createClustersBasedOnCriteria(int numClusters, Command command, JobRequest jobRequest) {
         final Set<String> tags = Stream.concat(
             jobRequest

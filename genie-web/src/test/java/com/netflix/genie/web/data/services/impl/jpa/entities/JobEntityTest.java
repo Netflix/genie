@@ -247,7 +247,7 @@ class JobEntityTest extends EntityTestBase {
 
     @Test
     void canSetMemoryUsed() {
-        this.testOptionalField(this.entity::getMemoryUsed, this.entity::setMemoryUsed, 10_240);
+        this.testOptionalField(this.entity::getMemoryUsed, this.entity::setMemoryUsed, 10_240L);
     }
 
     @Test
@@ -431,7 +431,7 @@ class JobEntityTest extends EntityTestBase {
 
     @Test
     void canSetRequestedMemory() {
-        this.testOptionalField(this.entity::getRequestedMemory, this.entity::setRequestedMemory, 2048);
+        this.testOptionalField(this.entity::getRequestedMemory, this.entity::setRequestedMemory, 2048L);
     }
 
     @Test
@@ -618,22 +618,22 @@ class JobEntityTest extends EntityTestBase {
 
     @Test
     void canSetRequestedDiskMb() {
-        this.testOptionalField(this.entity::getRequestedDiskMb, this.entity::setRequestedDiskMb, 1_5234);
+        this.testOptionalField(this.entity::getRequestedDiskMb, this.entity::setRequestedDiskMb, 1_5234L);
     }
 
     @Test
     void canSetDiskMbUsed() {
-        this.testOptionalField(this.entity::getDiskMbUsed, this.entity::setDiskMbUsed, 1_234);
+        this.testOptionalField(this.entity::getDiskMbUsed, this.entity::setDiskMbUsed, 1_234L);
     }
 
     @Test
     void canSetRequestedNetworkMbps() {
-        this.testOptionalField(this.entity::getRequestedNetworkMbps, this.entity::setRequestedNetworkMbps, 52);
+        this.testOptionalField(this.entity::getRequestedNetworkMbps, this.entity::setRequestedNetworkMbps, 52L);
     }
 
     @Test
     void canSetNetworkMbpsUsed() {
-        this.testOptionalField(this.entity::getNetworkMbpsUsed, this.entity::setNetworkMbpsUsed, 521);
+        this.testOptionalField(this.entity::getNetworkMbpsUsed, this.entity::setNetworkMbpsUsed, 521L);
     }
 
     @Test

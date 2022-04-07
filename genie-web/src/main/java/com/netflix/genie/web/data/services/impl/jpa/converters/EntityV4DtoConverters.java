@@ -25,10 +25,12 @@ import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.ClusterMetadata;
 import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.common.internal.dtos.CommandMetadata;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dtos.FinishedJob;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.dtos.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dtos.JobMetadata;
 import com.netflix.genie.common.internal.dtos.JobRequest;
@@ -51,7 +53,9 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -163,12 +167,19 @@ public final class EntityV4DtoConverters {
             ),
             metadataBuilder.build(),
             commandEntity.getExecutable(),
-            commandEntity.getMemory().orElse(null),
             commandEntity
                 .getClusterCriteria()
                 .stream()
                 .map(EntityV4DtoConverters::toCriterionDto)
-                .collect(Collectors.toList())
+                .collect(Collectors.toList()),
+            toComputeResources(
+                commandEntity::getCpu,
+                commandEntity::getGpu,
+                commandEntity::getMemory,
+                commandEntity::getDiskMb,
+                commandEntity::getNetworkMbps
+            ),
+            toImage(commandEntity::getImageName, commandEntity::getImageTag)
         );
     }
 
@@ -232,8 +243,18 @@ public final class EntityV4DtoConverters {
         jobRequestProjection.getRequestedAgentEnvironmentExt().ifPresent(jobEnvironmentRequestBuilder::withExt);
         jobEnvironmentRequestBuilder
             .withRequestedEnvironmentVariables(jobRequestProjection.getRequestedEnvironmentVariables());
-        jobRequestProjection.getRequestedCpu().ifPresent(jobEnvironmentRequestBuilder::withRequestedJobCpu);
-        jobRequestProjection.getRequestedMemory().ifPresent(jobEnvironmentRequestBuilder::withRequestedJobMemory);
+        jobEnvironmentRequestBuilder.withRequestedComputeResources(
+            toComputeResources(
+                jobRequestProjection::getRequestedCpu,
+                jobRequestProjection::getRequestedGpu,
+                jobRequestProjection::getRequestedMemory,
+                jobRequestProjection::getRequestedDiskMb,
+                jobRequestProjection::getRequestedNetworkMbps
+            )
+        );
+        jobEnvironmentRequestBuilder.withRequestedImage(
+            toImage(jobRequestProjection::getRequestedImageName, jobRequestProjection::getRequestedImageTag)
+        );
 
         return new JobRequest(
             requestedId,
@@ -440,11 +461,38 @@ public final class EntityV4DtoConverters {
         final Set<FileEntity> dependencies,
         @Nullable final FileEntity setupFile
     ) {
-
         return new ExecutionEnvironment(
             configs.stream().map(FileEntity::getFile).collect(Collectors.toSet()),
             dependencies.stream().map(FileEntity::getFile).collect(Collectors.toSet()),
             setupFile != null ? setupFile.getFile() : null
         );
+    }
+
+    private static ComputeResources toComputeResources(
+        final Supplier<Optional<Integer>> cpuGetter,
+        final Supplier<Optional<Integer>> gpuGetter,
+        final Supplier<Optional<Long>> memoryGetter,
+        final Supplier<Optional<Long>> diskMbGetter,
+        final Supplier<Optional<Long>> networkMbpsGetter
+    ) {
+        return new ComputeResources
+            .Builder()
+            .withCpu(cpuGetter.get().orElse(null))
+            .withGpu(gpuGetter.get().orElse(null))
+            .withMemoryMb(memoryGetter.get().orElse(null))
+            .withDiskMb(diskMbGetter.get().orElse(null))
+            .withNetworkMbps(networkMbpsGetter.get().orElse(null))
+            .build();
+    }
+
+    private static Image toImage(
+        final Supplier<Optional<String>> nameGetter,
+        final Supplier<Optional<String>> tagGetter
+    ) {
+        return new Image
+            .Builder()
+            .withName(nameGetter.get().orElse(null))
+            .withTag(tagGetter.get().orElse(null))
+            .build();
     }
 }

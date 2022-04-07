@@ -31,17 +31,21 @@ ALTER TABLE `jobs`
 ALTER TABLE `jobs`
   ADD COLUMN `gpu_used` INT(11) DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_disk_mb` INT(11) DEFAULT NULL;
+  ADD COLUMN `requested_disk_mb` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `disk_mb_used` INT(11) DEFAULT NULL;
+  ADD COLUMN `disk_mb_used` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_network_mbps` INT(11) DEFAULT NULL;
+  ADD COLUMN `requested_network_mbps` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `network_mbps_used` INT(11) DEFAULT NULL;
+  ADD COLUMN `network_mbps_used` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `jobs`
   DROP COLUMN `check_delay`;
 ALTER TABLE `jobs`
   DROP COLUMN `v4`;
+ALTER TABLE `jobs`
+  ALTER COLUMN `requested_memory` BIGINT(20) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ALTER COLUMN `memory_used` BIGINT(20) DEFAULT NULL;
 
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`;
@@ -50,10 +54,12 @@ ALTER TABLE `commands`
 ALTER TABLE `commands`
   ADD COLUMN `gpu` INT(11) DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `disk_mb` INT(11) DEFAULT NULL;
+  ADD COLUMN `disk_mb` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `network_mbps` INT(11) DEFAULT NULL;
+  ADD COLUMN `network_mbps` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `commands`
   ADD COLUMN `image_name` VARCHAR(1024) DEFAULT NULL;
 ALTER TABLE `commands`
   ADD COLUMN `image_tag` VARCHAR(1024) DEFAULT NULL;
+ALTER TABLE `commands`
+  ALTER COLUMN `memory` BIGINT(20) DEFAULT NULL;

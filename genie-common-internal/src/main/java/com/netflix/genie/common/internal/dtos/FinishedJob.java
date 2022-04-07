@@ -60,7 +60,7 @@ public class FinishedJob extends CommonMetadata {
     private final String grouping;
     private final String groupingInstance;
     private final String statusMessage;
-    private final Integer requestedMemory;
+    private final Long requestedMemory;
     private final String requestApiClientHostname;
     private final String requestApiClientUserAgent;
     private final String requestAgentClientHostname;
@@ -68,7 +68,7 @@ public class FinishedJob extends CommonMetadata {
     private final Integer numAttachments;
     private final Integer exitCode;
     private final String archiveLocation;
-    private final Integer memoryUsed;
+    private final Long memoryUsed;
     private final Command command;
     private final Cluster cluster;
     @Getter
@@ -156,7 +156,7 @@ public class FinishedJob extends CommonMetadata {
      *
      * @return the job requested memory, if present
      */
-    public Optional<Integer> getRequestedMemory() {
+    public Optional<Long> getRequestedMemory() {
         return Optional.ofNullable(requestedMemory);
     }
 
@@ -228,7 +228,7 @@ public class FinishedJob extends CommonMetadata {
      *
      * @return the job used memory, if present
      */
-    public Optional<Integer> getMemoryUsed() {
+    public Optional<Long> getMemoryUsed() {
         return Optional.ofNullable(memoryUsed);
     }
 
@@ -266,7 +266,7 @@ public class FinishedJob extends CommonMetadata {
         private String bGrouping;
         private String bGroupingInstance;
         private String bStatusMessage;
-        private Integer bRequestedMemory;
+        private Long bRequestedMemory;
         private String bRequestApiClientHostname;
         private String bRequestApiClientUserAgent;
         private String bRequestAgentClientHostname;
@@ -274,7 +274,7 @@ public class FinishedJob extends CommonMetadata {
         private Integer bNumAttachments;
         private Integer bExitCode;
         private String bArchiveLocation;
-        private Integer bMemoryUsed;
+        private Long bMemoryUsed;
         private Command bCommand;
         private Cluster bCluster;
         private List<Application> bApplications;
@@ -386,7 +386,7 @@ public class FinishedJob extends CommonMetadata {
          * @param requestedMemory the amount of memory requested
          * @return the builder
          */
-        public Builder withRequestedMemory(@Nullable final Integer requestedMemory) {
+        public Builder withRequestedMemory(@Nullable final Long requestedMemory) {
             this.bRequestedMemory = requestedMemory;
             return this;
         }
@@ -474,7 +474,7 @@ public class FinishedJob extends CommonMetadata {
          * @param memoryUsed the memory allocated to the job
          * @return the builder
          */
-        public Builder withMemoryUsed(@Nullable final Integer memoryUsed) {
+        public Builder withMemoryUsed(@Nullable final Long memoryUsed) {
             this.bMemoryUsed = memoryUsed;
             return this;
         }

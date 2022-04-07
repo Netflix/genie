@@ -43,7 +43,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         properties.isEnabled()
         properties.getLaunchCommandTemplate() == ["java", "-jar", LocalAgentLauncherProperties.AGENT_JAR_PLACEHOLDER, "exec", "--server-host", LocalAgentLauncherProperties.SERVER_HOST_PLACEHOLDER, "--server-port", LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, "--api-job", "--job-id", LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER]
         properties.getAgentJarPath() == "/tmp/genie-agent.jar"
-        properties.getMaxJobMemory() == 10_240
+        properties.getMaxJobMemory() == 10_240L
         properties.getMaxTotalJobMemory() == 30_720L
         !properties.isRunAsUserEnabled()
         properties.additionalEnvironment.isEmpty()
@@ -56,7 +56,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
     def "Setters and getters work properly"() {
         def newExecutable = Lists.newArrayList("/etc/genie-agent.sh", "run")
         def newJar = "/tmp/agent-SNAPSHOT.jar"
-        def newMaxJobMemory = 30_000
+        def newMaxJobMemory = 30_000L
         def newMaxTotalJobMemory = 900_000L
         def properties = new LocalAgentLauncherProperties()
         def environment = ImmutableMap.of("FOO", "Bar")

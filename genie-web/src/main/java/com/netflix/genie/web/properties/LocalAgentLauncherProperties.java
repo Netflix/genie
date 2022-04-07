@@ -113,7 +113,7 @@ public class LocalAgentLauncherProperties {
      * Defaults to 10 GB (10,240 MB).
      */
     @Min(value = 1, message = "The minimum value is 1MB but the value should likely be much higher")
-    private int maxJobMemory = 10_240;
+    private long maxJobMemory = 10_240;
 
     /**
      * Default to 30 GB (30,720 MB).

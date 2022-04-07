@@ -20,7 +20,6 @@ package com.netflix.genie.common.internal.dtos
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.netflix.genie.common.external.util.GenieObjectMapper
-import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification
 
 /**
@@ -51,8 +50,12 @@ class JobRequestSpec extends Specification {
             UUID.randomUUID().toString()
         )
         def requestedJobEnvironment = new JobEnvironmentRequest.Builder()
-            .withRequestedJobCpu(3)
-            .withRequestedJobMemory(10_000)
+            .withRequestedComputeResources(
+                new ComputeResources.Builder()
+                    .withCpu(3)
+                    .withMemoryMb(10_000)
+                    .build()
+            )
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
             .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
             .build()
@@ -240,8 +243,12 @@ class JobRequestSpec extends Specification {
         )
         def requestedJobEnvironment = new JobEnvironmentRequest.Builder()
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
-            .withRequestedJobCpu(2)
-            .withRequestedJobMemory(10_000)
+            .withRequestedComputeResources(
+                new ComputeResources.Builder()
+                    .withCpu(2)
+                    .withMemoryMb(10_000)
+                    .build()
+            )
             .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
             .build()
         def requestedAgentConfig = new AgentConfigRequest.Builder()
@@ -317,7 +324,7 @@ class JobRequestSpec extends Specification {
     }
 
     def "Test equals"() {
-        def base = createJobRequest()
+        def base = DtoSpecUtils.getRandomJobRequest()
         Object comparable
 
         when:
@@ -333,7 +340,7 @@ class JobRequestSpec extends Specification {
         base != comparable
 
         when:
-        comparable = createJobRequest()
+        comparable = DtoSpecUtils.getRandomJobRequest()
 
         then:
         base != comparable
@@ -361,15 +368,15 @@ class JobRequestSpec extends Specification {
         JobRequest two
 
         when:
-        one = createJobRequest()
+        one = DtoSpecUtils.getRandomJobRequest()
         two = one
 
         then:
         one.hashCode() == two.hashCode()
 
         when:
-        one = createJobRequest()
-        two = createJobRequest()
+        one = DtoSpecUtils.getRandomJobRequest()
+        two = DtoSpecUtils.getRandomJobRequest()
 
         then:
         one.hashCode() != two.hashCode()
@@ -391,15 +398,15 @@ class JobRequestSpec extends Specification {
         JobRequest two
 
         when:
-        one = createJobRequest()
+        one = DtoSpecUtils.getRandomJobRequest()
         two = one
 
         then:
         one.toString() == two.toString()
 
         when:
-        one = createJobRequest()
-        two = createJobRequest()
+        one = DtoSpecUtils.getRandomJobRequest()
+        two = DtoSpecUtils.getRandomJobRequest()
 
         then:
         one.toString() != two.toString()
@@ -414,50 +421,5 @@ class JobRequestSpec extends Specification {
 
         then:
         one.toString() == two.toString()
-    }
-
-    JobRequest createJobRequest() {
-        def metadata = new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build()
-        def criteria = new ExecutionResourceCriteria(
-            Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
-            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
-            null
-        )
-        def requestedId = UUID.randomUUID().toString()
-        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def timeout = RandomSuppliers.INT.get()
-        def interactive = true
-        def archivingDisabled = true
-        def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
-        def jobDirectoryLocation = "/tmp"
-        def requestedEnvironmentVariables = ImmutableMap.of(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        )
-        def requestedJobEnvironment = new JobEnvironmentRequest.Builder()
-            .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
-            .withRequestedJobCpu(RandomSuppliers.INT.get())
-            .withRequestedJobMemory(RandomSuppliers.INT.get())
-            .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
-            .build()
-        def requestedAgentConfig = new AgentConfigRequest.Builder()
-            .withArchivingDisabled(archivingDisabled)
-            .withTimeoutRequested(timeout)
-            .withInteractive(interactive)
-            .withRequestedJobDirectoryLocation(jobDirectoryLocation)
-            .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
-            .build()
-
-        return new JobRequest(
-            requestedId,
-            jobResources,
-            commandArgs,
-            metadata,
-            criteria,
-            requestedJobEnvironment,
-            requestedAgentConfig
-        )
     }
 }

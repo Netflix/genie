@@ -67,7 +67,7 @@ class CommandEntityTest extends EntityTestBase {
     private static final String USER = "tgianos";
     private static final List<String> EXECUTABLE = Lists.newArrayList("/bin/pig13", "-Dblah");
     private static final String VERSION = "1.0";
-    private static final int MEMORY = 10_240;
+    private static final long MEMORY = 10_240L;
 
     private CommandEntity c;
 
@@ -176,7 +176,7 @@ class CommandEntityTest extends EntityTestBase {
     @Test
     void testSetMemory() {
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(MEMORY);
-        final int newMemory = MEMORY + 1;
+        final long newMemory = MEMORY + 1;
         this.c.setMemory(newMemory);
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(newMemory);
     }
@@ -193,12 +193,12 @@ class CommandEntityTest extends EntityTestBase {
 
     @Test
     void testDiskMb() {
-        this.testOptionalField(this.c::getDiskMb, this.c::setDiskMb, 123_000);
+        this.testOptionalField(this.c::getDiskMb, this.c::setDiskMb, 123_000L);
     }
 
     @Test
     void testNetworkMbps() {
-        this.testOptionalField(this.c::getNetworkMbps, this.c::setNetworkMbps, 123_456);
+        this.testOptionalField(this.c::getNetworkMbps, this.c::setNetworkMbps, 123_456L);
     }
 
     @Test

@@ -43,7 +43,6 @@ class CommandSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def memory = 280
         def clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
@@ -51,6 +50,8 @@ class CommandSpec extends Specification {
             new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
         )
+        def computeResources = DtoSpecUtils.getRandomComputeResources()
+        def image = DtoSpecUtils.getRandomImage()
         Command command
 
         when:
@@ -61,8 +62,9 @@ class CommandSpec extends Specification {
             resources,
             metadata,
             executable,
-            memory,
-            clusterCriteria
+            clusterCriteria,
+            computeResources,
+            image
         )
 
         then:
@@ -72,8 +74,9 @@ class CommandSpec extends Specification {
         command.getResources() == resources
         command.getMetadata() == metadata
         command.getExecutable() == executable
-        command.getMemory().orElse(-1) == memory
         command.getClusterCriteria() == clusterCriteria
+        command.getComputeResources() == computeResources
+        command.getImage() == image
 
         when:
         command = new Command(
@@ -83,6 +86,7 @@ class CommandSpec extends Specification {
             null,
             metadata,
             executable,
+            null,
             null,
             null
         )
@@ -94,8 +98,9 @@ class CommandSpec extends Specification {
         command.getResources() == new ExecutionEnvironment(null, null, null)
         command.getMetadata() == metadata
         command.getExecutable() == executable
-        !command.getMemory().isPresent()
         command.getClusterCriteria().isEmpty()
+        command.getComputeResources() == new ComputeResources.Builder().build()
+        command.getImage() == new Image.Builder().build()
 
         when: "Executables contain blank strings they are removed"
         def newExecutable = Lists.newArrayList(executable)
@@ -109,6 +114,7 @@ class CommandSpec extends Specification {
             metadata,
             newExecutable,
             null,
+            null,
             null
         )
 
@@ -119,12 +125,13 @@ class CommandSpec extends Specification {
         command.getResources() == new ExecutionEnvironment(null, null, null)
         command.getMetadata() == metadata
         command.getExecutable() == executable
-        !command.getMemory().isPresent()
         command.getClusterCriteria().isEmpty()
+        command.getComputeResources() == new ComputeResources.Builder().build()
+        command.getImage() == new Image.Builder().build()
     }
 
     def "Test equals"() {
-        def base = createCommand()
+        def base = DtoSpecUtils.getRandomCommand()
         Object comparable
 
         when:
@@ -147,7 +154,8 @@ class CommandSpec extends Specification {
             null,
             Mock(CommandMetadata),
             Lists.newArrayList(UUID.randomUUID().toString()),
-            RandomSuppliers.INT.get(),
+            null,
+            null,
             null
         )
 
@@ -179,7 +187,8 @@ class CommandSpec extends Specification {
             null,
             baseMetadata,
             Lists.newArrayList(binary),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         )
         comparable = new Command(
@@ -189,7 +198,8 @@ class CommandSpec extends Specification {
             null,
             comparableMetadata,
             Lists.newArrayList(binary),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         )
 
@@ -202,15 +212,15 @@ class CommandSpec extends Specification {
         Command two
 
         when:
-        one = createCommand()
+        one = DtoSpecUtils.getRandomCommand()
         two = one
 
         then:
         one.hashCode() == two.hashCode()
 
         when:
-        one = createCommand()
-        two = createCommand()
+        one = DtoSpecUtils.getRandomCommand()
+        two = DtoSpecUtils.getRandomCommand()
 
         then:
         one.hashCode() != two.hashCode()
@@ -234,7 +244,8 @@ class CommandSpec extends Specification {
             null,
             baseMetadata,
             Lists.newArrayList(binary),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         )
         two = new Command(
@@ -244,7 +255,8 @@ class CommandSpec extends Specification {
             null,
             comparableMetadata,
             Lists.newArrayList(binary),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         )
 
@@ -257,15 +269,15 @@ class CommandSpec extends Specification {
         Command two
 
         when:
-        one = createCommand()
+        one = DtoSpecUtils.getRandomCommand()
         two = one
 
         then:
         one.toString() == two.toString()
 
         when:
-        one = createCommand()
-        two = createCommand()
+        one = DtoSpecUtils.getRandomCommand()
+        two = DtoSpecUtils.getRandomCommand()
 
         then:
         one.toString() != two.toString()
@@ -289,7 +301,8 @@ class CommandSpec extends Specification {
             null,
             baseMetadata,
             Lists.newArrayList(binary),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         )
         two = new Command(
@@ -299,38 +312,12 @@ class CommandSpec extends Specification {
             null,
             comparableMetadata,
             Lists.newArrayList(binary),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         )
 
         then:
         one.toString() == two.toString()
-    }
-
-    Command createCommand() {
-        def metadata = new CommandMetadata.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            CommandStatus.ACTIVE
-        ).build()
-        def id = UUID.randomUUID().toString()
-        def created = Instant.now()
-        def updated = Instant.now()
-        def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
-        def memory = RandomSuppliers.INT.get()
-        def clusterCriteria = Lists.newArrayList(
-            new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
-        )
-        return new Command(
-            id,
-            created,
-            updated,
-            resources,
-            metadata,
-            Lists.newArrayList(UUID.randomUUID().toString()),
-            memory,
-            clusterCriteria
-        )
     }
 }

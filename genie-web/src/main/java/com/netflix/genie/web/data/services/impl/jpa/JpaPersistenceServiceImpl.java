@@ -48,10 +48,12 @@ import com.netflix.genie.common.internal.dtos.CommandRequest;
 import com.netflix.genie.common.internal.dtos.CommandStatus;
 import com.netflix.genie.common.internal.dtos.CommonMetadata;
 import com.netflix.genie.common.internal.dtos.CommonResource;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dtos.FinishedJob;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.dtos.JobEnvironment;
 import com.netflix.genie.common.internal.dtos.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dtos.JobMetadata;
@@ -787,8 +789,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             commandRequest.getResources(),
             commandRequest.getMetadata(),
             commandRequest.getExecutable(),
-            commandRequest.getMemory().orElse(null),
-            commandRequest.getClusterCriteria()
+            commandRequest.getComputeResources().orElse(null),
+            commandRequest.getClusterCriteria(),
+            commandRequest.getImage().orElse(null)
         );
 
         try {
@@ -952,8 +955,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             updateCommand.getResources(),
             updateCommand.getMetadata(),
             updateCommand.getExecutable(),
-            updateCommand.getMemory().orElse(null),
-            updateCommand.getClusterCriteria()
+            updateCommand.getComputeResources(),
+            updateCommand.getClusterCriteria(),
+            updateCommand.getImage()
         );
     }
 
@@ -1653,9 +1657,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             jobSpecification.getTimeout().ifPresent(entity::setTimeoutUsed);
 
             final JobEnvironment jobEnvironment = resolvedJob.getJobEnvironment();
-            entity.setMemoryUsed(jobEnvironment.getMemory());
-
-            // TODO: There's probably some other fields we want to use from jobEnvironment
+            this.updateComputeResources(
+                jobEnvironment.getComputeResources(),
+                entity::setCpuUsed,
+                entity::setGpuUsed,
+                entity::setMemoryUsed,
+                entity::setDiskMbUsed,
+                entity::setNetworkMbpsUsed
+            );
+            this.updateImage(
+                jobEnvironment.getImage(),
+                entity::setImageNameUsed,
+                entity::setImageTagUsed
+            );
 
             entity.setResolved(true);
             entity.setStatus(JobStatus.RESOLVED.name());
@@ -2505,8 +2519,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final ExecutionEnvironment resources,
         final CommandMetadata metadata,
         final List<String> executable,
-        @Nullable final Integer memory,
-        final List<Criterion> clusterCriteria
+        @Nullable final ComputeResources computeResources,
+        final List<Criterion> clusterCriteria,
+        @Nullable final Image image
     ) {
         this.setEntityResources(resources, entity::setConfigs, entity::setDependencies);
         this.setEntityTags(metadata.getTags(), entity::setTags);
@@ -2514,7 +2529,15 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
 
         entity.setStatus(metadata.getStatus().name());
         entity.setExecutable(executable);
-        entity.setMemory(memory);
+        this.updateComputeResources(
+            computeResources,
+            entity::setCpu,
+            entity::setGpu,
+            entity::setMemory,
+            entity::setDiskMb,
+            entity::setNetworkMbps
+        );
+        this.updateImage(image, entity::setImageName, entity::setImageTag);
 
         this.updateClusterCriteria(entity, clusterCriteria);
     }
@@ -2639,9 +2662,20 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final JobEnvironmentRequest requestedJobEnvironment
     ) {
         jobEntity.setRequestedEnvironmentVariables(requestedJobEnvironment.getRequestedEnvironmentVariables());
-        requestedJobEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
-        requestedJobEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
+        this.updateComputeResources(
+            requestedJobEnvironment.getRequestedComputeResources().orElse(null),
+            jobEntity::setRequestedCpu,
+            jobEntity::setRequestedGpu,
+            jobEntity::setRequestedMemory,
+            jobEntity::setRequestedDiskMb,
+            jobEntity::setRequestedNetworkMbps
+        );
         requestedJobEnvironment.getExt().ifPresent(jobEntity::setRequestedAgentEnvironmentExt);
+        this.updateImage(
+            requestedJobEnvironment.getRequestedImage().orElse(null),
+            jobEntity::setRequestedImageName,
+            jobEntity::setRequestedImageTag
+        );
     }
 
     private void setRequestedAgentConfigFields(
@@ -2720,6 +2754,45 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final SpanCustomizer spanCustomizer = this.tracer.currentSpanCustomizer();
         this.tagAdapter.tag(spanCustomizer, TracingConstants.JOB_ID_TAG, jobId);
         return spanCustomizer;
+    }
+
+    private void updateComputeResources(
+        @Nullable final ComputeResources computeResources,
+        final Consumer<Integer> cpuSetter,
+        final Consumer<Integer> gpuSetter,
+        final Consumer<Long> memorySetter,
+        final Consumer<Long> diskMbSetter,
+        final Consumer<Long> networkMbpsSetter
+    ) {
+        // If nothing was passed in assume it means the user desired everything to be null or missing
+        if (computeResources == null) {
+            cpuSetter.accept(null);
+            gpuSetter.accept(null);
+            memorySetter.accept(null);
+            diskMbSetter.accept(null);
+            networkMbpsSetter.accept(null);
+        } else {
+            // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
+            cpuSetter.accept(computeResources.getCpu().orElse(null));
+            gpuSetter.accept(computeResources.getGpu().orElse(null));
+            memorySetter.accept(computeResources.getMemoryMb().orElse(null));
+            diskMbSetter.accept(computeResources.getDiskMb().orElse(null));
+            networkMbpsSetter.accept(computeResources.getNetworkMbps().orElse(null));
+        }
+    }
+
+    private void updateImage(
+        @Nullable final Image image,
+        final Consumer<String> nameSetter,
+        final Consumer<String> tagSetter
+    ) {
+        if (image == null) {
+            nameSetter.accept(null);
+            tagSetter.accept(null);
+        } else {
+            nameSetter.accept(image.getName().orElse(null));
+            tagSetter.accept(image.getTag().orElse(null));
+        }
     }
     //endregion
 }

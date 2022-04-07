@@ -19,6 +19,7 @@ package com.netflix.genie.common.internal.dtos;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 4.3.0
  */
-public class ComputeResources {
+public class ComputeResources implements Serializable {
 
     @Min(value = 1, message = "Must have at least one CPU")
     private final Integer cpu;
@@ -37,13 +38,13 @@ public class ComputeResources {
     private final Integer gpu;
 
     @Min(value = 1, message = "Must have at least 1 MB of memory")
-    private final Integer memoryMb;
+    private final Long memoryMb;
 
     @Min(value = 1, message = "Must have at least 1 MB of disk space")
-    private final Integer diskMb;
+    private final Long diskMb;
 
     @Min(value = 1, message = "Must have at least 1 Mbps of network bandwidth")
-    private final Integer networkMbps;
+    private final Long networkMbps;
 
     private ComputeResources(final Builder builder) {
         this.cpu = builder.bCpu;
@@ -76,7 +77,7 @@ public class ComputeResources {
      *
      * @return The amount or {@link Optional#empty()}
      */
-    public Optional<Integer> getMemoryMb() {
+    public Optional<Long> getMemoryMb() {
         return Optional.ofNullable(this.memoryMb);
     }
 
@@ -85,7 +86,7 @@ public class ComputeResources {
      *
      * @return The amount or {@link Optional#empty()}
      */
-    public Optional<Integer> getDiskMb() {
+    public Optional<Long> getDiskMb() {
         return Optional.ofNullable(this.diskMb);
     }
 
@@ -94,7 +95,7 @@ public class ComputeResources {
      *
      * @return The size or {@link Optional#empty()}
      */
-    public Optional<Integer> getNetworkMbps() {
+    public Optional<Long> getNetworkMbps() {
         return Optional.ofNullable(this.networkMbps);
     }
 
@@ -149,9 +150,9 @@ public class ComputeResources {
 
         private Integer bCpu;
         private Integer bGpu;
-        private Integer bMemoryMb;
-        private Integer bDiskMb;
-        private Integer bNetworkMbps;
+        private Long bMemoryMb;
+        private Long bDiskMb;
+        private Long bNetworkMbps;
 
         /**
          * Set the number of CPUs.
@@ -181,7 +182,7 @@ public class ComputeResources {
          * @param memoryMb The number must be at least 1 or {@literal null}
          * @return The {@link Builder}
          */
-        public Builder withMemoryMb(@Nullable final Integer memoryMb) {
+        public Builder withMemoryMb(@Nullable final Long memoryMb) {
             this.bMemoryMb = memoryMb;
             return this;
         }
@@ -192,7 +193,7 @@ public class ComputeResources {
          * @param diskMb The number must be at least 1 or {@literal null}
          * @return The {@link Builder}
          */
-        public Builder withDiskMb(@Nullable final Integer diskMb) {
+        public Builder withDiskMb(@Nullable final Long diskMb) {
             this.bDiskMb = diskMb;
             return this;
         }
@@ -203,7 +204,7 @@ public class ComputeResources {
          * @param networkMbps The number must be at least 1 or {@literal null}
          * @return The {@link Builder}
          */
-        public Builder withNetworkMbps(@Nullable final Integer networkMbps) {
+        public Builder withNetworkMbps(@Nullable final Long networkMbps) {
             this.bNetworkMbps = networkMbps;
             return this;
         }

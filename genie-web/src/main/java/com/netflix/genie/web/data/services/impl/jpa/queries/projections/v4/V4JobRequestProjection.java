@@ -215,11 +215,31 @@ public interface V4JobRequestProjection {
     Optional<Integer> getRequestedCpu();
 
     /**
+     * Get the number of GPUs requested by the job.
+     *
+     * @return The number of GPUs requested or {@link Optional#empty()}
+     */
+    Optional<Integer> getRequestedGpu();
+
+    /**
      * Get the memory requested to run this job with.
      *
      * @return The amount of memory the user requested for this job in MB as an Optional
      */
-    Optional<Integer> getRequestedMemory();
+    Optional<Long> getRequestedMemory();
+
+    /**
+     * Get the requested disk space for the job if any.
+     *
+     * @return The requested amount of disk space in MB or {@link Optional#empty()}
+     */
+    Optional<Long> getRequestedDiskMb();
+    /**
+     * Get the requested network mbps for the job if any.
+     *
+     * @return The requested network bandwidth in mbps or {@link Optional#empty()}
+     */
+    Optional<Long> getRequestedNetworkMbps();
 
     /**
      * Get the timeout (in seconds) requested by the user for this job.
@@ -234,4 +254,18 @@ public interface V4JobRequestProjection {
      * @return The applications
      */
     List<String> getRequestedApplications();
+
+    /**
+     * Get the requested container image name if there was one.
+     *
+     * @return The requested image name or {@link Optional#empty()}
+     */
+    Optional<String> getRequestedImageName();
+
+    /**
+     * Get the requested container image tag if there was one.
+     *
+     * @return The requested image tag or {@link Optional#empty()}
+     */
+    Optional<String> getRequestedImageTag();
 }

@@ -17,8 +17,11 @@
  */
 package com.netflix.genie.common.internal.dtos;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,7 +31,8 @@ import java.util.Optional;
  * @author tgianos
  * @since 4.3.0
  */
-public class Image {
+@JsonDeserialize(builder = Image.Builder.class)
+public class Image implements Serializable {
 
     @Size(max = 1024, message = "Maximum length of a container image name is 1024 characters")
     private final String name;

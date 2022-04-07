@@ -129,7 +129,7 @@ public final class EntityV3DtoConverters {
         jobRequestProjection.getGenieUserGroup().ifPresent(builder::withGroup);
         jobRequestProjection.getDescription().ifPresent(builder::withDescription);
         jobRequestProjection.getRequestedCpu().ifPresent(builder::withCpu);
-        jobRequestProjection.getRequestedMemory().ifPresent(builder::withMemory);
+        jobRequestProjection.getRequestedMemory().ifPresent(memory -> builder.withMemory(memory.intValue()));
         jobRequestProjection.getRequestedTimeout().ifPresent(builder::withTimeout);
         jobRequestProjection
             .getSetupFile()
@@ -161,7 +161,7 @@ public final class EntityV3DtoConverters {
             builder.withTimeout(started.plusSeconds(jobExecutionProjection.getTimeoutUsed().get()));
         }
         jobExecutionProjection.getExitCode().ifPresent(builder::withExitCode);
-        jobExecutionProjection.getMemoryUsed().ifPresent(builder::withMemory);
+        jobExecutionProjection.getMemoryUsed().ifPresent(memory -> builder.withMemory(memory.intValue()));
         try {
             builder.withArchiveStatus(
                 ArchiveStatus.valueOf(

@@ -47,7 +47,7 @@ public class JobsMemoryProperties {
     /**
      * Default to 1.5 GB (1,536 MB).
      */
-    private int defaultJobMemory = 1_024;
+    private long defaultJobMemory = 1_024L;
 
     /**
      * Defaults to 10 GB (10,240 MB).

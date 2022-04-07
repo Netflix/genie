@@ -63,7 +63,7 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
      *
      * @return The memory as an optional as it could be null
      */
-    Optional<Integer> getMemoryUsed();
+    Optional<Long> getMemoryUsed();
 
     /**
      * Get the final resolved timeout duration (in seconds) if there was one for this job.

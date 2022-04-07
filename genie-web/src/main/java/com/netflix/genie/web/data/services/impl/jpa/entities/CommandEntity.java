@@ -206,17 +206,17 @@ public class CommandEntity extends BaseEntity {
     @Basic
     @Column(name = "memory")
     @Min(1)
-    private Integer memory;
+    private Long memory;
 
     @Basic
     @Column(name = "disk_mb")
     @Min(1)
-    private Integer diskMb;
+    private Long diskMb;
 
     @Basic
     @Column(name = "network_mbps")
     @Min(1)
-    private Integer networkMbps;
+    private Long networkMbps;
 
     @Basic
     @Column(name = "image_name", length = 1024)
@@ -378,7 +378,7 @@ public class CommandEntity extends BaseEntity {
      *
      * @return Optional of Integer as it could be null
      */
-    public Optional<Integer> getMemory() {
+    public Optional<Long> getMemory() {
         return Optional.ofNullable(this.memory);
     }
 
@@ -387,7 +387,7 @@ public class CommandEntity extends BaseEntity {
      *
      * @return The amount of disk space in MB or {@link Optional#empty()}
      */
-    public Optional<Integer> getDiskMb() {
+    public Optional<Long> getDiskMb() {
         return Optional.ofNullable(this.diskMb);
     }
 
@@ -396,7 +396,7 @@ public class CommandEntity extends BaseEntity {
      *
      * @return The amount of network bandwidth in mbps or {@link Optional#empty()}
      */
-    public Optional<Integer> getNetworkMbps() {
+    public Optional<Long> getNetworkMbps() {
         return Optional.ofNullable(this.networkMbps);
     }
 

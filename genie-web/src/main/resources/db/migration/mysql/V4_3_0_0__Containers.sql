@@ -29,13 +29,16 @@ ALTER TABLE `jobs`
   ADD COLUMN `requested_network_mbps` INT(11)       DEFAULT NULL,
   ADD COLUMN `network_mbps_used`      INT(11)       DEFAULT NULL,
   DROP COLUMN `check_delay`,
-  DROP COLUMN `v4`;
+  DROP COLUMN `v4`,
+  MODIFY COLUMN `requested_memory` BIGINT(20) DEFAULT NULL,
+  MODIFY COLUMN `memory_used` BIGINT(20) DEFAULT NULL;
 
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`,
   ADD COLUMN `cpu`          INT(11)       DEFAULT NULL,
   ADD COLUMN `gpu`          INT(11)       DEFAULT NULL,
-  ADD COLUMN `disk_mb`      INT(11)       DEFAULT NULL,
-  ADD COLUMN `network_mbps` INT(11)       DEFAULT NULL,
+  ADD COLUMN `disk_mb`      BIGINT(20)    DEFAULT NULL,
+  ADD COLUMN `network_mbps` BIGINT(20)    DEFAULT NULL,
   ADD COLUMN `image_name`   VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `image_tag`    VARCHAR(1024) DEFAULT NULL;
+  ADD COLUMN `image_tag`    VARCHAR(1024) DEFAULT NULL,
+  MODIFY COLUMN `memory` BIGINT(20) DEFAULT NULL;

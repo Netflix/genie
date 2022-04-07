@@ -81,7 +81,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private static final String USED_MEMORY_KEY = "usedMemory";
     private static final String AVAILABLE_MEMORY_KEY = "availableMemory";
     private static final String AVAILABLE_MAX_JOB_CAPACITY_KEY = "availableMaxJobCapacity";
-    private static final Map<String, String> INFO_UNAVAILABLE_DETAILS = ImmutableMap.of(
+    private static final Map<String, String> INFO_UNAVAILABLE_DETAILS = Map.of(
         "jobInfoUnavailable",
         "Unable to retrieve host job information. State unknown."
     );
@@ -91,6 +91,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private static final Object MEMORY_CHECK_LOCK = new Object();
     private static final String THIS_CLASS = LocalAgentLauncherImpl.class.getCanonicalName();
     private static final Tag CLASS_TAG = Tag.of(LAUNCHER_CLASS_KEY, THIS_CLASS);
+    private static final long DEFAULT_JOB_MEMORY = 1_536L;
 
     private final String hostname;
     private final PersistenceService persistenceService;
@@ -222,7 +223,11 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
             }
 
             // Check error conditions
-            final int jobMemory = resolvedJob.getJobEnvironment().getMemory();
+            final long jobMemory = resolvedJob
+                .getJobEnvironment()
+                .getComputeResources()
+                .getMemoryMb()
+                .orElse(DEFAULT_JOB_MEMORY);
             final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
             // Job was resolved with more memory allocated than the system was configured to allow
@@ -341,7 +346,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         // accepted jobs during launch
         final long memoryAllocated = jobInfo.getTotalMemoryAllocated();
         final long availableMemory = this.launcherProperties.getMaxTotalJobMemory() - memoryAllocated;
-        final int maxJobMemory = this.launcherProperties.getMaxJobMemory();
+        final long maxJobMemory = this.launcherProperties.getMaxJobMemory();
 
         final Health.Builder builder;
 
