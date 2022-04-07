@@ -18,7 +18,6 @@
 package com.netflix.genie.common.internal.dtos
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.collect.ImmutableMap
 import spock.lang.Specification
 
 /**
@@ -29,37 +28,43 @@ import spock.lang.Specification
 class JobEnvironmentSpec extends Specification {
 
     def "Generated instances are immutable and correct"() {
-        def memory = 1_512
-        def cpu = 3
-        def environmentVariables = ImmutableMap.of(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        )
+        def environmentVariables = [
+            one: UUID.randomUUID().toString()
+        ]
         def ext = Mock(JsonNode)
+        def computeResources = Mock(ComputeResources)
+        def image = Mock(Image)
 
-        def builder = new JobEnvironment.Builder(memory)
+        def builder = new JobEnvironment.Builder()
 
         when:
         def environment = builder.build()
 
         then:
-        environment.getMemory() == memory
-        environment.getCpu() == 1
+        environment.getComputeResources() != null
+        environment.getImage() != null
         environment.getEnvironmentVariables().isEmpty()
         !environment.getExt().isPresent()
 
         when:
-        environment = builder.withCpu(cpu).withEnvironmentVariables(environmentVariables).withExt(ext).build()
+        environment = builder
+            .withComputeResources(computeResources)
+            .withImage(image)
+            .withEnvironmentVariables(environmentVariables)
+            .withExt(ext)
+            .build()
 
         then:
-        environment.getMemory() == memory
-        environment.getCpu() == cpu
+        environment.getComputeResources() == computeResources
+        environment.getImage() == image
         environment.getEnvironmentVariables() == environmentVariables
         environment.getExt().orElse(null) == ext
 
         when:
         def environment2 = builder.build()
-        def environment3 = builder.withMemory(memory + 1).build()
+        def environment3 = builder
+            .withImage(new Image.Builder().withName(UUID.randomUUID().toString()).build())
+            .build()
 
         then:
         environment == environment2

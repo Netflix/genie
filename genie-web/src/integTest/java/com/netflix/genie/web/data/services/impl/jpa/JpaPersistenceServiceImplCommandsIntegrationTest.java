@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.common.internal.dtos.CommandMetadata;
 import com.netflix.genie.common.internal.dtos.CommandRequest;
 import com.netflix.genie.common.internal.dtos.CommandStatus;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
@@ -45,6 +46,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -259,8 +261,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(created.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
-        Assertions.assertThat(created.getMemory()).isNotPresent();
         Assertions.assertThat(created.getClusterCriteria()).isEmpty();
+        Assertions.assertThat(created.getComputeResources()).isNotNull();
+        Assertions.assertThat(created.getImage()).isNotNull();
         this.service.deleteCommand(id);
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
@@ -276,7 +279,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
         );
-        final int memory = 512;
+        final long memory = 512L;
+        final ComputeResources computeResources = new ComputeResources.Builder().withMemoryMb(memory).build();
         final CommandRequest command = new CommandRequest.Builder(
             new CommandMetadata.Builder(
                 COMMAND_1_NAME,
@@ -287,7 +291,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .build(),
             COMMAND_1_EXECUTABLE
         )
-            .withMemory(memory)
+            .withComputeResources(computeResources)
             .withClusterCriteria(clusterCriteria)
             .build();
         final String id = this.service.saveCommand(command);
@@ -297,7 +301,10 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(created.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
-        Assertions.assertThat(created.getMemory()).isPresent().contains(memory);
+        Assertions
+            .assertThat(created.getComputeResources())
+            .extracting(ComputeResources::getMemoryMb)
+            .isEqualTo(Optional.of(memory));
         Assertions.assertThat(created.getClusterCriteria()).isEqualTo(clusterCriteria);
         this.service.deleteCommand(created.getId());
         Assertions
@@ -312,11 +319,11 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(command.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(command.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(command.getMetadata().getTags().size()).isEqualTo(3);
-        Assertions.assertThat(command.getMemory()).isNotPresent();
+        Assertions.assertThat(command.getComputeResources()).isNotNull();
         final Set<String> tags = Sets.newHashSet("yarn", "hadoop");
         tags.addAll(command.getMetadata().getTags());
 
-        final int memory = 1_024;
+        final long memory = 1_024L;
         final Command updateCommand = new Command(
             command.getId(),
             command.getCreated(),
@@ -333,7 +340,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .withTags(tags)
                 .build(),
             command.getExecutable(),
-            memory,
+            null,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
         );
 
@@ -343,7 +351,10 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(updated.getMetadata().getUser()).isEqualTo(COMMAND_2_USER);
         Assertions.assertThat(updated.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.INACTIVE);
         Assertions.assertThat(updated.getMetadata().getTags().size()).isEqualTo(5);
-        Assertions.assertThat(updated.getMemory()).isPresent().contains(memory);
+        Assertions
+            .assertThat(updated.getComputeResources())
+            .extracting(ComputeResources::getMemoryMb)
+            .isEqualTo(Optional.of(memory));
     }
 
     @Test
@@ -422,6 +433,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .build(),
             command.getExecutable(),
             null,
+            null,
             null
         );
 
@@ -444,8 +456,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             init.getResources(),
             init.getMetadata(),
             init.getExecutable(),
-            init.getMemory().orElse(null),
-            init.getClusterCriteria()
+            init.getClusterCriteria(),
+            null,
+            null
         );
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
@@ -1030,8 +1043,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .withTags(command.getMetadata().getTags())
                 .build(),
             command.getExecutable(),
-            command.getMemory().orElse(null),
-            clusterCriteria
+            clusterCriteria,
+            command.getComputeResources(),
+            command.getImage()
         );
     }
 }

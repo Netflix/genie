@@ -25,6 +25,7 @@ import com.netflix.genie.common.internal.dtos.AgentConfigRequest
 import com.netflix.genie.common.internal.dtos.ApplicationStatus
 import com.netflix.genie.common.internal.dtos.ClusterStatus
 import com.netflix.genie.common.internal.dtos.CommandStatus
+import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
@@ -275,7 +276,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         command.getResources().getSetupFile().orElseGet(RandomSuppliers.STRING) == setupFile
         command.getResources().getConfigs() == configs
         command.getResources().getDependencies() == dependencies
-        command.getMemory().orElseGet(RandomSuppliers.INT) == memory
+        command.getComputeResources().getMemoryMb().orElseGet(RandomSuppliers.LONG) == memory
         command.getMetadata().getMetadata().isPresent()
         command.getMetadata().getMetadata().get() == metadata
         command.getClusterCriteria() == clusterCriteria
@@ -391,7 +392,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         )
 
         def requestedTimeout = 32_000
-        def requestedMemory = 32_387
+        def requestedMemory = 32_387L
         def requestedCpu = 3
 
         def requestedEnvironmentVariables = ImmutableMap.of(
@@ -426,8 +427,12 @@ class EntityV4DtoConvertersSpec extends Specification {
 
         def jobEnvironmentRequest = new JobEnvironmentRequest.Builder()
             .withExt(metadata)
-            .withRequestedJobMemory(requestedMemory)
-            .withRequestedJobCpu(requestedCpu)
+            .withRequestedComputeResources(
+                new ComputeResources.Builder()
+                    .withMemoryMb(requestedMemory)
+                    .withCpu(requestedCpu)
+                    .build()
+            )
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
             .build()
 
@@ -734,7 +739,6 @@ class EntityV4DtoConvertersSpec extends Specification {
     }
 
     def "Can convert FinishedJobProjection to FinishedJob DTO lacking all optional fields"() {
-
         def created = Instant.now()
 
         CriterionEntity criterion = Mock(CriterionEntity) {
@@ -838,8 +842,13 @@ class EntityV4DtoConvertersSpec extends Specification {
             getSetupFile() >> Optional.empty()
             getConfigs() >> []
             getDependencies() >> []
+            getCpu() >> Optional.empty()
+            getGpu() >> Optional.empty()
             getMemory() >> Optional.empty()
-            getCheckDelay() >> 100
+            getDiskMb() >> Optional.empty()
+            getNetworkMbps() >> Optional.empty()
+            getImageName() >> Optional.empty()
+            getImageTag() >> Optional.empty()
             getClusterCriteria() >> []
         }
 
@@ -896,7 +905,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getGrouping() >> Optional.of("group")
             getGroupingInstance() >> Optional.of("group_instance")
             getStatusMsg() >> Optional.of("status message")
-            getRequestedMemory() >> Optional.of(512)
+            getRequestedMemory() >> Optional.of(512L)
             getRequestApiClientHostname() >> Optional.of("api_client_host")
             getRequestApiClientUserAgent() >> Optional.of("apl_client_user-agent")
             getRequestAgentClientHostname() >> Optional.of("agent_client_host")
@@ -904,7 +913,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getNumAttachments() >> Optional.of(3)
             getExitCode() >> Optional.of(127)
             getArchiveLocation() >> Optional.of("s3://bucket/prefix/job")
-            getMemoryUsed() >> Optional.of(1024)
+            getMemoryUsed() >> Optional.of(1024L)
             getMetadata() >> Optional.of(Mock(JsonNode))
             getCommand() >> Optional.of(commandEntity)
             getCluster() >> Optional.of(clusterEntity)

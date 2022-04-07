@@ -118,7 +118,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         def timeout = started.plusSeconds(50L)
         entity.setStarted(started)
         entity.setTimeoutUsed(50)
-        def memory = 10_265
+        def memory = 10_265L
         entity.setMemoryUsed(memory)
         entity.setArchiveStatus(ArchiveStatus.ARCHIVED.toString())
 
@@ -134,7 +134,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         execution.getProcessId().orElseGet(RandomSuppliers.INT) == processId
         execution.getCheckDelay().isEmpty()
         execution.getTimeout().orElseGet(RandomSuppliers.INSTANT) == timeout
-        execution.getMemory().orElseGet(RandomSuppliers.INT) == memory
+        execution.getMemory().orElseGet(RandomSuppliers.LONG) == memory
         execution.getArchiveStatus().orElse(null) == ArchiveStatus.ARCHIVED
     }
 
@@ -283,7 +283,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         final int cpu = 38
         entity.setRequestedCpu(cpu)
 
-        final int memory = 3060
+        final Long memory = 3060L
         entity.setRequestedMemory(memory)
 
         final List<String> applications = Lists.newArrayList(
@@ -325,7 +325,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         request.getGroup().orElseGet(RandomSuppliers.STRING) == group
         request.getSetupFile().orElseGet(RandomSuppliers.STRING) == setupFile
         request.getCpu().orElseGet(RandomSuppliers.INT) == cpu
-        request.getMemory().orElseGet(RandomSuppliers.INT) == memory
+        request.getMemory().orElseGet(RandomSuppliers.INT) == memory.intValue()
         request.getApplications() == applications
         request.getTimeout().orElseGet(RandomSuppliers.INT) == timeout
         request.getMetadata().isPresent()

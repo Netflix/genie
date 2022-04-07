@@ -46,6 +46,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import javax.script.ScriptEngineManager;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
 class CommandSelectorManagedScriptIntegrationTest {
 
     private static final ExecutionResourceCriteria CRITERIA = new ExecutionResourceCriteria(
-        Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
+        List.of(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
         new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
         null
     );
@@ -111,6 +112,7 @@ class CommandSelectorManagedScriptIntegrationTest {
                 CommandStatus.ACTIVE
             ).build(),
             Lists.newArrayList(UUID.randomUUID().toString()),
+            null,
             null,
             null
         );

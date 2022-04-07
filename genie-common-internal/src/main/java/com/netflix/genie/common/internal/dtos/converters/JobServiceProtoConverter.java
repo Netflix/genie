@@ -410,7 +410,7 @@ public class JobServiceProtoConverter {
                 .withName(protoCriterion.getName())
                 .withVersion(protoCriterion.getVersion())
                 .withStatus(protoCriterion.getStatus())
-                .withTags(protoCriterion.getTagsList() != null ? Sets.newHashSet(protoCriterion.getTagsList()) : null)
+                .withTags(Sets.newHashSet(protoCriterion.getTagsList()))
                 .build();
         } catch (final IllegalArgumentException e) {
             throw new GenieConversionException("Failed to convert criterion", e);
@@ -500,11 +500,7 @@ public class JobServiceProtoConverter {
                 protoJobMetadata.getVersion()
             )
                 .withDescription(protoJobMetadata.getDescription())
-                .withTags(
-                    protoJobMetadata.getTagsList() != null
-                        ? Sets.newHashSet(protoJobMetadata.getTagsList())
-                        : null
-                )
+                .withTags(Sets.newHashSet(protoJobMetadata.getTagsList()))
                 .withMetadata(protoJobMetadata.getMetadata())
                 .withEmail(protoJobMetadata.getEmail())
                 .withGrouping(protoJobMetadata.getGrouping())
@@ -525,12 +521,8 @@ public class JobServiceProtoConverter {
             );
 
             final ExecutionEnvironment jobResources = new ExecutionEnvironment(
-                protoJobMetadata.getConfigsList() != null
-                    ? Sets.newHashSet(protoJobMetadata.getConfigsList())
-                    : null,
-                protoJobMetadata.getDependenciesList() != null
-                    ? Sets.newHashSet(protoJobMetadata.getDependenciesList())
-                    : null,
+                Sets.newHashSet(protoJobMetadata.getConfigsList()),
+                Sets.newHashSet(protoJobMetadata.getDependenciesList()),
                 protoJobMetadata.getSetupFile()
             );
 

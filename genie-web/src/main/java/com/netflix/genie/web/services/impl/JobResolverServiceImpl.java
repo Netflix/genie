@@ -28,6 +28,7 @@ import com.netflix.genie.common.internal.dtos.Application;
 import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.ClusterMetadata;
 import com.netflix.genie.common.internal.dtos.Command;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.JobEnvironment;
 import com.netflix.genie.common.internal.dtos.JobMetadata;
@@ -125,6 +126,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String CLUSTER_SELECTOR_COUNTER
         = "genie.services.jobResolver.resolveCluster.clusterSelector.counter";
 
+    private static final int DEFAULT_CPU = 1;
     private static final String NO_RATIONALE = "No rationale provided";
     private static final String NO_ID_FOUND = "No id found";
     private static final String VERSION_4 = "4";
@@ -149,7 +151,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final List<ClusterSelector> clusterSelectors;
     private final CommandSelector commandSelector;
     private final MeterRegistry registry;
-    private final int defaultMemory;
+    private final long defaultMemory;
     // TODO: Switch to path
     private final File defaultJobDirectory;
     private final String defaultArchiveLocation;
@@ -307,12 +309,11 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.resolveCommand(context);
         this.resolveCluster(context);
         this.resolveApplications(context);
-        this.resolveJobMemory(context);
+        this.resolveComputeResources(context);
         this.resolveEnvironmentVariables(context);
         this.resolveTimeout(context);
         this.resolveArchiveLocation(context);
         this.resolveJobDirectory(context);
-        this.resolveCpu(context);
 
         return context.build();
     }
@@ -599,25 +600,6 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private void resolveJobMemory(final JobResolutionContext context) {
-        context.setJobMemory(
-            context.getJobRequest()
-                .getRequestedJobEnvironment()
-                .getRequestedJobMemory()
-                .orElse(
-                    context
-                        .getCommand()
-                        .orElseThrow(
-                            () -> new IllegalStateException(
-                                "Command not resolved before attempting to resolve job memory"
-                            )
-                        )
-                        .getMemory()
-                        .orElse(this.defaultMemory)
-                )
-        );
-    }
-
     private void resolveEnvironmentVariables(final JobResolutionContext context) {
         final Command command = context
             .getCommand()
@@ -631,7 +613,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             );
         final String id = context.getJobId();
         final JobRequest jobRequest = context.getJobRequest();
-        final int jobMemory = context
+        final long jobMemory = context
             .getJobMemory()
             .orElseThrow(
                 () -> new IllegalStateException("Job memory not resolved before attempting to resolve env variables")
@@ -690,12 +672,50 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
+    private void resolveComputeResources(final JobResolutionContext context) {
+        this.resolveCpu(context);
+        this.resolveJobMemory(context);
+    }
+
     private void resolveCpu(final JobResolutionContext context) {
         context.setCpu(
-            context.getJobRequest()
+            context
+                .getJobRequest()
                 .getRequestedJobEnvironment()
-                .getRequestedJobCpu()
-                .orElse(null)
+                .getRequestedComputeResources()
+                .flatMap(ComputeResources::getCpu)
+                .orElse(
+                    context
+                        .getCommand()
+                        .orElseThrow(
+                            () -> new IllegalStateException("Command hasn't been resolved before compute resources")
+                        )
+                        .getComputeResources()
+                        .getCpu()
+                        .orElse(DEFAULT_CPU)
+                )
+        );
+    }
+
+    private void resolveJobMemory(final JobResolutionContext context) {
+        context.setJobMemory(
+            context
+                .getJobRequest()
+                .getRequestedJobEnvironment()
+                .getRequestedComputeResources()
+                .flatMap(ComputeResources::getMemoryMb)
+                .orElse(
+                    context
+                        .getCommand()
+                        .orElseThrow(
+                            () -> new IllegalStateException(
+                                "Command not resolved before attempting to resolve job memory"
+                            )
+                        )
+                        .getComputeResources()
+                        .getMemoryMb()
+                        .orElse(this.defaultMemory)
+                )
         );
     }
 
@@ -952,7 +972,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         private Cluster cluster;
         private List<Application> applications;
 
-        private Integer jobMemory;
+        private Long jobMemory;
         private Map<String, String> environmentVariables;
         private Integer timeout;
         private String archiveLocation;
@@ -973,7 +993,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             return Optional.ofNullable(this.applications);
         }
 
-        Optional<Integer> getJobMemory() {
+        Optional<Long> getJobMemory() {
             return Optional.ofNullable(this.jobMemory);
         }
 
@@ -1049,9 +1069,15 @@ public class JobResolverServiceImpl implements JobResolverService {
                 this.timeout
             );
 
-            final JobEnvironment jobEnvironment = new JobEnvironment
-                .Builder(this.jobMemory)
+            final ComputeResources computeResources = new ComputeResources
+                .Builder()
                 .withCpu(this.cpu)
+                .withMemoryMb(this.jobMemory)
+                .build();
+
+            final JobEnvironment jobEnvironment = new JobEnvironment
+                .Builder()
+                .withComputeResources(computeResources)
                 .withEnvironmentVariables(this.environmentVariables)
                 .build();
 

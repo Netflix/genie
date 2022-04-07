@@ -25,7 +25,6 @@ import spock.lang.Unroll
  *
  * @author tgianos
  */
-@SuppressWarnings("checkstyle:finalclass")
 class ComputeResourcesSpec extends Specification {
 
     @Unroll
@@ -50,9 +49,9 @@ class ComputeResourcesSpec extends Specification {
         def computeResources2 = new ComputeResources.Builder()
             .withCpu(cpu == null ? 1 : cpu + 1)
             .withGpu(gpu == null ? 1 : gpu + 1)
-            .withMemoryMb(memoryMb == null ? 1 : memoryMb + 1)
-            .withDiskMb(diskMb == null ? 1 : diskMb + 1)
-            .withNetworkMbps(networkMbps == null ? 1 : networkMbps + 1)
+            .withMemoryMb(memoryMb == null ? 1L : memoryMb + 1L)
+            .withDiskMb(diskMb == null ? 1L : diskMb + 1L)
+            .withNetworkMbps(networkMbps == null ? 1L : networkMbps + 1L)
             .build()
 
         then:
@@ -73,12 +72,12 @@ class ComputeResourcesSpec extends Specification {
 
         where:
         cpu  | gpu  | memoryMb | diskMb | networkMbps
-        1    | 2    | 3        | 4      | 5
+        1    | 2    | 3L       | 4L     | 5L
         1    | null | null     | null   | null
         null | 2    | null     | null   | null
-        null | null | 3        | null   | null
-        null | null | null     | 4      | null
-        null | null | null     | null   | 5
+        null | null | 3L       | null   | null
+        null | null | null     | 4L     | null
+        null | null | null     | null   | 5L
         null | null | null     | null   | null
     }
 }

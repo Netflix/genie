@@ -34,9 +34,11 @@ import com.netflix.genie.common.internal.dtos.Command
 import com.netflix.genie.common.internal.dtos.CommandMetadata
 import com.netflix.genie.common.internal.dtos.CommandRequest
 import com.netflix.genie.common.internal.dtos.CommandStatus
+import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dtos.Image
 import com.netflix.genie.common.internal.dtos.JobMetadata
 import com.netflix.genie.common.internal.dtos.JobRequest
 import com.netflix.genie.common.internal.dtos.JobStatus
@@ -537,7 +539,7 @@ class DtoConvertersSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
         def executableAndArgs = Lists.newArrayList(binary, defaultBinaryArgument)
-        def memory = 128_347
+        def memory = 128_347L
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
@@ -571,7 +573,7 @@ class DtoConvertersSpec extends Specification {
             .withConfigs(configs)
             .withDependencies(dependencies)
             .withSetupFile(setupFile)
-            .withMemory(memory)
+            .withMemory((int) memory)
             .withClusterCriteria(clusterCriteria)
             .build()
         commandRequest = DtoConverters.toV4CommandRequest(v3Command)
@@ -588,7 +590,11 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getResources().getSetupFile().orElse(null) == setupFile
         commandRequest.getResources().getConfigs() == configs
         commandRequest.getResources().getDependencies() == dependencies
-        commandRequest.getMemory().orElse(-1) == memory
+        commandRequest
+            .getComputeResources()
+            .orElseThrow(IllegalStateException::new)
+            .getMemoryMb() == Optional.ofNullable(memory)
+        !commandRequest.getImage().isPresent()
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
@@ -618,7 +624,8 @@ class DtoConvertersSpec extends Specification {
         !commandRequest.getResources().getSetupFile().isPresent()
         commandRequest.getResources().getConfigs().isEmpty()
         commandRequest.getResources().getDependencies().isEmpty()
-        !commandRequest.getMemory().isPresent()
+        !commandRequest.getComputeResources().isPresent()
+        !commandRequest.getImage().isPresent()
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
@@ -640,7 +647,7 @@ class DtoConvertersSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
         def executableAndArgs = Lists.newArrayList(binary, defaultBinaryArgument)
-        def memory = 128_347
+        def memory = 128_347L
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
@@ -680,7 +687,7 @@ class DtoConvertersSpec extends Specification {
             .withMetadata(metadata)
             .withTags(tags)
             .withDescription(description)
-            .withMemory(memory)
+            .withMemory((int) memory)
             .withClusterCriteria(clusterCriteria)
             .build()
         v4Command = DtoConverters.toV4Command(v3Command)
@@ -689,7 +696,10 @@ class DtoConvertersSpec extends Specification {
         v4Command.getId() == id
         v4Command.getCreated() == created
         v4Command.getUpdated() == updated
-        v4Command.getMemory().orElse(null) == memory
+        v4Command
+            .getComputeResources()
+            .getMemoryMb() == Optional.ofNullable(memory)
+        v4Command.getImage() != null
         v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
@@ -723,7 +733,8 @@ class DtoConvertersSpec extends Specification {
         v4Command.getId() == id
         v4Command.getCreated() != null
         v4Command.getUpdated() != null
-        !v4Command.getMemory().isPresent()
+        v4Command.getComputeResources() == new ComputeResources.Builder().build()
+        v4Command.getImage() == new Image.Builder().build()
         v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
@@ -786,8 +797,9 @@ class DtoConvertersSpec extends Specification {
                 .withTags(tags)
                 .build(),
             executable,
-            memory,
-            clusterCriteria
+            clusterCriteria,
+            new ComputeResources.Builder().withMemoryMb(memory).build(),
+            null
         )
         v3Command = DtoConverters.toV3Command(v4Command)
 
@@ -818,6 +830,7 @@ class DtoConvertersSpec extends Specification {
             null,
             new CommandMetadata.Builder(name, user, version, status).build(),
             executable,
+            null,
             null,
             null
         )
@@ -993,14 +1006,24 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getMetadata().getTags() == tags
         v4JobRequest.getCriteria().getApplicationIds() == applicationIds
         v4JobRequest.getCommandArgs() == [StringUtils.join(commandArgs, StringUtils.SPACE)] as List
-        v4JobRequest.getRequestedJobEnvironment().getRequestedJobMemory().orElse(null) == memory
+        v4JobRequest
+            .getRequestedJobEnvironment()
+            .getRequestedComputeResources()
+            .orElseThrow(IllegalStateException::new)
+            .getMemoryMb()
+            .orElseThrow(IllegalStateException::new) == memory
         v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().orElse(-1) == timeout
         v4JobRequest.getMetadata().getMetadata().orElse(null) == metadata
         v4JobRequest.getMetadata().getGrouping().orElse(null) == grouping
         v4JobRequest.getMetadata().getGroupingInstance().orElse(null) == groupingInstance
         v4JobRequest.getMetadata().getGroup().orElse(null) == group
         v4JobRequest.getMetadata().getDescription().orElse(null) == description
-        v4JobRequest.getRequestedJobEnvironment().getRequestedJobCpu().orElse(null) == cpu
+        v4JobRequest
+            .getRequestedJobEnvironment()
+            .getRequestedComputeResources()
+            .orElseThrow(IllegalStateException::new)
+            .getCpu()
+            .orElse(null) == cpu
         !v4JobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().isPresent()
         !v4JobRequest.getRequestedAgentConfig().isArchivingDisabled() // TODO: [GENIE-657]
         !v4JobRequest.getRequestedJobEnvironment().getExt().isPresent()

@@ -17,16 +17,18 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
-import lombok.EqualsAndHashCode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -38,7 +40,6 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-@EqualsAndHashCode(of = "uniqueId", callSuper = false)
 @ToString(
     callSuper = true,
     doNotUseGetters = true
@@ -54,4 +55,28 @@ public class UniqueIdEntity extends AuditEntity {
     @Basic(optional = false)
     @Column(name = "requested_id", nullable = false, updatable = false)
     private boolean requestedId;
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressFBWarnings({"BC_EQUALS_METHOD_SHOULD_WORK_FOR_ALL_OBJECTS"})
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
+        final UniqueIdEntity that = (UniqueIdEntity) o;
+        return Objects.equals(this.uniqueId, that.uniqueId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return this.uniqueId.hashCode();
+    }
 }

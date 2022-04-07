@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Instant;
@@ -51,27 +50,25 @@ public class Command extends CommonResource {
     private final ImmutableList<
         @NotEmpty(message = "A default executable element shouldn't be an empty string")
         @Size(max = 1024, message = "Executable elements can only be 1024 characters") String> executable;
-    @Min(
-        value = 1,
-        message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
-    )
-    private final Integer memory;
     private final ImmutableList<Criterion> clusterCriteria;
+    private final ComputeResources computeResources;
+    private final Image image;
 
     /**
      * Constructor.
      *
-     * @param id              The unique identifier of this command
-     * @param created         The time this command was created in the system
-     * @param updated         The last time this command was updated in the system
-     * @param resources       The execution resources associated with this command
-     * @param metadata        The metadata associated with this command
-     * @param executable      The executable command that will be used when a job is run with this command. Generally
-     *                        this will start with the binary and be followed optionally by default arguments. Must
-     *                        have at least one. Blanks will be removed
-     * @param memory          The default memory that should be used to run a job with this command
-     * @param clusterCriteria The ordered list of cluster {@link Criterion} that should be used to resolve which
-     *                        clusters this command can run on at job execution time
+     * @param id               The unique identifier of this command
+     * @param created          The time this command was created in the system
+     * @param updated          The last time this command was updated in the system
+     * @param resources        The execution resources associated with this command
+     * @param metadata         The metadata associated with this command
+     * @param executable       The executable command that will be used when a job is run with this command. Generally
+     *                         this will start with the binary and be followed optionally by default arguments. Must
+     *                         have at least one. Blanks will be removed
+     * @param clusterCriteria  The ordered list of cluster {@link Criterion} that should be used to resolve which
+     *                         clusters this command can run on at job execution time
+     * @param computeResources The default computational resources a job should have if this command is selected
+     * @param image            The default image the job should launch an image in if this command is selected
      */
     @JsonCreator
     public Command(
@@ -81,8 +78,9 @@ public class Command extends CommonResource {
         @JsonProperty(value = "resources") @Nullable final ExecutionEnvironment resources,
         @JsonProperty(value = "metadata", required = true) final CommandMetadata metadata,
         @JsonProperty(value = "executable", required = true) final List<String> executable,
-        @JsonProperty(value = "memory") @Nullable final Integer memory,
-        @JsonProperty(value = "clusterCriteria") @Nullable final List<Criterion> clusterCriteria
+        @JsonProperty(value = "clusterCriteria") @Nullable final List<Criterion> clusterCriteria,
+        @JsonProperty(value = "computeResources") @Nullable final ComputeResources computeResources,
+        @JsonProperty(value = "image") @Nullable final Image image
     ) {
         super(id, created, updated, resources);
         this.metadata = metadata;
@@ -92,17 +90,9 @@ public class Command extends CommonResource {
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList())
         );
-        this.memory = memory;
         this.clusterCriteria = clusterCriteria != null ? ImmutableList.copyOf(clusterCriteria) : ImmutableList.of();
-    }
-
-    /**
-     * Get the default amount of memory (in MB) to use for jobs which use this command.
-     *
-     * @return {@link Optional} wrapper of the amount of memory to use for a job
-     */
-    public Optional<Integer> getMemory() {
-        return Optional.ofNullable(this.memory);
+        this.computeResources = computeResources != null ? computeResources : new ComputeResources.Builder().build();
+        this.image = image != null ? image : new Image.Builder().build();
     }
 
     /**
@@ -122,5 +112,23 @@ public class Command extends CommonResource {
      */
     public List<Criterion> getClusterCriteria() {
         return this.clusterCriteria;
+    }
+
+    /**
+     * Get any default compute resources that were requested for this command.
+     *
+     * @return The {@link ComputeResources} or {@link Optional#empty()}
+     */
+    public ComputeResources getComputeResources() {
+        return this.computeResources;
+    }
+
+    /**
+     * Get any image information associated by default with this command.
+     *
+     * @return The {@link Image} metadata
+     */
+    public Image getImage() {
+        return this.image;
     }
 }

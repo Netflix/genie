@@ -29,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -54,28 +53,17 @@ public class CommandRequest extends CommonRequestImpl {
     @NotEmpty(message = "At least one executable entry is required")
     private final ImmutableList<@Size(max = 255, message = "Executable elements can only be 255 characters") String>
         executable;
-    @Min(
-        value = 1,
-        message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
-    )
-    private final Integer memory;
     private final ImmutableList<Criterion> clusterCriteria;
+    private final ComputeResources computeResources;
+    private final Image image;
 
     private CommandRequest(final Builder builder) {
         super(builder);
         this.metadata = builder.bMetadata;
         this.executable = builder.bExecutable;
-        this.memory = builder.bMemory;
         this.clusterCriteria = ImmutableList.copyOf(builder.bClusterCriteria);
-    }
-
-    /**
-     * Get the default amount of memory (in MB) to use for jobs which use this command.
-     *
-     * @return {@link Optional} wrapper of the amount of memory to use for a job
-     */
-    public Optional<Integer> getMemory() {
-        return Optional.ofNullable(this.memory);
+        this.computeResources = builder.bComputeResources;
+        this.image = builder.bImage;
     }
 
     /**
@@ -98,6 +86,24 @@ public class CommandRequest extends CommonRequestImpl {
     }
 
     /**
+     * Get any default compute resources that were requested for this command.
+     *
+     * @return The {@link ComputeResources} or {@link Optional#empty()}
+     */
+    public Optional<ComputeResources> getComputeResources() {
+        return Optional.ofNullable(this.computeResources);
+    }
+
+    /**
+     * Get any image information associated by default with this command.
+     *
+     * @return The {@link Image} metadata or {@link Optional#empty()}
+     */
+    public Optional<Image> getImage() {
+        return Optional.ofNullable(this.image);
+    }
+
+    /**
      * Builder for a V4 Command Request.
      *
      * @author tgianos
@@ -108,7 +114,8 @@ public class CommandRequest extends CommonRequestImpl {
         private final CommandMetadata bMetadata;
         private final ImmutableList<String> bExecutable;
         private final List<Criterion> bClusterCriteria = Lists.newArrayList();
-        private Integer bMemory;
+        private ComputeResources bComputeResources;
+        private Image bImage;
 
         /**
          * Constructor which has required fields.
@@ -133,17 +140,6 @@ public class CommandRequest extends CommonRequestImpl {
         }
 
         /**
-         * Set the amount of memory (in MB) to default jobs run with this command to use.
-         *
-         * @param memory The default amount of memory (in MB) for jobs to use
-         * @return The builder
-         */
-        public Builder withMemory(@Nullable final Integer memory) {
-            this.bMemory = memory;
-            return this;
-        }
-
-        /**
          * Set the ordered list of {@link Criterion} that should be used to resolve which clusters this command
          * can run on at any given time.
          *
@@ -155,6 +151,28 @@ public class CommandRequest extends CommonRequestImpl {
             if (clusterCriteria != null) {
                 this.bClusterCriteria.addAll(clusterCriteria);
             }
+            return this;
+        }
+
+        /**
+         * Set any default compute resources that should be used if this command is selected.
+         *
+         * @param computeResources The {@link ComputeResources} or {@link Optional#empty()}
+         * @return This {@link Builder} instance
+         */
+        public Builder withComputeResources(@Nullable final ComputeResources computeResources) {
+            this.bComputeResources = computeResources;
+            return this;
+        }
+
+        /**
+         * Set any default image metadata that should be used if this command is selected.
+         *
+         * @param image The {@link Image} or {@link Optional#empty()}
+         * @return This {@link Builder} instance
+         */
+        public Builder withImage(@Nullable final Image image) {
+            this.bImage = image;
             return this;
         }
 

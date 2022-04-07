@@ -134,6 +134,7 @@ class JpaPersistenceServiceImplCommandsTest {
                         ).build(),
                         Lists.newArrayList(UUID.randomUUID().toString()),
                         null,
+                        null,
                         null
                     )
                 )

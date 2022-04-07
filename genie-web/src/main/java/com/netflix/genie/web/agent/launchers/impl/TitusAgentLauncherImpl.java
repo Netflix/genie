@@ -22,7 +22,7 @@ import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
-import com.google.common.collect.ImmutableMap;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
@@ -91,7 +91,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private static final String THIS_CLASS = TitusAgentLauncherImpl.class.getCanonicalName();
     private static final Tag CLASS_TAG = Tag.of(LAUNCHER_CLASS_KEY, THIS_CLASS);
     private static final int TITUS_JOB_BATCH_SIZE = 1;
-    private static final int ZERO = 0;
+    private static final int DEFAULT_JOB_CPU = 1;
+    private static final int DEFAULT_JOB_GPU = 0;
+    private static final long DEFAULT_JOB_MEMORY = 1_536L;
+    private static final long DEFAULT_JOB_DISK = 10_000L;
+    private static final long DEFAULT_JOB_NETWORK = 16_000L;
     private static final BiFunction<List<String>, Map<String, String>, List<String>> REPLACE_PLACEHOLDERS =
         (template, placeholders) -> template
             .stream()
@@ -236,7 +240,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
         // Map placeholders in entry point template to their values
-        final Map<String, String> placeholdersMap = ImmutableMap.of(
+        final Map<String, String> placeholdersMap = Map.of(
             TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
             jobId,
             TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
@@ -253,61 +257,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         final List<String> command = REPLACE_PLACEHOLDERS.apply(
             this.titusAgentLauncherProperties.getCommandTemplate(),
             placeholdersMap
-        );
-
-        final long memory = Math.max(
-            this.getDataSizeProperty(
-                TitusAgentLauncherProperties.MINIMUM_MEMORY_PROPERTY,
-                this.titusAgentLauncherProperties.getMinimumMemory()
-            ).toMegabytes(),
-            resolvedJob.getJobEnvironment().getMemory() + this.getDataSizeProperty(
-                TitusAgentLauncherProperties.ADDITIONAL_MEMORY_PROPERTY,
-                this.titusAgentLauncherProperties.getAdditionalMemory()
-            ).toMegabytes()
-        );
-        final int cpu = Math.max(
-            this.environment.getProperty(
-                TitusAgentLauncherProperties.MINIMUM_CPU_PROPERTY,
-                Integer.class,
-                this.titusAgentLauncherProperties.getMinimumCPU()
-            ),
-            resolvedJob.getJobEnvironment().getCpu() + this.environment.getProperty(
-                TitusAgentLauncherProperties.ADDITIONAL_CPU_PROPERTY,
-                Integer.class,
-                this.titusAgentLauncherProperties.getAdditionalCPU()
-            )
-        );
-        final long diskSize = Math.max(
-            this.getDataSizeProperty(
-                TitusAgentLauncherProperties.MINIMUM_DISK_SIZE_PROPERTY,
-                this.titusAgentLauncherProperties.getMinimumDiskSize()
-            ).toMegabytes(),
-            ZERO /* TODO: Placeholder for job request field */ + this.getDataSizeProperty(
-                TitusAgentLauncherProperties.ADDITIONAL_DISK_SIZE_PROPERTY,
-                this.titusAgentLauncherProperties.getAdditionalDiskSize()
-            ).toMegabytes()
-        );
-        final long networkMbps = Math.max(
-            this.getDataSizeProperty(
-                TitusAgentLauncherProperties.MINIMUM_BANDWIDTH_PROPERTY,
-                this.titusAgentLauncherProperties.getMinimumBandwidth()
-            ).toMegabytes(),
-            ZERO /* TODO: Placeholder for job request field */ + this.getDataSizeProperty(
-                TitusAgentLauncherProperties.ADDITIONAL_BANDWIDTH_PROPERTY,
-                this.titusAgentLauncherProperties.getAdditionalBandwidth()
-            ).toMegabytes()
-        ) * MEGABYTE_TO_MEGABIT;
-        final int gpus = Math.max(
-            this.environment.getProperty(
-                TitusAgentLauncherProperties.MINIMUM_GPU_PROPERTY,
-                Integer.class,
-                this.titusAgentLauncherProperties.getMinimumGPU()
-            ),
-            ZERO /* TODO: Placeholder for job request field */ + this.environment.getProperty(
-                TitusAgentLauncherProperties.ADDITIONAL_GPU_PROPERTY,
-                Integer.class,
-                this.titusAgentLauncherProperties.getAdditionalGPU()
-            )
         );
         final Duration runtimeLimit = this.titusAgentLauncherProperties.getRuntimeLimit();
 
@@ -332,15 +281,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .container(
                 TitusBatchJobRequest.Container
                     .builder()
-                    .resources(
-                        TitusBatchJobRequest.Resources.builder()
-                            .cpu(cpu)
-                            .gpu(gpus)
-                            .memoryMB(memory)
-                            .diskMB(diskSize)
-                            .networkMbps(networkMbps)
-                            .build()
-                    )
+                    .resources(this.getTitusResources(resolvedJob))
                     .securityProfile(
                         TitusBatchJobRequest.SecurityProfile.builder()
                             .attributes(new HashMap<>(this.titusAgentLauncherProperties.getSecurityAttributes()))
@@ -348,24 +289,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                             .iamRole(this.titusAgentLauncherProperties.getIAmRole())
                             .build()
                     )
-                    .image(
-                        TitusBatchJobRequest.Image.builder()
-                            .name(
-                                this.environment.getProperty(
-                                    TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
-                                    String.class,
-                                    this.titusAgentLauncherProperties.getImageName()
-                                )
-                            )
-                            .tag(
-                                this.environment.getProperty(
-                                    TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
-                                    String.class,
-                                    this.titusAgentLauncherProperties.getImageTag()
-                                )
-                            )
-                            .build()
-                    )
+                    .image(this.getTitusImage(resolvedJob))
                     .entryPoint(entryPoint)
                     .command(command)
                     .env(this.createJobEnvironment())
@@ -483,6 +407,96 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         }
 
         return jobEnvironment;
+    }
+
+    private TitusBatchJobRequest.Resources getTitusResources(final ResolvedJob resolvedJob) {
+        // TODO: Address defaults?
+        final ComputeResources computeResources = resolvedJob.getJobEnvironment().getComputeResources();
+        final int cpu = Math.max(
+            this.environment.getProperty(
+                TitusAgentLauncherProperties.MINIMUM_CPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getMinimumCPU()
+            ),
+            computeResources.getCpu().orElse(DEFAULT_JOB_CPU) + this.environment.getProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_CPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getAdditionalCPU()
+            )
+        );
+        final int gpus = Math.max(
+            this.environment.getProperty(
+                TitusAgentLauncherProperties.MINIMUM_GPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getMinimumGPU()
+            ),
+            computeResources.getGpu().orElse(DEFAULT_JOB_GPU) + this.environment.getProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_GPU_PROPERTY,
+                Integer.class,
+                this.titusAgentLauncherProperties.getAdditionalGPU()
+            )
+        );
+        final long memory = Math.max(
+            this.getDataSizeProperty(
+                TitusAgentLauncherProperties.MINIMUM_MEMORY_PROPERTY,
+                this.titusAgentLauncherProperties.getMinimumMemory()
+            ).toMegabytes(),
+            computeResources.getMemoryMb().orElse(DEFAULT_JOB_MEMORY) + this.getDataSizeProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_MEMORY_PROPERTY,
+                this.titusAgentLauncherProperties.getAdditionalMemory()
+            ).toMegabytes()
+        );
+        final long diskSize = Math.max(
+            this.getDataSizeProperty(
+                TitusAgentLauncherProperties.MINIMUM_DISK_SIZE_PROPERTY,
+                this.titusAgentLauncherProperties.getMinimumDiskSize()
+            ).toMegabytes(),
+            computeResources.getDiskMb().orElse(DEFAULT_JOB_DISK) + this.getDataSizeProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_DISK_SIZE_PROPERTY,
+                this.titusAgentLauncherProperties.getAdditionalDiskSize()
+            ).toMegabytes()
+        );
+        final long networkMbps = Math.max(
+            this.getDataSizeProperty(
+                TitusAgentLauncherProperties.MINIMUM_BANDWIDTH_PROPERTY,
+                this.titusAgentLauncherProperties.getMinimumBandwidth()
+            ).toMegabytes() * MEGABYTE_TO_MEGABIT,
+            computeResources.getNetworkMbps().orElse(DEFAULT_JOB_NETWORK) + this.getDataSizeProperty(
+                TitusAgentLauncherProperties.ADDITIONAL_BANDWIDTH_PROPERTY,
+                this.titusAgentLauncherProperties.getAdditionalBandwidth()
+            ).toMegabytes() * MEGABYTE_TO_MEGABIT
+        );
+
+        return TitusBatchJobRequest.Resources.builder()
+            .cpu(cpu)
+            .gpu(gpus)
+            .memoryMB(memory)
+            .diskMB(diskSize)
+            .networkMbps(networkMbps)
+            .build();
+    }
+
+    private TitusBatchJobRequest.Image getTitusImage(final ResolvedJob resolvedJob) {
+        final String imageName = resolvedJob.getJobEnvironment().getImage()
+            .getName()
+            .orElse(
+                this.environment.getProperty(
+                    TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
+                    String.class,
+                    this.titusAgentLauncherProperties.getImageName()
+                )
+            );
+        final String imageTag = resolvedJob.getJobEnvironment().getImage()
+            .getTag()
+            .orElse(
+                this.environment.getProperty(
+                    TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
+                    String.class,
+                    this.titusAgentLauncherProperties.getImageTag()
+                )
+            );
+
+        return TitusBatchJobRequest.Image.builder().name(imageName).tag(imageTag).build();
     }
 
     /**

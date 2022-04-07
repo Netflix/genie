@@ -94,7 +94,7 @@ public interface JobRequestProjection extends JobCommonFieldsProjection, SetupFi
      *
      * @return The amount of memory the user requested for this job in MB as an Optional
      */
-    Optional<Integer> getRequestedMemory();
+    Optional<Long> getRequestedMemory();
 
     /**
      * Get the timeout (in seconds) requested by the user for this job.

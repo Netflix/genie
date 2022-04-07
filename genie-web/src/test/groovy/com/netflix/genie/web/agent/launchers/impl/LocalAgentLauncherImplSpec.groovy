@@ -21,6 +21,7 @@ import brave.Span
 import brave.Tracer
 import brave.propagation.TraceContext
 import com.fasterxml.jackson.databind.JsonNode
+import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.JobEnvironment
 import com.netflix.genie.common.internal.dtos.JobMetadata
 import com.netflix.genie.common.internal.dtos.JobSpecification
@@ -81,7 +82,8 @@ class LocalAgentLauncherImplSpec extends Specification {
     ResolvedJob resolvedJob
     JobMetadata jobMetadata
     JobEnvironment jobEnvironment
-    int jobMemory
+    ComputeResources computeResources
+    long jobMemory
     JobSpecification jobSpec
     JobSpecification.ExecutionResource job
     Executor sharedExecutor
@@ -108,7 +110,8 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.resolvedJob = Mock(ResolvedJob)
         this.jobMetadata = Mock(JobMetadata)
         this.jobEnvironment = Mock(JobEnvironment)
-        this.jobMemory = 100
+        this.computeResources = Mock(ComputeResources)
+        this.jobMemory = 100L
         this.jobSpec = Mock(JobSpecification)
         this.job = Mock(JobSpecification.ExecutionResource)
         this.executor = Mock(Executor)
@@ -175,7 +178,8 @@ class LocalAgentLauncherImplSpec extends Specification {
         }
 
         1 * this.resolvedJob.getJobEnvironment() >> this.jobEnvironment
-        1 * this.jobEnvironment.getMemory() >> this.jobMemory
+        1 * this.jobEnvironment.getComputeResources() >> this.computeResources
+        1 * this.computeResources.getMemoryMb() >> Optional.of(this.jobMemory)
         1 * this.resolvedJob.getJobSpecification() >> this.jobSpec
         1 * this.jobSpec.getJob() >> this.job
         1 * this.job.getId() >> JOB_ID
@@ -251,7 +255,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     def "Can report health"() {
         def jobInfo = Mock(JobInfoAggregate)
         def maxTotalJobMemory = 100_003L
-        def maxJobMemory = 10_000
+        def maxJobMemory = 10_000L
         def properties = Mock(LocalAgentLauncherProperties) {
             getMaxTotalJobMemory() >> maxTotalJobMemory
             getMaxJobMemory() >> maxJobMemory

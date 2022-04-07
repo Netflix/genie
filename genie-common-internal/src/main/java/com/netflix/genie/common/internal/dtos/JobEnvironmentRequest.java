@@ -20,17 +20,16 @@ package com.netflix.genie.common.internal.dtos;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,15 +43,10 @@ import java.util.Optional;
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 @JsonDeserialize(builder = JobEnvironmentRequest.Builder.class)
-@SuppressWarnings("checkstyle:finalclass")
 public class JobEnvironmentRequest implements Serializable {
 
     private static final long serialVersionUID = -1782447793634908168L;
 
-    @Min(value = 1, message = "Number of CPU's requested can't be less than 1")
-    private final Integer requestedJobCpu;
-    @Min(value = 1, message = "Amount of memory requested has to be greater than 1 MB and preferably much more")
-    private final Integer requestedJobMemory;
     private final ImmutableMap<
         @NotBlank(message = "Environment variable key can't be blank")
         @Size(max = 255, message = "Max environment variable name length is 255 characters") String,
@@ -60,30 +54,14 @@ public class JobEnvironmentRequest implements Serializable {
         @Size(max = 1024, message = "Max environment variable value length is 1024 characters") String>
         requestedEnvironmentVariables;
     private final JsonNode ext;
+    private final ComputeResources requestedComputeResources;
+    private final Image requestedImage;
 
     private JobEnvironmentRequest(final Builder builder) {
-        this.requestedJobCpu = builder.bRequestedJobCpu;
-        this.requestedJobMemory = builder.bRequestedJobMemory;
         this.requestedEnvironmentVariables = ImmutableMap.copyOf(builder.bRequestedEnvironmentVariables);
         this.ext = builder.bExt;
-    }
-
-    /**
-     * Get the number of CPU cores requested by the user for the job process.
-     *
-     * @return The number of CPU cores requested wrapped in an {@link Optional}
-     */
-    public Optional<Integer> getRequestedJobCpu() {
-        return Optional.ofNullable(this.requestedJobCpu);
-    }
-
-    /**
-     * Get the amount of memory requested by the user to launch the job process with.
-     *
-     * @return The memory requested wrapped in an {@link Optional}
-     */
-    public Optional<Integer> getRequestedJobMemory() {
-        return Optional.ofNullable(this.requestedJobMemory);
+        this.requestedComputeResources = builder.bRequestedComputeResources;
+        this.requestedImage = builder.bRequestedImage;
     }
 
     /**
@@ -105,37 +83,42 @@ public class JobEnvironmentRequest implements Serializable {
     }
 
     /**
+     * Get the execution environment the user requested.
+     *
+     * @return The {@link ComputeResources} that were requested or {@link Optional#empty()}
+     */
+    public Optional<ComputeResources> getRequestedComputeResources() {
+        return Optional.ofNullable(this.requestedComputeResources);
+    }
+
+    /**
+     * Get the requested image metadata the user entered.
+     *
+     * @return The {@link Image} data or {@link Optional#empty()}
+     */
+    public Optional<Image> getRequestedImage() {
+        return Optional.ofNullable(this.requestedImage);
+    }
+
+    /**
      * Builder to create an immutable {@link JobEnvironmentRequest} instance.
      *
      * @author tgianos
      * @since 4.0.0
      */
     public static class Builder {
-        private final Map<String, String> bRequestedEnvironmentVariables = Maps.newHashMap();
-        private Integer bRequestedJobCpu;
-        private Integer bRequestedJobMemory;
+        private final Map<String, String> bRequestedEnvironmentVariables;
         private JsonNode bExt;
+        private ComputeResources bRequestedComputeResources;
+        private Image bRequestedImage;
 
         /**
-         * Set the number of CPU cores that should be allocated to run the associated job.
-         *
-         * @param requestedJobCpu The number of CPU's. Must be greater than or equal to 1.
-         * @return The builder
+         * Constructor.
          */
-        public Builder withRequestedJobCpu(@Nullable final Integer requestedJobCpu) {
-            this.bRequestedJobCpu = requestedJobCpu;
-            return this;
-        }
-
-        /**
-         * Set the amount of memory (in MB) that should be allocated for the job processes.
-         *
-         * @param requestedJobMemory The requested memory. Must be greater than or equal to 1 but preferably much more
-         * @return The builder
-         */
-        public Builder withRequestedJobMemory(@Nullable final Integer requestedJobMemory) {
-            this.bRequestedJobMemory = requestedJobMemory;
-            return this;
+        public Builder() {
+            this.bRequestedEnvironmentVariables = new HashMap<>();
+            this.bRequestedComputeResources = new ComputeResources.Builder().build();
+            this.bRequestedImage = new Image.Builder().build();
         }
 
         /**
@@ -163,6 +146,28 @@ public class JobEnvironmentRequest implements Serializable {
          */
         public Builder withExt(@Nullable final JsonNode ext) {
             this.bExt = ext;
+            return this;
+        }
+
+        /**
+         * Set the computation resources the job should run with.
+         *
+         * @param requestedComputeResources The {@link ComputeResources}
+         * @return This {@link Builder} instance
+         */
+        public Builder withRequestedComputeResources(final ComputeResources requestedComputeResources) {
+            this.bRequestedComputeResources = requestedComputeResources;
+            return this;
+        }
+
+        /**
+         * Set the image the job should run with.
+         *
+         * @param requestedImage The {@link Image}
+         * @return This {@link Builder} instance
+         */
+        public Builder withRequestedImage(final Image requestedImage) {
+            this.bRequestedImage = requestedImage;
             return this;
         }
 

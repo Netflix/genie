@@ -36,6 +36,7 @@ import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.common.internal.dtos.CommandMetadata;
 import com.netflix.genie.common.internal.dtos.CommandRequest;
 import com.netflix.genie.common.internal.dtos.CommandStatus;
+import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
@@ -47,11 +48,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Utility class to help convert between V3 and V4 DTOs during migration period.
+ * Utility class to help convert between V3 and internal DTOs.
  *
  * @author tgianos
  * @since 4.0.0
@@ -298,7 +300,13 @@ public final class DtoConverters {
         final List<String> executable = v3Command.getExecutableAndArguments();
         final CommandRequest.Builder builder = new CommandRequest.Builder(metadataBuilder.build(), executable);
         v3Command.getId().ifPresent(builder::withRequestedId);
-        v3Command.getMemory().ifPresent(builder::withMemory);
+        v3Command
+            .getMemory()
+            .ifPresent(
+                memory -> builder.withComputeResources(
+                    new ComputeResources.Builder().withMemoryMb((long) memory).build()
+                )
+            );
         builder.withResources(
             new ExecutionEnvironment(
                 v3Command.getConfigs(),
@@ -318,7 +326,7 @@ public final class DtoConverters {
     }
 
     /**
-     * Convert a V3 {@link com.netflix.genie.common.dto.Command} to a V4 {@link Command}.
+     * Convert a V3 {@link com.netflix.genie.common.dto.Command} to an intenral {@link Command}.
      *
      * @param v3Command The V3 Command to convert
      * @return The V4 representation of the supplied command
@@ -344,6 +352,10 @@ public final class DtoConverters {
             v3Command.getSetupFile().orElse(null)
         );
 
+        final ComputeResources computeResources = v3Command.getMemory().isPresent()
+            ? new ComputeResources.Builder().withMemoryMb((long) v3Command.getMemory().get()).build()
+            : null;
+
         return new Command(
             v3Command.getId().orElseThrow(IllegalArgumentException::new),
             v3Command.getCreated().orElse(Instant.now()),
@@ -351,12 +363,13 @@ public final class DtoConverters {
             resources,
             metadataBuilder.build(),
             v3Command.getExecutableAndArguments(),
-            v3Command.getMemory().orElse(null),
             v3Command
                 .getClusterCriteria()
                 .stream()
                 .map(DtoConverters::toV4CommandClusterCriterion)
-                .collect(Collectors.toList())
+                .collect(Collectors.toList()),
+            computeResources,
+            null
         );
     }
 
@@ -398,7 +411,10 @@ public final class DtoConverters {
 
         resources.getSetupFile().ifPresent(builder::withSetupFile);
 
-        v4Command.getMemory().ifPresent(builder::withMemory);
+        v4Command
+            .getComputeResources()
+            .getMemoryMb()
+            .ifPresent(memory -> builder.withMemory(memory.intValue()));
 
         return builder.build();
     }
@@ -444,8 +460,14 @@ public final class DtoConverters {
         );
 
         final JobEnvironmentRequest.Builder jobEnvironmentBuilder = new JobEnvironmentRequest.Builder();
-        v3JobRequest.getCpu().ifPresent(jobEnvironmentBuilder::withRequestedJobCpu);
-        v3JobRequest.getMemory().ifPresent(jobEnvironmentBuilder::withRequestedJobMemory);
+        final Optional<Integer> requestedCpu = v3JobRequest.getCpu();
+        final Optional<Integer> requestedMemory = v3JobRequest.getMemory();
+        if (requestedCpu.isPresent() || requestedMemory.isPresent()) {
+            final ComputeResources.Builder computeResourcesBuilder = new ComputeResources.Builder();
+            requestedCpu.ifPresent(computeResourcesBuilder::withCpu);
+            requestedMemory.ifPresent(memory -> computeResourcesBuilder.withMemoryMb(memory.longValue()));
+            jobEnvironmentBuilder.withRequestedComputeResources(computeResourcesBuilder.build());
+        }
 
         final AgentConfigRequest.Builder agentConfigBuilder = new AgentConfigRequest
             .Builder()
