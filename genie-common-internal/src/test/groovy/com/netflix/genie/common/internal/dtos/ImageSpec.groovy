@@ -28,26 +28,30 @@ import spock.lang.Unroll
 class ImageSpec extends Specification {
 
     @Unroll
-    def "can validate for #name, #tag"() {
+    def "can validate for #name, #tag, #arguments"() {
         when:
         def image0 = new Image.Builder()
             .withName(name)
             .withTag(tag)
+            .withArguments(arguments)
             .build()
 
         def image1 = new Image.Builder()
             .withName(name)
             .withTag(tag)
+            .withArguments(arguments)
             .build()
 
         def image2 = new Image.Builder()
             .withName(name == null ? UUID.randomUUID().toString() : name + "blah")
             .withTag(tag == null ? UUID.randomUUID().toString() : tag + "blah")
+            .withArguments([UUID.randomUUID().toString()])
             .build()
 
         then:
         image0.getName() == Optional.ofNullable(name)
         image0.getTag() == Optional.ofNullable(tag)
+        image0.getArguments() == (arguments == null ? new ArrayList<String>() : arguments)
 
         image0 == image1
         image0 != image2
@@ -59,10 +63,11 @@ class ImageSpec extends Specification {
         image0.toString() != image2.toString()
 
         where:
-        name                         | tag
-        UUID.randomUUID().toString() | UUID.randomUUID().toString()
-        UUID.randomUUID().toString() | null
-        null                         | UUID.randomUUID().toString()
-        null                         | null
+        name                         | tag                          | arguments
+        UUID.randomUUID().toString() | UUID.randomUUID().toString() | [UUID.randomUUID().toString()]
+        UUID.randomUUID().toString() | null                         | null
+        null                         | UUID.randomUUID().toString() | null
+        null                         | null                         | [UUID.randomUUID().toString(), UUID.randomUUID().toString()]
+        null                         | null                         | null
     }
 }
