@@ -263,7 +263,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
         Assertions.assertThat(created.getClusterCriteria()).isEmpty();
         Assertions.assertThat(created.getComputeResources()).isNotNull();
-        Assertions.assertThat(created.getImage()).isNotNull();
+        Assertions.assertThat(created.getImages()).isNotNull();
         this.service.deleteCommand(id);
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
@@ -1045,7 +1045,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             command.getExecutable(),
             clusterCriteria,
             command.getComputeResources(),
-            command.getImage()
+            command.getImages()
         );
     }
 }

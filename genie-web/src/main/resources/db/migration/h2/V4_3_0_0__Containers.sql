@@ -19,9 +19,9 @@
 ALTER TABLE `jobs`
   ADD COLUMN `cpu_used` INT(11) DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_image_name` VARCHAR(1024) DEFAULT NULL;
+  ADD COLUMN `requested_images` TEXT DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `image_name_used` VARCHAR(1024) DEFAULT NULL;
+  ADD COLUMN `images_used` TEXT DEFAULT NULL;
 ALTER TABLE `jobs`
   ADD COLUMN `requested_image_tag` VARCHAR(1024) DEFAULT NULL;
 ALTER TABLE `jobs`
@@ -58,8 +58,6 @@ ALTER TABLE `commands`
 ALTER TABLE `commands`
   ADD COLUMN `network_mbps` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `image_name` VARCHAR(1024) DEFAULT NULL;
-ALTER TABLE `commands`
-  ADD COLUMN `image_tag` VARCHAR(1024) DEFAULT NULL;
+  ADD COLUMN `images` TEXT DEFAULT NULL;
 ALTER TABLE `commands`
   ALTER COLUMN `memory` BIGINT(20) DEFAULT NULL;

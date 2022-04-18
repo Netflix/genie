@@ -18,9 +18,7 @@
 package com.netflix.genie.web.data.services.impl.jpa.converters
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.collect.ImmutableMap
-import com.google.common.collect.Lists
-import com.google.common.collect.Sets
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.AgentConfigRequest
 import com.netflix.genie.common.internal.dtos.ApplicationStatus
 import com.netflix.genie.common.internal.dtos.ClusterStatus
@@ -30,6 +28,7 @@ import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dtos.FinishedJob
+import com.netflix.genie.common.internal.dtos.Image
 import com.netflix.genie.common.internal.dtos.JobEnvironmentRequest
 import com.netflix.genie.common.internal.dtos.JobMetadata
 import com.netflix.genie.common.internal.dtos.JobRequest
@@ -75,14 +74,14 @@ class EntityV4DtoConvertersSpec extends Specification {
         entity.setDescription(description)
         def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
-        def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def tags = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         Set<TagEntity> tagEntities = tags.collect(
             {
                 new TagEntity(it)
             }
         )
         entity.setTags(tagEntities)
-        def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def configs = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         Set<FileEntity> configEntities = configs.collect(
             {
                 new FileEntity(it)
@@ -93,7 +92,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         def setupFileEntity = new FileEntity()
         setupFileEntity.setFile(setupFile)
         entity.setSetupFile(setupFileEntity)
-        def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def dependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         Set<FileEntity> dependencyEntities = dependencies.collect(
             {
                 new FileEntity(it)
@@ -139,7 +138,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         entity.setDescription(description)
         def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
-        def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def tags = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         final Set<TagEntity> tagEntities = tags.collect(
             {
                 def tagEntity = new TagEntity()
@@ -148,7 +147,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             }
         )
         entity.setTags(tagEntities)
-        def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def configs = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         final Set<FileEntity> configEntities = configs.collect(
             {
                 def fileEntity = new FileEntity()
@@ -157,7 +156,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             }
         )
         entity.setConfigs(configEntities)
-        def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def dependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         final Set<FileEntity> dependencyEntities = dependencies.collect(
             {
                 def fileEntity = new FileEntity()
@@ -206,21 +205,21 @@ class EntityV4DtoConvertersSpec extends Specification {
         entity.setStatus(CommandStatus.DEPRECATED.name())
         def metadata = Mock(JsonNode)
         entity.setMetadata(metadata)
-        def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def tags = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         final Set<TagEntity> tagEntities = tags.collect(
             {
                 new TagEntity(it)
             }
         )
         entity.setTags(tagEntities)
-        def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def configs = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         final Set<FileEntity> configEntities = configs.collect(
             {
                 new FileEntity(it)
             }
         )
         entity.setConfigs(configEntities)
-        def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def dependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         final Set<FileEntity> dependencyEntities = dependencies.collect(
             {
                 new FileEntity(it)
@@ -231,21 +230,21 @@ class EntityV4DtoConvertersSpec extends Specification {
         final FileEntity setupFileEntity = new FileEntity()
         setupFileEntity.setFile(setupFile)
         entity.setSetupFile(setupFileEntity)
-        def executable = Lists.newArrayList(
+        def executable = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ]
         entity.setExecutable(executable)
         def memory = 10_241
         entity.setMemory(memory)
-        def clusterCriteria = Lists.newArrayList(
+        def clusterCriteria = [
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
-            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-        )
+            new Criterion.Builder().withTags([UUID.randomUUID().toString()].toSet()).build()
+        ]
         def clusterCriteriaEntities = clusterCriteria.collect(
             {
                 def criterionEntity = new CriterionEntity()
@@ -258,6 +257,12 @@ class EntityV4DtoConvertersSpec extends Specification {
             }
         )
         entity.setClusterCriteria(clusterCriteriaEntities)
+        def images = [
+            (UUID.randomUUID().toString()): new Image.Builder().withName(UUID.randomUUID().toString()).build(),
+            (UUID.randomUUID().toString()): new Image.Builder().withName(UUID.randomUUID().toString()).build(),
+            (UUID.randomUUID().toString()): new Image.Builder().withName(UUID.randomUUID().toString()).build(),
+        ]
+        entity.setImages(GenieObjectMapper.getMapper().valueToTree(images))
 
         when:
         def command = EntityV4DtoConverters.toV4CommandDto(entity)
@@ -280,6 +285,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         command.getMetadata().getMetadata().isPresent()
         command.getMetadata().getMetadata().get() == metadata
         command.getClusterCriteria() == clusterCriteria
+        command.getImages() == images
     }
 
     def "Can convert job request projection to V4 job request DTO"() {
@@ -289,43 +295,43 @@ class EntityV4DtoConvertersSpec extends Specification {
         def description = UUID.randomUUID().toString()
         def version = UUID.randomUUID().toString()
         def metadata = Mock(JsonNode)
-        def tags = Sets.newHashSet(
+        def tags = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ].toSet()
         def email = UUID.randomUUID().toString()
         def grouping = UUID.randomUUID().toString()
         def groupingInstance = UUID.randomUUID().toString()
 
         def interactive = true
-        def commandArgs = Lists.newArrayList(
+        def commandArgs = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ]
         def jobDirectoryLocation = "/tmp"
 
-        def configs = Sets.newHashSet(
+        def configs = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
-        def dependencies = Sets.newHashSet(
+        ].toSet()
+        def dependencies = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ].toSet()
         def setupFile = UUID.randomUUID().toString()
 
         def commandCriterionId = UUID.randomUUID().toString()
         def commandCriterionName = UUID.randomUUID().toString()
         def commandCriterionVersion = UUID.randomUUID().toString()
         def commandCriterionStatus = UUID.randomUUID().toString()
-        def commandCriterionTags = Sets.newHashSet(
+        def commandCriterionTags = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ].toSet()
         def commandCriterion = new Criterion.Builder()
             .withId(commandCriterionId)
             .withName(commandCriterionName)
@@ -338,11 +344,11 @@ class EntityV4DtoConvertersSpec extends Specification {
         def clusterCriterion0Name = UUID.randomUUID().toString()
         def clusterCriterion0Version = UUID.randomUUID().toString()
         def clusterCriterion0Status = UUID.randomUUID().toString()
-        def clusterCriterion0Tags = Sets.newHashSet(
+        def clusterCriterion0Tags = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ].toSet()
         def clusterCriterion0 = new Criterion.Builder()
             .withId(clusterCriterion0Id)
             .withName(clusterCriterion0Name)
@@ -355,10 +361,10 @@ class EntityV4DtoConvertersSpec extends Specification {
         def clusterCriterion1Name = UUID.randomUUID().toString()
         def clusterCriterion1Version = UUID.randomUUID().toString()
         def clusterCriterion1Status = UUID.randomUUID().toString()
-        def clusterCriterion1Tags = Sets.newHashSet(
+        def clusterCriterion1Tags = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ].toSet()
         def clusterCriterion1 = new Criterion.Builder()
             .withId(clusterCriterion1Id)
             .withName(clusterCriterion1Name)
@@ -371,12 +377,12 @@ class EntityV4DtoConvertersSpec extends Specification {
         def clusterCriterion2Name = UUID.randomUUID().toString()
         def clusterCriterion2Version = UUID.randomUUID().toString()
         def clusterCriterion2Status = UUID.randomUUID().toString()
-        def clusterCriterion2Tags = Sets.newHashSet(
+        def clusterCriterion2Tags = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ].toSet()
         def clusterCriterion2 = new Criterion.Builder()
             .withId(clusterCriterion2Id)
             .withName(clusterCriterion2Name)
@@ -384,23 +390,26 @@ class EntityV4DtoConvertersSpec extends Specification {
             .withStatus(clusterCriterion2Status)
             .withTags(clusterCriterion2Tags)
             .build()
-        def clusterCriteria = Lists.newArrayList(clusterCriterion0, clusterCriterion1, clusterCriterion2)
+        def clusterCriteria = [clusterCriterion0, clusterCriterion1, clusterCriterion2]
 
-        def applicationIds = Lists.newArrayList(
+        def applicationIds = [
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
-        )
+        ]
 
         def requestedTimeout = 32_000
         def requestedMemory = 32_387L
         def requestedCpu = 3
 
-        def requestedEnvironmentVariables = ImmutableMap.of(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        )
+        def requestedEnvironmentVariables = [
+            (UUID.randomUUID().toString()): UUID.randomUUID().toString(),
+            (UUID.randomUUID().toString()): UUID.randomUUID().toString()
+        ]
+
+        def images = [
+            (UUID.randomUUID().toString()): new Image.Builder().withTag(UUID.randomUUID().toString()).build(),
+            (UUID.randomUUID().toString()): new Image.Builder().withTag(UUID.randomUUID().toString()).build(),
+        ]
 
         def jobMetadata = new JobMetadata.Builder(name, user, version)
             .withDescription(description)
@@ -434,6 +443,7 @@ class EntityV4DtoConvertersSpec extends Specification {
                     .build()
             )
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+            .withRequestedImages(images)
             .build()
 
         def jobRequest0 = new JobRequest(
@@ -506,6 +516,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         )
         jobEntity.setInteractive(interactive)
         jobEntity.setArchivingDisabled(true)
+        jobEntity.setRequestedImages(GenieObjectMapper.getMapper().valueToTree(images))
 
         def jobRequestResult
 
@@ -527,24 +538,21 @@ class EntityV4DtoConvertersSpec extends Specification {
     def "Can JobSpecificationProjection to JobSpecification DTO"() {
         def id = UUID.randomUUID().toString()
 
-        def environmentVariables = ImmutableMap.of(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        )
+        def environmentVariables = [
+            (UUID.randomUUID().toString()): UUID.randomUUID().toString(),
+            (UUID.randomUUID().toString()): UUID.randomUUID().toString(),
+            (UUID.randomUUID().toString()): UUID.randomUUID().toString()
+        ]
         def jobDirectoryLocation = UUID.randomUUID().toString()
-        def jobArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def jobArgs = [UUID.randomUUID().toString(), UUID.randomUUID().toString()]
         def interactive = true
-        def jobConfigs = Sets.newHashSet(UUID.randomUUID().toString())
-        def jobDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def jobConfigs = [UUID.randomUUID().toString()].toSet()
+        def jobDependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         def jobSetupFile = null
 
         def clusterId = UUID.randomUUID().toString()
-        def clusterConfigs = Sets.newHashSet(UUID.randomUUID().toString())
-        def clusterDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def clusterConfigs = [UUID.randomUUID().toString()].toSet()
+        def clusterDependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         def clusterSetupFile = UUID.randomUUID().toString()
         def clusterEntity = Mock(ClusterEntity) {
             1 * getUniqueId() >> clusterId
@@ -558,10 +566,10 @@ class EntityV4DtoConvertersSpec extends Specification {
         }
 
         def commandId = UUID.randomUUID().toString()
-        def commandConfigs = Sets.newHashSet(UUID.randomUUID().toString())
-        def commandDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def commandConfigs = [UUID.randomUUID().toString()].toSet()
+        def commandDependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         def commandSetupFile = UUID.randomUUID().toString()
-        def executableArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def executableArgs = [UUID.randomUUID().toString(), UUID.randomUUID().toString()]
         def commandEntity = Mock(CommandEntity) {
             1 * getUniqueId() >> commandId
             1 * getConfigs() >> commandConfigs
@@ -575,8 +583,8 @@ class EntityV4DtoConvertersSpec extends Specification {
         }
 
         def application0Id = UUID.randomUUID().toString()
-        def application0Configs = Sets.newHashSet(UUID.randomUUID().toString())
-        def application0Dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def application0Configs = [UUID.randomUUID().toString()].toSet()
+        def application0Dependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         def application0SetupFile = null
         def application0Entity = Mock(ApplicationEntity) {
             1 * getUniqueId() >> application0Id
@@ -590,8 +598,8 @@ class EntityV4DtoConvertersSpec extends Specification {
         }
 
         def application1Id = UUID.randomUUID().toString()
-        def application1Configs = Sets.newHashSet(UUID.randomUUID().toString())
-        def application1Dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def application1Configs = [UUID.randomUUID().toString()].toSet()
+        def application1Dependencies = [UUID.randomUUID().toString(), UUID.randomUUID().toString()].toSet()
         def application1SetupFile = UUID.randomUUID().toString()
         def application1Entity = Mock(ApplicationEntity) {
             1 * getUniqueId() >> application1Id
@@ -603,7 +611,7 @@ class EntityV4DtoConvertersSpec extends Specification {
                 .toSet()
             1 * getSetupFile() >> Optional.ofNullable(new FileEntity(application1SetupFile))
         }
-        def applications = Lists.newArrayList(application0Entity, application1Entity)
+        def applications = [application0Entity, application1Entity]
         def timeout = 242_383
 
         def jobSpecificationProjection = Mock(JobSpecificationProjection)
@@ -685,7 +693,7 @@ class EntityV4DtoConvertersSpec extends Specification {
                 commandSetupFile
             )
         )
-        jobSpecification.getApplications() == Lists.newArrayList(
+        jobSpecification.getApplications() == [
             new JobSpecification.ExecutionResource(
                 application0Id,
                 new ExecutionEnvironment(
@@ -702,7 +710,7 @@ class EntityV4DtoConvertersSpec extends Specification {
                     application1SetupFile
                 )
             )
-        )
+        ]
         jobSpecification.getTimeout().orElse(null) == timeout
     }
 
@@ -746,7 +754,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getName() >> Optional.of("cName")
             getVersion() >> Optional.of("cVersion")
             getStatus() >> Optional.of("cStatus")
-            getTags() >> Sets.newHashSet()
+            getTags() >> new HashSet<TagEntity>()
         }
 
         FinishedJobProjection p = Mock(FinishedJobProjection) {
@@ -777,8 +785,8 @@ class EntityV4DtoConvertersSpec extends Specification {
             getMetadata() >> Optional.empty()
             getCommand() >> Optional.empty()
             getCluster() >> Optional.empty()
-            getApplications() >> Lists.newArrayList()
-            getTags() >> Sets.newHashSet()
+            getApplications() >> new ArrayList<ApplicationEntity>()
+            getTags() >> new HashSet<TagEntity>()
         }
 
         when:
@@ -826,7 +834,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getName() >> Optional.of("cName")
             getVersion() >> Optional.of("cVersion")
             getStatus() >> Optional.of("cStatus")
-            getTags() >> Sets.newHashSet()
+            getTags() >> new HashSet<TagEntity>()
         }
 
         CommandEntity commandEntity = Mock(CommandEntity) {
@@ -847,8 +855,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getMemory() >> Optional.empty()
             getDiskMb() >> Optional.empty()
             getNetworkMbps() >> Optional.empty()
-            getImageName() >> Optional.empty()
-            getImageTag() >> Optional.empty()
+            getImages() >> Optional.empty()
             getClusterCriteria() >> []
         }
 
@@ -917,8 +924,8 @@ class EntityV4DtoConvertersSpec extends Specification {
             getMetadata() >> Optional.of(Mock(JsonNode))
             getCommand() >> Optional.of(commandEntity)
             getCluster() >> Optional.of(clusterEntity)
-            getApplications() >> Lists.newArrayList(applicationEntity)
-            getTags() >> Sets.newHashSet(jobTag1, jobTag2)
+            getApplications() >> [applicationEntity]
+            getTags() >> [jobTag1, jobTag2].toSet()
         }
 
         when:
@@ -954,6 +961,6 @@ class EntityV4DtoConvertersSpec extends Specification {
         dto.getCluster().isPresent()
         dto.getApplications().size() == 1
         dto.getTags().size() == 2
-        dto.getTags() == Sets.newHashSet(["tag1", "tag2"])
+        dto.getTags() == ["tag1", "tag2"].toSet()
     }
 }

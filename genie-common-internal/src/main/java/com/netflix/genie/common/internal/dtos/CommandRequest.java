@@ -20,8 +20,6 @@ package com.netflix.genie.common.internal.dtos;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -31,7 +29,11 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -51,19 +53,18 @@ public class CommandRequest extends CommonRequestImpl {
     @Valid
     private final CommandMetadata metadata;
     @NotEmpty(message = "At least one executable entry is required")
-    private final ImmutableList<@Size(max = 255, message = "Executable elements can only be 255 characters") String>
-        executable;
-    private final ImmutableList<Criterion> clusterCriteria;
+    private final List<@Size(max = 255, message = "Executable elements can only be 255 characters") String> executable;
+    private final List<Criterion> clusterCriteria;
     private final ComputeResources computeResources;
-    private final Image image;
+    private final Map<String, Image> images;
 
     private CommandRequest(final Builder builder) {
         super(builder);
         this.metadata = builder.bMetadata;
-        this.executable = builder.bExecutable;
-        this.clusterCriteria = ImmutableList.copyOf(builder.bClusterCriteria);
+        this.executable = Collections.unmodifiableList(new ArrayList<>(builder.bExecutable));
+        this.clusterCriteria = Collections.unmodifiableList(new ArrayList<>(builder.bClusterCriteria));
         this.computeResources = builder.bComputeResources;
-        this.image = builder.bImage;
+        this.images = Collections.unmodifiableMap(new HashMap<>(builder.bImages));
     }
 
     /**
@@ -97,10 +98,11 @@ public class CommandRequest extends CommonRequestImpl {
     /**
      * Get any image information associated by default with this command.
      *
-     * @return The {@link Image} metadata or {@link Optional#empty()}
+     * @return The map of image domain name to {@link Image} metadata as unmodifiable map. Any attempt to modify
+     * will throw an exception
      */
-    public Optional<Image> getImage() {
-        return Optional.ofNullable(this.image);
+    public Map<String, Image> getImages() {
+        return this.images;
     }
 
     /**
@@ -112,10 +114,10 @@ public class CommandRequest extends CommonRequestImpl {
     public static class Builder extends CommonRequestImpl.Builder<Builder> {
 
         private final CommandMetadata bMetadata;
-        private final ImmutableList<String> bExecutable;
-        private final List<Criterion> bClusterCriteria = Lists.newArrayList();
+        private final List<String> bExecutable;
+        private final List<Criterion> bClusterCriteria;
         private ComputeResources bComputeResources;
-        private Image bImage;
+        private Map<String, Image> bImages;
 
         /**
          * Constructor which has required fields.
@@ -131,12 +133,13 @@ public class CommandRequest extends CommonRequestImpl {
             @JsonProperty(value = "executable", required = true) final List<String> executable
         ) {
             super();
+            this.bClusterCriteria = new ArrayList<>();
             this.bMetadata = metadata;
-            this.bExecutable = ImmutableList.copyOf(
-                executable
-                    .stream()
-                    .filter(StringUtils::isNotBlank)
-                    .collect(Collectors.toList()));
+            this.bExecutable = executable
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList());
+            this.bImages = new HashMap<>();
         }
 
         /**
@@ -168,11 +171,14 @@ public class CommandRequest extends CommonRequestImpl {
         /**
          * Set any default image metadata that should be used if this command is selected.
          *
-         * @param image The {@link Image} or {@link Optional#empty()}
+         * @param images The {@link Image}'s or {@literal null}
          * @return This {@link Builder} instance
          */
-        public Builder withImage(@Nullable final Image image) {
-            this.bImage = image;
+        public Builder withImages(@Nullable final Map<String, Image> images) {
+            this.bImages.clear();
+            if (images != null) {
+                this.bImages.putAll(images);
+            }
             return this;
         }
 

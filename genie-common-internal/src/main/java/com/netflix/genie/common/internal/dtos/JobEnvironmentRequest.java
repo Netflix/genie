@@ -19,7 +19,6 @@ package com.netflix.genie.common.internal.dtos;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -29,6 +28,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -47,7 +47,7 @@ public class JobEnvironmentRequest implements Serializable {
 
     private static final long serialVersionUID = -1782447793634908168L;
 
-    private final ImmutableMap<
+    private final Map<
         @NotBlank(message = "Environment variable key can't be blank")
         @Size(max = 255, message = "Max environment variable name length is 255 characters") String,
         @NotNull(message = "Environment variable value can't be null")
@@ -55,13 +55,15 @@ public class JobEnvironmentRequest implements Serializable {
         requestedEnvironmentVariables;
     private final JsonNode ext;
     private final ComputeResources requestedComputeResources;
-    private final Image requestedImage;
+    private final Map<String, Image> requestedImages;
 
     private JobEnvironmentRequest(final Builder builder) {
-        this.requestedEnvironmentVariables = ImmutableMap.copyOf(builder.bRequestedEnvironmentVariables);
+        this.requestedEnvironmentVariables = Collections.unmodifiableMap(
+            new HashMap<>(builder.bRequestedEnvironmentVariables)
+        );
         this.ext = builder.bExt;
         this.requestedComputeResources = builder.bRequestedComputeResources;
-        this.requestedImage = builder.bRequestedImage;
+        this.requestedImages = Collections.unmodifiableMap(new HashMap<>(builder.bRequestedImages));
     }
 
     /**
@@ -87,17 +89,17 @@ public class JobEnvironmentRequest implements Serializable {
      *
      * @return The {@link ComputeResources} that were requested or {@link Optional#empty()}
      */
-    public Optional<ComputeResources> getRequestedComputeResources() {
-        return Optional.ofNullable(this.requestedComputeResources);
+    public ComputeResources getRequestedComputeResources() {
+        return this.requestedComputeResources;
     }
 
     /**
      * Get the requested image metadata the user entered.
      *
-     * @return The {@link Image} data or {@link Optional#empty()}
+     * @return The {@link Image} data in an immutable map.
      */
-    public Optional<Image> getRequestedImage() {
-        return Optional.ofNullable(this.requestedImage);
+    public Map<String, Image> getRequestedImages() {
+        return this.requestedImages;
     }
 
     /**
@@ -110,7 +112,7 @@ public class JobEnvironmentRequest implements Serializable {
         private final Map<String, String> bRequestedEnvironmentVariables;
         private JsonNode bExt;
         private ComputeResources bRequestedComputeResources;
-        private Image bRequestedImage;
+        private Map<String, Image> bRequestedImages;
 
         /**
          * Constructor.
@@ -118,7 +120,7 @@ public class JobEnvironmentRequest implements Serializable {
         public Builder() {
             this.bRequestedEnvironmentVariables = new HashMap<>();
             this.bRequestedComputeResources = new ComputeResources.Builder().build();
-            this.bRequestedImage = new Image.Builder().build();
+            this.bRequestedImages = new HashMap<>();
         }
 
         /**
@@ -161,13 +163,14 @@ public class JobEnvironmentRequest implements Serializable {
         }
 
         /**
-         * Set the image the job should run with.
+         * Set the images the job should run with.
          *
-         * @param requestedImage The {@link Image}
+         * @param requestedImages The {@link Image} map
          * @return This {@link Builder} instance
          */
-        public Builder withRequestedImage(final Image requestedImage) {
-            this.bRequestedImage = requestedImage;
+        public Builder withRequestedImages(final Map<String, Image> requestedImages) {
+            this.bRequestedImages.clear();
+            this.bRequestedImages.putAll(requestedImages);
             return this;
         }
 

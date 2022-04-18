@@ -113,7 +113,7 @@ class TitusAgentLauncherImplSpec extends Specification {
 
         this.jobEnvironment = Mock(JobEnvironment) {
             getComputeResources() >> this.computeResources
-            getImage() >> this.image
+            getImages() >> [(TitusAgentLauncherImpl.GENIE_AGENT_IMAGE_KEY): this.image]
         }
         this.resolvedJob = Mock(ResolvedJob) {
             getJobSpecification() >> jobSpecification

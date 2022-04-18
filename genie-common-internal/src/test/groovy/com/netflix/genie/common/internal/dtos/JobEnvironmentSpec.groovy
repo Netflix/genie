@@ -33,7 +33,10 @@ class JobEnvironmentSpec extends Specification {
         ]
         def ext = Mock(JsonNode)
         def computeResources = Mock(ComputeResources)
-        def image = Mock(Image)
+        def images = [
+            python: new Image.Builder().withName(UUID.randomUUID().toString()).build(),
+            spark : new Image.Builder().withName(UUID.randomUUID().toString()).build()
+        ]
 
         def builder = new JobEnvironment.Builder()
 
@@ -42,28 +45,28 @@ class JobEnvironmentSpec extends Specification {
 
         then:
         environment.getComputeResources() != null
-        environment.getImage() != null
+        environment.getImages() != null
         environment.getEnvironmentVariables().isEmpty()
         !environment.getExt().isPresent()
 
         when:
         environment = builder
             .withComputeResources(computeResources)
-            .withImage(image)
+            .withImages(images)
             .withEnvironmentVariables(environmentVariables)
             .withExt(ext)
             .build()
 
         then:
         environment.getComputeResources() == computeResources
-        environment.getImage() == image
+        environment.getImages() == images
         environment.getEnvironmentVariables() == environmentVariables
         environment.getExt().orElse(null) == ext
 
         when:
         def environment2 = builder.build()
         def environment3 = builder
-            .withImage(new Image.Builder().withName(UUID.randomUUID().toString()).build())
+            .withImages([python: new Image.Builder().withName(UUID.randomUUID().toString()).build()])
             .build()
 
         then:

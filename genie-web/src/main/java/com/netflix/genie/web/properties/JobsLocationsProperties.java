@@ -47,7 +47,6 @@ public class JobsLocationsProperties {
     @NotNull(message = "Archives storage location is required")
     private URI archives = URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/");
 
-    @Deprecated
     @NotNull(message = "Default job working directory is required")
     private URI jobs = URI.create("file://" + SYSTEM_TMP_DIR + "genie/jobs/");
 }

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.netflix.genie.common.internal.dtos.ComputeResources;
-import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
@@ -36,8 +36,9 @@ import com.netflix.genie.web.properties.TitusAgentLauncherProperties;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -76,8 +77,13 @@ import java.util.stream.Collectors;
  * @see <a href="https://netflix.github.io/titus/">Titus OSS Project</a>
  * @since 4.0.0
  */
-@Slf4j
 public class TitusAgentLauncherImpl implements AgentLauncher {
+
+    /**
+     * The name of the image in an images block that corresponds to the main image to launch on titus which
+     * should have the Genie agent as the entry point.
+     */
+    public static final String GENIE_AGENT_IMAGE_KEY = "genieAgent";
 
     static final int MEGABYTE_TO_MEGABIT = 8;
     private static final String GENIE_USER_ATTR = "genie.user";
@@ -101,6 +107,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .stream()
             .map(s -> placeholders.getOrDefault(s, s))
             .collect(Collectors.toList());
+    private static final Logger LOG = LoggerFactory.getLogger(TitusAgentLauncherImpl.class);
 
     private final RestTemplate restTemplate;
     private final RetryTemplate retryTemplate;
@@ -114,7 +121,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final MeterRegistry registry;
     private final Tracer tracer;
     private final BraveTracePropagator tracePropagator;
-    private final BraveTagAdapter tagAdapter;
 
     /**
      * Constructor.
@@ -148,7 +154,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         this.jobRequestAdapter = jobRequestAdapter;
         this.tracer = tracingComponents.getTracer();
         this.tracePropagator = tracingComponents.getTracePropagator();
-        this.tagAdapter = tracingComponents.getTagAdapter();
         this.environment = environment;
         if (this.environment instanceof ConfigurableEnvironment) {
             final ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) this.environment;
@@ -172,7 +177,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         @Nullable final JsonNode requestedLauncherExt
     ) throws AgentLaunchException {
         final long start = System.nanoTime();
-        log.info("Received request to launch Titus agent to run job: {}", resolvedJob);
+        LOG.info("Received request to launch Titus agent to run job: {}", resolvedJob);
         final Set<Tag> tags = new HashSet<>();
         tags.add(CLASS_TAG);
 
@@ -204,7 +209,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 )
             );
 
-            log.info("Created Titus job {} to execute Genie job {}", titusJobId, jobId);
+            LOG.info("Created Titus job {} to execute Genie job {}", titusJobId, jobId);
 
             MetricsUtils.addSuccessTags(tags);
 
@@ -217,7 +222,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     .putPOJO(TITUS_JOB_RESPONSE_EXT_FIELD, titusResponse)
             );
         } catch (Throwable t) {
-            log.error("Failed to launch job on Titus", t);
+            LOG.error("Failed to launch job on Titus", t);
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw new AgentLaunchException("Failed to create titus job for job " + jobId, t);
         } finally {
@@ -364,7 +369,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                 try {
                     return DataSize.parse(propValue);
                 } catch (final IllegalArgumentException e) {
-                    log.error(
+                    LOG.error(
                         "Unable to parse value of {} as DataSize. Falling back to default value {}",
                         propertyKey,
                         defaultValue,
@@ -477,26 +482,30 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     }
 
     private TitusBatchJobRequest.Image getTitusImage(final ResolvedJob resolvedJob) {
-        final String imageName = resolvedJob.getJobEnvironment().getImage()
-            .getName()
-            .orElse(
-                this.environment.getProperty(
-                    TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
-                    String.class,
-                    this.titusAgentLauncherProperties.getImageName()
-                )
-            );
-        final String imageTag = resolvedJob.getJobEnvironment().getImage()
-            .getTag()
-            .orElse(
-                this.environment.getProperty(
-                    TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
-                    String.class,
-                    this.titusAgentLauncherProperties.getImageTag()
-                )
-            );
+        final Map<String, Image> images = resolvedJob.getJobEnvironment().getImages();
 
-        return TitusBatchJobRequest.Image.builder().name(imageName).tag(imageTag).build();
+        final String defaultImageName = this.environment.getProperty(
+            TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY,
+            String.class,
+            this.titusAgentLauncherProperties.getImageName()
+        );
+        final String defaultImageTag = this.environment.getProperty(
+            TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY,
+            String.class,
+            this.titusAgentLauncherProperties.getImageTag()
+        );
+        final Image image = images.getOrDefault(
+            GENIE_AGENT_IMAGE_KEY,
+            new Image.Builder()
+                .withName(defaultImageName)
+                .withTag(defaultImageTag)
+                .build()
+        );
+
+        return TitusBatchJobRequest.Image.builder()
+            .name(image.getName().orElse(defaultImageName))
+            .tag(image.getTag().orElse(defaultImageTag))
+            .build();
     }
 
     /**

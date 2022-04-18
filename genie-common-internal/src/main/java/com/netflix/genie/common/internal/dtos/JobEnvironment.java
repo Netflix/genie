@@ -19,7 +19,6 @@ package com.netflix.genie.common.internal.dtos;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -29,6 +28,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +46,7 @@ import java.util.Optional;
 public class JobEnvironment implements Serializable {
 
     private static final long serialVersionUID = 8478136461571895069L;
-    private final ImmutableMap<
+    private final Map<
         @NotBlank(message = "Environment variable key can't be blank")
         @Size(max = 255, message = "Max environment variable name length is 255 characters") String,
         @NotNull(message = "Environment variable value can't be null")
@@ -54,13 +54,13 @@ public class JobEnvironment implements Serializable {
         environmentVariables;
     private final JsonNode ext;
     private final ComputeResources computeResources;
-    private final Image image;
+    private final Map<String, Image> images;
 
     private JobEnvironment(final Builder builder) {
-        this.environmentVariables = ImmutableMap.copyOf(builder.bEnvironmentVariables);
+        this.environmentVariables = Collections.unmodifiableMap(new HashMap<>(builder.bEnvironmentVariables));
         this.ext = builder.bExt;
         this.computeResources = builder.bComputeResources;
-        this.image = builder.bImage;
+        this.images = Collections.unmodifiableMap(new HashMap<>(builder.bImages));
     }
 
     /**
@@ -91,12 +91,12 @@ public class JobEnvironment implements Serializable {
     }
 
     /**
-     * Get the image for the job if any was defined.
+     * Get the images for the job if any were defined.
      *
      * @return The {@link Image}
      */
-    public Image getImage() {
-        return this.image;
+    public Map<String, Image> getImages() {
+        return this.images;
     }
 
     /**
@@ -109,7 +109,7 @@ public class JobEnvironment implements Serializable {
         private final Map<String, String> bEnvironmentVariables;
         private JsonNode bExt;
         private ComputeResources bComputeResources;
-        private Image bImage;
+        private final Map<String, Image> bImages;
 
         /**
          * Constructor.
@@ -117,7 +117,7 @@ public class JobEnvironment implements Serializable {
         public Builder() {
             this.bEnvironmentVariables = new HashMap<>();
             this.bComputeResources = new ComputeResources.Builder().build();
-            this.bImage = new Image.Builder().build();
+            this.bImages = new HashMap<>();
         }
 
         /**
@@ -158,13 +158,14 @@ public class JobEnvironment implements Serializable {
         }
 
         /**
-         * Set the image the job should use.
+         * Set the images the job should use.
          *
-         * @param image The {@link Image}
+         * @param images The {@link Image} set to use
          * @return This {@link Builder} instance
          */
-        public Builder withImage(final Image image) {
-            this.bImage = image;
+        public Builder withImages(final Map<String, Image> images) {
+            this.bImages.clear();
+            this.bImages.putAll(images);
             return this;
         }
 

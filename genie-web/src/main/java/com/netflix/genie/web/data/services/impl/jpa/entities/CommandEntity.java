@@ -136,6 +136,7 @@ import java.util.Set;
                 @NamedAttributeNode("configs"),
                 @NamedAttributeNode("dependencies"),
                 @NamedAttributeNode("tags"),
+                @NamedAttributeNode("images"),
                 @NamedAttributeNode(
                     value = "clusterCriteria",
                     subgraph = "criteria-sub-graph"
@@ -218,15 +219,12 @@ public class CommandEntity extends BaseEntity {
     @Min(1)
     private Long networkMbps;
 
-    @Basic
-    @Column(name = "image_name", length = 1024)
-    @Size(max = 1024, message = "Image name can be no longer than 1024 characters")
-    private String imageName;
-
-    @Basic
-    @Column(name = "image_tag", length = 1024)
-    @Size(max = 1024, message = "Image tag can be no longer than 1024 characters")
-    private String imageTag;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "images", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
+    @ToString.Exclude
+    private JsonNode images;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -401,21 +399,12 @@ public class CommandEntity extends BaseEntity {
     }
 
     /**
-     * Get the default name of the image to run the job with if this command is selected.
+     * Get the default set of images to run this job with if this command is selected.
      *
-     * @return The default name of the image or {@link Optional#empty()}
+     * @return The default set of images or {@link Optional#empty()}
      */
-    public Optional<String> getImageName() {
-        return Optional.ofNullable(this.imageName);
-    }
-
-    /**
-     * Get the default tag of the image to run the job with if this command is selected.
-     *
-     * @return The default tag of the image or {@link Optional#empty()}
-     */
-    public Optional<String> getImageTag() {
-        return Optional.ofNullable(this.imageTag);
+    public Optional<JsonNode> getImages() {
+        return Optional.ofNullable(this.images);
     }
 
     /**
