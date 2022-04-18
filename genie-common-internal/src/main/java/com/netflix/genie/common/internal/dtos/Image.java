@@ -20,8 +20,10 @@ package com.netflix.genie.common.internal.dtos;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,14 +36,14 @@ import java.util.Optional;
 @JsonDeserialize(builder = Image.Builder.class)
 public class Image implements Serializable {
 
-    @Size(max = 1024, message = "Maximum length of a container image name is 1024 characters")
     private final String name;
-    @Size(max = 1024, message = "Maximum length of a container image tag is 1024 characters")
     private final String tag;
+    private final List<String> arguments;
 
     private Image(final Builder builder) {
         this.name = builder.bName;
         this.tag = builder.bTag;
+        this.arguments = Collections.unmodifiableList(new ArrayList<>(builder.bArguments));
     }
 
     /**
@@ -63,11 +65,20 @@ public class Image implements Serializable {
     }
 
     /**
+     * Get the image arguments if any.
+     *
+     * @return An unmodifiable list of arguments. Any attempt to modify will throw an exception
+     */
+    public List<String> getArguments() {
+        return this.arguments;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.name, this.tag);
+        return Objects.hash(this.name, this.tag, this.arguments);
     }
 
     /**
@@ -82,7 +93,9 @@ public class Image implements Serializable {
             return false;
         }
         final Image image = (Image) o;
-        return Objects.equals(this.name, image.name) && Objects.equals(this.tag, image.tag);
+        return Objects.equals(this.name, image.name)
+            && Objects.equals(this.tag, image.tag)
+            && Objects.equals(this.arguments, image.arguments);
     }
 
     /**
@@ -91,8 +104,9 @@ public class Image implements Serializable {
     @Override
     public String toString() {
         return "Image{"
-            + "name='" + name + '\''
-            + ", tag='" + tag + '\''
+            + "name='" + this.name + '\''
+            + ", tag='" + this.tag + '\''
+            + ", arguments='" + this.arguments + '\''
             + '}';
     }
 
@@ -105,6 +119,14 @@ public class Image implements Serializable {
     public static class Builder {
         private String bName;
         private String bTag;
+        private final List<String> bArguments;
+
+        /**
+         * Constructor.
+         */
+        public Builder() {
+            this.bArguments = new ArrayList<>();
+        }
 
 
         /**
@@ -126,6 +148,21 @@ public class Image implements Serializable {
          */
         public Builder withTag(@Nullable final String tag) {
             this.bTag = tag;
+            return this;
+        }
+
+        /**
+         * Set the arguments for the image.
+         *
+         * @param arguments The arguments. {@literal null} will clear any currently set arguments, as will empty list.
+         *                  Any other value with replace.
+         * @return This {@link Builder} instance
+         */
+        public Builder withArguments(@Nullable final List<String> arguments) {
+            this.bArguments.clear();
+            if (arguments != null) {
+                this.bArguments.addAll(arguments);
+            }
             return this;
         }
 
