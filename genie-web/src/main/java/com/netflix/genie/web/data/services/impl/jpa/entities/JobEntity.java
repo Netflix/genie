@@ -112,7 +112,8 @@ import java.util.Set;
             attributeNodes = {
                 @NamedAttributeNode("metadata"),
                 @NamedAttributeNode("commandArgs"),
-                @NamedAttributeNode(value = "tags"),
+                @NamedAttributeNode("tags"),
+                @NamedAttributeNode("imagesUsed"),
                 // In actually looking at code this isn't used
                 // @NamedAttributeNode("applications")
             }
@@ -136,6 +137,7 @@ import java.util.Set;
                 @NamedAttributeNode("dependencies"),
                 @NamedAttributeNode("configs"),
                 @NamedAttributeNode("requestedApplications"),
+                @NamedAttributeNode("requestedImages"),
             },
             subgraphs = {
                 @NamedSubgraph(
@@ -169,6 +171,7 @@ import java.util.Set;
                 @NamedAttributeNode("configs"),
                 @NamedAttributeNode("requestedApplications"),
                 @NamedAttributeNode("requestedLauncherExt"),
+                @NamedAttributeNode("requestedImages"),
             },
             subgraphs = {
                 @NamedSubgraph(
@@ -588,25 +591,19 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "archive_status", length = 20)
     private String archiveStatus;
 
-    @Basic
-    @Column(name = "requested_image_name", length = 1024, updatable = false)
-    @Size(max = 1024, message = "Maximum image name length is 1024 characters")
-    private String requestedImageName;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "requested_images", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
+    @ToString.Exclude
+    private JsonNode requestedImages;
 
-    @Basic
-    @Column(name = "image_name_used", length = 1024)
-    @Size(max = 1024, message = "Maximum image name length is 1024 characters")
-    private String imageNameUsed;
-
-    @Basic
-    @Column(name = "requested_image_tag", length = 1024, updatable = false)
-    @Size(max = 1024, message = "Maximum image tag length is 1024 characters")
-    private String requestedImageTag;
-
-    @Basic
-    @Column(name = "image_tag_used", length = 1024)
-    @Size(max = 1024, message = "Maximum image tag length is 1024 characters")
-    private String imageTagUsed;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "images_used", columnDefinition = "TEXT DEFAULT NULL")
+    @Convert(converter = JsonAttributeConverter.class)
+    @ToString.Exclude
+    private JsonNode imagesUsed;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -1316,16 +1313,8 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getRequestedImageName() {
-        return Optional.ofNullable(this.requestedImageName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<String> getRequestedImageTag() {
-        return Optional.ofNullable(this.requestedImageTag);
+    public Optional<JsonNode> getRequestedImages() {
+        return Optional.ofNullable(this.requestedImages);
     }
 
     /**
@@ -1337,21 +1326,12 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the image name used for the job if there was one.
+     * Get the set of image configuration used for this job.
      *
-     * @return The image name used or {@link Optional#empty()}
+     * @return The images used or {@link Optional#empty()}
      */
-    public Optional<String> getImageNameUsed() {
-        return Optional.ofNullable(this.imageNameUsed);
-    }
-
-    /**
-     * Get the container image tag used for the job if there was one.
-     *
-     * @return The image tag used or {@link Optional#empty()}
-     */
-    public Optional<String> getImageTagUsed() {
-        return Optional.ofNullable(this.imageTagUsed);
+    public Optional<JsonNode> getImagesUsed() {
+        return Optional.ofNullable(this.imagesUsed);
     }
 
     /**

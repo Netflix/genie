@@ -17,17 +17,15 @@
  */
 
 ALTER TABLE `jobs`
-  ADD COLUMN `cpu_used`               INT(11)       DEFAULT NULL,
-  ADD COLUMN `requested_image_name`   VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `image_name_used`        VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `requested_image_tag`    VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `image_tag_used`         VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `requested_gpu`          INT(11)       DEFAULT NULL,
-  ADD COLUMN `gpu_used`               INT(11)       DEFAULT NULL,
-  ADD COLUMN `requested_disk_mb`      INT(11)       DEFAULT NULL,
-  ADD COLUMN `disk_mb_used`           INT(11)       DEFAULT NULL,
-  ADD COLUMN `requested_network_mbps` INT(11)       DEFAULT NULL,
-  ADD COLUMN `network_mbps_used`      INT(11)       DEFAULT NULL,
+  ADD COLUMN `cpu_used`               INT(11) DEFAULT NULL,
+  ADD COLUMN `requested_images`       TEXT    DEFAULT NULL,
+  ADD COLUMN `images_used`            TEXT    DEFAULT NULL,
+  ADD COLUMN `requested_gpu`          INT(11) DEFAULT NULL,
+  ADD COLUMN `gpu_used`               INT(11) DEFAULT NULL,
+  ADD COLUMN `requested_disk_mb`      INT(11) DEFAULT NULL,
+  ADD COLUMN `disk_mb_used`           INT(11) DEFAULT NULL,
+  ADD COLUMN `requested_network_mbps` INT(11) DEFAULT NULL,
+  ADD COLUMN `network_mbps_used`      INT(11) DEFAULT NULL,
   DROP COLUMN `check_delay`,
   DROP COLUMN `v4`,
   MODIFY COLUMN `requested_memory` BIGINT(20) DEFAULT NULL,
@@ -35,10 +33,9 @@ ALTER TABLE `jobs`
 
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`,
-  ADD COLUMN `cpu`          INT(11)       DEFAULT NULL,
-  ADD COLUMN `gpu`          INT(11)       DEFAULT NULL,
-  ADD COLUMN `disk_mb`      BIGINT(20)    DEFAULT NULL,
-  ADD COLUMN `network_mbps` BIGINT(20)    DEFAULT NULL,
-  ADD COLUMN `image_name`   VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `image_tag`    VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN `cpu`          INT(11)    DEFAULT NULL,
+  ADD COLUMN `gpu`          INT(11)    DEFAULT NULL,
+  ADD COLUMN `disk_mb`      BIGINT(20) DEFAULT NULL,
+  ADD COLUMN `network_mbps` BIGINT(20) DEFAULT NULL,
+  ADD COLUMN `images`       TEXT       DEFAULT NULL,
   MODIFY COLUMN `memory` BIGINT(20) DEFAULT NULL;

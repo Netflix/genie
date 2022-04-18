@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.common.internal.dtos
 
-import com.google.common.collect.Lists
-import com.google.common.collect.Sets
 import spock.lang.Specification
 
 /**
@@ -37,16 +35,19 @@ class CommandRequestSpec extends Specification {
         ).build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
-        def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def clusterCriteria = Lists.newArrayList(
+        def executable = [UUID.randomUUID().toString(), UUID.randomUUID().toString()]
+        def clusterCriteria = [
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
-            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-        )
+            new Criterion.Builder().withTags([UUID.randomUUID().toString()].toSet()).build()
+        ]
         def computeResources = DtoSpecUtils.getRandomComputeResources()
-        def image = DtoSpecUtils.getRandomImage()
+        def images = [
+            foo: DtoSpecUtils.getRandomImage(),
+            bar: DtoSpecUtils.getRandomImage()
+        ]
         CommandRequest request
 
         when:
@@ -55,7 +56,7 @@ class CommandRequestSpec extends Specification {
             .withResources(resources)
             .withClusterCriteria(clusterCriteria)
             .withComputeResources(computeResources)
-            .withImage(image)
+            .withImages(images)
             .build()
 
         then:
@@ -65,7 +66,7 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         request.getClusterCriteria() == clusterCriteria
         request.getComputeResources() == Optional.ofNullable(computeResources)
-        request.getImage() == Optional.ofNullable(image)
+        request.getImages() == images
 
         when:
         request = new CommandRequest.Builder(metadata, executable).build()
@@ -77,10 +78,10 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         request.getClusterCriteria().isEmpty()
         !request.getComputeResources().isPresent()
-        !request.getImage().isPresent()
+        request.getImages().isEmpty()
 
         when: "Optional fields are blank they're ignored"
-        def newExecutable = Lists.newArrayList(executable)
+        def newExecutable = new ArrayList(executable)
         newExecutable.add("\t")
         newExecutable.add(" ")
         newExecutable.add("")
@@ -89,7 +90,7 @@ class CommandRequestSpec extends Specification {
             .withResources(resources)
             .withClusterCriteria(null)
             .withComputeResources(null)
-            .withImage(null)
+            .withImages(null)
             .build()
 
         then:
@@ -99,7 +100,7 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         request.getClusterCriteria().isEmpty()
         !request.getComputeResources().isPresent()
-        !request.getImage().isPresent()
+        request.getImages().isEmpty()
     }
 
     def "Test equals"() {
@@ -119,7 +120,7 @@ class CommandRequestSpec extends Specification {
         base != comparable
 
         when:
-        comparable = new CommandRequest.Builder(Mock(CommandMetadata), Lists.newArrayList(UUID.randomUUID().toString()))
+        comparable = new CommandRequest.Builder(Mock(CommandMetadata), [UUID.randomUUID().toString()])
             .withRequestedId(UUID.randomUUID().toString())
             .toString()
 
@@ -140,8 +141,8 @@ class CommandRequestSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def baseMetadata = new CommandMetadata.Builder(name, user, version, status).build()
         def comparableMetadata = new CommandMetadata.Builder(name, user, version, status).build()
-        base = new CommandRequest.Builder(baseMetadata, Lists.newArrayList(binary)).build()
-        comparable = new CommandRequest.Builder(comparableMetadata, Lists.newArrayList(binary)).build()
+        base = new CommandRequest.Builder(baseMetadata, [binary]).build()
+        comparable = new CommandRequest.Builder(comparableMetadata, [binary]).build()
 
         then:
         base == comparable
@@ -173,8 +174,8 @@ class CommandRequestSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def baseMetadata = new CommandMetadata.Builder(name, user, version, status).build()
         def comparableMetadata = new CommandMetadata.Builder(name, user, version, status).build()
-        one = new CommandRequest.Builder(baseMetadata, Lists.newArrayList(binary)).build()
-        two = new CommandRequest.Builder(comparableMetadata, Lists.newArrayList(binary)).build()
+        one = new CommandRequest.Builder(baseMetadata, [binary]).build()
+        two = new CommandRequest.Builder(comparableMetadata, [binary]).build()
 
         then:
         one.hashCode() == two.hashCode()
@@ -206,8 +207,8 @@ class CommandRequestSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def baseMetadata = new CommandMetadata.Builder(name, user, version, status).build()
         def comparableMetadata = new CommandMetadata.Builder(name, user, version, status).build()
-        one = new CommandRequest.Builder(baseMetadata, Lists.newArrayList(binary)).build()
-        two = new CommandRequest.Builder(comparableMetadata, Lists.newArrayList(binary)).build()
+        one = new CommandRequest.Builder(baseMetadata, [binary]).build()
+        two = new CommandRequest.Builder(comparableMetadata, [binary]).build()
 
         then:
         one.toString() == two.toString()

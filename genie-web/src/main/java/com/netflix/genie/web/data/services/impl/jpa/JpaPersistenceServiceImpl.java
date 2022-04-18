@@ -31,6 +31,7 @@ import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
 import com.netflix.genie.common.internal.dtos.AgentConfigRequest;
 import com.netflix.genie.common.internal.dtos.Application;
@@ -791,7 +792,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             commandRequest.getExecutable(),
             commandRequest.getComputeResources().orElse(null),
             commandRequest.getClusterCriteria(),
-            commandRequest.getImage().orElse(null)
+            commandRequest.getImages()
         );
 
         try {
@@ -957,7 +958,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             updateCommand.getExecutable(),
             updateCommand.getComputeResources(),
             updateCommand.getClusterCriteria(),
-            updateCommand.getImage()
+            updateCommand.getImages()
         );
     }
 
@@ -1665,10 +1666,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
                 entity::setDiskMbUsed,
                 entity::setNetworkMbpsUsed
             );
-            this.updateImage(
-                jobEnvironment.getImage(),
-                entity::setImageNameUsed,
-                entity::setImageTagUsed
+            this.updateImages(
+                jobEnvironment.getImages(),
+                entity::setImagesUsed
             );
 
             entity.setResolved(true);
@@ -2521,7 +2521,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final List<String> executable,
         @Nullable final ComputeResources computeResources,
         final List<Criterion> clusterCriteria,
-        @Nullable final Image image
+        @Nullable final Map<String, Image> images
     ) {
         this.setEntityResources(resources, entity::setConfigs, entity::setDependencies);
         this.setEntityTags(metadata.getTags(), entity::setTags);
@@ -2537,7 +2537,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             entity::setDiskMb,
             entity::setNetworkMbps
         );
-        this.updateImage(image, entity::setImageName, entity::setImageTag);
+        this.updateImages(images, entity::setImages);
 
         this.updateClusterCriteria(entity, clusterCriteria);
     }
@@ -2663,7 +2663,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     ) {
         jobEntity.setRequestedEnvironmentVariables(requestedJobEnvironment.getRequestedEnvironmentVariables());
         this.updateComputeResources(
-            requestedJobEnvironment.getRequestedComputeResources().orElse(null),
+            requestedJobEnvironment.getRequestedComputeResources(),
             jobEntity::setRequestedCpu,
             jobEntity::setRequestedGpu,
             jobEntity::setRequestedMemory,
@@ -2671,11 +2671,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             jobEntity::setRequestedNetworkMbps
         );
         requestedJobEnvironment.getExt().ifPresent(jobEntity::setRequestedAgentEnvironmentExt);
-        this.updateImage(
-            requestedJobEnvironment.getRequestedImage().orElse(null),
-            jobEntity::setRequestedImageName,
-            jobEntity::setRequestedImageTag
-        );
+        this.updateImages(requestedJobEnvironment.getRequestedImages(), jobEntity::setRequestedImages);
     }
 
     private void setRequestedAgentConfigFields(
@@ -2781,17 +2777,14 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         }
     }
 
-    private void updateImage(
-        @Nullable final Image image,
-        final Consumer<String> nameSetter,
-        final Consumer<String> tagSetter
+    private void updateImages(
+        @Nullable final Map<String, Image> images,
+        final Consumer<JsonNode> imagesSetter
     ) {
-        if (image == null) {
-            nameSetter.accept(null);
-            tagSetter.accept(null);
+        if (images == null) {
+            imagesSetter.accept(null);
         } else {
-            nameSetter.accept(image.getName().orElse(null));
-            tagSetter.accept(image.getTag().orElse(null));
+            imagesSetter.accept(GenieObjectMapper.getMapper().valueToTree(images));
         }
     }
     //endregion

@@ -234,6 +234,7 @@ public interface V4JobRequestProjection {
      * @return The requested amount of disk space in MB or {@link Optional#empty()}
      */
     Optional<Long> getRequestedDiskMb();
+
     /**
      * Get the requested network mbps for the job if any.
      *
@@ -256,16 +257,9 @@ public interface V4JobRequestProjection {
     List<String> getRequestedApplications();
 
     /**
-     * Get the requested container image name if there was one.
+     * Get the requested container image configurations if there were any.
      *
-     * @return The requested image name or {@link Optional#empty()}
+     * @return The requested images or {@link Optional#empty()}
      */
-    Optional<String> getRequestedImageName();
-
-    /**
-     * Get the requested container image tag if there was one.
-     *
-     * @return The requested image tag or {@link Optional#empty()}
-     */
-    Optional<String> getRequestedImageTag();
+    Optional<JsonNode> getRequestedImages();
 }

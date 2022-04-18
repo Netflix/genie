@@ -17,7 +17,11 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.converters;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.AgentConfigRequest;
 import com.netflix.genie.common.internal.dtos.Application;
 import com.netflix.genie.common.internal.dtos.ApplicationMetadata;
@@ -48,11 +52,13 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -64,8 +70,13 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 4.0.0
  */
-@Slf4j
 public final class EntityV4DtoConverters {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EntityV4DtoConverters.class);
+
+    private static final TypeReference<Map<String, Image>> IMAGES_TYPE_REFERENCE = new TypeReference<>() {
+    };
+    private static final ObjectNode EMPTY_JSON = GenieObjectMapper.getMapper().createObjectNode();
 
     private EntityV4DtoConverters() {
     }
@@ -179,7 +190,7 @@ public final class EntityV4DtoConverters {
                 commandEntity::getDiskMb,
                 commandEntity::getNetworkMbps
             ),
-            toImage(commandEntity::getImageName, commandEntity::getImageTag)
+            toImages(commandEntity::getImages)
         );
     }
 
@@ -252,9 +263,7 @@ public final class EntityV4DtoConverters {
                 jobRequestProjection::getRequestedNetworkMbps
             )
         );
-        jobEnvironmentRequestBuilder.withRequestedImage(
-            toImage(jobRequestProjection::getRequestedImageName, jobRequestProjection::getRequestedImageTag)
-        );
+        jobEnvironmentRequestBuilder.withRequestedImages(toImages(jobRequestProjection::getRequestedImages));
 
         return new JobRequest(
             requestedId,
@@ -285,7 +294,7 @@ public final class EntityV4DtoConverters {
         try {
             return builder.build();
         } catch (final IllegalArgumentException iae) {
-            log.error("Creating a Criterion DTO from a Criterion entity threw exception", iae);
+            LOG.error("Creating a Criterion DTO from a Criterion entity threw exception", iae);
             // TODO: For now this is a generic GenieRuntimeException. If we would like more advanced logic at the
             //       edges (REST API, RPC API) based on type of exceptions we should subclass GenieRuntimeException
             throw new GenieRuntimeException(iae);
@@ -485,14 +494,9 @@ public final class EntityV4DtoConverters {
             .build();
     }
 
-    private static Image toImage(
-        final Supplier<Optional<String>> nameGetter,
-        final Supplier<Optional<String>> tagGetter
-    ) {
-        return new Image
-            .Builder()
-            .withName(nameGetter.get().orElse(null))
-            .withTag(tagGetter.get().orElse(null))
-            .build();
+    private static Map<String, Image> toImages(final Supplier<Optional<JsonNode>> imagesGetter) {
+        return GenieObjectMapper
+            .getMapper()
+            .convertValue(imagesGetter.get().orElse(EMPTY_JSON), IMAGES_TYPE_REFERENCE);
     }
 }

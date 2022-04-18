@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Projection to reproduce the JobRequest entity fields which were was a table present before 3.3.0.
+ * Projection to reproduce the JobRequest entity fields which were a table present before 3.3.0.
  *
  * @author tgianos
  * @since 3.3.0

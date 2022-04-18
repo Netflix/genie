@@ -683,7 +683,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .getJobRequest()
                 .getRequestedJobEnvironment()
                 .getRequestedComputeResources()
-                .flatMap(ComputeResources::getCpu)
+                .getCpu()
                 .orElse(
                     context
                         .getCommand()
@@ -703,7 +703,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .getJobRequest()
                 .getRequestedJobEnvironment()
                 .getRequestedComputeResources()
-                .flatMap(ComputeResources::getMemoryMb)
+                .getMemoryMb()
                 .orElse(
                     context
                         .getCommand()

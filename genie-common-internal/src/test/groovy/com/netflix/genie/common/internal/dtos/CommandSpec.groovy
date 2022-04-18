@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.common.internal.dtos
 
-import com.google.common.collect.Lists
-import com.google.common.collect.Sets
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification
 
@@ -42,16 +40,19 @@ class CommandSpec extends Specification {
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def created = Instant.now()
         def updated = Instant.now()
-        def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def clusterCriteria = Lists.newArrayList(
+        def executable = [UUID.randomUUID().toString(), UUID.randomUUID().toString()]
+        def clusterCriteria = [
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
             new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
-            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-        )
+            new Criterion.Builder().withTags([UUID.randomUUID().toString()].toSet()).build()
+        ]
         def computeResources = DtoSpecUtils.getRandomComputeResources()
-        def image = DtoSpecUtils.getRandomImage()
+        def images = [
+            foo: DtoSpecUtils.getRandomImage(),
+            bar: DtoSpecUtils.getRandomImage()
+        ]
         Command command
 
         when:
@@ -64,7 +65,7 @@ class CommandSpec extends Specification {
             executable,
             clusterCriteria,
             computeResources,
-            image
+            images
         )
 
         then:
@@ -76,7 +77,7 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         command.getClusterCriteria() == clusterCriteria
         command.getComputeResources() == computeResources
-        command.getImage() == image
+        command.getImages() == images
 
         when:
         command = new Command(
@@ -100,10 +101,10 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         command.getClusterCriteria().isEmpty()
         command.getComputeResources() == new ComputeResources.Builder().build()
-        command.getImage() == new Image.Builder().build()
+        command.getImages().isEmpty()
 
         when: "Executables contain blank strings they are removed"
-        def newExecutable = Lists.newArrayList(executable)
+        def newExecutable = new ArrayList(executable)
         newExecutable.add("\t")
         newExecutable.add("   ")
         command = new Command(
@@ -127,7 +128,7 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         command.getClusterCriteria().isEmpty()
         command.getComputeResources() == new ComputeResources.Builder().build()
-        command.getImage() == new Image.Builder().build()
+        command.getImages().isEmpty()
     }
 
     def "Test equals"() {
@@ -153,7 +154,7 @@ class CommandSpec extends Specification {
             Instant.now(),
             null,
             Mock(CommandMetadata),
-            Lists.newArrayList(UUID.randomUUID().toString()),
+            [UUID.randomUUID().toString()],
             null,
             null,
             null
@@ -186,7 +187,7 @@ class CommandSpec extends Specification {
             updated,
             null,
             baseMetadata,
-            Lists.newArrayList(binary),
+            [binary],
             null,
             new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
@@ -197,7 +198,7 @@ class CommandSpec extends Specification {
             updated,
             null,
             comparableMetadata,
-            Lists.newArrayList(binary),
+            [binary],
             null,
             new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
@@ -243,7 +244,7 @@ class CommandSpec extends Specification {
             updated,
             null,
             baseMetadata,
-            Lists.newArrayList(binary),
+            [binary],
             null,
             new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
@@ -254,7 +255,7 @@ class CommandSpec extends Specification {
             updated,
             null,
             comparableMetadata,
-            Lists.newArrayList(binary),
+            [binary],
             null,
             new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
@@ -300,7 +301,7 @@ class CommandSpec extends Specification {
             updated,
             null,
             baseMetadata,
-            Lists.newArrayList(binary),
+            [binary],
             null,
             new ComputeResources.Builder().withMemoryMb(memory).build(),
             null
@@ -311,7 +312,7 @@ class CommandSpec extends Specification {
             updated,
             null,
             comparableMetadata,
-            Lists.newArrayList(binary),
+            [binary],
             null,
             new ComputeResources.Builder().withMemoryMb(memory).build(),
             null

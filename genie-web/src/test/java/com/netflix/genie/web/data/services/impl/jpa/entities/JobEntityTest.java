@@ -637,38 +637,20 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void canSetRequestedImageName() {
+    void canSetRequestedImages() {
         this.testOptionalField(
-            this.entity::getRequestedImageName,
-            this.entity::setRequestedImageName,
-            UUID.randomUUID().toString()
+            this.entity::getRequestedImages,
+            this.entity::setRequestedImages,
+            Mockito.mock(JsonNode.class)
         );
     }
 
     @Test
     void canSetImageNameUsed() {
         this.testOptionalField(
-            this.entity::getImageNameUsed,
-            this.entity::setImageNameUsed,
-            UUID.randomUUID().toString()
-        );
-    }
-
-    @Test
-    void canSetRequestedImageTag() {
-        this.testOptionalField(
-            this.entity::getRequestedImageTag,
-            this.entity::setRequestedImageTag,
-            UUID.randomUUID().toString()
-        );
-    }
-
-    @Test
-    void canSetImageTagUsed() {
-        this.testOptionalField(
-            this.entity::getImageTagUsed,
-            this.entity::setImageTagUsed,
-            UUID.randomUUID().toString()
+            this.entity::getImagesUsed,
+            this.entity::setImagesUsed,
+            Mockito.mock(JsonNode.class)
         );
     }
 

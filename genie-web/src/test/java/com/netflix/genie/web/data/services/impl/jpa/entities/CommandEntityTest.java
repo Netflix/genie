@@ -97,6 +97,7 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(entity.getApplications()).isEmpty();
         Assertions.assertThat(entity.getMemory()).isNotPresent();
         Assertions.assertThat(entity.getLauncherExt()).isNotPresent();
+        Assertions.assertThat(entity.getImages()).isNotPresent();
     }
 
     @Test
@@ -202,20 +203,11 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testImageName() {
+    void testImages() {
         this.testOptionalField(
-            this.c::getImageName,
-            this.c::setImageName,
-            UUID.randomUUID().toString()
-        );
-    }
-
-    @Test
-    void testImageTag() {
-        this.testOptionalField(
-            this.c::getImageTag,
-            this.c::setImageTag,
-            UUID.randomUUID().toString()
+            this.c::getImages,
+            this.c::setImages,
+            Mockito.mock(JsonNode.class)
         );
     }
 

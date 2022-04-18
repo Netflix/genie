@@ -38,7 +38,6 @@ import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
-import com.netflix.genie.common.internal.dtos.Image
 import com.netflix.genie.common.internal.dtos.JobMetadata
 import com.netflix.genie.common.internal.dtos.JobRequest
 import com.netflix.genie.common.internal.dtos.JobStatus
@@ -594,7 +593,7 @@ class DtoConvertersSpec extends Specification {
             .getComputeResources()
             .orElseThrow(IllegalStateException::new)
             .getMemoryMb() == Optional.ofNullable(memory)
-        !commandRequest.getImage().isPresent()
+        commandRequest.getImages().isEmpty()
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
@@ -625,7 +624,7 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getResources().getConfigs().isEmpty()
         commandRequest.getResources().getDependencies().isEmpty()
         !commandRequest.getComputeResources().isPresent()
-        !commandRequest.getImage().isPresent()
+        commandRequest.getImages().isEmpty()
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
@@ -699,7 +698,7 @@ class DtoConvertersSpec extends Specification {
         v4Command
             .getComputeResources()
             .getMemoryMb() == Optional.ofNullable(memory)
-        v4Command.getImage() != null
+        v4Command.getImages().isEmpty()
         v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
@@ -734,7 +733,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getCreated() != null
         v4Command.getUpdated() != null
         v4Command.getComputeResources() == new ComputeResources.Builder().build()
-        v4Command.getImage() == new Image.Builder().build()
+        v4Command.getImages().isEmpty()
         v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
@@ -1009,7 +1008,6 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest
             .getRequestedJobEnvironment()
             .getRequestedComputeResources()
-            .orElseThrow(IllegalStateException::new)
             .getMemoryMb()
             .orElseThrow(IllegalStateException::new) == memory
         v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().orElse(-1) == timeout
@@ -1021,7 +1019,6 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest
             .getRequestedJobEnvironment()
             .getRequestedComputeResources()
-            .orElseThrow(IllegalStateException::new)
             .getCpu()
             .orElse(null) == cpu
         !v4JobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().isPresent()

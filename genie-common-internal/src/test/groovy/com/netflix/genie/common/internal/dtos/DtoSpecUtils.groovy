@@ -67,7 +67,10 @@ class DtoSpecUtils {
             [UUID.randomUUID().toString()],
             clusterCriteria,
             getRandomComputeResources(),
-            getRandomImage()
+            [
+                (UUID.randomUUID().toString()): getRandomImage(),
+                (UUID.randomUUID().toString()): getRandomImage()
+            ]
         )
     }
 
@@ -85,7 +88,12 @@ class DtoSpecUtils {
             .withResources(resources)
             .withClusterCriteria([new Criterion.Builder().withId(UUID.randomUUID().toString()).build()])
             .withComputeResources(getRandomComputeResources())
-            .withImage(getRandomImage())
+            .withImages(
+                [
+                    (UUID.randomUUID().toString()): getRandomImage(),
+                    (UUID.randomUUID().toString()): getRandomImage(),
+                ]
+            )
             .build()
     }
 
@@ -104,7 +112,7 @@ class DtoSpecUtils {
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
         def requestedEnvironmentVariables = [
-            hi: UUID.randomUUID().toString(),
+            hi : UUID.randomUUID().toString(),
             bye: UUID.randomUUID().toString()
         ]
         def requestedJobEnvironment = new JobEnvironmentRequest.Builder()

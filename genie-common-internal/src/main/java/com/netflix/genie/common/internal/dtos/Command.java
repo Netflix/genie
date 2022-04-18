@@ -19,7 +19,6 @@ package com.netflix.genie.common.internal.dtos;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -30,7 +29,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,12 +50,12 @@ public class Command extends CommonResource {
     @Valid
     private final CommandMetadata metadata;
     @NotEmpty(message = "At least one executable entry is required")
-    private final ImmutableList<
+    private final List<
         @NotEmpty(message = "A default executable element shouldn't be an empty string")
         @Size(max = 1024, message = "Executable elements can only be 1024 characters") String> executable;
-    private final ImmutableList<Criterion> clusterCriteria;
+    private final List<Criterion> clusterCriteria;
     private final ComputeResources computeResources;
-    private final Image image;
+    private final Map<String, Image> images;
 
     /**
      * Constructor.
@@ -68,7 +71,7 @@ public class Command extends CommonResource {
      * @param clusterCriteria  The ordered list of cluster {@link Criterion} that should be used to resolve which
      *                         clusters this command can run on at job execution time
      * @param computeResources The default computational resources a job should have if this command is selected
-     * @param image            The default image the job should launch an image in if this command is selected
+     * @param images           The default images the job should launch with if this command is selected
      */
     @JsonCreator
     public Command(
@@ -80,19 +83,23 @@ public class Command extends CommonResource {
         @JsonProperty(value = "executable", required = true) final List<String> executable,
         @JsonProperty(value = "clusterCriteria") @Nullable final List<Criterion> clusterCriteria,
         @JsonProperty(value = "computeResources") @Nullable final ComputeResources computeResources,
-        @JsonProperty(value = "image") @Nullable final Image image
+        @JsonProperty(value = "images") @Nullable final Map<String, Image> images
     ) {
         super(id, created, updated, resources);
         this.metadata = metadata;
-        this.executable = ImmutableList.copyOf(
+        this.executable = Collections.unmodifiableList(
             executable
                 .stream()
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList())
         );
-        this.clusterCriteria = clusterCriteria != null ? ImmutableList.copyOf(clusterCriteria) : ImmutableList.of();
+        this.clusterCriteria = Collections.unmodifiableList(
+            clusterCriteria != null
+                ? new ArrayList<>(clusterCriteria)
+                : new ArrayList<>()
+        );
         this.computeResources = computeResources != null ? computeResources : new ComputeResources.Builder().build();
-        this.image = image != null ? image : new Image.Builder().build();
+        this.images = Collections.unmodifiableMap(images != null ? new HashMap<>(images) : new HashMap<>());
     }
 
     /**
@@ -126,9 +133,9 @@ public class Command extends CommonResource {
     /**
      * Get any image information associated by default with this command.
      *
-     * @return The {@link Image} metadata
+     * @return The {@link Image} metadata as unmodifiable map. Any attempt to modify will throw an exception
      */
-    public Image getImage() {
-        return this.image;
+    public Map<String, Image> getImages() {
+        return this.images;
     }
 }
