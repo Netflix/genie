@@ -28,6 +28,7 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
+import com.netflix.genie.web.properties.JobResolutionProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
@@ -76,21 +77,22 @@ class ServicesAutoConfigurationTest {
     @Test
     void canCreateBeans() {
         this.contextRunner.run(
-            context -> {
-                Assertions.assertThat(context).hasSingleBean(JobsForwardingProperties.class);
-                Assertions.assertThat(context).hasSingleBean(JobsLocationsProperties.class);
-                Assertions.assertThat(context).hasSingleBean(JobsMemoryProperties.class);
-                Assertions.assertThat(context).hasSingleBean(JobsUsersProperties.class);
-                Assertions.assertThat(context).hasSingleBean(JobsActiveLimitProperties.class);
-                Assertions.assertThat(context).hasSingleBean(AttachmentServiceProperties.class);
-                Assertions.assertThat(context).hasSingleBean(JobsProperties.class);
-                Assertions.assertThat(context).hasSingleBean(AttachmentService.class);
-                Assertions.assertThat(context).hasSingleBean(JobResolverService.class);
-                Assertions.assertThat(context).hasSingleBean(JobDirectoryServerService.class);
-                Assertions.assertThat(context).hasSingleBean(JobLaunchService.class);
-                Assertions.assertThat(context).hasSingleBean(ArchivedJobService.class);
-                Assertions.assertThat(context).hasSingleBean(RequestForwardingService.class);
-            }
+            context -> Assertions
+                .assertThat(context)
+                .hasSingleBean(JobsForwardingProperties.class)
+                .hasSingleBean(JobsLocationsProperties.class)
+                .hasSingleBean(JobsMemoryProperties.class)
+                .hasSingleBean(JobsUsersProperties.class)
+                .hasSingleBean(JobsActiveLimitProperties.class)
+                .hasSingleBean(AttachmentServiceProperties.class)
+                .hasSingleBean(JobsProperties.class)
+                .hasSingleBean(AttachmentService.class)
+                .hasSingleBean(JobResolverService.class)
+                .hasSingleBean(JobDirectoryServerService.class)
+                .hasSingleBean(JobLaunchService.class)
+                .hasSingleBean(ArchivedJobService.class)
+                .hasSingleBean(RequestForwardingService.class)
+                .hasSingleBean(JobResolutionProperties.class)
         );
     }
 

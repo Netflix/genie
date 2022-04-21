@@ -41,14 +41,13 @@ public class CommandModelAssemblerTest {
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
     private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
-    private static final long CHECK_DELAY = 1000L;
 
     private Command command;
     private CommandModelAssembler assembler;
 
     @BeforeEach
     void setup() {
-        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS)
             .withId(ID)
             .build();
         this.assembler = new CommandModelAssembler();

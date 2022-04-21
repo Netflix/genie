@@ -24,6 +24,7 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
+import com.netflix.genie.web.properties.JobResolutionProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsForwardingProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
@@ -82,6 +83,18 @@ import java.util.List;
 )
 @Slf4j
 public class ServicesAutoConfiguration {
+
+    /**
+     * Provide a bean for {@link JobResolutionProperties} which encapsulates defaults and other values set by
+     * external configuration related to job resolution.
+     *
+     * @param environment The application {@link Environment}
+     * @return A {@link JobResolutionProperties} instance which will refresh itself in the background
+     */
+    @Bean
+    public JobResolutionProperties jobResolutionProperties(final Environment environment) {
+        return new JobResolutionProperties(environment);
+    }
 
     /**
      * Collection of properties related to job execution.
