@@ -19,11 +19,6 @@ package com.netflix.genie.web.services.impl;
 
 import brave.SpanCustomizer;
 import brave.Tracer;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dtos.Application;
 import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.ClusterMetadata;
@@ -60,9 +55,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,8 +71,12 @@ import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,9 +90,10 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 4.0.0
  */
-@Slf4j
 @Validated
 public class JobResolverServiceImpl implements JobResolverService {
+    private static final Logger LOG = LoggerFactory.getLogger(JobResolverServiceImpl.class);
+
     //region Metric Constants
     /**
      * How long it takes to completely resolve a job given inputs.
@@ -211,9 +212,10 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id
     ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
         final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet(SAVED_TAG);
+        final Set<Tag> tags = new HashSet<>();
+        tags.add(SAVED_TAG);
         try {
-            log.info("Received request to resolve a job with id {}", id);
+            LOG.info("Received request to resolve a job with id {}", id);
             final JobStatus jobStatus = this.persistenceService.getJobStatus(id);
             if (!jobStatus.isResolvable()) {
                 throw new IllegalArgumentException("Job " + id + " is already resolved: " + jobStatus);
@@ -269,9 +271,10 @@ public class JobResolverServiceImpl implements JobResolverService {
         final boolean apiJob
     ) throws GenieJobResolutionException, GenieJobResolutionRuntimeException {
         final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet(NOT_SAVED_TAG);
+        final Set<Tag> tags = new HashSet<>();
+        tags.add(NOT_SAVED_TAG);
         try {
-            log.info(
+            LOG.info(
                 "Received request to resolve a job for id {} and request {}",
                 id,
                 jobRequest
@@ -335,7 +338,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      */
     private void resolveCommand(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
+        final Set<Tag> tags = new HashSet<>();
         try {
             final JobRequest jobRequest = context.getJobRequest();
             final Criterion criterion = jobRequest.getCriteria().getCommandCriterion();
@@ -400,7 +403,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                             + result.getSelectionRationale().orElse(NO_RATIONALE)
                     )
                 );
-            log.debug(
+            LOG.debug(
                 "Selected command {} for criterion {} using {} due to {}",
                 command.getId(),
                 criterion,
@@ -441,7 +444,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      */
     private void resolveCluster(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
+        final Set<Tag> tags = new HashSet<>();
 
         final String jobId = context.getJobId();
         try {
@@ -467,7 +470,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             Cluster cluster = null;
             for (final ClusterSelector clusterSelector : this.clusterSelectors) {
                 // Create subset of tags just for this selector. Copy existing tags if any.
-                final Set<Tag> selectorTags = Sets.newHashSet(tags);
+                final Set<Tag> selectorTags = new HashSet<>(tags);
                 // Note: This is done before the selection because if we do it after and the selector throws
                 //       exception then we don't have this tag in the metrics. Which is unfortunate since the result
                 //       does return the selector
@@ -488,7 +491,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
                     if (selectedClusterOptional.isPresent()) {
                         cluster = selectedClusterOptional.get();
-                        log.debug(
+                        LOG.debug(
                             "Successfully selected cluster {} using selector {} for job {} with rationale: {}",
                             cluster.getId(),
                             clusterSelectorClass,
@@ -507,7 +510,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                         );
                         selectorTags.add(NO_CLUSTER_RESOLVED_ID);
                         selectorTags.add(NO_CLUSTER_RESOLVED_NAME);
-                        log.debug(
+                        LOG.debug(
                             "Selector {} returned no preference with rationale: {}",
                             clusterSelectorClass,
                             result.getSelectionRationale().orElse(NO_RATIONALE)
@@ -518,7 +521,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     // This is a choice to provides "best-service": select a cluster as long as it matches criteria,
                     // even if one of the selectors encountered an error and cannot choose the best candidate.
                     MetricsUtils.addFailureTagsWithException(selectorTags, e);
-                    log.warn(
+                    LOG.warn(
                         "Cluster selector {} evaluation threw exception for job {}",
                         clusterSelectorClass,
                         jobId,
@@ -533,7 +536,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 throw new GenieJobResolutionException("No cluster resolved for job " + jobId);
             }
 
-            log.debug("Resolved cluster {} for job {}", cluster.getId(), jobId);
+            LOG.debug("Resolved cluster {} for job {}", cluster.getId(), jobId);
 
             context.setCluster(cluster);
             MetricsUtils.addSuccessTags(tags);
@@ -561,7 +564,7 @@ public class JobResolverServiceImpl implements JobResolverService {
 
     private void resolveApplications(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
+        final Set<Tag> tags = new HashSet<>();
         final String id = context.getJobId();
         final JobRequest jobRequest = context.getJobRequest();
         try {
@@ -569,9 +572,9 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .getCommand()
                 .orElseThrow(() -> new IllegalStateException("Command hasn't been resolved before applications"))
                 .getId();
-            log.debug("Selecting applications for job {} and command {}", id, commandId);
+            LOG.debug("Selecting applications for job {} and command {}", id, commandId);
             // TODO: What do we do about application status? Should probably check here
-            final List<Application> applications = Lists.newArrayList();
+            final List<Application> applications = new ArrayList<>();
             if (jobRequest.getCriteria().getApplicationIds().isEmpty()) {
                 applications.addAll(this.persistenceService.getApplicationsForCommand(commandId));
             } else {
@@ -579,7 +582,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     applications.add(this.persistenceService.getApplication(applicationId));
                 }
             }
-            log.debug(
+            LOG.debug(
                 "Resolved applications {} for job {}",
                 applications
                     .stream()
@@ -620,7 +623,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             );
         // N.B. variables may be evaluated in a different order than they are added to this map (due to serialization).
         // Hence variables in this set should not depend on each-other.
-        final ImmutableMap.Builder<String, String> envVariables = ImmutableMap.builder();
+        final Map<String, String> envVariables = new HashMap<>();
         envVariables.put(JobConstants.GENIE_VERSION_ENV_VAR, VERSION_4);
         envVariables.put(JobConstants.GENIE_CLUSTER_ID_ENV_VAR, cluster.getId());
         envVariables.put(JobConstants.GENIE_CLUSTER_NAME_ENV_VAR, cluster.getMetadata().getName());
@@ -645,7 +648,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             this.tagsToString(jobRequest.getCriteria().getCommandCriterion().getTags())
         );
         final List<Criterion> clusterCriteria = jobRequest.getCriteria().getClusterCriteria();
-        final List<String> clusterCriteriaTags = Lists.newArrayListWithExpectedSize(clusterCriteria.size());
+        final List<String> clusterCriteriaTags = new ArrayList<>(clusterCriteria.size());
         for (int i = 0; i < clusterCriteria.size(); i++) {
             final Criterion criterion = clusterCriteria.get(i);
             final String criteriaTagsString = this.tagsToString(criterion.getTags());
@@ -659,7 +662,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         envVariables.put(JobConstants.GENIE_USER_ENV_VAR, jobRequest.getMetadata().getUser());
         envVariables.put(JobConstants.GENIE_USER_GROUP_ENV_VAR, jobRequest.getMetadata().getGroup().orElse(""));
 
-        context.setEnvironmentVariables(envVariables.build());
+        context.setEnvironmentVariables(Collections.unmodifiableMap(envVariables));
     }
 
     private void resolveTimeout(final JobResolutionContext context) {
@@ -762,9 +765,9 @@ public class JobResolverServiceImpl implements JobResolverService {
     ) {
         final long start = System.nanoTime();
         try {
-            final ImmutableMap.Builder<Command, List<Criterion>> mapBuilder = ImmutableMap.builder();
+            final Map<Command, List<Criterion>> mapBuilder = new HashMap<>();
             for (final Command command : commands) {
-                final ImmutableList.Builder<Criterion> listBuilder = ImmutableList.builder();
+                final List<Criterion> listBuilder = new ArrayList<>();
                 for (final Criterion commandClusterCriterion : command.getClusterCriteria()) {
                     for (final Criterion jobClusterCriterion : jobRequest.getCriteria().getClusterCriteria()) {
                         try {
@@ -773,7 +776,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                             // the db query as a join with a subquery.
                             listBuilder.add(this.mergeCriteria(commandClusterCriterion, jobClusterCriterion));
                         } catch (final IllegalArgumentException e) {
-                            log.debug(
+                            LOG.debug(
                                 "Unable to merge command cluster criterion {} and job cluster criterion {}. Skipping.",
                                 commandClusterCriterion,
                                 jobClusterCriterion,
@@ -782,9 +785,9 @@ public class JobResolverServiceImpl implements JobResolverService {
                         }
                     }
                 }
-                mapBuilder.put(command, listBuilder.build());
+                mapBuilder.put(command, Collections.unmodifiableList(listBuilder));
             }
-            return mapBuilder.build();
+            return Collections.unmodifiableMap(mapBuilder);
         } finally {
             this.registry
                 .timer(GENERATE_CRITERIA_PERMUTATIONS_TIMER)
@@ -818,16 +821,16 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Map<Command, List<Criterion>> commandClusterCriteria,
         final Set<Cluster> candidateClusters
     ) {
-        final ImmutableMap.Builder<Command, Set<Cluster>> matrixBuilder = ImmutableMap.builder();
+        final Map<Command, Set<Cluster>> matrixBuilder = new HashMap<>();
         for (final Map.Entry<Command, List<Criterion>> entry : commandClusterCriteria.entrySet()) {
             final Command command = entry.getKey();
-            final ImmutableSet.Builder<Cluster> matchedClustersBuilder = ImmutableSet.builder();
+            final Set<Cluster> matchedClustersBuilder = new HashSet<>();
 
             // Loop through the criterion in the priority order first
             for (final Criterion criterion : entry.getValue()) {
                 for (final Cluster candidateCluster : candidateClusters) {
                     if (this.clusterMatchesCriterion(candidateCluster, criterion)) {
-                        log.debug(
+                        LOG.debug(
                             "Cluster {} matched criterion {} for command {}",
                             candidateCluster.getId(),
                             criterion,
@@ -837,11 +840,11 @@ public class JobResolverServiceImpl implements JobResolverService {
                     }
                 }
 
-                final ImmutableSet<Cluster> matchedClusters = matchedClustersBuilder.build();
+                final Set<Cluster> matchedClusters = Collections.unmodifiableSet(matchedClustersBuilder);
                 if (!matchedClusters.isEmpty()) {
                     // If we found some clusters the evaluation for this command is done
                     matrixBuilder.put(command, matchedClusters);
-                    log.debug("For command {} matched clusters {}", command, matchedClusters);
+                    LOG.debug("For command {} matched clusters {}", command, matchedClusters);
                     // short circuit further criteria evaluation for this command
                     break;
                 }
@@ -850,8 +853,8 @@ public class JobResolverServiceImpl implements JobResolverService {
             // of resulting map as no value would be added to the result builder
         }
 
-        final ImmutableMap<Command, Set<Cluster>> matrix = matrixBuilder.build();
-        log.debug("Complete command -> clusters matrix: {}", matrix);
+        final Map<Command, Set<Cluster>> matrix = Collections.unmodifiableMap(matrixBuilder);
+        LOG.debug("Complete command -> clusters matrix: {}", matrix);
         return matrix;
     }
 
@@ -885,7 +888,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         builder.withVersion(
             this.mergeCriteriaStrings(one.getVersion().orElse(null), two.getVersion().orElse(null), VERSION_FIELD)
         );
-        final Set<String> tags = Sets.newHashSet(one.getTags());
+        final Set<String> tags = new HashSet<>(one.getTags());
         tags.addAll(two.getTags());
         builder.withTags(tags);
         return builder.build();
@@ -918,7 +921,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      * @return a CSV string
      */
     private String tagsToString(final Set<String> tags) {
-        final List<String> sortedTags = Lists.newArrayList(tags);
+        final List<String> sortedTags = new ArrayList<>(tags);
         // Sort tags for the sake of determinism (e.g., tests)
         sortedTags.sort(Comparator.naturalOrder());
         final String joinedString = StringUtils.join(sortedTags, ',');
