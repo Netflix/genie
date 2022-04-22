@@ -19,10 +19,6 @@ package com.netflix.genie.web.services.impl
 
 import brave.SpanCustomizer
 import brave.Tracer
-import com.google.common.collect.ImmutableSet
-import com.google.common.collect.Iterables
-import com.google.common.collect.Lists
-import com.google.common.collect.Sets
 import com.netflix.genie.common.internal.dtos.AgentConfigRequest
 import com.netflix.genie.common.internal.dtos.Application
 import com.netflix.genie.common.internal.dtos.ApplicationMetadata
@@ -51,6 +47,7 @@ import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
+import com.netflix.genie.web.properties.JobResolutionProperties
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.selectors.ClusterSelectionContext
 import com.netflix.genie.web.selectors.ClusterSelector
@@ -58,7 +55,7 @@ import com.netflix.genie.web.selectors.CommandSelectionContext
 import com.netflix.genie.web.selectors.CommandSelector
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
-import org.springframework.core.env.Environment
+import org.springframework.mock.env.MockEnvironment
 import spock.lang.Specification
 
 import javax.annotation.Nullable
@@ -78,6 +75,7 @@ class JobResolverServiceImplSpec extends Specification {
     private ClusterSelector clusterSelector
     private CommandSelector commandSelector
     private JobsProperties jobsProperties
+    private JobResolutionProperties jobResolutionProperties
     private Tracer tracer
     private BraveTagAdapter tagAdapter
 
@@ -99,13 +97,14 @@ class JobResolverServiceImplSpec extends Specification {
             getTagAdapter() >> this.tagAdapter
             getTracer() >> this.tracer
         }
+        this.jobResolutionProperties = new JobResolutionProperties(new MockEnvironment())
         this.service = new JobResolverServiceImpl(
             dataServices,
-            Lists.newArrayList(this.clusterSelector),
+            [this.clusterSelector],
             this.commandSelector,
             new SimpleMeterRegistry(),
             this.jobsProperties,
-            Mock(Environment),
+            this.jobResolutionProperties,
             tracingComponents
         )
     }
@@ -116,11 +115,11 @@ class JobResolverServiceImplSpec extends Specification {
         def executableBinary = UUID.randomUUID().toString()
         def executableArgument0 = UUID.randomUUID().toString()
         def executableArgument1 = UUID.randomUUID().toString()
-        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
-        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
+        def executable = [executableBinary, executableArgument0, executableArgument1]
+        def arguments = [UUID.randomUUID().toString()]
         def command0 = createCommand(command0Id, executable)
         def command1 = createCommand(command1Id, executable)
-        def commands = Sets.newHashSet(command0, command1)
+        def commands = [command0, command1].toSet()
         ResourceSelectionResult<Command> commandSelectionResult = Mock(ResourceSelectionResult) {
             getSelectorClass() >> this.getClass()
             getSelectionRationale() >> Optional.empty()
@@ -139,19 +138,19 @@ class JobResolverServiceImplSpec extends Specification {
 
         def command0JobRequest0Clusters = createClustersBasedOnCriteria(2, command0, jobRequest0)
         def command1JobRequest0Clusters = createClustersBasedOnCriteria(3, command1, jobRequest0)
-        def jobRequest0Clusters = Sets.newHashSet(command0JobRequest0Clusters)
+        def jobRequest0Clusters = new HashSet<>(command0JobRequest0Clusters)
         jobRequest0Clusters.addAll(command1JobRequest0Clusters)
         def jobRequest0SelectedCluster = command0JobRequest0Clusters.head()
 
         def command0JobRequest1Clusters = createClustersBasedOnCriteria(1, command0, jobRequest1)
         def command1JobRequest1Clusters = createClustersBasedOnCriteria(4, command1, jobRequest1)
-        def jobRequest1Clusters = Sets.newHashSet(command0JobRequest1Clusters)
+        def jobRequest1Clusters = new HashSet<>(command0JobRequest1Clusters)
         jobRequest1Clusters.addAll(command1JobRequest1Clusters)
         def jobRequest1SelectedCluster = command1JobRequest1Clusters.head()
 
         def command0JobRequest2Clusters = createClustersBasedOnCriteria(4, command0, jobRequest2)
         def command1JobRequest2Clusters = createClustersBasedOnCriteria(2, command1, jobRequest2)
-        def jobRequest2Clusters = Sets.newHashSet(command0JobRequest2Clusters)
+        def jobRequest2Clusters = new HashSet<>(command0JobRequest2Clusters)
         jobRequest2Clusters.addAll(command1JobRequest2Clusters)
         def jobRequest2SelectedCluster = command1JobRequest2Clusters.head()
 
@@ -181,7 +180,7 @@ class JobResolverServiceImplSpec extends Specification {
             }
         ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(jobRequest0SelectedCluster)
-        1 * this.persistenceService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
+        1 * this.persistenceService.getApplicationsForCommand(command0Id) >> new ArrayList<>()
         jobSpec.getExecutableArgs() == expectedCommandArgs
         jobSpec.getJobArgs() == expectedJobArgs
         jobSpec.getJob().getId() == jobId
@@ -198,7 +197,7 @@ class JobResolverServiceImplSpec extends Specification {
             )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
         jobEnvironment.getComputeResources().getMemoryMb()
-            == Optional.of(this.jobsProperties.getMemory().getDefaultJobMemory())
+            == this.jobResolutionProperties.getDefaultComputeResources().getMemoryMb()
         jobEnvironment.getComputeResources().getCpu() == Optional.of(1)
         !jobEnvironment.getExt().isPresent()
         jobSpec.getTimeout().orElse(null) == com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION
@@ -225,7 +224,7 @@ class JobResolverServiceImplSpec extends Specification {
             }
         ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(jobRequest1SelectedCluster)
-        1 * this.persistenceService.getApplicationsForCommand(command1Id) >> Lists.newArrayList()
+        1 * this.persistenceService.getApplicationsForCommand(command1Id) >> new ArrayList<>()
         jobSpec.getExecutableArgs() == expectedCommandArgs
         jobSpec.getJobArgs() == expectedJobArgs
         jobSpec.getJob().getId() == jobId
@@ -242,7 +241,7 @@ class JobResolverServiceImplSpec extends Specification {
             )
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
         jobEnvironment.getComputeResources().getMemoryMb()
-            == Optional.of(this.jobsProperties.getMemory().getDefaultJobMemory())
+            == this.jobResolutionProperties.getDefaultComputeResources().getMemoryMb()
         jobEnvironment.getComputeResources().getCpu() == Optional.of(1)
         !jobEnvironment.getExt().isPresent()
         jobSpec.getTimeout().orElse(null) == 5_002
@@ -271,7 +270,7 @@ class JobResolverServiceImplSpec extends Specification {
             }
         ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(jobRequest2SelectedCluster)
-        1 * this.persistenceService.getApplicationsForCommand(command1Id) >> Lists.newArrayList()
+        1 * this.persistenceService.getApplicationsForCommand(command1Id) >> new ArrayList<>()
         1 * this.persistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
         jobSpec.getExecutableArgs() == expectedCommandArgs
         jobSpec.getJobArgs() == expectedJobArgs
@@ -300,11 +299,11 @@ class JobResolverServiceImplSpec extends Specification {
         def executableBinary = UUID.randomUUID().toString()
         def executableArgument0 = UUID.randomUUID().toString()
         def executableArgument1 = UUID.randomUUID().toString()
-        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
-        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
+        def executable = [executableBinary, executableArgument0, executableArgument1]
+        def arguments = [UUID.randomUUID().toString()]
         def command0 = createCommand(command0Id, executable)
         def command1 = createCommand(command1Id, executable)
-        def commands = Sets.newHashSet(command0, command1)
+        def commands = [command0, command1].toSet()
 
         def jobId = UUID.randomUUID().toString()
 
@@ -312,7 +311,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         def command0JobRequestClusters = createClustersBasedOnCriteria(2, command0, jobRequest)
         def command1JobRequestClusters = createClustersBasedOnCriteria(3, command1, jobRequest)
-        def jobRequest0Clusters = Sets.newHashSet(command0JobRequestClusters)
+        def jobRequest0Clusters = new HashSet<>(command0JobRequestClusters)
         jobRequest0Clusters.addAll(command1JobRequestClusters)
 
         when: "V4 resolution"
@@ -347,10 +346,10 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "Can handle resources not found errors with V3 and V4 algorithms"() {
-        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
+        def arguments = [UUID.randomUUID().toString()]
         def jobId = UUID.randomUUID().toString()
         def jobRequest0 = createJobRequest(arguments, null, null, null)
-        def emptySet = Sets.newHashSet()
+        def emptySet = new HashSet<Command>()
 
         when: "V4 resolution"
         this.service.resolveJob(jobId, jobRequest0, true)
@@ -376,15 +375,15 @@ class JobResolverServiceImplSpec extends Specification {
 
         where:
         input                                                       | output
-        Sets.newHashSet()                                           | ""
-        Sets.newHashSet("some.tag:t")                               | "some.tag:t"
-        Sets.newHashSet("foo", "bar")                               | "bar,foo"
-        Sets.newHashSet("bar", "foo")                               | "bar,foo"
-        Sets.newHashSet("foo", "bar", "tag,with,commas")            | "bar,foo,tag,with,commas"
-        Sets.newHashSet("foo", "bar", "tag with spaces")            | "bar,foo,tag with spaces"
-        Sets.newHashSet("foo", "bar", "tag\nwith\nnewlines")        | "bar,foo,tag\nwith\nnewlines"
-        Sets.newHashSet("foo", "bar", "\"tag-with-double-quotes\"") | "\"tag-with-double-quotes\",bar,foo"
-        Sets.newHashSet("foo", "bar", "\'tag-with-single-quotes\'") | "\'tag-with-single-quotes\',bar,foo"
+        new HashSet<String>()                                           | ""
+        Set.of("some.tag:t")                               | "some.tag:t"
+        Set.of("foo", "bar")                               | "bar,foo"
+        Set.of("bar", "foo")                               | "bar,foo"
+        Set.of("foo", "bar", "tag,with,commas")            | "bar,foo,tag,with,commas"
+        Set.of("foo", "bar", "tag with spaces")            | "bar,foo,tag with spaces"
+        Set.of("foo", "bar", "tag\nwith\nnewlines")        | "bar,foo,tag\nwith\nnewlines"
+        Set.of("foo", "bar", "\"tag-with-double-quotes\"") | "\"tag-with-double-quotes\",bar,foo"
+        Set.of("foo", "bar", "\'tag-with-single-quotes\'") | "\'tag-with-single-quotes\',bar,foo"
     }
 
     def "Can resolve correct environment variables"() {
@@ -393,19 +392,19 @@ class JobResolverServiceImplSpec extends Specification {
         def jobName = UUID.randomUUID().toString()
         def clusterId = UUID.randomUUID().toString()
         def clusterName = UUID.randomUUID().toString()
-        def clusterTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def clusterTags = Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def commandId = UUID.randomUUID().toString()
         def commandName = UUID.randomUUID().toString()
-        def commandTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def clusterCriteria = Lists.newArrayList(
+        def commandTags = Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def clusterCriteria = [
             new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString()))
                 .build(),
             new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
-        )
-        def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        ]
+        def commandCriterion = new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build()
         def grouping = UUID.randomUUID().toString()
         def groupingInstance = UUID.randomUUID().toString()
         def jobRequest = new JobRequest(
@@ -413,7 +412,7 @@ class JobResolverServiceImplSpec extends Specification {
             null,
             null,
             new JobMetadata.Builder(jobName, user)
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .withGrouping(grouping)
                 .withGroupingInstance(groupingInstance)
                 .build(),
@@ -444,7 +443,7 @@ class JobResolverServiceImplSpec extends Specification {
                 UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE
             ).withTags(commandTags).build(),
-            Lists.newArrayList(UUID.randomUUID().toString()),
+            [UUID.randomUUID().toString()],
             null,
             null,
             null
@@ -452,7 +451,8 @@ class JobResolverServiceImplSpec extends Specification {
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         context.setCluster(cluster)
         context.setCommand(command)
-        context.setJobMemory(this.jobsProperties.getMemory().getDefaultJobMemory())
+        def memory = 1_005L
+        context.setComputeResources(new ComputeResources.Builder().withMemoryMb(memory).build())
 
         when:
         this.service.resolveEnvironmentVariables(context)
@@ -468,7 +468,7 @@ class JobResolverServiceImplSpec extends Specification {
         envVariables.get(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR) == this.service.tagsToString(commandTags)
         envVariables.get(JobConstants.GENIE_JOB_ID_ENV_VAR) == jobId
         envVariables.get(JobConstants.GENIE_JOB_NAME_ENV_VAR) == jobName
-        envVariables.get(JobConstants.GENIE_JOB_MEMORY_ENV_VAR) == String.valueOf(this.jobsProperties.getMemory().getDefaultJobMemory())
+        envVariables.get(JobConstants.GENIE_JOB_MEMORY_ENV_VAR) == String.valueOf(memory)
         envVariables.get(JobConstants.GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR) == this.service.tagsToString(commandCriterion.getTags())
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_0") == this.service.tagsToString(clusterCriteria.get(0).getTags())
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_1") == this.service.tagsToString(clusterCriteria.get(1).getTags())
@@ -509,9 +509,9 @@ class JobResolverServiceImplSpec extends Specification {
         def criterion1 = new Criterion.Builder().withName(UUID.randomUUID().toString()).build()
         def criterion2 = new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build()
         def criterion3 = new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build()
-        def criterion4 = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        def criterion4 = new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build()
         def criterion5 = new Criterion.Builder().withTags(
-            Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         ).build()
         def criterion6 = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
 
@@ -580,13 +580,13 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "can resolve command"() {
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def jobRequest = createJobRequest([UUID.randomUUID().toString()], null, null, null)
         def jobId = UUID.randomUUID().toString()
-        def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
-        def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
-        def command1Set = Sets.newHashSet(command1)
-        def command2 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
-        def allCommands = Sets.newHashSet(command0, command1, command2)
+        def command0 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
+        def command1 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
+        def command1Set = Set.of(command1)
+        def command2 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
+        def allCommands = Set.of(command0, command1, command2)
         def commandCriterion = jobRequest.getCriteria().getCommandCriterion()
         ResourceSelectionResult<Command> selectionResult = Mock(ResourceSelectionResult)
         def command1UniqueCriteria = this.service.flattenClusterCriteriaPermutations(
@@ -605,7 +605,7 @@ class JobResolverServiceImplSpec extends Specification {
                 jobRequest
             )
         )
-        def allClusters = Sets.newHashSet()
+        def allClusters = new HashSet<Cluster>()
         allClusters.addAll(command0Clusters)
         allClusters.addAll(command1Clusters)
         allClusters.addAll(command2Clusters)
@@ -615,7 +615,7 @@ class JobResolverServiceImplSpec extends Specification {
         this.service.resolveCommand(context)
 
         then: "An exception is thrown"
-        1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet()
+        1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> new HashSet<>()
         0 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Cluster>, _ as boolean)
         0 * this.commandSelector.select(_ as CommandSelectionContext)
         thrown(GenieJobResolutionException)
@@ -626,7 +626,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "The selector is not invoked as no command is selected"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> command1Set
-        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> Sets.newHashSet()
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> new HashSet<>()
         0 * this.commandSelector.select(_ as CommandSelectionContext)
         thrown(GenieJobResolutionException)
 
@@ -636,7 +636,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "The selector is not invoked as no command is selected"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> command1Set
-        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> Sets.newHashSet(
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> Set.of(
             createCluster(UUID.randomUUID().toString()) // this cluster will never match
         )
         0 * this.commandSelector.select(_ as CommandSelectionContext)
@@ -749,12 +749,12 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster0 = createCluster(UUID.randomUUID().toString())
         def cluster1 = createCluster(UUID.randomUUID().toString())
         def cluster2 = createCluster(UUID.randomUUID().toString())
-        def clusters = Sets.newHashSet(cluster0, cluster1, cluster2)
+        def clusters = Set.of(cluster0, cluster1, cluster2)
         def jobId = UUID.randomUUID().toString()
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def jobRequest = createJobRequest([UUID.randomUUID().toString()], null, null, null)
         def commandClusters = [
             (command)      : clusters,
-            (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
+            (Mock(Command)): Set.of(Mock(Cluster), Mock(Cluster))
         ]
         def context = Mock(JobResolverServiceImpl.JobResolutionContext) {
             getJobRequest() >> jobRequest
@@ -797,7 +797,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown"
         1 * context.getCommand() >> Optional.of(command)
-        1 * context.getCommandClusters() >> Optional.of([(command): Sets.newHashSet()])
+        1 * context.getCommandClusters() >> Optional.of([(command): new HashSet<Cluster>()])
         0 * context.setCluster(_ as Cluster)
         thrown(GenieJobResolutionRuntimeException)
 
@@ -870,12 +870,12 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "can generate cluster criteria permutations"() {
-        def commands = Sets.newHashSet(
-            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
-            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
-            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def commands = Set.of(
+            createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()]),
+            createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()]),
+            createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
         )
-        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def jobRequest = createJobRequest([UUID.randomUUID().toString()], null, null, null)
 
         // build expected map
         final Map<Command, List<Criterion>> expectedMap = [:]
@@ -902,9 +902,9 @@ class JobResolverServiceImplSpec extends Specification {
 
     def "can flatten cluster criteria permutations"() {
         def commands = [
-            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
-            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
-            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+            createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()]),
+            createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()]),
+            createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
         ] as Set
         Map<Command, List<Criterion>> permutations = commands.collectEntries { command ->
             [command, command.getClusterCriteria()]
@@ -944,7 +944,7 @@ class JobResolverServiceImplSpec extends Specification {
         )
         !this.service.clusterMatchesCriterion(
             cluster,
-            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+            new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build()
         )
         def builder = new Criterion.Builder()
         def metadata = cluster.getMetadata()
@@ -954,7 +954,7 @@ class JobResolverServiceImplSpec extends Specification {
         this.service.clusterMatchesCriterion(cluster, builder.withStatus(metadata.getStatus().name()).build())
         this.service.clusterMatchesCriterion(
             cluster,
-            builder.withTags(ImmutableSet.copyOf(Iterables.limit(metadata.getTags(), 1))).build()
+            builder.withTags(metadata.getTags().stream().limit(1L).collect(Collectors.toSet())).build()
         )
     }
 
@@ -963,60 +963,60 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster1 = createCluster(UUID.randomUUID().toString())
         def cluster2 = createCluster(UUID.randomUUID().toString())
         def cluster3 = createCluster(UUID.randomUUID().toString())
-        def cluster4Tags = Sets.newHashSet(cluster3.getMetadata().getTags())
+        def cluster4Tags = new HashSet<>(cluster3.getMetadata().getTags())
         cluster4Tags.add(UUID.randomUUID().toString())
         def cluster4 = createCluster(UUID.randomUUID().toString(), cluster4Tags)
-        def candidateClusters = Sets.newHashSet(cluster0, cluster1, cluster2, cluster3, cluster4)
+        def candidateClusters = Set.of(cluster0, cluster1, cluster2, cluster3, cluster4)
 
-        def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
-        def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
-        def command2 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
-        def command3 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command0 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
+        def command1 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
+        def command2 = createCommand(UUID.randomUUID().toString(),[UUID.randomUUID().toString()])
+        def command3 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
 
         Map<Command, List<Criterion>> commandClusterCriteria = [:]
-        commandClusterCriteria[command0] = Lists.newArrayList(
+        commandClusterCriteria[command0] = [
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(), // no match
             new Criterion.Builder().withName(UUID.randomUUID().toString()).build(), // no match
             new Criterion.Builder().withName(cluster2.getMetadata().getName()).build(), // cluster2
             new Criterion.Builder().withTags(cluster3.getMetadata().getTags()).build(), // would be cluster3
-        )
+        ]
         // command1 should be filtered out as it won't match anything
-        commandClusterCriteria[command1] = Lists.newArrayList(
-            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-        )
-        commandClusterCriteria[command2] = Lists.newArrayList(
+        commandClusterCriteria[command1] = [
+            new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build()
+        ]
+        commandClusterCriteria[command2] = [
             new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(), // no match
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(), // no match
             new Criterion.Builder().withTags(cluster3.getMetadata().getTags()).build(), // cluster3, cluster4
-        )
-        commandClusterCriteria[command3] = Lists.newArrayList(
+        ]
+        commandClusterCriteria[command3] = [
             new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build(), // cluster1
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(), // no match
             new Criterion.Builder().withTags(cluster3.getMetadata().getTags()).build(), // cluster3, cluster4
-        )
+        ]
 
         when:
         def result = this.service.generateCommandClustersMap(commandClusterCriteria, candidateClusters)
 
         then:
         result.size() == 3 // command1 should have been filtered out
-        result[command0] == Sets.newHashSet(cluster2)
-        result[command2] == Sets.newHashSet(cluster3, cluster4)
-        result[command3] == Sets.newHashSet(cluster1)
+        result[command0] == [cluster2].toSet()
+        result[command2] == [cluster3, cluster4].toSet()
+        result[command3] == [cluster1].toSet()
     }
 
     def "JobResolutionContext behaves as expected"() {
         def jobId = UUID.randomUUID().toString()
         def jobRequest = createJobRequest(
-            Lists.newArrayList(UUID.randomUUID().toString()),
+            [UUID.randomUUID().toString()],
             null,
             null,
             null
         )
         def apiJob = true
-        def command = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
         def cluster = createCluster(UUID.randomUUID().toString())
-        def applications = Lists.newArrayList(
+        def applications = [
             new Application(
                 UUID.randomUUID().toString(),
                 Instant.now(),
@@ -1029,8 +1029,7 @@ class JobResolverServiceImplSpec extends Specification {
                     ApplicationStatus.ACTIVE
                 ).build()
             )
-        )
-        def jobMemory = 1_234
+        ]
         def environmentVariables = [
             "one": "two"
         ]
@@ -1038,11 +1037,11 @@ class JobResolverServiceImplSpec extends Specification {
         def jobDirectory = Mock(File)
         def timeout = 13_349_388
         def commandClusters = [
-            (Mock(Command)): Sets.newHashSet(Mock(Cluster)),
-            (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
+            (Mock(Command)): Set.of(Mock(Cluster)),
+            (Mock(Command)): Set.of(Mock(Cluster), Mock(Cluster))
         ]
-        def cpu = 5
         def spanCustomizer = Mock(SpanCustomizer)
+        def computeResources = Mock(ComputeResources)
 
         when:
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob, spanCustomizer)
@@ -1054,13 +1053,12 @@ class JobResolverServiceImplSpec extends Specification {
         !context.getCommand().isPresent()
         !context.getCluster().isPresent()
         !context.getApplications().isPresent()
-        !context.getJobMemory().isPresent()
+        context.getComputeResources().isEmpty()
         !context.getEnvironmentVariables().isPresent()
         !context.getTimeout().isPresent()
         !context.getArchiveLocation().isPresent()
         !context.getJobDirectory().isPresent()
         !context.getCommandClusters().isPresent()
-        !context.getCpu().isPresent()
         context.getSpanCustomizer() == spanCustomizer
 
         when:
@@ -1094,11 +1092,11 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(IllegalStateException)
 
         when:
-        context.setJobMemory(jobMemory)
+        context.setComputeResources(computeResources)
         context.build()
 
         then:
-        context.getJobMemory().orElse(null) == jobMemory
+        context.getComputeResources().orElse(null) == computeResources
         thrown(IllegalStateException)
 
         when:
@@ -1145,12 +1143,6 @@ class JobResolverServiceImplSpec extends Specification {
 
         then:
         context.getCommandClusters().orElse(null) == commandClusters
-
-        when:
-        context.setCpu(cpu)
-
-        then:
-        context.getCpu().orElse(null) == cpu
     }
 
     //region Helper Methods
@@ -1173,7 +1165,7 @@ class JobResolverServiceImplSpec extends Specification {
                 .withTags(
                     tags != null
                         ? tags
-                        : Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                        : Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
                 )
                 .build()
         )
@@ -1191,13 +1183,13 @@ class JobResolverServiceImplSpec extends Specification {
                 UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE
             )
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build(),
             executable,
-            Lists.newArrayList(
-                new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build(),
-                new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-            ),
+            [
+                new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build(),
+                new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build()
+            ],
             null,
             null
         )
@@ -1209,15 +1201,15 @@ class JobResolverServiceImplSpec extends Specification {
         @Nullable Integer requestedTimeout,
         @Nullable Integer requestedCpu
     ) {
-        def clusterCriteria = Lists.newArrayList(
+        def clusterCriteria = [
             new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString()))
                 .build(),
             new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
-        )
-        def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        ]
+        def commandCriterion = new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build()
         return new JobRequest(
             null,
             null,
@@ -1254,7 +1246,7 @@ class JobResolverServiceImplSpec extends Specification {
                 .stream()
                 .flatMap { it.getTags().stream() }
         ).collect(Collectors.toSet())
-        Set<Cluster> clusters = Sets.newHashSet()
+        Set<Cluster> clusters = new HashSet<>()
         for (def i = 0; i < numClusters; i++) {
             clusters.add(createCluster(UUID.randomUUID().toString(), tags))
         }
