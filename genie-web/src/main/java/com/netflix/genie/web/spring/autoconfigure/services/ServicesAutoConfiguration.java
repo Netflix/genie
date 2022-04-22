@@ -48,7 +48,6 @@ import com.netflix.genie.web.services.impl.LocalFileSystemAttachmentServiceImpl;
 import com.netflix.genie.web.services.impl.RequestForwardingServiceImpl;
 import com.netflix.genie.web.services.impl.S3AttachmentServiceImpl;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -81,7 +80,6 @@ import java.util.List;
         AttachmentServiceProperties.class
     }
 )
-@Slf4j
 public class ServicesAutoConfiguration {
 
     /**
@@ -155,13 +153,13 @@ public class ServicesAutoConfiguration {
     /**
      * Get an implementation of {@link JobResolverService} if one hasn't already been defined.
      *
-     * @param dataServices      The {@link DataServices} encapsulation instance to use
-     * @param clusterSelectors  The {@link ClusterSelector} implementations to use
-     * @param commandSelector   The {@link CommandSelector} implementation to use
-     * @param registry          The metrics repository to use
-     * @param jobsProperties    The properties for running a job set by the user
-     * @param environment       The Spring application {@link Environment} for dynamic property resolution
-     * @param tracingComponents The {@link BraveTracingComponents} to use
+     * @param dataServices            The {@link DataServices} encapsulation instance to use
+     * @param clusterSelectors        The {@link ClusterSelector} implementations to use
+     * @param commandSelector         The {@link CommandSelector} implementation to use
+     * @param registry                The metrics repository to use
+     * @param jobsProperties          The properties for running a job set by the user
+     * @param jobResolutionProperties The {@link JobResolutionProperties} instance
+     * @param tracingComponents       The {@link BraveTracingComponents} to use
      * @return A {@link JobResolverServiceImpl} instance
      */
     @Bean
@@ -172,7 +170,7 @@ public class ServicesAutoConfiguration {
         final CommandSelector commandSelector,
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
-        final Environment environment,
+        final JobResolutionProperties jobResolutionProperties,
         final BraveTracingComponents tracingComponents
     ) {
         return new JobResolverServiceImpl(
@@ -181,7 +179,7 @@ public class ServicesAutoConfiguration {
             commandSelector,
             registry,
             jobsProperties,
-            environment,
+            jobResolutionProperties,
             tracingComponents
         );
     }

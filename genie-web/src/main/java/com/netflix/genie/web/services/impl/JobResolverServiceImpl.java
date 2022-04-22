@@ -41,6 +41,7 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
+import com.netflix.genie.web.properties.JobResolutionProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelector;
@@ -60,7 +61,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.TargetClassAware;
-import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -82,6 +82,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -128,6 +129,10 @@ public class JobResolverServiceImpl implements JobResolverService {
         = "genie.services.jobResolver.resolveCluster.clusterSelector.counter";
 
     private static final int DEFAULT_CPU = 1;
+    private static final int DEFAULT_GPU = 0;
+    private static final long DEFAULT_MEMORY = 1_500L;
+    private static final long DEFAULT_DISK = 10_000L;
+    private static final long DEFAULT_NETWORK = 256L;
     private static final String NO_RATIONALE = "No rationale provided";
     private static final String NO_ID_FOUND = "No id found";
     private static final String VERSION_4 = "4";
@@ -152,12 +157,12 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final List<ClusterSelector> clusterSelectors;
     private final CommandSelector commandSelector;
     private final MeterRegistry registry;
-    private final long defaultMemory;
     // TODO: Switch to path
     private final File defaultJobDirectory;
     private final String defaultArchiveLocation;
     private final Tracer tracer;
     private final BraveTagAdapter tagAdapter;
+    private final JobResolutionProperties jobResolutionProperties;
     //endregion
 
     //region Public APIs
@@ -165,13 +170,13 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * Constructor.
      *
-     * @param dataServices      The {@link DataServices} encapsulation instance to use
-     * @param clusterSelectors  The {@link ClusterSelector} implementations to use
-     * @param commandSelector   The {@link CommandSelector} implementation to use
-     * @param registry          The {@link MeterRegistry }metrics repository to use
-     * @param jobsProperties    The properties for running a job set by the user
-     * @param environment       The Spring application {@link Environment} for dynamic property resolution
-     * @param tracingComponents The {@link BraveTracingComponents} instance to use
+     * @param dataServices            The {@link DataServices} encapsulation instance to use
+     * @param clusterSelectors        The {@link ClusterSelector} implementations to use
+     * @param commandSelector         The {@link CommandSelector} implementation to use
+     * @param registry                The {@link MeterRegistry }metrics repository to use
+     * @param jobsProperties          The properties for running a job set by the user
+     * @param jobResolutionProperties The {@link JobResolutionProperties} instance
+     * @param tracingComponents       The {@link BraveTracingComponents} instance to use
      */
     public JobResolverServiceImpl(
         final DataServices dataServices,
@@ -179,13 +184,13 @@ public class JobResolverServiceImpl implements JobResolverService {
         final CommandSelector commandSelector, // TODO: For now this is a single value but maybe support List
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
-        final Environment environment,
+        final JobResolutionProperties jobResolutionProperties,
         final BraveTracingComponents tracingComponents
     ) {
         this.persistenceService = dataServices.getPersistenceService();
         this.clusterSelectors = clusterSelectors;
         this.commandSelector = commandSelector;
-        this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
+        this.jobResolutionProperties = jobResolutionProperties;
 
         final URI jobDirProperty = jobsProperties.getLocations().getJobs();
         this.defaultJobDirectory = Paths.get(jobDirProperty).toFile();
@@ -617,10 +622,12 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id = context.getJobId();
         final JobRequest jobRequest = context.getJobRequest();
         final long jobMemory = context
-            .getJobMemory()
+            .getComputeResources()
             .orElseThrow(
                 () -> new IllegalStateException("Job memory not resolved before attempting to resolve env variables")
-            );
+            )
+            .getMemoryMb()
+            .orElseThrow(() -> new IllegalStateException("No memory has been resolved before attempting to resolve"));
         // N.B. variables may be evaluated in a different order than they are added to this map (due to serialization).
         // Hence variables in this set should not depend on each-other.
         final Map<String, String> envVariables = new HashMap<>();
@@ -676,50 +683,59 @@ public class JobResolverServiceImpl implements JobResolverService {
     }
 
     private void resolveComputeResources(final JobResolutionContext context) {
-        this.resolveCpu(context);
-        this.resolveJobMemory(context);
-    }
-
-    private void resolveCpu(final JobResolutionContext context) {
-        context.setCpu(
-            context
-                .getJobRequest()
-                .getRequestedJobEnvironment()
-                .getRequestedComputeResources()
-                .getCpu()
-                .orElse(
-                    context
-                        .getCommand()
-                        .orElseThrow(
-                            () -> new IllegalStateException("Command hasn't been resolved before compute resources")
-                        )
-                        .getComputeResources()
-                        .getCpu()
-                        .orElse(DEFAULT_CPU)
+        final ComputeResources req = context
+            .getJobRequest()
+            .getRequestedJobEnvironment()
+            .getRequestedComputeResources();
+        final ComputeResources command = context
+            .getCommand()
+            .orElseThrow(() -> new IllegalStateException("Command hasn't been resolved before compute resources"))
+            .getComputeResources();
+        final ComputeResources defaults = this.jobResolutionProperties.getDefaultComputeResources();
+        context.setComputeResources(
+            new ComputeResources.Builder()
+                .withCpu(this.resolveComputeResource(req::getCpu, command::getCpu, defaults::getCpu, DEFAULT_CPU))
+                .withGpu(this.resolveComputeResource(req::getGpu, command::getGpu, defaults::getGpu, DEFAULT_GPU))
+                .withMemoryMb(
+                    this.resolveComputeResource(
+                        req::getMemoryMb,
+                        command::getMemoryMb,
+                        defaults::getMemoryMb,
+                        DEFAULT_MEMORY
+                    )
                 )
+                .withDiskMb(
+                    this.resolveComputeResource(req::getDiskMb, command::getDiskMb, defaults::getDiskMb, DEFAULT_DISK)
+                )
+                .withNetworkMbps(
+                    this.resolveComputeResource(
+                        req::getNetworkMbps,
+                        command::getNetworkMbps,
+                        defaults::getNetworkMbps,
+                        DEFAULT_NETWORK
+                    )
+                )
+                .build()
         );
     }
 
-    private void resolveJobMemory(final JobResolutionContext context) {
-        context.setJobMemory(
-            context
-                .getJobRequest()
-                .getRequestedJobEnvironment()
-                .getRequestedComputeResources()
-                .getMemoryMb()
-                .orElse(
-                    context
-                        .getCommand()
-                        .orElseThrow(
-                            () -> new IllegalStateException(
-                                "Command not resolved before attempting to resolve job memory"
-                            )
-                        )
-                        .getComputeResources()
-                        .getMemoryMb()
-                        .orElse(this.defaultMemory)
-                )
-        );
+    private <T> T resolveComputeResource(
+        final Supplier<Optional<T>> requestedResource,
+        final Supplier<Optional<T>> commandResource,
+        final Supplier<Optional<T>> configuredDefault,
+        final T hardCodedDefault
+    ) {
+        return requestedResource
+            .get()
+            .orElse(
+                commandResource
+                    .get()
+                    .orElse(
+                        configuredDefault
+                            .get()
+                            .orElse(hardCodedDefault)
+                    )
+            );
     }
 
     private void resolveArchiveLocation(final JobResolutionContext context) {
@@ -975,12 +991,11 @@ public class JobResolverServiceImpl implements JobResolverService {
         private Cluster cluster;
         private List<Application> applications;
 
-        private Long jobMemory;
+        private ComputeResources computeResources;
         private Map<String, String> environmentVariables;
         private Integer timeout;
         private String archiveLocation;
         private File jobDirectory;
-        private Integer cpu;
 
         private Map<Command, Set<Cluster>> commandClusters;
 
@@ -996,8 +1011,8 @@ public class JobResolverServiceImpl implements JobResolverService {
             return Optional.ofNullable(this.applications);
         }
 
-        Optional<Long> getJobMemory() {
-            return Optional.ofNullable(this.jobMemory);
+        Optional<ComputeResources> getComputeResources() {
+            return Optional.ofNullable(this.computeResources);
         }
 
         Optional<Map<String, String>> getEnvironmentVariables() {
@@ -1020,10 +1035,6 @@ public class JobResolverServiceImpl implements JobResolverService {
             return Optional.ofNullable(this.commandClusters);
         }
 
-        Optional<Integer> getCpu() {
-            return Optional.ofNullable(this.cpu);
-        }
-
         ResolvedJob build() {
             // Error checking
             if (this.command == null) {
@@ -1035,8 +1046,8 @@ public class JobResolverServiceImpl implements JobResolverService {
             if (this.applications == null) {
                 throw new IllegalStateException("Applications were never resolved for job " + this.jobId);
             }
-            if (this.jobMemory == null) {
-                throw new IllegalStateException("Job memory was never resolved for job " + this.jobId);
+            if (this.computeResources == null) {
+                throw new IllegalStateException("Compute resources were never resolved for job " + this.jobId);
             }
             if (this.environmentVariables == null) {
                 throw new IllegalStateException("Environment variables were never resolved for job " + this.jobId);
@@ -1072,15 +1083,9 @@ public class JobResolverServiceImpl implements JobResolverService {
                 this.timeout
             );
 
-            final ComputeResources computeResources = new ComputeResources
-                .Builder()
-                .withCpu(this.cpu)
-                .withMemoryMb(this.jobMemory)
-                .build();
-
             final JobEnvironment jobEnvironment = new JobEnvironment
                 .Builder()
-                .withComputeResources(computeResources)
+                .withComputeResources(this.computeResources)
                 .withEnvironmentVariables(this.environmentVariables)
                 .build();
 
