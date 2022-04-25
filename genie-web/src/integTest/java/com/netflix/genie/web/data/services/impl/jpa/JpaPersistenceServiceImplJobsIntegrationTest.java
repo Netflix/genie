@@ -46,6 +46,7 @@ import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dtos.FinishedJob;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.dtos.JobEnvironment;
 import com.netflix.genie.common.internal.dtos.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dtos.JobMetadata;
@@ -85,9 +86,13 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -270,7 +275,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/init.xml")
-    void canSaveAndRetrieveJobSpecification() throws GenieCheckedException, IOException {
+    void canSaveAndRetrieveResolvedJobInformation() throws GenieCheckedException, IOException {
         final String jobId = this.service.saveJobSubmission(
             new JobSubmission.Builder(
                 this.createJobRequest(null, UUID.randomUUID().toString()),
@@ -280,24 +285,27 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         final JobRequest jobRequest = this.service.getJobRequest(jobId);
 
-        final JobSpecification jobSpecification = this.createJobSpecification(
-            jobId,
-            jobRequest,
-            UUID.randomUUID().toString(),
-            null
-        );
-
-        final ResolvedJob resolvedJob = new ResolvedJob(
-            jobSpecification,
-            new JobEnvironment.Builder().build(),
-            jobRequest.getMetadata()
-        );
+        final ResolvedJob resolvedJob = this.createResolvedJob(jobId, jobRequest, null);
 
         this.service.saveResolvedJob(jobId, resolvedJob);
         Assertions
             .assertThat(this.service.getJobSpecification(jobId))
             .isPresent()
-            .contains(jobSpecification);
+            .contains(resolvedJob.getJobSpecification());
+        final JobEntity job = this.jobRepository.findByUniqueId(jobId).orElseThrow();
+        final ComputeResources computeResources = resolvedJob.getJobEnvironment().getComputeResources();
+        Assertions.assertThat(job.getCpuUsed()).isEqualTo(computeResources.getCpu());
+        Assertions.assertThat(job.getGpuUsed()).isEqualTo(computeResources.getGpu());
+        Assertions.assertThat(job.getMemoryUsed()).isEqualTo(computeResources.getMemoryMb());
+        Assertions.assertThat(job.getDiskMbUsed()).isEqualTo(computeResources.getDiskMb());
+        Assertions.assertThat(job.getNetworkMbpsUsed()).isEqualTo(computeResources.getNetworkMbps());
+        Assertions
+            .assertThat(job.getImagesUsed())
+            .isEqualTo(
+                Optional.ofNullable(
+                    GenieObjectMapper.getMapper().valueToTree(resolvedJob.getJobEnvironment().getImages())
+                )
+            );
 
         final String jobId2 = this.service.saveJobSubmission(
             new JobSubmission.Builder(
@@ -311,7 +319,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         final JobSpecification jobSpecification2 = this.createJobSpecification(
             jobId2,
             jobRequest2,
-            null,
             10_358
         );
 
@@ -342,7 +349,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         final JobSpecification jobSpecification = this.createJobSpecification(
             jobId,
             jobRequest,
-            UUID.randomUUID().toString(),
             null
         );
 
@@ -396,18 +402,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
         final JobRequest jobRequest = this.service.getJobRequest(jobId);
 
-        final JobSpecification jobSpecification = this.createJobSpecification(
-            jobId,
-            jobRequest,
-            UUID.randomUUID().toString(),
-            null
-        );
-
-        final ResolvedJob resolvedJob = new ResolvedJob(
-            jobSpecification,
-            new JobEnvironment.Builder().build(),
-            jobRequest.getMetadata()
-        );
+        final ResolvedJob resolvedJob = this.createResolvedJob(jobId, jobRequest, null);
         this.service.saveResolvedJob(jobId, resolvedJob);
 
         final String agentHostname = UUID.randomUUID().toString();
@@ -1415,10 +1410,21 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         }
     }
 
+    private ResolvedJob createResolvedJob(
+        final String jobId,
+        final JobRequest jobRequest,
+        @Nullable final Integer timeout
+    ) throws GenieCheckedException {
+        return new ResolvedJob(
+            this.createJobSpecification(jobId, jobRequest, timeout),
+            this.createJobEnvironment(),
+            jobRequest.getMetadata()
+        );
+    }
+
     private JobSpecification createJobSpecification(
         final String jobId,
         final JobRequest jobRequest,
-        @Nullable final String archiveLocation,
         @Nullable final Integer timeout
     ) throws GenieCheckedException {
         final String clusterId = "cluster1";
@@ -1471,5 +1477,34 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             ARCHIVE_LOCATION,
             timeout
         );
+    }
+
+    private JobEnvironment createJobEnvironment() {
+        final Map<String, Image> images = new HashMap<>();
+        final List<String> arguments = new ArrayList<>();
+        for (int i = 0; i < new Random().nextInt(10); i++) {
+            arguments.add(String.valueOf(i));
+            images.put(
+                UUID.randomUUID().toString(),
+                new Image.Builder()
+                    .withName(UUID.randomUUID().toString())
+                    .withTag(UUID.randomUUID().toString())
+                    .withArguments(arguments)
+                    .build()
+            );
+        }
+
+        return new JobEnvironment.Builder()
+            .withComputeResources(
+                new ComputeResources.Builder()
+                    .withCpu(RandomSuppliers.INT.get() & Integer.MAX_VALUE)
+                    .withGpu(RandomSuppliers.INT.get() & Integer.MAX_VALUE)
+                    .withMemoryMb(RandomSuppliers.LONG.get() & Long.MAX_VALUE)
+                    .withDiskMb(RandomSuppliers.LONG.get() & Long.MAX_VALUE)
+                    .withNetworkMbps(RandomSuppliers.LONG.get() & Long.MAX_VALUE)
+                    .build()
+            )
+            .withImages(images)
+            .build();
     }
 }
