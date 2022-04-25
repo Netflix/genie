@@ -25,6 +25,7 @@ import com.netflix.genie.common.internal.dtos.ClusterMetadata;
 import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.dtos.JobEnvironment;
 import com.netflix.genie.common.internal.dtos.JobMetadata;
 import com.netflix.genie.common.internal.dtos.JobRequest;
@@ -318,6 +319,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.resolveCluster(context);
         this.resolveApplications(context);
         this.resolveComputeResources(context);
+        this.resolveImages(context);
         this.resolveEnvironmentVariables(context);
         this.resolveTimeout(context);
         this.resolveArchiveLocation(context);
@@ -738,6 +740,28 @@ public class JobResolverServiceImpl implements JobResolverService {
             );
     }
 
+    private void resolveImages(final JobResolutionContext context) {
+        final Map<String, Image> requestImages = context
+            .getJobRequest()
+            .getRequestedJobEnvironment()
+            .getRequestedImages();
+        final Map<String, Image> commandImages = context
+            .getCommand()
+            .orElseThrow(() -> new IllegalStateException("No command resolved before trying to resolve images"))
+            .getImages();
+        final Map<String, Image> defaultImages = this.jobResolutionProperties.getDefaultImages();
+
+        // Find all the image keys
+        final Map<String, Image> resolvedImages = new HashMap<>(defaultImages);
+        for (final Map.Entry<String, Image> entry : commandImages.entrySet()) {
+            resolvedImages.merge(entry.getKey(), entry.getValue(), this::mergeImages);
+        }
+        for (final Map.Entry<String, Image> entry : requestImages.entrySet()) {
+            resolvedImages.merge(entry.getKey(), entry.getValue(), this::mergeImages);
+        }
+        context.setImages(resolvedImages);
+    }
+
     private void resolveArchiveLocation(final JobResolutionContext context) {
         // TODO: Disable ability to disable archival for all jobs during internal V4 migration.
         //       Will allow us to reach out to clients who may set this variable but still expect output after
@@ -928,6 +952,14 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
+    private Image mergeImages(final Image secondary, final Image primary) {
+        return new Image.Builder()
+            .withName(primary.getName().orElse(secondary.getName().orElse(null)))
+            .withTag(primary.getTag().orElse(secondary.getTag().orElse(null)))
+            .withArguments(primary.getArguments().isEmpty() ? secondary.getArguments() : primary.getArguments())
+            .build();
+    }
+
     /**
      * Helper to convert a set of tags into a string that is a suitable value for a shell environment variable.
      * Adds double quotes as necessary (i.e. in case of spaces, newlines), performs escaping of in-tag quotes.
@@ -996,8 +1028,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         private Integer timeout;
         private String archiveLocation;
         private File jobDirectory;
-
         private Map<Command, Set<Cluster>> commandClusters;
+        private Map<String, Image> images;
 
         Optional<Command> getCommand() {
             return Optional.ofNullable(this.command);
@@ -1035,6 +1067,10 @@ public class JobResolverServiceImpl implements JobResolverService {
             return Optional.ofNullable(this.commandClusters);
         }
 
+        Optional<Map<String, Image>> getImages() {
+            return Optional.ofNullable(this.images);
+        }
+
         ResolvedJob build() {
             // Error checking
             if (this.command == null) {
@@ -1048,6 +1084,9 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
             if (this.computeResources == null) {
                 throw new IllegalStateException("Compute resources were never resolved for job " + this.jobId);
+            }
+            if (this.images == null) {
+                throw new IllegalStateException("Images were never resolved for job " + this.jobId);
             }
             if (this.environmentVariables == null) {
                 throw new IllegalStateException("Environment variables were never resolved for job " + this.jobId);
@@ -1087,6 +1126,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .Builder()
                 .withComputeResources(this.computeResources)
                 .withEnvironmentVariables(this.environmentVariables)
+                .withImages(this.images)
                 .build();
 
             return new ResolvedJob(jobSpecification, jobEnvironment, this.jobRequest.getMetadata());

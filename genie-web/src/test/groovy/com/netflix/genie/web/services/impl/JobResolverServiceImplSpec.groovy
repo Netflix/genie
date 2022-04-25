@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dtos.Image
 import com.netflix.genie.common.internal.dtos.JobEnvironmentRequest
 import com.netflix.genie.common.internal.dtos.JobMetadata
 import com.netflix.genie.common.internal.dtos.JobRequest
@@ -291,6 +292,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobEnvironment.getComputeResources().getCpu() == Optional.of(requestedCpu)
         !jobEnvironment.getExt().isPresent()
         !jobSpec.getTimeout().isPresent()
+        jobEnvironment.getImages().isEmpty()
     }
 
     def "Can handle runtime resolution errors with V3 and V4 algorithms"() {
@@ -374,8 +376,8 @@ class JobResolverServiceImplSpec extends Specification {
         this.service.tagsToString(input) == output
 
         where:
-        input                                                       | output
-        new HashSet<String>()                                           | ""
+        input                                              | output
+        new HashSet<String>()                              | ""
         Set.of("some.tag:t")                               | "some.tag:t"
         Set.of("foo", "bar")                               | "bar,foo"
         Set.of("bar", "foo")                               | "bar,foo"
@@ -970,7 +972,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         def command0 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
         def command1 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
-        def command2 = createCommand(UUID.randomUUID().toString(),[UUID.randomUUID().toString()])
+        def command2 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
         def command3 = createCommand(UUID.randomUUID().toString(), [UUID.randomUUID().toString()])
 
         Map<Command, List<Criterion>> commandClusterCriteria = [:]
@@ -1003,6 +1005,23 @@ class JobResolverServiceImplSpec extends Specification {
         result[command0] == [cluster2].toSet()
         result[command2] == [cluster3, cluster4].toSet()
         result[command3] == [cluster1].toSet()
+    }
+
+    def "Merge images behaves as expected"() {
+        expect:
+        this.service.mergeImages(secondary, primary) == expected
+
+        where:
+        secondary                                                                                 | primary | expected
+        new Image.Builder().build()                                                               |
+            new Image.Builder().build()                                                                     |
+            new Image.Builder().build()
+        new Image.Builder().withName("foo").withTag("bar").withArguments(["a", "b", "c"]).build() |
+            new Image.Builder().withName("bar").withTag("foo").withArguments(["1", "2", "3"]).build()       |
+            new Image.Builder().withName("bar").withTag("foo").withArguments(["1", "2", "3"]).build()
+        new Image.Builder().withName("foo").withTag("bar").withArguments(["a", "b", "c"]).build() |
+            new Image.Builder().withArguments(["1", "2", "3"]).build()                                      |
+            new Image.Builder().withName("foo").withTag("bar").withArguments(["1", "2", "3"]).build()
     }
 
     def "JobResolutionContext behaves as expected"() {
@@ -1042,6 +1061,9 @@ class JobResolverServiceImplSpec extends Specification {
         ]
         def spanCustomizer = Mock(SpanCustomizer)
         def computeResources = Mock(ComputeResources)
+        def images = [
+            genie: new Image.Builder().withName("genie-agent").withTag("4.3.0").build()
+        ]
 
         when:
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob, spanCustomizer)
@@ -1100,6 +1122,14 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(IllegalStateException)
 
         when:
+        context.setImages(images)
+        context.build()
+
+        then:
+        context.getImages().orElse(null) == images
+        thrown(IllegalStateException)
+
+        when:
         context.setEnvironmentVariables(environmentVariables)
         context.build()
 
@@ -1143,6 +1173,68 @@ class JobResolverServiceImplSpec extends Specification {
 
         then:
         context.getCommandClusters().orElse(null) == commandClusters
+    }
+
+    def "can resolve images"() {
+        def requestImages = [
+            r     : new Image.Builder().withName("r").withTag("latest.release").build(),
+            python: new Image.Builder().withTag("3.11.0").build(),
+            genie : new Image.Builder().withArguments(["jobId", "1234"]).build()
+        ]
+        def commandImages = [
+            python: new Image.Builder().withName("python").withTag("3.10.0").withArguments(["a"]).build(),
+            spark : new Image.Builder().withName("spark").withTag("3.2").build()
+        ]
+        def defaultImages = [
+            genie: new Image.Builder().withName("genie-agent").withTag("4.3.0").build(),
+            java : new Image.Builder().withName("java").withTag("11.0").build()
+        ]
+        def context = new JobResolverServiceImpl.JobResolutionContext(
+            UUID.randomUUID().toString(),
+            Mock(JobRequest) {
+                getRequestedJobEnvironment() >> Mock(JobEnvironmentRequest) {
+                    getRequestedImages() >> requestImages
+                }
+            },
+            true,
+            Mock(SpanCustomizer)
+        )
+        def service = new JobResolverServiceImpl(
+            Mock(DataServices) {
+                getPersistenceService() >> Mock(PersistenceService)
+            },
+            [Mock(ClusterSelector)],
+            Mock(CommandSelector),
+            new SimpleMeterRegistry(),
+            JobsProperties.getJobsPropertiesDefaults(),
+            Mock(JobResolutionProperties) {
+                getDefaultImages() >> defaultImages
+            },
+            Mock(BraveTracingComponents) {
+                getTracer() >> Mock(Tracer)
+                getTagAdapter() >> Mock(BraveTagAdapter)
+            }
+        )
+
+        when:
+        service.resolveImages(context)
+
+        then:
+        thrown(IllegalStateException)
+
+        when:
+        context.setCommand(Mock(Command) { getImages() >> commandImages })
+        service.resolveImages(context)
+
+        then:
+        context.getImages().isPresent()
+        context.getImages().get() == [
+            r     : new Image.Builder().withName("r").withTag("latest.release").build(),
+            python: new Image.Builder().withName("python").withTag("3.11.0").withArguments(["a"]).build(),
+            spark : new Image.Builder().withName("spark").withTag("3.2").build(),
+            genie : new Image.Builder().withName("genie-agent").withTag("4.3.0").withArguments(["jobId", "1234"]).build(),
+            java  : new Image.Builder().withName("java").withTag("11.0").build()
+        ]
     }
 
     //region Helper Methods

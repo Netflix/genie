@@ -87,7 +87,7 @@ export GENIE_JOB_GROUPING_INSTANCE="Workflow.Foo_Step.Blah-2020021919:12:34.000_
 
 export GENIE_JOB_ID="JOB_ID_PLACEHOLDER"
 
-export GENIE_JOB_MEMORY="1024"
+export GENIE_JOB_MEMORY="1500"
 
 export GENIE_JOB_NAME="List * ... Directories bash job"
 
