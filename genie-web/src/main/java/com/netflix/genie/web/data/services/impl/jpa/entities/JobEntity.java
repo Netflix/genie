@@ -395,12 +395,12 @@ public class JobEntity extends BaseEntity implements
 
     @Basic
     @Column(name = "requested_gpu", updatable = false)
-    @Min(value = 1, message = "Can't have less than 1 GPU")
+    @Min(value = 0, message = "Can't have less than 0 GPU")
     private Integer requestedGpu;
 
     @Basic
     @Column(name = "gpu_used")
-    @Min(value = 1, message = "Can't have less than 1 GPU")
+    @Min(value = 0, message = "Can't have less than 0 GPU")
     private Integer gpuUsed;
 
     @Basic
