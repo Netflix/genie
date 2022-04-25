@@ -20,8 +20,6 @@ package com.netflix.genie.web.data.services.impl.jpa;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dtos.Application;
 import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.ClusterStatus;
@@ -31,6 +29,7 @@ import com.netflix.genie.common.internal.dtos.CommandRequest;
 import com.netflix.genie.common.internal.dtos.CommandStatus;
 import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.assertj.core.api.Assertions;
@@ -45,7 +44,9 @@ import javax.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -63,21 +64,21 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     private static final String COMMAND_1_NAME = "pig_13_prod";
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
-    private static final List<String> COMMAND_1_EXECUTABLE = Lists.newArrayList("pig");
+    private static final List<String> COMMAND_1_EXECUTABLE = List.of("pig");
     private static final CommandStatus COMMAND_1_STATUS = CommandStatus.ACTIVE;
 
     private static final String COMMAND_2_ID = "command2";
     private static final String COMMAND_2_NAME = "hive_11_prod";
     private static final String COMMAND_2_USER = "amsharma";
     private static final String COMMAND_2_VERSION = "4.5.6";
-    private static final List<String> COMMAND_2_EXECUTABLE = Lists.newArrayList("hive");
+    private static final List<String> COMMAND_2_EXECUTABLE = List.of("hive");
     private static final CommandStatus COMMAND_2_STATUS = CommandStatus.INACTIVE;
 
     private static final String COMMAND_3_ID = "command3";
     private static final String COMMAND_3_NAME = "pig_11_prod";
     private static final String COMMAND_3_USER = "tgianos";
     private static final String COMMAND_3_VERSION = "7.8.9";
-    private static final List<String> COMMAND_3_EXECUTABLE = Lists.newArrayList("pig");
+    private static final List<String> COMMAND_3_EXECUTABLE = List.of("pig");
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
     private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
@@ -139,7 +140,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
     void testGetCommandsByStatuses() {
-        final Set<CommandStatus> statuses = Sets.newHashSet(CommandStatus.INACTIVE, CommandStatus.DEPRECATED);
+        final Set<CommandStatus> statuses = Set.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED);
         final Page<Command> commands = this.service.findCommands(null, null, statuses, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
@@ -149,7 +150,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
     void testGetCommandsByTags() {
-        final Set<String> tags = Sets.newHashSet("prod");
+        final Set<String> tags = new HashSet<>();
+        tags.add("prod");
         Page<Command> commands = this.service.findCommands(null, null, null, tags, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
         Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
@@ -226,9 +228,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
     void testGetCommandsWithTags() {
-        final Set<CommandStatus> activeStatuses = Sets.newHashSet(CommandStatus.ACTIVE);
-        final Set<CommandStatus> inactiveStatuses = Sets.newHashSet(CommandStatus.INACTIVE);
-        final Set<String> tags = Sets.newHashSet("prod", "hive");
+        final Set<CommandStatus> activeStatuses = Set.of(CommandStatus.ACTIVE);
+        final Set<CommandStatus> inactiveStatuses = Set.of(CommandStatus.INACTIVE);
+        final Set<String> tags = Set.of("prod", "hive");
         Page<Command> commands;
         commands = this.service.findCommands(null, null, activeStatuses, tags, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(0);
@@ -240,6 +242,23 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @Test
     void testSaveCommand() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
+        final ComputeResources computeResources = new ComputeResources.Builder()
+            .withCpu(7)
+            .withGpu(8)
+            .withMemoryMb(1_352L)
+            .withDiskMb(10_324L)
+            .withNetworkMbps(534L)
+            .build();
+        final Map<String, Image> images = Map.of(
+            UUID.randomUUID().toString(),
+            new Image.Builder().withName(UUID.randomUUID().toString()).withTag(UUID.randomUUID().toString()).build(),
+            UUID.randomUUID().toString(),
+            new Image.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withTag(UUID.randomUUID().toString())
+                .withArguments(List.of(UUID.randomUUID().toString()))
+                .build()
+        );
         final CommandRequest command = new CommandRequest.Builder(
             new CommandMetadata.Builder(
                 COMMAND_1_NAME,
@@ -251,6 +270,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             COMMAND_1_EXECUTABLE
         )
             .withRequestedId(id)
+            .withComputeResources(computeResources)
+            .withImages(images)
             .build();
         final String createdId = this.service.saveCommand(command);
         Assertions.assertThat(createdId).isEqualTo(id);
@@ -262,8 +283,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
         Assertions.assertThat(created.getClusterCriteria()).isEmpty();
-        Assertions.assertThat(created.getComputeResources()).isNotNull();
-        Assertions.assertThat(created.getImages()).isNotNull();
+        Assertions.assertThat(created.getComputeResources()).isEqualTo(computeResources);
+        Assertions.assertThat(created.getImages()).isEqualTo(images);
         this.service.deleteCommand(id);
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
@@ -272,11 +293,11 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     void testSaveCommandNoId() throws GenieCheckedException {
-        final List<Criterion> clusterCriteria = Lists.newArrayList(
+        final List<Criterion> clusterCriteria = List.of(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion
                 .Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
         );
         final long memory = 512L;
@@ -320,7 +341,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions.assertThat(command.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
         Assertions.assertThat(command.getMetadata().getTags().size()).isEqualTo(3);
         Assertions.assertThat(command.getComputeResources()).isNotNull();
-        final Set<String> tags = Sets.newHashSet("yarn", "hadoop");
+        final Set<String> tags = new HashSet<>();
+        tags.add("yarn");
+        tags.add("hadoop");
         tags.addAll(command.getMetadata().getTags());
 
         final long memory = 1_024L;
@@ -361,7 +384,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @DatabaseSetup("persistence/commands/init.xml")
     void testUpdateCommandWithClusterCriteria() throws GenieCheckedException {
         Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
-        final List<Criterion> criteria0 = Lists.newArrayList(
+        final List<Criterion> criteria0 = List.of(
             new Criterion.Builder()
                 .withStatus(ClusterStatus.UP.name())
                 .build(),
@@ -369,12 +392,12 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .withId(UUID.randomUUID().toString())
                 .build(),
             new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString()))
                 .build()
         );
-        final List<Criterion> criteria1 = Lists.newArrayList(
+        final List<Criterion> criteria1 = List.of(
             new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build(),
             new Criterion.Builder()
                 .withName(ClusterStatus.UP.name())
@@ -507,7 +530,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
+        final Set<String> newConfigs = Set.of(newConfig1, newConfig2, newConfig3);
 
         Assertions.assertThat(this.service.getConfigsForResource(COMMAND_1_ID, Command.class)).hasSize(2);
         this.service.addConfigsToResource(COMMAND_1_ID, newConfigs, Command.class);
@@ -522,7 +545,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
+        final Set<String> newConfigs = Set.of(newConfig1, newConfig2, newConfig3);
 
         Assertions.assertThat(this.service.getConfigsForResource(COMMAND_1_ID, Command.class)).hasSize(2);
         this.service.updateConfigsForResource(COMMAND_1_ID, newConfigs, Command.class);
@@ -563,7 +586,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
 
-        final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
+        final Set<String> newDependencies = Set.of(newDependency1, newDependency2, newDependency3);
 
         Assertions.assertThat(this.service.getDependenciesForResource(COMMAND_3_ID, Command.class)).hasSize(2);
         this.service.addDependenciesToResource(COMMAND_3_ID, newDependencies, Command.class);
@@ -578,7 +601,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
 
-        final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
+        final Set<String> newDependencies = Set.of(newDependency1, newDependency2, newDependency3);
 
         Assertions.assertThat(this.service.getDependenciesForResource(COMMAND_1_ID, Command.class)).isEmpty();
         this.service.updateDependenciesForResource(COMMAND_1_ID, newDependencies, Command.class);
@@ -621,7 +644,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     void testAddApplicationsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
-        final List<String> appIds = Lists.newArrayList(APP_1_ID);
+        final List<String> appIds = List.of(APP_1_ID);
         final Set<Command> preCommands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions
             .assertThat(preCommands)
@@ -648,7 +671,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     void testSetApplicationsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
-        final List<String> appIds = Lists.newArrayList(APP_1_ID);
+        final List<String> appIds = List.of(APP_1_ID);
         final Set<Command> preCommands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions
             .assertThat(preCommands)
@@ -700,7 +723,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
+        final Set<String> newTags = Set.of(newTag1, newTag2, newTag3);
 
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).hasSize(3);
         this.service.addTagsToResource(COMMAND_1_ID, newTags, Command.class);
@@ -715,7 +738,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
+        final Set<String> newTags = Set.of(newTag1, newTag2, newTag3);
 
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).hasSize(3);
         this.service.updateTagsForResource(COMMAND_1_ID, newTags, Command.class);
@@ -785,10 +808,10 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final Criterion criterion3 = new Criterion.Builder().withName(UUID.randomUUID().toString()).build();
         final Criterion criterion4 = new Criterion
             .Builder()
-            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             .build();
 
-        final List<Criterion> clusterCriteria = Lists.newArrayList(
+        final List<Criterion> clusterCriteria = List.of(
             criterion0,
             criterion1,
             criterion2
@@ -802,7 +825,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 CommandStatus.ACTIVE
             )
                 .build(),
-            Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         )
             .withClusterCriteria(clusterCriteria)
             .build();
@@ -844,7 +867,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @Test
     void testFindCommandsMatchingCriterion() throws Exception {
         // Create some commands to test with
-        final List<Criterion> clusterCriteria = Lists.newArrayList(
+        final List<Criterion> clusterCriteria = List.of(
             new Criterion.Builder().withName("prodCluster").build()
         );
         final Command command0 = this.createTestCommand(null, null, clusterCriteria);
@@ -852,11 +875,11 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final Command command2 = this.createTestCommand(UUID.randomUUID().toString(), null, clusterCriteria);
 
         // Create two commands with supersets of command1 tags so that we can test that resolution
-        final Set<String> command3Tags = Sets.newHashSet(command1.getMetadata().getTags());
+        final Set<String> command3Tags = new HashSet<>(command1.getMetadata().getTags());
         command3Tags.add(UUID.randomUUID().toString());
         command3Tags.add(UUID.randomUUID().toString());
         final Command command3 = this.createTestCommand(null, command3Tags, clusterCriteria);
-        final Set<String> command4Tags = Sets.newHashSet(command1.getMetadata().getTags());
+        final Set<String> command4Tags = new HashSet<>(command1.getMetadata().getTags());
         command4Tags.add(UUID.randomUUID().toString());
         final Command command4 = this.createTestCommand(null, command4Tags, clusterCriteria);
 
@@ -916,7 +939,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build(),
+                    new Criterion.Builder().withTags(Set.of(UUID.randomUUID().toString())).build(),
                     true
                 )
             )
@@ -1005,10 +1028,10 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 CommandStatus.ACTIVE
             )
                 .withTags(
-                    tags == null ? Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()) : tags
+                    tags == null ? Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()) : tags
                 )
                 .build(),
-            Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         );
 
         if (id != null) {
