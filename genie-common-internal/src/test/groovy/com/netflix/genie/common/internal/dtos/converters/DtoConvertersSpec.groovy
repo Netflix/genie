@@ -38,6 +38,7 @@ import com.netflix.genie.common.internal.dtos.ComputeResources
 import com.netflix.genie.common.internal.dtos.Criterion
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dtos.Image
 import com.netflix.genie.common.internal.dtos.JobMetadata
 import com.netflix.genie.common.internal.dtos.JobRequest
 import com.netflix.genie.common.internal.dtos.JobStatus
@@ -623,7 +624,7 @@ class DtoConvertersSpec extends Specification {
         !commandRequest.getResources().getSetupFile().isPresent()
         commandRequest.getResources().getConfigs().isEmpty()
         commandRequest.getResources().getDependencies().isEmpty()
-        !commandRequest.getComputeResources().isPresent()
+        commandRequest.getComputeResources().isPresent()
         commandRequest.getImages().isEmpty()
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
@@ -1508,5 +1509,37 @@ class DtoConvertersSpec extends Specification {
                 ] as Set
             )
             .build()
+    }
+
+    def "can convert compute resources to and from runtime resources"() {
+        def computeResources0 = new ComputeResources.Builder()
+            .withCpu(7)
+            .withGpu(3)
+            .withMemoryMb(1_452L)
+            .withDiskMb(10_092L)
+            .withNetworkMbps(1_024L)
+            .build()
+
+        when:
+        def computeResources1 = DtoConverters.toComputeResources(
+            DtoConverters.toV3RuntimeResources(computeResources0)
+        )
+
+        then:
+        computeResources1 == computeResources0
+    }
+
+    def "can convert image to and from container image"() {
+        def image0 = new Image.Builder()
+            .withName(UUID.randomUUID().toString())
+            .withTag(UUID.randomUUID().toString())
+            .withArguments([UUID.randomUUID().toString(), UUID.randomUUID().toString()])
+            .build()
+
+        when:
+        def image1 = DtoConverters.toImage(DtoConverters.toV3ContainerImage(image0))
+
+        then:
+        image1 == image0
     }
 }

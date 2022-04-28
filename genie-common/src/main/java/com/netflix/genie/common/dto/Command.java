@@ -20,8 +20,6 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,11 +29,16 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
- * A command data transfer object. After creation it is read-only.
+ * A command data transfer object. After creation, it is read-only.
  *
  * @author tgianos
  * @since 3.0.0
@@ -64,8 +67,10 @@ public class Command extends ExecutionEnvironmentDTO {
         value = 1,
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
     )
+    @Deprecated
     private final Integer memory;
     private final List<Criterion> clusterCriteria;
+    private final Runtime runtime;
 
     /**
      * Constructor used by the builder.
@@ -76,24 +81,38 @@ public class Command extends ExecutionEnvironmentDTO {
         super(builder);
         this.status = builder.bStatus;
         this.checkDelay = DEFAULT_CHECK_DELAY;
-        this.memory = builder.bMemory;
         if (!builder.bExecutableAndArguments.isEmpty()) {
-            this.executableAndArguments = ImmutableList.copyOf(builder.bExecutableAndArguments);
+            this.executableAndArguments = Collections.unmodifiableList(
+                new ArrayList<>(builder.bExecutableAndArguments)
+            );
             this.executable = StringUtils.join(builder.bExecutableAndArguments, ' ');
         } else if (builder.bExecutable != null && !builder.bExecutable.isEmpty()) {
             this.executable = builder.bExecutable;
-            this.executableAndArguments = ImmutableList.copyOf(StringUtils.split(builder.bExecutable, ' '));
+            this.executableAndArguments = Collections.unmodifiableList(
+                Arrays.asList(StringUtils.split(builder.bExecutable, ' '))
+            );
         } else {
             throw new IllegalArgumentException("Cannot build command without 'executable' OR 'executableAndArguments'");
         }
-        this.clusterCriteria = ImmutableList.copyOf(builder.bClusterCriteria);
+        this.clusterCriteria = Collections.unmodifiableList(new ArrayList<>(builder.bClusterCriteria));
+        this.runtime = new Runtime.Builder()
+            .withResources(builder.bRuntimeResources.build())
+            .withImages(builder.bImages)
+            .build();
+        this.memory = this.runtime
+            .getResources()
+            .getMemoryMb()
+            .flatMap(mem -> Optional.of(mem.intValue()))
+            .orElse(null);
     }
 
     /**
      * Get the default amount of memory (in MB) to use for jobs which use this command.
      *
      * @return Optional of the amount of memory as it could be null if none set
+     * @deprecated Use runtime instead
      */
+    @Deprecated
     public Optional<Integer> getMemory() {
         return Optional.ofNullable(this.memory);
     }
@@ -107,10 +126,11 @@ public class Command extends ExecutionEnvironmentDTO {
     public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
         private final CommandStatus bStatus;
-        private final List<String> bExecutableAndArguments = Lists.newArrayList();
-        private final List<Criterion> bClusterCriteria = Lists.newArrayList();
+        private final List<String> bExecutableAndArguments = new ArrayList<>();
+        private final List<Criterion> bClusterCriteria = new ArrayList<>();
         private String bExecutable;
-        private Integer bMemory;
+        private final RuntimeResources.Builder bRuntimeResources = new RuntimeResources.Builder();
+        private final Map<String, ContainerImage> bImages = new HashMap<>();
 
         /**
          * Constructor which has required fields.
@@ -203,9 +223,11 @@ public class Command extends ExecutionEnvironmentDTO {
          *
          * @param memory The default amount of memory (in MB) for jobs to use
          * @return The builder
+         * @deprecated Use {@link #withRuntime(Runtime)} instead
          */
+        @Deprecated
         public Builder withMemory(@Nullable final Integer memory) {
-            this.bMemory = memory;
+            this.bRuntimeResources.withMemoryMb(memory == null ? null : memory.longValue());
             return this;
         }
 
@@ -269,6 +291,34 @@ public class Command extends ExecutionEnvironmentDTO {
             this.bClusterCriteria.clear();
             if (clusterCriteria != null) {
                 this.bClusterCriteria.addAll(clusterCriteria);
+            }
+            return this;
+        }
+
+        /**
+         * Set the runtime for any jobs that use this command.
+         *
+         * @param runtime The {@link Runtime} or {@literal null}
+         * @return The builder instance
+         */
+        public Builder withRuntime(@Nullable final Runtime runtime) {
+            this.bImages.clear();
+            if (runtime == null) {
+                this.bRuntimeResources
+                    .withCpu(null)
+                    .withGpu(null)
+                    .withMemoryMb(null)
+                    .withDiskMb(null)
+                    .withNetworkMbps(null);
+            } else {
+                final RuntimeResources resources = runtime.getResources();
+                this.bRuntimeResources
+                    .withCpu(resources.getCpu().orElse(null))
+                    .withGpu(resources.getGpu().orElse(null))
+                    .withMemoryMb(resources.getMemoryMb().orElse(null))
+                    .withDiskMb(resources.getDiskMb().orElse(null))
+                    .withNetworkMbps(resources.getNetworkMbps().orElse(null));
+                this.bImages.putAll(runtime.getImages());
             }
             return this;
         }

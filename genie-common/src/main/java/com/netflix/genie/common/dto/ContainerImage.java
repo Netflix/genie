@@ -167,7 +167,8 @@ public class ContainerImage implements Serializable {
         }
 
         /**
-         * Create an immutable instance of {@link ContainerImage} based on the current contents of this builder instance.
+         * Create an immutable instance of {@link ContainerImage} based on the current contents of this builder
+         * instance.
          *
          * @return A new {@link ContainerImage} instance
          */
