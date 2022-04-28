@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.Objects;
  * @since 4.3.0
  */
 @JsonDeserialize(builder = Runtime.Builder.class)
-public class Runtime {
+public class Runtime implements Serializable {
     private final RuntimeResources resources;
     private final Map<String, ContainerImage> images;
 
@@ -87,10 +88,10 @@ public class Runtime {
      */
     @Override
     public String toString() {
-        return "Runtime{" +
-            "resources=" + this.resources +
-            ", images=" + this.images +
-            '}';
+        return "Runtime{"
+            + "resources=" + this.resources
+            + ", images=" + this.images
+            + '}';
     }
 
     /**

@@ -22,6 +22,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.ContainerImage;
+import com.netflix.genie.common.dto.Runtime;
+import com.netflix.genie.common.dto.RuntimeResources;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dtos.AgentConfigRequest;
 import com.netflix.genie.common.internal.dtos.Application;
@@ -40,6 +43,7 @@ import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.dtos.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dtos.JobMetadata;
 import com.netflix.genie.common.internal.dtos.JobRequest;
@@ -48,6 +52,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -300,13 +305,20 @@ public final class DtoConverters {
         final List<String> executable = v3Command.getExecutableAndArguments();
         final CommandRequest.Builder builder = new CommandRequest.Builder(metadataBuilder.build(), executable);
         v3Command.getId().ifPresent(builder::withRequestedId);
-        v3Command
-            .getMemory()
-            .ifPresent(
-                memory -> builder.withComputeResources(
-                    new ComputeResources.Builder().withMemoryMb((long) memory).build()
+        final Runtime runtime = v3Command.getRuntime();
+        builder.withComputeResources(toComputeResources(runtime.getResources()));
+        builder.withImages(
+            runtime
+                .getImages()
+                .entrySet()
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> toImage(entry.getValue())
+                    )
                 )
-            );
+        );
         builder.withResources(
             new ExecutionEnvironment(
                 v3Command.getConfigs(),
@@ -352,10 +364,6 @@ public final class DtoConverters {
             v3Command.getSetupFile().orElse(null)
         );
 
-        final ComputeResources computeResources = v3Command.getMemory().isPresent()
-            ? new ComputeResources.Builder().withMemoryMb((long) v3Command.getMemory().get()).build()
-            : null;
-
         return new Command(
             v3Command.getId().orElseThrow(IllegalArgumentException::new),
             v3Command.getCreated().orElse(Instant.now()),
@@ -368,8 +376,18 @@ public final class DtoConverters {
                 .stream()
                 .map(DtoConverters::toV4CommandClusterCriterion)
                 .collect(Collectors.toList()),
-            computeResources,
-            null
+            toComputeResources(v3Command.getRuntime().getResources()),
+            v3Command
+                .getRuntime()
+                .getImages()
+                .entrySet()
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> toImage(entry.getValue())
+                    )
+                )
         );
     }
 
@@ -410,11 +428,23 @@ public final class DtoConverters {
         commandMetadata.getMetadata().ifPresent(builder::withMetadata);
 
         resources.getSetupFile().ifPresent(builder::withSetupFile);
-
-        v4Command
-            .getComputeResources()
-            .getMemoryMb()
-            .ifPresent(memory -> builder.withMemory(memory.intValue()));
+        builder.withRuntime(
+            new Runtime.Builder()
+                .withResources(toV3RuntimeResources(v4Command.getComputeResources()))
+                .withImages(
+                    v4Command
+                        .getImages()
+                        .entrySet()
+                        .stream()
+                        .collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> toV3ContainerImage(entry.getValue())
+                            )
+                        )
+                )
+                .build()
+        );
 
         return builder.build();
     }
@@ -917,6 +947,66 @@ public final class DtoConverters {
         criterion.getStatus().ifPresent(builder::withStatus);
         criterion.getVersion().ifPresent(builder::withVersion);
         builder.withTags(criterion.getTags());
+        return builder.build();
+    }
+
+    /**
+     * Convert internal {@link ComputeResources} to the V3 API {@link RuntimeResources} representation.
+     *
+     * @param computeResources The {@link ComputeResources} to convert
+     * @return The same data within a new {@link RuntimeResources} instance
+     */
+    public static RuntimeResources toV3RuntimeResources(final ComputeResources computeResources) {
+        final RuntimeResources.Builder builder = new RuntimeResources.Builder();
+        computeResources.getCpu().ifPresent(builder::withCpu);
+        computeResources.getGpu().ifPresent(builder::withGpu);
+        computeResources.getMemoryMb().ifPresent(builder::withMemoryMb);
+        computeResources.getDiskMb().ifPresent(builder::withDiskMb);
+        computeResources.getNetworkMbps().ifPresent(builder::withNetworkMbps);
+        return builder.build();
+    }
+
+    /**
+     * Convert the V3 API {@link RuntimeResources} to the internal {@link ComputeResources} representation.
+     *
+     * @param runtimeResources The {@link RuntimeResources} to convert
+     * @return The same data within a new {@link ComputeResources} instance
+     */
+    public static ComputeResources toComputeResources(final RuntimeResources runtimeResources) {
+        final ComputeResources.Builder builder = new ComputeResources.Builder();
+        runtimeResources.getCpu().ifPresent(builder::withCpu);
+        runtimeResources.getGpu().ifPresent(builder::withGpu);
+        runtimeResources.getMemoryMb().ifPresent(builder::withMemoryMb);
+        runtimeResources.getDiskMb().ifPresent(builder::withDiskMb);
+        runtimeResources.getNetworkMbps().ifPresent(builder::withNetworkMbps);
+        return builder.build();
+    }
+
+    /**
+     * Convert the internal {@link Image} to the V3 API {@link ContainerImage} representation.
+     *
+     * @param image The {@link Image} to convert
+     * @return The same data within a new {@link ContainerImage} instance
+     */
+    public static ContainerImage toV3ContainerImage(final Image image) {
+        final ContainerImage.Builder builder = new ContainerImage.Builder();
+        image.getName().ifPresent(builder::withName);
+        image.getTag().ifPresent(builder::withTag);
+        builder.withArguments(image.getArguments());
+        return builder.build();
+    }
+
+    /**
+     * Convert the V3 API representation of {@link ContainerImage} to the internal {@link Image} representation.
+     *
+     * @param containerImage The {@link ContainerImage} to convert
+     * @return The {@link Image} representation
+     */
+    public static Image toImage(final ContainerImage containerImage) {
+        final Image.Builder builder = new Image.Builder();
+        containerImage.getName().ifPresent(builder::withName);
+        containerImage.getTag().ifPresent(builder::withTag);
+        builder.withArguments(containerImage.getArguments());
         return builder.build();
     }
 

@@ -25,7 +25,9 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -67,6 +69,7 @@ class CommandTest {
         Assertions.assertThat(command.getMemory().isPresent()).isFalse();
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
         Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
+        Assertions.assertThat(command.getRuntime()).isNotNull();
     }
 
     @SuppressWarnings("deprecation")
@@ -91,6 +94,7 @@ class CommandTest {
         Assertions.assertThat(command.getMemory().isPresent()).isFalse();
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
         Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
+        Assertions.assertThat(command.getRuntime()).isNotNull();
     }
 
     @SuppressWarnings("deprecation")
@@ -115,6 +119,7 @@ class CommandTest {
         Assertions.assertThat(command.getMemory().isPresent()).isFalse();
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
         Assertions.assertThat(command.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
+        Assertions.assertThat(command.getRuntime()).isNotNull();
     }
 
     @SuppressWarnings("deprecation")
@@ -147,7 +152,7 @@ class CommandTest {
         final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
-        builder.withMemory(MEMORY);
+        builder.withMemory(MEMORY - 1);
 
         builder.withCheckDelay(CHECK_DELAY);
 
@@ -159,6 +164,21 @@ class CommandTest {
             new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
         );
         builder.withClusterCriteria(clusterCriteria);
+
+        final Map<String, ContainerImage> images = new HashMap<>();
+        final Runtime runtime = new Runtime.Builder()
+            .withResources(
+                new RuntimeResources.Builder()
+                    .withCpu(8)
+                    .withMemoryMb((long) MEMORY)
+                    .withDiskMb(18_333L)
+                    .withGpu(3)
+                    .withNetworkMbps(512L)
+                    .build()
+            )
+            .withImages(images)
+            .build();
+        builder.withRuntime(runtime);
 
         final Command command = builder.build();
         Assertions.assertThat(command.getName()).isEqualTo(NAME);
@@ -178,8 +198,10 @@ class CommandTest {
         Assertions.assertThat(command.getUpdated()).isPresent().contains(updated);
         Assertions.assertThat(command.getMemory()).isPresent().contains(MEMORY);
         Assertions.assertThat(command.getClusterCriteria()).isEqualTo(clusterCriteria);
+        Assertions.assertThat(command.getRuntime()).isEqualTo(runtime);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     void canBuildCommandNullOptionals() {
         final Command.Builder builder
@@ -195,6 +217,7 @@ class CommandTest {
         builder.withMemory(null);
         builder.withClusterCriteria(null);
         builder.withCheckDelay(null);
+        builder.withRuntime(null);
 
         final Command command = builder.build();
         Assertions.assertThat(command.getName()).isEqualTo(NAME);
@@ -213,6 +236,7 @@ class CommandTest {
         Assertions.assertThat(command.getUpdated()).isNotPresent();
         Assertions.assertThat(command.getMemory()).isNotPresent();
         Assertions.assertThat(command.getClusterCriteria()).isEmpty();
+        Assertions.assertThat(command.getRuntime()).isNotNull();
     }
 
     @Test

@@ -23,11 +23,14 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.ContainerImage;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.Runtime;
+import com.netflix.genie.common.dto.RuntimeResources;
 import com.netflix.genie.common.internal.dtos.Criterion;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.hateoas.MediaTypes;
@@ -554,6 +557,11 @@ final class Snippets {
     private static final ConstraintDescriptions APPLICATION_CONSTRAINTS = new ConstraintDescriptions(Application.class);
     private static final ConstraintDescriptions CLUSTER_CONSTRAINTS = new ConstraintDescriptions(Cluster.class);
     private static final ConstraintDescriptions CRITERION_CONSTRAINTS = new ConstraintDescriptions(Criterion.class);
+    private static final ConstraintDescriptions RUNTIME_CONSTRAINTS = new ConstraintDescriptions(Runtime.class);
+    private static final ConstraintDescriptions RUNTIME_RESOURCES_CONSTRAINTS
+        = new ConstraintDescriptions(RuntimeResources.class);
+    private static final ConstraintDescriptions CONTAINER_IMAGE_CONSTRAINTS
+        = new ConstraintDescriptions(ContainerImage.class);
 
     private Snippets() {
     }
@@ -829,7 +837,12 @@ final class Snippets {
                     "The priority ordered list of criteria to resolve clusters that this command can run jobs on"
                 )
                 .type(JsonFieldType.ARRAY)
-                .optional()
+                .optional(),
+            PayloadDocumentation
+                .subsectionWithPath("runtime")
+                .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "runtime"))
+                .description("The various job runtime parameters that should be used if this command is used")
+                .type(JsonFieldType.OBJECT)
         );
     }
 
@@ -1273,6 +1286,21 @@ final class Snippets {
                 .description("The set of tags a resource needs to have to match this criterion")
                 .type(JsonFieldType.ARRAY)
                 .optional(),
+        };
+    }
+
+    private static FieldDescriptor[] getRuntimeFieldDescriptors() {
+        return new FieldDescriptor[]{
+            PayloadDocumentation
+                .fieldWithPath("resources")
+                .attributes(getConstraintsForField(RUNTIME_CONSTRAINTS, "resources"))
+                .description("The runtime resources (cpu, gpu, memory, disk, network) that should be allocated")
+                .type(JsonFieldType.OBJECT),
+            PayloadDocumentation
+                .fieldWithPath("images")
+                .attributes(getConstraintsForField(RUNTIME_CONSTRAINTS, "images"))
+                .description("The map of system wide key to container image definition")
+                .type(JsonFieldType.OBJECT),
         };
     }
 }
