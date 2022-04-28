@@ -28,7 +28,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -72,11 +75,9 @@ class JobRequestTest {
         );
     }
 
-    /**
-     * Test to make sure can build a valid JobRequest using the builder.
-     */
-    @Test
+
     @SuppressWarnings("deprecation")
+    @Test
     void canBuildJobRequestDeprecated() {
         final JobRequest request = new JobRequest.Builder(
             NAME,
@@ -113,9 +114,7 @@ class JobRequestTest {
         Assertions.assertThat(request.getGroupingInstance().isPresent()).isFalse();
     }
 
-    /**
-     * Test to make sure can build a valid JobRequest using the builder.
-     */
+    @SuppressWarnings("deprecation")
     @Test
     void canBuildJobRequest() {
         final JobRequest request
@@ -126,13 +125,13 @@ class JobRequestTest {
         Assertions.assertThat(request.getCommandArgs().isPresent()).isFalse();
         Assertions.assertThat(request.getClusterCriterias()).isEqualTo(CLUSTER_CRITERIA);
         Assertions.assertThat(request.getCommandCriteria()).isEqualTo(COMMAND_CRITERION);
-        Assertions.assertThat(request.getCpu().isPresent()).isFalse();
+        Assertions.assertThat(request.getCpu()).isNotPresent();
         Assertions.assertThat(request.isDisableLogArchival()).isEqualTo(false);
         Assertions.assertThat(request.getEmail().isPresent()).isFalse();
         Assertions.assertThat(request.getConfigs()).isEmpty();
         Assertions.assertThat(request.getDependencies()).isEmpty();
         Assertions.assertThat(request.getGroup().isPresent()).isFalse();
-        Assertions.assertThat(request.getMemory().isPresent()).isFalse();
+        Assertions.assertThat(request.getMemory()).isNotPresent();
         Assertions.assertThat(request.getSetupFile().isPresent()).isFalse();
         Assertions.assertThat(request.getCreated().isPresent()).isFalse();
         Assertions.assertThat(request.getDescription().isPresent()).isFalse();
@@ -143,13 +142,12 @@ class JobRequestTest {
         Assertions.assertThat(request.getTimeout().isPresent()).isFalse();
         Assertions.assertThat(request.getGrouping().isPresent()).isFalse();
         Assertions.assertThat(request.getGroupingInstance().isPresent()).isFalse();
+        Assertions.assertThat(request.getRuntime()).isNotNull();
     }
 
-    /**
-     * Test to make sure can build a valid JobRequest with optional parameters.
-     */
-    @Test
+
     @SuppressWarnings("deprecation")
+    @Test
     void canBuildJobRequestWithOptionalsDeprecated() {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, CLUSTER_CRITERIA, COMMAND_CRITERION);
@@ -157,7 +155,7 @@ class JobRequestTest {
         builder.withCommandArgs(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
 
         final int cpu = 5;
-        builder.withCpu(cpu);
+        builder.withCpu(cpu - 1);
 
         final boolean disableLogArchival = true;
         builder.withDisableLogArchival(disableLogArchival);
@@ -183,7 +181,7 @@ class JobRequestTest {
         builder.withGroup(group);
 
         final int memory = 2048;
-        builder.withMemory(memory);
+        builder.withMemory(memory - 1);
 
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
@@ -224,6 +222,29 @@ class JobRequestTest {
         final String groupingInstance = UUID.randomUUID().toString();
         builder.withGroupingInstance(groupingInstance);
 
+        final Map<String, ContainerImage> images = new HashMap<>();
+        images.put(
+            UUID.randomUUID().toString(),
+            new ContainerImage.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withTag(UUID.randomUUID().toString())
+                .withArguments(Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+        );
+        final Runtime runtime = new Runtime.Builder()
+            .withResources(
+                new RuntimeResources.Builder()
+                    .withCpu(cpu)
+                    .withGpu(7)
+                    .withMemoryMb((long) memory)
+                    .withDiskMb(10_342L)
+                    .withNetworkMbps(512L)
+                    .build()
+            )
+            .withImages(images)
+            .build();
+        builder.withRuntime(runtime);
+
         final JobRequest request = builder.build();
         Assertions.assertThat(request.getName()).isEqualTo(NAME);
         Assertions.assertThat(request.getUser()).isEqualTo(USER);
@@ -254,11 +275,10 @@ class JobRequestTest {
         Assertions
             .assertThat(request.getGroupingInstance().orElseThrow(IllegalArgumentException::new))
             .isEqualTo(groupingInstance);
+        Assertions.assertThat(request.getRuntime()).isEqualTo(runtime);
     }
 
-    /**
-     * Test to make sure can build a valid JobRequest with optional parameters.
-     */
+    @SuppressWarnings("deprecation")
     @Test
     void canBuildJobRequestWithOptionals() {
         final JobRequest.Builder builder
@@ -267,7 +287,6 @@ class JobRequestTest {
         builder.withCommandArgs(COMMAND_ARGS);
 
         final int cpu = 5;
-        builder.withCpu(cpu);
 
         final boolean disableLogArchival = true;
         builder.withDisableLogArchival(disableLogArchival);
@@ -293,7 +312,6 @@ class JobRequestTest {
         builder.withGroup(group);
 
         final int memory = 2048;
-        builder.withMemory(memory);
 
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
@@ -334,6 +352,29 @@ class JobRequestTest {
         final String groupingInstance = UUID.randomUUID().toString();
         builder.withGroupingInstance(groupingInstance);
 
+        final Map<String, ContainerImage> images = new HashMap<>();
+        images.put(
+            UUID.randomUUID().toString(),
+            new ContainerImage.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withTag(UUID.randomUUID().toString())
+                .withArguments(Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+        );
+        final Runtime runtime = new Runtime.Builder()
+            .withResources(
+                new RuntimeResources.Builder()
+                    .withCpu(cpu)
+                    .withGpu(3)
+                    .withMemoryMb((long) memory)
+                    .withDiskMb(10_345L)
+                    .withNetworkMbps(1_243L)
+                    .build()
+            )
+            .withImages(images)
+            .build();
+        builder.withRuntime(runtime);
+
         final JobRequest request = builder.build();
         Assertions.assertThat(request.getName()).isEqualTo(NAME);
         Assertions.assertThat(request.getUser()).isEqualTo(USER);
@@ -364,11 +405,9 @@ class JobRequestTest {
         Assertions
             .assertThat(request.getGroupingInstance().orElseThrow(IllegalArgumentException::new))
             .isEqualTo(groupingInstance);
+        Assertions.assertThat(request.getRuntime()).isEqualTo(runtime);
     }
 
-    /**
-     * Test to make sure a JobRequest can be successfully built when nulls are inputted.
-     */
     @Test
     void canBuildJobRequestWithNulls() {
         final JobRequest.Builder builder
@@ -385,6 +424,7 @@ class JobRequestTest {
         builder.withTags(null);
         builder.withUpdated(null);
         builder.withApplications(null);
+        builder.withRuntime(null);
 
         final JobRequest request = builder.build();
         Assertions.assertThat(request.getName()).isEqualTo(NAME);
@@ -408,6 +448,7 @@ class JobRequestTest {
         Assertions.assertThat(request.getUpdated().isPresent()).isFalse();
         Assertions.assertThat(request.getApplications()).isEmpty();
         Assertions.assertThat(request.getTimeout().isPresent()).isFalse();
+        Assertions.assertThat(request.getRuntime()).isNotNull();
     }
 
     /**

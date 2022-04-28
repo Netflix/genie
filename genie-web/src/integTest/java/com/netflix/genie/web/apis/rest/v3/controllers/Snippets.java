@@ -943,7 +943,12 @@ final class Snippets {
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "groupingInstance"))
                 .description("The grouping instance of the job relative to other jobs. e.g. scheduler job run")
                 .type(JsonFieldType.STRING)
-                .optional()
+                .optional(),
+            PayloadDocumentation
+                .subsectionWithPath("runtime")
+                .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "runtime"))
+                .description("The requested job runtime values")
+                .type(JsonFieldType.OBJECT)
         );
     }
 

@@ -53,7 +53,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -489,15 +488,16 @@ public final class DtoConverters {
             v3JobRequest.getApplications()
         );
 
+        final Runtime runtime = v3JobRequest.getRuntime();
         final JobEnvironmentRequest.Builder jobEnvironmentBuilder = new JobEnvironmentRequest.Builder();
-        final Optional<Integer> requestedCpu = v3JobRequest.getCpu();
-        final Optional<Integer> requestedMemory = v3JobRequest.getMemory();
-        if (requestedCpu.isPresent() || requestedMemory.isPresent()) {
-            final ComputeResources.Builder computeResourcesBuilder = new ComputeResources.Builder();
-            requestedCpu.ifPresent(computeResourcesBuilder::withCpu);
-            requestedMemory.ifPresent(memory -> computeResourcesBuilder.withMemoryMb(memory.longValue()));
-            jobEnvironmentBuilder.withRequestedComputeResources(computeResourcesBuilder.build());
-        }
+        jobEnvironmentBuilder.withRequestedComputeResources(toComputeResources(runtime.getResources()));
+        jobEnvironmentBuilder.withRequestedImages(
+            runtime
+                .getImages()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> toImage(entry.getValue())))
+        );
 
         final AgentConfigRequest.Builder agentConfigBuilder = new AgentConfigRequest
             .Builder()
@@ -561,6 +561,24 @@ public final class DtoConverters {
         jobResources.getSetupFile().ifPresent(v3Builder::withSetupFile);
 
         v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().ifPresent(v3Builder::withTimeout);
+        final JobEnvironmentRequest jobEnvironmentRequest = v4JobRequest.getRequestedJobEnvironment();
+        v3Builder.withRuntime(
+            new Runtime.Builder()
+                .withResources(toV3RuntimeResources(jobEnvironmentRequest.getRequestedComputeResources()))
+                .withImages(
+                    jobEnvironmentRequest
+                        .getRequestedImages()
+                        .entrySet()
+                        .stream()
+                        .collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> toV3ContainerImage(entry.getValue())
+                            )
+                        )
+                )
+                .build()
+        );
 
         return v3Builder.build();
     }
