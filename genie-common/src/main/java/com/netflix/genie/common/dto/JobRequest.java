@@ -33,8 +33,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,14 +71,17 @@ public class JobRequest extends ExecutionEnvironmentDTO {
     @Email(message = "Must be a valid email address")
     private final String email;
     @Min(value = 1, message = "Must have at least 1 CPU")
+    @Deprecated
     private final Integer cpu;
     @Min(value = 1, message = "Must have at least 1 MB of memory. Preferably much more.")
+    @Deprecated
     private final Integer memory;
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeout;
     private final List<String> applications;
     private final String grouping;
     private final String groupingInstance;
+    private final Runtime runtime;
 
     /**
      * Constructor used by the builder build() method.
@@ -91,12 +96,20 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         this.group = builder.bGroup;
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
-        this.cpu = builder.bCpu;
-        this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
         this.applications = ImmutableList.copyOf(builder.bApplications);
         this.grouping = builder.bGrouping;
         this.groupingInstance = builder.bGroupingInstance;
+        this.runtime = new Runtime.Builder()
+            .withResources(builder.bRuntimeResources.build())
+            .withImages(builder.bImages)
+            .build();
+
+        this.cpu = this.runtime.getResources().getCpu().orElse(null);
+        this.memory = this.runtime.getResources()
+            .getMemoryMb()
+            .map(Long::intValue)
+            .orElse(null);
     }
 
     /**
@@ -130,7 +143,10 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * Get the number of CPU's requested to run this job.
      *
      * @return The number of CPU's as an Optional
+     * @deprecated Use runtime instead
+     * @since 4.3.0
      */
+    @Deprecated
     public Optional<Integer> getCpu() {
         return Optional.ofNullable(this.cpu);
     }
@@ -139,7 +155,10 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * Get the amount of memory (in MB) requested to run this job with.
      *
      * @return The amount of memory as an Optional
+     * @deprecated Use runtime instead
+     * @since 4.3.0
      */
+    @Deprecated
     public Optional<Integer> getMemory() {
         return Optional.ofNullable(this.memory);
     }
@@ -188,11 +207,11 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         private String bGroup;
         private boolean bDisableLogArchival;
         private String bEmail;
-        private Integer bCpu;
-        private Integer bMemory;
         private Integer bTimeout;
         private String bGrouping;
         private String bGroupingInstance;
+        private final RuntimeResources.Builder bRuntimeResources = new RuntimeResources.Builder();
+        private final Map<String, ContainerImage> bImages = new HashMap<>();
 
         /**
          * Constructor which has required fields.
@@ -365,20 +384,24 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          *
          * @param cpu The number of cpu's. Must be greater than 0.
          * @return The builder
+         * @deprecated Use {@link #withRuntime(Runtime)} instead
          */
+        @Deprecated
         public Builder withCpu(@Nullable final Integer cpu) {
-            this.bCpu = cpu;
+            this.bRuntimeResources.withCpu(cpu);
             return this;
         }
 
         /**
-         * Set the amount of memory being requested to run the job..
+         * Set the amount of memory being requested to run the job.
          *
          * @param memory The amount of memory in terms of MB's. Must be greater than 0.
          * @return The builder
+         * @deprecated Use {@link #withRuntime(Runtime)} instead
          */
+        @Deprecated
         public Builder withMemory(@Nullable final Integer memory) {
-            this.bMemory = memory;
+            this.bRuntimeResources.withMemoryMb(memory == null ? null : memory.longValue());
             return this;
         }
 
@@ -428,6 +451,35 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          */
         public Builder withGroupingInstance(@Nullable final String groupingInstance) {
             this.bGroupingInstance = groupingInstance;
+            return this;
+        }
+
+        /**
+         * Set the requested job runtime environment details.
+         *
+         * @param runtime The {@link Runtime} information or {@literal null}
+         * @return The {@link Builder} instance
+         */
+        public Builder withRuntime(@Nullable final Runtime runtime) {
+            this.bImages.clear();
+            if (runtime == null) {
+                this.bRuntimeResources
+                    .withCpu(null)
+                    .withGpu(null)
+                    .withMemoryMb(null)
+                    .withDiskMb(null)
+                    .withNetworkMbps(null);
+            } else {
+                final RuntimeResources resources = runtime.getResources();
+                this.bRuntimeResources
+                    .withCpu(resources.getCpu().orElse(null))
+                    .withGpu(resources.getGpu().orElse(null))
+                    .withMemoryMb(resources.getMemoryMb().orElse(null))
+                    .withDiskMb(resources.getDiskMb().orElse(null))
+                    .withNetworkMbps(resources.getNetworkMbps().orElse(null));
+                this.bImages.putAll(runtime.getImages());
+            }
+
             return this;
         }
 
