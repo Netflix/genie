@@ -18,7 +18,6 @@
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.data.services.impl.jpa.listeners.JobEntityListener;
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.PredicateUtils;
@@ -33,8 +32,8 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProje
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobSearchProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.StatusProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,6 +70,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -278,7 +278,7 @@ public class JobEntity extends BaseEntity implements
     JobClusterProjection,
     JobCommandProjection,
     JobSearchProjection,
-    V4JobRequestProjection,
+    JobRequestProjection,
     JobSpecificationProjection,
     JobArchiveLocationProjection,
     JobApiProjection,
@@ -614,7 +614,7 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "value", length = 1024, nullable = false, updatable = false)
     @ToString.Exclude
     private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
-        requestedEnvironmentVariables = Maps.newHashMap();
+        requestedEnvironmentVariables = new HashMap<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -627,7 +627,7 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "value", length = 1024, nullable = false)
     @ToString.Exclude
     private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
-        environmentVariables = Maps.newHashMap();
+        environmentVariables = new HashMap<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

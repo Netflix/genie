@@ -41,8 +41,8 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobAppli
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobCommandProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
@@ -109,7 +109,7 @@ class JpaPersistenceServiceImplJobsTest {
     @Test
     void noJobRequestFoundReturnsEmptyOptional() {
         Mockito
-            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(V4JobRequestProjection.class)))
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(JobRequestProjection.class)))
             .thenReturn(Optional.empty());
 
         Assertions
