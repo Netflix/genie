@@ -18,19 +18,14 @@
 package com.netflix.genie.web.data.services.impl.jpa.converters
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ArchiveStatus
-import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.UserResourcesSummary
 import com.netflix.genie.test.suppliers.RandomSuppliers
-import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity
-import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate
-import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 
 import java.time.Instant
@@ -134,8 +129,10 @@ class EntityV3DtoConvertersSpec extends Specification {
         execution.getProcessId().orElseGet(RandomSuppliers.INT) == processId
         execution.getCheckDelay().isEmpty()
         execution.getTimeout().orElseGet(RandomSuppliers.INSTANT) == timeout
-        execution.getMemory().orElseGet(RandomSuppliers.LONG) == memory
+        execution.getMemory().orElseGet(RandomSuppliers.INT) == memory
         execution.getArchiveStatus().orElse(null) == ArchiveStatus.ARCHIVED
+        execution.getRuntime().getImages().isEmpty()
+        execution.getRuntime().getResources().getMemoryMb().orElse(null) == memory
     }
 
     def "Can convert Job Execution Projection with null archiveStatus to Job Execution DTO"() {

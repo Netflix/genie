@@ -769,37 +769,33 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the number of CPU's used by the job.
-     *
-     * @return The number of CPU's used or {@link Optional#empty()}
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getCpuUsed() {
         return Optional.ofNullable(this.cpuUsed);
     }
 
     /**
-     * Get the number of GPUs used by the job.
-     *
-     * @return The number of GPUs used or {@link Optional#empty()}
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getGpuUsed() {
         return Optional.ofNullable(this.gpuUsed);
     }
 
     /**
-     * Get the amount of disk space used for a job.
-     *
-     * @return The amount of disk space in MB or {@link Optional#empty()}
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Long> getDiskMbUsed() {
         return Optional.ofNullable(this.diskMbUsed);
     }
 
     /**
-     * Get network bandwidth used for a job if any.
-     *
-     * @return The network bandwidth in mbps or {@link Optional#empty()}
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Long> getNetworkMbpsUsed() {
         return Optional.ofNullable(this.networkMbpsUsed);
     }
@@ -1288,10 +1284,9 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the set of image configuration used for this job.
-     *
-     * @return The images used or {@link Optional#empty()}
+     * {@inheritDoc}
      */
+    @Override
     public Optional<JsonNode> getImagesUsed() {
         return Optional.ofNullable(this.imagesUsed);
     }

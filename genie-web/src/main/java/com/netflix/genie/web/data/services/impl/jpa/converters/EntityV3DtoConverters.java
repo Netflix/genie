@@ -17,11 +17,18 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.converters;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netflix.genie.common.dto.ArchiveStatus;
+import com.netflix.genie.common.dto.ContainerImage;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
+import com.netflix.genie.common.dto.Runtime;
+import com.netflix.genie.common.dto.RuntimeResources;
 import com.netflix.genie.common.dto.UserResourcesSummary;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.dtos.converters.DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate;
@@ -31,6 +38,7 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProje
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,6 +50,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public final class EntityV3DtoConverters {
+    private static final TypeReference<Map<String, Image>> IMAGES_TYPE_REFERENCE = new TypeReference<>() {
+    };
+    private static final ObjectNode EMPTY_JSON = GenieObjectMapper.getMapper().createObjectNode();
 
     private EntityV3DtoConverters() {
     }
@@ -99,7 +110,26 @@ public final class EntityV3DtoConverters {
             builder.withTimeout(started.plusSeconds(jobExecutionProjection.getTimeoutUsed().get()));
         }
         jobExecutionProjection.getExitCode().ifPresent(builder::withExitCode);
-        jobExecutionProjection.getMemoryUsed().ifPresent(memory -> builder.withMemory(memory.intValue()));
+        final RuntimeResources.Builder resourcesBuilder = new RuntimeResources.Builder();
+        jobExecutionProjection.getCpuUsed().ifPresent(resourcesBuilder::withCpu);
+        jobExecutionProjection.getGpuUsed().ifPresent(resourcesBuilder::withGpu);
+        jobExecutionProjection.getMemoryUsed().ifPresent(resourcesBuilder::withMemoryMb);
+        jobExecutionProjection.getDiskMbUsed().ifPresent(resourcesBuilder::withDiskMb);
+        jobExecutionProjection.getNetworkMbpsUsed().ifPresent(resourcesBuilder::withNetworkMbps);
+
+        final Map<String, ContainerImage> images = GenieObjectMapper
+            .getMapper()
+            .convertValue(jobExecutionProjection.getImagesUsed().orElse(EMPTY_JSON), IMAGES_TYPE_REFERENCE)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> DtoConverters.toV3ContainerImage(entry.getValue())
+                )
+            );
+        builder.withRuntime(new Runtime.Builder().withResources(resourcesBuilder.build()).withImages(images).build());
+
         try {
             builder.withArchiveStatus(
                 ArchiveStatus.valueOf(
