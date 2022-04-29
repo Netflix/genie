@@ -79,12 +79,6 @@ import java.util.stream.Collectors;
  */
 public class TitusAgentLauncherImpl implements AgentLauncher {
 
-    /**
-     * The name of the image in an images block that corresponds to the main image to launch on titus which
-     * should have the Genie agent as the entry point.
-     */
-    public static final String GENIE_AGENT_IMAGE_KEY = "genieAgent";
-
     static final int MEGABYTE_TO_MEGABIT = 8;
     private static final String GENIE_USER_ATTR = "genie.user";
     private static final String GENIE_SOURCE_HOST_ATTR = "genie.sourceHost";
@@ -495,7 +489,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             this.titusAgentLauncherProperties.getImageTag()
         );
         final Image image = images.getOrDefault(
-            GENIE_AGENT_IMAGE_KEY,
+            this.environment.getProperty(
+                TitusAgentLauncherProperties.AGENT_IMAGE_KEY_PROPERTY,
+                String.class,
+                this.titusAgentLauncherProperties.getAgentImageKey()
+            ),
             new Image.Builder()
                 .withName(defaultImageName)
                 .withTag(defaultImageTag)
