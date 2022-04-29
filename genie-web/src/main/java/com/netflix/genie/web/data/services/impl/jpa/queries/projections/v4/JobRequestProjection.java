@@ -35,7 +35,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 // TODO: Clean this up as things get more finalized to break out fields into reusable super interfaces
-public interface V4JobRequestProjection {
+public interface JobRequestProjection {
     /**
      * Get the unique identifier for this entity.
      *

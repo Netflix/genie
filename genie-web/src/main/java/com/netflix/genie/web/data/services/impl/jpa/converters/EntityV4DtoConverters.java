@@ -50,8 +50,8 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,11 +197,11 @@ public final class EntityV4DtoConverters {
     /**
      * Convert a job request entity to a DTO.
      *
-     * @param jobRequestProjection The projection of the {@link V4JobRequestProjection} to convert
+     * @param jobRequestProjection The projection of the {@link JobRequestProjection} to convert
      * @return The original job request DTO
      * @throws GenieRuntimeException When criterion can't be properly converted
      */
-    public static JobRequest toV4JobRequestDto(final V4JobRequestProjection jobRequestProjection) {
+    public static JobRequest toV4JobRequestDto(final JobRequestProjection jobRequestProjection) {
         final String requestedId = jobRequestProjection.isRequestedId() ? jobRequestProjection.getUniqueId() : null;
 
         // Rebuild the job metadata
