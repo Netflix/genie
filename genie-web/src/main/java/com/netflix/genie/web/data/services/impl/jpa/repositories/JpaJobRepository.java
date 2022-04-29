@@ -24,7 +24,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobAppli
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobClusterProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobCommandProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -242,16 +241,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
     @EntityGraph(value = JobEntity.V3_JOB_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
     Optional<JobProjection> getV3Job(@Param("id") String id);
-
-    /**
-     * Get the data needed to create a V3 Job Request DTO.
-     *
-     * @param id The unique id of the job
-     * @return The {@link JobRequestProjection} data or {@link Optional#empty()} if the job doesn't exist
-     */
-    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
-    @EntityGraph(value = JobEntity.V3_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
-    Optional<JobRequestProjection> getV3JobRequest(@Param("id") String id);
 
     /**
      * Get the data needed to create a V4 Job Request DTO.

@@ -30,7 +30,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobComma
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobSearchProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.StatusProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
@@ -116,36 +115,6 @@ import java.util.Set;
                 @NamedAttributeNode("imagesUsed"),
                 // In actually looking at code this isn't used
                 // @NamedAttributeNode("applications")
-            }
-        ),
-        // Intended to be used as a LOAD graph
-        @NamedEntityGraph(
-            name = JobEntity.V3_JOB_REQUEST_DTO_ENTITY_GRAPH,
-            attributeNodes = {
-                @NamedAttributeNode("metadata"),
-                @NamedAttributeNode("commandArgs"),
-                @NamedAttributeNode("tags"),
-                @NamedAttributeNode("setupFile"),
-                @NamedAttributeNode(
-                    value = "clusterCriteria",
-                    subgraph = "criterion-sub-graph"
-                ),
-                @NamedAttributeNode(
-                    value = "commandCriterion",
-                    subgraph = "criterion-sub-graph"
-                ),
-                @NamedAttributeNode("dependencies"),
-                @NamedAttributeNode("configs"),
-                @NamedAttributeNode("requestedApplications"),
-                @NamedAttributeNode("requestedImages"),
-            },
-            subgraphs = {
-                @NamedSubgraph(
-                    name = "criterion-sub-graph",
-                    attributeNodes = {
-                        @NamedAttributeNode("tags")
-                    }
-                ),
             }
         ),
         // Intended to be used as a LOAD graph
@@ -303,7 +272,6 @@ import java.util.Set;
 public class JobEntity extends BaseEntity implements
     FinishedJobProjection,
     JobProjection,
-    JobRequestProjection,
     JobMetadataProjection,
     JobExecutionProjection,
     JobApplicationsProjection,
@@ -321,12 +289,6 @@ public class JobEntity extends BaseEntity implements
      * for a V3 Job DTO.
      */
     public static final String V3_JOB_DTO_ENTITY_GRAPH = "Job.v3.dto.job";
-
-    /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
-     * for a V3 Job Request DTO.
-     */
-    public static final String V3_JOB_REQUEST_DTO_ENTITY_GRAPH = "Job.v3.dto.request";
 
     /**
      * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed

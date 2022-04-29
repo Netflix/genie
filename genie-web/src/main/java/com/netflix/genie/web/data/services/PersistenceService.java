@@ -530,16 +530,6 @@ public interface PersistenceService {
     //region V3 Job APIs
 
     /**
-     * Get job request for given job id.
-     *
-     * @param id id of job request to look up
-     * @return the job
-     * @throws GenieException if there is an error
-     */
-    @Deprecated
-    com.netflix.genie.common.dto.JobRequest getV3JobRequest(@NotBlank String id) throws GenieException;
-
-    /**
      * Get job information for given job id.
      *
      * @param id id of job to look up

@@ -21,16 +21,13 @@ import com.netflix.genie.common.dto.ArchiveStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.internal.dtos.converters.DtoConverters;
-import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -78,65 +75,6 @@ public final class EntityV3DtoConverters {
         jobProjection.getGrouping().ifPresent(builder::withGrouping);
         jobProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
         jobProjection.getMetadata().ifPresent(builder::withMetadata);
-
-        return builder.build();
-    }
-
-    /**
-     * Convert database record into a DTO.
-     *
-     * @param jobRequestProjection The database data to convert
-     * @return A {@link JobRequest} instance
-     */
-    public static JobRequest toJobRequestDto(final JobRequestProjection jobRequestProjection) {
-        final JobRequest.Builder builder = new JobRequest.Builder(
-            jobRequestProjection.getName(),
-            jobRequestProjection.getUser(),
-            jobRequestProjection.getVersion(),
-            jobRequestProjection
-                .getClusterCriteria()
-                .stream()
-                .map(EntityV4DtoConverters::toCriterionDto)
-                .map(DtoConverters::toClusterCriteria)
-                .collect(Collectors.toList()),
-            DtoConverters.toV3CriterionTags(
-                EntityV4DtoConverters.toCriterionDto(jobRequestProjection.getCommandCriterion())
-            )
-        )
-            .withCreated(jobRequestProjection.getCreated())
-            .withId(jobRequestProjection.getUniqueId())
-            .withDisableLogArchival(jobRequestProjection.isArchivingDisabled())
-            .withConfigs(
-                jobRequestProjection
-                    .getConfigs()
-                    .stream()
-                    .map(FileEntity::getFile)
-                    .collect(Collectors.toSet())
-            )
-            .withDependencies(
-                jobRequestProjection
-                    .getDependencies()
-                    .stream()
-                    .map(FileEntity::getFile)
-                    .collect(Collectors.toSet())
-            )
-            .withTags(jobRequestProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
-            .withUpdated(jobRequestProjection.getUpdated())
-            .withApplications(jobRequestProjection.getRequestedApplications())
-            .withCommandArgs(jobRequestProjection.getCommandArgs());
-
-        jobRequestProjection.getEmail().ifPresent(builder::withEmail);
-        jobRequestProjection.getGenieUserGroup().ifPresent(builder::withGroup);
-        jobRequestProjection.getDescription().ifPresent(builder::withDescription);
-        jobRequestProjection.getRequestedCpu().ifPresent(builder::withCpu);
-        jobRequestProjection.getRequestedMemory().ifPresent(memory -> builder.withMemory(memory.intValue()));
-        jobRequestProjection.getRequestedTimeout().ifPresent(builder::withTimeout);
-        jobRequestProjection
-            .getSetupFile()
-            .ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
-        jobRequestProjection.getGrouping().ifPresent(builder::withGrouping);
-        jobRequestProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
-        jobRequestProjection.getMetadata().ifPresent(builder::withMetadata);
 
         return builder.build();
     }
