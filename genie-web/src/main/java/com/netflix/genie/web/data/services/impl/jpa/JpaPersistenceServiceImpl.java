@@ -1308,20 +1308,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Deprecated
-    public com.netflix.genie.common.dto.JobRequest getV3JobRequest(@NotBlank final String id) throws GenieException {
-        log.debug("[getV3JobRequest] Called with id {}", id);
-        return EntityV3DtoConverters.toJobRequestDto(
-            this.jobRepository
-                .getV3JobRequest(id)
-                .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id))
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Job getJob(@NotBlank final String id) throws GenieException {
         log.debug("[getJob] Called with id {}", id);
         return EntityV3DtoConverters.toJobDto(

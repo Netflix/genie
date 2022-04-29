@@ -983,31 +983,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
-    void canGetV3JobRequest() throws GenieException {
-        final com.netflix.genie.common.dto.JobRequest job1Request = this.service.getV3JobRequest(JOB_1_ID);
-        Assertions.assertThat(job1Request.getCommandArgs()).contains("-f query.q");
-        Assertions.assertThat(job1Request.getClusterCriterias()).hasSize(2);
-        Assertions
-            .assertThat(job1Request.getClusterCriterias().get(0).getTags())
-            .hasSize(4)
-            .containsExactlyInAnyOrder("genie.id:cluster1", "genie.name:h2query", "sla", "yarn");
-        Assertions
-            .assertThat(job1Request.getClusterCriterias().get(1).getTags())
-            .hasSize(2)
-            .containsExactlyInAnyOrder("sla", "adhoc");
-        Assertions
-            .assertThat(job1Request.getCommandCriteria())
-            .hasSize(3)
-            .containsExactlyInAnyOrder("type:spark", "ver:1.6.0", "genie.name:spark");
-        Assertions.assertThat(this.service.getV3JobRequest(JOB_2_ID).getCommandArgs()).contains("-f spark.jar");
-        Assertions.assertThat(this.service.getV3JobRequest(JOB_3_ID).getCommandArgs()).contains("-f spark.jar");
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.getV3JobRequest(UUID.randomUUID().toString()));
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
     void canGetJob() throws GenieException {
         Assertions.assertThat(this.service.getJob(JOB_1_ID).getName()).isEqualTo("testSparkJob");
         Assertions.assertThat(this.service.getJob(JOB_2_ID).getName()).isEqualTo("testSparkJob1");

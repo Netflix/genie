@@ -33,7 +33,8 @@ import javax.annotation.Nonnull;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobRequestModelAssembler implements RepresentationModelAssembler<JobRequest, EntityModel<JobRequest>> {
+public class JobRequestModelAssembler implements
+    RepresentationModelAssembler<JobRequestModelAssembler.JobRequestWrapper, EntityModel<JobRequest>> {
 
     private static final String JOB_LINK = "job";
     private static final String EXECUTION_LINK = "execution";
@@ -46,9 +47,9 @@ public class JobRequestModelAssembler implements RepresentationModelAssembler<Jo
      */
     @Override
     @Nonnull
-    public EntityModel<JobRequest> toModel(final JobRequest jobRequest) {
-        final String id = jobRequest.getId().orElseThrow(IllegalArgumentException::new);
-        final EntityModel<JobRequest> jobRequestModel = EntityModel.of(jobRequest);
+    public EntityModel<JobRequest> toModel(final JobRequestWrapper wrapper) {
+        final String id = wrapper.getId();
+        final EntityModel<JobRequest> jobRequestModel = EntityModel.of(wrapper.getJobRequest());
 
         try {
             jobRequestModel.add(
@@ -122,5 +123,46 @@ public class JobRequestModelAssembler implements RepresentationModelAssembler<Jo
         }
 
         return jobRequestModel;
+    }
+
+    /**
+     * A simple wrapper class because the job request may not have an id available (there wasn't one
+     * originally sent) so need to use the one the system provided later in order to generate the links properly.
+     *
+     * @author tgianos
+     * @since 4.3.0
+     */
+    public static class JobRequestWrapper {
+        private final String id;
+        private final JobRequest jobRequest;
+
+        /**
+         * Constructor.
+         *
+         * @param id         The actual id of the job
+         * @param jobRequest The original job request
+         */
+        public JobRequestWrapper(final String id, final JobRequest jobRequest) {
+            this.id = id;
+            this.jobRequest = jobRequest;
+        }
+
+        /**
+         * Get the actual id of the job the system assigned after job submission if none was already supplied.
+         *
+         * @return The jobs' unique id
+         */
+        public String getId() {
+            return this.id;
+        }
+
+        /**
+         * Get the original job request sent to the system by the user.
+         *
+         * @return The {@link JobRequest}
+         */
+        public JobRequest getJobRequest() {
+            return this.jobRequest;
+        }
     }
 }

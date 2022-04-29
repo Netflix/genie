@@ -590,14 +590,18 @@ public class JobRestController {
      *
      * @param id The id of the job
      * @return The job request
-     * @throws GenieException On any internal error
+     * @throws NotFoundException If no job with {@literal id} exists
      */
     @GetMapping(value = "/{id}/request", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<JobRequest> getJobRequest(
-        @PathVariable("id") final String id) throws GenieException {
+    public EntityModel<JobRequest> getJobRequest(@PathVariable("id") final String id) throws NotFoundException {
         log.info("[getJobRequest] Called for job request with id {}", id);
-        return this.jobRequestModelAssembler.toModel(this.persistenceService.getV3JobRequest(id));
+        return this.jobRequestModelAssembler.toModel(
+            new JobRequestModelAssembler.JobRequestWrapper(
+                id,
+                DtoConverters.toV3JobRequest(this.persistenceService.getJobRequest(id))
+            )
+        );
     }
 
     /**
