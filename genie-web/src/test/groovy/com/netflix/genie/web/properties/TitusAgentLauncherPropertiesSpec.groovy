@@ -70,6 +70,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
             "--server-host", TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER,
             "--server-port", TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER
         ]
+        p.getAgentImageKey() == "genieAgent"
 
         when:
         p.setEnabled(true)
@@ -119,6 +120,7 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
                 "--launchInJobDirectory"
             ]
         )
+        p.setAgentImageKey("genie-agent")
 
         then:
         p.isEnabled()
@@ -165,5 +167,6 @@ class TitusAgentLauncherPropertiesSpec extends Specification {
             "--api-job",
             "--launchInJobDirectory"
         ]
+        p.getAgentImageKey() == "genie-agent"
     }
 }

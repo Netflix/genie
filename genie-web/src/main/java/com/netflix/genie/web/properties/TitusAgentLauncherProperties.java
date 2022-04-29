@@ -165,6 +165,11 @@ public class TitusAgentLauncherProperties {
     public static final String SERVER_PORT_PLACEHOLDER = "<SERVER_PORT>";
 
     /**
+     * The property containing the Agent image key to look up the corresponding image metadata within.
+     */
+    public static final String AGENT_IMAGE_KEY_PROPERTY = PREFIX + ".agentImageKey";
+
+    /**
      * Whether the Titus Agent Launcher is enabled.
      */
     private boolean enabled;
@@ -369,4 +374,9 @@ public class TitusAgentLauncherProperties {
      * The sequence (jobGroupInfo) within the application space for Titus request.
      */
     private String sequence = "";
+
+    /**
+     * The key within the images block that corresponds to the image housing the Genie agent binary.
+     */
+    private String agentImageKey = "genieAgent";
 }

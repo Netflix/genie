@@ -88,7 +88,9 @@ class TitusAgentLauncherImplSpec extends Specification {
 
     void setup() {
         this.requestedCPU = 3
-        this.requestedMemory = 1024
+        this.requestedMemory = 1024L
+        this.launcherProperties = new TitusAgentLauncherProperties()
+        this.launcherProperties.setEndpoint(URI.create(TITUS_ENDPOINT_PREFIX))
 
         this.job = Mock(JobSpecification.ExecutionResource) {
             getId() >> JOB_ID
@@ -113,7 +115,7 @@ class TitusAgentLauncherImplSpec extends Specification {
 
         this.jobEnvironment = Mock(JobEnvironment) {
             getComputeResources() >> this.computeResources
-            getImages() >> [(TitusAgentLauncherImpl.GENIE_AGENT_IMAGE_KEY): this.image]
+            getImages() >> [(this.launcherProperties.getAgentImageKey()): this.image]
         }
         this.resolvedJob = Mock(ResolvedJob) {
             getJobSpecification() >> jobSpecification
@@ -125,8 +127,6 @@ class TitusAgentLauncherImplSpec extends Specification {
         this.restTemplate = Mock(RestTemplate)
         this.cache = Mock(Cache)
         this.genieHostInfo = new GenieHostInfo("hostname")
-        this.launcherProperties = new TitusAgentLauncherProperties()
-        this.launcherProperties.setEndpoint(URI.create(TITUS_ENDPOINT_PREFIX))
         this.registry = new SimpleMeterRegistry()
         this.environment = new MockEnvironment()
         this.tracer = Mock(Tracer)
