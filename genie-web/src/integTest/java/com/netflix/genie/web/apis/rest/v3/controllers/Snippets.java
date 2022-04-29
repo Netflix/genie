@@ -1072,7 +1072,12 @@ final class Snippets {
                 .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "launcherExt"))
                 .description("JSON object that contains metadata specific to the launcher implementation for the job")
                 .type(JsonFieldType.OBJECT)
-                .optional()
+                .optional(),
+            PayloadDocumentation
+                .subsectionWithPath("runtime")
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "runtime"))
+                .description("The runtime execution environment for a job")
+                .type(JsonFieldType.OBJECT)
         );
     }
 

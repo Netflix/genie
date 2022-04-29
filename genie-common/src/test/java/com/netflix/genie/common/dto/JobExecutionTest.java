@@ -23,6 +23,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -56,6 +58,7 @@ class JobExecutionTest {
         Assertions.assertThat(execution.getMemory().isPresent()).isFalse();
         Assertions.assertThat(execution.getArchiveStatus().isPresent()).isFalse();
         Assertions.assertThat(execution.getLauncherExt().isPresent()).isFalse();
+        Assertions.assertThat(execution.getRuntime()).isNotNull();
     }
 
     /**
@@ -68,7 +71,7 @@ class JobExecutionTest {
         builder.withCheckDelay(CHECK_DELAY);
         builder.withProcessId(PROCESS_ID);
         builder.withTimeout(TIMEOUT);
-        builder.withMemory(MEMORY);
+        builder.withMemory(MEMORY - 1);
         builder.withArchiveStatus(ArchiveStatus.ARCHIVED);
 
         final int exitCode = 0;
@@ -85,6 +88,25 @@ class JobExecutionTest {
 
         final JsonNode launcherExt = JsonNodeFactory.instance.objectNode();
         builder.withLauncherExt(launcherExt);
+
+        final Map<String, ContainerImage> images = new HashMap<>();
+        images.put(
+            UUID.randomUUID().toString(),
+            new ContainerImage.Builder().withName(UUID.randomUUID().toString()).build()
+        );
+        final Runtime runtime = new Runtime.Builder()
+            .withResources(
+                new RuntimeResources.Builder()
+                    .withCpu(5)
+                    .withGpu(98)
+                    .withMemoryMb((long) MEMORY)
+                    .withDiskMb(324L)
+                    .withNetworkMbps(255L)
+                    .build()
+            )
+            .withImages(images)
+            .build();
+        builder.withRuntime(runtime);
 
         final JobExecution execution = builder.build();
         Assertions.assertThat(execution.getHostName()).isEqualTo(HOST_NAME);
@@ -104,6 +126,7 @@ class JobExecutionTest {
             .isEqualTo(ArchiveStatus.ARCHIVED);
         Assertions.assertThat(execution.getLauncherExt().orElseThrow(IllegalArgumentException::new))
             .isEqualTo(launcherExt);
+        Assertions.assertThat(execution.getRuntime()).isEqualTo(runtime);
     }
 
     /**

@@ -59,11 +59,39 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
     Optional<Integer> getExitCode();
 
     /**
+     * Get the number of CPU's used by the job.
+     *
+     * @return The number of CPU's used or {@link Optional#empty()}
+     */
+    Optional<Integer> getCpuUsed();
+
+    /**
+     * Get the number of GPUs used by the job.
+     *
+     * @return The number of GPUs used or {@link Optional#empty()}
+     */
+    Optional<Integer> getGpuUsed();
+
+    /**
      * Get the amount of memory (in MB) that this job is/was run with.
      *
      * @return The memory as an optional as it could be null
      */
     Optional<Long> getMemoryUsed();
+
+    /**
+     * Get the amount of disk space used for a job.
+     *
+     * @return The amount of disk space in MB or {@link Optional#empty()}
+     */
+    Optional<Long> getDiskMbUsed();
+
+    /**
+     * Get network bandwidth used for a job if any.
+     *
+     * @return The network bandwidth in mbps or {@link Optional#empty()}
+     */
+    Optional<Long> getNetworkMbpsUsed();
 
     /**
      * Get the final resolved timeout duration (in seconds) if there was one for this job.
@@ -85,4 +113,11 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
      * @return An Optional wrapping the JSON representation of the launcher metadata, if present.
      */
     Optional<JsonNode> getLauncherExt();
+
+    /**
+     * Get the set of image configuration used for this job.
+     *
+     * @return The images used or {@link Optional#empty()}
+     */
+    Optional<JsonNode> getImagesUsed();
 }

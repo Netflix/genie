@@ -65,7 +65,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Utility methods for converting from V4 DTO to entities and vice versa.
+ * Utility methods for converting from DTO to entities and vice versa.
  *
  * @author tgianos
  * @since 4.0.0

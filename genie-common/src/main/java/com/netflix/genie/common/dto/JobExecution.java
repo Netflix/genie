@@ -28,6 +28,8 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -72,9 +74,11 @@ public class JobExecution extends BaseDTO {
         value = 1,
         message = "The amount of memory this job is set to use on the system"
     )
+    @Deprecated
     private final Integer memory;
     private final ArchiveStatus archiveStatus;
     private final JsonNode launcherExt;
+    private final Runtime runtime;
 
     /**
      * Constructor used by the builder build() method.
@@ -87,10 +91,15 @@ public class JobExecution extends BaseDTO {
         this.processId = builder.bProcessId;
         this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
-        this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
         this.archiveStatus = builder.bArchiveStatus;
         this.launcherExt = builder.bLauncherExt;
+        this.runtime = new Runtime.Builder()
+            .withResources(builder.bRuntimeResources.build())
+            .withImages(builder.bImages)
+            .build();
+
+        this.memory = this.runtime.getResources().getMemoryMb().map(Long::intValue).orElse(null);
     }
 
     /**
@@ -169,20 +178,21 @@ public class JobExecution extends BaseDTO {
         private Long bCheckDelay;
         private Instant bTimeout;
         private Integer bExitCode;
-        private Integer bMemory;
         private ArchiveStatus bArchiveStatus;
         private JsonNode bLauncherExt;
+        private final RuntimeResources.Builder bRuntimeResources;
+        private final Map<String, ContainerImage> bImages;
 
         /**
          * Constructor which has required fields.
          *
          * @param hostName The hostname where the job is running
          */
-        public Builder(
-            @JsonProperty(value = "hostName", required = true) final String hostName
-        ) {
+        public Builder(@JsonProperty(value = "hostName", required = true) final String hostName) {
             super();
             this.bHostName = hostName;
+            this.bRuntimeResources = new RuntimeResources.Builder();
+            this.bImages = new HashMap<>();
         }
 
         /**
@@ -234,9 +244,11 @@ public class JobExecution extends BaseDTO {
          *
          * @param memory The amount of memory in megabytes
          * @return The builder
+         * @deprecated Use {@link #withRuntime(Runtime)} instead
          */
+        @Deprecated
         public Builder withMemory(@Nullable final Integer memory) {
-            this.bMemory = memory;
+            this.bRuntimeResources.withMemoryMb(memory == null ? null : memory.longValue());
             return this;
         }
 
@@ -246,7 +258,7 @@ public class JobExecution extends BaseDTO {
          * @param archiveStatus The archive status
          * @return The builder
          */
-        public Builder withArchiveStatus(final ArchiveStatus archiveStatus) {
+        public Builder withArchiveStatus(@Nullable final ArchiveStatus archiveStatus) {
             this.bArchiveStatus = archiveStatus;
             return this;
         }
@@ -259,6 +271,34 @@ public class JobExecution extends BaseDTO {
          */
         public Builder withLauncherExt(@Nullable final JsonNode launcherExt) {
             this.bLauncherExt = launcherExt;
+            return this;
+        }
+
+        /**
+         * Set the runtime this job is executing with.
+         *
+         * @param runtime The runtime
+         * @return This {@link Builder} instance
+         */
+        public Builder withRuntime(@Nullable final Runtime runtime) {
+            this.bImages.clear();
+            if (runtime == null) {
+                this.bRuntimeResources
+                    .withCpu(null)
+                    .withGpu(null)
+                    .withMemoryMb(null)
+                    .withDiskMb(null)
+                    .withNetworkMbps(null);
+            } else {
+                final RuntimeResources resources = runtime.getResources();
+                this.bRuntimeResources
+                    .withCpu(resources.getCpu().orElse(null))
+                    .withGpu(resources.getGpu().orElse(null))
+                    .withMemoryMb(resources.getMemoryMb().orElse(null))
+                    .withDiskMb(resources.getDiskMb().orElse(null))
+                    .withNetworkMbps(resources.getNetworkMbps().orElse(null));
+                this.bImages.putAll(runtime.getImages());
+            }
             return this;
         }
 
