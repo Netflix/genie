@@ -33,9 +33,9 @@ ALTER TABLE jobs
 
 ALTER TABLE commands
   DROP COLUMN check_delay,
-  ADD COLUMN cpu          INT  DEFAULT NULL,
-  ADD COLUMN gpu          INT  DEFAULT NULL,
-  ADD COLUMN disk_mb      INT  DEFAULT NULL,
-  ADD COLUMN network_mbps INT  DEFAULT NULL,
-  ADD COLUMN images       TEXT DEFAULT NULL,
+  ADD COLUMN cpu          INT    DEFAULT NULL,
+  ADD COLUMN gpu          INT    DEFAULT NULL,
+  ADD COLUMN disk_mb      BIGINT DEFAULT NULL,
+  ADD COLUMN network_mbps BIGINT DEFAULT NULL,
+  ADD COLUMN images       TEXT   DEFAULT NULL,
   ALTER COLUMN memory TYPE BIGINT;
