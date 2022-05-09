@@ -111,7 +111,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockListLast">
 <h4>violations</h4>
-<pre>java.util.Set&lt;javax.validation.ConstraintViolation&lt;<a href="com/netflix/genie/common/external/dtos/v4/AgentJobRequest.html" title="interface in com.netflix.genie.common.external.dtos.v4">AgentJobRequest</a>&gt;&gt; violations</pre>
+<pre>java.util.Set&lt;javax.validation.ConstraintViolation&lt;<a href="com/netflix/genie/common/internal/dtos/AgentJobRequest.html" title="interface in com.netflix.genie.common.internal.dtos">AgentJobRequest</a>&gt;&gt; violations</pre>
 </li>
 </ul>
 </li>
@@ -358,11 +358,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>checkDelay</h4>
-<pre>@javax.validation.constraints.Min(value=1L, message="The delay between checks must be at least 1 millisecond. Probably should be much more than that") long checkDelay</pre>
+<pre>long checkDelay</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
 </li>
 <li class="blockList">
 <h4>clusterCriteria</h4>
-<pre>java.util.List&lt;<a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt; clusterCriteria</pre>
+<pre>java.util.List&lt;<a href="com/netflix/genie/common/dto/Criterion.html" title="class in com.netflix.genie.common.dto">Criterion</a>&gt; clusterCriteria</pre>
 </li>
 <li class="blockList">
 <h4>executable</h4>
@@ -375,6 +376,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>memory</h4>
 <pre>@Min(value=1L,message="The minimum amount of memory if desired is 1 MB. Probably should be much more than that") java.lang.Integer memory</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
+</li>
+<li class="blockList">
+<h4>runtime</h4>
+<pre><a href="com/netflix/genie/common/dto/Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a> runtime</pre>
 </li>
 <li class="blockListLast">
 <h4>status</h4>
@@ -419,6 +425,66 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockListLast">
 <h4>version</h4>
 <pre>@NotEmpty(message="A version is required and must be at most 255 characters.") @Size(max=255,message="The version can be no longer than 255 characters") java.lang.String version</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.dto.ContainerImage">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/dto/ContainerImage.html" title="class in com.netflix.genie.common.dto">com.netflix.genie.common.dto.ContainerImage</a> extends java.lang.Object implements Serializable</h3>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>arguments</h4>
+<pre>java.util.List&lt;java.lang.String&gt; arguments</pre>
+</li>
+<li class="blockList">
+<h4>name</h4>
+<pre>java.lang.String name</pre>
+</li>
+<li class="blockListLast">
+<h4>tag</h4>
+<pre>java.lang.String tag</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.dto.Criterion">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/dto/Criterion.html" title="class in com.netflix.genie.common.dto">com.netflix.genie.common.dto.Criterion</a> extends java.lang.Object implements Serializable</h3>
+<dl class="nameValue">
+<dt>serialVersionUID:</dt>
+<dd>-8382495858646428806L</dd>
+</dl>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>id</h4>
+<pre>java.lang.String id</pre>
+</li>
+<li class="blockList">
+<h4>name</h4>
+<pre>java.lang.String name</pre>
+</li>
+<li class="blockList">
+<h4>status</h4>
+<pre>java.lang.String status</pre>
+</li>
+<li class="blockList">
+<h4>tags</h4>
+<pre>com.google.common.collect.ImmutableSet&lt;@NotEmpty(message="A tag can\'t be an empty string") @Size(max=255,message="A tag can\'t be longer than 255 characters") java.lang.String&gt; tags</pre>
+</li>
+<li class="blockListLast">
+<h4>version</h4>
+<pre>java.lang.String version</pre>
 </li>
 </ul>
 </li>
@@ -526,7 +592,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>archiveStatus</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a> archiveStatus</pre>
+<pre><a href="com/netflix/genie/common/dto/ArchiveStatus.html" title="enum in com.netflix.genie.common.dto">ArchiveStatus</a> archiveStatus</pre>
 </li>
 <li class="blockList">
 <h4>checkDelay</h4>
@@ -547,10 +613,15 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>memory</h4>
 <pre>@Min(value=1L,message="The amount of memory this job is set to use on the system") java.lang.Integer memory</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
 </li>
 <li class="blockList">
 <h4>processId</h4>
 <pre>java.lang.Integer processId</pre>
+</li>
+<li class="blockList">
+<h4>runtime</h4>
+<pre><a href="com/netflix/genie/common/dto/Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a> runtime</pre>
 </li>
 <li class="blockListLast">
 <h4>timeout</h4>
@@ -627,6 +698,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>cpu</h4>
 <pre>@Min(value=1L,message="Must have at least 1 CPU") java.lang.Integer cpu</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
 </li>
 <li class="blockList">
 <h4>disableLogArchival</h4>
@@ -651,10 +723,67 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <h4>memory</h4>
 <pre>@Min(value=1L,message="Must have at least 1 MB of memory. Preferably much more.") java.lang.Integer memory</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
+</li>
+<li class="blockList">
+<h4>runtime</h4>
+<pre><a href="com/netflix/genie/common/dto/Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a> runtime</pre>
 </li>
 <li class="blockListLast">
 <h4>timeout</h4>
 <pre>@Min(value=1L,message="The timeout must be at least 1 second, preferably much more.") java.lang.Integer timeout</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.dto.Runtime">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/dto/Runtime.html" title="class in com.netflix.genie.common.dto">com.netflix.genie.common.dto.Runtime</a> extends java.lang.Object implements Serializable</h3>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>images</h4>
+<pre>java.util.Map&lt;java.lang.String,&#8203;<a href="com/netflix/genie/common/dto/ContainerImage.html" title="class in com.netflix.genie.common.dto">ContainerImage</a>&gt; images</pre>
+</li>
+<li class="blockListLast">
+<h4>resources</h4>
+<pre><a href="com/netflix/genie/common/dto/RuntimeResources.html" title="class in com.netflix.genie.common.dto">RuntimeResources</a> resources</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.dto.RuntimeResources">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/dto/RuntimeResources.html" title="class in com.netflix.genie.common.dto">com.netflix.genie.common.dto.RuntimeResources</a> extends java.lang.Object implements Serializable</h3>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>cpu</h4>
+<pre>@Min(value=1L,message="Must have at least one CPU") java.lang.Integer cpu</pre>
+</li>
+<li class="blockList">
+<h4>diskMb</h4>
+<pre>@Min(value=1L,message="Must have at least 1 MB of disk space") java.lang.Long diskMb</pre>
+</li>
+<li class="blockList">
+<h4>gpu</h4>
+<pre>@Min(value=1L,message="Must have at least one GPU") java.lang.Integer gpu</pre>
+</li>
+<li class="blockList">
+<h4>memoryMb</h4>
+<pre>@Min(value=1L,message="Must have at least 1 MB of memory") java.lang.Long memoryMb</pre>
+</li>
+<li class="blockListLast">
+<h4>networkMbps</h4>
+<pre>@Min(value=1L,message="Must have at least 1 Mbps of network bandwidth") java.lang.Long networkMbps</pre>
 </li>
 </ul>
 </li>
@@ -817,12 +946,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <section role="region">
-<h2 title="Package">Package&nbsp;com.netflix.genie.common.external.dtos.v4</h2>
+<h2 title="Package">Package&nbsp;com.netflix.genie.common.internal.dtos</h2>
 <ul class="blockList">
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.AgentClientMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.AgentClientMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.AgentClientMetadata</a> extends <a href="com/netflix/genie/common/external/dtos/v4/ClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ClientMetadata</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.AgentClientMetadata</a> extends <a href="com/netflix/genie/common/internal/dtos/ClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ClientMetadata</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
@@ -839,10 +968,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.AgentConfigRequest">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.AgentConfigRequest">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/AgentConfigRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.AgentConfigRequest</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/AgentConfigRequest.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.AgentConfigRequest</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>8222386837109375937L</dd>
@@ -875,10 +1004,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ApiClientMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ApiClientMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ApiClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ApiClientMetadata</a> extends <a href="com/netflix/genie/common/external/dtos/v4/ClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ClientMetadata</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ApiClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ApiClientMetadata</a> extends <a href="com/netflix/genie/common/internal/dtos/ClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ClientMetadata</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
@@ -891,33 +1020,33 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.Application">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.Application">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.Application</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.Application</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockListLast">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/ApplicationMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/ApplicationMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ApplicationMetadata</a> metadata</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ApplicationMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ApplicationMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ApplicationMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ApplicationMetadata</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonMetadata</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ApplicationMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ApplicationMetadata</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommonMetadata</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockList">
 <h4>status</h4>
-<pre>@NotNull(message="An application status is required") <a href="com/netflix/genie/common/external/dtos/v4/ApplicationStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ApplicationStatus</a> status</pre>
+<pre>@NotNull(message="An application status is required") <a href="com/netflix/genie/common/internal/dtos/ApplicationStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ApplicationStatus</a> status</pre>
 </li>
 <li class="blockListLast">
 <h4>type</h4>
@@ -927,26 +1056,26 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ApplicationRequest">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ApplicationRequest">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ApplicationRequest</a> extends com.netflix.genie.common.external.dtos.v4.CommonRequestImpl implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ApplicationRequest.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ApplicationRequest</a> extends com.netflix.genie.common.internal.dtos.CommonRequestImpl implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockListLast">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/ApplicationMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/ApplicationMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ApplicationMetadata</a> metadata</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ClientMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ClientMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ClientMetadata</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ClientMetadata</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>7973228050794689900L</dd>
@@ -963,138 +1092,138 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.Cluster">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.Cluster">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.Cluster</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.Cluster</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockListLast">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/ClusterMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/ClusterMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ClusterMetadata</a> metadata</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ClusterMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ClusterMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ClusterMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ClusterMetadata</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonMetadata</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ClusterMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ClusterMetadata</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommonMetadata</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockListLast">
 <h4>status</h4>
-<pre>@NotNull(message="A cluster status is required") <a href="com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a> status</pre>
+<pre>@NotNull(message="A cluster status is required") <a href="com/netflix/genie/common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a> status</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ClusterRequest">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ClusterRequest">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ClusterRequest</a> extends com.netflix.genie.common.external.dtos.v4.CommonRequestImpl implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ClusterRequest.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ClusterRequest</a> extends com.netflix.genie.common.internal.dtos.CommonRequestImpl implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockListLast">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/ClusterMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/ClusterMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ClusterMetadata</a> metadata</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.Command">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.Command">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.Command</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.Command</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockList">
-<h4>checkDelay</h4>
-<pre>@javax.validation.constraints.Min(value=1L, message="The delay between checks must be at least 1 millisecond. Probably should be much more than that") long checkDelay</pre>
+<h4>clusterCriteria</h4>
+<pre>java.util.List&lt;<a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt; clusterCriteria</pre>
 </li>
 <li class="blockList">
-<h4>clusterCriteria</h4>
-<pre>com.google.common.collect.ImmutableList&lt;<a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt; clusterCriteria</pre>
+<h4>computeResources</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/ComputeResources.html" title="class in com.netflix.genie.common.internal.dtos">ComputeResources</a> computeResources</pre>
 </li>
 <li class="blockList">
 <h4>executable</h4>
-<pre>@NotEmpty(message="At least one executable entry is required") com.google.common.collect.ImmutableList&lt;@NotEmpty(message="A default executable element shouldn\'t be an empty string") @Size(max=1024,message="Executable elements can only be 1024 characters") java.lang.String&gt; executable</pre>
+<pre>@NotEmpty(message="At least one executable entry is required") java.util.List&lt;@NotEmpty(message="A default executable element shouldn\'t be an empty string") @Size(max=1024,message="Executable elements can only be 1024 characters") java.lang.String&gt; executable</pre>
 </li>
 <li class="blockList">
-<h4>memory</h4>
-<pre>@Min(value=1L,message="The minimum amount of memory if desired is 1 MB. Probably should be much more than that") java.lang.Integer memory</pre>
+<h4>images</h4>
+<pre>java.util.Map&lt;java.lang.String,&#8203;<a href="com/netflix/genie/common/internal/dtos/Image.html" title="class in com.netflix.genie.common.internal.dtos">Image</a>&gt; images</pre>
 </li>
 <li class="blockListLast">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/CommandMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/CommandMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommandMetadata</a> metadata</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.CommandMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.CommandMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/CommandMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.CommandMetadata</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonMetadata</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/CommandMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.CommandMetadata</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommonMetadata</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockListLast">
 <h4>status</h4>
-<pre>@NotNull(message="A command status is required") <a href="com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a> status</pre>
+<pre>@NotNull(message="A command status is required") <a href="com/netflix/genie/common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a> status</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.CommandRequest">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.CommandRequest">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.CommandRequest</a> extends com.netflix.genie.common.external.dtos.v4.CommonRequestImpl implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.CommandRequest</a> extends com.netflix.genie.common.internal.dtos.CommonRequestImpl implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockList">
-<h4>checkDelay</h4>
-<pre>@Min(value=1L,message="The delay between checks must be at least 1 millisecond. Probably should be much more than that") java.lang.Long checkDelay</pre>
+<h4>clusterCriteria</h4>
+<pre>java.util.List&lt;<a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt; clusterCriteria</pre>
 </li>
 <li class="blockList">
-<h4>clusterCriteria</h4>
-<pre>com.google.common.collect.ImmutableList&lt;<a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt; clusterCriteria</pre>
+<h4>computeResources</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/ComputeResources.html" title="class in com.netflix.genie.common.internal.dtos">ComputeResources</a> computeResources</pre>
 </li>
 <li class="blockList">
 <h4>executable</h4>
-<pre>@NotEmpty(message="At least one executable entry is required") com.google.common.collect.ImmutableList&lt;@Size(max=255,message="Executable elements can only be 255 characters") java.lang.String&gt; executable</pre>
+<pre>@NotEmpty(message="At least one executable entry is required") java.util.List&lt;@Size(max=255,message="Executable elements can only be 255 characters") java.lang.String&gt; executable</pre>
 </li>
 <li class="blockList">
-<h4>memory</h4>
-<pre>@Min(value=1L,message="The minimum amount of memory if desired is 1 MB. Probably should be much more than that") java.lang.Integer memory</pre>
+<h4>images</h4>
+<pre>java.util.Map&lt;java.lang.String,&#8203;<a href="com/netflix/genie/common/internal/dtos/Image.html" title="class in com.netflix.genie.common.internal.dtos">Image</a>&gt; images</pre>
 </li>
 <li class="blockListLast">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/CommandMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/CommandMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommandMetadata</a> metadata</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.CommonMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.CommonMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.CommonMetadata</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/CommonMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.CommonMetadata</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>7789443514882247655L</dd>
@@ -1131,10 +1260,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.CommonResource">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.CommonResource">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.CommonResource</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.CommonResource</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>-2939351280830204953L</dd>
@@ -1153,7 +1282,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>resources</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/ExecutionEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4">ExecutionEnvironment</a> resources</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/ExecutionEnvironment.html" title="class in com.netflix.genie.common.internal.dtos">ExecutionEnvironment</a> resources</pre>
 </li>
 <li class="blockListLast">
 <h4>updated</h4>
@@ -1163,10 +1292,42 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.Criterion">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ComputeResources">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.Criterion</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ComputeResources.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ComputeResources</a> extends java.lang.Object implements Serializable</h3>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>cpu</h4>
+<pre>@Min(value=1L,message="Must have at least one CPU") java.lang.Integer cpu</pre>
+</li>
+<li class="blockList">
+<h4>diskMb</h4>
+<pre>@Min(value=1L,message="Must have at least 1 MB of disk space") java.lang.Long diskMb</pre>
+</li>
+<li class="blockList">
+<h4>gpu</h4>
+<pre>@Min(value=1L,message="Must have at least one GPU") java.lang.Integer gpu</pre>
+</li>
+<li class="blockList">
+<h4>memoryMb</h4>
+<pre>@Min(value=1L,message="Must have at least 1 MB of memory") java.lang.Long memoryMb</pre>
+</li>
+<li class="blockListLast">
+<h4>networkMbps</h4>
+<pre>@Min(value=1L,message="Must have at least 1 Mbps of network bandwidth") java.lang.Long networkMbps</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.Criterion">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.Criterion</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>-8382495858646428806L</dd>
@@ -1199,10 +1360,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ExecutionEnvironment">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ExecutionEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ExecutionEnvironment.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ExecutionEnvironment</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>4614789276383154791L</dd>
@@ -1227,10 +1388,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/ExecutionResourceCriteria.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/ExecutionResourceCriteria.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.ExecutionResourceCriteria</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>4888642026303173660L</dd>
@@ -1245,20 +1406,148 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>clusterCriteria</h4>
-<pre>@NotEmpty(message="At least one cluster criterion is required") com.google.common.collect.ImmutableList&lt;@Valid <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt; clusterCriteria</pre>
+<pre>@NotEmpty(message="At least one cluster criterion is required") com.google.common.collect.ImmutableList&lt;@Valid <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt; clusterCriteria</pre>
 </li>
 <li class="blockListLast">
 <h4>commandCriterion</h4>
-<pre>@NotNull(message="Command criterion is required") @Valid <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a> commandCriterion</pre>
+<pre>@NotNull(message="Command criterion is required") @Valid <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a> commandCriterion</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobEnvironment">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.FinishedJob">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobEnvironment</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.FinishedJob</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommonMetadata</a> implements Serializable</h3>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>applications</h4>
+<pre>java.util.List&lt;<a href="com/netflix/genie/common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt; applications</pre>
+</li>
+<li class="blockList">
+<h4>archiveLocation</h4>
+<pre>java.lang.String archiveLocation</pre>
+</li>
+<li class="blockList">
+<h4>cluster</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a> cluster</pre>
+</li>
+<li class="blockList">
+<h4>clusterCriteria</h4>
+<pre>java.util.List&lt;@Valid <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt; clusterCriteria</pre>
+</li>
+<li class="blockList">
+<h4>command</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a> command</pre>
+</li>
+<li class="blockList">
+<h4>commandArgs</h4>
+<pre>java.util.List&lt;java.lang.String&gt; commandArgs</pre>
+</li>
+<li class="blockList">
+<h4>commandCriterion</h4>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a> commandCriterion</pre>
+</li>
+<li class="blockList">
+<h4>created</h4>
+<pre>java.time.Instant created</pre>
+</li>
+<li class="blockList">
+<h4>exitCode</h4>
+<pre>java.lang.Integer exitCode</pre>
+</li>
+<li class="blockList">
+<h4>finished</h4>
+<pre>java.time.Instant finished</pre>
+</li>
+<li class="blockList">
+<h4>grouping</h4>
+<pre>java.lang.String grouping</pre>
+</li>
+<li class="blockList">
+<h4>groupingInstance</h4>
+<pre>java.lang.String groupingInstance</pre>
+</li>
+<li class="blockList">
+<h4>memoryUsed</h4>
+<pre>java.lang.Long memoryUsed</pre>
+</li>
+<li class="blockList">
+<h4>numAttachments</h4>
+<pre>java.lang.Integer numAttachments</pre>
+</li>
+<li class="blockList">
+<h4>requestAgentClientHostname</h4>
+<pre>java.lang.String requestAgentClientHostname</pre>
+</li>
+<li class="blockList">
+<h4>requestAgentClientVersion</h4>
+<pre>java.lang.String requestAgentClientVersion</pre>
+</li>
+<li class="blockList">
+<h4>requestApiClientHostname</h4>
+<pre>java.lang.String requestApiClientHostname</pre>
+</li>
+<li class="blockList">
+<h4>requestApiClientUserAgent</h4>
+<pre>java.lang.String requestApiClientUserAgent</pre>
+</li>
+<li class="blockList">
+<h4>requestedMemory</h4>
+<pre>java.lang.Long requestedMemory</pre>
+</li>
+<li class="blockList">
+<h4>started</h4>
+<pre>java.time.Instant started</pre>
+</li>
+<li class="blockList">
+<h4>status</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a> status</pre>
+</li>
+<li class="blockList">
+<h4>statusMessage</h4>
+<pre>java.lang.String statusMessage</pre>
+</li>
+<li class="blockListLast">
+<h4>uniqueId</h4>
+<pre>@Size(max=255,message="Max length for the ID is 255 characters") java.lang.String uniqueId</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.Image">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/Image.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.Image</a> extends java.lang.Object implements Serializable</h3>
+<ul class="blockList">
+<li class="blockList">
+<h3>Serialized Fields</h3>
+<ul class="blockList">
+<li class="blockList">
+<h4>arguments</h4>
+<pre>java.util.List&lt;java.lang.String&gt; arguments</pre>
+</li>
+<li class="blockList">
+<h4>name</h4>
+<pre>java.lang.String name</pre>
+</li>
+<li class="blockListLast">
+<h4>tag</h4>
+<pre>java.lang.String tag</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobEnvironment">
+<!--   -->
+</a>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobEnvironment.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobEnvironment</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>8478136461571895069L</dd>
@@ -1268,29 +1557,29 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <h3>Serialized Fields</h3>
 <ul class="blockList">
 <li class="blockList">
-<h4>cpu</h4>
-<pre>@javax.validation.constraints.Min(value=1L, message="Number of CPU\'s can\'t be less than 1") int cpu</pre>
+<h4>computeResources</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/ComputeResources.html" title="class in com.netflix.genie.common.internal.dtos">ComputeResources</a> computeResources</pre>
 </li>
 <li class="blockList">
 <h4>environmentVariables</h4>
-<pre>com.google.common.collect.ImmutableMap&lt;@NotBlank(message="Environment variable key can\'t be blank") @Size(max=255,message="Max environment variable name length is 255 characters") java.lang.String,&#8203;@NotNull(message="Environment variable value can\'t be null") @Size(max=1024,message="Max environment variable value length is 1024 characters") java.lang.String&gt; environmentVariables</pre>
+<pre>java.util.Map&lt;@NotBlank(message="Environment variable key can\'t be blank") @Size(max=255,message="Max environment variable name length is 255 characters") java.lang.String,&#8203;@NotNull(message="Environment variable value can\'t be null") @Size(max=1024,message="Max environment variable value length is 1024 characters") java.lang.String&gt; environmentVariables</pre>
 </li>
 <li class="blockList">
 <h4>ext</h4>
 <pre>com.fasterxml.jackson.databind.JsonNode ext</pre>
 </li>
 <li class="blockListLast">
-<h4>memory</h4>
-<pre>@javax.validation.constraints.Min(value=1L, message="Amount of memory has to be greater than 1 MB and preferably much more") int memory</pre>
+<h4>images</h4>
+<pre>java.util.Map&lt;java.lang.String,&#8203;<a href="com/netflix/genie/common/internal/dtos/Image.html" title="class in com.netflix.genie.common.internal.dtos">Image</a>&gt; images</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobEnvironmentRequest">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobEnvironmentRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobEnvironmentRequest.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobEnvironmentRequest</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>-1782447793634908168L</dd>
@@ -1304,25 +1593,25 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>com.fasterxml.jackson.databind.JsonNode ext</pre>
 </li>
 <li class="blockList">
-<h4>requestedEnvironmentVariables</h4>
-<pre>com.google.common.collect.ImmutableMap&lt;@NotBlank(message="Environment variable key can\'t be blank") @Size(max=255,message="Max environment variable name length is 255 characters") java.lang.String,&#8203;@NotNull(message="Environment variable value can\'t be null") @Size(max=1024,message="Max environment variable value length is 1024 characters") java.lang.String&gt; requestedEnvironmentVariables</pre>
+<h4>requestedComputeResources</h4>
+<pre><a href="com/netflix/genie/common/internal/dtos/ComputeResources.html" title="class in com.netflix.genie.common.internal.dtos">ComputeResources</a> requestedComputeResources</pre>
 </li>
 <li class="blockList">
-<h4>requestedJobCpu</h4>
-<pre>@Min(value=1L,message="Number of CPU\'s requested can\'t be less than 1") java.lang.Integer requestedJobCpu</pre>
+<h4>requestedEnvironmentVariables</h4>
+<pre>java.util.Map&lt;@NotBlank(message="Environment variable key can\'t be blank") @Size(max=255,message="Max environment variable name length is 255 characters") java.lang.String,&#8203;@NotNull(message="Environment variable value can\'t be null") @Size(max=1024,message="Max environment variable value length is 1024 characters") java.lang.String&gt; requestedEnvironmentVariables</pre>
 </li>
 <li class="blockListLast">
-<h4>requestedJobMemory</h4>
-<pre>@Min(value=1L,message="Amount of memory requested has to be greater than 1 MB and preferably much more") java.lang.Integer requestedJobMemory</pre>
+<h4>requestedImages</h4>
+<pre>java.util.Map&lt;java.lang.String,&#8203;<a href="com/netflix/genie/common/internal/dtos/Image.html" title="class in com.netflix.genie.common.internal.dtos">Image</a>&gt; requestedImages</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobMetadata</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonMetadata</a> implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobMetadata</a> extends <a href="com/netflix/genie/common/internal/dtos/CommonMetadata.html" title="class in com.netflix.genie.common.internal.dtos">CommonMetadata</a> implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
@@ -1347,10 +1636,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobRequest">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobRequest">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobRequest</a> extends com.netflix.genie.common.external.dtos.v4.CommonRequestImpl implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobRequest</a> extends com.netflix.genie.common.internal.dtos.CommonRequestImpl implements Serializable</h3>
 <ul class="blockList">
 <li class="blockList">
 <h3>Serialized Fields</h3>
@@ -1361,28 +1650,28 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>criteria</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/ExecutionResourceCriteria.html" title="class in com.netflix.genie.common.external.dtos.v4">ExecutionResourceCriteria</a> criteria</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/ExecutionResourceCriteria.html" title="class in com.netflix.genie.common.internal.dtos">ExecutionResourceCriteria</a> criteria</pre>
 </li>
 <li class="blockList">
 <h4>metadata</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/JobMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">JobMetadata</a> metadata</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/JobMetadata.html" title="class in com.netflix.genie.common.internal.dtos">JobMetadata</a> metadata</pre>
 </li>
 <li class="blockList">
 <h4>requestedAgentConfig</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/AgentConfigRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentConfigRequest</a> requestedAgentConfig</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/AgentConfigRequest.html" title="class in com.netflix.genie.common.internal.dtos">AgentConfigRequest</a> requestedAgentConfig</pre>
 </li>
 <li class="blockListLast">
 <h4>requestedJobEnvironment</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/JobEnvironmentRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobEnvironmentRequest</a> requestedJobEnvironment</pre>
+<pre>@Valid <a href="com/netflix/genie/common/internal/dtos/JobEnvironmentRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobEnvironmentRequest</a> requestedJobEnvironment</pre>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobRequestMetadata">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobRequestMetadata">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobRequestMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobRequestMetadata</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobRequestMetadata.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobRequestMetadata</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>-8265590545951599460L</dd>
@@ -1393,7 +1682,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>agentClientMetadata</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a> agentClientMetadata</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a> agentClientMetadata</pre>
 </li>
 <li class="blockList">
 <h4>api</h4>
@@ -1401,7 +1690,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>apiClientMetadata</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/ApiClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ApiClientMetadata</a> apiClientMetadata</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/ApiClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">ApiClientMetadata</a> apiClientMetadata</pre>
 </li>
 <li class="blockList">
 <h4>numAttachments</h4>
@@ -1419,10 +1708,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobSpecification">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobSpecification">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobSpecification</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobSpecification</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>4741981587685457902L</dd>
@@ -1433,7 +1722,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>applications</h4>
-<pre>com.google.common.collect.ImmutableList&lt;<a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification.ExecutionResource</a>&gt; applications</pre>
+<pre>com.google.common.collect.ImmutableList&lt;<a href="com/netflix/genie/common/internal/dtos/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification.ExecutionResource</a>&gt; applications</pre>
 </li>
 <li class="blockList">
 <h4>archiveLocation</h4>
@@ -1441,11 +1730,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>cluster</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification.ExecutionResource</a> cluster</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification.ExecutionResource</a> cluster</pre>
 </li>
 <li class="blockList">
 <h4>command</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification.ExecutionResource</a> command</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification.ExecutionResource</a> command</pre>
 </li>
 <li class="blockList">
 <h4>environmentVariables</h4>
@@ -1461,7 +1750,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>job</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification.ExecutionResource</a> job</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification.ExecutionResource</a> job</pre>
 </li>
 <li class="blockList">
 <h4>jobArgs</h4>
@@ -1479,10 +1768,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 </ul>
 </li>
-<li class="blockList"><a id="com.netflix.genie.common.external.dtos.v4.JobSpecification.ExecutionResource">
+<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.JobSpecification.ExecutionResource">
 <!--   -->
 </a>
-<h3>Class <a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.external.dtos.v4">com.netflix.genie.common.external.dtos.v4.JobSpecification.ExecutionResource</a> extends java.lang.Object implements Serializable</h3>
+<h3>Class <a href="com/netflix/genie/common/internal/dtos/JobSpecification.ExecutionResource.html" title="class in com.netflix.genie.common.internal.dtos">com.netflix.genie.common.internal.dtos.JobSpecification.ExecutionResource</a> extends java.lang.Object implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>-444882678226048086L</dd>
@@ -1493,122 +1782,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>executionEnvironment</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/ExecutionEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4">ExecutionEnvironment</a> executionEnvironment</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/ExecutionEnvironment.html" title="class in com.netflix.genie.common.internal.dtos">ExecutionEnvironment</a> executionEnvironment</pre>
 </li>
 <li class="blockListLast">
 <h4>id</h4>
 <pre>java.lang.String id</pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</section>
-</li>
-<li class="blockList">
-<section role="region">
-<h2 title="Package">Package&nbsp;com.netflix.genie.common.internal.dtos.v4</h2>
-<ul class="blockList">
-<li class="blockList"><a id="com.netflix.genie.common.internal.dtos.v4.FinishedJob">
-<!--   -->
-</a>
-<h3>Class <a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">com.netflix.genie.common.internal.dtos.v4.FinishedJob</a> extends <a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonMetadata</a> implements Serializable</h3>
-<ul class="blockList">
-<li class="blockList">
-<h3>Serialized Fields</h3>
-<ul class="blockList">
-<li class="blockList">
-<h4>applications</h4>
-<pre>java.util.List&lt;<a href="com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt; applications</pre>
-</li>
-<li class="blockList">
-<h4>archiveLocation</h4>
-<pre>java.lang.String archiveLocation</pre>
-</li>
-<li class="blockList">
-<h4>cluster</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a> cluster</pre>
-</li>
-<li class="blockList">
-<h4>clusterCriteria</h4>
-<pre>java.util.List&lt;@Valid <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt; clusterCriteria</pre>
-</li>
-<li class="blockList">
-<h4>command</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a> command</pre>
-</li>
-<li class="blockList">
-<h4>commandArgs</h4>
-<pre>java.util.List&lt;java.lang.String&gt; commandArgs</pre>
-</li>
-<li class="blockList">
-<h4>commandCriterion</h4>
-<pre>@Valid <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a> commandCriterion</pre>
-</li>
-<li class="blockList">
-<h4>created</h4>
-<pre>java.time.Instant created</pre>
-</li>
-<li class="blockList">
-<h4>exitCode</h4>
-<pre>java.lang.Integer exitCode</pre>
-</li>
-<li class="blockList">
-<h4>finished</h4>
-<pre>java.time.Instant finished</pre>
-</li>
-<li class="blockList">
-<h4>grouping</h4>
-<pre>java.lang.String grouping</pre>
-</li>
-<li class="blockList">
-<h4>groupingInstance</h4>
-<pre>java.lang.String groupingInstance</pre>
-</li>
-<li class="blockList">
-<h4>memoryUsed</h4>
-<pre>java.lang.Integer memoryUsed</pre>
-</li>
-<li class="blockList">
-<h4>numAttachments</h4>
-<pre>java.lang.Integer numAttachments</pre>
-</li>
-<li class="blockList">
-<h4>requestAgentClientHostname</h4>
-<pre>java.lang.String requestAgentClientHostname</pre>
-</li>
-<li class="blockList">
-<h4>requestAgentClientVersion</h4>
-<pre>java.lang.String requestAgentClientVersion</pre>
-</li>
-<li class="blockList">
-<h4>requestApiClientHostname</h4>
-<pre>java.lang.String requestApiClientHostname</pre>
-</li>
-<li class="blockList">
-<h4>requestApiClientUserAgent</h4>
-<pre>java.lang.String requestApiClientUserAgent</pre>
-</li>
-<li class="blockList">
-<h4>requestedMemory</h4>
-<pre>java.lang.Integer requestedMemory</pre>
-</li>
-<li class="blockList">
-<h4>started</h4>
-<pre>java.time.Instant started</pre>
-</li>
-<li class="blockList">
-<h4>status</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a> status</pre>
-</li>
-<li class="blockList">
-<h4>statusMessage</h4>
-<pre>java.lang.String statusMessage</pre>
-</li>
-<li class="blockListLast">
-<h4>uniqueId</h4>
-<pre>@Size(max=255,message="Max length for the ID is 255 characters") java.lang.String uniqueId</pre>
 </li>
 </ul>
 </li>
@@ -1875,10 +2053,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>java.util.List&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt; applications</pre>
 </li>
 <li class="blockList">
-<h4>checkDelay</h4>
-<pre>@javax.validation.constraints.Min(1L) long checkDelay</pre>
-</li>
-<li class="blockList">
 <h4>clusterCriteria</h4>
 <pre>java.util.List&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt; clusterCriteria</pre>
 </li>
@@ -1887,12 +2061,28 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>java.util.Set&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt; configs</pre>
 </li>
 <li class="blockList">
+<h4>cpu</h4>
+<pre>@Min(1L) java.lang.Integer cpu</pre>
+</li>
+<li class="blockList">
 <h4>dependencies</h4>
 <pre>java.util.Set&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt; dependencies</pre>
 </li>
 <li class="blockList">
+<h4>diskMb</h4>
+<pre>@Min(1L) java.lang.Long diskMb</pre>
+</li>
+<li class="blockList">
 <h4>executable</h4>
 <pre>@NotEmpty(message="No executable arguments entered. At least one is required.") java.util.List&lt;@NotBlank @Size(max=1024) java.lang.String&gt; executable</pre>
+</li>
+<li class="blockList">
+<h4>gpu</h4>
+<pre>@Min(1L) java.lang.Integer gpu</pre>
+</li>
+<li class="blockList">
+<h4>images</h4>
+<pre>com.fasterxml.jackson.databind.JsonNode images</pre>
 </li>
 <li class="blockList">
 <h4>launcherExt</h4>
@@ -1900,7 +2090,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>memory</h4>
-<pre>@Min(1L) java.lang.Integer memory</pre>
+<pre>@Min(1L) java.lang.Long memory</pre>
+</li>
+<li class="blockList">
+<h4>networkMbps</h4>
+<pre>@Min(1L) java.lang.Long networkMbps</pre>
 </li>
 <li class="blockListLast">
 <h4>tags</h4>
@@ -2023,10 +2217,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>boolean archivingDisabled</pre>
 </li>
 <li class="blockList">
-<h4>checkDelay</h4>
-<pre>@Min(1L) java.lang.Long checkDelay</pre>
-</li>
-<li class="blockList">
 <h4>claimed</h4>
 <pre>boolean claimed</pre>
 </li>
@@ -2063,8 +2253,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>java.util.Set&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt; configs</pre>
 </li>
 <li class="blockList">
+<h4>cpuUsed</h4>
+<pre>@Min(value=1L,message="Can\'t have less than 1 CPU") java.lang.Integer cpuUsed</pre>
+</li>
+<li class="blockList">
 <h4>dependencies</h4>
 <pre>java.util.Set&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt; dependencies</pre>
+</li>
+<li class="blockList">
+<h4>diskMbUsed</h4>
+<pre>@Min(value=1L,message="Can\'t have less than 1 MB of disk space") java.lang.Long diskMbUsed</pre>
 </li>
 <li class="blockList">
 <h4>email</h4>
@@ -2087,12 +2285,20 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>@Size(max=255,message="Max length in database is 255 characters") java.lang.String genieUserGroup</pre>
 </li>
 <li class="blockList">
+<h4>gpuUsed</h4>
+<pre>@Min(value=0L,message="Can\'t have less than 0 GPU") java.lang.Integer gpuUsed</pre>
+</li>
+<li class="blockList">
 <h4>grouping</h4>
 <pre>@Size(max=255,message="Max length in database is 255 characters") java.lang.String grouping</pre>
 </li>
 <li class="blockList">
 <h4>groupingInstance</h4>
 <pre>@Size(max=255,message="Max length in database is 255 characters") java.lang.String groupingInstance</pre>
+</li>
+<li class="blockList">
+<h4>imagesUsed</h4>
+<pre>com.fasterxml.jackson.databind.JsonNode imagesUsed</pre>
 </li>
 <li class="blockList">
 <h4>interactive</h4>
@@ -2108,7 +2314,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>memoryUsed</h4>
-<pre>java.lang.Integer memoryUsed</pre>
+<pre>@Min(value=1L,message="Can\'t have less than 1 MB of memory allocated") java.lang.Long memoryUsed</pre>
+</li>
+<li class="blockList">
+<h4>networkMbpsUsed</h4>
+<pre>@Min(value=1L,message="Can\'t have less than 1 MBPS of network") java.lang.Long networkMbpsUsed</pre>
 </li>
 <li class="blockList">
 <h4>notifiedJobStatus</h4>
@@ -2159,8 +2369,20 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>@Min(value=1L,message="Can\'t have less than 1 CPU") java.lang.Integer requestedCpu</pre>
 </li>
 <li class="blockList">
+<h4>requestedDiskMb</h4>
+<pre>@Min(value=1L,message="Can\'t have less than 1 MB of disk space") java.lang.Long requestedDiskMb</pre>
+</li>
+<li class="blockList">
 <h4>requestedEnvironmentVariables</h4>
 <pre>java.util.Map&lt;@NotBlank @Size(max=255) java.lang.String,&#8203;@NotNull @Size(max=1024) java.lang.String&gt; requestedEnvironmentVariables</pre>
+</li>
+<li class="blockList">
+<h4>requestedGpu</h4>
+<pre>@Min(value=0L,message="Can\'t have less than 0 GPU") java.lang.Integer requestedGpu</pre>
+</li>
+<li class="blockList">
+<h4>requestedImages</h4>
+<pre>com.fasterxml.jackson.databind.JsonNode requestedImages</pre>
 </li>
 <li class="blockList">
 <h4>requestedJobDirectoryLocation</h4>
@@ -2172,7 +2394,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>requestedMemory</h4>
-<pre>@Min(value=1L,message="Can\'t have less than 1 MB of memory allocated") java.lang.Integer requestedMemory</pre>
+<pre>@Min(value=1L,message="Can\'t have less than 1 MB of memory allocated") java.lang.Long requestedMemory</pre>
+</li>
+<li class="blockList">
+<h4>requestedNetworkMbps</h4>
+<pre>@Min(value=1L,message="Can\'t have less than 1 MBPS of network") java.lang.Long requestedNetworkMbps</pre>
 </li>
 <li class="blockList">
 <h4>requestedTimeout</h4>
@@ -2208,15 +2434,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>timeoutUsed</h4>
-<pre>java.lang.Integer timeoutUsed</pre>
-</li>
-<li class="blockList">
-<h4>totalSizeOfAttachments</h4>
-<pre>@Min(value=0L,message="Can\'t have less than zero bytes total attachment size") java.lang.Long totalSizeOfAttachments</pre>
+<pre>@Min(1L) java.lang.Integer timeoutUsed</pre>
 </li>
 <li class="blockListLast">
-<h4>v4</h4>
-<pre>boolean v4</pre>
+<h4>totalSizeOfAttachments</h4>
+<pre>@Min(value=0L,message="Can\'t have less than zero bytes total attachment size") java.lang.Long totalSizeOfAttachments</pre>
 </li>
 </ul>
 </li>
@@ -2279,11 +2501,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </li>
 <li class="blockList">
 <h4>newStatus</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a> newStatus</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a> newStatus</pre>
 </li>
 <li class="blockListLast">
 <h4>previousStatus</h4>
-<pre><a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a> previousStatus</pre>
+<pre><a href="com/netflix/genie/common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a> previousStatus</pre>
 </li>
 </ul>
 </li>

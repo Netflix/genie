@@ -194,35 +194,35 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#claimJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">claimJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-        @Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#claimJob(java.lang.String,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">claimJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+        @Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
 <td class="colLast">
 <div class="block">Set a job identified by <code>id</code> to be owned by the agent identified by <code>agentClientMetadata</code>.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#dryRunJobSpecificationResolution(com.netflix.genie.common.external.dtos.v4.JobRequest)">dryRunJobSpecificationResolution</a></span>&#8203;(@Valid <a href="../../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)</code></th>
+<td class="colFirst"><code><a href="../../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#dryRunJobSpecificationResolution(com.netflix.genie.common.internal.dtos.JobRequest)">dryRunJobSpecificationResolution</a></span>&#8203;(@Valid <a href="../../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest)</code></th>
 <td class="colLast">
 <div class="block">Run the job specification resolution algorithm on the given input but save nothing in the system.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAgentProperties(com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">getAgentProperties</a></span>&#8203;(@Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAgentProperties(com.netflix.genie.common.internal.dtos.AgentClientMetadata)">getAgentProperties</a></span>&#8203;(@Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
 <td class="colLast">
 <div class="block">Provide configuration properties for an agent that is beginning to execute a job.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
+<td class="colFirst"><code><a href="../../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobSpecification(java.lang.String)">getJobSpecification</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get a job specification if has been resolved.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
+<td class="colFirst"><code><a href="../../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobStatus(java.lang.String)">getJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Retrieve the status of the job identified with <code>id</code>.</div>
@@ -230,21 +230,21 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#handshake(com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">handshake</a></span>&#8203;(@Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#handshake(com.netflix.genie.common.internal.dtos.AgentClientMetadata)">handshake</a></span>&#8203;(@Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
 <td class="colLast">
-<div class="block">Shake hands and allow a client or reject it based on the supplied <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>AgentClientMetadata</code></a>.</div>
+<div class="block">Shake hands and allow a client or reject it based on the supplied <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos"><code>AgentClientMetadata</code></a>.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#reserveJobId(com.netflix.genie.common.external.dtos.v4.JobRequest,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">reserveJobId</a></span>&#8203;(@Valid <a href="../../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-            @Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#reserveJobId(com.netflix.genie.common.internal.dtos.JobRequest,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">reserveJobId</a></span>&#8203;(@Valid <a href="../../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
+            @Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
 <td class="colLast">
-<div class="block">Reserve a job id and persist job details in the database based on the supplied <a href="../../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
+<div class="block">Reserve a job id and persist job details in the database based on the supplied <a href="../../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobRequest</code></a>.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="../../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></code></td>
+<td class="colFirst"><code><a href="../../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveJobSpecification(java.lang.String)">resolveJobSpecification</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Resolve the job specification for job identified by the given id.</div>
@@ -252,17 +252,17 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">updateJobArchiveStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-                      <a href="../../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;newArchiveStatus)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.internal.dtos.ArchiveStatus)">updateJobArchiveStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+                      <a href="../../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&nbsp;newArchiveStatus)</code></th>
 <td class="colLast">
 <div class="block">Update the archive status status of the job identified with <code>id</code> to be <code>newStatus</code>.</div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">updateJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-               <a href="../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
-               <a href="../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobStatus(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus,java.lang.String)">updateJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+               <a href="../../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;currentStatus,
+               <a href="../../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;newStatus,
                java.lang.String&nbsp;newStatusMessage)</code></th>
 <td class="colLast">
 <div class="block">Update the status of the job identified with <code>id</code> to be <code>newStatus</code> provided that the current status
@@ -325,19 +325,19 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="handshake(com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">
+<a id="handshake(com.netflix.genie.common.internal.dtos.AgentClientMetadata)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>handshake</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;handshake&#8203;(@Valid
-                      @Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)
+                      @Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)
                throws <a href="../../../../common/internal/exceptions/unchecked/GenieAgentRejectedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieAgentRejectedException</a></pre>
-<div class="block">Shake hands and allow a client or reject it based on the supplied <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>AgentClientMetadata</code></a>.</div>
+<div class="block">Shake hands and allow a client or reject it based on the supplied <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos"><code>AgentClientMetadata</code></a>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#handshake(com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">handshake</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#handshake(com.netflix.genie.common.internal.dtos.AgentClientMetadata)">handshake</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentClientMetadata</code> - The metadata about the agent starting to run a given job</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -345,18 +345,18 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 </dl>
 </li>
 </ul>
-<a id="getAgentProperties(com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">
+<a id="getAgentProperties(com.netflix.genie.common.internal.dtos.AgentClientMetadata)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getAgentProperties</h4>
 <pre class="methodSignature">public&nbsp;java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;getAgentProperties&#8203;(@Valid
-                                                                                 @Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
+                                                                                 @Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
 <div class="block">Provide configuration properties for an agent that is beginning to execute a job.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#getAgentProperties(com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">getAgentProperties</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#getAgentProperties(com.netflix.genie.common.internal.dtos.AgentClientMetadata)">getAgentProperties</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentClientMetadata</code> - The metadata about the agent starting to run a given job</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -364,20 +364,20 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 </dl>
 </li>
 </ul>
-<a id="reserveJobId(com.netflix.genie.common.external.dtos.v4.JobRequest,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">
+<a id="reserveJobId(com.netflix.genie.common.internal.dtos.JobRequest,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>reserveJobId</h4>
 <pre class="methodSignature">public&nbsp;java.lang.String&nbsp;reserveJobId&#8203;(@Valid
-                                     @Valid <a href="../../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+                                     @Valid <a href="../../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
                                      @Valid
-                                     @Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
-<div class="block">Reserve a job id and persist job details in the database based on the supplied <a href="../../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
+                                     @Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
+<div class="block">Reserve a job id and persist job details in the database based on the supplied <a href="../../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobRequest</code></a>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#reserveJobId(com.netflix.genie.common.external.dtos.v4.JobRequest,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">reserveJobId</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#reserveJobId(com.netflix.genie.common.internal.dtos.JobRequest,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">reserveJobId</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobRequest</code> - The job request containing all the metadata needed to reserve a job id</dd>
 <dd><code>agentClientMetadata</code> - The metadata about the agent driving this job request</dd>
@@ -392,7 +392,7 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 <ul class="blockList">
 <li class="blockList">
 <h4>resolveJobSpecification</h4>
-<pre class="methodSignature">public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;resolveJobSpecification&#8203;(@NotBlank
+<pre class="methodSignature">public&nbsp;<a href="../../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a>&nbsp;resolveJobSpecification&#8203;(@NotBlank
                                                 @NotBlank java.lang.String&nbsp;id)
                                          throws <a href="../../../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a>,
                                                 <a href="../../../../common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></pre>
@@ -419,7 +419,7 @@ implements <a href="../AgentJobService.html" title="interface in com.netflix.gen
 <li class="blockList">
 <h4>getJobSpecification</h4>
 <pre class="methodSignature">@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;getJobSpecification&#8203;(@NotBlank
+public&nbsp;<a href="../../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a>&nbsp;getJobSpecification&#8203;(@NotBlank
                                             @NotBlank java.lang.String&nbsp;id)</pre>
 <div class="block">Get a job specification if has been resolved.</div>
 <dl>
@@ -432,20 +432,20 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 </dl>
 </li>
 </ul>
-<a id="dryRunJobSpecificationResolution(com.netflix.genie.common.external.dtos.v4.JobRequest)">
+<a id="dryRunJobSpecificationResolution(com.netflix.genie.common.internal.dtos.JobRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>dryRunJobSpecificationResolution</h4>
 <pre class="methodSignature">@Transactional(readOnly=true)
-public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;dryRunJobSpecificationResolution&#8203;(@Valid
-                                                         @Valid <a href="../../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)
+public&nbsp;<a href="../../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a>&nbsp;dryRunJobSpecificationResolution&#8203;(@Valid
+                                                         @Valid <a href="../../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest)
                                                   throws <a href="../../../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></pre>
 <div class="block">Run the job specification resolution algorithm on the given input but save nothing in the system.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#dryRunJobSpecificationResolution(com.netflix.genie.common.external.dtos.v4.JobRequest)">dryRunJobSpecificationResolution</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#dryRunJobSpecificationResolution(com.netflix.genie.common.internal.dtos.JobRequest)">dryRunJobSpecificationResolution</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobRequest</code> - The job request containing all the metadata needed to resolve a job specification</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -455,7 +455,7 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 </dl>
 </li>
 </ul>
-<a id="claimJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">
+<a id="claimJob(java.lang.String,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -464,19 +464,19 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 <pre class="methodSignature">public&nbsp;void&nbsp;claimJob&#8203;(@NotBlank
                      @NotBlank java.lang.String&nbsp;id,
                      @Valid
-                     @Valid <a href="../../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
+                     @Valid <a href="../../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</pre>
 <div class="block">Set a job identified by <code>id</code> to be owned by the agent identified by <code>agentClientMetadata</code>. The
  job status in the system will be set to <a href="../../../../common/dto/JobStatus.html#CLAIMED"><code>JobStatus.CLAIMED</code></a></div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#claimJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">claimJob</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#claimJob(java.lang.String,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">claimJob</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to claim. Must exist in the system.</dd>
 <dd><code>agentClientMetadata</code> - The metadata about the client claiming the job</dd>
 </dl>
 </li>
 </ul>
-<a id="updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">
+<a id="updateJobStatus(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -484,18 +484,18 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 <h4>updateJobStatus</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;updateJobStatus&#8203;(@NotBlank
                             @NotBlank java.lang.String&nbsp;id,
-                            <a href="../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
-                            <a href="../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
+                            <a href="../../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;currentStatus,
+                            <a href="../../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;newStatus,
                             @Nullable
                             java.lang.String&nbsp;newStatusMessage)</pre>
 <div class="block">Update the status of the job identified with <code>id</code> to be <code>newStatus</code> provided that the current status
  of the job matches <code>newStatus</code>. Optionally a status message can be provided to provide more details to
- users. If the <code>newStatus</code> is <a href="../../../../common/external/dtos/v4/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a> the start time will be set. If the <code>newStatus</code>
- is a member of <a href="../../../../common/external/dtos/v4/JobStatus.html#getFinishedStatuses()"><code>JobStatus.getFinishedStatuses()</code></a> and the job had a started time set the finished time of
+ users. If the <code>newStatus</code> is <a href="../../../../common/internal/dtos/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a> the start time will be set. If the <code>newStatus</code>
+ is a member of <a href="../../../../common/internal/dtos/JobStatus.html#getFinishedStatuses()"><code>JobStatus.getFinishedStatuses()</code></a> and the job had a started time set the finished time of
  the job will be set.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">updateJobStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#updateJobStatus(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus,java.lang.String)">updateJobStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to update status for. Must exist in the system.</dd>
 <dd><code>currentStatus</code> - The status the caller to this API thinks the job currently has</dd>
@@ -510,7 +510,7 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobStatus</h4>
-<pre class="methodSignature">public&nbsp;<a href="../../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus&#8203;(@NotBlank
+<pre class="methodSignature">public&nbsp;<a href="../../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;getJobStatus&#8203;(@NotBlank
                               @NotBlank java.lang.String&nbsp;id)</pre>
 <div class="block">Retrieve the status of the job identified with <code>id</code>.</div>
 <dl>
@@ -523,7 +523,7 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 </dl>
 </li>
 </ul>
-<a id="updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">
+<a id="updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.internal.dtos.ArchiveStatus)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -531,12 +531,12 @@ public&nbsp;<a href="../../../../common/external/dtos/v4/JobSpecification.html" 
 <h4>updateJobArchiveStatus</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;updateJobArchiveStatus&#8203;(@NotBlank
                                    @NotBlank java.lang.String&nbsp;id,
-                                   <a href="../../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;newArchiveStatus)</pre>
+                                   <a href="../../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&nbsp;newArchiveStatus)</pre>
 <div class="block">Update the archive status status of the job identified with <code>id</code> to be <code>newStatus</code>.
  Notice this is a 'blind write', the currently persisted value will always be overwritten.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../AgentJobService.html#updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">updateJobArchiveStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
+<dd><code><a href="../AgentJobService.html#updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.internal.dtos.ArchiveStatus)">updateJobArchiveStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to update status for. Must exist in the system.</dd>
 <dd><code>newArchiveStatus</code> - The new archive status the caller would like to update the status to</dd>

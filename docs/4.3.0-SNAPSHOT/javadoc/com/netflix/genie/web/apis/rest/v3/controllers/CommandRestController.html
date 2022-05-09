@@ -194,10 +194,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Criterion)">addClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
-                             @Valid <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion)">addClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
+                             @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)</code></th>
 <td class="colLast">
-<div class="block">Add a new <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> as the lowest priority criterion for the given command.</div>
+<div class="block">Add a new <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> as the lowest priority criterion for the given command.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -253,10 +253,10 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getClusterCriteriaForCommand(java.lang.String)">getClusterCriteriaForCommand</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Get all the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command in priority order.</div>
+<div class="block">Get all the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> currently associated with the command in priority order.</div>
 </td>
 </tr>
 <tr id="i10" class="altColor">
@@ -309,9 +309,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#insertClusterCriterionForCommand(java.lang.String,@javax.validation.constraints.Min(0L)int,com.netflix.genie.common.external.dtos.v4.Criterion)">insertClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#insertClusterCriterionForCommand(java.lang.String,@javax.validation.constraints.Min(0L)int,com.netflix.genie.common.internal.dtos.Criterion)">insertClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
                                 @javax.validation.constraints.Min(0L) int&nbsp;priority,
-                                @Valid <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion)</code></th>
+                                @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)</code></th>
 <td class="colLast">
 <div class="block">Insert a new cluster criterion for the given command at the supplied priority.</div>
 </td>
@@ -335,7 +335,7 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllClusterCriteriaFromCommand(java.lang.String)">removeAllClusterCriteriaFromCommand</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Remove all the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command.</div>
+<div class="block">Remove all the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> currently associated with the command.</div>
 </td>
 </tr>
 <tr id="i20" class="altColor">
@@ -384,11 +384,11 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i26" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a>&lt;<a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../common/dto/ResolvedResources.html" title="class in com.netflix.genie.common.dto">ResolvedResources</a>&lt;<a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveClustersForCommandClusterCriteria(java.lang.String,java.lang.Boolean)">resolveClustersForCommandClusterCriteria</a></span>&#8203;(java.lang.String&nbsp;id,
                                         java.lang.Boolean&nbsp;addDefaultStatus)</code></th>
 <td class="colLast">
-<div class="block">For a given <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> and attempt to resolve all the <a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
+<div class="block">For a given <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> and attempt to resolve all the <a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
  criteria would currently match within the database.</div>
 </td>
 </tr>
@@ -403,7 +403,7 @@ extends java.lang.Object</pre>
 <tr id="i28" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setClusterCriteriaForCommand(java.lang.String,java.util.List)">setClusterCriteriaForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
-                            @Valid java.util.List&lt;<a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code></th>
+                            @Valid java.util.List&lt;<a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;clusterCriteria)</code></th>
 <td class="colLast">
 <div class="block">Set all new cluster criteria for the given command.</div>
 </td>
@@ -1117,10 +1117,10 @@ public&nbsp;java.util.Set&lt;org.springframework.hateoas.EntityModel&lt;<a href=
 <pre class="methodSignature">@GetMapping(value="/{id}/clusterCriteria",
             produces="application/json")
 @ResponseStatus(OK)
-public&nbsp;java.util.List&lt;<a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;getClusterCriteriaForCommand&#8203;(@PathVariable("id")
+public&nbsp;java.util.List&lt;<a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;getClusterCriteriaForCommand&#8203;(@PathVariable("id")
                                                               java.lang.String&nbsp;id)
                                                        throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Get all the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command in priority order.</div>
+<div class="block">Get all the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> currently associated with the command in priority order.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to get the criteria for</dd>
@@ -1142,7 +1142,7 @@ public&nbsp;java.util.List&lt;<a href="../../../../../common/external/dtos/v4/Cr
 public&nbsp;void&nbsp;removeAllClusterCriteriaFromCommand&#8203;(@PathVariable("id")
                                                 java.lang.String&nbsp;id)
                                          throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Remove all the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command.</div>
+<div class="block">Remove all the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> currently associated with the command.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to remove the criteria for</dd>
@@ -1151,7 +1151,7 @@ public&nbsp;void&nbsp;removeAllClusterCriteriaFromCommand&#8203;(@PathVariable("
 </dl>
 </li>
 </ul>
-<a id="addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Criterion)">
+<a id="addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1163,13 +1163,13 @@ public&nbsp;void&nbsp;removeAllClusterCriteriaFromCommand&#8203;(@PathVariable("
 public&nbsp;void&nbsp;addClusterCriterionForCommand&#8203;(@PathVariable("id")
                                           java.lang.String&nbsp;id,
                                           @RequestBody @Valid
-                                          @Valid <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion)
+                                          @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)
                                    throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Add a new <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> as the lowest priority criterion for the given command.</div>
+<div class="block">Add a new <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> as the lowest priority criterion for the given command.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to add the new criterion to</dd>
-<dd><code>criterion</code> - The <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to add</dd>
+<dd><code>criterion</code> - The <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to add</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When no <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> with the given id exists</dd>
 </dl>
@@ -1187,19 +1187,19 @@ public&nbsp;void&nbsp;addClusterCriterionForCommand&#8203;(@PathVariable("id")
 public&nbsp;void&nbsp;setClusterCriteriaForCommand&#8203;(@PathVariable("id")
                                          java.lang.String&nbsp;id,
                                          @RequestBody @Valid
-                                         @Valid java.util.List&lt;<a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)
+                                         @Valid java.util.List&lt;<a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;clusterCriteria)
                                   throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Set all new cluster criteria for the given command.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to add the new criteria to</dd>
-<dd><code>clusterCriteria</code> - The list of <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order to set for the given command</dd>
+<dd><code>clusterCriteria</code> - The list of <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> in priority order to set for the given command</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When no <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> with the given id exists</dd>
 </dl>
 </li>
 </ul>
-<a id="insertClusterCriterionForCommand(java.lang.String,@javax.validation.constraints.Min(0L)int,com.netflix.genie.common.external.dtos.v4.Criterion)">
+<a id="insertClusterCriterionForCommand(java.lang.String,@javax.validation.constraints.Min(0L)int,com.netflix.genie.common.internal.dtos.Criterion)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1213,14 +1213,14 @@ public&nbsp;void&nbsp;insertClusterCriterionForCommand&#8203;(@PathVariable("id"
                                              @PathVariable("priority") @Min(0L)
                                              @javax.validation.constraints.Min(0L) int&nbsp;priority,
                                              @RequestBody @Valid
-                                             @Valid <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion)
+                                             @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)
                                       throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Insert a new cluster criterion for the given command at the supplied priority.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to add the new criterion for</dd>
 <dd><code>priority</code> - The priority (min 0) to insert the criterion at in the list</dd>
-<dd><code>criterion</code> - The <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to add</dd>
+<dd><code>criterion</code> - The <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to add</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When no <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> with the given id exists</dd>
 </dl>
@@ -1258,21 +1258,21 @@ public&nbsp;void&nbsp;removeClusterCriterionFromCommand&#8203;(@PathVariable("id
 <pre class="methodSignature">@GetMapping(value="/{id}/resolvedClusters",
             produces="application/json")
 @ResponseStatus(OK)
-public&nbsp;java.util.List&lt;<a href="../../../../../common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a>&lt;<a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;&nbsp;resolveClustersForCommandClusterCriteria&#8203;(@PathVariable("id")
+public&nbsp;java.util.List&lt;<a href="../../../../../common/dto/ResolvedResources.html" title="class in com.netflix.genie.common.dto">ResolvedResources</a>&lt;<a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;&nbsp;resolveClustersForCommandClusterCriteria&#8203;(@PathVariable("id")
                                                                                            java.lang.String&nbsp;id,
                                                                                            @RequestParam(value="addDefaultStatus",defaultValue="true")
                                                                                            java.lang.Boolean&nbsp;addDefaultStatus)
                                                                                     throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">For a given <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> and attempt to resolve all the <a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
+<div class="block">For a given <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> and attempt to resolve all the <a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
  criteria would currently match within the database.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to get the criterion from</dd>
-<dd><code>addDefaultStatus</code> - Whether the system should add the default <a href="../../../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>ClusterStatus</code></a> to the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>
-                         if no status currently is within the <a href="../../../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>. The default value is
-                         true which will currently add the status <a href="../../../../../common/external/dtos/v4/ClusterStatus.html#UP"><code>ClusterStatus.UP</code></a></dd>
+<dd><code>addDefaultStatus</code> - Whether the system should add the default <a href="../../../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos"><code>ClusterStatus</code></a> to the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>
+                         if no status currently is within the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>. The default value is
+                         true which will currently add the status <a href="../../../../../common/internal/dtos/ClusterStatus.html#UP"><code>ClusterStatus.UP</code></a></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>A list <a href="../../../../../common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>ResolvedResources</code></a> of each criterion to the <a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s it resolved to</dd>
+<dd>A list <a href="../../../../../common/dto/ResolvedResources.html" title="class in com.netflix.genie.common.dto"><code>ResolvedResources</code></a> of each criterion to the <a href="../../../../../common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s it resolved to</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When no <a href="../../../../../common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> with the given id exists</dd>
 </dl>

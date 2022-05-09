@@ -585,7 +585,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <table class="constantsSummary">
-<caption><span>com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">DtoConverters</a></span><span class="tabEnd">&nbsp;</span></caption>
+<caption><span>com.netflix.genie.common.internal.dtos.converters.<a href="com/netflix/genie/common/internal/dtos/converters/DtoConverters.html" title="class in com.netflix.genie.common.internal.dtos.converters">DtoConverters</a></span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Constant Field</th>
@@ -593,17 +593,17 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a id="com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters.GENIE_ID_PREFIX">
+<td class="colFirst"><a id="com.netflix.genie.common.internal.dtos.converters.DtoConverters.GENIE_ID_PREFIX">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#GENIE_ID_PREFIX">GENIE_ID_PREFIX</a></code></th>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/common/internal/dtos/converters/DtoConverters.html#GENIE_ID_PREFIX">GENIE_ID_PREFIX</a></code></th>
 <td class="colLast"><code>"genie.id:"</code></td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><a id="com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters.GENIE_NAME_PREFIX">
+<td class="colFirst"><a id="com.netflix.genie.common.internal.dtos.converters.DtoConverters.GENIE_NAME_PREFIX">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#GENIE_NAME_PREFIX">GENIE_NAME_PREFIX</a></code></th>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/common/internal/dtos/converters/DtoConverters.html#GENIE_NAME_PREFIX">GENIE_NAME_PREFIX</a></code></th>
 <td class="colLast"><code>"genie.name:"</code></td>
 </tr>
 </tbody>
@@ -1391,25 +1391,25 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"applications"</code></td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CHECK_DELAY">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#CHECK_DELAY">CHECK_DELAY</a></code></th>
-<td class="colLast"><code>"checkDelay"</code></td>
-</tr>
-<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CLUSTER_CRITERIA">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#CLUSTER_CRITERIA">CLUSTER_CRITERIA</a></code></th>
 <td class="colLast"><code>"clusterCriteria"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CONFIGS">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#CONFIGS">CONFIGS</a></code></th>
 <td class="colLast"><code>"configs"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CPU">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#CPU">CPU</a></code></th>
+<td class="colLast"><code>"cpu"</code></td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.DEPENDENCIES">
@@ -1419,25 +1419,53 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"dependencies"</code></td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.DISK_MB">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#DISK_MB">DISK_MB</a></code></th>
+<td class="colLast"><code>"diskMb"</code></td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.EXECUTABLE">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#EXECUTABLE">EXECUTABLE</a></code></th>
 <td class="colLast"><code>"executable"</code></td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.GPU">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#GPU">GPU</a></code></th>
+<td class="colLast"><code>"gpu"</code></td>
+</tr>
 <tr class="altColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.IMAGES">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#IMAGES">IMAGES</a></code></th>
+<td class="colLast"><code>"images"</code></td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.LAUNCHER_EXT">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#LAUNCHER_EXT">LAUNCHER_EXT</a></code></th>
 <td class="colLast"><code>"launcherExt"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.MEMORY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#MEMORY">MEMORY</a></code></th>
 <td class="colLast"><code>"memory"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.NETWORK_MBPS">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#NETWORK_MBPS">NETWORK_MBPS</a></code></th>
+<td class="colLast"><code>"networkMbps"</code></td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.TAGS">
@@ -1572,20 +1600,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"Job.v3.dto.job"</code></td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity.V3_JOB_REQUEST_DTO_ENTITY_GRAPH">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#V3_JOB_REQUEST_DTO_ENTITY_GRAPH">V3_JOB_REQUEST_DTO_ENTITY_GRAPH</a></code></th>
-<td class="colLast"><code>"Job.v3.dto.request"</code></td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#V4_JOB_REQUEST_DTO_ENTITY_GRAPH">V4_JOB_REQUEST_DTO_ENTITY_GRAPH</a></code></th>
 <td class="colLast"><code>"Job.v4.dto.request"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity.V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
@@ -1661,74 +1682,74 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"archivingDisabled"</code></td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CHECK_DELAY">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CHECK_DELAY">CHECK_DELAY</a></code></th>
-<td class="colLast"><code>"checkDelay"</code></td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CLAIMED">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CLAIMED">CLAIMED</a></code></th>
 <td class="colLast"><code>"claimed"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CLUSTER">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CLUSTER">CLUSTER</a></code></th>
 <td class="colLast"><code>"cluster"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CLUSTER_CRITERIA">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CLUSTER_CRITERIA">CLUSTER_CRITERIA</a></code></th>
 <td class="colLast"><code>"clusterCriteria"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CLUSTER_NAME">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CLUSTER_NAME">CLUSTER_NAME</a></code></th>
 <td class="colLast"><code>"clusterName"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.COMMAND">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#COMMAND">COMMAND</a></code></th>
 <td class="colLast"><code>"command"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.COMMAND_ARGS">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#COMMAND_ARGS">COMMAND_ARGS</a></code></th>
 <td class="colLast"><code>"commandArgs"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.COMMAND_CRITERION">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#COMMAND_CRITERION">COMMAND_CRITERION</a></code></th>
 <td class="colLast"><code>"commandCriterion"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.COMMAND_NAME">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#COMMAND_NAME">COMMAND_NAME</a></code></th>
 <td class="colLast"><code>"commandName"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CONFIGS">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CONFIGS">CONFIGS</a></code></th>
 <td class="colLast"><code>"configs"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.CPU_USED">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CPU_USED">CPU_USED</a></code></th>
+<td class="colLast"><code>"cpuUsed"</code></td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.DEPENDENCIES">
@@ -1738,39 +1759,53 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"dependencies"</code></td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.DISK_MB_USED">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#DISK_MB_USED">DISK_MB_USED</a></code></th>
+<td class="colLast"><code>"diskMbUsed"</code></td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.EMAIL">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#EMAIL">EMAIL</a></code></th>
 <td class="colLast"><code>"email"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.ENVIRONMENT_VARIABLES">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#ENVIRONMENT_VARIABLES">ENVIRONMENT_VARIABLES</a></code></th>
 <td class="colLast"><code>"environmentVariables"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.EXIT_CODE">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#EXIT_CODE">EXIT_CODE</a></code></th>
 <td class="colLast"><code>"exitCode"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.FINISHED">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#FINISHED">FINISHED</a></code></th>
 <td class="colLast"><code>"finished"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.GENIE_USER_GROUP">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GENIE_USER_GROUP">GENIE_USER_GROUP</a></code></th>
 <td class="colLast"><code>"genieUserGroup"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.GPU_USED">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GPU_USED">GPU_USED</a></code></th>
+<td class="colLast"><code>"gpuUsed"</code></td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.GROUPING">
@@ -1787,32 +1822,46 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"groupingInstance"</code></td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.IMAGES_USED">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#IMAGES_USED">IMAGES_USED</a></code></th>
+<td class="colLast"><code>"imagesUsed"</code></td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.INTERACTIVE">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#INTERACTIVE">INTERACTIVE</a></code></th>
 <td class="colLast"><code>"interactive"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.JOB_DIRECTORY_LOCATION">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#JOB_DIRECTORY_LOCATION">JOB_DIRECTORY_LOCATION</a></code></th>
 <td class="colLast"><code>"jobDirectoryLocation"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.LAUNCHER_EXT">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#LAUNCHER_EXT">LAUNCHER_EXT</a></code></th>
 <td class="colLast"><code>"launcherExt"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.MEMORY_USED">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#MEMORY_USED">MEMORY_USED</a></code></th>
 <td class="colLast"><code>"memoryUsed"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.NETWORK_MBPS_USED">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#NETWORK_MBPS_USED">NETWORK_MBPS_USED</a></code></th>
+<td class="colLast"><code>"networkMbpsUsed"</code></td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.NUM_ATTACHMENTS">
@@ -1892,32 +1941,60 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"requestedCpu"</code></td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_DISK_MB">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_DISK_MB">REQUESTED_DISK_MB</a></code></th>
+<td class="colLast"><code>"requestedDiskMb"</code></td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_ENVIRONMENT_VARIABLES">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_ENVIRONMENT_VARIABLES">REQUESTED_ENVIRONMENT_VARIABLES</a></code></th>
 <td class="colLast"><code>"requestedEnvironmentVariables"</code></td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_GPU">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_GPU">REQUESTED_GPU</a></code></th>
+<td class="colLast"><code>"requestedGpu"</code></td>
+</tr>
 <tr class="altColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_IMAGES">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_IMAGES">REQUESTED_IMAGES</a></code></th>
+<td class="colLast"><code>"requestedImages"</code></td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_JOB_DIRECTORY_LOCATION">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_JOB_DIRECTORY_LOCATION">REQUESTED_JOB_DIRECTORY_LOCATION</a></code></th>
 <td class="colLast"><code>"requestedJobDirectoryLocation"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_LAUNCHER_EXT">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_LAUNCHER_EXT">REQUESTED_LAUNCHER_EXT</a></code></th>
 <td class="colLast"><code>"requestedLauncherExt"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_MEMORY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_MEMORY">REQUESTED_MEMORY</a></code></th>
 <td class="colLast"><code>"requestedMemory"</code></td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_NETWORK_MBPS">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#REQUESTED_NETWORK_MBPS">REQUESTED_NETWORK_MBPS</a></code></th>
+<td class="colLast"><code>"requestedNetworkMbps"</code></td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.REQUESTED_TIMEOUT">
@@ -1988,13 +2065,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#TOTAL_SIZE_OF_ATTACHMENTS">TOTAL_SIZE_OF_ATTACHMENTS</a></code></th>
 <td class="colLast"><code>"totalSizeOfAttachments"</code></td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><a id="com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_.V4">
-<!--   -->
-</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#V4">V4</a></code></th>
-<td class="colLast"><code>"v4"</code></td>
 </tr>
 </tbody>
 </table>
@@ -3157,111 +3227,118 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"><code>"genie.agent.launcher.titus.additionalMemory"</code></td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.AGENT_IMAGE_KEY_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#AGENT_IMAGE_KEY_PROPERTY">AGENT_IMAGE_KEY_PROPERTY</a></code></th>
+<td class="colLast"><code>"genie.agent.launcher.titus.agentImageKey"</code></td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.CAPACITY_GROUP_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#CAPACITY_GROUP_PROPERTY">CAPACITY_GROUP_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.capacityGroup"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.CONTAINER_ATTRIBUTES_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#CONTAINER_ATTRIBUTES_PROPERTY">CONTAINER_ATTRIBUTES_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.container-attributes"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.ENABLE_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#ENABLE_PROPERTY">ENABLE_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.enabled"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.IMAGE_NAME_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#IMAGE_NAME_PROPERTY">IMAGE_NAME_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.imageName"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.IMAGE_TAG_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#IMAGE_TAG_PROPERTY">IMAGE_TAG_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.imageTag"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#JOB_ID_PLACEHOLDER">JOB_ID_PLACEHOLDER</a></code></th>
 <td class="colLast"><code>"&lt;JOB_ID&gt;"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.MINIMUM_BANDWIDTH_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_BANDWIDTH_PROPERTY">MINIMUM_BANDWIDTH_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.minimumBandwidth"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.MINIMUM_CPU_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_CPU_PROPERTY">MINIMUM_CPU_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.minimumCPU"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.MINIMUM_DISK_SIZE_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_DISK_SIZE_PROPERTY">MINIMUM_DISK_SIZE_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.minimumDiskSize"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.MINIMUM_GPU_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_GPU_PROPERTY">MINIMUM_GPU_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.minimumGPU"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.MINIMUM_MEMORY_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#MINIMUM_MEMORY_PROPERTY">MINIMUM_MEMORY_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.minimumMemory"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.PREFIX">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#PREFIX">PREFIX</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.RETRIES_PROPERTY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#RETRIES_PROPERTY">RETRIES_PROPERTY</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.retries"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.RUNTIME_LIMIT">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#RUNTIME_LIMIT">RUNTIME_LIMIT</a></code></th>
 <td class="colLast"><code>"genie.agent.launcher.titus.runtimeLimit"</code></td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.SERVER_HOST_PLACEHOLDER">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/TitusAgentLauncherProperties.html#SERVER_HOST_PLACEHOLDER">SERVER_HOST_PLACEHOLDER</a></code></th>
 <td class="colLast"><code>"&lt;SERVER_HOST&gt;"</code></td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.TitusAgentLauncherProperties.SERVER_PORT_PLACEHOLDER">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>

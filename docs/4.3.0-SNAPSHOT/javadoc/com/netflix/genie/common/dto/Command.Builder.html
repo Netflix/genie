@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":42,"i3":42,"i4":10};
+var data = {"i0":10,"i1":42,"i2":10,"i3":42,"i4":42,"i5":42,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -182,22 +182,34 @@ extends <a href="ExecutionEnvironmentDTO.Builder.html" title="class in com.netfl
        java.lang.String&nbsp;version,
        <a href="CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
        java.lang.String&nbsp;executable,
-       long&nbsp;checkDelay)</code></th>
+       long&nbsp;ignoredCheckDelay)</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="deprecationComment">Use <a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)"><code>Builder(String, String, String, CommandStatus, List, long)</code></a></div>
+<div class="deprecationComment">Use <a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)"><code>Builder(String, String, String, CommandStatus, List)</code></a></div>
 </div>
 </td>
 </tr>
 <tr class="rowColor">
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)">Builder</a></span>&#8203;(java.lang.String&nbsp;name,
+       java.lang.String&nbsp;user,
+       java.lang.String&nbsp;version,
+       <a href="CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
+       java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments)</code></th>
+<td class="colLast">
+<div class="block">Constructor with required fields.</div>
+</td>
+</tr>
+<tr class="altColor">
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)">Builder</a></span>&#8203;(java.lang.String&nbsp;name,
        java.lang.String&nbsp;user,
        java.lang.String&nbsp;version,
        <a href="CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
        java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments,
-       long&nbsp;checkDelay)</code></th>
+       long&nbsp;ignoredCheckDelay)</code></th>
 <td class="colLast">
-<div class="block">Constructor with required fields.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)"><code>Builder(String, String, String, CommandStatus, List)</code></a></div>
+</div>
 </td>
 </tr>
 </table>
@@ -227,13 +239,20 @@ extends <a href="ExecutionEnvironmentDTO.Builder.html" title="class in com.netfl
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withClusterCriteria(java.util.List)">withClusterCriteria</a></span>&#8203;(java.util.List&lt;<a href="../external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withCheckDelay(java.lang.Long)">withCheckDelay</a></span>&#8203;(java.lang.Long&nbsp;ignoredCheckDelay)</code></th>
 <td class="colLast">
-<div class="block">Set the ordered list of <a href="../external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which clusters this command
- can run on at any given time.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withClusterCriteria(java.util.List)">withClusterCriteria</a></span>&#8203;(java.util.List&lt;<a href="Criterion.html" title="class in com.netflix.genie.common.dto">Criterion</a>&gt;&nbsp;clusterCriteria)</code></th>
+<td class="colLast">
+<div class="block">Set the ordered list of <a href="Criterion.html" title="class in com.netflix.genie.common.dto"><code>Criterion</code></a> that should be used to resolve which clusters this command
+ can run on at any given time.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withExecutable(java.lang.String)">withExecutable</a></span>&#8203;(java.lang.String&nbsp;executable)</code></th>
 <td class="colLast">
@@ -243,7 +262,7 @@ extends <a href="ExecutionEnvironmentDTO.Builder.html" title="class in com.netfl
 </div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withExecutableAndArguments(java.util.List)">withExecutableAndArguments</a></span>&#8203;(java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments)</code></th>
 <td class="colLast">
@@ -253,11 +272,20 @@ extends <a href="ExecutionEnvironmentDTO.Builder.html" title="class in com.netfl
 </div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withMemory(java.lang.Integer)">withMemory</a></span>&#8203;(java.lang.Integer&nbsp;memory)</code></th>
 <td class="colLast">
-<div class="block">Set the amount of memory (in MB) to default jobs run with this command to use.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code><a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withRuntime(com.netflix.genie.common.dto.Runtime)">withRuntime</a></span>&#8203;(<a href="Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a>&nbsp;runtime)</code></th>
+<td class="colLast">
+<div class="block">Set the runtime for any jobs that use this command.</div>
 </td>
 </tr>
 </table>
@@ -317,9 +345,9 @@ public&nbsp;Builder&#8203;(java.lang.String&nbsp;name,
                java.lang.String&nbsp;version,
                <a href="CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
                java.lang.String&nbsp;executable,
-               long&nbsp;checkDelay)</pre>
+               long&nbsp;ignoredCheckDelay)</pre>
 <div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
-<div class="deprecationComment">Use <a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)"><code>Builder(String, String, String, CommandStatus, List, long)</code></a></div>
+<div class="deprecationComment">Use <a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)"><code>Builder(String, String, String, CommandStatus, List)</code></a></div>
 </div>
 <div class="block">Constructor which has required fields.</div>
 <dl>
@@ -329,12 +357,39 @@ public&nbsp;Builder&#8203;(java.lang.String&nbsp;name,
 <dd><code>version</code> - The version to use for the Command</dd>
 <dd><code>status</code> - The status of the Command</dd>
 <dd><code>executable</code> - The executable for the command</dd>
-<dd><code>checkDelay</code> - How long the system should go between checking the status of jobs run with this command.
-                   In milliseconds.</dd>
+<dd><code>ignoredCheckDelay</code> - Ignored. Here for backwards compatibility.</dd>
 </dl>
 </li>
 </ul>
 <a id="&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>Builder</h4>
+<pre>@Deprecated
+public&nbsp;Builder&#8203;(java.lang.String&nbsp;name,
+               java.lang.String&nbsp;user,
+               java.lang.String&nbsp;version,
+               <a href="CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
+               java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments,
+               long&nbsp;ignoredCheckDelay)</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)"><code>Builder(String, String, String, CommandStatus, List)</code></a></div>
+</div>
+<div class="block">Constructor with required fields.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - The name to use for the Command</dd>
+<dd><code>user</code> - The user to use for the Command</dd>
+<dd><code>version</code> - The version to use for the Command</dd>
+<dd><code>status</code> - The status of the Command</dd>
+<dd><code>executableAndArguments</code> - The executable for the command and its fixed arguments</dd>
+<dd><code>ignoredCheckDelay</code> - Ignored. Here for backwards compatibility.</dd>
+</dl>
+</li>
+</ul>
+<a id="&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -344,8 +399,7 @@ public&nbsp;Builder&#8203;(java.lang.String&nbsp;name,
                java.lang.String&nbsp;user,
                java.lang.String&nbsp;version,
                <a href="CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a>&nbsp;status,
-               java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments,
-               long&nbsp;checkDelay)</pre>
+               java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments)</pre>
 <div class="block">Constructor with required fields.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -354,8 +408,6 @@ public&nbsp;Builder&#8203;(java.lang.String&nbsp;name,
 <dd><code>version</code> - The version to use for the Command</dd>
 <dd><code>status</code> - The status of the Command</dd>
 <dd><code>executableAndArguments</code> - The executable for the command and its fixed arguments</dd>
-<dd><code>checkDelay</code> - How long the system should go between checking the status of jobs run with this
-                               command. In milliseconds.</dd>
 </dl>
 </li>
 </ul>
@@ -375,8 +427,12 @@ public&nbsp;Builder&#8203;(java.lang.String&nbsp;name,
 <ul class="blockList">
 <li class="blockList">
 <h4>withMemory</h4>
-<pre class="methodSignature">public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withMemory&#8203;(@Nullable
+<pre class="methodSignature">@Deprecated
+public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withMemory&#8203;(@Nullable
                                   java.lang.Integer&nbsp;memory)</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
 <div class="block">Set the amount of memory (in MB) to default jobs run with this command to use.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -434,6 +490,26 @@ public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.com
 </dl>
 </li>
 </ul>
+<a id="withCheckDelay(java.lang.Long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withCheckDelay</h4>
+<pre class="methodSignature">@Deprecated
+public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withCheckDelay&#8203;(@Nullable
+                                      java.lang.Long&nbsp;ignoredCheckDelay)</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
+<div class="block">The check delay for pre-4.x.x Genie backends. This no longer has any impact on the system and is here
+ to maintain backwards compatibility. Will always be set to -1.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>ignoredCheckDelay</code> - The check delay but this value is ignored</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The current <a href="Command.Builder.html" title="class in com.netflix.genie.common.dto"><code>Command.Builder</code></a> instance</dd>
+</dl>
+</li>
+</ul>
 <a id="withClusterCriteria(java.util.List)">
 <!--   -->
 </a>
@@ -441,14 +517,31 @@ public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.com
 <li class="blockList">
 <h4>withClusterCriteria</h4>
 <pre class="methodSignature">public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withClusterCriteria&#8203;(@Nullable
-                                           java.util.List&lt;<a href="../external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</pre>
-<div class="block">Set the ordered list of <a href="../external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which clusters this command
+                                           java.util.List&lt;<a href="Criterion.html" title="class in com.netflix.genie.common.dto">Criterion</a>&gt;&nbsp;clusterCriteria)</pre>
+<div class="block">Set the ordered list of <a href="Criterion.html" title="class in com.netflix.genie.common.dto"><code>Criterion</code></a> that should be used to resolve which clusters this command
  can run on at any given time.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>clusterCriteria</code> - The <a href="../external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order</dd>
+<dd><code>clusterCriteria</code> - The <a href="Criterion.html" title="class in com.netflix.genie.common.dto"><code>Criterion</code></a> in priority order</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The builder</dd>
+</dl>
+</li>
+</ul>
+<a id="withRuntime(com.netflix.genie.common.dto.Runtime)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withRuntime</h4>
+<pre class="methodSignature">public&nbsp;<a href="Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withRuntime&#8203;(@Nullable
+                                   <a href="Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a>&nbsp;runtime)</pre>
+<div class="block">Set the runtime for any jobs that use this command.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>runtime</code> - The <a href="Runtime.html" title="class in com.netflix.genie.common.dto"><code>Runtime</code></a> or null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The builder instance</dd>
 </dl>
 </li>
 </ul>

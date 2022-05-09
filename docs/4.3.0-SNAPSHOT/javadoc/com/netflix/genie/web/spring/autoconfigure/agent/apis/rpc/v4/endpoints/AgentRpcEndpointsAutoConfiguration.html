@@ -183,7 +183,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#gRpcAgentFileStreamService(com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter,org.springframework.scheduling.TaskScheduler,com.netflix.genie.web.properties.AgentFileStreamProperties,io.micrometer.core.instrument.MeterRegistry)">gRpcAgentFileStreamService</a></span>&#8203;(<a href="../../../../../../../../common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#gRpcAgentFileStreamService(com.netflix.genie.common.internal.dtos.converters.JobDirectoryManifestProtoConverter,org.springframework.scheduling.TaskScheduler,com.netflix.genie.web.properties.AgentFileStreamProperties,io.micrometer.core.instrument.MeterRegistry)">gRpcAgentFileStreamService</a></span>&#8203;(<a href="../../../../../../../../common/internal/dtos/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
                           org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                           <a href="../../../../../../../properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties</a>&nbsp;properties,
                           io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code></th>
@@ -215,8 +215,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobServiceImpl</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#gRpcJobService(com.netflix.genie.web.agent.services.AgentJobService,com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter,com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer,io.micrometer.core.instrument.MeterRegistry)">gRpcJobService</a></span>&#8203;(<a href="../../../../../../../agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a>&nbsp;agentJobService,
-              <a href="../../../../../../../../common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#gRpcJobService(com.netflix.genie.web.agent.services.AgentJobService,com.netflix.genie.common.internal.dtos.converters.JobServiceProtoConverter,com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer,io.micrometer.core.instrument.MeterRegistry)">gRpcJobService</a></span>&#8203;(<a href="../../../../../../../agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a>&nbsp;agentJobService,
+              <a href="../../../../../../../../common/internal/dtos/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter,
               <a href="../../../../../../../agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">JobServiceProtoErrorComposer</a>&nbsp;protoErrorComposer,
               io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code></th>
 <td class="colLast">
@@ -321,7 +321,7 @@ public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/JobService
 </dl>
 </li>
 </ul>
-<a id="gRpcAgentFileStreamService(com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter,org.springframework.scheduling.TaskScheduler,com.netflix.genie.web.properties.AgentFileStreamProperties,io.micrometer.core.instrument.MeterRegistry)">
+<a id="gRpcAgentFileStreamService(com.netflix.genie.common.internal.dtos.converters.JobDirectoryManifestProtoConverter,org.springframework.scheduling.TaskScheduler,com.netflix.genie.web.properties.AgentFileStreamProperties,io.micrometer.core.instrument.MeterRegistry)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -329,7 +329,7 @@ public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/JobService
 <h4>gRpcAgentFileStreamService</h4>
 <pre class="methodSignature">@Bean
 @ConditionalOnMissingBean(com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase.class)
-public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a>&nbsp;gRpcAgentFileStreamService&#8203;(<a href="../../../../../../../../common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
+public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a>&nbsp;gRpcAgentFileStreamService&#8203;(<a href="../../../../../../../../common/internal/dtos/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
                                                                  @Qualifier("genieTaskScheduler")
                                                                  org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
                                                                  <a href="../../../../../../../properties/AgentFileStreamProperties.html" title="class in com.netflix.genie.web.properties">AgentFileStreamProperties</a>&nbsp;properties,
@@ -338,7 +338,7 @@ public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcAgentF
  if no other is provided.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>converter</code> - The <a href="../../../../../../../../common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters"><code>JobDirectoryManifestProtoConverter</code></a> instance to use</dd>
+<dd><code>converter</code> - The <a href="../../../../../../../../common/internal/dtos/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.converters"><code>JobDirectoryManifestProtoConverter</code></a> instance to use</dd>
 <dd><code>taskScheduler</code> - The <code>TaskScheduler</code> to use to schedule tasks</dd>
 <dd><code>properties</code> - The service properties</dd>
 <dd><code>registry</code> - The meter registry</dd>
@@ -398,7 +398,7 @@ public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcJobKil
 </dl>
 </li>
 </ul>
-<a id="gRpcJobService(com.netflix.genie.web.agent.services.AgentJobService,com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter,com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer,io.micrometer.core.instrument.MeterRegistry)">
+<a id="gRpcJobService(com.netflix.genie.web.agent.services.AgentJobService,com.netflix.genie.common.internal.dtos.converters.JobServiceProtoConverter,com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer,io.micrometer.core.instrument.MeterRegistry)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -407,7 +407,7 @@ public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcJobKil
 <pre class="methodSignature">@Bean
 @ConditionalOnMissingBean(com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase.class)
 public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobServiceImpl</a>&nbsp;gRpcJobService&#8203;(<a href="../../../../../../../agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService</a>&nbsp;agentJobService,
-                                         <a href="../../../../../../../../common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter,
+                                         <a href="../../../../../../../../common/internal/dtos/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.converters">JobServiceProtoConverter</a>&nbsp;jobServiceProtoConverter,
                                          <a href="../../../../../../../agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">JobServiceProtoErrorComposer</a>&nbsp;protoErrorComposer,
                                          io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</pre>
 <div class="block">Provide an implementation of <code>JobServiceGrpc.JobServiceImplBase</code> if no other is
@@ -415,7 +415,7 @@ public&nbsp;<a href="../../../../../../../agent/apis/rpc/v4/endpoints/GRpcJobSer
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentJobService</code> - The <a href="../../../../../../../agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> instance to use</dd>
-<dd><code>jobServiceProtoConverter</code> - The <a href="../../../../../../../../common/internal/dtos/v4/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters"><code>JobServiceProtoConverter</code></a> instance to use</dd>
+<dd><code>jobServiceProtoConverter</code> - The <a href="../../../../../../../../common/internal/dtos/converters/JobServiceProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.converters"><code>JobServiceProtoConverter</code></a> instance to use</dd>
 <dd><code>protoErrorComposer</code> - The <a href="../../../../../../../agent/apis/rpc/v4/endpoints/JobServiceProtoErrorComposer.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints"><code>JobServiceProtoErrorComposer</code></a> instance to use</dd>
 <dd><code>meterRegistry</code> - The meter registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

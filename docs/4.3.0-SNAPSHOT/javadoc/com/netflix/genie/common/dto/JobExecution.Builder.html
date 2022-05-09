@@ -27,8 +27,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":42,"i6":10,"i7":10,"i8":10};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -184,7 +184,7 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
@@ -199,7 +199,7 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withArchiveStatus(com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">withArchiveStatus</a></span>&#8203;(<a href="../external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withArchiveStatus(com.netflix.genie.common.dto.ArchiveStatus)">withArchiveStatus</a></span>&#8203;(<a href="ArchiveStatus.html" title="enum in com.netflix.genie.common.dto">ArchiveStatus</a>&nbsp;archiveStatus)</code></th>
 <td class="colLast">
 <div class="block">Set the archive status for this job.</div>
 </td>
@@ -229,7 +229,9 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 <td class="colFirst"><code><a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withMemory(java.lang.Integer)">withMemory</a></span>&#8203;(java.lang.Integer&nbsp;memory)</code></th>
 <td class="colLast">
-<div class="block">Set the amount of memory (in MB) to use for this job execution.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
@@ -240,6 +242,13 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 </td>
 </tr>
 <tr id="i7" class="rowColor">
+<td class="colFirst"><code><a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withRuntime(com.netflix.genie.common.dto.Runtime)">withRuntime</a></span>&#8203;(<a href="Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a>&nbsp;runtime)</code></th>
+<td class="colLast">
+<div class="block">Set the runtime this job is executing with.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withTimeout(java.time.Instant)">withTimeout</a></span>&#8203;(java.time.Instant&nbsp;timeout)</code></th>
 <td class="colLast">
@@ -375,8 +384,12 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 <ul class="blockList">
 <li class="blockList">
 <h4>withMemory</h4>
-<pre class="methodSignature">public&nbsp;<a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a>&nbsp;withMemory&#8203;(@Nullable
+<pre class="methodSignature">@Deprecated
+public&nbsp;<a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a>&nbsp;withMemory&#8203;(@Nullable
                                        java.lang.Integer&nbsp;memory)</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
 <div class="block">Set the amount of memory (in MB) to use for this job execution.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -386,13 +399,14 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 </dl>
 </li>
 </ul>
-<a id="withArchiveStatus(com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">
+<a id="withArchiveStatus(com.netflix.genie.common.dto.ArchiveStatus)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>withArchiveStatus</h4>
-<pre class="methodSignature">public&nbsp;<a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a>&nbsp;withArchiveStatus&#8203;(<a href="../external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)</pre>
+<pre class="methodSignature">public&nbsp;<a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a>&nbsp;withArchiveStatus&#8203;(@Nullable
+                                              <a href="ArchiveStatus.html" title="enum in com.netflix.genie.common.dto">ArchiveStatus</a>&nbsp;archiveStatus)</pre>
 <div class="block">Set the archive status for this job.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -416,6 +430,23 @@ extends <a href="BaseDTO.Builder.html" title="class in com.netflix.genie.common.
 <dd><code>launcherExt</code> - The launcher extension</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The builder</dd>
+</dl>
+</li>
+</ul>
+<a id="withRuntime(com.netflix.genie.common.dto.Runtime)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withRuntime</h4>
+<pre class="methodSignature">public&nbsp;<a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto">JobExecution.Builder</a>&nbsp;withRuntime&#8203;(@Nullable
+                                        <a href="Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a>&nbsp;runtime)</pre>
+<div class="block">Set the runtime this job is executing with.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>runtime</code> - The runtime</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>This <a href="JobExecution.Builder.html" title="class in com.netflix.genie.common.dto"><code>JobExecution.Builder</code></a> instance</dd>
 </dl>
 </li>
 </ul>

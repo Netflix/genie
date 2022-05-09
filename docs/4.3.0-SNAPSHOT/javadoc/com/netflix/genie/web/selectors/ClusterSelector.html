@@ -118,7 +118,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Superinterfaces:</dt>
-<dd><code><a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,&#8203;<a href="ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
+<dd><code><a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>,&#8203;<a href="ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
 </dl>
 <dl>
 <dt>All Known Implementing Classes:</dt>
@@ -127,9 +127,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <hr>
 <pre>@Validated
 public interface <span class="typeNameLabel">ClusterSelector</span>
-extends <a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,&#8203;<a href="ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</pre>
-<div class="block">Interface for any classes which provide a way to select a <a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> from a set of clusters
- which matched criterion provided by a user in a <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and combined with the criteria for the command
+extends <a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>,&#8203;<a href="ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</pre>
+<div class="block">Interface for any classes which provide a way to select a <a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> from a set of clusters
+ which matched criterion provided by a user in a <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobRequest</code></a> and combined with the criteria for the command
  selected for a given job.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>

@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -283,45 +283,80 @@ extends <a href="BaseEntity.html" title="class in com.netflix.genie.web.data.ser
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#equals(java.lang.Object)">equals</a></span>&#8203;(java.lang.Object&nbsp;o)</code></th>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCpu()">getCpu</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the default number of CPUs for a job using this command.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDiskMb()">getDiskMb</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the default amount of disk space for the job using this command in MB.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGpu()">getGpu</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the default number of GPUs for a job using this command.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getImages()">getImages</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the default set of images to run this job with if this command is selected.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLauncherExt()">getLauncherExt</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get any metadata associated with this command pertaining to specifying details for various agent launchers.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getMemory()">getMemory</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the default memory for a job using this command.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNetworkMbps()">getNetworkMbps</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the default amount of network bandwidth to allocate to the job using this command in mbps.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeApplication(com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity)">removeApplication</a></span>&#8203;(@NotNull <a href="ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&nbsp;application)</code></th>
 <td class="colLast">
 <div class="block">Remove an application from this command.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code><a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeClusterCriterion(int)">removeClusterCriterion</a></span>&#8203;(int&nbsp;priority)</code></th>
 <td class="colLast">
 <div class="block">Remove the criterion with the given priority from the list of available criterion for this command.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setApplications(java.util.List)">setApplications</a></span>&#8203;(java.util.List&lt;<a href="ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt;&nbsp;applications)</code></th>
 <td class="colLast">
 <div class="block">Sets the applications for this command.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setClusterCriteria(java.util.List)">setClusterCriteria</a></span>&#8203;(java.util.List&lt;<a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt;&nbsp;clusterCriteria)</code></th>
 <td class="colLast">
@@ -329,35 +364,35 @@ extends <a href="BaseEntity.html" title="class in com.netflix.genie.web.data.ser
  for a job.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setConfigs(java.util.Set)">setConfigs</a></span>&#8203;(java.util.Set&lt;<a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;&nbsp;configs)</code></th>
 <td class="colLast">
 <div class="block">Set all the files associated as configuration files for this cluster.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDependencies(java.util.Set)">setDependencies</a></span>&#8203;(java.util.Set&lt;<a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;&nbsp;dependencies)</code></th>
 <td class="colLast">
 <div class="block">Set all the files associated as dependency files for this cluster.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setExecutable(java.util.List)">setExecutable</a></span>&#8203;(@NotEmpty java.util.List&lt;@NotBlank @Size(max=1024) java.lang.String&gt;&nbsp;executable)</code></th>
 <td class="colLast">
 <div class="block">Set the executable and any default arguments for this command.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLauncherExt(com.fasterxml.jackson.databind.JsonNode)">setLauncherExt</a></span>&#8203;(com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExt)</code></th>
 <td class="colLast">
 <div class="block">Set any metadata pertaining to additional instructions for various launchers if this command is used.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setTags(java.util.Set)">setTags</a></span>&#8203;(java.util.Set&lt;<a href="TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt;&nbsp;tags)</code></th>
 <td class="colLast">
@@ -580,17 +615,87 @@ extends <a href="BaseEntity.html" title="class in com.netflix.genie.web.data.ser
 </dl>
 </li>
 </ul>
+<a id="getCpu()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCpu</h4>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getCpu()</pre>
+<div class="block">Get the default number of CPUs for a job using this command.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of CPUs or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
+<a id="getGpu()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGpu</h4>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getGpu()</pre>
+<div class="block">Get the default number of GPUs for a job using this command.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of GPUs or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
 <a id="getMemory()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getMemory</h4>
-<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getMemory()</pre>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getMemory()</pre>
 <div class="block">Get the default memory for a job using this command.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Optional of Integer as it could be null</dd>
+</dl>
+</li>
+</ul>
+<a id="getDiskMb()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDiskMb</h4>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getDiskMb()</pre>
+<div class="block">Get the default amount of disk space for the job using this command in MB.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The amount of disk space in MB or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
+<a id="getNetworkMbps()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getNetworkMbps</h4>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getNetworkMbps()</pre>
+<div class="block">Get the default amount of network bandwidth to allocate to the job using this command in mbps.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The amount of network bandwidth in mbps or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
+<a id="getImages()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getImages</h4>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getImages()</pre>
+<div class="block">Get the default set of images to run this job with if this command is selected.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The default set of images or <code>Optional.empty()</code></dd>
 </dl>
 </li>
 </ul>

@@ -27,8 +27,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var data = {"i0":42};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -152,7 +152,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <hr>
 <pre>public class <span class="typeNameLabel">Command</span>
 extends <a href="ExecutionEnvironmentDTO.html" title="class in com.netflix.genie.common.dto">ExecutionEnvironmentDTO</a></pre>
-<div class="block">A command data transfer object. After creation it is read-only.</div>
+<div class="block">A command data transfer object. After creation, it is read-only.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>3.0.0</dd>
@@ -248,7 +248,7 @@ extends <a href="ExecutionEnvironmentDTO.html" title="class in com.netflix.genie
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
@@ -258,7 +258,9 @@ extends <a href="ExecutionEnvironmentDTO.html" title="class in com.netflix.genie
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getMemory()">getMemory</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Get the default amount of memory (in MB) to use for jobs which use this command.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use runtime instead</div>
+</div>
 </td>
 </tr>
 </table>
@@ -361,7 +363,11 @@ extends <a href="ExecutionEnvironmentDTO.html" title="class in com.netflix.genie
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getMemory</h4>
-<pre class="methodSignature">public&nbsp;java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getMemory()</pre>
+<pre class="methodSignature">@Deprecated
+public&nbsp;java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getMemory()</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use runtime instead</div>
+</div>
 <div class="block">Get the default amount of memory (in MB) to use for jobs which use this command.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>

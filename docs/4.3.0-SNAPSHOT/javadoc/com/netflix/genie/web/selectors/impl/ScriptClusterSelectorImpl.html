@@ -132,7 +132,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a></code>, <code><a href="../ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,&#8203;<a href="../ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
+<dd><code><a href="../ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a></code>, <code><a href="../ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>,&#8203;<a href="../ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
 </dl>
 <hr>
 <pre>public class <span class="typeNameLabel">ScriptClusterSelectorImpl</span>
@@ -189,7 +189,7 @@ implements <a href="../ClusterSelector.html" title="interface in com.netflix.gen
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
+<td class="colFirst"><code><a href="../../dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#select(com.netflix.genie.web.selectors.ClusterSelectionContext)">select</a></span>&#8203;(@Valid <a href="../ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)</code></th>
 <td class="colLast">
 <div class="block">Select a resource from the given set of resources if possible.</div>
@@ -251,13 +251,13 @@ implements <a href="../ClusterSelector.html" title="interface in com.netflix.gen
 <ul class="blockListLast">
 <li class="blockList">
 <h4>select</h4>
-<pre class="methodSignature">public&nbsp;<a href="../../dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;select&#8203;(@Valid
+<pre class="methodSignature">public&nbsp;<a href="../../dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;select&#8203;(@Valid
                                                @Valid <a href="../ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)
                                         throws <a href="../../exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../ResourceSelector.html#select(C)">select</a></code>&nbsp;in interface&nbsp;<code><a href="../ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,&#8203;<a href="../ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
+<dd><code><a href="../ResourceSelector.html#select(C)">select</a></code>&nbsp;in interface&nbsp;<code><a href="../ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>,&#8203;<a href="../ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>context</code> - The context specific for this resource selection</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

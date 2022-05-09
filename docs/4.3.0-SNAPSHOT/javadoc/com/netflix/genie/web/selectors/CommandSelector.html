@@ -118,7 +118,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Superinterfaces:</dt>
-<dd><code><a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>,&#8203;<a href="CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</code></dd>
+<dd><code><a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>,&#8203;<a href="CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</code></dd>
 </dl>
 <dl>
 <dt>All Known Implementing Classes:</dt>
@@ -127,9 +127,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <hr>
 <pre>@Validated
 public interface <span class="typeNameLabel">CommandSelector</span>
-extends <a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>,&#8203;<a href="CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</pre>
-<div class="block">Interface for any classes which provide a way to select a <a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> from a set of commands
- which matched criterion provided by a user in a <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
+extends <a href="ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>,&#8203;<a href="CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</pre>
+<div class="block">Interface for any classes which provide a way to select a <a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> from a set of commands
+ which matched criterion provided by a user in a <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobRequest</code></a>.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>

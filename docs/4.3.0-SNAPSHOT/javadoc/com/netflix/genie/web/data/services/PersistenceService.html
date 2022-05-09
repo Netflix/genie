@@ -27,8 +27,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6,"i37":6,"i38":6,"i39":6,"i40":6,"i41":6,"i42":6,"i43":6,"i44":6,"i45":6,"i46":6,"i47":6,"i48":6,"i49":6,"i50":6,"i51":6,"i52":6,"i53":6,"i54":6,"i55":6,"i56":6,"i57":38,"i58":6,"i59":6,"i60":6,"i61":6,"i62":6,"i63":6,"i64":6,"i65":6,"i66":6,"i67":6,"i68":6,"i69":6,"i70":6,"i71":6,"i72":6,"i73":6,"i74":6,"i75":6,"i76":6,"i77":6,"i78":6,"i79":6,"i80":6,"i81":6,"i82":6,"i83":6,"i84":6,"i85":6,"i86":6};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],32:["t6","Deprecated Methods"]};
+var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6,"i37":6,"i38":6,"i39":6,"i40":6,"i41":6,"i42":6,"i43":6,"i44":6,"i45":6,"i46":6,"i47":6,"i48":6,"i49":6,"i50":6,"i51":6,"i52":6,"i53":6,"i54":6,"i55":6,"i56":6,"i57":6,"i58":6,"i59":6,"i60":6,"i61":6,"i62":6,"i63":6,"i64":6,"i65":6,"i66":6,"i67":6,"i68":6,"i69":6,"i70":6,"i71":6,"i72":6,"i73":6,"i74":6,"i75":6,"i76":6,"i77":6,"i78":6,"i79":6,"i80":6,"i81":6,"i82":6,"i83":6,"i84":6,"i85":6};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -148,7 +148,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t6" class="tableTab"><span><a href="javascript:show(32);">Deprecated Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
@@ -164,23 +164,23 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Criterion)">addClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
-                             @Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion)">addClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
+                             @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)</code></th>
 <td class="colLast">
-<div class="block">Add a new <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.</div>
+<div class="block">Add a new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Criterion,@javax.validation.constraints.Min(0L)int)">addClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
-                             @Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion,@javax.validation.constraints.Min(0L)int)">addClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
+                             @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
                              @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></th>
 <td class="colLast">
-<div class="block">Add a new <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.</div>
+<div class="block">Add a new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addConfigsToResource(java.lang.String,java.util.Set,java.lang.Class)">addConfigsToResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                     java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;configs,
                     java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -189,7 +189,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addDependenciesToResource(java.lang.String,java.util.Set,java.lang.Class)">addDependenciesToResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                          java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;dependencies,
                          java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -198,7 +198,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addTagsToResource(java.lang.String,java.util.Set,java.lang.Class)">addTagsToResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                  java.util.Set&lt;@Size(max=255) java.lang.String&gt;&nbsp;tags,
                  java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -208,8 +208,8 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#claimJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">claimJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-        @Valid <a href="../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#claimJob(java.lang.String,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">claimJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+        @Valid <a href="../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)</code></th>
 <td class="colLast">
 <div class="block">Set a job identified by <code>id</code> to be owned by the agent identified by <code>agentClientMetadata</code>.</div>
 </td>
@@ -239,27 +239,27 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteApplication(java.lang.String)">deleteApplication</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Delete an <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> from the system.</div>
+<div class="block">Delete an <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a> from the system.</div>
 </td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteCluster(java.lang.String)">deleteCluster</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Delete a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> by id.</div>
+<div class="block">Delete a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> by id.</div>
 </td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteCommand(java.lang.String)">deleteCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Delete a <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> from system.</div>
+<div class="block">Delete a <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> from system.</div>
 </td>
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteJobsCreatedBefore(java.time.Instant,java.util.Set,@javax.validation.constraints.Min(1L)int)">deleteJobsCreatedBefore</a></span>&#8203;(@NotNull java.time.Instant&nbsp;creationThreshold,
-                       @NotNull java.util.Set&lt;<a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;excludeStatuses,
+                       @NotNull java.util.Set&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;excludeStatuses,
                        @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></th>
 <td class="colLast">
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
@@ -275,7 +275,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>long</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteUnusedClusters(java.util.Set,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedClusters</a></span>&#8203;(java.util.Set&lt;<a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteUnusedClusters(java.util.Set,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedClusters</a></span>&#8203;(java.util.Set&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
                     @NotNull java.time.Instant&nbsp;clusterCreatedThreshold,
                     @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></th>
 <td class="colLast">
@@ -285,7 +285,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteUnusedCommands(java.util.Set,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedCommands</a></span>&#8203;(java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteUnusedCommands(java.util.Set,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedCommands</a></span>&#8203;(java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;deleteStatuses,
                     @NotNull java.time.Instant&nbsp;commandCreatedThreshold,
                     @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></th>
 <td class="colLast">
@@ -312,10 +312,10 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i19" class="rowColor">
-<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;</code></td>
+<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findApplications(java.lang.String,java.lang.String,java.util.Set,java.util.Set,java.lang.String,org.springframework.data.domain.Pageable)">findApplications</a></span>&#8203;(java.lang.String&nbsp;name,
                 java.lang.String&nbsp;user,
-                java.util.Set&lt;<a href="../../../common/external/dtos/v4/ApplicationStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ApplicationStatus</a>&gt;&nbsp;statuses,
+                java.util.Set&lt;<a href="../../../common/internal/dtos/ApplicationStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ApplicationStatus</a>&gt;&nbsp;statuses,
                 java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
                 java.lang.String&nbsp;type,
                 org.springframework.data.domain.Pageable&nbsp;page)</code></th>
@@ -324,38 +324,38 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i20" class="altColor">
-<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
+<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findClusters(java.lang.String,java.util.Set,java.util.Set,java.time.Instant,java.time.Instant,org.springframework.data.domain.Pageable)">findClusters</a></span>&#8203;(java.lang.String&nbsp;name,
-            java.util.Set&lt;<a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses,
+            java.util.Set&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;statuses,
             java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
             java.time.Instant&nbsp;minUpdateTime,
             java.time.Instant&nbsp;maxUpdateTime,
             org.springframework.data.domain.Pageable&nbsp;page)</code></th>
 <td class="colLast">
-<div class="block">Find and <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>s that match the given parameters.</div>
+<div class="block">Find and <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>s that match the given parameters.</div>
 </td>
 </tr>
 <tr id="i21" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findClustersMatchingAnyCriterion(java.util.Set,boolean)">findClustersMatchingAnyCriterion</a></span>&#8203;(@NotEmpty java.util.Set&lt;@Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;criteria,
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findClustersMatchingAnyCriterion(java.util.Set,boolean)">findClustersMatchingAnyCriterion</a></span>&#8203;(@NotEmpty java.util.Set&lt;@Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;criteria,
                                 boolean&nbsp;addDefaultStatus)</code></th>
 <td class="colLast">
-<div class="block">Find all the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match any of the given <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<div class="block">Find all the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s that match any of the given <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 </td>
 </tr>
 <tr id="i22" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findClustersMatchingCriterion(com.netflix.genie.common.external.dtos.v4.Criterion,boolean)">findClustersMatchingCriterion</a></span>&#8203;(@Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findClustersMatchingCriterion(com.netflix.genie.common.internal.dtos.Criterion,boolean)">findClustersMatchingCriterion</a></span>&#8203;(@Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
                              boolean&nbsp;addDefaultStatus)</code></th>
 <td class="colLast">
-<div class="block">Find all the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<div class="block">Find all the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s that match the given <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 </td>
 </tr>
 <tr id="i23" class="rowColor">
-<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
+<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findCommands(java.lang.String,java.lang.String,java.util.Set,java.util.Set,org.springframework.data.domain.Pageable)">findCommands</a></span>&#8203;(java.lang.String&nbsp;name,
             java.lang.String&nbsp;user,
-            java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses,
+            java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;statuses,
             java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
             org.springframework.data.domain.Pageable&nbsp;page)</code></th>
 <td class="colLast">
@@ -363,11 +363,11 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i24" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findCommandsMatchingCriterion(com.netflix.genie.common.external.dtos.v4.Criterion,boolean)">findCommandsMatchingCriterion</a></span>&#8203;(@Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findCommandsMatchingCriterion(com.netflix.genie.common.internal.dtos.Criterion,boolean)">findCommandsMatchingCriterion</a></span>&#8203;(@Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
                              boolean&nbsp;addDefaultStatus)</code></th>
 <td class="colLast">
-<div class="block">Find all the <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<div class="block">Find all the <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a>'s that match the given <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 </td>
 </tr>
 <tr id="i25" class="rowColor">
@@ -407,59 +407,59 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i28" class="altColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getApplication(java.lang.String)">getApplication</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the application metadata for given id.</div>
 </td>
 </tr>
 <tr id="i29" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getApplicationsForCommand(java.lang.String)">getApplicationsForCommand</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the applications for a given command.</div>
 </td>
 </tr>
 <tr id="i30" class="altColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCluster(java.lang.String)">getCluster</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Get the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> identified by the given id.</div>
+<div class="block">Get the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> identified by the given id.</div>
 </td>
 </tr>
 <tr id="i31" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getClusterCriteriaForCommand(java.lang.String)">getClusterCriteriaForCommand</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">For the given command id return the Cluster <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order that is currently
+<div class="block">For the given command id return the Cluster <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> in priority order that is currently
  associated with this command if any.</div>
 </td>
 </tr>
 <tr id="i32" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getClustersForCommand(java.lang.String,java.util.Set)">getClustersForCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-                     java.util.Set&lt;<a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses)</code></th>
+                     java.util.Set&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;statuses)</code></th>
 <td class="colLast">
 <div class="block">Get all the clusters the command with given id is associated with.</div>
 </td>
 </tr>
 <tr id="i33" class="rowColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCommand(java.lang.String)">getCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Get the metadata for the <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> identified by the id.</div>
+<div class="block">Get the metadata for the <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> identified by the id.</div>
 </td>
 </tr>
 <tr id="i34" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCommandsForApplication(java.lang.String,java.util.Set)">getCommandsForApplication</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-                         java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses)</code></th>
+                         java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;statuses)</code></th>
 <td class="colLast">
 <div class="block">Get all the commands the application with given id is associated with.</div>
 </td>
 </tr>
 <tr id="i35" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getConfigsForResource(java.lang.String,java.lang.Class)">getConfigsForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                      java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
 <td class="colLast">
@@ -467,7 +467,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i36" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDependenciesForResource(java.lang.String,java.lang.Class)">getDependenciesForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                           java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
 <td class="colLast">
@@ -475,7 +475,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i37" class="rowColor">
-<td class="colFirst"><code><a href="../../../common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos">FinishedJob</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFinishedJob(java.lang.String)">getFinishedJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get a DTO representing a finished job.</div>
@@ -496,7 +496,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i40" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobApplications(java.lang.String)">getJobApplications</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the applications the job used or is currently using.</div>
@@ -510,21 +510,21 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i42" class="altColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobArchiveStatus(java.lang.String)">getJobArchiveStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the archive status for a job with the given <code>id</code>.</div>
 </td>
 </tr>
 <tr id="i43" class="rowColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobCluster(java.lang.String)">getJobCluster</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the cluster the job used or is using.</div>
 </td>
 </tr>
 <tr id="i44" class="altColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobCommand(java.lang.String)">getJobCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the command the job used or is using.</div>
@@ -545,21 +545,21 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i47" class="rowColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobRequest(java.lang.String)">getJobRequest</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the original request for a job.</div>
 </td>
 </tr>
 <tr id="i48" class="altColor">
-<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobSpecification(java.lang.String)">getJobSpecification</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the saved job specification for the given job.</div>
 </td>
 </tr>
 <tr id="i49" class="rowColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
+<td class="colFirst"><code><a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobStatus(java.lang.String)">getJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the status for a job with the given <code>id</code>.</div>
@@ -567,8 +567,8 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i50" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobsWithStatusAndArchiveStatusUpdatedBefore(java.util.Set,java.util.Set,java.time.Instant)">getJobsWithStatusAndArchiveStatusUpdatedBefore</a></span>&#8203;(@NotEmpty java.util.Set&lt;<a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
-                                              @NotEmpty java.util.Set&lt;<a href="../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&gt;&nbsp;archiveStatuses,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getJobsWithStatusAndArchiveStatusUpdatedBefore(java.util.Set,java.util.Set,java.time.Instant)">getJobsWithStatusAndArchiveStatusUpdatedBefore</a></span>&#8203;(@NotEmpty java.util.Set&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;statuses,
+                                              @NotEmpty java.util.Set&lt;<a href="../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&gt;&nbsp;archiveStatuses,
                                               @NotNull java.time.Instant&nbsp;updated)</code></th>
 <td class="colLast">
 <div class="block">Get the set of jobs (agent only) whose state is in <code>statuses</code> and archive status is in
@@ -590,7 +590,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </td>
 </tr>
 <tr id="i53" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTagsForResource(java.lang.String,java.lang.Class)">getTagsForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                   java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
 <td class="colLast">
@@ -613,58 +613,51 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i56" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;<a href="../../../common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto">UserResourcesSummary</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserResourcesSummaries(java.util.Set,boolean)">getUserResourcesSummaries</a></span>&#8203;(java.util.Set&lt;<a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserResourcesSummaries(java.util.Set,boolean)">getUserResourcesSummaries</a></span>&#8203;(java.util.Set&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;statuses,
                          boolean&nbsp;api)</code></th>
 <td class="colLast">
 <div class="block">Get a map of summaries of resources usage for each user with at least one active job.</div>
 </td>
 </tr>
 <tr id="i57" class="rowColor">
-<td class="colFirst"><code><a href="../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getV3JobRequest(java.lang.String)">getV3JobRequest</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
-<td class="colLast">
-<div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
-</td>
-</tr>
-<tr id="i58" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isApiJob(java.lang.String)">isApiJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get whether the job with the given ID was submitted via the REST API or other mechanism.</div>
 </td>
 </tr>
-<tr id="i59" class="rowColor">
+<tr id="i58" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllClusterCriteriaForCommand(java.lang.String)">removeAllClusterCriteriaForCommand</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
-<div class="block">Remove all the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command identified by id.</div>
+<div class="block">Remove all the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> currently associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i60" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i59" class="rowColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllConfigsForResource(java.lang.String,java.lang.Class)">removeAllConfigsForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                            java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
 <td class="colLast">
 <div class="block">Remove all configuration files from the resource.</div>
 </td>
 </tr>
-<tr id="i61" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i60" class="altColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllDependenciesForResource(java.lang.String,java.lang.Class)">removeAllDependenciesForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                                 java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
 <td class="colLast">
 <div class="block">Remove all dependency files from the resource.</div>
 </td>
 </tr>
-<tr id="i62" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i61" class="rowColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAllTagsForResource(java.lang.String,java.lang.Class)">removeAllTagsForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                         java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
 <td class="colLast">
 <div class="block">Remove all tags from the resource.</div>
 </td>
 </tr>
-<tr id="i63" class="rowColor">
+<tr id="i62" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeApplicationForCommand(java.lang.String,java.lang.String)">removeApplicationForCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                            @NotBlank java.lang.String&nbsp;appId)</code></th>
@@ -672,24 +665,24 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove the application from the command.</div>
 </td>
 </tr>
-<tr id="i64" class="altColor">
+<tr id="i63" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeApplicationsForCommand(java.lang.String)">removeApplicationsForCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Remove all the applications from the command.</div>
 </td>
 </tr>
-<tr id="i65" class="rowColor">
+<tr id="i64" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeClusterCriterionForCommand(java.lang.String,@javax.validation.constraints.Min(0L)int)">removeClusterCriterionForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
                                 @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></th>
 <td class="colLast">
-<div class="block">Remove the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
+<div class="block">Remove the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
  associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i66" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i65" class="rowColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeConfigForResource(java.lang.String,java.lang.String,java.lang.Class)">removeConfigForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                        @NotBlank java.lang.String&nbsp;config,
                        java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -697,8 +690,8 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove a configuration file from the given resource.</div>
 </td>
 </tr>
-<tr id="i67" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i66" class="altColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeDependencyForResource(java.lang.String,java.lang.String,java.lang.Class)">removeDependencyForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                            @NotBlank java.lang.String&nbsp;dependency,
                            java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -706,8 +699,8 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove a dependency file from the given resource.</div>
 </td>
 </tr>
-<tr id="i68" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i67" class="rowColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeTagForResource(java.lang.String,java.lang.String,java.lang.Class)">removeTagForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                     @NotBlank java.lang.String&nbsp;tag,
                     java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -715,35 +708,35 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Remove a tag from the given resource.</div>
 </td>
 </tr>
-<tr id="i69" class="rowColor">
+<tr id="i68" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveApplication(com.netflix.genie.common.external.dtos.v4.ApplicationRequest)">saveApplication</a></span>&#8203;(@Valid <a href="../../../common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationRequest</a>&nbsp;applicationRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveApplication(com.netflix.genie.common.internal.dtos.ApplicationRequest)">saveApplication</a></span>&#8203;(@Valid <a href="../../../common/internal/dtos/ApplicationRequest.html" title="class in com.netflix.genie.common.internal.dtos">ApplicationRequest</a>&nbsp;applicationRequest)</code></th>
 <td class="colLast">
 <div class="block">Save a new application.</div>
 </td>
 </tr>
+<tr id="i69" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveCluster(com.netflix.genie.common.internal.dtos.ClusterRequest)">saveCluster</a></span>&#8203;(@Valid <a href="../../../common/internal/dtos/ClusterRequest.html" title="class in com.netflix.genie.common.internal.dtos">ClusterRequest</a>&nbsp;clusterRequest)</code></th>
+<td class="colLast">
+<div class="block">Save a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>.</div>
+</td>
+</tr>
 <tr id="i70" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveCluster(com.netflix.genie.common.external.dtos.v4.ClusterRequest)">saveCluster</a></span>&#8203;(@Valid <a href="../../../common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest</a>&nbsp;clusterRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveCommand(com.netflix.genie.common.internal.dtos.CommandRequest)">saveCommand</a></span>&#8203;(@Valid <a href="../../../common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos">CommandRequest</a>&nbsp;commandRequest)</code></th>
 <td class="colLast">
-<div class="block">Save a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>.</div>
+<div class="block">Save a <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> in the system based on the given <a href="../../../common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>CommandRequest</code></a>.</div>
 </td>
 </tr>
 <tr id="i71" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveCommand(com.netflix.genie.common.external.dtos.v4.CommandRequest)">saveCommand</a></span>&#8203;(@Valid <a href="../../../common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest</a>&nbsp;commandRequest)</code></th>
-<td class="colLast">
-<div class="block">Save a <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> in the system based on the given <a href="../../../common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>CommandRequest</code></a>.</div>
-</td>
-</tr>
-<tr id="i72" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveJobSubmission(com.netflix.genie.web.dtos.JobSubmission)">saveJobSubmission</a></span>&#8203;(@Valid <a href="../../dtos/JobSubmission.html" title="class in com.netflix.genie.web.dtos">JobSubmission</a>&nbsp;jobSubmission)</code></th>
 <td class="colLast">
 <div class="block">Save the given job submission information in the underlying data store.</div>
 </td>
 </tr>
-<tr id="i73" class="rowColor">
+<tr id="i72" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveResolvedJob(java.lang.String,com.netflix.genie.web.dtos.ResolvedJob)">saveResolvedJob</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                @Valid <a href="../../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)</code></th>
@@ -751,7 +744,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Save the given resolved details for a job.</div>
 </td>
 </tr>
-<tr id="i74" class="altColor">
+<tr id="i73" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setApplicationsForCommand(java.lang.String,java.util.List)">setApplicationsForCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                          @NotNull java.util.List&lt;@NotBlank java.lang.String&gt;&nbsp;applicationIds)</code></th>
@@ -759,41 +752,41 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Set the applications for the command.</div>
 </td>
 </tr>
-<tr id="i75" class="rowColor">
+<tr id="i74" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setClusterCriteriaForCommand(java.lang.String,java.util.List)">setClusterCriteriaForCommand</a></span>&#8203;(java.lang.String&nbsp;id,
-                            java.util.List&lt;@Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code></th>
+                            java.util.List&lt;@Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;clusterCriteria)</code></th>
 <td class="colLast">
 <div class="block">For the command identified by id reset the entire list of cluster criteria to match the contents of
  clusterCriteria.</div>
 </td>
 </tr>
+<tr id="i75" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateApplication(java.lang.String,com.netflix.genie.common.internal.dtos.Application)">updateApplication</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+                 @Valid <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&nbsp;updateApp)</code></th>
+<td class="colLast">
+<div class="block">Update an <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a>.</div>
+</td>
+</tr>
 <tr id="i76" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateApplication(java.lang.String,com.netflix.genie.common.external.dtos.v4.Application)">updateApplication</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-                 @Valid <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;updateApp)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateCluster(java.lang.String,com.netflix.genie.common.internal.dtos.Cluster)">updateCluster</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+             @Valid <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&nbsp;updateCluster)</code></th>
 <td class="colLast">
-<div class="block">Update an <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a>.</div>
+<div class="block">Update a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> with the given information.</div>
 </td>
 </tr>
 <tr id="i77" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateCluster(java.lang.String,com.netflix.genie.common.external.dtos.v4.Cluster)">updateCluster</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-             @Valid <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;updateCluster)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Command)">updateCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+             @Valid <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&nbsp;updateCommand)</code></th>
 <td class="colLast">
-<div class="block">Update a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with the given information.</div>
+<div class="block">Update a <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a>.</div>
 </td>
 </tr>
 <tr id="i78" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Command)">updateCommand</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-             @Valid <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;updateCommand)</code></th>
-<td class="colLast">
-<div class="block">Update a <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>.</div>
-</td>
-</tr>
-<tr id="i79" class="rowColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateConfigsForResource(java.lang.String,java.util.Set,java.lang.Class)">updateConfigsForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                         java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;configs,
                         java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -801,8 +794,8 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Update the set of configuration files associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i80" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i79" class="rowColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateDependenciesForResource(java.lang.String,java.util.Set,java.lang.Class)">updateDependenciesForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                              java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;dependencies,
                              java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -810,26 +803,26 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Update the set of dependency files associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i81" class="rowColor">
+<tr id="i80" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">updateJobArchiveStatus</a></span>&#8203;(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
-                      @NotNull(message="Status cannot be null.") <a href="../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.internal.dtos.ArchiveStatus)">updateJobArchiveStatus</a></span>&#8203;(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
+                      @NotNull(message="Status cannot be null.") <a href="../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&nbsp;archiveStatus)</code></th>
 <td class="colLast">
 <div class="block">Update the status and status message of the job.</div>
 </td>
 </tr>
-<tr id="i82" class="altColor">
-<td class="colFirst"><code><a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">updateJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
-               @NotNull <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
-               @NotNull <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
+<tr id="i81" class="rowColor">
+<td class="colFirst"><code><a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateJobStatus(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus,java.lang.String)">updateJobStatus</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
+               @NotNull <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;currentStatus,
+               @NotNull <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;newStatus,
                java.lang.String&nbsp;newStatusMessage)</code></th>
 <td class="colLast">
 <div class="block">Update the status of the job identified with <code>id</code> to be <code>newStatus</code> provided that the current status
  of the job matches <code>newStatus</code>.</div>
 </td>
 </tr>
-<tr id="i83" class="rowColor">
+<tr id="i82" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateLauncherExt(java.lang.String,com.fasterxml.jackson.databind.JsonNode)">updateLauncherExt</a></span>&#8203;(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
                  @NotNull(message="Status cannot be null.") com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExtension)</code></th>
@@ -837,7 +830,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Update the launcher extension field for this job.</div>
 </td>
 </tr>
-<tr id="i84" class="altColor">
+<tr id="i83" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateRequestedLauncherExt(java.lang.String,com.fasterxml.jackson.databind.JsonNode)">updateRequestedLauncherExt</a></span>&#8203;(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
                           @NotNull(message="Status cannot be null.") com.fasterxml.jackson.databind.JsonNode&nbsp;launcherExtension)</code></th>
@@ -845,19 +838,19 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Update the requested launcher extension field for this job.</div>
 </td>
 </tr>
-<tr id="i85" class="rowColor">
+<tr id="i84" class="altColor">
 <td class="colFirst"><code>int</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateStatusForUnusedCommands(com.netflix.genie.common.external.dtos.v4.CommandStatus,java.time.Instant,java.util.Set,int)">updateStatusForUnusedCommands</a></span>&#8203;(<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateStatusForUnusedCommands(com.netflix.genie.common.internal.dtos.CommandStatus,java.time.Instant,java.util.Set,int)">updateStatusForUnusedCommands</a></span>&#8203;(<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&nbsp;desiredStatus,
                              java.time.Instant&nbsp;commandCreatedThreshold,
-                             java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
+                             java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;currentStatuses,
                              int&nbsp;batchSize)</code></th>
 <td class="colLast">
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
  it was created before commandCreatedThreshold and it hasn't been used in any job.</div>
 </td>
 </tr>
-<tr id="i86" class="altColor">
-<td class="colFirst"><code>&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
+<tr id="i85" class="rowColor">
+<td class="colFirst"><code>&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;<br>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateTagsForResource(java.lang.String,java.util.Set,java.lang.Class)">updateTagsForResource</a></span>&#8203;(@NotBlank java.lang.String&nbsp;id,
                      java.util.Set&lt;@Size(max=255) java.lang.String&gt;&nbsp;tags,
                      java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code></th>
@@ -882,19 +875,19 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="saveApplication(com.netflix.genie.common.external.dtos.v4.ApplicationRequest)">
+<a id="saveApplication(com.netflix.genie.common.internal.dtos.ApplicationRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>saveApplication</h4>
 <pre class="methodSignature">java.lang.String&nbsp;saveApplication&#8203;(@Valid
-                                 @Valid <a href="../../../common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationRequest</a>&nbsp;applicationRequest)
+                                 @Valid <a href="../../../common/internal/dtos/ApplicationRequest.html" title="class in com.netflix.genie.common.internal.dtos">ApplicationRequest</a>&nbsp;applicationRequest)
                           throws <a href="../../exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></pre>
 <div class="block">Save a new application.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>applicationRequest</code> - The <a href="../../../common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>ApplicationRequest</code></a> containing the metadata of the application to create</dd>
+<dd><code>applicationRequest</code> - The <a href="../../../common/internal/dtos/ApplicationRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>ApplicationRequest</code></a> containing the metadata of the application to create</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The unique id of the application that was created</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -908,7 +901,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getApplication</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;getApplication&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&nbsp;getApplication&#8203;(@NotBlank
                            @NotBlank java.lang.String&nbsp;id)
                     throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the application metadata for given id.</div>
@@ -916,7 +909,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique id for application configuration to get. Not null/empty.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a></dd>
+<dd>The <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - if no application with id exists</dd>
 </dl>
@@ -928,12 +921,12 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>findApplications</h4>
-<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;findApplications&#8203;(@Nullable
+<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;&nbsp;findApplications&#8203;(@Nullable
                                                                    java.lang.String&nbsp;name,
                                                                    @Nullable
                                                                    java.lang.String&nbsp;user,
                                                                    @Nullable
-                                                                   java.util.Set&lt;<a href="../../../common/external/dtos/v4/ApplicationStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ApplicationStatus</a>&gt;&nbsp;statuses,
+                                                                   java.util.Set&lt;<a href="../../../common/internal/dtos/ApplicationStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ApplicationStatus</a>&gt;&nbsp;statuses,
                                                                    @Nullable
                                                                    java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
                                                                    @Nullable
@@ -953,7 +946,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="updateApplication(java.lang.String,com.netflix.genie.common.external.dtos.v4.Application)">
+<a id="updateApplication(java.lang.String,com.netflix.genie.common.internal.dtos.Application)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -962,16 +955,16 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">void&nbsp;updateApplication&#8203;(@NotBlank
                        @NotBlank java.lang.String&nbsp;id,
                        @Valid
-                       @Valid <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;updateApp)
+                       @Valid <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&nbsp;updateApp)
                 throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
                        <a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
-<div class="block">Update an <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a>.</div>
+<div class="block">Update an <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the application to update</dd>
 <dd><code>updateApp</code> - Information to update for the application configuration with</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> with id exists</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a> with id exists</dd>
 <dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If id and updateApp id don't match</dd>
 </dl>
 </li>
@@ -987,7 +980,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <div class="block">Delete all applications from the system.</div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - When any <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> is still associated with a command</dd>
+<dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - When any <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a> is still associated with a command</dd>
 </dl>
 </li>
 </ul>
@@ -1000,12 +993,12 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">void&nbsp;deleteApplication&#8203;(@NotBlank
                        @NotBlank java.lang.String&nbsp;id)
                 throws <a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
-<div class="block">Delete an <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> from the system.</div>
+<div class="block">Delete an <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a> from the system.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique id of the application to delete</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - When the <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> is still used by any command</dd>
+<dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - When the <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a> is still used by any command</dd>
 </dl>
 </li>
 </ul>
@@ -1015,10 +1008,10 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getCommandsForApplication</h4>
-<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;getCommandsForApplication&#8203;(@NotBlank
+<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;&nbsp;getCommandsForApplication&#8203;(@NotBlank
                                                  @NotBlank java.lang.String&nbsp;id,
                                                  @Nullable
-                                                 java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses)
+                                                 java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;statuses)
                                           throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the commands the application with given id is associated with.</div>
 <dl>
@@ -1028,7 +1021,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The commands the application is used by</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a> with id exists</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a> with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -1056,23 +1049,23 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="saveCluster(com.netflix.genie.common.external.dtos.v4.ClusterRequest)">
+<a id="saveCluster(com.netflix.genie.common.internal.dtos.ClusterRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>saveCluster</h4>
 <pre class="methodSignature">java.lang.String&nbsp;saveCluster&#8203;(@Valid
-                             @Valid <a href="../../../common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest</a>&nbsp;clusterRequest)
+                             @Valid <a href="../../../common/internal/dtos/ClusterRequest.html" title="class in com.netflix.genie.common.internal.dtos">ClusterRequest</a>&nbsp;clusterRequest)
                       throws <a href="../../exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></pre>
-<div class="block">Save a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>.</div>
+<div class="block">Save a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>clusterRequest</code> - The cluster information to save</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The id of the saved cluster</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - If a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with the given id already exists</dd>
+<dd><code><a href="../../exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - If a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> with the given id already exists</dd>
 </dl>
 </li>
 </ul>
@@ -1082,17 +1075,17 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getCluster</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;getCluster&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&nbsp;getCluster&#8203;(@NotBlank
                    @NotBlank java.lang.String&nbsp;id)
             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Get the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> identified by the given id.</div>
+<div class="block">Get the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> identified by the given id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - unique id of the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> to get</dd>
+<dd><code>id</code> - unique id of the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> to get</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a></dd>
+<dd>The <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with id exists</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -1102,10 +1095,10 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>findClusters</h4>
-<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;findClusters&#8203;(@Nullable
+<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;findClusters&#8203;(@Nullable
                                                            java.lang.String&nbsp;name,
                                                            @Nullable
-                                                           java.util.Set&lt;<a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses,
+                                                           java.util.Set&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;statuses,
                                                            @Nullable
                                                            java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
                                                            @Nullable
@@ -1113,11 +1106,11 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
                                                            @Nullable
                                                            java.time.Instant&nbsp;maxUpdateTime,
                                                            org.springframework.data.domain.Pageable&nbsp;page)</pre>
-<div class="block">Find and <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>s that match the given parameters. Null or empty parameters are ignored.</div>
+<div class="block">Find and <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>s that match the given parameters. Null or empty parameters are ignored.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>name</code> - cluster name</dd>
-<dd><code>statuses</code> - <a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>ClusterStatus</code></a> that clusters must be in to be matched</dd>
+<dd><code>statuses</code> - <a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos"><code>ClusterStatus</code></a> that clusters must be in to be matched</dd>
 <dd><code>tags</code> - tags attached to this cluster</dd>
 <dd><code>minUpdateTime</code> - min time when cluster was updated</dd>
 <dd><code>maxUpdateTime</code> - max time when cluster was updated</dd>
@@ -1127,7 +1120,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="updateCluster(java.lang.String,com.netflix.genie.common.external.dtos.v4.Cluster)">
+<a id="updateCluster(java.lang.String,com.netflix.genie.common.internal.dtos.Cluster)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1136,16 +1129,16 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">void&nbsp;updateCluster&#8203;(@NotBlank
                    @NotBlank java.lang.String&nbsp;id,
                    @Valid
-                   @Valid <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;updateCluster)
+                   @Valid <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&nbsp;updateCluster)
             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
                    <a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
-<div class="block">Update a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with the given information.</div>
+<div class="block">Update a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> with the given information.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to update</dd>
 <dd><code>updateCluster</code> - The information to update the cluster with</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with id exists</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> with id exists</dd>
 <dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If the id doesn't match the updateCluster id</dd>
 </dl>
 </li>
@@ -1174,7 +1167,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">void&nbsp;deleteCluster&#8203;(@NotBlank
                    @NotBlank java.lang.String&nbsp;id)
             throws <a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
-<div class="block">Delete a <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> by id.</div>
+<div class="block">Delete a <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a> by id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique id of the cluster to delete</dd>
@@ -1189,7 +1182,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteUnusedClusters</h4>
-<pre class="methodSignature">long&nbsp;deleteUnusedClusters&#8203;(java.util.Set&lt;<a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
+<pre class="methodSignature">long&nbsp;deleteUnusedClusters&#8203;(java.util.Set&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
                           @NotNull
                           @NotNull java.time.Instant&nbsp;clusterCreatedThreshold,
                           @Min(1L)
@@ -1198,7 +1191,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
  the given time.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>deleteStatuses</code> - The set of <a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>ClusterStatus</code></a> a cluster must be in to be considered for
+<dd><code>deleteStatuses</code> - The set of <a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos"><code>ClusterStatus</code></a> a cluster must be in to be considered for
                                 deletion.</dd>
 <dd><code>clusterCreatedThreshold</code> - The instant in time before which a cluster must have been created to be
                                 considered for deletion. Exclusive.</dd>
@@ -1208,23 +1201,23 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="findClustersMatchingCriterion(com.netflix.genie.common.external.dtos.v4.Criterion,boolean)">
+<a id="findClustersMatchingCriterion(com.netflix.genie.common.internal.dtos.Criterion,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findClustersMatchingCriterion</h4>
-<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;findClustersMatchingCriterion&#8203;(@Valid
-                                                     @Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;findClustersMatchingCriterion&#8203;(@Valid
+                                                     @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
                                                      boolean&nbsp;addDefaultStatus)</pre>
-<div class="block">Find all the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<div class="block">Find all the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s that match the given <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>criterion</code> - The <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> supplied that each cluster needs to completely match to be returned</dd>
+<dd><code>criterion</code> - The <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> supplied that each cluster needs to completely match to be returned</dd>
 <dd><code>addDefaultStatus</code> - true if the a default status should be added to the supplied
-                         <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> if the supplied criterion doesn't already have a status</dd>
+                         <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> if the supplied criterion doesn't already have a status</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>All the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s which matched the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a></dd>
+<dd>All the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s which matched the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a></dd>
 </dl>
 </li>
 </ul>
@@ -1234,31 +1227,31 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>findClustersMatchingAnyCriterion</h4>
-<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;findClustersMatchingAnyCriterion&#8203;(@NotEmpty
-                                                        @NotEmpty java.util.Set&lt;@Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;criteria,
+<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;findClustersMatchingAnyCriterion&#8203;(@NotEmpty
+                                                        @NotEmpty java.util.Set&lt;@Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;criteria,
                                                         boolean&nbsp;addDefaultStatus)</pre>
-<div class="block">Find all the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match any of the given <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<div class="block">Find all the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s that match any of the given <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>criteria</code> - The set of <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> supplied that a cluster needs to completely match at least
+<dd><code>criteria</code> - The set of <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> supplied that a cluster needs to completely match at least
                          one of to be returned</dd>
 <dd><code>addDefaultStatus</code> - true if the a default status should be added to the supplied
-                         <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> if the supplied criterion doesn't already have a status</dd>
+                         <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> if the supplied criterion doesn't already have a status</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>All the <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s which matched the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a></dd>
+<dd>All the <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s which matched the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a></dd>
 </dl>
 </li>
 </ul>
-<a id="saveCommand(com.netflix.genie.common.external.dtos.v4.CommandRequest)">
+<a id="saveCommand(com.netflix.genie.common.internal.dtos.CommandRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>saveCommand</h4>
 <pre class="methodSignature">java.lang.String&nbsp;saveCommand&#8203;(@Valid
-                             @Valid <a href="../../../common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest</a>&nbsp;commandRequest)
+                             @Valid <a href="../../../common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos">CommandRequest</a>&nbsp;commandRequest)
                       throws <a href="../../exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></pre>
-<div class="block">Save a <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> in the system based on the given <a href="../../../common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>CommandRequest</code></a>.</div>
+<div class="block">Save a <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> in the system based on the given <a href="../../../common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>CommandRequest</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>commandRequest</code> - encapsulates the command configuration information to create</dd>
@@ -1275,17 +1268,17 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getCommand</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;getCommand&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&nbsp;getCommand&#8203;(@NotBlank
                    @NotBlank java.lang.String&nbsp;id)
             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Get the metadata for the <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> identified by the id.</div>
+<div class="block">Get the metadata for the <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> identified by the id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique id for command to get. Not null/empty.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The command</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 </dl>
 </li>
 </ul>
@@ -1295,12 +1288,12 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>findCommands</h4>
-<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;findCommands&#8203;(@Nullable
+<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;&nbsp;findCommands&#8203;(@Nullable
                                                            java.lang.String&nbsp;name,
                                                            @Nullable
                                                            java.lang.String&nbsp;user,
                                                            @Nullable
-                                                           java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses,
+                                                           java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;statuses,
                                                            @Nullable
                                                            java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
                                                            org.springframework.data.domain.Pageable&nbsp;page)</pre>
@@ -1317,7 +1310,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="updateCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Command)">
+<a id="updateCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Command)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1326,16 +1319,16 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">void&nbsp;updateCommand&#8203;(@NotBlank
                    @NotBlank java.lang.String&nbsp;id,
                    @Valid
-                   @Valid <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;updateCommand)
+                   @Valid <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&nbsp;updateCommand)
             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
                    <a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
-<div class="block">Update a <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>.</div>
+<div class="block">Update a <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command configuration to update. Not null or empty.</dd>
 <dd><code>updateCommand</code> - contains the information to update the command with</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 <dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - When the id doesn't match the id of updateCommand</dd>
 </dl>
 </li>
@@ -1364,12 +1357,12 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">void&nbsp;deleteCommand&#8203;(@NotBlank
                    @NotBlank java.lang.String&nbsp;id)
             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Delete a <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> from system.</div>
+<div class="block">Delete a <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> from system.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique if of the command to delete</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 </dl>
 </li>
 </ul>
@@ -1391,7 +1384,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dd><code>id</code> - The id of the command to add the application file to. Not null/empty/blank.</dd>
 <dd><code>applicationIds</code> - The ids of the applications to add. Not null.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id or one of the
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id or one of the
                                      applications doesn't exist</dd>
 <dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If an application with one of the ids is already associated with the command</dd>
 </dl>
@@ -1415,7 +1408,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dd><code>id</code> - The id of the command to add the application file to. Not null/empty/blank.</dd>
 <dd><code>applicationIds</code> - The ids of the applications to set. Not null.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id or one of the
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id or one of the
                                      applications doesn't exist</dd>
 <dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If there are duplicate application ids in the list</dd>
 </dl>
@@ -1427,7 +1420,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getApplicationsForCommand</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;getApplicationsForCommand&#8203;(java.lang.String&nbsp;id)
+<pre class="methodSignature">java.util.List&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;&nbsp;getApplicationsForCommand&#8203;(java.lang.String&nbsp;id)
                                                throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the applications for a given command.</div>
 <dl>
@@ -1436,7 +1429,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The applications or exception if none exist.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 </dl>
 </li>
 </ul>
@@ -1455,7 +1448,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to remove the application from. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 <dd><code><a href="../../exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If applications are unable to be removed</dd>
 </dl>
 </li>
@@ -1477,7 +1470,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dd><code>id</code> - The id of the command to remove the application from. Not null/empty/blank.</dd>
 <dd><code>appId</code> - The id of the application to remove. Not null/empty/blank</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 </dl>
 </li>
 </ul>
@@ -1487,10 +1480,10 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getClustersForCommand</h4>
-<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;getClustersForCommand&#8203;(@NotBlank
+<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;getClustersForCommand&#8203;(@NotBlank
                                              @NotBlank java.lang.String&nbsp;id,
                                              @Nullable
-                                             java.util.Set&lt;<a href="../../../common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses)
+                                             java.util.Set&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;statuses)
                                       throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the clusters the command with given id is associated with.</div>
 <dl>
@@ -1500,7 +1493,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The clusters the command is available on.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> exists with the given id</dd>
+<dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> exists with the given id</dd>
 </dl>
 </li>
 </ul>
@@ -1510,9 +1503,9 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getClusterCriteriaForCommand</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;getClusterCriteriaForCommand&#8203;(java.lang.String&nbsp;id)
+<pre class="methodSignature">java.util.List&lt;<a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;getClusterCriteriaForCommand&#8203;(java.lang.String&nbsp;id)
                                                 throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">For the given command id return the Cluster <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order that is currently
+<div class="block">For the given command id return the Cluster <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> in priority order that is currently
  associated with this command if any.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1524,7 +1517,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Criterion)">
+<a id="addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1532,20 +1525,20 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <h4>addClusterCriterionForCommand</h4>
 <pre class="methodSignature">void&nbsp;addClusterCriterionForCommand&#8203;(java.lang.String&nbsp;id,
                                    @Valid
-                                   @Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion)
+                                   @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)
                             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Add a new <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.
+<div class="block">Add a new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.
  This new criterion will be the lowest priority criterion.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to add to</dd>
-<dd><code>criterion</code> - The new <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to add</dd>
+<dd><code>criterion</code> - The new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to add</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no command with id exists</dd>
 </dl>
 </li>
 </ul>
-<a id="addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.external.dtos.v4.Criterion,@javax.validation.constraints.Min(0L)int)">
+<a id="addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion,@javax.validation.constraints.Min(0L)int)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1553,11 +1546,11 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <h4>addClusterCriterionForCommand</h4>
 <pre class="methodSignature">void&nbsp;addClusterCriterionForCommand&#8203;(java.lang.String&nbsp;id,
                                    @Valid
-                                   @Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+                                   @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
                                    @Min(0L)
                                    @javax.validation.constraints.Min(0L) int&nbsp;priority)
                             throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Add a new <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.
+<div class="block">Add a new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.
  The priority is the place in the list this new criterion should be placed. A value of 0
  indicates it should be placed at the front of the list with the highest possible priority. 1 would be
  second in the list etc. If priority is &gt; the current size of the cluster criteria list
@@ -1565,7 +1558,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to add to</dd>
-<dd><code>criterion</code> - The new <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to add</dd>
+<dd><code>criterion</code> - The new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to add</dd>
 <dd><code>priority</code> - The place in the existing cluster criteria list this new criterion should be placed. Min 0.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no command with id exists</dd>
@@ -1579,14 +1572,14 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <li class="blockList">
 <h4>setClusterCriteriaForCommand</h4>
 <pre class="methodSignature">void&nbsp;setClusterCriteriaForCommand&#8203;(java.lang.String&nbsp;id,
-                                  java.util.List&lt;@Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)
+                                  java.util.List&lt;@Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&gt;&nbsp;clusterCriteria)
                            throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">For the command identified by id reset the entire list of cluster criteria to match the contents of
  clusterCriteria.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to set the cluster criteria for</dd>
-<dd><code>clusterCriteria</code> - The priority list of <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> to set</dd>
+<dd><code>clusterCriteria</code> - The priority list of <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to set</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no command with id exists</dd>
 </dl>
@@ -1602,7 +1595,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
                                       @Min(0L)
                                       @javax.validation.constraints.Min(0L) int&nbsp;priority)
                                throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Remove the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
+<div class="block">Remove the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
  associated with the command identified by id. A value of 0 for priority
  will result in the first element in the list being removed, 1 the second element and so on.</div>
 <dl>
@@ -1622,7 +1615,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <h4>removeAllClusterCriteriaForCommand</h4>
 <pre class="methodSignature">void&nbsp;removeAllClusterCriteriaForCommand&#8203;(java.lang.String&nbsp;id)
                                  throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Remove all the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command identified by id.</div>
+<div class="block">Remove all the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> currently associated with the command identified by id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the command to remove the criteria from</dd>
@@ -1631,35 +1624,35 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="findCommandsMatchingCriterion(com.netflix.genie.common.external.dtos.v4.Criterion,boolean)">
+<a id="findCommandsMatchingCriterion(com.netflix.genie.common.internal.dtos.Criterion,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findCommandsMatchingCriterion</h4>
-<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;findCommandsMatchingCriterion&#8203;(@Valid
-                                                     @Valid <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+<pre class="methodSignature">java.util.Set&lt;<a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;&nbsp;findCommandsMatchingCriterion&#8203;(@Valid
+                                                     @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
                                                      boolean&nbsp;addDefaultStatus)</pre>
-<div class="block">Find all the <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<div class="block">Find all the <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a>'s that match the given <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>criterion</code> - The <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> supplied that each command needs to completely match to be returned</dd>
+<dd><code>criterion</code> - The <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> supplied that each command needs to completely match to be returned</dd>
 <dd><code>addDefaultStatus</code> - true if a default status should be added to the supplied criterion if a
                          status isn't already present</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>All the <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s which matched the <a href="../../../common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a></dd>
+<dd>All the <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a>'s which matched the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a></dd>
 </dl>
 </li>
 </ul>
-<a id="updateStatusForUnusedCommands(com.netflix.genie.common.external.dtos.v4.CommandStatus,java.time.Instant,java.util.Set,int)">
+<a id="updateStatusForUnusedCommands(com.netflix.genie.common.internal.dtos.CommandStatus,java.time.Instant,java.util.Set,int)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>updateStatusForUnusedCommands</h4>
-<pre class="methodSignature">int&nbsp;updateStatusForUnusedCommands&#8203;(<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
+<pre class="methodSignature">int&nbsp;updateStatusForUnusedCommands&#8203;(<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&nbsp;desiredStatus,
                                   java.time.Instant&nbsp;commandCreatedThreshold,
-                                  java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
+                                  java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;currentStatuses,
                                   int&nbsp;batchSize)</pre>
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
  it was created before commandCreatedThreshold and it hasn't been used in any job.</div>
@@ -1681,7 +1674,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteUnusedCommands</h4>
-<pre class="methodSignature">long&nbsp;deleteUnusedCommands&#8203;(java.util.Set&lt;<a href="../../../common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
+<pre class="methodSignature">long&nbsp;deleteUnusedCommands&#8203;(java.util.Set&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;deleteStatuses,
                           @NotNull
                           @NotNull java.time.Instant&nbsp;commandCreatedThreshold,
                           @Min(1L)
@@ -1696,28 +1689,6 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <dd><code>batchSize</code> - The maximum number of commands to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of commands that were deleted</dd>
-</dl>
-</li>
-</ul>
-<a id="getV3JobRequest(java.lang.String)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getV3JobRequest</h4>
-<pre class="methodSignature">@Deprecated
-<a href="../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;getV3JobRequest&#8203;(@NotBlank
-                           @NotBlank java.lang.String&nbsp;id)
-                    throws <a href="../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
-<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span></div>
-<div class="block">Get job request for given job id.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - id of job request to look up</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the job</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - if there is an error</dd>
 </dl>
 </li>
 </ul>
@@ -1852,7 +1823,7 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 <pre class="methodSignature">long&nbsp;deleteJobsCreatedBefore&#8203;(@NotNull
                              @NotNull java.time.Instant&nbsp;creationThreshold,
                              @NotNull
-                             @NotNull java.util.Set&lt;<a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;excludeStatuses,
+                             @NotNull java.util.Set&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;excludeStatuses,
                              @Min(1L)
                              @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</pre>
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
@@ -1879,7 +1850,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
                             throws <a href="../../exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></pre>
 <div class="block">Save the given job submission information in the underlying data store.
  <p>
- The job record will be created with initial state of <a href="../../../common/external/dtos/v4/JobStatus.html#RESERVED"><code>JobStatus.RESERVED</code></a> meaning that the unique id
+ The job record will be created with initial state of <a href="../../../common/internal/dtos/JobStatus.html#RESERVED"><code>JobStatus.RESERVED</code></a> meaning that the unique id
  returned by this API has been reserved within Genie and no other job can use it. If
  <a href="../../dtos/JobSubmission.html" title="class in com.netflix.genie.web.dtos"><code>JobSubmission</code></a> contains some attachments these attachments will be persisted to a
  configured storage system (i.e. local disk, S3, etc) and added to the set of dependencies for the job.
@@ -1904,7 +1875,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobRequest</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;getJobRequest&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;getJobRequest&#8203;(@NotBlank
                          @NotBlank java.lang.String&nbsp;id)
                   throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the original request for a job.</div>
@@ -1929,7 +1900,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
                      @Valid
                      @Valid <a href="../../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)
               throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
-<div class="block">Save the given resolved details for a job. Sets the job status to <a href="../../../common/external/dtos/v4/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a>.</div>
+<div class="block">Save the given resolved details for a job. Sets the job status to <a href="../../../common/internal/dtos/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job</dd>
@@ -1947,7 +1918,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobSpecification</h4>
-<pre class="methodSignature">java.util.Optional&lt;<a href="../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&gt;&nbsp;getJobSpecification&#8203;(@NotBlank
+<pre class="methodSignature">java.util.Optional&lt;<a href="../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos">JobSpecification</a>&gt;&nbsp;getJobSpecification&#8203;(@NotBlank
                                                          @NotBlank java.lang.String&nbsp;id)
                                                   throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the saved job specification for the given job. If the job hasn't had a job specification resolved an empty
@@ -1956,13 +1927,13 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobSpecification</code></a> if one is present else an empty <code>Optional</code></dd>
+<dd>The <a href="../../../common/internal/dtos/JobSpecification.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobSpecification</code></a> if one is present else an empty <code>Optional</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with <code>id</code> exists</dd>
 </dl>
 </li>
 </ul>
-<a id="claimJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.AgentClientMetadata)">
+<a id="claimJob(java.lang.String,com.netflix.genie.common.internal.dtos.AgentClientMetadata)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -1971,12 +1942,12 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <pre class="methodSignature">void&nbsp;claimJob&#8203;(@NotBlank
               @NotBlank java.lang.String&nbsp;id,
               @Valid
-              @Valid <a href="../../../common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a>&nbsp;agentClientMetadata)
+              @Valid <a href="../../../common/internal/dtos/AgentClientMetadata.html" title="class in com.netflix.genie.common.internal.dtos">AgentClientMetadata</a>&nbsp;agentClientMetadata)
        throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
               <a href="../../../common/internal/exceptions/unchecked/GenieJobAlreadyClaimedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobAlreadyClaimedException</a>,
               <a href="../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></pre>
 <div class="block">Set a job identified by <code>id</code> to be owned by the agent identified by <code>agentClientMetadata</code>. The
- job status in the system will be set to <a href="../../../common/external/dtos/v4/JobStatus.html#CLAIMED"><code>JobStatus.CLAIMED</code></a></div>
+ job status in the system will be set to <a href="../../../common/internal/dtos/JobStatus.html#CLAIMED"><code>JobStatus.CLAIMED</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to claim. Must exist in the system.</dd>
@@ -1984,29 +1955,29 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - if no job with the given <code>id</code> exists</dd>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobAlreadyClaimedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobAlreadyClaimedException</a></code> - if the job with the given <code>id</code> already has been claimed</dd>
-<dd><code><a href="../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></code> - if the current job status is not <a href="../../../common/external/dtos/v4/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a></dd>
+<dd><code><a href="../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></code> - if the current job status is not <a href="../../../common/internal/dtos/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a></dd>
 </dl>
 </li>
 </ul>
-<a id="updateJobStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus,java.lang.String)">
+<a id="updateJobStatus(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>updateJobStatus</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;updateJobStatus&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;updateJobStatus&#8203;(@NotBlank
                           @NotBlank java.lang.String&nbsp;id,
                           @NotNull
-                          @NotNull <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
+                          @NotNull <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;currentStatus,
                           @NotNull
-                          @NotNull <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;newStatus,
+                          @NotNull <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;newStatus,
                           @Nullable
                           java.lang.String&nbsp;newStatusMessage)
                    throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Update the status of the job identified with <code>id</code> to be <code>newStatus</code> provided that the current status
  of the job matches <code>newStatus</code>. Optionally a status message can be provided to provide more details to
- users. If the <code>newStatus</code> is <a href="../../../common/external/dtos/v4/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a> the start time will be set. If the <code>newStatus</code>
- is a member of <a href="../../../common/external/dtos/v4/JobStatus.html#getFinishedStatuses()"><code>JobStatus.getFinishedStatuses()</code></a> and the job had a started time set the finished time of
+ users. If the <code>newStatus</code> is <a href="../../../common/internal/dtos/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a> the start time will be set. If the <code>newStatus</code>
+ is a member of <a href="../../../common/internal/dtos/JobStatus.html#getFinishedStatuses()"><code>JobStatus.getFinishedStatuses()</code></a> and the job had a started time set the finished time of
  the job will be set. If the currentStatus is different from what the source of truth thinks this
  function will skip the update and just return the current source of truth value.</div>
 <dl>
@@ -2022,7 +1993,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 </dl>
 </li>
 </ul>
-<a id="updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.external.dtos.v4.ArchiveStatus)">
+<a id="updateJobArchiveStatus(java.lang.String,com.netflix.genie.common.internal.dtos.ArchiveStatus)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -2031,7 +2002,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <pre class="methodSignature">void&nbsp;updateJobArchiveStatus&#8203;(@NotBlank(message="No job id entered. Unable to update.")
                             @NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
                             @NotNull(message="Status cannot be null.")
-                            @NotNull(message="Status cannot be null.") <a href="../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;archiveStatus)
+                            @NotNull(message="Status cannot be null.") <a href="../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&nbsp;archiveStatus)
                      throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Update the status and status message of the job.</div>
 <dl>
@@ -2049,7 +2020,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobStatus</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;getJobStatus&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;getJobStatus&#8203;(@NotBlank
                        @NotBlank java.lang.String&nbsp;id)
                 throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the status for a job with the given <code>id</code>.</div>
@@ -2069,7 +2040,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobArchiveStatus</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&nbsp;getJobArchiveStatus&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&nbsp;getJobArchiveStatus&#8203;(@NotBlank
                                   @NotBlank java.lang.String&nbsp;id)
                            throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the archive status for a job with the given <code>id</code>.</div>
@@ -2109,7 +2080,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getFinishedJob</h4>
-<pre class="methodSignature"><a href="../../../common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a>&nbsp;getFinishedJob&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos">FinishedJob</a>&nbsp;getFinishedJob&#8203;(@NotBlank
                            @NotBlank java.lang.String&nbsp;id)
                     throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
                            <a href="../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></pre>
@@ -2151,7 +2122,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobCluster</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;getJobCluster&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&nbsp;getJobCluster&#8203;(@NotBlank
                       @NotBlank java.lang.String&nbsp;id)
                throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the cluster the job used or is using.</div>
@@ -2159,7 +2130,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to get the cluster for</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a></dd>
+<dd>The <a href="../../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If either the job or the cluster is not found</dd>
 </dl>
@@ -2171,7 +2142,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobCommand</h4>
-<pre class="methodSignature"><a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;getJobCommand&#8203;(@NotBlank
+<pre class="methodSignature"><a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&nbsp;getJobCommand&#8203;(@NotBlank
                       @NotBlank java.lang.String&nbsp;id)
                throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the command the job used or is using.</div>
@@ -2179,7 +2150,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to get the command for</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a></dd>
+<dd>The <a href="../../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If either the job or the command is not found</dd>
 </dl>
@@ -2191,7 +2162,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getJobApplications</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;&nbsp;getJobApplications&#8203;(@NotBlank
+<pre class="methodSignature">java.util.List&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;&nbsp;getJobApplications&#8203;(@NotBlank
                                                @NotBlank java.lang.String&nbsp;id)
                                         throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the applications the job used or is currently using.</div>
@@ -2199,7 +2170,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to get the applications for</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../../common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a>s</dd>
+<dd>The <a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos"><code>Application</code></a>s</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If either the job or the applications were not found</dd>
 </dl>
@@ -2228,12 +2199,12 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getUserResourcesSummaries</h4>
-<pre class="methodSignature">java.util.Map&lt;java.lang.String,&#8203;<a href="../../../common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto">UserResourcesSummary</a>&gt;&nbsp;getUserResourcesSummaries&#8203;(java.util.Set&lt;<a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
+<pre class="methodSignature">java.util.Map&lt;java.lang.String,&#8203;<a href="../../../common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto">UserResourcesSummary</a>&gt;&nbsp;getUserResourcesSummaries&#8203;(java.util.Set&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;statuses,
                                                                                      boolean&nbsp;api)</pre>
 <div class="block">Get a map of summaries of resources usage for each user with at least one active job.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>statuses</code> - The set of <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>JobStatus</code></a> a job must be in to be considered in this request</dd>
+<dd><code>statuses</code> - The set of <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos"><code>JobStatus</code></a> a job must be in to be considered in this request</dd>
 <dd><code>api</code> - Whether the job was submitted via the api (true) or the agent cli (false)</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a map of user resources summaries, keyed on user name</dd>
@@ -2250,9 +2221,9 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
                          @NotBlank java.lang.String&nbsp;hostname)</pre>
 <div class="block">Get the amount of memory currently used on the given host by Genie jobs in any of the following states.
  <p>
- <a href="../../../common/external/dtos/v4/JobStatus.html#CLAIMED"><code>JobStatus.CLAIMED</code></a>
- <a href="../../../common/external/dtos/v4/JobStatus.html#INIT"><code>JobStatus.INIT</code></a>
- <a href="../../../common/external/dtos/v4/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a></div>
+ <a href="../../../common/internal/dtos/JobStatus.html#CLAIMED"><code>JobStatus.CLAIMED</code></a>
+ <a href="../../../common/internal/dtos/JobStatus.html#INIT"><code>JobStatus.INIT</code></a>
+ <a href="../../../common/internal/dtos/JobStatus.html#RUNNING"><code>JobStatus.RUNNING</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>hostname</code> - The hostname to get the memory for</dd>
@@ -2313,9 +2284,9 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <li class="blockList">
 <h4>getJobsWithStatusAndArchiveStatusUpdatedBefore</h4>
 <pre class="methodSignature">java.util.Set&lt;java.lang.String&gt;&nbsp;getJobsWithStatusAndArchiveStatusUpdatedBefore&#8203;(@NotEmpty
-                                                                               @NotEmpty java.util.Set&lt;<a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;statuses,
+                                                                               @NotEmpty java.util.Set&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;statuses,
                                                                                @NotEmpty
-                                                                               @NotEmpty java.util.Set&lt;<a href="../../../common/external/dtos/v4/ArchiveStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ArchiveStatus</a>&gt;&nbsp;archiveStatuses,
+                                                                               @NotEmpty java.util.Set&lt;<a href="../../../common/internal/dtos/ArchiveStatus.html" title="enum in com.netflix.genie.common.internal.dtos">ArchiveStatus</a>&gt;&nbsp;archiveStatuses,
                                                                                @NotNull
                                                                                @NotNull java.time.Instant&nbsp;updated)</pre>
 <div class="block">Get the set of jobs (agent only) whose state is in <code>statuses</code> and archive status is in
@@ -2419,7 +2390,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>addConfigsToResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;addConfigsToResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;addConfigsToResource&#8203;(@NotBlank
                                                      @NotBlank java.lang.String&nbsp;id,
                                                      java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;configs,
                                                      java.lang.Class&lt;R&gt;&nbsp;resourceClass)
@@ -2443,7 +2414,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getConfigsForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getConfigsForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getConfigsForResource&#8203;(@NotBlank
                                                                                  @NotBlank java.lang.String&nbsp;id,
                                                                                  java.lang.Class&lt;R&gt;&nbsp;resourceClass)
                                                                           throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
@@ -2467,7 +2438,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>updateConfigsForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;updateConfigsForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;updateConfigsForResource&#8203;(@NotBlank
                                                          @NotBlank java.lang.String&nbsp;id,
                                                          java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;configs,
                                                          java.lang.Class&lt;R&gt;&nbsp;resourceClass)
@@ -2491,7 +2462,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>removeAllConfigsForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;removeAllConfigsForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;removeAllConfigsForResource&#8203;(@NotBlank
                                                             @NotBlank java.lang.String&nbsp;id,
                                                             java.lang.Class&lt;R&gt;&nbsp;resourceClass)
                                                      throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
@@ -2513,7 +2484,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>removeConfigForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;removeConfigForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;removeConfigForResource&#8203;(@NotBlank
                                                         @NotBlank java.lang.String&nbsp;id,
                                                         @NotBlank
                                                         @NotBlank java.lang.String&nbsp;config,
@@ -2538,7 +2509,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>addDependenciesToResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;addDependenciesToResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;addDependenciesToResource&#8203;(@NotBlank
                                                           @NotBlank java.lang.String&nbsp;id,
                                                           java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;dependencies,
                                                           java.lang.Class&lt;R&gt;&nbsp;resourceClass)
@@ -2562,7 +2533,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getDependenciesForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getDependenciesForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getDependenciesForResource&#8203;(@NotBlank
                                                                                       @NotBlank java.lang.String&nbsp;id,
                                                                                       java.lang.Class&lt;R&gt;&nbsp;resourceClass)
                                                                                throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
@@ -2586,7 +2557,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>updateDependenciesForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;updateDependenciesForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;updateDependenciesForResource&#8203;(@NotBlank
                                                               @NotBlank java.lang.String&nbsp;id,
                                                               java.util.Set&lt;@Size(max=1024) java.lang.String&gt;&nbsp;dependencies,
                                                               java.lang.Class&lt;R&gt;&nbsp;resourceClass)
@@ -2610,7 +2581,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>removeAllDependenciesForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;removeAllDependenciesForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;removeAllDependenciesForResource&#8203;(@NotBlank
                                                                  @NotBlank java.lang.String&nbsp;id,
                                                                  java.lang.Class&lt;R&gt;&nbsp;resourceClass)
                                                           throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
@@ -2632,7 +2603,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>removeDependencyForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;removeDependencyForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;removeDependencyForResource&#8203;(@NotBlank
                                                             @NotBlank java.lang.String&nbsp;id,
                                                             @NotBlank
                                                             @NotBlank java.lang.String&nbsp;dependency,
@@ -2657,7 +2628,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>addTagsToResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;addTagsToResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;addTagsToResource&#8203;(@NotBlank
                                                   @NotBlank java.lang.String&nbsp;id,
                                                   java.util.Set&lt;@Size(max=255) java.lang.String&gt;&nbsp;tags,
                                                   java.lang.Class&lt;R&gt;&nbsp;resourceClass)
@@ -2681,7 +2652,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>getTagsForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getTagsForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getTagsForResource&#8203;(@NotBlank
                                                                               @NotBlank java.lang.String&nbsp;id,
                                                                               java.lang.Class&lt;R&gt;&nbsp;resourceClass)
                                                                        throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
@@ -2705,7 +2676,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>updateTagsForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;updateTagsForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;updateTagsForResource&#8203;(@NotBlank
                                                       @NotBlank java.lang.String&nbsp;id,
                                                       java.util.Set&lt;@Size(max=255) java.lang.String&gt;&nbsp;tags,
                                                       java.lang.Class&lt;R&gt;&nbsp;resourceClass)
@@ -2729,7 +2700,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>removeAllTagsForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;removeAllTagsForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;removeAllTagsForResource&#8203;(@NotBlank
                                                          @NotBlank java.lang.String&nbsp;id,
                                                          java.lang.Class&lt;R&gt;&nbsp;resourceClass)
                                                   throws <a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
@@ -2751,7 +2722,7 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 <ul class="blockList">
 <li class="blockList">
 <h4>removeTagForResource</h4>
-<pre class="methodSignature">&lt;R extends <a href="../../../common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;&nbsp;void&nbsp;removeTagForResource&#8203;(@NotBlank
+<pre class="methodSignature">&lt;R extends <a href="../../../common/internal/dtos/CommonResource.html" title="class in com.netflix.genie.common.internal.dtos">CommonResource</a>&gt;&nbsp;void&nbsp;removeTagForResource&#8203;(@NotBlank
                                                      @NotBlank java.lang.String&nbsp;id,
                                                      @NotBlank
                                                      @NotBlank java.lang.String&nbsp;tag,

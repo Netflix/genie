@@ -602,7 +602,7 @@ public&nbsp;void&nbsp;killJob&#8203;(@PathVariable("id")
 @ResponseStatus(OK)
 public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&gt;&nbsp;getJobRequest&#8203;(@PathVariable("id")
                                                                          java.lang.String&nbsp;id)
-                                                                  throws <a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                  throws <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get the original job request.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -610,7 +610,7 @@ public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../c
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The job request</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - On any internal error</dd>
+<dd><code><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no job with id exists</dd>
 </dl>
 </li>
 </ul>

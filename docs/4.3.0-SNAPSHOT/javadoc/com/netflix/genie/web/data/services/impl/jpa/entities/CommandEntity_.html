@@ -180,16 +180,6 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#CHECK_DELAY">CHECK_DELAY</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkDelay">checkDelay</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#CLUSTER_CRITERIA">CLUSTER_CRITERIA</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -209,6 +199,16 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Integer&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#cpu">cpu</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#CPU">CPU</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;<a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#dependencies">dependencies</a></span></code></th>
 <td class="colLast">&nbsp;</td>
@@ -216,6 +216,16 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#DEPENDENCIES">DEPENDENCIES</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#DISK_MB">DISK_MB</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#diskMb">diskMb</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -229,6 +239,26 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Integer&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#gpu">gpu</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#GPU">GPU</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#images">images</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#IMAGES">IMAGES</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#LAUNCHER_EXT">LAUNCHER_EXT</a></span></code></th>
 <td class="colLast">&nbsp;</td>
@@ -239,13 +269,23 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Integer&gt;</code></td>
+<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#memory">memory</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#MEMORY">MEMORY</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#NETWORK_MBPS">NETWORK_MBPS</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#networkMbps">networkMbps</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -350,40 +390,40 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <pre>public static volatile&nbsp;javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;<a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt; configs</pre>
 </li>
 </ul>
+<a id="images">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>images</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;com.fasterxml.jackson.databind.JsonNode&gt; images</pre>
+</li>
+</ul>
 <a id="memory">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>memory</h4>
-<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Integer&gt; memory</pre>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt; memory</pre>
 </li>
 </ul>
-<a id="clusterCriteria">
+<a id="cpu">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>clusterCriteria</h4>
-<pre>public static volatile&nbsp;javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;<a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt; clusterCriteria</pre>
+<h4>cpu</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Integer&gt; cpu</pre>
 </li>
 </ul>
-<a id="checkDelay">
+<a id="gpu">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>checkDelay</h4>
-<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt; checkDelay</pre>
-</li>
-</ul>
-<a id="launcherExt">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>launcherExt</h4>
-<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;com.fasterxml.jackson.databind.JsonNode&gt; launcherExt</pre>
+<h4>gpu</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Integer&gt; gpu</pre>
 </li>
 </ul>
 <a id="executable">
@@ -413,6 +453,42 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <pre>public static volatile&nbsp;javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;<a href="TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt; tags</pre>
 </li>
 </ul>
+<a id="diskMb">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>diskMb</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt; diskMb</pre>
+</li>
+</ul>
+<a id="networkMbps">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>networkMbps</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;java.lang.Long&gt; networkMbps</pre>
+</li>
+</ul>
+<a id="clusterCriteria">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>clusterCriteria</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;<a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt; clusterCriteria</pre>
+</li>
+</ul>
+<a id="launcherExt">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>launcherExt</h4>
+<pre>public static volatile&nbsp;javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,&#8203;com.fasterxml.jackson.databind.JsonNode&gt; launcherExt</pre>
+</li>
+</ul>
 <a id="applications">
 <!--   -->
 </a>
@@ -435,6 +511,19 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 </dl>
 </li>
 </ul>
+<a id="IMAGES">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>IMAGES</h4>
+<pre>public static final&nbsp;java.lang.String IMAGES</pre>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.IMAGES">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
 <a id="MEMORY">
 <!--   -->
 </a>
@@ -448,42 +537,29 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 </dl>
 </li>
 </ul>
-<a id="CLUSTER_CRITERIA">
+<a id="CPU">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>CLUSTER_CRITERIA</h4>
-<pre>public static final&nbsp;java.lang.String CLUSTER_CRITERIA</pre>
+<h4>CPU</h4>
+<pre>public static final&nbsp;java.lang.String CPU</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CLUSTER_CRITERIA">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CPU">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
-<a id="CHECK_DELAY">
+<a id="GPU">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>CHECK_DELAY</h4>
-<pre>public static final&nbsp;java.lang.String CHECK_DELAY</pre>
+<h4>GPU</h4>
+<pre>public static final&nbsp;java.lang.String GPU</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CHECK_DELAY">Constant Field Values</a></dd>
-</dl>
-</li>
-</ul>
-<a id="LAUNCHER_EXT">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>LAUNCHER_EXT</h4>
-<pre>public static final&nbsp;java.lang.String LAUNCHER_EXT</pre>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.LAUNCHER_EXT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.GPU">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -523,6 +599,58 @@ extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.se
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.TAGS">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a id="DISK_MB">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>DISK_MB</h4>
+<pre>public static final&nbsp;java.lang.String DISK_MB</pre>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.DISK_MB">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a id="NETWORK_MBPS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>NETWORK_MBPS</h4>
+<pre>public static final&nbsp;java.lang.String NETWORK_MBPS</pre>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.NETWORK_MBPS">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a id="CLUSTER_CRITERIA">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CLUSTER_CRITERIA</h4>
+<pre>public static final&nbsp;java.lang.String CLUSTER_CRITERIA</pre>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.CLUSTER_CRITERIA">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a id="LAUNCHER_EXT">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>LAUNCHER_EXT</h4>
+<pre>public static final&nbsp;java.lang.String LAUNCHER_EXT</pre>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.LAUNCHER_EXT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>

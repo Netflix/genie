@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6};
+var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -305,20 +305,13 @@ extends <a href="JpaBaseRepository.html" title="interface in com.netflix.genie.w
 </td>
 </tr>
 <tr id="i17" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;<a href="../queries/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobRequestProjection</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getV3JobRequest(java.lang.String)">getV3JobRequest</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
-<td class="colLast">
-<div class="block">Get the data needed to create a V3 Job Request DTO.</div>
-</td>
-</tr>
-<tr id="i18" class="altColor">
-<td class="colFirst"><code>java.util.Optional&lt;<a href="../queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">V4JobRequestProjection</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../queries/projections/v4/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobRequestProjection</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getV4JobRequest(java.lang.String)">getV4JobRequest</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
 <div class="block">Get the data needed to create a V4 Job Request DTO.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Boolean&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isAPI(java.lang.String)">isAPI</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
 <td class="colLast">
@@ -692,26 +685,6 @@ java.util.Optional&lt;<a href="../queries/projections/JobProjection.html" title=
 </dl>
 </li>
 </ul>
-<a id="getV3JobRequest(java.lang.String)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getV3JobRequest</h4>
-<pre class="methodSignature">@Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
-@EntityGraph(value="Job.v3.dto.request",
-             type=LOAD)
-java.util.Optional&lt;<a href="../queries/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobRequestProjection</a>&gt;&nbsp;getV3JobRequest&#8203;(@Param("id")
-                                                         java.lang.String&nbsp;id)</pre>
-<div class="block">Get the data needed to create a V3 Job Request DTO.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The unique id of the job</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../queries/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections"><code>JobRequestProjection</code></a> data or <code>Optional.empty()</code> if the job doesn't exist</dd>
-</dl>
-</li>
-</ul>
 <a id="getV4JobRequest(java.lang.String)">
 <!--   -->
 </a>
@@ -721,14 +694,14 @@ java.util.Optional&lt;<a href="../queries/projections/JobRequestProjection.html"
 <pre class="methodSignature">@Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
 @EntityGraph(value="Job.v4.dto.request",
              type=LOAD)
-java.util.Optional&lt;<a href="../queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">V4JobRequestProjection</a>&gt;&nbsp;getV4JobRequest&#8203;(@Param("id")
-                                                           java.lang.String&nbsp;id)</pre>
+java.util.Optional&lt;<a href="../queries/projections/v4/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">JobRequestProjection</a>&gt;&nbsp;getV4JobRequest&#8203;(@Param("id")
+                                                         java.lang.String&nbsp;id)</pre>
 <div class="block">Get the data needed to create a V4 Job Request DTO.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The unique id of the job</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><code>V4JobRequestProjection</code></a> data or <code>Optional.empty()</code> if the job doesn't exist</dd>
+<dd>The <a href="../queries/projections/v4/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><code>JobRequestProjection</code></a> data or <code>Optional.empty()</code> if the job doesn't exist</dd>
 </dl>
 </li>
 </ul>

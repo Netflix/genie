@@ -189,9 +189,9 @@ implements <a href="PersistedJobStatusObserver.html" title="interface in com.net
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#notify(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus)">notify</a></span>&#8203;(java.lang.String&nbsp;jobId,
-      <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;previousStatus,
-      <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#notify(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus)">notify</a></span>&#8203;(java.lang.String&nbsp;jobId,
+      <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;previousStatus,
+      <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;currentStatus)</code></th>
 <td class="colLast">
 <div class="block">Handle a notification of job status change after the latter was successfully committed to persistent storage.</div>
 </td>
@@ -244,7 +244,7 @@ implements <a href="PersistedJobStatusObserver.html" title="interface in com.net
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="notify(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus)">
+<a id="notify(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -252,12 +252,12 @@ implements <a href="PersistedJobStatusObserver.html" title="interface in com.net
 <h4>notify</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;notify&#8203;(java.lang.String&nbsp;jobId,
                    @Nullable
-                   <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;previousStatus,
-                   <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus)</pre>
+                   <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;previousStatus,
+                   <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos">JobStatus</a>&nbsp;currentStatus)</pre>
 <div class="block">Handle a notification of job status change after the latter was successfully committed to persistent storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="PersistedJobStatusObserver.html#notify(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobStatus,com.netflix.genie.common.external.dtos.v4.JobStatus)">notify</a></code>&nbsp;in interface&nbsp;<code><a href="PersistedJobStatusObserver.html" title="interface in com.netflix.genie.web.data.observers">PersistedJobStatusObserver</a></code></dd>
+<dd><code><a href="PersistedJobStatusObserver.html#notify(java.lang.String,com.netflix.genie.common.internal.dtos.JobStatus,com.netflix.genie.common.internal.dtos.JobStatus)">notify</a></code>&nbsp;in interface&nbsp;<code><a href="PersistedJobStatusObserver.html" title="interface in com.netflix.genie.web.data.observers">PersistedJobStatusObserver</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - the job unique id</dd>
 <dd><code>previousStatus</code> - the previous job status, or null if this job was just created and persisted</dd>

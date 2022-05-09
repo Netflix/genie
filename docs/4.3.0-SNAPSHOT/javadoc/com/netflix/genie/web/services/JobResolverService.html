@@ -165,8 +165,8 @@ public interface <span class="typeNameLabel">JobResolverService</span></pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean)">resolveJob</a></span>&#8203;(java.lang.String&nbsp;id,
-          @Valid <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveJob(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean)">resolveJob</a></span>&#8203;(java.lang.String&nbsp;id,
+          @Valid <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
           boolean&nbsp;apiJob)</code></th>
 <td class="colLast">
 <div class="block">Given a job request resolve all the details needed to run a job.</div>
@@ -201,11 +201,11 @@ public interface <span class="typeNameLabel">JobResolverService</span></pre>
                        <a href="../../common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></pre>
 <div class="block">Given the id of a job that was successfully submitted to the system this API will attempt to resolve all the
  concrete details (cluster, command, resources, etc) needed for the system to actually launch the job. Once these
- details are determined they are persisted and the job is marked as <a href="../../common/external/dtos/v4/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a>.</div>
+ details are determined they are persisted and the job is marked as <a href="../../common/internal/dtos/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to resolve. The job must exist and its status must return true from
-           <a href="../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>JobStatus</code></a>#isResolvable()</dd>
+           <a href="../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos"><code>JobStatus</code></a>#isResolvable()</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> instance containing all the concrete information needed to execute the job</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -214,7 +214,7 @@ public interface <span class="typeNameLabel">JobResolverService</span></pre>
 </dl>
 </li>
 </ul>
-<a id="resolveJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean)">
+<a id="resolveJob(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -223,7 +223,7 @@ public interface <span class="typeNameLabel">JobResolverService</span></pre>
 <pre class="methodSignature">@Nonnull
 <a href="../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolveJob&#8203;(java.lang.String&nbsp;id,
                        @Valid
-                       @Valid <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+                       @Valid <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
                        boolean&nbsp;apiJob)
                 throws <a href="../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a>,
                        <a href="../../common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></pre>

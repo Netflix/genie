@@ -123,7 +123,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li><a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">com.netflix.genie.web.selectors.ResourceSelectionContext</a>&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</li>
+<li><a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">com.netflix.genie.web.selectors.ResourceSelectionContext</a>&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</li>
 <li>
 <ul class="inheritance">
 <li>com.netflix.genie.web.selectors.ClusterSelectionContext</li>
@@ -137,7 +137,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <hr>
 <pre>public class <span class="typeNameLabel">ClusterSelectionContext</span>
-extends <a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</pre>
+extends <a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</pre>
 <div class="block">Extension of <a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in cluster selection.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -163,11 +163,11 @@ extends <a href="ResourceSelectionContext.html" title="class in com.netflix.geni
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean,com.netflix.genie.common.external.dtos.v4.Command,java.util.Set)">ClusterSelectionContext</a></span>&#8203;(@NotEmpty java.lang.String&nbsp;jobId,
-                       @NotNull <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean,com.netflix.genie.common.internal.dtos.Command,java.util.Set)">ClusterSelectionContext</a></span>&#8203;(@NotEmpty java.lang.String&nbsp;jobId,
+                       @NotNull <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
                        boolean&nbsp;apiJob,
-                       @Valid <a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;command,
-                       @NotEmpty java.util.Set&lt;@Valid <a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;clusters)</code></th>
+                       @Valid <a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&nbsp;command,
+                       @NotEmpty java.util.Set&lt;@Valid <a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;clusters)</code></th>
 <td class="colLast">
 <div class="block">Constructor.</div>
 </td>
@@ -191,14 +191,14 @@ extends <a href="ResourceSelectionContext.html" title="class in com.netflix.geni
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>java.util.Optional&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCommand()">getCommand</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the command which was already selected for the job if there was one.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getResources()">getResources</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Return the <code>Set</code> of distinct resources that a selector is meant to chose from.</div>
@@ -228,7 +228,7 @@ extends <a href="ResourceSelectionContext.html" title="class in com.netflix.geni
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean,com.netflix.genie.common.external.dtos.v4.Command,java.util.Set)">
+<a id="&lt;init&gt;(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean,com.netflix.genie.common.internal.dtos.Command,java.util.Set)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -237,12 +237,12 @@ extends <a href="ResourceSelectionContext.html" title="class in com.netflix.geni
 <pre>public&nbsp;ClusterSelectionContext&#8203;(@NotEmpty
                                @NotEmpty java.lang.String&nbsp;jobId,
                                @NotNull
-                               @NotNull <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+                               @NotNull <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
                                boolean&nbsp;apiJob,
                                @Nullable @Valid
-                               @Valid <a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;command,
+                               @Valid <a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&nbsp;command,
                                @NotEmpty
-                               @NotEmpty java.util.Set&lt;@Valid <a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;clusters)</pre>
+                               @NotEmpty java.util.Set&lt;@Valid <a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;clusters)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -270,14 +270,14 @@ extends <a href="ResourceSelectionContext.html" title="class in com.netflix.geni
 <ul class="blockList">
 <li class="blockList">
 <h4>getCommand</h4>
-<pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;getCommand()</pre>
+<pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;&nbsp;getCommand()</pre>
 <div class="block">Get the command which was already selected for the job if there was one.
  <p>
  This is currently returning an optional due to the support for v3 and v4 algorithms. Once v4 is the only
  resource selection algorithm command will no longer be optional.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> wrapped in an <code>Optional</code></dd>
+<dd>The <a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a> wrapped in an <code>Optional</code></dd>
 </dl>
 </li>
 </ul>
@@ -287,11 +287,11 @@ extends <a href="ResourceSelectionContext.html" title="class in com.netflix.geni
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getResources</h4>
-<pre class="methodSignature">public&nbsp;java.util.Set&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;getResources()</pre>
+<pre class="methodSignature">public&nbsp;java.util.Set&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;&nbsp;getResources()</pre>
 <div class="block">Return the <code>Set</code> of distinct resources that a selector is meant to chose from.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="ResourceSelectionContext.html#getResources()">getResources</a></code>&nbsp;in class&nbsp;<code><a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;<a href="../../common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></dd>
+<dd><code><a href="ResourceSelectionContext.html#getResources()">getResources</a></code>&nbsp;in class&nbsp;<code><a href="ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;<a href="../../common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos">Cluster</a>&gt;</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The resources</dd>
 </dl>

@@ -137,6 +137,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast"></td>
 </tr>
 <tr class="altColor">
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Command.Builder.html#withCheckDelay(java.lang.Long)">com.netflix.genie.common.dto.Command.Builder.withCheckDelay&#8203;(Long)</a></th>
+<td class="colLast"></td>
+</tr>
+<tr class="rowColor">
 <th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Command.Builder.html#withExecutable(java.lang.String)">com.netflix.genie.common.dto.Command.Builder.withExecutable&#8203;(String)</a></th>
 <td class="colLast">
 <div class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
@@ -144,7 +148,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  <a href="com/netflix/genie/common/dto/Command.Builder.html#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)"><code>Builder(String, String, String, CommandStatus, List, long)</code></a>.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Command.Builder.html#withExecutableAndArguments(java.util.List)">com.netflix.genie.common.dto.Command.Builder.withExecutableAndArguments&#8203;(List&lt;String&gt;)</a></th>
 <td class="colLast">
 <div class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
@@ -152,10 +156,28 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  <a href="com/netflix/genie/common/dto/Command.Builder.html#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)"><code>Builder(String, String, String, CommandStatus, List, long)</code></a>.</div>
 </td>
 </tr>
+<tr class="rowColor">
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Command.Builder.html#withMemory(java.lang.Integer)">com.netflix.genie.common.dto.Command.Builder.withMemory&#8203;(Integer)</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use <a href="com/netflix/genie/common/dto/Command.Builder.html#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>Command.Builder.withRuntime(Runtime)</code></a> instead</div>
+</td>
+</tr>
 <tr class="altColor">
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Command.html#getMemory()">com.netflix.genie.common.dto.Command.getMemory()</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use runtime instead</div>
+</td>
+</tr>
+<tr class="rowColor">
 <th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Job.Builder.html#withCommandArgs(java.lang.String)">com.netflix.genie.common.dto.Job.Builder.withCommandArgs&#8203;(String)</a></th>
 <td class="colLast">
 <div class="deprecationComment">See <a href="com/netflix/genie/common/dto/Job.Builder.html#withCommandArgs(java.util.List)"><code>Job.Builder.withCommandArgs(List)</code></a></div>
+</td>
+</tr>
+<tr class="altColor">
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/JobExecution.Builder.html#withMemory(java.lang.Integer)">com.netflix.genie.common.dto.JobExecution.Builder.withMemory&#8203;(Integer)</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use <a href="com/netflix/genie/common/dto/JobExecution.Builder.html#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>JobExecution.Builder.withRuntime(Runtime)</code></a> instead</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -165,12 +187,28 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </td>
 </tr>
 <tr class="altColor">
-<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getV3JobRequest(java.lang.String)">com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl.getV3JobRequest&#8203;(String)</a></th>
-<td class="colLast"></td>
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/JobRequest.Builder.html#withCpu(java.lang.Integer)">com.netflix.genie.common.dto.JobRequest.Builder.withCpu&#8203;(Integer)</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use <a href="com/netflix/genie/common/dto/JobRequest.Builder.html#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>JobRequest.Builder.withRuntime(Runtime)</code></a> instead</div>
+</td>
 </tr>
 <tr class="rowColor">
-<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getV3JobRequest(java.lang.String)">com.netflix.genie.web.data.services.PersistenceService.getV3JobRequest&#8203;(String)</a></th>
-<td class="colLast"></td>
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/JobRequest.Builder.html#withMemory(java.lang.Integer)">com.netflix.genie.common.dto.JobRequest.Builder.withMemory&#8203;(Integer)</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use <a href="com/netflix/genie/common/dto/JobRequest.Builder.html#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>JobRequest.Builder.withRuntime(Runtime)</code></a> instead</div>
+</td>
+</tr>
+<tr class="altColor">
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/JobRequest.html#getCpu()">com.netflix.genie.common.dto.JobRequest.getCpu()</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use runtime instead</div>
+</td>
+</tr>
+<tr class="rowColor">
+<th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/JobRequest.html#getMemory()">com.netflix.genie.common.dto.JobRequest.getMemory()</a></th>
+<td class="colLast">
+<div class="deprecationComment">Use runtime instead</div>
+</td>
 </tr>
 <tr class="altColor">
 <th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusters(groovy.lang.Binding)">com.netflix.genie.web.scripts.GroovyScriptUtils.getClusters&#8203;(Binding)</a></th>
@@ -229,7 +267,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tr class="altColor">
 <th class="colDeprecatedItemName" scope="row"><a href="com/netflix/genie/common/dto/Command.Builder.html#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.lang.String,long)">com.netflix.genie.common.dto.Command.Builder&#8203;(String, String, String, CommandStatus, String, long)</a></th>
 <td class="colLast">
-<div class="deprecationComment">Use <a href="com/netflix/genie/common/dto/Command.Builder.html#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List,long)"><code>Builder(String, String, String, CommandStatus, List, long)</code></a></div>
+<div class="deprecationComment">Use <a href="com/netflix/genie/common/dto/Command.Builder.html#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,com.netflix.genie.common.dto.CommandStatus,java.util.List)"><code>Builder(String, String, String, CommandStatus, List)</code></a></div>
 </td>
 </tr>
 <tr class="rowColor">

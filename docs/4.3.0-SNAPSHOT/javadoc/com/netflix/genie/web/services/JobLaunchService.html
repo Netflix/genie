@@ -203,7 +203,7 @@ java.lang.String&nbsp;launchJob&#8203;(@Valid
 <dd><code>jobSubmission</code> - The payload of metadata and resources making up all the information needed to launch
                       a job</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The id of the job. Upon return the job will at least be in <a href="../../common/external/dtos/v4/JobStatus.html#ACCEPTED"><code>JobStatus.ACCEPTED</code></a> state</dd>
+<dd>The id of the job. Upon return the job will at least be in <a href="../../common/internal/dtos/JobStatus.html#ACCEPTED"><code>JobStatus.ACCEPTED</code></a> state</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></code> - If the system was unable to launch an agent to handle job execution</dd>
 <dd><code><a href="../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></code> - If the job, based on user input and current system state, can't be

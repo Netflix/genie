@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9};
+var data = {"i0":9,"i1":9,"i2":9,"i3":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -180,13 +180,6 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>static <a href="../../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toJobRequestDto(com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection)">toJobRequestDto</a></span>&#8203;(<a href="../queries/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobRequestProjection</a>&nbsp;jobRequestProjection)</code></th>
-<td class="colLast">
-<div class="block">Convert database record into a DTO.</div>
-</td>
-</tr>
-<tr id="i4" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../../common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto">UserResourcesSummary</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toUserResourceSummaryDto(com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate)">toUserResourceSummaryDto</a></span>&#8203;(<a href="../queries/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">UserJobResourcesAggregate</a>&nbsp;userJobResourcesAggregate)</code></th>
 <td class="colLast">
@@ -230,22 +223,6 @@ extends java.lang.Object</pre>
 <dd><code>jobProjection</code> - The data from the database</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The job DTO representation</dd>
-</dl>
-</li>
-</ul>
-<a id="toJobRequestDto(com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toJobRequestDto</h4>
-<pre class="methodSignature">public static&nbsp;<a href="../../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;toJobRequestDto&#8203;(<a href="../queries/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">JobRequestProjection</a>&nbsp;jobRequestProjection)</pre>
-<div class="block">Convert database record into a DTO.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobRequestProjection</code> - The database data to convert</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A <a href="../../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto"><code>JobRequest</code></a> instance</dd>
 </dl>
 </li>
 </ul>

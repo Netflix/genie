@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":42,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
+var data = {"i0":10,"i1":10,"i2":42,"i3":10,"i4":42,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":42,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -251,7 +251,9 @@ extends <a href="ExecutionEnvironmentDTO.Builder.html" title="class in com.netfl
 <td class="colFirst"><code><a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withCpu(java.lang.Integer)">withCpu</a></span>&#8203;(java.lang.Integer&nbsp;cpu)</code></th>
 <td class="colLast">
-<div class="block">Set the number of cpu's being requested to run the job.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -293,10 +295,19 @@ extends <a href="ExecutionEnvironmentDTO.Builder.html" title="class in com.netfl
 <td class="colFirst"><code><a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withMemory(java.lang.Integer)">withMemory</a></span>&#8203;(java.lang.Integer&nbsp;memory)</code></th>
 <td class="colLast">
-<div class="block">Set the amount of memory being requested to run the job..</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
 </td>
 </tr>
 <tr id="i11" class="rowColor">
+<td class="colFirst"><code><a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withRuntime(com.netflix.genie.common.dto.Runtime)">withRuntime</a></span>&#8203;(<a href="Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a>&nbsp;runtime)</code></th>
+<td class="colLast">
+<div class="block">Set the requested job runtime environment details.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
 <td class="colFirst"><code><a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withTimeout(java.lang.Integer)">withTimeout</a></span>&#8203;(java.lang.Integer&nbsp;timeout)</code></th>
 <td class="colLast">
@@ -515,8 +526,12 @@ public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.
 <ul class="blockList">
 <li class="blockList">
 <h4>withCpu</h4>
-<pre class="methodSignature">public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a>&nbsp;withCpu&#8203;(@Nullable
+<pre class="methodSignature">@Deprecated
+public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a>&nbsp;withCpu&#8203;(@Nullable
                                   java.lang.Integer&nbsp;cpu)</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
 <div class="block">Set the number of cpu's being requested to run the job. Defaults to 1 if not set.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -532,9 +547,13 @@ public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.
 <ul class="blockList">
 <li class="blockList">
 <h4>withMemory</h4>
-<pre class="methodSignature">public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a>&nbsp;withMemory&#8203;(@Nullable
+<pre class="methodSignature">@Deprecated
+public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a>&nbsp;withMemory&#8203;(@Nullable
                                      java.lang.Integer&nbsp;memory)</pre>
-<div class="block">Set the amount of memory being requested to run the job..</div>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">Use <a href="#withRuntime(com.netflix.genie.common.dto.Runtime)"><code>withRuntime(Runtime)</code></a> instead</div>
+</div>
+<div class="block">Set the amount of memory being requested to run the job.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>memory</code> - The amount of memory in terms of MB's. Must be greater than 0.</dd>
@@ -612,6 +631,23 @@ public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.
 <dd>The builder</dd>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>3.3.0</dd>
+</dl>
+</li>
+</ul>
+<a id="withRuntime(com.netflix.genie.common.dto.Runtime)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withRuntime</h4>
+<pre class="methodSignature">public&nbsp;<a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto">JobRequest.Builder</a>&nbsp;withRuntime&#8203;(@Nullable
+                                      <a href="Runtime.html" title="class in com.netflix.genie.common.dto">Runtime</a>&nbsp;runtime)</pre>
+<div class="block">Set the requested job runtime environment details.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>runtime</code> - The <a href="Runtime.html" title="class in com.netflix.genie.common.dto"><code>Runtime</code></a> information or null</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="JobRequest.Builder.html" title="class in com.netflix.genie.common.dto"><code>JobRequest.Builder</code></a> instance</dd>
 </dl>
 </li>
 </ul>

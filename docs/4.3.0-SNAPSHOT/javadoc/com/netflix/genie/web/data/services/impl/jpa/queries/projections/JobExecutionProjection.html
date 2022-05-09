@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6};
+var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -166,55 +166,83 @@ extends <a href="AuditProjection.html" title="interface in com.netflix.genie.web
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCheckDelay()">getCheckDelay</a></span>()</code></th>
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCpuUsed()">getCpuUsed</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Get the amount of time (in milliseconds) to delay the check for the job status.</div>
+<div class="block">Get the number of CPU's used by the job.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDiskMbUsed()">getDiskMbUsed</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the amount of disk space used for a job.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getExitCode()">getExitCode</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the exit code from the process that ran the job.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGpuUsed()">getGpuUsed</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the number of GPUs used by the job.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getImagesUsed()">getImagesUsed</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get the set of image configuration used for this job.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLauncherExt()">getLauncherExt</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the launcher metadata for this job.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getMemoryUsed()">getMemoryUsed</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the amount of memory (in MB) that this job is/was run with.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNetworkMbpsUsed()">getNetworkMbpsUsed</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Get network bandwidth used for a job if any.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessId()">getProcessId</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the process id of the job.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.time.Instant&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStarted()">getStarted</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get when the job was started.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTimeoutUsed()">getTimeoutUsed</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the final resolved timeout duration (in seconds) if there was one for this job.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUniqueId()">getUniqueId</a></span>()</code></th>
 <td class="colLast">
@@ -301,20 +329,6 @@ extends <a href="AuditProjection.html" title="interface in com.netflix.genie.web
 </dl>
 </li>
 </ul>
-<a id="getCheckDelay()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getCheckDelay</h4>
-<pre class="methodSignature">java.util.Optional&lt;java.lang.Long&gt;&nbsp;getCheckDelay()</pre>
-<div class="block">Get the amount of time (in milliseconds) to delay the check for the job status.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Could be null so return optional of the Long</dd>
-</dl>
-</li>
-</ul>
 <a id="getExitCode()">
 <!--   -->
 </a>
@@ -329,17 +343,73 @@ extends <a href="AuditProjection.html" title="interface in com.netflix.genie.web
 </dl>
 </li>
 </ul>
+<a id="getCpuUsed()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCpuUsed</h4>
+<pre class="methodSignature">java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getCpuUsed()</pre>
+<div class="block">Get the number of CPU's used by the job.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of CPU's used or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
+<a id="getGpuUsed()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGpuUsed</h4>
+<pre class="methodSignature">java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getGpuUsed()</pre>
+<div class="block">Get the number of GPUs used by the job.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of GPUs used or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
 <a id="getMemoryUsed()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getMemoryUsed</h4>
-<pre class="methodSignature">java.util.Optional&lt;java.lang.Integer&gt;&nbsp;getMemoryUsed()</pre>
+<pre class="methodSignature">java.util.Optional&lt;java.lang.Long&gt;&nbsp;getMemoryUsed()</pre>
 <div class="block">Get the amount of memory (in MB) that this job is/was run with.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The memory as an optional as it could be null</dd>
+</dl>
+</li>
+</ul>
+<a id="getDiskMbUsed()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDiskMbUsed</h4>
+<pre class="methodSignature">java.util.Optional&lt;java.lang.Long&gt;&nbsp;getDiskMbUsed()</pre>
+<div class="block">Get the amount of disk space used for a job.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The amount of disk space in MB or <code>Optional.empty()</code></dd>
+</dl>
+</li>
+</ul>
+<a id="getNetworkMbpsUsed()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getNetworkMbpsUsed</h4>
+<pre class="methodSignature">java.util.Optional&lt;java.lang.Long&gt;&nbsp;getNetworkMbpsUsed()</pre>
+<div class="block">Get network bandwidth used for a job if any.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The network bandwidth in mbps or <code>Optional.empty()</code></dd>
 </dl>
 </li>
 </ul>
@@ -374,7 +444,7 @@ extends <a href="AuditProjection.html" title="interface in com.netflix.genie.web
 <a id="getLauncherExt()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getLauncherExt</h4>
 <pre class="methodSignature">java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getLauncherExt()</pre>
@@ -382,6 +452,20 @@ extends <a href="AuditProjection.html" title="interface in com.netflix.genie.web
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An Optional wrapping the JSON representation of the launcher metadata, if present.</dd>
+</dl>
+</li>
+</ul>
+<a id="getImagesUsed()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getImagesUsed</h4>
+<pre class="methodSignature">java.util.Optional&lt;com.fasterxml.jackson.databind.JsonNode&gt;&nbsp;getImagesUsed()</pre>
+<div class="block">Get the set of image configuration used for this job.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The images used or <code>Optional.empty()</code></dd>
 </dl>
 </li>
 </ul>

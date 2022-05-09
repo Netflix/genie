@@ -164,12 +164,12 @@ implements <a href="../JobResolverService.html" title="interface in com.netflix.
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(com.netflix.genie.web.data.services.DataServices,java.util.List,com.netflix.genie.web.selectors.CommandSelector,io.micrometer.core.instrument.MeterRegistry,com.netflix.genie.web.properties.JobsProperties,org.springframework.core.env.Environment,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)">JobResolverServiceImpl</a></span>&#8203;(<a href="../../data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(com.netflix.genie.web.data.services.DataServices,java.util.List,com.netflix.genie.web.selectors.CommandSelector,io.micrometer.core.instrument.MeterRegistry,com.netflix.genie.web.properties.JobsProperties,com.netflix.genie.web.properties.JobResolutionProperties,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)">JobResolverServiceImpl</a></span>&#8203;(<a href="../../data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                       @NotEmpty java.util.List&lt;<a href="../../selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>&gt;&nbsp;clusterSelectors,
                       <a href="../../selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>&nbsp;commandSelector,
                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                       <a href="../../properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
-                      org.springframework.core.env.Environment&nbsp;environment,
+                      <a href="../../properties/JobResolutionProperties.html" title="class in com.netflix.genie.web.properties">JobResolutionProperties</a>&nbsp;jobResolutionProperties,
                       <a href="../../../common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code></th>
 <td class="colLast">
 <div class="block">Constructor.</div>
@@ -203,8 +203,8 @@ implements <a href="../JobResolverService.html" title="interface in com.netflix.
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean)">resolveJob</a></span>&#8203;(java.lang.String&nbsp;id,
-          @Valid <a href="../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveJob(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean)">resolveJob</a></span>&#8203;(java.lang.String&nbsp;id,
+          @Valid <a href="../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
           boolean&nbsp;apiJob)</code></th>
 <td class="colLast">
 <div class="block">Given a job request resolve all the details needed to run a job.</div>
@@ -234,7 +234,7 @@ implements <a href="../JobResolverService.html" title="interface in com.netflix.
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(com.netflix.genie.web.data.services.DataServices,java.util.List,com.netflix.genie.web.selectors.CommandSelector,io.micrometer.core.instrument.MeterRegistry,com.netflix.genie.web.properties.JobsProperties,org.springframework.core.env.Environment,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)">
+<a id="&lt;init&gt;(com.netflix.genie.web.data.services.DataServices,java.util.List,com.netflix.genie.web.selectors.CommandSelector,io.micrometer.core.instrument.MeterRegistry,com.netflix.genie.web.properties.JobsProperties,com.netflix.genie.web.properties.JobResolutionProperties,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -246,7 +246,7 @@ implements <a href="../JobResolverService.html" title="interface in com.netflix.
                               <a href="../../selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>&nbsp;commandSelector,
                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                               <a href="../../properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
-                              org.springframework.core.env.Environment&nbsp;environment,
+                              <a href="../../properties/JobResolutionProperties.html" title="class in com.netflix.genie.web.properties">JobResolutionProperties</a>&nbsp;jobResolutionProperties,
                               <a href="../../../common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</pre>
 <div class="block">Constructor.</div>
 <dl>
@@ -256,7 +256,7 @@ implements <a href="../JobResolverService.html" title="interface in com.netflix.
 <dd><code>commandSelector</code> - The <a href="../../selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors"><code>CommandSelector</code></a> implementation to use</dd>
 <dd><code>registry</code> - The <code>MeterRegistry</code>metrics repository to use</dd>
 <dd><code>jobsProperties</code> - The properties for running a job set by the user</dd>
-<dd><code>environment</code> - The Spring application <code>Environment</code> for dynamic property resolution</dd>
+<dd><code>jobResolutionProperties</code> - The <a href="../../properties/JobResolutionProperties.html" title="class in com.netflix.genie.web.properties"><code>JobResolutionProperties</code></a> instance</dd>
 <dd><code>tracingComponents</code> - The <a href="../../../common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave"><code>BraveTracingComponents</code></a> instance to use</dd>
 </dl>
 </li>
@@ -284,13 +284,13 @@ public&nbsp;<a href="../../dtos/ResolvedJob.html" title="class in com.netflix.ge
                               <a href="../../../common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></pre>
 <div class="block">Given the id of a job that was successfully submitted to the system this API will attempt to resolve all the
  concrete details (cluster, command, resources, etc) needed for the system to actually launch the job. Once these
- details are determined they are persisted and the job is marked as <a href="../../../common/external/dtos/v4/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a>.</div>
+ details are determined they are persisted and the job is marked as <a href="../../../common/internal/dtos/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a>.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../JobResolverService.html#resolveJob(java.lang.String)">resolveJob</a></code>&nbsp;in interface&nbsp;<code><a href="../JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job to resolve. The job must exist and its status must return true from
-           <a href="../../../common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>JobStatus</code></a>#isResolvable()</dd>
+           <a href="../../../common/internal/dtos/JobStatus.html" title="enum in com.netflix.genie.common.internal.dtos"><code>JobStatus</code></a>#isResolvable()</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos"><code>ResolvedJob</code></a> instance containing all the concrete information needed to execute the job</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -299,7 +299,7 @@ public&nbsp;<a href="../../dtos/ResolvedJob.html" title="class in com.netflix.ge
 </dl>
 </li>
 </ul>
-<a id="resolveJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean)">
+<a id="resolveJob(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -308,14 +308,14 @@ public&nbsp;<a href="../../dtos/ResolvedJob.html" title="class in com.netflix.ge
 <pre class="methodSignature">@Nonnull
 public&nbsp;<a href="../../dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolveJob&#8203;(java.lang.String&nbsp;id,
                               @Valid
-                              @Valid <a href="../../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+                              @Valid <a href="../../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos">JobRequest</a>&nbsp;jobRequest,
                               boolean&nbsp;apiJob)
                        throws <a href="../../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a>,
                               <a href="../../../common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></pre>
 <div class="block">Given a job request resolve all the details needed to run a job. This API is stateless and saves nothing.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../JobResolverService.html#resolveJob(java.lang.String,com.netflix.genie.common.external.dtos.v4.JobRequest,boolean)">resolveJob</a></code>&nbsp;in interface&nbsp;<code><a href="../JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a></code></dd>
+<dd><code><a href="../JobResolverService.html#resolveJob(java.lang.String,com.netflix.genie.common.internal.dtos.JobRequest,boolean)">resolveJob</a></code>&nbsp;in interface&nbsp;<code><a href="../JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the job</dd>
 <dd><code>jobRequest</code> - The job request containing all details a user wants to have for their job</dd>

@@ -126,7 +126,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="ManagedScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ManagedScript</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ResourceSelectorScript</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</li>
+<li><a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ResourceSelectorScript</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</li>
 <li>
 <ul class="inheritance">
 <li>com.netflix.genie.web.scripts.CommandSelectorManagedScript</li>
@@ -142,7 +142,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <hr>
 <pre>public class <span class="typeNameLabel">CommandSelectorManagedScript</span>
-extends <a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</pre>
+extends <a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</pre>
 <div class="block">An extension of <a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> which from a set of commands and the original job request will
  attempt to determine the best command to use for execution.</div>
 <dl>
@@ -204,10 +204,10 @@ extends <a href="ResourceSelectorScript.html" title="class in com.netflix.genie.
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
+<td class="colFirst"><code><a href="ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#selectResource(com.netflix.genie.web.selectors.CommandSelectionContext)">selectResource</a></span>&#8203;(<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&nbsp;context)</code></th>
 <td class="colLast">
-<div class="block">Given the <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
+<div class="block">Given the <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </td>
 </tr>
@@ -278,13 +278,13 @@ extends <a href="ResourceSelectorScript.html" title="class in com.netflix.genie.
 <ul class="blockList">
 <li class="blockList">
 <h4>selectResource</h4>
-<pre class="methodSignature">public&nbsp;<a href="ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;selectResource&#8203;(<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&nbsp;context)
+<pre class="methodSignature">public&nbsp;<a href="ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>&gt;&nbsp;selectResource&#8203;(<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&nbsp;context)
                                                      throws <a href="../exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
-<div class="block">Given the <a href="../../common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
+<div class="block">Given the <a href="../../common/internal/dtos/JobRequest.html" title="class in com.netflix.genie.common.internal.dtos"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="ResourceSelectorScript.html#selectResource(C)">selectResource</a></code>&nbsp;in class&nbsp;<code><a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</code></dd>
+<dd><code><a href="ResourceSelectorScript.html#selectResource(C)">selectResource</a></code>&nbsp;in class&nbsp;<code><a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>context</code> - The <a href="../selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> instance containing information about the context for this
                 selection</dd>
@@ -306,7 +306,7 @@ extends <a href="ResourceSelectorScript.html" title="class in com.netflix.genie.
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="ResourceSelectorScript.html#addParametersForScript(java.util.Map,C)">addParametersForScript</a></code>&nbsp;in class&nbsp;<code><a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</code></dd>
+<dd><code><a href="ResourceSelectorScript.html#addParametersForScript(java.util.Map,C)">addParametersForScript</a></code>&nbsp;in class&nbsp;<code><a href="ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos">Command</a>,&#8203;<a href="../selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parameters</code> - The existing set of parameters for implementations to add to</dd>
 <dd><code>context</code> - The selection context</dd>
