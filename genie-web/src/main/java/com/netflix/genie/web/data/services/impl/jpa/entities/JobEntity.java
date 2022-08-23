@@ -156,7 +156,6 @@ import java.util.Set;
             name = JobEntity.V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH,
             attributeNodes = {
                 @NamedAttributeNode("configs"),
-                @NamedAttributeNode("dependencies"),
                 @NamedAttributeNode("setupFile"),
                 @NamedAttributeNode("commandArgs"),
                 @NamedAttributeNode(
@@ -171,7 +170,6 @@ import java.util.Set;
                     value = "applications",
                     subgraph = "resource-sub-graph"
                 ),
-                @NamedAttributeNode("environmentVariables"),
             },
             subgraphs = {
                 @NamedSubgraph(
