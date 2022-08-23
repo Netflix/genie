@@ -57,11 +57,13 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatus
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.assertj.core.api.Assertions;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.core.io.FileSystemResource;
@@ -87,6 +89,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -265,6 +268,35 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .collect(Collectors.toSet());
 
         Assertions.assertThat(savedAttachmentURIs).isEqualTo(attachmentURIs);
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/jobSpecification.xml")
+    void verifyLazyLoadJobDependencyAndEnvironmentVariables() {
+
+        final String jobId = "job3";
+
+        // load the projection.
+        final Optional<JobSpecificationProjection> jobSpecificationProjectionOption =
+            this.jobRepository.getJobSpecification(jobId);
+        Assertions.assertThat(jobSpecificationProjectionOption).isPresent();
+
+        // None of the lazy-loading attributes is initialized.
+        final JobSpecificationProjection jobSpecificationProjection = jobSpecificationProjectionOption.get();
+        Assertions.assertThat(Hibernate.isInitialized(jobSpecificationProjection.getDependencies())).isFalse();
+        Assertions.assertThat(Hibernate.isInitialized(jobSpecificationProjection.getEnvironmentVariables())).isFalse();
+
+        // Initialize job dependencies and check the correctness.
+        Hibernate.initialize(jobSpecificationProjection.getDependencies());
+        Assertions.assertThat(Hibernate.isInitialized(jobSpecificationProjection.getDependencies())).isTrue();
+        Assertions.assertThat(jobSpecificationProjection.getDependencies()).hasSize(3);
+        // Ensure job environment variables are still not initialized.
+        Assertions.assertThat(Hibernate.isInitialized(jobSpecificationProjection.getEnvironmentVariables())).isFalse();
+
+        // Initialize job environment variables and check the correctness.
+        Hibernate.initialize(jobSpecificationProjection.getEnvironmentVariables());
+        Assertions.assertThat(Hibernate.isInitialized(jobSpecificationProjection.getEnvironmentVariables())).isTrue();
+        Assertions.assertThat(jobSpecificationProjection.getEnvironmentVariables()).hasSize(2);
     }
 
     @Test
