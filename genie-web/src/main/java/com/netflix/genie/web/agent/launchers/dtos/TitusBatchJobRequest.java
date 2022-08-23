@@ -20,7 +20,9 @@ package com.netflix.genie.web.agent.launchers.dtos;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import org.apache.logging.log4j.util.Strings;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -108,6 +110,10 @@ public class TitusBatchJobRequest {
         @NotNull
         @NonNull
         private Map<String, String> attributes;
+        @Nullable
+        private ContainerConstraints softConstraints;
+        @Nullable
+        private ContainerConstraints hardConstraints;
     }
 
     /**
@@ -138,6 +144,22 @@ public class TitusBatchJobRequest {
         @NotNull
         @NonNull
         private String iamRole;
+    }
+
+    /**
+     * Titus job container constraints.
+     */
+    @Data
+    @Builder
+    public static class ContainerConstraints {
+        @NotNull
+        @NonNull
+        private Map<String, String> constraints;
+
+        @NotNull
+        @NonNull
+        @Builder.Default()
+        private String expression = Strings.EMPTY;
     }
 
     /**
