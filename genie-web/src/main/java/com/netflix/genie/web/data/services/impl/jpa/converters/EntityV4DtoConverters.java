@@ -480,7 +480,7 @@ public final class EntityV4DtoConverters {
     private static ComputeResources toComputeResources(
         final Supplier<Optional<Integer>> cpuGetter,
         final Supplier<Optional<Integer>> gpuGetter,
-        final Supplier<Optional<Long>> memoryGetter,
+        final Supplier<Optional<Integer>> memoryGetter,
         final Supplier<Optional<Long>> diskMbGetter,
         final Supplier<Optional<Long>> networkMbpsGetter
     ) {

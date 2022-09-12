@@ -115,7 +115,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     // Job Request fields
     private static final int CPU_REQUESTED = 2;
-    private static final long MEMORY_REQUESTED = 1024L;
+    private static final int MEMORY_REQUESTED = 1024;
     private static final int TIMEOUT_REQUESTED = 84500;
 
     // Job Metadata fields
@@ -559,7 +559,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(finishedJob.getGrouping()).isNotPresent();
         Assertions.assertThat(finishedJob.getGroupingInstance()).isNotPresent();
         Assertions.assertThat(finishedJob.getStatusMessage()).isNotPresent();
-        Assertions.assertThat(finishedJob.getRequestedMemory()).isPresent().contains(1560L);
+        Assertions.assertThat(finishedJob.getRequestedMemory()).isPresent().contains(1560);
         Assertions.assertThat(finishedJob.getRequestApiClientHostname()).isNotPresent();
         Assertions.assertThat(finishedJob.getRequestApiClientUserAgent()).isNotPresent();
         Assertions.assertThat(finishedJob.getRequestAgentClientHostname()).isNotPresent();
@@ -1505,7 +1505,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
                 new ComputeResources.Builder()
                     .withCpu(RandomSuppliers.INT.get() & Integer.MAX_VALUE)
                     .withGpu(RandomSuppliers.INT.get() & Integer.MAX_VALUE)
-                    .withMemoryMb(RandomSuppliers.LONG.get() & Long.MAX_VALUE)
+                    .withMemoryMb(RandomSuppliers.INT.get() & Integer.MAX_VALUE)
                     .withDiskMb(RandomSuppliers.LONG.get() & Long.MAX_VALUE)
                     .withNetworkMbps(RandomSuppliers.LONG.get() & Long.MAX_VALUE)
                     .build()

@@ -84,11 +84,11 @@ class TitusAgentLauncherImplSpec extends Specification {
     Span currentSpan
 
     int requestedCPU
-    long requestedMemory
+    int requestedMemory
 
     void setup() {
         this.requestedCPU = 3
-        this.requestedMemory = 1024L
+        this.requestedMemory = 1024
         this.launcherProperties = new TitusAgentLauncherProperties()
         this.launcherProperties.setEndpoint(URI.create(TITUS_ENDPOINT_PREFIX))
 
@@ -201,7 +201,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getAttributes().get("genie.jobId") == JOB_ID
         requestCapture.getContainer().getResources().getCpu() == this.requestedCPU + 1
         requestCapture.getContainer().getResources().getGpu() == TitusAgentLauncherImpl.DEFAULT_JOB_GPU
-        requestCapture.getContainer().getResources().getMemoryMB() == DataSize.ofGigabytes(4).toMegabytes()
+        requestCapture.getContainer().getResources().getMemoryMB() == DataSize.ofGigabytes(4).toMegabytes().intValue()
         requestCapture.getContainer().getResources().getDiskMB() ==
             TitusAgentLauncherImpl.DEFAULT_JOB_DISK + this.launcherProperties.getAdditionalDiskSize().toMegabytes()
         requestCapture.getContainer().getResources().getNetworkMbps() == TitusAgentLauncherImpl.DEFAULT_JOB_NETWORK + this.launcherProperties.getAdditionalBandwidth().toMegabytes() * TitusAgentLauncherImpl.MEGABYTE_TO_MEGABIT
@@ -284,7 +284,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         this.launcherProperties.setAdditionalMemory(additionalMemory)
 
         ComputeResources compute = new ComputeResources.Builder()
-            .withMemoryMb((Long) jobRequestMemory)
+            .withMemoryMb(jobRequestMemory as Integer)
             .build()
         ResolvedJob resolved = Mock(ResolvedJob) {
             getJobEnvironment() >> Mock(JobEnvironment) {

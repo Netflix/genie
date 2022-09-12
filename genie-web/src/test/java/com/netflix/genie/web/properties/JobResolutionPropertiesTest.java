@@ -52,7 +52,7 @@ class JobResolutionPropertiesTest {
         final ComputeResources computeResources = properties.getDefaultComputeResources();
         Assertions.assertThat(computeResources.getCpu()).contains(1);
         Assertions.assertThat(computeResources.getGpu()).contains(0);
-        Assertions.assertThat(computeResources.getMemoryMb()).contains(1_500L);
+        Assertions.assertThat(computeResources.getMemoryMb()).contains(1500);
         Assertions.assertThat(computeResources.getDiskMb()).contains(DataSize.ofGigabytes(10L).toMegabytes());
         Assertions
             .assertThat(computeResources.getNetworkMbps())
@@ -68,7 +68,7 @@ class JobResolutionPropertiesTest {
         this.environment
             .withProperty("genie.services.resolution.defaults.runtime.resources.cpu", "7")
             .withProperty("genie.services.resolution.defaults.runtime.resources.gpu", "1")
-            .withProperty("genie.services.resolution.defaults.runtime.resources.memory", "1GB")
+            .withProperty("genie.services.resolution.defaults.runtime.resources.memory", "1024")
             .withProperty("genie.services.resolution.defaults.runtime.resources.disk", "100GB")
             .withProperty("genie.services.resolution.defaults.runtime.resources.network", "15GB");
         final JobResolutionProperties properties = new JobResolutionProperties(this.environment);
@@ -78,7 +78,7 @@ class JobResolutionPropertiesTest {
         final ComputeResources computeResources = properties.getDefaultComputeResources();
         Assertions.assertThat(computeResources.getCpu()).contains(7);
         Assertions.assertThat(computeResources.getGpu()).contains(1);
-        Assertions.assertThat(computeResources.getMemoryMb()).contains(DataSize.ofGigabytes(1L).toMegabytes());
+        Assertions.assertThat(computeResources.getMemoryMb()).contains(1024);
         Assertions.assertThat(computeResources.getDiskMb()).contains(DataSize.ofGigabytes(100L).toMegabytes());
         Assertions
             .assertThat(computeResources.getNetworkMbps())

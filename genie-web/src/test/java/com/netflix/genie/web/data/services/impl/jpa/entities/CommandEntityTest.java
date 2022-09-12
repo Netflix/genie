@@ -67,7 +67,7 @@ class CommandEntityTest extends EntityTestBase {
     private static final String USER = "tgianos";
     private static final List<String> EXECUTABLE = Lists.newArrayList("/bin/pig13", "-Dblah");
     private static final String VERSION = "1.0";
-    private static final long MEMORY = 10_240L;
+    private static final int MEMORY = 10240;
 
     private CommandEntity c;
 
@@ -177,7 +177,7 @@ class CommandEntityTest extends EntityTestBase {
     @Test
     void testSetMemory() {
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(MEMORY);
-        final long newMemory = MEMORY + 1;
+        final int newMemory = MEMORY + 1;
         this.c.setMemory(newMemory);
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(newMemory);
     }

@@ -77,7 +77,7 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
      *
      * @return The memory as an optional as it could be null
      */
-    Optional<Long> getMemoryUsed();
+    Optional<Integer> getMemoryUsed();
 
     /**
      * Get the amount of disk space used for a job.

@@ -99,7 +99,7 @@ public interface FinishedJobProjection extends BaseProjection {
      *
      * @return The amount of memory the user requested for this job in MB as an Optional
      */
-    Optional<Long> getRequestedMemory();
+    Optional<Integer> getRequestedMemory();
 
     /**
      * Get the request api client hostname.
@@ -155,7 +155,7 @@ public interface FinishedJobProjection extends BaseProjection {
      *
      * @return The memory as an {@link Optional} as it could be null
      */
-    Optional<Long> getMemoryUsed();
+    Optional<Integer> getMemoryUsed();
 
     /**
      * Get all the cluster criteria.

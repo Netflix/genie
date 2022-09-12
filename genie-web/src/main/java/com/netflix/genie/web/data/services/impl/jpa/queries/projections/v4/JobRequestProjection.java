@@ -226,7 +226,7 @@ public interface JobRequestProjection {
      *
      * @return The amount of memory the user requested for this job in MB as an Optional
      */
-    Optional<Long> getRequestedMemory();
+    Optional<Integer> getRequestedMemory();
 
     /**
      * Get the requested disk space for the job if any.

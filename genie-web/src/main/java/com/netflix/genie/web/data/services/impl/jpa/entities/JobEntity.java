@@ -366,12 +366,12 @@ public class JobEntity extends BaseEntity implements
     @Basic
     @Column(name = "requested_memory", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private Long requestedMemory;
+    private Integer requestedMemory;
 
     @Basic
     @Column(name = "memory_used")
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private Long memoryUsed;
+    private Integer memoryUsed;
 
     @Basic
     @Column(name = "requested_disk_mb", updatable = false)
@@ -860,7 +860,7 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<Long> getRequestedMemory() {
+    public Optional<Integer> getRequestedMemory() {
         return Optional.ofNullable(this.requestedMemory);
     }
 
@@ -926,7 +926,7 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<Long> getMemoryUsed() {
+    public Optional<Integer> getMemoryUsed() {
         return Optional.ofNullable(this.memoryUsed);
     }
 

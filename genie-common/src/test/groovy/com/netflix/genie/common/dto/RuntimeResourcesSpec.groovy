@@ -49,7 +49,7 @@ class RuntimeResourcesSpec extends Specification {
         def computeResources2 = new RuntimeResources.Builder()
             .withCpu(cpu == null ? 1 : cpu + 1)
             .withGpu(gpu == null ? 1 : gpu + 1)
-            .withMemoryMb(memoryMb == null ? 1L : memoryMb + 1L)
+            .withMemoryMb(memoryMb == null ? 1 : memoryMb + 1)
             .withDiskMb(diskMb == null ? 1L : diskMb + 1L)
             .withNetworkMbps(networkMbps == null ? 1L : networkMbps + 1L)
             .build()
@@ -72,10 +72,10 @@ class RuntimeResourcesSpec extends Specification {
 
         where:
         cpu  | gpu  | memoryMb | diskMb | networkMbps
-        1    | 2    | 3L       | 4L     | 5L
+        1    | 2    | 3        | 4L     | 5L
         1    | null | null     | null   | null
         null | 2    | null     | null   | null
-        null | null | 3L       | null   | null
+        null | null | 3        | null   | null
         null | null | null     | 4L     | null
         null | null | null     | null   | 5L
         null | null | null     | null   | null

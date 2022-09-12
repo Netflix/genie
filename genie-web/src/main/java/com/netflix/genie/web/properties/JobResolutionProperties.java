@@ -103,7 +103,7 @@ public class JobResolutionProperties {
         this.defaultComputeResources = new ComputeResources.Builder()
             .withCpu(resources.getCpu())
             .withGpu(resources.getGpu())
-            .withMemoryMb(resources.getMemory().toMegabytes())
+            .withMemoryMb(resources.getMemory())
             .withDiskMb(resources.getDisk().toMegabytes())
             .withNetworkMbps(resources.getNetwork().toMegabytes() * MB_TO_MBIT)
             .build();
@@ -192,7 +192,7 @@ public class JobResolutionProperties {
     public static class Resources {
         private static final int DEFAULT_CPU = 1;
         private static final int DEFAULT_GPU = 0;
-        private static final DataSize DEFAULT_MEMORY = DataSize.ofMegabytes(1_500L);
+        private static final int DEFAULT_MEMORY = 1500;
         private static final DataSize DEFAULT_DISK = DataSize.ofGigabytes(10L);
         private static final DataSize DEFAULT_NETWORK = DataSize.ofMegabytes(1_250L); // 10000 mbps
 
@@ -212,7 +212,7 @@ public class JobResolutionProperties {
          * The amount of memory that should be allocated to a job if no other value was requested.
          */
         @NotNull
-        private DataSize memory = DEFAULT_MEMORY;
+        private int memory = DEFAULT_MEMORY;
 
         /**
          * The amount of disk space that should be allocated to a job if no other value was requested.
@@ -268,7 +268,7 @@ public class JobResolutionProperties {
          *
          * @return The amount of memory as a {@link DataSize} instance
          */
-        public DataSize getMemory() {
+        public int getMemory() {
             return this.memory;
         }
 
@@ -277,8 +277,8 @@ public class JobResolutionProperties {
          *
          * @param memory The new amount of memory or {@literal null} to reset to default
          */
-        public void setMemory(@Nullable final DataSize memory) {
-            this.memory = memory == null ? DEFAULT_MEMORY : memory;
+        public void setMemory(final int memory) {
+            this.memory = memory;
         }
 
         /**

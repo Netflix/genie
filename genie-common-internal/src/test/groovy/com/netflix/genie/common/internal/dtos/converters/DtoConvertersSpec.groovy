@@ -539,7 +539,7 @@ class DtoConvertersSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
         def executableAndArgs = Lists.newArrayList(binary, defaultBinaryArgument)
-        def memory = 128_347L
+        def memory = 128_347
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
@@ -647,7 +647,7 @@ class DtoConvertersSpec extends Specification {
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
         def executableAndArgs = Lists.newArrayList(binary, defaultBinaryArgument)
-        def memory = 128_347L
+        def memory = 128_347
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
@@ -1515,7 +1515,7 @@ class DtoConvertersSpec extends Specification {
         def computeResources0 = new ComputeResources.Builder()
             .withCpu(7)
             .withGpu(3)
-            .withMemoryMb(1_452L)
+            .withMemoryMb(1452)
             .withDiskMb(10_092L)
             .withNetworkMbps(1_024L)
             .build()

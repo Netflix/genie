@@ -53,7 +53,7 @@ class RuntimeSpec extends Specification {
         resources                                                   | images
         new RuntimeResources.Builder().withCpu(10).build()          | [genie: new ContainerImage.Builder().withName(UUID.randomUUID().toString()).build()]
         null                                                        | [python: new ContainerImage.Builder().withTag("latest.release").build()]
-        new RuntimeResources.Builder().withMemoryMb(3_243L).build() | null
+        new RuntimeResources.Builder().withMemoryMb(3_243).build()  | null
         null                                                        | null
     }
 }

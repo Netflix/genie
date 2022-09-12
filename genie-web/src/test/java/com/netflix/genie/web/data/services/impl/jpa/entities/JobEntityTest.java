@@ -247,7 +247,7 @@ class JobEntityTest extends EntityTestBase {
 
     @Test
     void canSetMemoryUsed() {
-        this.testOptionalField(this.entity::getMemoryUsed, this.entity::setMemoryUsed, 10_240L);
+        this.testOptionalField(this.entity::getMemoryUsed, this.entity::setMemoryUsed, 10_240);
     }
 
     @Test
@@ -431,7 +431,7 @@ class JobEntityTest extends EntityTestBase {
 
     @Test
     void canSetRequestedMemory() {
-        this.testOptionalField(this.entity::getRequestedMemory, this.entity::setRequestedMemory, 2048L);
+        this.testOptionalField(this.entity::getRequestedMemory, this.entity::setRequestedMemory, 2048);
     }
 
     @Test

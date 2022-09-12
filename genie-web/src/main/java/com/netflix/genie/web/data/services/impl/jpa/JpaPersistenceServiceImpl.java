@@ -2742,7 +2742,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Nullable final ComputeResources computeResources,
         final Consumer<Integer> cpuSetter,
         final Consumer<Integer> gpuSetter,
-        final Consumer<Long> memorySetter,
+        final Consumer<Integer> memorySetter,
         final Consumer<Long> diskMbSetter,
         final Consumer<Long> networkMbpsSetter
     ) {

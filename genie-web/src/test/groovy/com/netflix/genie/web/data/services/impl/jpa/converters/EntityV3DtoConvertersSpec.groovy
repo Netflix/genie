@@ -113,7 +113,7 @@ class EntityV3DtoConvertersSpec extends Specification {
         def timeout = started.plusSeconds(50L)
         entity.setStarted(started)
         entity.setTimeoutUsed(50)
-        def memory = 10_265L
+        def memory = 10265
         entity.setMemoryUsed(memory)
         entity.setArchiveStatus(ArchiveStatus.ARCHIVED.toString())
 

@@ -107,9 +107,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
 
         this.cpu = this.runtime.getResources().getCpu().orElse(null);
         this.memory = this.runtime.getResources()
-            .getMemoryMb()
-            .map(Long::intValue)
-            .orElse(null);
+            .getMemoryMb().orElse(null);
     }
 
     /**
@@ -401,7 +399,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          */
         @Deprecated
         public Builder withMemory(@Nullable final Integer memory) {
-            this.bRuntimeResources.withMemoryMb(memory == null ? null : memory.longValue());
+            this.bRuntimeResources.withMemoryMb(memory);
             return this;
         }
 

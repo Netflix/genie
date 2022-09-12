@@ -245,7 +245,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         final ComputeResources computeResources = new ComputeResources.Builder()
             .withCpu(7)
             .withGpu(8)
-            .withMemoryMb(1_352L)
+            .withMemoryMb(1352)
             .withDiskMb(10_324L)
             .withNetworkMbps(534L)
             .build();
@@ -300,7 +300,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 .withTags(Set.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
         );
-        final long memory = 512L;
+        final int memory = 512;
         final ComputeResources computeResources = new ComputeResources.Builder().withMemoryMb(memory).build();
         final CommandRequest command = new CommandRequest.Builder(
             new CommandMetadata.Builder(
@@ -346,7 +346,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         tags.add("hadoop");
         tags.addAll(command.getMetadata().getTags());
 
-        final long memory = 1_024L;
+        final int memory = 1024;
         final Command updateCommand = new Command(
             command.getId(),
             command.getCreated(),

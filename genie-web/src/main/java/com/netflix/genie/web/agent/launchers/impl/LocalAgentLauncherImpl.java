@@ -91,7 +91,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private static final Object MEMORY_CHECK_LOCK = new Object();
     private static final String THIS_CLASS = LocalAgentLauncherImpl.class.getCanonicalName();
     private static final Tag CLASS_TAG = Tag.of(LAUNCHER_CLASS_KEY, THIS_CLASS);
-    private static final long DEFAULT_JOB_MEMORY = 1_536L;
+    private static final int DEFAULT_JOB_MEMORY = 1_536;
 
     private final String hostname;
     private final PersistenceService persistenceService;

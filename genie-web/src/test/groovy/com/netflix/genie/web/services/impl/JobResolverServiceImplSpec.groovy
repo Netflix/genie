@@ -133,7 +133,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         def jobRequest0 = createJobRequest(arguments, null, null, null)
         def jobRequest1 = createJobRequest(arguments, null, 5_002, null)
-        def requestedMemory = 6_323L
+        def requestedMemory = 6_323
         def requestedCpu = 5
         def jobRequest2 = createJobRequest(arguments, requestedMemory, null, requestedCpu)
 
@@ -453,7 +453,7 @@ class JobResolverServiceImplSpec extends Specification {
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true, Mock(SpanCustomizer))
         context.setCluster(cluster)
         context.setCommand(command)
-        def memory = 1_005L
+        def memory = 1_005
         context.setComputeResources(new ComputeResources.Builder().withMemoryMb(memory).build())
 
         when:
@@ -1289,7 +1289,7 @@ class JobResolverServiceImplSpec extends Specification {
 
     private static JobRequest createJobRequest(
         List<String> commandArgs,
-        @Nullable Long requestedMemory,
+        @Nullable Integer requestedMemory,
         @Nullable Integer requestedTimeout,
         @Nullable Integer requestedCpu
     ) {

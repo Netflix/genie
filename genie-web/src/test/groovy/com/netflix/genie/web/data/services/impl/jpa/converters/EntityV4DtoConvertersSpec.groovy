@@ -398,7 +398,7 @@ class EntityV4DtoConvertersSpec extends Specification {
         ]
 
         def requestedTimeout = 32_000
-        def requestedMemory = 32_387L
+        def requestedMemory = 32_387
         def requestedCpu = 3
 
         def requestedEnvironmentVariables = [
@@ -912,7 +912,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getGrouping() >> Optional.of("group")
             getGroupingInstance() >> Optional.of("group_instance")
             getStatusMsg() >> Optional.of("status message")
-            getRequestedMemory() >> Optional.of(512L)
+            getRequestedMemory() >> Optional.of(512)
             getRequestApiClientHostname() >> Optional.of("api_client_host")
             getRequestApiClientUserAgent() >> Optional.of("apl_client_user-agent")
             getRequestAgentClientHostname() >> Optional.of("agent_client_host")
@@ -920,7 +920,7 @@ class EntityV4DtoConvertersSpec extends Specification {
             getNumAttachments() >> Optional.of(3)
             getExitCode() >> Optional.of(127)
             getArchiveLocation() >> Optional.of("s3://bucket/prefix/job")
-            getMemoryUsed() >> Optional.of(1024L)
+            getMemoryUsed() >> Optional.of(1024)
             getMetadata() >> Optional.of(Mock(JsonNode))
             getCommand() >> Optional.of(commandEntity)
             getCluster() >> Optional.of(clusterEntity)

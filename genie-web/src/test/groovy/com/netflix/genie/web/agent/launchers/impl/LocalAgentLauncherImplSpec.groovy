@@ -83,7 +83,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     JobMetadata jobMetadata
     JobEnvironment jobEnvironment
     ComputeResources computeResources
-    long jobMemory
+    int jobMemory
     JobSpecification jobSpec
     JobSpecification.ExecutionResource job
     Executor sharedExecutor
@@ -111,7 +111,7 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.jobMetadata = Mock(JobMetadata)
         this.jobEnvironment = Mock(JobEnvironment)
         this.computeResources = Mock(ComputeResources)
-        this.jobMemory = 100L
+        this.jobMemory = 100
         this.jobSpec = Mock(JobSpecification)
         this.job = Mock(JobSpecification.ExecutionResource)
         this.executor = Mock(Executor)

@@ -38,7 +38,7 @@ public class ComputeResources implements Serializable {
     private final Integer gpu;
 
     @Min(value = 1, message = "Must have at least 1 MB of memory")
-    private final Long memoryMb;
+    private final Integer memoryMb;
 
     @Min(value = 1, message = "Must have at least 1 MB of disk space")
     private final Long diskMb;
@@ -77,7 +77,7 @@ public class ComputeResources implements Serializable {
      *
      * @return The amount or {@link Optional#empty()}
      */
-    public Optional<Long> getMemoryMb() {
+    public Optional<Integer> getMemoryMb() {
         return Optional.ofNullable(this.memoryMb);
     }
 
@@ -150,7 +150,7 @@ public class ComputeResources implements Serializable {
 
         private Integer bCpu;
         private Integer bGpu;
-        private Long bMemoryMb;
+        private Integer bMemoryMb;
         private Long bDiskMb;
         private Long bNetworkMbps;
 
@@ -182,7 +182,7 @@ public class ComputeResources implements Serializable {
          * @param memoryMb The number must be at least 1 or {@literal null}
          * @return The {@link Builder}
          */
-        public Builder withMemoryMb(@Nullable final Long memoryMb) {
+        public Builder withMemoryMb(@Nullable final Integer memoryMb) {
             this.bMemoryMb = memoryMb;
             return this;
         }

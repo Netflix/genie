@@ -99,7 +99,7 @@ class JobExecutionTest {
                 new RuntimeResources.Builder()
                     .withCpu(5)
                     .withGpu(98)
-                    .withMemoryMb((long) MEMORY)
+                    .withMemoryMb(MEMORY)
                     .withDiskMb(324L)
                     .withNetworkMbps(255L)
                     .build()

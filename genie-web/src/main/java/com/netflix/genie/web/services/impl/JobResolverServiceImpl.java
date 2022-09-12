@@ -131,7 +131,7 @@ public class JobResolverServiceImpl implements JobResolverService {
 
     private static final int DEFAULT_CPU = 1;
     private static final int DEFAULT_GPU = 0;
-    private static final long DEFAULT_MEMORY = 1_500L;
+    private static final int DEFAULT_MEMORY = 1_500;
     private static final long DEFAULT_DISK = 10_000L;
     private static final long DEFAULT_NETWORK = 256L;
     private static final String NO_RATIONALE = "No rationale provided";

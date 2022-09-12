@@ -170,7 +170,7 @@ class CommandTest {
             .withResources(
                 new RuntimeResources.Builder()
                     .withCpu(8)
-                    .withMemoryMb((long) MEMORY)
+                    .withMemoryMb(MEMORY)
                     .withDiskMb(18_333L)
                     .withGpu(3)
                     .withNetworkMbps(512L)

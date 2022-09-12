@@ -99,7 +99,7 @@ public class JobExecution extends BaseDTO {
             .withImages(builder.bImages)
             .build();
 
-        this.memory = this.runtime.getResources().getMemoryMb().map(Long::intValue).orElse(null);
+        this.memory = this.runtime.getResources().getMemoryMb().orElse(null);
     }
 
     /**
@@ -248,7 +248,7 @@ public class JobExecution extends BaseDTO {
          */
         @Deprecated
         public Builder withMemory(@Nullable final Integer memory) {
-            this.bRuntimeResources.withMemoryMb(memory == null ? null : memory.longValue());
+            this.bRuntimeResources.withMemoryMb(memory);
             return this;
         }
 

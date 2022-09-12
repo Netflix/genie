@@ -207,7 +207,7 @@ public class CommandEntity extends BaseEntity {
     @Basic
     @Column(name = "memory")
     @Min(1)
-    private Long memory;
+    private Integer memory;
 
     @Basic
     @Column(name = "disk_mb")
@@ -376,7 +376,7 @@ public class CommandEntity extends BaseEntity {
      *
      * @return Optional of Integer as it could be null
      */
-    public Optional<Long> getMemory() {
+    public Optional<Integer> getMemory() {
         return Optional.ofNullable(this.memory);
     }
 

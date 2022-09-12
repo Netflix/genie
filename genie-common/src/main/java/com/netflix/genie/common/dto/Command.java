@@ -102,7 +102,6 @@ public class Command extends ExecutionEnvironmentDTO {
         this.memory = this.runtime
             .getResources()
             .getMemoryMb()
-            .flatMap(mem -> Optional.of(mem.intValue()))
             .orElse(null);
     }
 
@@ -227,7 +226,7 @@ public class Command extends ExecutionEnvironmentDTO {
          */
         @Deprecated
         public Builder withMemory(@Nullable final Integer memory) {
-            this.bRuntimeResources.withMemoryMb(memory == null ? null : memory.longValue());
+            this.bRuntimeResources.withMemoryMb(memory);
             return this;
         }
 

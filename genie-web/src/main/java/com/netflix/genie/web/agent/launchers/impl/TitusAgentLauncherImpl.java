@@ -93,7 +93,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private static final int TITUS_JOB_BATCH_SIZE = 1;
     private static final int DEFAULT_JOB_CPU = 1;
     private static final int DEFAULT_JOB_GPU = 0;
-    private static final long DEFAULT_JOB_MEMORY = 1_536L;
+    private static final int DEFAULT_JOB_MEMORY = 1_536;
     private static final long DEFAULT_JOB_DISK = 10_000L;
     private static final long DEFAULT_JOB_NETWORK = 16_000L;
     private static final BiFunction<List<String>, Map<String, String>, List<String>> REPLACE_PLACEHOLDERS =
