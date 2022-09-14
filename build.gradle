@@ -91,7 +91,7 @@ configure((Set<Project>) ext.javaProjects) {
         imports {
             mavenBom SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
-            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_aws_version}"
+            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.4.1"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
@@ -123,7 +123,6 @@ configure((Set<Project>) ext.javaProjects) {
             dependency("org.codehaus.groovy:groovy-all:3.0.9")
             dependency("org.codehaus.janino:janino:3.1.6")
             dependency("org.dbunit:dbunit:2.7.3")
-            dependency("com.h2database:h2:${h2_db_version}")
             dependencySet(group: "org.springdoc", version: "1.6.6") {
                 entry "springdoc-openapi-hateoas"
                 entry "springdoc-openapi-ui"
