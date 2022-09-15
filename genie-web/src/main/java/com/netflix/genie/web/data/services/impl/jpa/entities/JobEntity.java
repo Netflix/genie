@@ -18,6 +18,7 @@
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.web.data.services.impl.jpa.converters.IntegerToLongConverter;
 import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.data.services.impl.jpa.listeners.JobEntityListener;
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.PredicateUtils;
@@ -363,13 +364,13 @@ public class JobEntity extends BaseEntity implements
     @Min(value = 0, message = "Can't have less than 0 GPU")
     private Integer gpuUsed;
 
-    @Basic
     @Column(name = "requested_memory", updatable = false)
+    @Convert(converter = IntegerToLongConverter.class)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
     private Long requestedMemory;
 
-    @Basic
     @Column(name = "memory_used")
+    @Convert(converter = IntegerToLongConverter.class)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
     private Long memoryUsed;
 
