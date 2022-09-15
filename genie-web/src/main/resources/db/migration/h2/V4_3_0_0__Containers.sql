@@ -42,10 +42,6 @@ ALTER TABLE `jobs`
   DROP COLUMN `check_delay`;
 ALTER TABLE `jobs`
   DROP COLUMN `v4`;
-ALTER TABLE `jobs`
-  ALTER COLUMN `requested_memory` BIGINT(20) DEFAULT NULL;
-ALTER TABLE `jobs`
-  ALTER COLUMN `memory_used` BIGINT(20) DEFAULT NULL;
 
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`;
@@ -59,5 +55,3 @@ ALTER TABLE `commands`
   ADD COLUMN `network_mbps` BIGINT(20) DEFAULT NULL;
 ALTER TABLE `commands`
   ADD COLUMN `images` TEXT DEFAULT NULL;
-ALTER TABLE `commands`
-  ALTER COLUMN `memory` BIGINT(20) DEFAULT NULL;

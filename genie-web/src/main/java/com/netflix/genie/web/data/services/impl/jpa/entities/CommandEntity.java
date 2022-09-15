@@ -18,6 +18,7 @@
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.web.data.services.impl.jpa.converters.IntegerToLongConverter;
 import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.Getter;
@@ -204,8 +205,8 @@ public class CommandEntity extends BaseEntity {
     @Min(1)
     private Integer gpu;
 
-    @Basic
     @Column(name = "memory")
+    @Convert(converter = IntegerToLongConverter.class)
     @Min(1)
     private Long memory;
 

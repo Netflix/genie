@@ -28,8 +28,7 @@ ALTER TABLE `jobs`
   ADD COLUMN `network_mbps_used`      BIGINT(20) DEFAULT NULL,
   DROP COLUMN `check_delay`,
   DROP COLUMN `v4`,
-  MODIFY COLUMN `requested_memory` BIGINT(20) DEFAULT NULL,
-  MODIFY COLUMN `memory_used` BIGINT(20) DEFAULT NULL;
+  ALGORITHM=INPLACE, LOCK=NONE;
 
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`,
@@ -38,4 +37,4 @@ ALTER TABLE `commands`
   ADD COLUMN `disk_mb`      BIGINT(20) DEFAULT NULL,
   ADD COLUMN `network_mbps` BIGINT(20) DEFAULT NULL,
   ADD COLUMN `images`       TEXT       DEFAULT NULL,
-  MODIFY COLUMN `memory` BIGINT(20) DEFAULT NULL;
+  ALGORITHM=INPLACE, LOCK=NONE;

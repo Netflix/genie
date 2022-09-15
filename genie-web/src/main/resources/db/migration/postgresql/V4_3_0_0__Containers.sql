@@ -27,9 +27,7 @@ ALTER TABLE jobs
   ADD COLUMN requested_network_mbps BIGINT DEFAULT NULL,
   ADD COLUMN network_mbps_used      BIGINT DEFAULT NULL,
   DROP COLUMN check_delay,
-  DROP COLUMN v4,
-  ALTER COLUMN requested_memory TYPE BIGINT,
-  ALTER COLUMN memory_used TYPE BIGINT;
+  DROP COLUMN v4;
 
 ALTER TABLE commands
   DROP COLUMN check_delay,
@@ -37,5 +35,4 @@ ALTER TABLE commands
   ADD COLUMN gpu          INT    DEFAULT NULL,
   ADD COLUMN disk_mb      BIGINT DEFAULT NULL,
   ADD COLUMN network_mbps BIGINT DEFAULT NULL,
-  ADD COLUMN images       TEXT   DEFAULT NULL,
-  ALTER COLUMN memory TYPE BIGINT;
+  ADD COLUMN images       TEXT   DEFAULT NULL;
