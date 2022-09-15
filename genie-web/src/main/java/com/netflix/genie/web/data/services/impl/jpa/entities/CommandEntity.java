@@ -206,6 +206,8 @@ public class CommandEntity extends BaseEntity {
     private Integer gpu;
 
     @Column(name = "memory")
+    // Memory that stored in DB has data type of Integer and unit type of MB. If the memory retrieved from db
+    // is 2048, it means 2048 MB, NOT 2048 Bytes.
     @Convert(converter = IntegerToLongConverter.class)
     @Min(1)
     private Long memory;

@@ -365,11 +365,15 @@ public class JobEntity extends BaseEntity implements
     private Integer gpuUsed;
 
     @Column(name = "requested_memory", updatable = false)
+    // Memory that stored in DB has data type of Integer and unit type of MB. If the requestedMemory retrieved from db
+    // is 2048, it means 2048 MB, NOT 2048 Bytes.
     @Convert(converter = IntegerToLongConverter.class)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
     private Long requestedMemory;
 
     @Column(name = "memory_used")
+    // Memory that stored in DB has data type of Integer and unit type of MB. If the memoryUsed retrieved from db
+    // is 2048, it means 2048 MB, NOT 2048 Bytes.
     @Convert(converter = IntegerToLongConverter.class)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
     private Long memoryUsed;
