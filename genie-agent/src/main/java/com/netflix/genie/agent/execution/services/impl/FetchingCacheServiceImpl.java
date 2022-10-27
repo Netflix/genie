@@ -103,7 +103,11 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
      */
     @Override
     public void get(final URI sourceFileUri, final File destinationFile) throws DownloadException, IOException {
-        lookupOrDownload(sourceFileUri, destinationFile);
+        try {
+            lookupOrDownload(sourceFileUri, destinationFile);
+        } catch (IOException e) {
+            throw  new IOException("failed to download: " + sourceFileUri.toASCIIString(), e);
+        }
     }
 
     /**
@@ -217,7 +221,7 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
             Files.copy(cachedResourceVersionDataFile, destinationFile);
             //Critical section end
         } catch (LockException e) {
-            throw new DownloadException("Error downloading dependency", e);
+            throw new DownloadException("Error downloading dependency: " + uriString, e);
         }
 
         //Clean up any older versions
