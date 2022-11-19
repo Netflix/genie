@@ -248,8 +248,8 @@ configure((Set<Project>) ext.javaProjects) {
                 }
             }
 
-            if (System.env."TRAVIS" == "true") {
-                systemProperty "spring.profiles.include", "travisci"
+            if (System.env."GITHUB_ACTIONS" == "true" || System.env."GITHUB_ACTION") {
+                systemProperty "spring.profiles.include", "githubactions"
             }
 
             reports.html.destination(new File("${reporting.baseDir}/test/${task.name}"))

@@ -1,0 +1,124 @@
+name: Genie Build
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - v*.*.*
+      - v*.*.*-rc.*
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_DB: genie
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: genie
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    name: Gradle Build
+    env:
+      NETFLIX_OSS_SONATYPE_USERNAME: ${{ secrets.ORG_SONATYPE_USERNAME }}
+      NETFLIX_OSS_SONATYPE_PASSWORD: ${{ secrets.ORG_SONATYPE_PASSWORD }}
+      NETFLIX_OSS_SIGNING_KEY: ${{ secrets.ORG_SIGNING_KEY }}
+      NETFLIX_OSS_SIGNING_PASSWORD: ${{ secrets.ORG_SIGNING_PASSWORD }}
+      NETFLIX_OSS_REPO_USERNAME: ${{ secrets.ORG_NETFLIXOSS_USERNAME }}
+      NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
+      DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
+      GRGIT_USER: ${{ secrets.GRGIT_USER }}
+      GRGIT_PASS: ${{ secrets.GITHUB_TOKEN }}
+      GRADLE_OPTS: -Djava.io.tmpdir=/tmp/
+    steps:
+      - uses: actions/checkout@v1
+      - name: Configure MySQL database
+        run: |
+          "${{ format('{0}/.github/configure-mysql.sh', github.workspace) }}"
+      - name: Configure Genie temp folders
+        run: |
+          mkdir -p /tmp/genie/cache /tmp/genie/archives /tmp/genie/jobs
+      - name: Setup jdk 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - uses: actions/cache@v1
+        id: gradle-cache
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/dependency-locks/*.lockfile') }}
+          restore-keys: |
+            - ${{ runner.os }}-gradle-
+      - uses: actions/cache@v1
+        id: gradle-wrapper-cache
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-gradlewrapper-
+      - uses: actions/cache@v1
+        id: genie-ui-node-modules
+        with:
+          path: genie-ui/node_modules/
+          key: ${{ runner.os }}-genie-ui-node-modules-${{ hashFiles('genie-ui/node_modules/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-genie-ui-node-modules-
+      - uses: actions/cache@v1
+        id: genie-ui-gradle-nodejs
+        with:
+          path: genie-ui/.gradle/nodejs
+          key: ${{ runner.os }}-genie-ui-gradle-nodejs-${{ hashFiles('genie-ui/.gradle/nodejs/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-genie-ui-gradle-nodejs-
+      - uses: actions/cache@v1
+        id: genie-ui-gradle-npm
+        with:
+          path: genie-ui/.gradle/npm
+          key: ${{ runner.os }}-genie-ui-gradle-npm-${{ hashFiles('genie-ui/.gradle/npm/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-genie-ui-gradle-npm-
+      - name: Build pull request
+        if: |
+          github.event_name == 'pull_request' ||
+          ((!startsWith(github.ref, 'refs/tags/v')) && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev-snapshot')
+        run: |
+          ./gradlew --stacktrace build codeCoverageReport coveralls
+          INTEGRATION_TEST_DB=mysql ./gradlew --stacktrace genie-web:integrationTest
+          INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest
+          ./gradlew --stacktrace javadoc asciidoc dockerBuildAllImages
+      - name: Publish snapshot
+        if: |
+          (!startsWith(github.ref, 'refs/tags/v')) &&
+          github.event_name != 'pull_request' &&
+          github.ref == 'refs/heads/master'
+        run: ./gradlew build snapshot codeCoverageReport coveralls gitPublishPush dockerPush
+      - name: Publish snapshot (dev-snapshot branch)
+        if: |
+          (!startsWith(github.ref, 'refs/tags/v')) &&
+          github.event_name != 'pull_request' &&
+          github.ref == 'refs/heads/dev-snapshot'
+        run: ./gradlew build snapshot dockerPush -x check
+      - name: Publish candidate
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          contains(github.ref, '-rc.')
+        run: ./gradlew --stacktrace -Prelease.useLastTag=true candidate codeCoverageReport coveralls gitPublishPush dockerPush
+      - name: Publish release
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          (!contains(github.ref, '-rc.'))
+        run: --stacktrace -Prelease.useLastTag=true final codeCoverageReport coveralls gitPublishPush dockerPush
+      - name: Codecov
+        uses: codecov/codecov-action@v1
