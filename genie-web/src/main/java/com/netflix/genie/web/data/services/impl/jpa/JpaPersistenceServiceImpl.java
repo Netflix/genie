@@ -2320,11 +2320,17 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedFiles(@NotNull final Instant createdThreshold, @Min(1) final int batchSize) {
-        log.debug("[deleteUnusedFiles] Called to delete unused files created before {}", createdThreshold);
+    public long deleteUnusedFiles(@NotNull final Instant createdThresholdLowerBound,
+                                  @NotNull final Instant createdThresholdUpperBound,
+                                  @Min(1) final int batchSize) {
+        log.debug(
+            "[deleteUnusedFiles] Called to delete unused files created between {} and {}",
+            createdThresholdLowerBound,
+            createdThresholdUpperBound
+        );
         return this.fileRepository.deleteByIdIn(
             this.fileRepository
-                .findUnusedFiles(createdThreshold, batchSize)
+                .findUnusedFiles(createdThresholdLowerBound, createdThresholdUpperBound, batchSize)
                 .stream()
                 .map(Number::longValue)
                 .collect(Collectors.toSet())

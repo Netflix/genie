@@ -1138,11 +1138,15 @@ public interface PersistenceService {
      * Delete all files from the database that aren't referenced which were created before the supplied created
      * threshold.
      *
-     * @param createdThreshold The instant in time where files created before this time that aren't referenced
-     *                         will be deleted. Inclusive
+     * @param createdThresholdLowerBound The instant in time when files created after this time that aren't referenced
+     *                                   will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when files created before this time that aren't referenced
+     *                                   will be selected. Inclusive.
      * @param batchSize        The maximum number of files to delete in a single transaction
      * @return The number of files deleted
      */
-    long deleteUnusedFiles(@NotNull Instant createdThreshold, @Min(1) int batchSize);
+    long deleteUnusedFiles(@NotNull Instant createdThresholdLowerBound,
+                           @NotNull Instant createdThresholdUpperBound,
+                           @Min(1) int batchSize);
     //endregion
 }
