@@ -339,18 +339,33 @@ public class DatabaseCleanupTask extends LeaderTask {
                     Integer.class,
                     this.cleanupProperties.getBatchSize()
                 );
+                final long rollingWindowHours = this.environment.getProperty(
+                    DatabaseCleanupProperties.FileDatabaseCleanupProperties.ROLLING_WINDOW_HOURS_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getFileCleanup().getRollingWindowHours()
+                );
+                final long batchDaysWithin = this.environment.getProperty(
+                    DatabaseCleanupProperties.FileDatabaseCleanupProperties.BATCH_DAYS_WITHIN_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getFileCleanup().getBatchDaysWithin()
+                );
                 log.info(
                     "Attempting to delete unused files from before {} in batches of {}",
                     creationThreshold,
                     batchSize
                 );
 
-                long deleted;
                 long totalDeleted = 0L;
-                do {
-                    deleted = this.persistenceService.deleteUnusedFiles(creationThreshold, batchSize);
-                    totalDeleted += deleted;
-                } while (deleted > 0);
+                Instant upperBound = creationThreshold;
+                Instant lowerBound = creationThreshold.minus(rollingWindowHours, ChronoUnit.HOURS);
+                final Instant batchLowerBound = creationThreshold.minus(batchDaysWithin, ChronoUnit.DAYS);
+                while (upperBound.isAfter(batchLowerBound)) {
+                    totalDeleted += deleteUnusedFilesBetween(lowerBound, upperBound, batchSize);
+                    upperBound = lowerBound;
+                    lowerBound = lowerBound.minus(rollingWindowHours, ChronoUnit.HOURS);
+                }
+                // do a final deletion of everything < batchLowerBound
+                totalDeleted += deleteUnusedFilesBetween(Instant.EPOCH, upperBound, batchSize);
                 log.info(
                     "Deleted {} files that were unused by any resource and created before {}",
                     totalDeleted,
@@ -366,6 +381,16 @@ public class DatabaseCleanupTask extends LeaderTask {
                 .timer(FILE_DELETION_TIMER, tags)
                 .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         }
+    }
+
+    private long deleteUnusedFilesBetween(final Instant lowerBound, final Instant upperBound, final int batchSize) {
+        long deleted;
+        long totalDeleted = 0L;
+        do {
+            deleted = this.persistenceService.deleteUnusedFiles(lowerBound, upperBound, batchSize);
+            totalDeleted += deleted;
+        } while (deleted > 0);
+        return totalDeleted;
     }
 
     private void deleteTags(final Instant creationThreshold) {

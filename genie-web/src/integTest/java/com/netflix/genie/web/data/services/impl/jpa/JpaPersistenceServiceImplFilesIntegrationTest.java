@@ -75,7 +75,7 @@ class JpaPersistenceServiceImplFilesIntegrationTest extends JpaPersistenceServic
         Assertions.assertThat(this.fileRepository.existsByFile(file4)).isTrue();
         Assertions.assertThat(this.fileRepository.existsByFile(file5)).isTrue();
 
-        Assertions.assertThat(this.service.deleteUnusedFiles(Instant.now(), 10)).isEqualTo(2L);
+        Assertions.assertThat(this.service.deleteUnusedFiles(Instant.EPOCH, Instant.now(), 10)).isEqualTo(2L);
 
         Assertions.assertThat(this.fileRepository.existsByFile(file1)).isFalse();
         Assertions.assertThat(this.fileRepository.existsByFile(file2)).isTrue();

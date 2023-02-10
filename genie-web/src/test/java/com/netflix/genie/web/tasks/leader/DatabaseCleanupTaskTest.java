@@ -127,8 +127,12 @@ class DatabaseCleanupTaskTest {
         final int negativeDays = -1 * days;
         final int pageSize = 10;
         final int batchSize = 100;
+        final int rollingWindow = 12;
+        final int batchDaysWithin = 3;
 
         Mockito.when(this.cleanupProperties.getBatchSize()).thenReturn(batchSize);
+        Mockito.when(this.fileCleanupProperties.getBatchDaysWithin()).thenReturn(batchDaysWithin);
+        Mockito.when(this.fileCleanupProperties.getRollingWindowHours()).thenReturn(rollingWindow);
         Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
         Mockito.when(this.commandDeactivationProperties.getCommandCreationThreshold()).thenReturn(60);
@@ -161,7 +165,8 @@ class DatabaseCleanupTaskTest {
                 )
             ).thenReturn(1L, 0L, 2L, 0L);
         Mockito
-            .when(this.persistenceService.deleteUnusedFiles(Mockito.any(Instant.class), Mockito.eq(batchSize)))
+            .when(this.persistenceService.deleteUnusedFiles(
+                Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.eq(batchSize)))
             .thenReturn(3L, 0L, 4L, 0L);
         Mockito
             .when(this.persistenceService.deleteUnusedTags(Mockito.any(Instant.class), Mockito.eq(batchSize)))
@@ -217,8 +222,8 @@ class DatabaseCleanupTaskTest {
                 Mockito.eq(batchSize)
             );
             Mockito
-                .verify(this.persistenceService, Mockito.times(4))
-                .deleteUnusedFiles(Mockito.any(Instant.class), Mockito.eq(batchSize));
+                .verify(this.persistenceService, Mockito.times(16))
+                .deleteUnusedFiles(Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.eq(batchSize));
             Mockito
                 .verify(this.persistenceService, Mockito.times(4))
                 .deleteUnusedTags(Mockito.any(Instant.class), Mockito.eq(batchSize));
@@ -324,7 +329,7 @@ class DatabaseCleanupTaskTest {
             .deleteUnusedClusters(Mockito.anySet(), Mockito.any(Instant.class), Mockito.anyInt());
         Mockito
             .verify(this.persistenceService, Mockito.never())
-            .deleteUnusedFiles(Mockito.any(Instant.class), Mockito.anyInt());
+            .deleteUnusedFiles(Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.anyInt());
         Mockito
             .verify(this.persistenceService, Mockito.never())
             .deleteUnusedTags(Mockito.any(Instant.class), Mockito.anyInt());

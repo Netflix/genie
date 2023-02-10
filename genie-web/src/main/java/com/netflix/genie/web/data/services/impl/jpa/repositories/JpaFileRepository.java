@@ -52,7 +52,8 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
             + "AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) "
             + "AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) "
             + "AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) "
-            + "AND created <= :createdThreshold "
+            + "AND created <= :createdThresholdUpperBound "
+            + "AND created >= :createdThresholdLowerBound "
             + "LIMIT :limit "
             + "FOR UPDATE;";
 
@@ -84,14 +85,17 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * Find the ids of all files from the database that aren't referenced which were created before the supplied created
      * threshold.
      *
-     * @param createdThreshold The instant in time where files created before this time that aren't referenced
-     *                         will be selected. Inclusive.
+     * @param createdThresholdLowerBound The instant in time when files created after this time that aren't referenced
+     *                                   will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when files created before this time that aren't referenced
+     *                                   will be selected. Inclusive.
      * @param limit            The maximum number of file ids to retrieve
      * @return The ids of the files which should be deleted
      */
     @Query(value = SELECT_FOR_UPDATE_UNUSED_FILES_SQL, nativeQuery = true)
     Set<Number> findUnusedFiles(
-        @Param("createdThreshold") Instant createdThreshold,
+        @Param("createdThresholdLowerBound") Instant createdThresholdLowerBound,
+        @Param("createdThresholdUpperBound") Instant createdThresholdUpperBound,
         @Param("limit") int limit
     );
 
