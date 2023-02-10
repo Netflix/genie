@@ -2187,7 +2187,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html#SELECT_FOR_UPDATE_UNUSED_FILES_SQL">SELECT_FOR_UPDATE_UNUSED_FILES_SQL</a></code></th>
-<td class="colLast"><code>"SELECT id FROM files WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) AND created &lt;= :createdThreshold LIMIT :limit FOR UPDATE;"</code></td>
+<td class="colLast"><code>"SELECT id FROM files WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) AND created &lt;= :createdThresholdUpperBound AND created &gt;= :createdThresholdLowerBound LIMIT :limit FOR UPDATE;"</code></td>
 </tr>
 </tbody>
 </table>
@@ -2639,11 +2639,25 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
+<td class="colFirst"><a id="com.netflix.genie.web.properties.DatabaseCleanupProperties.FileDatabaseCleanupProperties.BATCH_DAYS_WITHIN_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#BATCH_DAYS_WITHIN_PROPERTY">BATCH_DAYS_WITHIN_PROPERTY</a></code></th>
+<td class="colLast"><code>"genie.tasks.database-cleanup.file-cleanup.batchDaysWithin"</code></td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.DatabaseCleanupProperties.FileDatabaseCleanupProperties.FILE_CLEANUP_PROPERTY_PREFIX">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#FILE_CLEANUP_PROPERTY_PREFIX">FILE_CLEANUP_PROPERTY_PREFIX</a></code></th>
 <td class="colLast"><code>"genie.tasks.database-cleanup.file-cleanup"</code></td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a id="com.netflix.genie.web.properties.DatabaseCleanupProperties.FileDatabaseCleanupProperties.ROLLING_WINDOW_HOURS_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#ROLLING_WINDOW_HOURS_PROPERTY">ROLLING_WINDOW_HOURS_PROPERTY</a></code></th>
+<td class="colLast"><code>"genie.tasks.database-cleanup.file-cleanup.rollingWindowHours"</code></td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a id="com.netflix.genie.web.properties.DatabaseCleanupProperties.FileDatabaseCleanupProperties.SKIP_PROPERTY">

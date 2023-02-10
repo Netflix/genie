@@ -295,7 +295,8 @@ public interface <span class="typeNameLabel">PersistenceService</span></pre>
 </tr>
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>long</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteUnusedFiles(java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedFiles</a></span>&#8203;(@NotNull java.time.Instant&nbsp;createdThreshold,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteUnusedFiles(java.time.Instant,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedFiles</a></span>&#8203;(@NotNull java.time.Instant&nbsp;createdThresholdLowerBound,
+                 @NotNull java.time.Instant&nbsp;createdThresholdUpperBound,
                  @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></th>
 <td class="colLast">
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
@@ -2763,22 +2764,26 @@ java.lang.String&nbsp;saveJobSubmission&#8203;(@Valid
 </dl>
 </li>
 </ul>
-<a id="deleteUnusedFiles(java.time.Instant,@javax.validation.constraints.Min(1L)int)">
+<a id="deleteUnusedFiles(java.time.Instant,java.time.Instant,@javax.validation.constraints.Min(1L)int)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>deleteUnusedFiles</h4>
 <pre class="methodSignature">long&nbsp;deleteUnusedFiles&#8203;(@NotNull
-                       @NotNull java.time.Instant&nbsp;createdThreshold,
+                       @NotNull java.time.Instant&nbsp;createdThresholdLowerBound,
+                       @NotNull
+                       @NotNull java.time.Instant&nbsp;createdThresholdUpperBound,
                        @Min(1L)
                        @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</pre>
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>createdThreshold</code> - The instant in time where files created before this time that aren't referenced
-                         will be deleted. Inclusive</dd>
+<dd><code>createdThresholdLowerBound</code> - The instant in time when files created after this time that aren't referenced
+                                   will be selected. Inclusive.</dd>
+<dd><code>createdThresholdUpperBound</code> - The instant in time when files created before this time that aren't referenced
+                                   will be selected. Inclusive.</dd>
 <dd><code>batchSize</code> - The maximum number of files to delete in a single transaction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of files deleted</dd>

@@ -208,7 +208,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.Number&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findUnusedFiles(java.time.Instant,int)">findUnusedFiles</a></span>&#8203;(java.time.Instant&nbsp;createdThreshold,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findUnusedFiles(java.time.Instant,java.time.Instant,int)">findUnusedFiles</a></span>&#8203;(java.time.Instant&nbsp;createdThresholdLowerBound,
+               java.time.Instant&nbsp;createdThresholdUpperBound,
                int&nbsp;limit)</code></th>
 <td class="colLast">
 <div class="block">Find the ids of all files from the database that aren't referenced which were created before the supplied created
@@ -339,24 +340,28 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dl>
 </li>
 </ul>
-<a id="findUnusedFiles(java.time.Instant,int)">
+<a id="findUnusedFiles(java.time.Instant,java.time.Instant,int)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findUnusedFiles</h4>
-<pre class="methodSignature">@Query(value="SELECT id FROM files WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) AND created &lt;= :createdThreshold LIMIT :limit FOR UPDATE;",
+<pre class="methodSignature">@Query(value="SELECT id FROM files WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) AND created &lt;= :createdThresholdUpperBound AND created &gt;= :createdThresholdLowerBound LIMIT :limit FOR UPDATE;",
        nativeQuery=true)
-java.util.Set&lt;java.lang.Number&gt;&nbsp;findUnusedFiles&#8203;(@Param("createdThreshold")
-                                                java.time.Instant&nbsp;createdThreshold,
+java.util.Set&lt;java.lang.Number&gt;&nbsp;findUnusedFiles&#8203;(@Param("createdThresholdLowerBound")
+                                                java.time.Instant&nbsp;createdThresholdLowerBound,
+                                                @Param("createdThresholdUpperBound")
+                                                java.time.Instant&nbsp;createdThresholdUpperBound,
                                                 @Param("limit")
                                                 int&nbsp;limit)</pre>
 <div class="block">Find the ids of all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>createdThreshold</code> - The instant in time where files created before this time that aren't referenced
-                         will be selected. Inclusive.</dd>
+<dd><code>createdThresholdLowerBound</code> - The instant in time when files created after this time that aren't referenced
+                                   will be selected. Inclusive.</dd>
+<dd><code>createdThresholdUpperBound</code> - The instant in time when files created before this time that aren't referenced
+                                   will be selected. Inclusive.</dd>
 <dd><code>limit</code> - The maximum number of file ids to retrieve</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ids of the files which should be deleted</dd>

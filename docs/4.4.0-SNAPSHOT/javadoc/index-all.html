@@ -1319,6 +1319,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Batch.html#%3Cinit%3E()">Batch()</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.Batch.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.Batch</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#BATCH_DAYS_WITHIN_PROPERTY">BATCH_DAYS_WITHIN_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The number of days within current day that the unused files deletion will be running in batch mode.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#BATCH_SIZE_PROPERTY">BATCH_SIZE_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a></dt>
 <dd>
 <div class="block">The batch size used to iteratively delete unused entities.</div>
@@ -3435,12 +3439,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#deleteUnusedFiles(java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedFiles(Instant, @javax.validation.constraints.Min(1L) int)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#deleteUnusedFiles(java.time.Instant,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedFiles(Instant, Instant, @javax.validation.constraints.Min(1L) int)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedFiles(java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedFiles(Instant, @javax.validation.constraints.Min(1L) int)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedFiles(java.time.Instant,java.time.Instant,@javax.validation.constraints.Min(1L)int)">deleteUnusedFiles(Instant, Instant, @javax.validation.constraints.Min(1L) int)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
@@ -4310,7 +4314,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Find commands from the database where their status is in statuses and they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html#findUnusedFiles(java.time.Instant,int)">findUnusedFiles(Instant, int)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaFileRepository</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html#findUnusedFiles(java.time.Instant,java.time.Instant,int)">findUnusedFiles(Instant, Instant, int)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaFileRepository</a></dt>
 <dd>
 <div class="block">Find the ids of all files from the database that aren't referenced which were created before the supplied created
  threshold.</div>
@@ -11456,6 +11460,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><a href="com/netflix/genie/web/properties/RetryProperties.ServiceSpecificProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">RetryProperties.ServiceSpecificProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
 <div class="block">Retry properties specific to a particular service.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#ROLLING_WINDOW_HOURS_PROPERTY">ROLLING_WINDOW_HOURS_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The size of the rolling window used to delete unused files, units in hours.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/RootModelAssembler.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers"><span class="typeNameLink">RootModelAssembler</span></a> - Class in <a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/package-summary.html">com.netflix.genie.web.apis.rest.v3.hateoas.assemblers</a></dt>
 <dd>
