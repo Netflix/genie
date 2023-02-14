@@ -22,6 +22,7 @@ import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
+import com.google.common.base.Strings;
 import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
@@ -261,7 +262,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
         final Map<String, String> jobAttributes = this.createJobAttributes(jobId, resolvedJob);
 
-        final TitusBatchJobRequest request = TitusBatchJobRequest.builder()
+        final TitusBatchJobRequest.TitusBatchJobRequestBuilder requestBuilder = TitusBatchJobRequest.builder()
             .owner(
                 TitusBatchJobRequest.Owner
                     .builder()
@@ -339,12 +340,37 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     .detail(this.titusAgentLauncherProperties.getDetail())
                     .sequence(this.titusAgentLauncherProperties.getSequence())
                     .build()
-            )
-            .build();
+            );
+
+        final Optional<String> networkConfiguration = validateNetworkConfiguration(this.environment.getProperty(
+            TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION,
+            String.class));
+        networkConfiguration.ifPresent(config -> requestBuilder.networkConfiguration(
+                TitusBatchJobRequest.NetworkConfiguration.builder().networkMode(config).build()));
+
+        final TitusBatchJobRequest request = requestBuilder.build();
 
         // Run the request through the security adapter to add any necessary context
         this.jobRequestAdapter.modifyJobRequest(request, resolvedJob);
         return request;
+    }
+
+    private Optional<String> validateNetworkConfiguration(@Nullable final String networkConfig) {
+        if (Strings.isNullOrEmpty(networkConfig)) {
+            return Optional.empty();
+        }
+
+        switch (networkConfig) {
+            case "Ipv4Only":
+            case "Ipv6AndIpv4":
+            case "Ipv6AndIpv4Fallback":
+            case "Ipv6Only":
+            case "HighScale":
+                return Optional.of(networkConfig);
+            default:
+                return Optional.empty();
+        }
+
     }
 
     /**

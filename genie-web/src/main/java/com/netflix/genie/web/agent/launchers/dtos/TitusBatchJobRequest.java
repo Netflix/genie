@@ -71,6 +71,8 @@ public class TitusBatchJobRequest {
     @NotNull
     @NonNull
     private JobGroupInfo jobGroupInfo;
+    @Nullable
+    private NetworkConfiguration networkConfiguration;
 
     /**
      * Titus job owner POJO.
@@ -188,6 +190,15 @@ public class TitusBatchJobRequest {
         @Min(1)
         private int size;
         private long runtimeLimitSec;
+    }
+
+    /**
+     * Titus job network configuration.
+     */
+    @Data
+    @Builder
+    public static class NetworkConfiguration {
+        private String networkMode;
     }
 
     /**

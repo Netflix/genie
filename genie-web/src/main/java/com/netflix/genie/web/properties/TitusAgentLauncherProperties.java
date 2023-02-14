@@ -170,6 +170,11 @@ public class TitusAgentLauncherProperties {
     public static final String AGENT_IMAGE_KEY_PROPERTY = PREFIX + ".agentImageKey";
 
     /**
+     * The property for titus container network mode.
+     */
+    public static final String CONTAINER_NETWORK_CONFIGURATION = PREFIX + ".networkConfiguration";
+
+    /**
      * Whether the Titus Agent Launcher is enabled.
      */
     private boolean enabled;

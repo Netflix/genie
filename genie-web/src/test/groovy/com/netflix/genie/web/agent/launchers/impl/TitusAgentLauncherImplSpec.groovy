@@ -605,6 +605,42 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getContainer().getAttributes().get(prop2Key) == prop2Value
     }
 
+    def "Check container attributes resolution"() {
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+        String dualstack = "Ipv6AndIpv4"
+        String nonsense = "whatever"
+
+        when:
+        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION, dualstack)
+        this.launcher.launchAgent(this.resolvedJob, null)
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
+        requestCapture != null
+        requestCapture.getNetworkConfiguration() != null
+        requestCapture.getNetworkConfiguration().getNetworkMode() == dualstack
+
+        when:
+        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION, nonsense)
+        this.launcher.launchAgent(this.resolvedJob, null)
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
+        requestCapture != null
+        requestCapture.getNetworkConfiguration() == null
+    }
+
     def "Retry policy works as expected"() {
         def retryCodes = EnumSet.of(HttpStatus.REQUEST_TIMEOUT, HttpStatus.SERVICE_UNAVAILABLE)
         def maxRetries = 2
