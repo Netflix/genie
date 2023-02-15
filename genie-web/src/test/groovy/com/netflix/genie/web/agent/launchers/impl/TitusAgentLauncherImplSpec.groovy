@@ -605,14 +605,12 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getContainer().getAttributes().get(prop2Key) == prop2Value
     }
 
-    def "Check container attributes resolution"() {
+    def "Check titus container network mode"() {
         TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
         TitusBatchJobRequest requestCapture
-        String dualstack = "Ipv6AndIpv4"
-        String nonsense = "whatever"
 
         when:
-        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION, dualstack)
+        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION, inputNetworkMode)
         this.launcher.launchAgent(this.resolvedJob, null)
 
         then:
@@ -623,22 +621,21 @@ class TitusAgentLauncherImplSpec extends Specification {
         }
         1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
         requestCapture != null
-        requestCapture.getNetworkConfiguration() != null
-        requestCapture.getNetworkConfiguration().getNetworkMode() == dualstack
-
-        when:
-        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION, nonsense)
-        this.launcher.launchAgent(this.resolvedJob, null)
-
-        then:
-        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
-            args ->
-                requestCapture = args[1] as TitusBatchJobRequest
-                return response
+        if (requestNetworkMode != null) {
+            requestCapture.getNetworkConfiguration() != null
+            requestCapture.getNetworkConfiguration().getNetworkMode() == requestNetworkMode
+        } else {
+            requestCapture.getNetworkConfiguration() == null
         }
-        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
-        requestCapture != null
-        requestCapture.getNetworkConfiguration() == null
+
+        where:
+        inputNetworkMode      | requestNetworkMode
+        "Ipv4Only"            | "Ipv4Only"
+        "Ipv6AndIpv4"         | "Ipv6AndIpv4"
+        "Ipv6AndIpv4Fallback" | "Ipv6AndIpv4Fallback"
+        "Ipv6Only"            | "Ipv6Only"
+        "HighScale"           | "HighScale"
+        "NonSense"            | null
     }
 
     def "Retry policy works as expected"() {

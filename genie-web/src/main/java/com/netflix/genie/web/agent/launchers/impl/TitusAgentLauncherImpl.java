@@ -116,6 +116,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final MeterRegistry registry;
     private final Tracer tracer;
     private final BraveTracePropagator tracePropagator;
+    private final static String TITUS_NETWORK_MODE_IPV4 = "Ipv4Only";
+    private final static String TITUS_NETWORK_MODE_DUAL_STACK = "Ipv6AndIpv4";
+    private final static String TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK = "Ipv6AndIpv4Fallback";
+    private final static String TITUS_NETWORK_MODE_IPV6 = "Ipv6Only";
+    private final static String TITUS_NETWORK_MODE_HIGH_SCALE = "HighScale";
 
     /**
      * Constructor.
@@ -361,11 +366,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         }
 
         switch (networkConfig) {
-            case "Ipv4Only":
-            case "Ipv6AndIpv4":
-            case "Ipv6AndIpv4Fallback":
-            case "Ipv6Only":
-            case "HighScale":
+            case TITUS_NETWORK_MODE_IPV4:
+            case TITUS_NETWORK_MODE_DUAL_STACK:
+            case TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK:
+            case TITUS_NETWORK_MODE_IPV6:
+            case TITUS_NETWORK_MODE_HIGH_SCALE:
                 return Optional.of(networkConfig);
             default:
                 return Optional.empty();
