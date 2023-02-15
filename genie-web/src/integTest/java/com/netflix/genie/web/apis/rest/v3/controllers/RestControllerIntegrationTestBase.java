@@ -41,10 +41,13 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockSnippet;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -55,12 +58,17 @@ import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -108,6 +116,8 @@ abstract class RestControllerIntegrationTestBase {
     static final String JOBS_LINK_KEY = "jobs";
     static final Set<String> CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
     static final Set<String> COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
+
+    private static final Logger LOG = LoggerFactory.getLogger(RestControllerIntegrationTestBase.class);
     private static final String URI_HOST = "genie.example.com";
     private static final String URI_SCHEME = "https";
     private static final String LOCAL_TEST_SERVER_PORT_PROPERTY_NAME = "local.server.port";
@@ -138,6 +148,10 @@ abstract class RestControllerIntegrationTestBase {
 
     protected int port;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+    private TransactionTemplate transactionTemplate;
+
     private RequestSpecification requestSpecification;
 
     private static String getLinkedResourceExpectedUri(
@@ -163,15 +177,57 @@ abstract class RestControllerIntegrationTestBase {
         return this.requestSpecification;
     }
 
+    private void doInTransactionWithoutResult(final Supplier<Void> supplier) {
+        int retriesLeft = 3;
+        while (retriesLeft > 0) {
+            try {
+                this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    protected void doInTransactionWithoutResult(final TransactionStatus status) {
+                        supplier.get();
+                    }
+                });
+                return;
+            } catch (DataAccessException e) {
+                LOG.warn("Exception caught when running transactions.", e);
+                retriesLeft--;
+                if (retriesLeft <= 0) {
+                    throw e;
+                }
+            }
+        }
+    }
+
     @BeforeEach
     void beforeBase(final RestDocumentationContextProvider documentationContextProvider) {
-        this.jobRepository.deleteAll();
-        this.clusterRepository.deleteAll();
-        this.commandRepository.deleteAll();
-        this.applicationRepository.deleteAll();
-        this.criterionRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
+        doInTransactionWithoutResult(() -> {
+            this.jobRepository.deleteAll();
+            return null;
+        });
+        doInTransactionWithoutResult(() -> {
+            this.clusterRepository.deleteAll();
+            return null;
+        });
+        doInTransactionWithoutResult(() -> {
+            this.commandRepository.deleteAll();
+            return null;
+        });
+        doInTransactionWithoutResult(() -> {
+            this.applicationRepository.deleteAll();
+            return null;
+        });
+        doInTransactionWithoutResult(() -> {
+            this.criterionRepository.deleteAll();
+            return null;
+        });
+        doInTransactionWithoutResult(() -> {
+            this.fileRepository.deleteAll();
+            return null;
+        });
+        doInTransactionWithoutResult(() -> {
+            this.tagRepository.deleteAll();
+            return null;
+        });
 
         this.requestSpecification = new RequestSpecBuilder()
             .addFilter(
