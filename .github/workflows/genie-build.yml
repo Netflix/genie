@@ -119,6 +119,6 @@ jobs:
         if: |
           startsWith(github.ref, 'refs/tags/v') &&
           (!contains(github.ref, '-rc.'))
-        run: --stacktrace -Prelease.useLastTag=true final codeCoverageReport coveralls gitPublishPush dockerPush
+        run: ./gradlew --stacktrace -Prelease.useLastTag=true final codeCoverageReport coveralls gitPublishPush dockerPush
       - name: Codecov
         uses: codecov/codecov-action@v1
