@@ -22,6 +22,7 @@ import brave.Tracer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
+import com.google.common.base.Strings;
 import com.netflix.genie.common.internal.dtos.ComputeResources;
 import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
@@ -102,6 +103,13 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .map(s -> placeholders.getOrDefault(s, s))
             .collect(Collectors.toList());
     private static final Logger LOG = LoggerFactory.getLogger(TitusAgentLauncherImpl.class);
+    // For Titus network mode details, see
+    // https://github.com/Netflix/titus-api-definitions/blob/master/doc/titus-v3-spec.md#networkconfigurationnetworkmode
+    private static final String TITUS_NETWORK_MODE_IPV4 = "Ipv4Only";
+    private static final String TITUS_NETWORK_MODE_DUAL_STACK = "Ipv6AndIpv4";
+    private static final String TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK = "Ipv6AndIpv4Fallback";
+    private static final String TITUS_NETWORK_MODE_IPV6 = "Ipv6Only";
+    private static final String TITUS_NETWORK_MODE_HIGH_SCALE = "HighScale";
 
     private final RestTemplate restTemplate;
     private final RetryTemplate retryTemplate;
@@ -261,7 +269,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
         final Map<String, String> jobAttributes = this.createJobAttributes(jobId, resolvedJob);
 
-        final TitusBatchJobRequest request = TitusBatchJobRequest.builder()
+        final TitusBatchJobRequest.TitusBatchJobRequestBuilder requestBuilder = TitusBatchJobRequest.builder()
             .owner(
                 TitusBatchJobRequest.Owner
                     .builder()
@@ -339,12 +347,37 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     .detail(this.titusAgentLauncherProperties.getDetail())
                     .sequence(this.titusAgentLauncherProperties.getSequence())
                     .build()
-            )
-            .build();
+            );
+
+        final Optional<String> networkConfiguration = validateNetworkConfiguration(this.environment.getProperty(
+            TitusAgentLauncherProperties.CONTAINER_NETWORK_MODE,
+            String.class));
+        networkConfiguration.ifPresent(config -> requestBuilder.networkConfiguration(
+                TitusBatchJobRequest.NetworkConfiguration.builder().networkMode(config).build()));
+
+        final TitusBatchJobRequest request = requestBuilder.build();
 
         // Run the request through the security adapter to add any necessary context
         this.jobRequestAdapter.modifyJobRequest(request, resolvedJob);
         return request;
+    }
+
+    private Optional<String> validateNetworkConfiguration(@Nullable final String networkConfig) {
+        if (Strings.isNullOrEmpty(networkConfig)) {
+            return Optional.empty();
+        }
+
+        switch (networkConfig) {
+            case TITUS_NETWORK_MODE_IPV4:
+            case TITUS_NETWORK_MODE_DUAL_STACK:
+            case TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK:
+            case TITUS_NETWORK_MODE_IPV6:
+            case TITUS_NETWORK_MODE_HIGH_SCALE:
+                return Optional.of(networkConfig);
+            default:
+                return Optional.empty();
+        }
+
     }
 
     /**

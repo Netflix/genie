@@ -605,6 +605,39 @@ class TitusAgentLauncherImplSpec extends Specification {
         requestCapture.getContainer().getAttributes().get(prop2Key) == prop2Value
     }
 
+    def "Check titus container network mode"() {
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_MODE, inputNetworkMode)
+        this.launcher.launchAgent(this.resolvedJob, null)
+
+        then:
+        1 * this.restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
+        requestCapture != null
+        if (requestNetworkMode != null) {
+            requestCapture.getNetworkConfiguration() != null
+            requestCapture.getNetworkConfiguration().getNetworkMode() == requestNetworkMode
+        } else {
+            requestCapture.getNetworkConfiguration() == null
+        }
+
+        where:
+        inputNetworkMode      | requestNetworkMode
+        "Ipv4Only"            | "Ipv4Only"
+        "Ipv6AndIpv4"         | "Ipv6AndIpv4"
+        "Ipv6AndIpv4Fallback" | "Ipv6AndIpv4Fallback"
+        "Ipv6Only"            | "Ipv6Only"
+        "HighScale"           | "HighScale"
+        "NonSense"            | null
+    }
+
     def "Retry policy works as expected"() {
         def retryCodes = EnumSet.of(HttpStatus.REQUEST_TIMEOUT, HttpStatus.SERVICE_UNAVAILABLE)
         def maxRetries = 2
