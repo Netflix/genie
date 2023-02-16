@@ -103,6 +103,11 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .map(s -> placeholders.getOrDefault(s, s))
             .collect(Collectors.toList());
     private static final Logger LOG = LoggerFactory.getLogger(TitusAgentLauncherImpl.class);
+    private static final String TITUS_NETWORK_MODE_IPV4 = "Ipv4Only";
+    private static final String TITUS_NETWORK_MODE_DUAL_STACK = "Ipv6AndIpv4";
+    private static final String TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK = "Ipv6AndIpv4Fallback";
+    private static final String TITUS_NETWORK_MODE_IPV6 = "Ipv6Only";
+    private static final String TITUS_NETWORK_MODE_HIGH_SCALE = "HighScale";
 
     private final RestTemplate restTemplate;
     private final RetryTemplate retryTemplate;
@@ -116,11 +121,6 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private final MeterRegistry registry;
     private final Tracer tracer;
     private final BraveTracePropagator tracePropagator;
-    private final static String TITUS_NETWORK_MODE_IPV4 = "Ipv4Only";
-    private final static String TITUS_NETWORK_MODE_DUAL_STACK = "Ipv6AndIpv4";
-    private final static String TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK = "Ipv6AndIpv4Fallback";
-    private final static String TITUS_NETWORK_MODE_IPV6 = "Ipv6Only";
-    private final static String TITUS_NETWORK_MODE_HIGH_SCALE = "HighScale";
 
     /**
      * Constructor.
