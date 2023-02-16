@@ -172,7 +172,7 @@ public class TitusAgentLauncherProperties {
     /**
      * The property for titus container network mode.
      */
-    public static final String CONTAINER_NETWORK_CONFIGURATION = PREFIX + ".networkConfiguration";
+    public static final String CONTAINER_NETWORK_MODE = PREFIX + ".networkMode";
 
     /**
      * Whether the Titus Agent Launcher is enabled.

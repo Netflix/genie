@@ -610,7 +610,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         TitusBatchJobRequest requestCapture
 
         when:
-        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION, inputNetworkMode)
+        this.environment.withProperty(TitusAgentLauncherProperties.CONTAINER_NETWORK_MODE, inputNetworkMode)
         this.launcher.launchAgent(this.resolvedJob, null)
 
         then:

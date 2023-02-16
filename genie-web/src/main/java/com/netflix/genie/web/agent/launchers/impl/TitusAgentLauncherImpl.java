@@ -103,6 +103,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             .map(s -> placeholders.getOrDefault(s, s))
             .collect(Collectors.toList());
     private static final Logger LOG = LoggerFactory.getLogger(TitusAgentLauncherImpl.class);
+    // For Titus network mode details, see
+    // https://github.com/Netflix/titus-api-definitions/blob/master/doc/titus-v3-spec.md#networkconfigurationnetworkmode
     private static final String TITUS_NETWORK_MODE_IPV4 = "Ipv4Only";
     private static final String TITUS_NETWORK_MODE_DUAL_STACK = "Ipv6AndIpv4";
     private static final String TITUS_NETWORK_MODE_DUAL_STACK_FALLBACK = "Ipv6AndIpv4Fallback";
@@ -348,7 +350,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
             );
 
         final Optional<String> networkConfiguration = validateNetworkConfiguration(this.environment.getProperty(
-            TitusAgentLauncherProperties.CONTAINER_NETWORK_CONFIGURATION,
+            TitusAgentLauncherProperties.CONTAINER_NETWORK_MODE,
             String.class));
         networkConfiguration.ifPresent(config -> requestBuilder.networkConfiguration(
                 TitusBatchJobRequest.NetworkConfiguration.builder().networkMode(config).build()));
