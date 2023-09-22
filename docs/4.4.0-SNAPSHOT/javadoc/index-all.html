@@ -14,7 +14,7 @@
 <!--[if IE]>
 <script type="text/javascript" src="jquery/jszip-utils/dist/jszip-utils-ie.min.js"></script>
 <![endif]-->
-<script type="text/javascript" src="jquery/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="jquery/jquery-3.6.1.min.js"></script>
 <script type="text/javascript" src="jquery/jquery-ui.min.js"></script>
 </head>
 <body>
@@ -12728,6 +12728,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Submit a job to genie using the jobRequest provided.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String)">submitJob(JobRequest, String, String)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
+<dd>
+<div class="block">Submit a job to genie using the jobRequest and upstream security token information.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#submitJob(java.util.Map,com.netflix.genie.common.dto.JobRequest)">submitJob(Map&lt;String, String&gt;, JobRequest)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
+<dd>
+<div class="block">Method to submit a job to Genie with user defined custom headers.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.List)">submitJobWithAttachments(JobRequest, List&lt;MultipartBody.Part&gt;)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
 <dd>
 <div class="block">Submit a job with attachments.</div>
@@ -12735,6 +12743,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.Map)">submitJobWithAttachments(JobRequest, Map&lt;String, InputStream&gt;)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
 <dd>
 <div class="block">Submit a job to genie using the jobRequest and attachments provided.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.Map,java.lang.String,java.lang.String)">submitJobWithAttachments(JobRequest, Map&lt;String, InputStream&gt;, String, String)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
+<dd>
+<div class="block">Submit a job to genie using the jobRequest and attachments provided with the upstream security information.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#submitJobWithAttachments(java.util.Map,com.netflix.genie.common.dto.JobRequest,java.util.List)">submitJobWithAttachments(Map&lt;String, String&gt;, JobRequest, List&lt;MultipartBody.Part&gt;)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
+<dd>
+<div class="block">Submit a job with attachments and custom headers.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatus.html#SUCCEEDED">SUCCEEDED</a></span> - com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a></dt>
 <dd>

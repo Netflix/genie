@@ -14,7 +14,7 @@
 <!--[if IE]>
 <script type="text/javascript" src="../../../../../jquery/jszip-utils/dist/jszip-utils-ie.min.js"></script>
 <![endif]-->
-<script type="text/javascript" src="../../../../../jquery/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="../../../../../jquery/jquery-3.6.1.min.js"></script>
 <script type="text/javascript" src="../../../../../jquery/jquery-ui.min.js"></script>
 </head>
 <body>
@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6};
+var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -287,10 +287,27 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>retrofit2.Call&lt;java.lang.Void&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#submitJob(java.util.Map,com.netflix.genie.common.dto.JobRequest)">submitJob</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;customHeaders,
+         <a href="../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;request)</code></th>
+<td class="colLast">
+<div class="block">Method to submit a job to Genie with user defined custom headers.</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>retrofit2.Call&lt;java.lang.Void&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.List)">submitJobWithAttachments</a></span>&#8203;(<a href="../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;request,
                         java.util.List&lt;okhttp3.MultipartBody.Part&gt;&nbsp;attachments)</code></th>
 <td class="colLast">
 <div class="block">Submit a job with attachments.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>retrofit2.Call&lt;java.lang.Void&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#submitJobWithAttachments(java.util.Map,com.netflix.genie.common.dto.JobRequest,java.util.List)">submitJobWithAttachments</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;customHeaders,
+                        <a href="../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;request,
+                        java.util.List&lt;okhttp3.MultipartBody.Part&gt;&nbsp;attachments)</code></th>
+<td class="colLast">
+<div class="block">Submit a job with attachments and custom headers.</div>
 </td>
 </tr>
 </table>
@@ -352,6 +369,27 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;submitJob&#8203;(@Body
 </dl>
 </li>
 </ul>
+<a id="submitJob(java.util.Map,com.netflix.genie.common.dto.JobRequest)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>submitJob</h4>
+<pre class="methodSignature">@POST("/api/v3/jobs")
+retrofit2.Call&lt;java.lang.Void&gt;&nbsp;submitJob&#8203;(@HeaderMap
+                                         java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;customHeaders,
+                                         @Body
+                                         <a href="../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;request)</pre>
+<div class="block">Method to submit a job to Genie with user defined custom headers.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>customHeaders</code> - client defined custom headers.</dd>
+<dd><code>request</code> - The request object containing all the</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A callable object.</dd>
+</dl>
+</li>
+</ul>
 <a id="submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.List)">
 <!--   -->
 </a>
@@ -367,6 +405,31 @@ retrofit2.Call&lt;java.lang.Void&gt;&nbsp;submitJobWithAttachments&#8203;(@Part(
 <div class="block">Submit a job with attachments.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>request</code> - A JobRequest object containing all the details needed to run the job.</dd>
+<dd><code>attachments</code> - A list of all the attachment files to be sent to the server.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A callable object.</dd>
+</dl>
+</li>
+</ul>
+<a id="submitJobWithAttachments(java.util.Map,com.netflix.genie.common.dto.JobRequest,java.util.List)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>submitJobWithAttachments</h4>
+<pre class="methodSignature">@Multipart
+@POST("/api/v3/jobs")
+retrofit2.Call&lt;java.lang.Void&gt;&nbsp;submitJobWithAttachments&#8203;(@HeaderMap
+                                                        java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;customHeaders,
+                                                        @Part("request")
+                                                        <a href="../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;request,
+                                                        @Part
+                                                        java.util.List&lt;okhttp3.MultipartBody.Part&gt;&nbsp;attachments)</pre>
+<div class="block">Submit a job with attachments and custom headers.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>customHeaders</code> - client defined custom headers.</dd>
 <dd><code>request</code> - A JobRequest object containing all the details needed to run the job.</dd>
 <dd><code>attachments</code> - A list of all the attachment files to be sent to the server.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

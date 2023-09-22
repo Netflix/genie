@@ -14,7 +14,7 @@
 <!--[if IE]>
 <script type="text/javascript" src="../../../../jquery/jszip-utils/dist/jszip-utils-ie.min.js"></script>
 <![endif]-->
-<script type="text/javascript" src="../../../../jquery/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="../../../../jquery/jquery-3.6.1.min.js"></script>
 <script type="text/javascript" src="../../../../jquery/jquery-ui.min.js"></script>
 </head>
 <body>
@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":42,"i11":42,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":42,"i11":42,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -389,13 +389,32 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String)">submitJob</a></span>&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
+         java.lang.String&nbsp;upstreamSecurityTokenName,
+         java.lang.String&nbsp;upstreamSecurityTokenValue)</code></th>
+<td class="colLast">
+<div class="block">Submit a job to genie using the jobRequest and upstream security token information.</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.Map)">submitJobWithAttachments</a></span>&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
                         java.util.Map&lt;java.lang.String,&#8203;java.io.InputStream&gt;&nbsp;attachments)</code></th>
 <td class="colLast">
 <div class="block">Submit a job to genie using the jobRequest and attachments provided.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.Map,java.lang.String,java.lang.String)">submitJobWithAttachments</a></span>&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
+                        java.util.Map&lt;java.lang.String,&#8203;java.io.InputStream&gt;&nbsp;attachments,
+                        java.lang.String&nbsp;upstreamSecurityTokenName,
+                        java.lang.String&nbsp;upstreamSecurityTokenValue)</code></th>
+<td class="colLast">
+<div class="block">Submit a job to genie using the jobRequest and attachments provided with the upstream security information.</div>
+</td>
+</tr>
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code><a href="../common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#waitForCompletion(java.lang.String,long)">waitForCompletion</a></span>&#8203;(java.lang.String&nbsp;jobId,
                  long&nbsp;blockTimeout)</code></th>
@@ -403,7 +422,7 @@ extends java.lang.Object</pre>
 <div class="block">Wait for job to complete, until the given timeout.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code><a href="../common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#waitForCompletion(java.lang.String,long,long)">waitForCompletion</a></span>&#8203;(java.lang.String&nbsp;jobId,
                  long&nbsp;blockTimeout,
@@ -498,12 +517,35 @@ public&nbsp;JobClient&#8203;(@NotEmpty
 <li class="blockList">
 <h4>submitJob</h4>
 <pre class="methodSignature">public&nbsp;java.lang.String&nbsp;submitJob&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest)
-                           throws java.io.IOException,
-                                  <a href="exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></pre>
+                           throws java.io.IOException</pre>
 <div class="block">Submit a job to genie using the jobRequest provided.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobRequest</code> - A job request containing all the details for running a job.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>jobId The id of the job submitted.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></code> - If the response recieved is not 2xx.</dd>
+<dd><code>java.io.IOException</code> - For Network and other IO issues.</dd>
+</dl>
+</li>
+</ul>
+<a id="submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>submitJob</h4>
+<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;submitJob&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
+                                  java.lang.String&nbsp;upstreamSecurityTokenName,
+                                  java.lang.String&nbsp;upstreamSecurityTokenValue)
+                           throws java.io.IOException</pre>
+<div class="block">Submit a job to genie using the jobRequest and upstream security token information.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobRequest</code> - A job request containing all the details for running a job.</dd>
+<dd><code>upstreamSecurityTokenName</code> - the security token name provided by upstream.</dd>
+<dd><code>upstreamSecurityTokenValue</code> - the security token value provided by upstream.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>jobId The id of the job submitted.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -520,13 +562,38 @@ public&nbsp;JobClient&#8203;(@NotEmpty
 <h4>submitJobWithAttachments</h4>
 <pre class="methodSignature">public&nbsp;java.lang.String&nbsp;submitJobWithAttachments&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
                                                  java.util.Map&lt;java.lang.String,&#8203;java.io.InputStream&gt;&nbsp;attachments)
-                                          throws java.io.IOException,
-                                                 <a href="exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></pre>
+                                          throws java.io.IOException</pre>
 <div class="block">Submit a job to genie using the jobRequest and attachments provided.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobRequest</code> - A job request containing all the details for running a job.</dd>
 <dd><code>attachments</code> - A map of filenames/input-streams needed to be sent to the server as attachments.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>jobId The id of the job submitted.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="exceptions/GenieClientException.html" title="class in com.netflix.genie.client.exceptions">GenieClientException</a></code> - If the response recieved is not 2xx.</dd>
+<dd><code>java.io.IOException</code> - For Network and other IO issues.</dd>
+</dl>
+</li>
+</ul>
+<a id="submitJobWithAttachments(com.netflix.genie.common.dto.JobRequest,java.util.Map,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>submitJobWithAttachments</h4>
+<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;submitJobWithAttachments&#8203;(<a href="../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
+                                                 java.util.Map&lt;java.lang.String,&#8203;java.io.InputStream&gt;&nbsp;attachments,
+                                                 java.lang.String&nbsp;upstreamSecurityTokenName,
+                                                 java.lang.String&nbsp;upstreamSecurityTokenValue)
+                                          throws java.io.IOException</pre>
+<div class="block">Submit a job to genie using the jobRequest and attachments provided with the upstream security information.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobRequest</code> - A job request containing all the details for running a job.</dd>
+<dd><code>attachments</code> - A map of filenames/input-streams needed to be sent to the server as attachments.</dd>
+<dd><code>upstreamSecurityTokenName</code> - the security token name provided by upstream.</dd>
+<dd><code>upstreamSecurityTokenValue</code> - the security token value provided by upstream.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>jobId The id of the job submitted.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
