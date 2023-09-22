@@ -43,6 +43,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 
 import javax.annotation.Nullable;
@@ -52,9 +53,12 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Client library for the Job Service.
@@ -119,16 +123,38 @@ public class JobClient {
      */
     public String submitJob(
         final JobRequest jobRequest
-    ) throws IOException, GenieClientException {
+    ) throws IOException {
+        return submitJob(jobRequest, jobService::submitJob);
+    }
+
+    /**
+     * Submit a job to genie using the jobRequest and upstream security token information.
+     *
+     * @param jobRequest A job request containing all the details for running a job.
+     * @param upstreamSecurityTokenName the security token name provided by upstream.
+     * @param upstreamSecurityTokenValue the security token value provided by upstream.
+     * @return jobId The id of the job submitted.
+     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public String submitJob(
+        final JobRequest jobRequest,
+        final String upstreamSecurityTokenName,
+        final String upstreamSecurityTokenValue
+    ) throws IOException {
+        final Map<String, String> headers =
+            Collections.singletonMap(upstreamSecurityTokenName, upstreamSecurityTokenValue);
+        return submitJob(jobRequest, jr -> jobService.submitJob(headers, jr));
+    }
+
+    private String submitJob(
+        final JobRequest jobRequest,
+        final Function<JobRequest, Call<Void>> submitFn) throws IOException {
         if (jobRequest == null) {
             throw new IllegalArgumentException("Job Request cannot be null.");
         }
-        final String locationHeader = this.jobService
-            .submitJob(jobRequest)
-            .execute()
-            .headers()
-            .get(GenieClientUtils.LOCATION_HEADER);
-
+        final String locationHeader =
+            submitFn.apply(jobRequest).execute().headers().get(GenieClientUtils.LOCATION_HEADER);
         if (StringUtils.isBlank(locationHeader)) {
             throw new GenieClientException("No location header. Unable to get ID");
         }
@@ -147,7 +173,37 @@ public class JobClient {
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
         final Map<String, InputStream> attachments
-    ) throws IOException, GenieClientException {
+    ) throws IOException {
+        return submitJobWithAttachments(jobRequest, attachments, jobService::submitJobWithAttachments);
+    }
+
+    /**
+     * Submit a job to genie using the jobRequest and attachments provided with the upstream security information.
+     *
+     * @param jobRequest  A job request containing all the details for running a job.
+     * @param attachments A map of filenames/input-streams needed to be sent to the server as attachments.
+     * @param upstreamSecurityTokenName the security token name provided by upstream.
+     * @param upstreamSecurityTokenValue the security token value provided by upstream.
+     * @return jobId The id of the job submitted.
+     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public String submitJobWithAttachments(
+        final JobRequest jobRequest,
+        final Map<String, InputStream> attachments,
+        final String upstreamSecurityTokenName,
+        final String upstreamSecurityTokenValue
+    ) throws IOException {
+        final Map<String, String> headers =
+            Collections.singletonMap(upstreamSecurityTokenName, upstreamSecurityTokenValue);
+        return submitJobWithAttachments(
+            jobRequest, attachments, (jr, at) -> jobService.submitJobWithAttachments(headers, jr, at));
+    }
+
+    private String submitJobWithAttachments(
+        final JobRequest jobRequest,
+        final Map<String, InputStream> attachments,
+        final BiFunction<JobRequest, List<MultipartBody.Part>, Call<Void>> submitFn) throws IOException {
         if (jobRequest == null) {
             throw new IllegalArgumentException("Job Request cannot be null.");
         }
@@ -177,8 +233,7 @@ public class JobClient {
 
             attachmentFiles.add(part);
         }
-        final String locationHeader = this.jobService
-            .submitJobWithAttachments(jobRequest, attachmentFiles)
+        final String locationHeader = submitFn.apply(jobRequest, attachmentFiles)
             .execute()
             .headers()
             .get(GenieClientUtils.LOCATION_HEADER);

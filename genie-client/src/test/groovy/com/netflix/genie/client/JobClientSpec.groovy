@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.client
 
+import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -66,5 +67,76 @@ class JobClientSpec extends Specification {
         "{\"_embedded\": {\"notRight\": []}}"            | _
         "{\"_embedded\": {\"jobSearchResultList\": {}}}" | _
         "{\"_embedded\": {\"jobSearchResultList\": []}}" | _
+    }
+
+    @Unroll
+    def "submit job with upstream security information formed correct request"() {
+        setup:
+        def server = new MockWebServer()
+        server.enqueue(new MockResponse().setHeader("location", genieId))
+        server.start()
+        def url = server.url("")
+        def okHttpClient = new OkHttpClient.Builder().build()
+        def retrofit = new Retrofit.Builder()
+            .baseUrl(url)
+            .client(okHttpClient)
+            .addConverterFactory(JacksonConverterFactory.create(GenieObjectMapper.getMapper()))
+            .build()
+        def jobClient = new JobClient(retrofit, 5)
+
+        when:
+        def jobId = jobClient.submitJob(Mock(JobRequest), securityName, securityValue)
+        def request = server.takeRequest()
+
+        then: "No exception is thrown and empty list is returned"
+        noExceptionThrown()
+
+        expect:
+        request.headers.get(securityName) == securityValue
+        jobId == genieId
+
+        cleanup:
+        server.shutdown()
+
+        where:
+        genieId          | securityName                | securityValue
+        "a-genie-id"     | "x-forwarded-authorization" | "some-security-value"
+        "b-genie-id"     | "Authorization"             | "some-auth-value"
+    }
+
+    @Unroll
+    def "submit job with attachments and upstream security information formed correct request"() {
+        setup:
+        def server = new MockWebServer()
+        server.enqueue(new MockResponse().setHeader("location", genieId))
+        server.start()
+        def url = server.url("")
+        def okHttpClient = new OkHttpClient.Builder().build()
+        def retrofit = new Retrofit.Builder()
+            .baseUrl(url)
+            .client(okHttpClient)
+            .addConverterFactory(JacksonConverterFactory.create(GenieObjectMapper.getMapper()))
+            .build()
+        def jobClient = new JobClient(retrofit, 5)
+
+        when:
+        def jobId = jobClient.submitJobWithAttachments(
+            Mock(JobRequest), new HashMap<String, InputStream>(), securityName, securityValue)
+        def request = server.takeRequest()
+
+        then: "No exception is thrown and empty list is returned"
+        noExceptionThrown()
+
+        expect:
+        request.headers.get(securityName) == securityValue
+        jobId == genieId
+
+        cleanup:
+        server.shutdown()
+
+        where:
+        genieId          | securityName                | securityValue
+        "a-genie-id"     | "x-forwarded-authorization" | "some-security-value"
+        "b-genie-id"     | "Authorization"             | "some-auth-value"
     }
 }
