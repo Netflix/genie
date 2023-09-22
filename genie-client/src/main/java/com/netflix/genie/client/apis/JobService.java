@@ -32,6 +32,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.HeaderMap;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -40,6 +41,7 @@ import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -65,6 +67,17 @@ public interface JobService {
     Call<Void> submitJob(@Body JobRequest request);
 
     /**
+     * Method to submit a job to Genie with user defined custom headers.
+     *
+     * @param customHeaders client defined custom headers.
+     * @param request The request object containing all the
+     * @return A callable object.
+     */
+    @POST(JOBS_URL_SUFFIX)
+    Call<Void> submitJob(@HeaderMap Map<String, String> customHeaders,
+                         @Body JobRequest request);
+
+    /**
      * Submit a job with attachments.
      *
      * @param request     A JobRequest object containing all the details needed to run the job.
@@ -74,6 +87,22 @@ public interface JobService {
     @Multipart
     @POST(JOBS_URL_SUFFIX)
     Call<Void> submitJobWithAttachments(
+        @Part("request") JobRequest request,
+        @Part List<MultipartBody.Part> attachments
+    );
+
+    /**
+     * Submit a job with attachments and custom headers.
+     *
+     * @param customHeaders client defined custom headers.
+     * @param request     A JobRequest object containing all the details needed to run the job.
+     * @param attachments A list of all the attachment files to be sent to the server.
+     * @return A callable object.
+     */
+    @Multipart
+    @POST(JOBS_URL_SUFFIX)
+    Call<Void> submitJobWithAttachments(
+        @HeaderMap Map<String, String> customHeaders,
         @Part("request") JobRequest request,
         @Part List<MultipartBody.Part> attachments
     );
