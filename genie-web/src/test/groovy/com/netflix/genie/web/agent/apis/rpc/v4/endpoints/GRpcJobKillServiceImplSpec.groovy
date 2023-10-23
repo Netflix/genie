@@ -145,16 +145,42 @@ class GRpcJobKillServiceImplSpec extends Specification {
         0 * this.agentRoutingService.isAgentConnectionLocal(this.jobId)
         noExceptionThrown()
 
-        when: "The job is active, the agent is connected, the job is local but no observer"
+        when: "The job is active, the agent is connected, the job is local but no observer, and force updating job status succeeded"
         this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
 
-        then: "Correct exception is thrown"
+        then: "The database is updated and no exception is thrown"
         1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.CLAIMED
-        0 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        1 * this.persistenceService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
         1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> true
         0 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
         0 * this.responseObserver.onCompleted()
-        thrown(GenieServerException)
+        noExceptionThrown()
+
+        when: "The job is active, the agent is connected, the job is local but no observer, and current job status is invalid for updating"
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
+
+        then: "The database is not updated and GenieInvalidStatusException is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.CLAIMED
+        1 * this.persistenceService.updateJobStatus(this.jobId, JobStatus.CLAIMED, JobStatus.KILLED, this.reason) >> {
+            throw new GenieInvalidStatusException()
+        }
+        1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> true
+        0 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
+        0 * this.responseObserver.onCompleted()
+        thrown(GenieInvalidStatusException)
+
+        when: "The job is active, the agent is connected, the job is local but no observer, and the job is not found"
+        this.serviceSpy.killJob(this.jobId, this.reason, this.servletRequest)
+
+        then: "The database is not updated and GenieJobNotFoundException is thrown"
+        1 * this.persistenceService.getJobStatus(this.jobId) >> JobStatus.CLAIMED
+        1 * this.persistenceService.updateJobStatus(this.jobId, JobStatus.CLAIMED, JobStatus.KILLED, this.reason) >> {
+            throw new NotFoundException()
+        }
+        1 * this.agentRoutingService.isAgentConnectionLocal(this.jobId) >> true
+        0 * this.responseObserver.onNext(_ as JobKillRegistrationResponse)
+        0 * this.responseObserver.onCompleted()
+        thrown(GenieJobNotFoundException)
 
         when: "The job is active, the agent is connected, and there is an observer"
         this.serviceSpy.registerForKillNotification(this.request, this.responseObserver)

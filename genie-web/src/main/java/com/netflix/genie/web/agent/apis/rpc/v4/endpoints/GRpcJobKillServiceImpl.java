@@ -154,15 +154,42 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
                     = this.parkedJobKillResponseObservers.remove(jobId);
 
                 if (responseObserver == null) {
-                    log.error("Job {} not killed. Expected local agent connection not found", jobId);
-                    throw new GenieServerException(
-                        "Job " + jobId + " not killed. Expected local agent connection not found."
+                    // This might happen when the agent has gone but its status is not updated
+                    // In this case, we force updating the job status to KILLED.
+                    log.warn("Tried to kill Job {}, but expected local agent connection not found. "
+                            + "Trying to force updating the job status to {}",
+                        jobId,
+                        JobStatus.KILLED
                     );
-                }
-                responseObserver.onNext(JobKillRegistrationResponse.newBuilder().build());
-                responseObserver.onCompleted();
+                    try {
+                        this.persistenceService.updateJobStatus(jobId, currentJobStatus, JobStatus.KILLED, reason);
+                        log.info("Succeeded to force updating the status of Job {} to {}",
+                            jobId,
+                            JobStatus.KILLED
+                        );
+                    } catch (final GenieInvalidStatusException e) {
+                        log.error(
+                            "Failed to force updating the status of Job {} to {} "
+                                + "due to current status not being expected {}",
+                            jobId,
+                            JobStatus.KILLED,
+                            currentJobStatus
+                        );
+                        throw e;
+                    } catch (final NotFoundException e) {
+                        log.error(
+                            "Failed to force updating the status of Job {} to {} due to job not found",
+                            jobId,
+                            JobStatus.KILLED
+                        );
+                        throw new GenieJobNotFoundException(e);
+                    }
+                } else {
+                    responseObserver.onNext(JobKillRegistrationResponse.newBuilder().build());
+                    responseObserver.onCompleted();
 
-                log.info("Agent notified for killing job {}", jobId);
+                    log.info("Agent notified for killing job {}", jobId);
+                }
             } else {
                 // Agent is running somewhere else try to forward the request
                 final String hostname = this.agentRoutingService
