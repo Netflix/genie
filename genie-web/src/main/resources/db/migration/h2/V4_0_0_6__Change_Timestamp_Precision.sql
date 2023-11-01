@@ -31,7 +31,7 @@ ALTER TABLE `commands`
 ALTER TABLE `commands`
     ALTER COLUMN `updated` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6);
 ALTER TABLE `commands`
-    ADD COLUMN `launcher_ext` TEXT DEFAULT NULL;
+    ADD COLUMN `launcher_ext` CLOB DEFAULT NULL;
 
 ALTER TABLE `files`
     ALTER COLUMN `created` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6);
@@ -53,9 +53,9 @@ ALTER TABLE `jobs`
 ALTER TABLE `jobs`
     ADD COLUMN `archive_status` VARCHAR(20) DEFAULT NULL;
 ALTER TABLE `jobs`
-    ADD COLUMN `requested_launcher_ext` TEXT DEFAULT NULL;
+    ADD COLUMN `requested_launcher_ext` CLOB DEFAULT NULL;
 ALTER TABLE `jobs`
-    ADD COLUMN `launcher_ext` TEXT DEFAULT NULL;
+    ADD COLUMN `launcher_ext` CLOB DEFAULT NULL;
 
 CREATE INDEX `JOBS_ARCHIVE_STATUS_INDEX` ON `jobs` (`archive_status`);
 

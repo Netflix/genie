@@ -17,27 +17,27 @@
  */
 
 ALTER TABLE `jobs`
-  ADD COLUMN `cpu_used` INT(11) DEFAULT NULL;
+  ADD COLUMN `cpu_used` INT     DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_images` TEXT DEFAULT NULL;
+  ADD COLUMN `requested_images` CLOB DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `images_used` TEXT DEFAULT NULL;
+  ADD COLUMN `images_used` CLOB DEFAULT NULL;
 ALTER TABLE `jobs`
   ADD COLUMN `requested_image_tag` VARCHAR(1024) DEFAULT NULL;
 ALTER TABLE `jobs`
   ADD COLUMN `image_tag_used` VARCHAR(1024) DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_gpu` INT(11) DEFAULT NULL;
+  ADD COLUMN `requested_gpu` INT     DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `gpu_used` INT(11) DEFAULT NULL;
+  ADD COLUMN `gpu_used` INT     DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_disk_mb` BIGINT(20) DEFAULT NULL;
+  ADD COLUMN `requested_disk_mb` BIGINT     DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `disk_mb_used` BIGINT(20) DEFAULT NULL;
+  ADD COLUMN `disk_mb_used` BIGINT DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `requested_network_mbps` BIGINT(20) DEFAULT NULL;
+  ADD COLUMN `requested_network_mbps` BIGINT     DEFAULT NULL;
 ALTER TABLE `jobs`
-  ADD COLUMN `network_mbps_used` BIGINT(20) DEFAULT NULL;
+  ADD COLUMN `network_mbps_used` BIGINT     DEFAULT NULL;
 ALTER TABLE `jobs`
   DROP COLUMN `check_delay`;
 ALTER TABLE `jobs`
@@ -46,12 +46,12 @@ ALTER TABLE `jobs`
 ALTER TABLE `commands`
   DROP COLUMN `check_delay`;
 ALTER TABLE `commands`
-  ADD COLUMN `cpu` INT(11) DEFAULT NULL;
+  ADD COLUMN `cpu` INT     DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `gpu` INT(11) DEFAULT NULL;
+  ADD COLUMN `gpu` INT     DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `disk_mb` BIGINT(20) DEFAULT NULL;
+  ADD COLUMN `disk_mb` BIGINT     DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `network_mbps` BIGINT(20) DEFAULT NULL;
+  ADD COLUMN `network_mbps` BIGINT DEFAULT NULL;
 ALTER TABLE `commands`
-  ADD COLUMN `images` TEXT DEFAULT NULL;
+  ADD COLUMN `images` CLOB DEFAULT NULL;

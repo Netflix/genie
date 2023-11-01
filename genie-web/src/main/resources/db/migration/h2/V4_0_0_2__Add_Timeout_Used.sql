@@ -17,6 +17,6 @@
  */
 
 ALTER TABLE `jobs`
-    ADD COLUMN `timeout_used` INT(11) DEFAULT NULL;
+    ADD COLUMN `timeout_used` INT     DEFAULT NULL;
 ALTER TABLE `jobs`
     ADD COLUMN `api` BOOLEAN NOT NULL DEFAULT FALSE;

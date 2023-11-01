@@ -18,9 +18,9 @@
 
 CREATE TABLE `commands_cluster_criteria`
 (
-    `command_id`     BIGINT(20) NOT NULL,
-    `criterion_id`   BIGINT(20) NOT NULL,
-    `priority_order` INT(11)    NOT NULL,
+    `command_id`     BIGINT  NOT NULL,
+    `criterion_id`   BIGINT  NOT NULL,
+    `priority_order` INT     NOT NULL,
     PRIMARY KEY (`command_id`, `criterion_id`, `priority_order`),
     CONSTRAINT `COMMANDS_CLUSTER_CRITERIA_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
         ON DELETE CASCADE,

@@ -141,7 +141,7 @@ spring:
       repositories:
         enabled: false
   datasource:
-    url: jdbc:h2:mem:genie
+    url: jdbc:h2:mem:genie;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=value,limit;
     username: root
     password:
     hikari:

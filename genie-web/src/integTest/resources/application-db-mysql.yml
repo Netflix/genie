@@ -18,7 +18,7 @@
 
 spring:
   datasource:
-    url: jdbc:mariadb://127.0.0.1/genie
+    url: jdbc:mysql://127.0.0.1/genie
     username: root
     password: password
     hikari:
@@ -28,3 +28,8 @@ spring:
         prepStmtCacheSqlLimit: 2048
         serverTimezone: UTC
         useServerPrepStmts: true
+  jpa:
+    properties:
+      hibernate:
+        auto_quote_keyword: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
