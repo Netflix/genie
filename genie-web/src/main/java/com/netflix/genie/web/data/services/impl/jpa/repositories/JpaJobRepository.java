@@ -49,7 +49,8 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     String FIND_OLD_JOBS_QUERY =
         "SELECT id"
             + " FROM jobs"
-            + " WHERE created < :createdThreshold AND status NOT IN (:excludedStatuses)"
+            + " WHERE created < :createdThreshold"
+            + " AND (status NOT IN (:excludedStatuses) OR (:excludedStatuses) IS NULL)"
             + " LIMIT :batchSize"; // JPQL doesn't support limit so this needs to be native query
 
     // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
