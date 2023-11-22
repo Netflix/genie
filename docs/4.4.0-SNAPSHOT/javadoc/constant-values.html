@@ -2206,7 +2206,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#FIND_OLD_JOBS_QUERY">FIND_OLD_JOBS_QUERY</a></code></th>
-<td class="colLast"><code>"SELECT id FROM jobs WHERE created &lt; :createdThreshold AND status NOT IN (:excludedStatuses) LIMIT :batchSize"</code></td>
+<td class="colLast"><code>"SELECT id FROM jobs WHERE created &lt; :createdThreshold AND (status NOT IN (:excludedStatuses) OR (:excludedStatuses) IS NULL) LIMIT :batchSize"</code></td>
 </tr>
 </tbody>
 </table>
