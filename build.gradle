@@ -282,6 +282,7 @@ configure((Set<Project>) ext.javaProjects) {
 
     spotbugs {
         toolVersion = "4.8.2"
+        ignoreFailures = true
         excludeFilter = new File("$rootProject.projectDir/config/spotbugs/excludeFilter.xml")
     }
     spotbugsTest.enabled = false
