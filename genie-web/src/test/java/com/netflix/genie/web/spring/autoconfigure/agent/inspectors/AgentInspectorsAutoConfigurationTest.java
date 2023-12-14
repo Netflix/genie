@@ -48,7 +48,7 @@ class AgentInspectorsAutoConfigurationTest {
      * Test expected context when configuration is enabled.
      */
     @Test
-    void testContextIfEnabled() {
+    void contextIfEnabled() {
         this.contextRunner
             .withPropertyValues(
                 "genie.agent.filter.enabled=true"
@@ -69,7 +69,7 @@ class AgentInspectorsAutoConfigurationTest {
      * Test expected context when configuration is disabled.
      */
     @Test
-    void testContextIfDisabled() {
+    void contextIfDisabled() {
         this.contextRunner
             .withPropertyValues(
                 "genie.agent.filter.enabled=nope"
@@ -86,7 +86,7 @@ class AgentInspectorsAutoConfigurationTest {
      * Test expected context when configuration is not explicitly enabled or disabled.
      */
     @Test
-    void testContextIfUnspecified() {
+    void contextIfUnspecified() {
         this.contextRunner
             .withPropertyValues(
                 "genie.some.other.property=true"

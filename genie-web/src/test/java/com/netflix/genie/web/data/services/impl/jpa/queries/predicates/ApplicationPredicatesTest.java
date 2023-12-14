@@ -24,13 +24,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.SetJoin;
 import java.util.Set;
 import java.util.UUID;
 
@@ -108,7 +108,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindAll() {
+    void findAll() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, TAGS, TYPE);
 
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
@@ -127,7 +127,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindAllLike() {
+    void findAllLike() {
         final String newName = NAME + "%";
         final String newUser = USER_NAME + "%";
         final String newType = TYPE + "%";
@@ -146,7 +146,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindNoName() {
+    void findNoName() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, null, USER_NAME, STATUSES, TAGS, TYPE);
 
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.name), NAME);
@@ -162,7 +162,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindNoUserName() {
+    void findNoUserName() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, null, STATUSES, TAGS, TYPE);
 
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
@@ -178,7 +178,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindNoStatuses() {
+    void findNoStatuses() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, null, TAGS, TYPE);
 
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
@@ -194,7 +194,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindEmptyStatuses() {
+    void findEmptyStatuses() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, Sets.newHashSet(), TAGS, TYPE);
 
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
@@ -210,7 +210,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindNoTags() {
+    void findNoTags() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, null, TYPE);
 
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
@@ -223,7 +223,7 @@ class ApplicationPredicatesTest {
     }
 
     @Test
-    void testFindNoType() {
+    void findNoType() {
         ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, TAGS, null);
 
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);

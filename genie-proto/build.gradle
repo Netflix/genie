@@ -17,6 +17,12 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
+    compileOnly "org.glassfish.jaxb:jaxb-runtime:4.0.4"
+
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
+
     implementation("io.grpc:grpc-stub")
     implementation("io.grpc:grpc-protobuf")
 
@@ -33,6 +39,7 @@ dependencies {
      *******************************/
 
     testImplementation(project(":genie-test"))
+    testImplementation "org.glassfish.jaxb:jaxb-runtime:4.0.4"
 }
 
 // Configure protobuf classes and grpc stubs generation

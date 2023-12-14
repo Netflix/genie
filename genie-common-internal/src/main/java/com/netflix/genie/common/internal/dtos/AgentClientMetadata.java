@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.common.internal.dtos;
 
+import jakarta.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**

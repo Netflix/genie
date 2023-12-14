@@ -1,3 +1,7 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
@@ -12,7 +16,7 @@ idea {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -32,9 +36,9 @@ dependencies {
      * Annotation Processors
      *******************************/
 
-    annotationProcessor("javax.annotation:javax.annotation-api")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("org.glassfish.jaxb:jaxb-runtime")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen")
+    annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen")
     annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 

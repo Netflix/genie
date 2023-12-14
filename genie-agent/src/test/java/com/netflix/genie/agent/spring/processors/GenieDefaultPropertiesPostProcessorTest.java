@@ -35,7 +35,7 @@ class GenieDefaultPropertiesPostProcessorTest {
     private final GenieDefaultPropertiesPostProcessor processor = new GenieDefaultPropertiesPostProcessor();
 
     @Test
-    void testSmokeProperty() {
+    void smokeProperty() {
         this.contextRunner
             .run(
                 context -> {

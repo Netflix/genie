@@ -19,13 +19,11 @@ package com.netflix.genie;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Smoke test to make sure the app comes up successfully with all defaults.
@@ -33,7 +31,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author tgianos
  * @since 4.0.0
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {
         GenieApp.class
@@ -49,7 +46,7 @@ class GenieAppSmokeTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    void testAppStarts() {
+    void appStarts() {
         Assertions
             .assertThat(
                 this.restTemplate

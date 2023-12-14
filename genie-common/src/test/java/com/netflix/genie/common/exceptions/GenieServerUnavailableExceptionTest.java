@@ -38,7 +38,7 @@ class GenieServerUnavailableExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testTwoArgConstructor() {
+    void twoArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieServerUnavailableException.class)
             .isThrownBy(
@@ -55,7 +55,7 @@ class GenieServerUnavailableExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testMessageArgConstructor() {
+    void messageArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieServerUnavailableException.class)
             .isThrownBy(

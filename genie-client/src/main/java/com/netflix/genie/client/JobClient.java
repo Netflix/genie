@@ -36,6 +36,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import jakarta.annotation.Nullable;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -46,10 +47,9 @@ import org.apache.commons.lang3.StringUtils;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -748,7 +748,7 @@ public class JobClient {
             ? this.jobService.getJobOutputFile(jobId, pathArg).execute().body()
             : this.jobService.getJobOutputFile(jobId, pathArg, rangeHeader).execute().body();
         if (body == null) {
-            throw new GenieClientException(String.format("No data for %s returned", outputFilePath));
+            throw new GenieClientException("No data for %s returned".formatted(outputFilePath));
         }
         return body.byteStream();
     }

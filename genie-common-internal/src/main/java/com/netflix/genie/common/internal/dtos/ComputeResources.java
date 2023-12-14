@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.common.internal.dtos;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import java.io.Serializable;
+
+import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 

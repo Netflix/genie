@@ -42,8 +42,8 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -72,9 +72,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
@@ -105,7 +104,6 @@ public class CommandRestController {
      * @param dataServices          The {@link DataServices} encapsulation instance to use
      * @param entityModelAssemblers The encapsulation of all available V3 resource assemblers
      */
-    @Autowired
     public CommandRestController(final DataServices dataServices, final EntityModelAssemblers entityModelAssemblers) {
         this.persistenceService = dataServices.getPersistenceService();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
@@ -147,7 +145,7 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Command> getCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public EntityModel<Command> getCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called to get command with id {}", id);
         return this.commandModelAssembler.toModel(
             DtoConverters.toV3Command(this.persistenceService.getCommand(id))
@@ -169,8 +167,8 @@ public class CommandRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedModel<EntityModel<Command>> getCommands(
-        @RequestParam(value = "name", required = false) @Nullable final String name,
-        @RequestParam(value = "user", required = false) @Nullable final String user,
+        @RequestParam(required = false) @Nullable final String name,
+        @RequestParam(required = false) @Nullable final String user,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
         @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
         @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
@@ -291,7 +289,7 @@ public class CommandRestController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Command updateCommand
     ) throws NotFoundException, PreconditionFailedException {
         log.debug("Called to update command {}", updateCommand);
@@ -310,7 +308,7 @@ public class CommandRestController {
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final JsonPatch patch
     ) throws NotFoundException, PreconditionFailedException, GenieServerException {
         log.info("Called to patch command {} with patch {}", id, patch);
@@ -350,7 +348,7 @@ public class CommandRestController {
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public void deleteCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called to delete command with id {}", id);
         this.persistenceService.deleteCommand(id);
     }
@@ -365,7 +363,7 @@ public class CommandRestController {
     @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> configs
     ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, configs);
@@ -385,7 +383,7 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getConfigsForCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getConfigsForCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         return this.persistenceService.getConfigsForResource(
             id,
@@ -403,7 +401,7 @@ public class CommandRestController {
     @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> configs
     ) throws NotFoundException {
         log.info("Called with id {} and configs {}", id, configs);
@@ -422,7 +420,7 @@ public class CommandRestController {
      */
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllConfigsForCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllConfigsForCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllConfigsForResource(
             id,
@@ -440,7 +438,7 @@ public class CommandRestController {
     @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> dependencies
     ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
@@ -460,7 +458,7 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getDependenciesForCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         return this.persistenceService.getDependenciesForResource(
             id,
@@ -478,7 +476,7 @@ public class CommandRestController {
     @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> dependencies
     ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
@@ -497,7 +495,7 @@ public class CommandRestController {
      */
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllDependenciesForCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllDependenciesForResource(
             id,
@@ -515,7 +513,7 @@ public class CommandRestController {
     @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
@@ -535,7 +533,7 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getTagsForCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         // Kept this way for V3 tag conversion
         return DtoConverters.toV3Command(this.persistenceService.getCommand(id)).getTags();
@@ -551,7 +549,7 @@ public class CommandRestController {
     @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
@@ -570,7 +568,7 @@ public class CommandRestController {
      */
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllTagsForCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllTagsForCommand(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllTagsForResource(id, com.netflix.genie.common.internal.dtos.Command.class);
     }
@@ -585,8 +583,8 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForCommand(
-        @PathVariable("id") final String id,
-        @PathVariable("tag") final String tag
+        @PathVariable final String id,
+        @PathVariable final String tag
     ) throws NotFoundException {
         log.info("Called with id {} and tag {}", id, tag);
         this.persistenceService.removeTagForResource(
@@ -608,7 +606,7 @@ public class CommandRestController {
     @PostMapping(value = "/{id}/applications", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addApplicationsForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final List<String> applicationIds
     ) throws NotFoundException, PreconditionFailedException {
         log.info("Called with id {} and application {}", id, applicationIds);
@@ -625,7 +623,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<Application>> getApplicationsForCommand(
-        @PathVariable("id") final String id
+        @PathVariable final String id
     ) throws NotFoundException {
         log.info("Called with id {}", id);
         return this.persistenceService.getApplicationsForCommand(id)
@@ -646,7 +644,7 @@ public class CommandRestController {
     @PutMapping(value = "/{id}/applications", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setApplicationsForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final List<String> applicationIds
     ) throws NotFoundException, PreconditionFailedException {
         log.info("Called with id {} and application {}", id, applicationIds);
@@ -663,7 +661,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/applications")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllApplicationsForCommand(
-        @PathVariable("id") final String id
+        @PathVariable final String id
     ) throws NotFoundException, PreconditionFailedException {
         log.info("Called with id '{}'", id);
         this.persistenceService.removeApplicationsForCommand(id);
@@ -679,8 +677,8 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/applications/{appId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeApplicationForCommand(
-        @PathVariable("id") final String id,
-        @PathVariable("appId") final String appId
+        @PathVariable final String id,
+        @PathVariable final String appId
     ) throws NotFoundException {
         log.info("Called with id '{}' and app id {}", id, appId);
         this.persistenceService.removeApplicationForCommand(id, appId);
@@ -698,7 +696,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/clusters", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<EntityModel<Cluster>> getClustersForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws NotFoundException, GeniePreconditionException {
         log.info("Called with id {} and statuses {}", id, statuses);
@@ -730,7 +728,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/clusterCriteria", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<Criterion> getClusterCriteriaForCommand(
-        @PathVariable("id") final String id
+        @PathVariable final String id
     ) throws NotFoundException {
         log.info("Called for command {}", id);
         return this.persistenceService.getClusterCriteriaForCommand(id);
@@ -745,7 +743,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/clusterCriteria")
     @ResponseStatus(HttpStatus.OK)
     public void removeAllClusterCriteriaFromCommand(
-        @PathVariable("id") final String id
+        @PathVariable final String id
     ) throws NotFoundException {
         log.info("Called for command {}", id);
         this.persistenceService.removeAllClusterCriteriaForCommand(id);
@@ -761,7 +759,7 @@ public class CommandRestController {
     @PostMapping(value = "/{id}/clusterCriteria", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void addClusterCriterionForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody @Valid final Criterion criterion
     ) throws NotFoundException {
         log.info("Called to add {} as the lowest priority cluster criterion for command {}", criterion, id);
@@ -778,7 +776,7 @@ public class CommandRestController {
     @PutMapping(value = "/{id}/clusterCriteria", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void setClusterCriteriaForCommand(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody @Valid final List<Criterion> clusterCriteria
     ) throws NotFoundException {
         log.info("Called to set {} as the cluster criteria for command {}", clusterCriteria, id);
@@ -796,8 +794,8 @@ public class CommandRestController {
     @PutMapping(value = "/{id}/clusterCriteria/{priority}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void insertClusterCriterionForCommand(
-        @PathVariable("id") final String id,
-        @PathVariable("priority") @Min(0) final int priority,
+        @PathVariable final String id,
+        @PathVariable @Min(0) final int priority,
         @RequestBody @Valid final Criterion criterion
     ) throws NotFoundException {
         log.info("Called to insert new criterion {} for command {} with priority {}", criterion, id, priority);
@@ -814,8 +812,8 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/clusterCriteria/{priority}")
     @ResponseStatus(HttpStatus.OK)
     public void removeClusterCriterionFromCommand(
-        @PathVariable("id") final String id,
-        @PathVariable("priority") @Min(0) final int priority
+        @PathVariable final String id,
+        @PathVariable @Min(0) final int priority
     ) throws NotFoundException {
         log.info("Called to remove the criterion from command {} with priority {}", id, priority);
         this.persistenceService.removeClusterCriterionForCommand(id, priority);
@@ -835,8 +833,8 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/resolvedClusters", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ResolvedResources<Cluster>> resolveClustersForCommandClusterCriteria(
-        @PathVariable("id") final String id,
-        @RequestParam(value = "addDefaultStatus", defaultValue = "true") final Boolean addDefaultStatus
+        @PathVariable final String id,
+        @RequestParam(defaultValue = "true") final Boolean addDefaultStatus
     ) throws NotFoundException {
         log.info("Called to resolve clusters for command {}", id);
 

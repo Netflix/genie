@@ -18,10 +18,10 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Optional;
 
 /**

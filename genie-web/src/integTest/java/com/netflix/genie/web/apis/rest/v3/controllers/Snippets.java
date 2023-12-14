@@ -807,8 +807,10 @@ final class Snippets {
                 .fieldWithPath("executableAndArguments")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "executableAndArguments"))
                 .description(
-                    "The executable and arguments to run on the Genie node when this command is used."
-                        + " e.g. /usr/bin/hadoop"
+                    """
+                    The executable and arguments to run on the Genie node when this command is used.\
+                     e.g. /usr/bin/hadoop\
+                    """
                 )
                 .type(JsonFieldType.ARRAY),
             PayloadDocumentation
@@ -859,17 +861,21 @@ final class Snippets {
                 .subsectionWithPath("clusterCriterias")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "clusterCriterias"))
                 .description(
-                    "List of cluster criteria's for which a match will be attempted with register cluster tags."
-                        + " Each set of tags within a given cluster criteria must have at least one non-blank "
-                        + "(e.g. ' ', '    ', null) tag."
+                    """
+                    List of cluster criteria's for which a match will be attempted with register cluster tags.\
+                     Each set of tags within a given cluster criteria must have at least one non-blank \
+                    (e.g. ' ', '    ', null) tag.\
+                    """
                 )
                 .type(JsonFieldType.ARRAY),
             PayloadDocumentation
                 .fieldWithPath("commandCriteria")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "commandCriteria"))
                 .description(
-                    "Set of tags which will attempt to match against the commands linked to selected cluster."
-                        + " There must be at least one non-blank (e.g. ' ', '   ', null) criteria within the set"
+                    """
+                    Set of tags which will attempt to match against the commands linked to selected cluster.\
+                     There must be at least one non-blank (e.g. ' ', '   ', null) criteria within the set\
+                    """
                 )
                 .type(JsonFieldType.ARRAY),
             PayloadDocumentation

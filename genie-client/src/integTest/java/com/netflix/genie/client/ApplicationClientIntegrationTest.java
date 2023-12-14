@@ -45,7 +45,7 @@ import java.util.UUID;
 abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTestBase {
 
     @Test
-    void testCanCreateAndGetApplication() throws Exception {
+    void canCreateAndGetApplication() throws Exception {
         final String id = UUID.randomUUID().toString();
         final Application application = this.constructApplicationDTO(id);
 
@@ -66,7 +66,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testGetApplicationsUsingParams() throws Exception {
+    void getApplicationsUsingParams() throws Exception {
         final String application1Id = UUID.randomUUID().toString();
         final String application2Id = UUID.randomUUID().toString();
 
@@ -181,7 +181,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testGetApplicationsUsingPagination() throws Exception {
+    void getApplicationsUsingPagination() throws Exception {
         final String id1 = UUID.randomUUID() + "_1";
         final String id2 = UUID.randomUUID() + "_2";
         final String id3 = UUID.randomUUID() + "_3";
@@ -217,8 +217,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
         Assertions.assertThat(
             results.stream()
                 .map(Application::getId)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
         ).containsExactlyInAnyOrder(id1, id2, id3);
 
         // Paginate, 1 result per page
@@ -275,12 +274,12 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testApplicationNotExist() {
+    void applicationNotExist() {
         Assertions.assertThatIOException().isThrownBy(() -> this.applicationClient.getApplication("foo"));
     }
 
     @Test
-    void testGetAllAndDeleteAllApplications() throws Exception {
+    void getAllAndDeleteAllApplications() throws Exception {
         final List<Application> initialApplicationList = this.applicationClient.getApplications();
         Assertions.assertThat(initialApplicationList).isEmpty();
 
@@ -302,7 +301,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testDeleteApplication() throws Exception {
+    void deleteApplication() throws Exception {
         final Application application1 = constructApplicationDTO(null);
         final String appId1 = this.applicationClient.createApplication(application1);
 
@@ -314,7 +313,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testUpdateApplication() throws Exception {
+    void updateApplication() throws Exception {
         final Application application1 = constructApplicationDTO(null);
         final String app1Id = this.applicationClient.createApplication(application1);
 
@@ -345,7 +344,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testApplicationTagsMethods() throws Exception {
+    void applicationTagsMethods() throws Exception {
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
@@ -393,7 +392,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testApplicationConfigsMethods() throws Exception {
+    void applicationConfigsMethods() throws Exception {
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
@@ -429,7 +428,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testApplicationDependenciesMethods() throws Exception {
+    void applicationDependenciesMethods() throws Exception {
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
@@ -465,7 +464,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testApplicationPatchMethod() throws Exception {
+    void applicationPatchMethod() throws Exception {
         final ObjectMapper mapper = GenieObjectMapper.getMapper();
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
@@ -483,7 +482,7 @@ abstract class ApplicationClientIntegrationTest extends GenieClientIntegrationTe
     }
 
     @Test
-    void testCanGetCommandsForApplication() throws Exception {
+    void canGetCommandsForApplication() throws Exception {
         final Command command1 = constructCommandDTO(null);
         final Command command2 = constructCommandDTO(null);
 

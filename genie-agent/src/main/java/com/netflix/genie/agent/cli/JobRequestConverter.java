@@ -27,9 +27,9 @@ import com.netflix.genie.common.internal.dtos.JobMetadata;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -158,8 +158,8 @@ public class JobRequestConverter {
 
         ConversionException(@NotEmpty final Set<ConstraintViolation<AgentJobRequest>> violations) {
             super(
-                String.format(
-                    "Job request failed validation: %s (%d total violations)",
+                
+                    "Job request failed validation: %s (%d total violations)".formatted(
                     violations.iterator().next().getMessage(),
                     violations.size()
                 )

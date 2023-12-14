@@ -19,9 +19,8 @@ package com.netflix.genie.agent.execution.statemachine.listeners;
 
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.annotation.Nullable;
 
 /**
  * Listener that logs state machine events and transitions.

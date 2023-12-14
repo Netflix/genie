@@ -47,7 +47,7 @@ class RandomCommandSelectorImplTest {
     }
 
     @Test
-    void testValidCommandSet() throws ResourceSelectionException {
+    void validCommandSet() throws ResourceSelectionException {
         final Command command1 = Mockito.mock(Command.class);
         final Command command2 = Mockito.mock(Command.class);
         final Command command3 = Mockito.mock(Command.class);
@@ -68,7 +68,7 @@ class RandomCommandSelectorImplTest {
     }
 
     @Test
-    void testValidCommandSetOfOne() throws ResourceSelectionException {
+    void validCommandSetOfOne() throws ResourceSelectionException {
         final Command command = Mockito.mock(Command.class);
         final CommandSelectionContext context = Mockito.mock(CommandSelectionContext.class);
         Mockito.when(context.getResources()).thenReturn(Sets.newHashSet(command));

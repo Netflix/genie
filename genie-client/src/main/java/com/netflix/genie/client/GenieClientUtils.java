@@ -26,6 +26,7 @@ import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.interceptors.ResponseMappingInterceptor;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import jakarta.annotation.Nullable;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

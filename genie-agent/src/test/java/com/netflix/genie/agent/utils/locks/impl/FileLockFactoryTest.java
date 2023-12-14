@@ -44,7 +44,7 @@ class FileLockFactoryTest {
     }
 
     @Test
-    void canGetTaskExecutor(@TempDir final Path tmpDir) throws IOException, LockException {
+    void canGetTaskExecutor(@TempDir Path tmpDir) throws IOException, LockException {
         Assertions
             .assertThat(
                 this.fileLockFactory.getLock(Files.createFile(tmpDir.resolve(UUID.randomUUID().toString())).toFile())

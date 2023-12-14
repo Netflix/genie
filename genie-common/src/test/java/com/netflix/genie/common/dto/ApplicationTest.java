@@ -190,7 +190,7 @@ class ApplicationTest {
      * Test equals.
      */
     @Test
-    void testEqualityAndHashCode() {
+    void equalityAndHashCode() {
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         builder.withDependencies(null);
         builder.withType(null);

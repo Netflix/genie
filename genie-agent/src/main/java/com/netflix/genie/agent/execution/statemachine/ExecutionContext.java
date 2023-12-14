@@ -40,7 +40,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -34,7 +34,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class CommandModelAssemblerTest {
+class CommandModelAssemblerTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();

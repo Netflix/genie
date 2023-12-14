@@ -35,7 +35,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.CronTrigger;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
@@ -303,8 +303,10 @@ public class DatabaseCleanupTask extends LeaderTask {
                 } while (deleted > 0);
 
                 log.info(
-                    "Deleted {} clusters that were in one of {} states, were created before {} and weren't "
-                        + " attached to any jobs",
+                    """
+                    Deleted {} clusters that were in one of {} states, were created before {} and weren't \
+                     attached to any jobs\
+                    """,
                     totalDeleted,
                     TO_DELETE_CLUSTER_STATUSES,
                     creationThreshold

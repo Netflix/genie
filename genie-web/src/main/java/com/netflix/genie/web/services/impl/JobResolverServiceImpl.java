@@ -53,6 +53,8 @@ import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -65,10 +67,8 @@ import org.springframework.aop.TargetClassAware;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -979,8 +979,8 @@ public class JobResolverServiceImpl implements JobResolverService {
 
     private String getProxyObjectClassName(final Object possibleProxyObject) {
         final String className;
-        if (possibleProxyObject instanceof TargetClassAware) {
-            final Class<?> targetClass = ((TargetClassAware) possibleProxyObject).getTargetClass();
+        if (possibleProxyObject instanceof TargetClassAware aware) {
+            final Class<?> targetClass = aware.getTargetClass();
             if (targetClass != null) {
                 className = targetClass.getCanonicalName();
             } else {

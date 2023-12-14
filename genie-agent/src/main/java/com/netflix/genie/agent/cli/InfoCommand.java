@@ -32,7 +32,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,8 +120,8 @@ class InfoCommand implements AgentCommand {
 
                 messageBuilder
                     .append(
-                        String.format(
-                            "  - %s (%s) [%s]",
+                        
+                            "  - %s (%s) [%s]".formatted(
                             beanName,
                             beanClass == null ? "?" : beanClass,
                             description
@@ -144,8 +144,8 @@ class InfoCommand implements AgentCommand {
             for (Map.Entry<String, Object> envEntry : envEntries) {
                 messageBuilder
                     .append(
-                        String.format(
-                            "  - %s=%s",
+                        
+                            "  - %s=%s".formatted(
                             envEntry.getKey(),
                             envEntry.getValue()
                         )
@@ -166,8 +166,8 @@ class InfoCommand implements AgentCommand {
             for (Map.Entry<String, Object> property : properties) {
                 messageBuilder
                     .append(
-                        String.format(
-                            "  - %s=%s",
+                        
+                            "  - %s=%s".formatted(
                             property.getKey(),
                             property.getValue()
                         )
@@ -182,8 +182,8 @@ class InfoCommand implements AgentCommand {
             for (PropertySource<?> propertySource : propertySources) {
                 messageBuilder
                     .append(
-                        String.format(
-                            "  - %s (%s)",
+                        
+                            "  - %s (%s)".formatted(
                             propertySource.getName(),
                             propertySource.getClass().getSimpleName()
                         )

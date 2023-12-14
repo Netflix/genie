@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.events;
 
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanClassLoaderAware;
@@ -28,7 +29,6 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.ResolvableType;
 
-import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 /**

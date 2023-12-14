@@ -24,13 +24,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.SetJoin;
 import java.time.Instant;
 import java.util.Set;
 
@@ -107,7 +107,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindAll() {
+    void findAll() {
         ClusterPredicates
             .find(
                 this.root,
@@ -136,7 +136,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindAllLike() {
+    void findAllLike() {
         final String newName = NAME + "%";
         ClusterPredicates
             .find(
@@ -166,7 +166,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindNoName() {
+    void findNoName() {
         ClusterPredicates
             .find(
                 this.root,
@@ -197,7 +197,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindNoStatuses() {
+    void findNoStatuses() {
         ClusterPredicates
             .find(
                 this.root,
@@ -227,7 +227,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindEmptyStatuses() {
+    void findEmptyStatuses() {
         ClusterPredicates
             .find(
                 this.root,
@@ -257,7 +257,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindNoTags() {
+    void findNoTags() {
         ClusterPredicates
             .find(
                 this.root,
@@ -284,7 +284,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindNoMinTime() {
+    void findNoMinTime() {
         ClusterPredicates
             .find(
                 this.root,
@@ -314,7 +314,7 @@ class ClusterPredicatesTest {
     }
 
     @Test
-    void testFindNoMax() {
+    void findNoMax() {
         ClusterPredicates
             .find(
                 this.root,

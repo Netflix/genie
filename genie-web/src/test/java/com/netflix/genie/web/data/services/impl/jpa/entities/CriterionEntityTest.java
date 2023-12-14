@@ -130,7 +130,7 @@ class CriterionEntityTest extends EntityTestBase {
      * Test to make sure equals and hash code only care about the id of the base class not the tags.
      */
     @Test
-    void testEqualsAndHashCode() {
+    void equalsAndHashCode() {
         final Set<TagEntity> tags = Sets.newHashSet(
             new TagEntity(UUID.randomUUID().toString()),
             new TagEntity(UUID.randomUUID().toString())

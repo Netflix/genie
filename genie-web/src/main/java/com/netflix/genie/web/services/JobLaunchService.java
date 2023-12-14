@@ -24,10 +24,10 @@ import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import jakarta.annotation.Nonnull;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nonnull;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Top level coordination service responsible for taking a job request and running the job if possible.

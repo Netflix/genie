@@ -48,12 +48,12 @@ class JobModelAssemblerTest {
     }
 
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         Assertions.assertThat(this.assembler).isNotNull();
     }
 
     @Test
-    public void canConvertToModel() {
+    void canConvertToModel() {
         final EntityModel<Job> model = this.assembler.toModel(this.job);
         Assertions.assertThat(model.getLinks()).hasSize(9);
         Assertions.assertThat(model.getLink("self")).isPresent();

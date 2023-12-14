@@ -34,11 +34,11 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepositor
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -63,8 +63,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -601,7 +601,7 @@ abstract class RestControllerIntegrationTestBase {
 
     String getIdFromLocation(@Nullable final String location) {
         if (location == null) {
-            Assertions.fail("No location provided");
+            fail("No location provided");
         }
         return location.substring(location.lastIndexOf("/") + 1);
     }

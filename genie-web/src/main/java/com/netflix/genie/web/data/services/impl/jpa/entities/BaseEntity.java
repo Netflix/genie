@@ -21,21 +21,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.web.data.services.impl.jpa.converters.JsonAttributeConverter;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.BaseProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.SetupFileProjection;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.Optional;
 
 /**

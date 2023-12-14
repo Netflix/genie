@@ -49,10 +49,7 @@ public class AgentFileProtocolResolverRegistrar implements ApplicationContextAwa
      */
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        if (applicationContext instanceof ConfigurableApplicationContext) {
-
-            final ConfigurableApplicationContext configurableApplicationContext
-                = (ConfigurableApplicationContext) applicationContext;
+        if (applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext) {
 
             log.info(
                 "Adding instance of {} to the set of protocol resolvers",

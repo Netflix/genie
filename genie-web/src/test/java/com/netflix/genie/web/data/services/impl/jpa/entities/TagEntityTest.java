@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.UUID;
 
 /**
@@ -83,7 +83,7 @@ class TagEntityTest extends EntityTestBase {
      * Test to make sure equals and hash code only care about the unique tag.
      */
     @Test
-    void testEqualsAndHashCode() {
+    void equalsAndHashCode() {
         final String tag = UUID.randomUUID().toString();
         final TagEntity one = new TagEntity(tag);
         final TagEntity two = new TagEntity(tag);

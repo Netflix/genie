@@ -17,20 +17,20 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.entities;
 
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,7 +65,7 @@ import java.util.Set;
 public class ClusterEntity extends BaseEntity {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to construct a
      * Cluster DTO.
      */
     public static final String DTO_ENTITY_GRAPH = "Cluster.dto";

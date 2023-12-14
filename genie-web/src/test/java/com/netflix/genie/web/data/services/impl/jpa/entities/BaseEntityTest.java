@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.UUID;
 
 /**
@@ -56,7 +56,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test the default Constructor.
      */
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         final BaseEntity local = new BaseEntity();
         Assertions.assertThat(local.getUniqueId()).isNotBlank();
         Assertions.assertThat(local.getName()).isNull();
@@ -71,7 +71,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure validation works.
      */
     @Test
-    void testValidate() {
+    void validate() {
         this.validate(this.b);
     }
 
@@ -79,7 +79,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure validation works.
      */
     @Test
-    void testValidateWithNothing() {
+    void validateWithNothing() {
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.validate(new BaseEntity()));
@@ -89,7 +89,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure validation works and throws exception when no name entered.
      */
     @Test
-    void testValidateNoName() {
+    void validateNoName() {
         this.b.setName("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -100,7 +100,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure validation works and throws exception when no name entered.
      */
     @Test
-    void testValidateNoUser() {
+    void validateNoUser() {
         this.b.setUser("     ");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -111,7 +111,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure validation works and throws exception when no name entered.
      */
     @Test
-    void testValidateNoVersion() {
+    void validateNoVersion() {
         this.b.setVersion("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -122,7 +122,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test the getting and setting of the unique id.
      */
     @Test
-    void testSetUniqueId() {
+    void setUniqueId() {
         final BaseEntity local = new BaseEntity();
         Assertions.assertThat(local.getUniqueId()).isNotBlank();
         Assertions.assertThat(local.getUniqueId()).isNotEqualTo(UNIQUE_ID);
@@ -134,7 +134,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure the name is being set properly.
      */
     @Test
-    void testSetName() {
+    void setName() {
         final BaseEntity local = new BaseEntity();
         Assertions.assertThat(local.getName()).isNull();
         local.setName(NAME);
@@ -145,7 +145,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure the user is being set properly.
      */
     @Test
-    void testSetUser() {
+    void setUser() {
         final BaseEntity local = new BaseEntity();
         Assertions.assertThat(local.getUser()).isNull();
         local.setUser(USER);
@@ -156,7 +156,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure the version is being set properly.
      */
     @Test
-    void testSetVersion() {
+    void setVersion() {
         final BaseEntity local = new BaseEntity();
         Assertions.assertThat(local.getVersion()).isNull();
         local.setVersion(VERSION);
@@ -167,7 +167,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test the description get/set.
      */
     @Test
-    void testSetDescription() {
+    void setDescription() {
         Assertions.assertThat(this.b.getDescription()).isNotPresent();
         final String description = "Test description";
         this.b.setDescription(description);
@@ -178,7 +178,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test the setup file get/set.
      */
     @Test
-    void testSetSetupFile() {
+    void setSetupFile() {
         Assertions.assertThat(this.b.getSetupFile()).isNotPresent();
         final FileEntity setupFile = new FileEntity(UUID.randomUUID().toString());
         this.b.setSetupFile(setupFile);
@@ -191,7 +191,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test the metadata setter and getter.
      */
     @Test
-    void testSetMetadata() {
+    void setMetadata() {
         Assertions.assertThat(this.b.getMetadata()).isNotPresent();
         this.b.setMetadata(METADATA);
         Assertions.assertThat(this.b.getMetadata()).isPresent().contains(METADATA);
@@ -203,7 +203,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test the is requested id fields.
      */
     @Test
-    void testSetRequestedId() {
+    void setRequestedId() {
         Assertions.assertThat(this.b.isRequestedId()).isFalse();
         this.b.setRequestedId(true);
         Assertions.assertThat(this.b.isRequestedId()).isTrue();
@@ -213,7 +213,7 @@ class BaseEntityTest extends EntityTestBase {
      * Test to make sure equals and hash code only care about the unique id.
      */
     @Test
-    void testEqualsAndHashCode() {
+    void equalsAndHashCode() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         final BaseEntity one = new BaseEntity();

@@ -46,7 +46,7 @@ class RandomClusterSelectorImplTest {
     }
 
     @Test
-    void testValidClusterSet() throws ResourceSelectionException {
+    void validClusterSet() throws ResourceSelectionException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
         final Cluster cluster3 = Mockito.mock(Cluster.class);
@@ -70,7 +70,7 @@ class RandomClusterSelectorImplTest {
     }
 
     @Test
-    void testValidClusterSetOfOne() throws ResourceSelectionException {
+    void validClusterSetOfOne() throws ResourceSelectionException {
         final Cluster cluster = Mockito.mock(Cluster.class);
         final ClusterSelectionContext context = Mockito.mock(ClusterSelectionContext.class);
         Mockito.when(context.getResources()).thenReturn(Sets.newHashSet(cluster));

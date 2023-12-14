@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +58,13 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         final JobEntity localJobEntity = new JobEntity();
         Assertions.assertThat(localJobEntity.getUniqueId()).isNotBlank();
     }
 
     @Test
-    void testConstructor() {
+    void constructor() {
         Assertions.assertThat(this.entity.getUniqueId()).isNotBlank();
         Assertions.assertThat(NAME).isEqualTo(this.entity.getName());
         Assertions.assertThat(USER).isEqualTo(this.entity.getUser());
@@ -72,7 +72,7 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testOnCreateJob() {
+    void onCreateJob() {
         Assertions.assertThat(this.entity.getTagSearchString()).isNull();
         this.entity.onCreateJob();
         Assertions.assertThat(this.entity.getTagSearchString()).isNull();
@@ -85,7 +85,7 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetGetClusterName() {
+    void setGetClusterName() {
         this.testOptionalField(
             this.entity::getClusterName,
             this.entity::setClusterName,
@@ -94,7 +94,7 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetGetCommandName() {
+    void setGetCommandName() {
         this.testOptionalField(
             this.entity::getCommandName,
             this.entity::setCommandName,
@@ -103,7 +103,7 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetGetCommandArgs() {
+    void setGetCommandArgs() {
         Assertions.assertThat(this.entity.getCommandArgs()).isEmpty();
         this.entity.setCommandArgs(null);
         Assertions.assertThat(this.entity.getCommandArgs()).isEmpty();
@@ -116,29 +116,29 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetGetStatus() {
+    void setGetStatus() {
         Assertions.assertThat(this.entity.getStatus()).isNull();
         this.entity.setStatus(JobStatus.KILLED.name());
         Assertions.assertThat(this.entity.getStatus()).isEqualTo(JobStatus.KILLED.name());
     }
 
     @Test
-    void testSetGetStatusMsg() {
+    void setGetStatusMsg() {
         this.testOptionalField(this.entity::getStatusMsg, this.entity::setStatusMsg, UUID.randomUUID().toString());
     }
 
     @Test
-    void testSetGetStarted() {
+    void setGetStarted() {
         this.testOptionalField(this.entity::getStarted, this.entity::setStarted, Instant.ofEpochMilli(123453L));
     }
 
     @Test
-    void testSetGetFinished() {
+    void setGetFinished() {
         this.testOptionalField(this.entity::getFinished, this.entity::setFinished, Instant.ofEpochMilli(123453L));
     }
 
     @Test
-    void testSetGetArchiveLocation() {
+    void setGetArchiveLocation() {
         this.testOptionalField(
             this.entity::getArchiveLocation,
             this.entity::setArchiveLocation,
@@ -147,7 +147,7 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetNotifiedJobStatus() {
+    void setNotifiedJobStatus() {
         final JobEntity localJobEntity = new JobEntity();
         Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isNotPresent();
         localJobEntity.setNotifiedJobStatus(JobStatus.RUNNING.name());
@@ -155,7 +155,7 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetGetTags() {
+    void setGetTags() {
         Assertions.assertThat(this.entity.getTags()).isEmpty();
         final TagEntity one = new TagEntity("someTag");
         final TagEntity two = new TagEntity("someOtherTag");
@@ -168,12 +168,12 @@ class JobEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         this.validate(this.entity);
     }
 
     @Test
-    void testValidateBadSuperClass() {
+    void validateBadSuperClass() {
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.validate(new JobEntity()));

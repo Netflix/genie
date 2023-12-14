@@ -20,11 +20,10 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
-import javax.annotation.Nonnull;
 
 /**
  * Assembles Cluster resources out of clusters.

@@ -20,9 +20,8 @@ package com.netflix.genie.agent.execution.statemachine.listeners;
 import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
-
-import javax.annotation.Nullable;
 
 /**
  * Job execution listener that prints messages visible to the user in the console.

@@ -19,11 +19,11 @@ package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import jakarta.annotation.Nullable;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotBlank;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Interface for services to kill jobs.

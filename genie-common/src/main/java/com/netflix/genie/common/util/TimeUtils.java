@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.common.util;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Utility methods for dealing with time. Particularly duration.

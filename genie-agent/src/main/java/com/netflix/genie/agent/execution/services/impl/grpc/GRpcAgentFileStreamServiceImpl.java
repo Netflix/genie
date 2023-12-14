@@ -35,10 +35,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.Context;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -219,8 +219,8 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             if (this.controlStreamObserver == null) {
                 log.debug("Creating new control stream");
                 this.controlStreamObserver = fileStreamServiceStub.sync(this.responseObserver);
-                if (this.controlStreamObserver instanceof ClientCallStreamObserver) {
-                    ((ClientCallStreamObserver) this.controlStreamObserver)
+                if (this.controlStreamObserver instanceof ClientCallStreamObserver observer) {
+                    observer
                         .setMessageCompression(this.properties.isEnableCompression());
                 }
             }

@@ -25,11 +25,11 @@ import com.netflix.genie.web.apis.rest.v3.controllers.CommandRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.RootRestController;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**

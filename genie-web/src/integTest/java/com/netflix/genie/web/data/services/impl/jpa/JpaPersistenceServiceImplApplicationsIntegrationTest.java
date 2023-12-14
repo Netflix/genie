@@ -35,7 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
@@ -74,7 +74,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplication() throws NotFoundException {
+    void getApplication() throws NotFoundException {
         final Application app = this.service.getApplication(APP_1_ID);
         Assertions.assertThat(app.getId()).isEqualTo(APP_1_ID);
         final ApplicationMetadata appMetadata = app.getMetadata();
@@ -113,7 +113,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
     }
 
     @Test
-    void testGetApplicationEmpty() {
+    void getApplicationEmpty() {
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.service.getApplication(""));
@@ -121,7 +121,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsByName() {
+    void getApplicationsByName() {
         final Page<Application> apps = this.service.findApplications(APP_2_NAME, null, null, null, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(1);
         Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
@@ -129,7 +129,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsByUser() {
+    void getApplicationsByUser() {
         final Page<Application> apps = this.service.findApplications(null, APP_1_USER, null, null, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_3_ID);
@@ -138,7 +138,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsByStatuses() {
+    void getApplicationsByStatuses() {
         final Set<ApplicationStatus> statuses = Sets.newHashSet(ApplicationStatus.ACTIVE, ApplicationStatus.INACTIVE);
         final Page<Application> apps = this.service.findApplications(null, null, statuses, null, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(2);
@@ -148,7 +148,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsByTags() {
+    void getApplicationsByTags() {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Application> apps = this.service.findApplications(null, null, null, tags, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
@@ -175,7 +175,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsByTagsWhenOneDoesntExist() {
+    void getApplicationsByTagsWhenOneDoesntExist() {
         final Set<String> tags = Sets.newHashSet("prod", UUID.randomUUID().toString());
         final Page<Application> apps = this.service.findApplications(null, null, null, tags, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(0);
@@ -183,7 +183,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsByType() {
+    void getApplicationsByType() {
         final Page<Application> apps = this.service.findApplications(null, null, null, null, APP_2_TYPE, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(1);
         Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
@@ -191,7 +191,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsDescending() {
+    void getApplicationsDescending() {
         //Default to order by Updated
         final Page<Application> apps = this.service.findApplications(null, null, null, null, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
@@ -202,7 +202,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsAscending() {
+    void getApplicationsAscending() {
         //Default to order by Updated
         final Pageable ascendingPage = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         final Page<Application> apps = this.service.findApplications(null, null, null, null, null, ascendingPage);
@@ -214,7 +214,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsOrderBysDefault() {
+    void getApplicationsOrderBysDefault() {
         //Default to order by Updated
         final Page<Application> apps = this.service.findApplications(null, null, null, null, null, PAGEABLE);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
@@ -225,7 +225,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsOrderBysName() {
+    void getApplicationsOrderBysName() {
         final Pageable orderByNamePage = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
         final Page<Application> apps = this.service.findApplications(null, null, null, null, null, orderByNamePage);
         Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
@@ -236,7 +236,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsOrderBysInvalidField() {
+    void getApplicationsOrderBysInvalidField() {
         final Pageable orderByInvalidPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         Assertions
             .assertThatExceptionOfType(RuntimeException.class)
@@ -245,7 +245,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetApplicationsWithTags() {
+    void getApplicationsWithTags() {
         final Set<ApplicationStatus> inactiveStatuses = Sets.newHashSet(ApplicationStatus.INACTIVE);
         final Set<ApplicationStatus> activeStatuses = Sets.newHashSet(ApplicationStatus.ACTIVE);
         final Set<String> tags = Sets.newHashSet("prod", "yarn");
@@ -258,7 +258,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
     }
 
     @Test
-    void testCreateApplication() throws GenieCheckedException {
+    void createApplication() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final ApplicationRequest app = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
@@ -286,7 +286,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
     }
 
     @Test
-    void testCreateApplicationNoId() throws GenieCheckedException {
+    void createApplicationNoId() throws GenieCheckedException {
         final ApplicationRequest app = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
@@ -311,7 +311,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testUpdateApplication() throws GenieCheckedException {
+    void updateApplication() throws GenieCheckedException {
         final Application getApp = this.service.getApplication(APP_1_ID);
         Assertions.assertThat(getApp.getMetadata().getUser()).isEqualTo(APP_1_USER);
         Assertions.assertThat(getApp.getMetadata().getStatus()).isEqualByComparingTo(ApplicationStatus.INACTIVE);
@@ -348,7 +348,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testUpdateCreateAndUpdate() throws GenieCheckedException {
+    void updateCreateAndUpdate() throws GenieCheckedException {
         final Application init = this.service.getApplication(APP_1_ID);
         final Instant created = init.getCreated();
         final Instant updated = init.getUpdated();
@@ -362,7 +362,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testDeleteAll() throws GenieCheckedException {
+    void deleteAll() throws GenieCheckedException {
         Assertions.assertThat(this.applicationRepository.count()).isEqualTo(3L);
         // To solve referential integrity problem
         this.commandRepository.findByUniqueId(COMMAND_1_ID).ifPresent(this.commandRepository::delete);
@@ -373,7 +373,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testDelete() throws GenieCheckedException {
+    void delete() throws GenieCheckedException {
         this.service.deleteApplication(APP_3_ID);
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
@@ -382,7 +382,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testAddConfigsToApplication() throws GenieCheckedException {
+    void addConfigsToApplication() throws GenieCheckedException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -397,7 +397,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testUpdateConfigsForApplication() throws GenieCheckedException {
+    void updateConfigsForApplication() throws GenieCheckedException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -412,13 +412,13 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetConfigsForApplication() throws GenieCheckedException {
+    void getConfigsForApplication() throws GenieCheckedException {
         Assertions.assertThat(this.service.getConfigsForResource(APP_1_ID, Application.class)).hasSize(2);
     }
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testRemoveAllConfigsForApplication() throws GenieCheckedException {
+    void removeAllConfigsForApplication() throws GenieCheckedException {
         Assertions.assertThat(this.service.getConfigsForResource(APP_1_ID, Application.class)).hasSize(2);
         this.service.removeAllConfigsForResource(APP_1_ID, Application.class);
         Assertions.assertThat(this.service.getConfigsForResource(APP_1_ID, Application.class)).isEmpty();
@@ -426,7 +426,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testRemoveConfigForApplication() throws GenieCheckedException {
+    void removeConfigForApplication() throws GenieCheckedException {
         final Set<String> configs = this.service.getConfigsForResource(APP_1_ID, Application.class);
         Assertions.assertThat(configs).hasSize(2);
         final String removedConfig = configs.iterator().next();
@@ -438,7 +438,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testAddDependenciesToApplication() throws GenieCheckedException {
+    void addDependenciesToApplication() throws GenieCheckedException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
@@ -453,7 +453,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testUpdateDependenciesForApplication() throws GenieCheckedException {
+    void updateDependenciesForApplication() throws GenieCheckedException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
@@ -468,13 +468,13 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetDependenciesForApplication() throws GenieCheckedException {
+    void getDependenciesForApplication() throws GenieCheckedException {
         Assertions.assertThat(this.service.getDependenciesForResource(APP_1_ID, Application.class)).hasSize(2);
     }
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testRemoveAllDependenciesForApplication() throws GenieCheckedException {
+    void removeAllDependenciesForApplication() throws GenieCheckedException {
         Assertions.assertThat(this.service.getDependenciesForResource(APP_1_ID, Application.class)).hasSize(2);
         this.service.removeAllDependenciesForResource(APP_1_ID, Application.class);
         Assertions.assertThat(this.service.getDependenciesForResource(APP_1_ID, Application.class)).isEmpty();
@@ -482,7 +482,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testRemoveDependencyForApplication() throws GenieCheckedException {
+    void removeDependencyForApplication() throws GenieCheckedException {
         final Set<String> dependencies = this.service.getDependenciesForResource(APP_1_ID, Application.class);
         Assertions.assertThat(dependencies).hasSize(2);
         final String removedDependency = dependencies.iterator().next();
@@ -494,7 +494,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testAddTagsToApplication() throws GenieCheckedException {
+    void addTagsToApplication() throws GenieCheckedException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -509,7 +509,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testUpdateTagsForApplication() throws GenieCheckedException {
+    void updateTagsForApplication() throws GenieCheckedException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -524,13 +524,13 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetTagsForApplication() throws GenieCheckedException {
+    void getTagsForApplication() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(APP_1_ID, Application.class)).hasSize(1);
     }
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testRemoveAllTagsForApplication() throws GenieCheckedException {
+    void removeAllTagsForApplication() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(APP_1_ID, Application.class)).hasSize(1);
         this.service.removeAllTagsForResource(APP_1_ID, Application.class);
         Assertions.assertThat(this.service.getTagsForResource(APP_1_ID, Application.class)).isEmpty();
@@ -538,7 +538,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testRemoveTagForApplication() throws GenieCheckedException {
+    void removeTagForApplication() throws GenieCheckedException {
         final Set<String> tags = this.service.getTagsForResource(APP_1_ID, Application.class);
         Assertions.assertThat(tags).contains("prod");
         this.service.removeTagForResource(APP_1_ID, "prod", Application.class);
@@ -547,7 +547,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
 
     @Test
     @DatabaseSetup("persistence/applications/init.xml")
-    void testGetCommandsForApplication() throws GenieCheckedException {
+    void getCommandsForApplication() throws GenieCheckedException {
         final Set<Command> commands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions
             .assertThat(commands)
@@ -556,7 +556,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
     }
 
     @Test
-    void testGetCommandsForApplicationNoId() {
+    void getCommandsForApplicationNoId() {
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.service.getCommandsForApplication("", null));
@@ -568,7 +568,7 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
         value = "persistence/applications/deleteUnusedApplications/after.xml",
         assertionMode = DatabaseAssertionMode.NON_STRICT
     )
-    void testDeleteUnusedApplications() {
+    void deleteUnusedApplications() {
         Assertions.assertThat(this.applicationRepository.existsByUniqueId("app2")).isTrue();
         Assertions.assertThat(this.applicationRepository.count()).isEqualTo(6);
         final Instant createdThreshold = Instant.parse("2020-03-10T02:44:00.000Z");

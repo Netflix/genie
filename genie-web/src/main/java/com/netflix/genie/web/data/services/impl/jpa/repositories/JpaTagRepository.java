@@ -38,16 +38,18 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * This is the query used to find the ids of tags that aren't referenced by any of the other tables.
      */
     String SELECT_FOR_UPDATE_UNUSED_TAGS_SQL =
-        "SELECT id "
-            + "FROM tags "
-            + "WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) "
-            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) "
-            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) "
-            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) "
-            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) "
-            + "AND created <= :createdThreshold "
-            + "LIMIT :limit "
-            + "FOR UPDATE;";
+        """
+        SELECT id \
+        FROM tags \
+        WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) \
+        AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) \
+        AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) \
+        AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) \
+        AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) \
+        AND created <= :createdThreshold \
+        LIMIT :limit \
+        FOR UPDATE;\
+        """;
 
     /**
      * Find a tag by its unique tag value.

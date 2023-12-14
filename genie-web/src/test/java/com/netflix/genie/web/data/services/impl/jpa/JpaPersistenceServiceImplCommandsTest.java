@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +81,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testGetCommandNotExists() {
+    void getCommandNotExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.getCommandDto(id)).thenReturn(Optional.empty());
         Assertions
@@ -90,7 +90,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testCreateCommandAlreadyExists() {
+    void createCommandAlreadyExists() {
         final CommandRequest command = new CommandRequest.Builder(
             new CommandMetadata.Builder(
                 COMMAND_1_NAME,
@@ -113,7 +113,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testUpdateCommandNoCommandExists() {
+    void updateCommandNoCommandExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.getCommandDto(id)).thenReturn(Optional.empty());
         Assertions
@@ -142,7 +142,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testUpdateCommandIdsDontMatch() {
+    void updateCommandIdsDontMatch() {
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(UUID.randomUUID().toString());
         Assertions
@@ -151,7 +151,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testAddConfigsToCommandNoCommand() {
+    void addConfigsToCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -160,7 +160,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testUpdateConfigsForCommandNoCommand() {
+    void updateConfigsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -169,7 +169,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testGetConfigsForCommandNoCommand() {
+    void getConfigsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -178,7 +178,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveAllConfigsForCommandNoCommand() {
+    void removeAllConfigsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -187,7 +187,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveConfigForCommandNoCommand() {
+    void removeConfigForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -196,7 +196,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testAddDependenciesForCommand() {
+    void addDependenciesForCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -205,7 +205,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testUpdateDependenciesForCommand() {
+    void updateDependenciesForCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -214,7 +214,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testGetDependenciesForCommand() {
+    void getDependenciesForCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -223,7 +223,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveAllDependenciesForCommand() {
+    void removeAllDependenciesForCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -232,7 +232,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveDependencyForCommand() {
+    void removeDependencyForCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -241,7 +241,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testSetApplicationsForCommandNoAppId() {
+    void setApplicationsForCommandNoAppId() {
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(
@@ -253,7 +253,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testSetApplicationsForCommandNoCommandExists() {
+    void setApplicationsForCommandNoCommandExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Mockito.when(this.jpaApplicationRepository.existsByUniqueId(Mockito.anyString())).thenReturn(true);
@@ -265,7 +265,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testSetApplicationsForCommandNoAppExists() {
+    void setApplicationsForCommandNoAppExists() {
         final String appId = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.existsByUniqueId(appId)).thenReturn(false);
         Assertions
@@ -284,7 +284,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testGetApplicationsForCommandNoCommand() {
+    void getApplicationsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -293,7 +293,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveApplicationsForCommandNoCommandExists() {
+    void removeApplicationsForCommandNoCommandExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -302,7 +302,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testAddTagsForCommandNoCommand() {
+    void addTagsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -311,7 +311,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testUpdateTagsForCommandNoCommand() {
+    void updateTagsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -320,7 +320,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testGetTagsForCommandNoCommand() {
+    void getTagsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -329,7 +329,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveAllTagsForCommandNoCommand() {
+    void removeAllTagsForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -338,7 +338,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testRemoveTagForCommandNoCommand() {
+    void removeTagForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -347,7 +347,7 @@ class JpaPersistenceServiceImplCommandsTest {
     }
 
     @Test
-    void testGetClustersForCommandNoCommand() {
+    void getClustersForCommandNoCommand() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions

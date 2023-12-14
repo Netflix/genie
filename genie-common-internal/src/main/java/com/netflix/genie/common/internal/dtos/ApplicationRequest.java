@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Fields representing all the values users can set when creating a new Application resource.

@@ -63,13 +63,9 @@ public class S3ProtocolResolverRegistrar implements ApplicationContextAware {
      */
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        if (applicationContext instanceof ConfigurableApplicationContext) {
-            final ConfigurableApplicationContext configurableApplicationContext
-                = (ConfigurableApplicationContext) applicationContext;
+        if (applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext) {
 
-            if (configurableApplicationContext instanceof AbstractApplicationContext) {
-                final AbstractApplicationContext abstractApplicationContext
-                    = (AbstractApplicationContext) configurableApplicationContext;
+            if (configurableApplicationContext instanceof AbstractApplicationContext abstractApplicationContext) {
 
                 final Collection<ProtocolResolver> protocolResolvers
                     = abstractApplicationContext.getProtocolResolvers();

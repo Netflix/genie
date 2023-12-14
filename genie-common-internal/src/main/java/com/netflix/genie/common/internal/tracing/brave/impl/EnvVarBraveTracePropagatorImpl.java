@@ -158,12 +158,14 @@ public class EnvVarBraveTracePropagatorImpl implements BraveTracePropagator {
             }
 
             LOG.debug(
-                "Extracted trace context: "
-                    + "Trace Id Low = {}, "
-                    + "Trace Id High = {}, "
-                    + "Parent Span Id = {}, "
-                    + "New Span Id = {}, "
-                    + "Sampled = {}",
+                """
+                Extracted trace context: \
+                Trace Id Low = {}, \
+                Trace Id High = {}, \
+                Parent Span Id = {}, \
+                New Span Id = {}, \
+                Sampled = {}\
+                """,
                 traceIdLow,
                 traceIdHigh,
                 parentSpanId,

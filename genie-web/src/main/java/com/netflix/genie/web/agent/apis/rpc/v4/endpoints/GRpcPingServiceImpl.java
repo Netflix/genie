@@ -66,8 +66,8 @@ public class GRpcPingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
         final StringBuilder sb = new StringBuilder();
 
         sb.append(
-            String.format(
-                "Received ping with id: '%s' from client: '%s' and timestamp: '%s'. ",
+            
+                "Received ping with id: '%s' from client: '%s' and timestamp: '%s'. ".formatted(
                 request.getRequestId(),
                 request.getSourceName(),
                 Timestamps.toString(request.getTimestamp())

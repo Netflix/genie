@@ -38,7 +38,7 @@ class OAuth2SecurityInterceptorTest {
     private static final String SCOPE = "scope";
 
     @Test
-    void testCanConstruct() {
+    void canConstruct() {
         Assertions
             .assertThatCode(() -> new OAuth2SecurityInterceptor(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE))
             .doesNotThrowAnyException();
@@ -46,7 +46,7 @@ class OAuth2SecurityInterceptorTest {
 
     @Disabled("fails randomly")
     @Test
-    void testTokenFetchFailure() throws Exception {
+    void tokenFetchFailure() throws Exception {
         final Interceptor.Chain chain = Mockito.mock(Interceptor.Chain.class);
         final OAuth2SecurityInterceptor oAuth2SecurityInterceptor = new OAuth2SecurityInterceptor(
             URL,

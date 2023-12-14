@@ -36,12 +36,14 @@ public interface JpaApplicationRepository extends JpaBaseRepository<ApplicationE
      * created before the given time.
      */
     String FIND_UNUSED_APPLICATIONS_QUERY =
-        "SELECT id"
-            + " FROM applications"
-            + " WHERE created < :createdThreshold"
-            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications)"
-            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)"
-            + " LIMIT :limit";
+        """
+        SELECT id\
+         FROM applications\
+         WHERE created < :createdThreshold\
+         AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications)\
+         AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)\
+         LIMIT :limit\
+        """;
 
     /**
      * Delete any application records where it's not linked to any jobs and it's not linked to any commands and was

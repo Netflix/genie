@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -83,7 +83,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         final CommandEntity entity = new CommandEntity();
         Assertions.assertThat(entity.getSetupFile()).isNotPresent();
         Assertions.assertThat(entity.getExecutable()).isEmpty();
@@ -101,12 +101,12 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         this.validate(this.c);
     }
 
     @Test
-    void testValidateNoName() {
+    void validateNoName() {
         this.c.setName("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -114,7 +114,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateNoUser() {
+    void validateNoUser() {
         this.c.setUser("   ");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -122,7 +122,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateNoVersion() {
+    void validateNoVersion() {
         this.c.setVersion("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -130,7 +130,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateEmptyExecutable() {
+    void validateEmptyExecutable() {
         this.c.setExecutable(Lists.newArrayList());
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -138,7 +138,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateBlankExecutable() {
+    void validateBlankExecutable() {
         this.c.setExecutable(Lists.newArrayList("    "));
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -146,7 +146,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateExecutableArgumentTooLong() {
+    void validateExecutableArgumentTooLong() {
         this.c.setExecutable(Lists.newArrayList(StringUtils.leftPad("", 1025, 'e')));
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -154,13 +154,13 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetStatus() {
+    void setStatus() {
         this.c.setStatus(CommandStatus.ACTIVE.name());
         Assertions.assertThat(this.c.getStatus()).isEqualTo(CommandStatus.ACTIVE.name());
     }
 
     @Test
-    void testSetSetupFile() {
+    void setSetupFile() {
         Assertions.assertThat(this.c.getSetupFile()).isNotPresent();
         final String setupFile = "s3://netflix.propFile";
         final FileEntity setupFileEntity = new FileEntity(setupFile);
@@ -169,13 +169,13 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetExecutable() {
+    void setExecutable() {
         this.c.setExecutable(EXECUTABLE);
         Assertions.assertThat(this.c.getExecutable()).isEqualTo(EXECUTABLE);
     }
 
     @Test
-    void testSetMemory() {
+    void setMemory() {
         Assertions.assertThat(this.c.getMemory()).isPresent().contains(MEMORY);
         final long newMemory = MEMORY + 1;
         this.c.setMemory(newMemory);
@@ -183,27 +183,27 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testCpu() {
+    void cpu() {
         this.testOptionalField(this.c::getCpu, this.c::setCpu, 12);
     }
 
     @Test
-    void testGpu() {
+    void gpu() {
         this.testOptionalField(this.c::getGpu, this.c::setGpu, 123);
     }
 
     @Test
-    void testDiskMb() {
+    void diskMb() {
         this.testOptionalField(this.c::getDiskMb, this.c::setDiskMb, 123_000L);
     }
 
     @Test
-    void testNetworkMbps() {
+    void networkMbps() {
         this.testOptionalField(this.c::getNetworkMbps, this.c::setNetworkMbps, 123_456L);
     }
 
     @Test
-    void testImages() {
+    void images() {
         this.testOptionalField(
             this.c::getImages,
             this.c::setImages,
@@ -212,7 +212,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetConfigs() {
+    void setConfigs() {
         Assertions.assertThat(this.c.getConfigs()).isEmpty();
         final Set<FileEntity> configs = Sets.newHashSet(new FileEntity("s3://netflix.configFile"));
         this.c.setConfigs(configs);
@@ -223,7 +223,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetDependencies() {
+    void setDependencies() {
         Assertions.assertThat(this.c.getDependencies()).isEmpty();
         final Set<FileEntity> dependencies = Sets.newHashSet(new FileEntity("dep1"));
         this.c.setDependencies(dependencies);
@@ -234,7 +234,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetTags() {
+    void setTags() {
         Assertions.assertThat(this.c.getTags()).isEmpty();
         final TagEntity one = new TagEntity("tag1");
         final TagEntity two = new TagEntity("tag2");
@@ -247,7 +247,7 @@ class CommandEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetApplications() throws GenieCheckedException {
+    void setApplications() throws GenieCheckedException {
         Assertions.assertThat(this.c.getApplications()).isEmpty();
         final ApplicationEntity one = new ApplicationEntity();
         one.setUniqueId("one");

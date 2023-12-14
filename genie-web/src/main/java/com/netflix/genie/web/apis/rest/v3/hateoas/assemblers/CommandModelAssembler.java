@@ -21,11 +21,10 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.apis.rest.v3.controllers.CommandRestController;
+import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
-import javax.annotation.Nonnull;
 
 /**
  * Assembles Command resources out of commands.

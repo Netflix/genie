@@ -22,11 +22,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;

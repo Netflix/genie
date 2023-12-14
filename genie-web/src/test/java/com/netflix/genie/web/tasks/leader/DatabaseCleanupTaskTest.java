@@ -110,8 +110,7 @@ class DatabaseCleanupTaskTest {
         this.environment.setProperty(DatabaseCleanupProperties.EXPRESSION_PROPERTY, expression);
         Mockito.when(this.cleanupProperties.getExpression()).thenReturn("0 0 0 * * *");
         final Trigger trigger = this.task.getTrigger();
-        if (trigger instanceof CronTrigger) {
-            final CronTrigger cronTrigger = (CronTrigger) trigger;
+        if (trigger instanceof CronTrigger cronTrigger) {
             Assertions.assertThat(cronTrigger.getExpression()).isEqualTo(expression);
         } else {
             Assertions.fail("Trigger was not of expected type: " + CronTrigger.class.getName());

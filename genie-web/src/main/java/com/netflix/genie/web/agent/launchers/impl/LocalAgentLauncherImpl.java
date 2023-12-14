@@ -45,6 +45,7 @@ import com.netflix.genie.web.util.MetricsUtils;
 import com.netflix.genie.web.util.UNIXUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -54,8 +55,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.boot.actuate.health.Health;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;

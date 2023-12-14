@@ -1,3 +1,7 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
@@ -11,24 +15,20 @@ idea {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
 dependencies {
-    /*******************************
-     * API Dependencies
-     *******************************/
-
-    /*******************************
-     * Implementation Dependencies
-     *******************************/
+    compileOnly "org.glassfish.jaxb:jaxb-runtime:4.0.4"
 
     implementation(project(":genie-test"))
     implementation("com.google.guava:guava")
     implementation("commons-io:commons-io")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation "org.glassfish.jaxb:jaxb-runtime:4.0.4"
 
     /*******************************
      * Compile Only Dependencies

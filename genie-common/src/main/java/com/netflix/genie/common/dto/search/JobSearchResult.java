@@ -26,12 +26,12 @@ import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.JsonUtils;
 import com.netflix.genie.common.util.TimeUtils;
+import jakarta.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;

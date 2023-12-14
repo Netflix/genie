@@ -40,12 +40,12 @@ import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
-import javax.annotation.Nullable;
 import javax.naming.LimitExceededException;
 import java.io.InputStream;
 import java.net.URI;
@@ -133,7 +133,7 @@ public class GRpcAgentFileStreamServiceImpl
         log.debug("Attempting to stream file: {} of job: {}", relativePath, jobId);
         final Optional<DirectoryManifest> optionalManifest = this.getManifest(jobId);
 
-        if (!optionalManifest.isPresent()) {
+        if (optionalManifest.isEmpty()) {
             log.warn("No manifest found for job: {}" + jobId);
             return Optional.empty();
         }

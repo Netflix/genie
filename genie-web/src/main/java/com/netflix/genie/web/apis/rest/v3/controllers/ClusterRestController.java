@@ -35,8 +35,8 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -65,8 +65,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -98,7 +97,6 @@ public class ClusterRestController {
      * @param dataServices          The {@link DataServices} encapsulation instance to use.
      * @param entityModelAssemblers The encapsulation of all available V3 resource assemblers
      */
-    @Autowired
     public ClusterRestController(final DataServices dataServices, final EntityModelAssemblers entityModelAssemblers) {
         this.persistenceService = dataServices.getPersistenceService();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
@@ -138,7 +136,7 @@ public class ClusterRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Cluster> getCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public EntityModel<Cluster> getCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[getCluster] Called with id: {}", id);
         return this.clusterModelAssembler.toModel(
             DtoConverters.toV3Cluster(this.persistenceService.getCluster(id))
@@ -162,17 +160,19 @@ public class ClusterRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedModel<EntityModel<Cluster>> getClusters(
-        @RequestParam(value = "name", required = false) @Nullable final String name,
+        @RequestParam(required = false) @Nullable final String name,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
         @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
-        @RequestParam(value = "minUpdateTime", required = false) @Nullable final Long minUpdateTime,
-        @RequestParam(value = "maxUpdateTime", required = false) @Nullable final Long maxUpdateTime,
+        @RequestParam(required = false) @Nullable final Long minUpdateTime,
+        @RequestParam(required = false) @Nullable final Long maxUpdateTime,
         @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Cluster> assembler
     ) throws GenieException {
         log.info(
-            "[getClusters] Called to find clusters [name | statuses | tags | minUpdateTime | maxUpdateTime | page]\n"
-                + "{} | {} | {} | {} | {} | {}",
+            """
+            [getClusters] Called to find clusters [name | statuses | tags | minUpdateTime | maxUpdateTime | page]
+            {} | {} | {} | {} | {} | {}\
+            """,
             name,
             statuses,
             tags,
@@ -287,7 +287,7 @@ public class ClusterRestController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Cluster updateCluster
     ) throws NotFoundException, PreconditionFailedException {
         log.info("[updateCluster] Called with id {} update fields {}", id, updateCluster);
@@ -306,7 +306,7 @@ public class ClusterRestController {
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final JsonPatch patch
     ) throws NotFoundException, PreconditionFailedException, GenieServerException {
         log.info("[patchCluster] Called with id {} with patch {}", id, patch);
@@ -334,7 +334,7 @@ public class ClusterRestController {
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCluster(@PathVariable("id") final String id) throws PreconditionFailedException {
+    public void deleteCluster(@PathVariable final String id) throws PreconditionFailedException {
         log.info("[deleteCluster] Called for id: {}", id);
         this.persistenceService.deleteCluster(id);
     }
@@ -361,7 +361,7 @@ public class ClusterRestController {
     @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> configs
     ) throws NotFoundException {
         log.info("[addConfigsForCluster] Called with id {} and config {}", id, configs);
@@ -381,7 +381,7 @@ public class ClusterRestController {
      */
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getConfigsForCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getConfigsForCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[getConfigsForCluster] Called with id {}", id);
         return this.persistenceService.getConfigsForResource(
             id,
@@ -399,7 +399,7 @@ public class ClusterRestController {
     @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> configs
     ) throws NotFoundException {
         log.info("[updateConfigsForCluster] Called with id {} and configs {}", id, configs);
@@ -418,7 +418,7 @@ public class ClusterRestController {
      */
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllConfigsForCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllConfigsForCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[removeAllConfigsForCluster] Called with id {}", id);
         this.persistenceService.removeAllConfigsForResource(
             id,
@@ -436,7 +436,7 @@ public class ClusterRestController {
     @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> dependencies
     ) throws NotFoundException {
         log.info("[addDependenciesForCluster] Called with id {} and dependencies {}", id, dependencies);
@@ -456,7 +456,7 @@ public class ClusterRestController {
      */
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getDependenciesForCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[getDependenciesForCluster] Called with id {}", id);
         return this.persistenceService.getDependenciesForResource(
             id,
@@ -474,7 +474,7 @@ public class ClusterRestController {
     @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> dependencies
     ) throws NotFoundException {
         log.info("[updateDependenciesForCluster] Called with id {} and dependencies {}", id, dependencies);
@@ -493,7 +493,7 @@ public class ClusterRestController {
      */
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllDependenciesForCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[removeAllDependenciesForCluster] Called with id {}", id);
         this.persistenceService.removeAllDependenciesForResource(
             id,
@@ -511,7 +511,7 @@ public class ClusterRestController {
     @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("[addTagsForCluster] Called with id {} and tags {}", id, tags);
@@ -527,7 +527,7 @@ public class ClusterRestController {
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getTagsForCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[getTagsForCluster] Called with id {}", id);
         // Left this way for v3 tag conversion
         return DtoConverters.toV3Cluster(this.persistenceService.getCluster(id)).getTags();
@@ -543,7 +543,7 @@ public class ClusterRestController {
     @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("[updateTagsForCluster] Called with id {} and tags {}", id, tags);
@@ -562,7 +562,7 @@ public class ClusterRestController {
      */
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllTagsForCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllTagsForCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[removeAllTagsForCluster] Called with id {}", id);
         this.persistenceService.removeAllTagsForResource(id, com.netflix.genie.common.internal.dtos.Cluster.class);
     }
@@ -577,8 +577,8 @@ public class ClusterRestController {
     @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForCluster(
-        @PathVariable("id") final String id,
-        @PathVariable("tag") final String tag
+        @PathVariable final String id,
+        @PathVariable final String tag
     ) throws NotFoundException {
         log.info("[removeTagForCluster] Called with id {} and tag {}", id, tag);
         this.persistenceService.removeTagForResource(id, tag, com.netflix.genie.common.internal.dtos.Cluster.class);
@@ -593,7 +593,7 @@ public class ClusterRestController {
     @PostMapping(value = "/{id}/commands", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addCommandsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final List<String> commandIds
     ) {
         log.info("[addCommandsForCluster] Called with id {} and commandIds {}. No-op.", id, commandIds);
@@ -610,7 +610,7 @@ public class ClusterRestController {
     @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<Command>> getCommandsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws NotFoundException {
         log.info("[getCommandsForCluster] Called with id {} status {}. No-op.", id, statuses);
@@ -629,7 +629,7 @@ public class ClusterRestController {
     @PutMapping(value = "/{id}/commands", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCommandsForCluster(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final List<String> commandIds
     ) {
         log.info("[setCommandsForCluster] Called with id {} and commandIds {}. No-op.", id, commandIds);
@@ -642,7 +642,7 @@ public class ClusterRestController {
      */
     @DeleteMapping(value = "/{id}/commands")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllCommandsForCluster(@PathVariable("id") final String id) {
+    public void removeAllCommandsForCluster(@PathVariable final String id) {
         log.info("[removeAllCommandsForCluster] Called with id {}. No-op.", id);
     }
 
@@ -655,8 +655,8 @@ public class ClusterRestController {
     @DeleteMapping(value = "/{id}/commands/{commandId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeCommandForCluster(
-        @PathVariable("id") final String id,
-        @PathVariable("commandId") final String commandId
+        @PathVariable final String id,
+        @PathVariable final String commandId
     ) {
         log.info("[removeCommandForCluster] Called with id {} and command id {}. No-op.", id, commandId);
     }

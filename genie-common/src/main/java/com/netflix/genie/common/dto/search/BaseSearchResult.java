@@ -24,7 +24,7 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**

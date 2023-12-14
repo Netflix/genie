@@ -1,3 +1,7 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
 apply plugin: "java-library"
@@ -11,7 +15,7 @@ idea {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -40,10 +44,43 @@ dependencies {
      * Test Dependencies
      *******************************/
 
+    integTestCompileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
     testImplementation(project(":genie-test"))
     testImplementation(project(":genie-test-web"))
+    testRuntimeClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
 
     integTestImplementation("commons-io:commons-io")
+
+    integTestRuntimeClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    rewriteimplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    rewriteintegTestImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    rewritesmokeTestImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    rewritetestImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    runtimeClasspath "org.glassfish.jaxb:jaxb-runtime:4.0.4"
+
+    smokeTestCompileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    smokeTestRuntimeClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    testCompileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
 }
 
 license {

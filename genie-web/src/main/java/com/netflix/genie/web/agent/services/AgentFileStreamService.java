@@ -18,11 +18,11 @@
 package com.netflix.genie.web.agent.services;
 
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
+import jakarta.annotation.Nullable;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpRange;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;

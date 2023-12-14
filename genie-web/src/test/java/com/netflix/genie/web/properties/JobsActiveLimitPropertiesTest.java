@@ -76,7 +76,7 @@ class JobsActiveLimitPropertiesTest {
      * Make sure environment is used when looking for a user-specific limit override.
      */
     @Test
-    void testUserOverrides() {
+    void userOverrides() {
         final String userName = "SomeUser";
         final int userLimit = 999;
         final Environment environment = Mockito.mock(Environment.class);

@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class JobStatusTest {
 
     @Test
-    void testIsActive() {
+    void isActive() {
         Assertions.assertThat(JobStatus.RUNNING.isActive()).isTrue();
         Assertions.assertThat(JobStatus.INIT.isActive()).isTrue();
         Assertions.assertThat(JobStatus.FAILED.isActive()).isFalse();
@@ -43,7 +43,7 @@ class JobStatusTest {
     }
 
     @Test
-    void testIsFinished() {
+    void isFinished() {
         Assertions.assertThat(JobStatus.RUNNING.isFinished()).isFalse();
         Assertions.assertThat(JobStatus.INIT.isFinished()).isFalse();
         Assertions.assertThat(JobStatus.FAILED.isFinished()).isTrue();
@@ -57,7 +57,7 @@ class JobStatusTest {
     }
 
     @Test
-    void testIsResolvable() {
+    void isResolvable() {
         Assertions.assertThat(JobStatus.RUNNING.isResolvable()).isFalse();
         Assertions.assertThat(JobStatus.INIT.isResolvable()).isFalse();
         Assertions.assertThat(JobStatus.FAILED.isResolvable()).isFalse();
@@ -71,7 +71,7 @@ class JobStatusTest {
     }
 
     @Test
-    void testIsClaimable() {
+    void isClaimable() {
         Assertions.assertThat(JobStatus.RUNNING.isClaimable()).isFalse();
         Assertions.assertThat(JobStatus.INIT.isClaimable()).isFalse();
         Assertions.assertThat(JobStatus.FAILED.isClaimable()).isFalse();
@@ -85,7 +85,7 @@ class JobStatusTest {
     }
 
     @Test
-    void testGetActivesStatuses() {
+    void getActivesStatuses() {
         Assertions
             .assertThat(JobStatus.getActiveStatuses())
             .containsExactlyInAnyOrder(
@@ -99,26 +99,26 @@ class JobStatusTest {
     }
 
     @Test
-    void testGetFinishedStatuses() {
+    void getFinishedStatuses() {
         Assertions
             .assertThat(JobStatus.getFinishedStatuses())
             .containsExactlyInAnyOrder(JobStatus.INVALID, JobStatus.FAILED, JobStatus.KILLED, JobStatus.SUCCEEDED);
     }
 
     @Test
-    void testGetResolvableStatuses() {
+    void getResolvableStatuses() {
         Assertions.assertThat(JobStatus.getResolvableStatuses()).containsExactlyInAnyOrder(JobStatus.RESERVED);
     }
 
     @Test
-    void testGetClaimableStatuses() {
+    void getClaimableStatuses() {
         Assertions
             .assertThat(JobStatus.getClaimableStatuses())
             .containsExactlyInAnyOrder(JobStatus.RESOLVED, JobStatus.ACCEPTED);
     }
 
     @Test
-    void testGetStatusesBeforeClaimed() {
+    void getStatusesBeforeClaimed() {
         Assertions
             .assertThat(JobStatus.getStatusesBeforeClaimed())
             .containsExactlyInAnyOrder(JobStatus.ACCEPTED, JobStatus.RESERVED, JobStatus.RESOLVED);

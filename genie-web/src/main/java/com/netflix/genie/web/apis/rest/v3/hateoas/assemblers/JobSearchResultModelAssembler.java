@@ -20,11 +20,10 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
+import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
-import javax.annotation.Nonnull;
 
 /**
  * Assembles Job resources out of job search result DTOs.

@@ -24,13 +24,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.SetJoin;
 import java.util.Set;
 
 /**
@@ -99,7 +99,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindAll() {
+    void findAll() {
         CommandPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, TAGS);
 
         Mockito
@@ -120,7 +120,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindAllLike() {
+    void findAllLike() {
         final String newName = NAME + "%";
         final String newUser = USER_NAME + "%";
         CommandPredicates.find(this.root, this.cq, this.cb, newName, newUser, STATUSES, TAGS);
@@ -143,7 +143,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindNoName() {
+    void findNoName() {
         CommandPredicates.find(this.root, this.cq, this.cb, null, USER_NAME, STATUSES, TAGS);
 
         Mockito
@@ -164,7 +164,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindNoUserName() {
+    void findNoUserName() {
         CommandPredicates.find(this.root, this.cq, this.cb, NAME, null, STATUSES, TAGS);
 
         Mockito
@@ -185,7 +185,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindNoTags() {
+    void findNoTags() {
         CommandPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, null);
 
         Mockito
@@ -203,7 +203,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindNoStatuses() {
+    void findNoStatuses() {
         CommandPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, null, TAGS);
 
         Mockito
@@ -224,7 +224,7 @@ class CommandPredicatesTest {
     }
 
     @Test
-    void testFindEmptyStatuses() {
+    void findEmptyStatuses() {
         CommandPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, Sets.newHashSet(), TAGS);
 
         Mockito

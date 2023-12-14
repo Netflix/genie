@@ -35,7 +35,7 @@ class CommandStatusTest {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    void testValidCommandStatus() throws GeniePreconditionException {
+    void validCommandStatus() throws GeniePreconditionException {
         Assertions
             .assertThat(CommandStatus.parse(CommandStatus.ACTIVE.name().toLowerCase()))
             .isEqualByComparingTo(CommandStatus.ACTIVE);
@@ -51,7 +51,7 @@ class CommandStatusTest {
      * Tests whether an invalid command status throws exception.
      */
     @Test
-    void testInvalidCommandStatus() {
+    void invalidCommandStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> CommandStatus.parse("DOES_NOT_EXIST"));
@@ -61,7 +61,7 @@ class CommandStatusTest {
      * Tests whether an invalid application status throws exception.
      */
     @Test
-    void testBlankCommandStatus() {
+    void blankCommandStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> CommandStatus.parse("  "));

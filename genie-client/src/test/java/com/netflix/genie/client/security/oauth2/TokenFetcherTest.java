@@ -37,49 +37,49 @@ class TokenFetcherTest {
     private static final String SCOPE = "scope";
 
     @Test
-    void testConstructorWithEmptyUrl() {
+    void constructorWithEmptyUrl() {
         Assertions
             .assertThatIllegalArgumentException()
             .isThrownBy(() -> new TokenFetcher(null, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE));
     }
 
     @Test
-    void testConstructorWithEmptyClientIdl() {
+    void constructorWithEmptyClientIdl() {
         Assertions
             .assertThatIllegalArgumentException()
             .isThrownBy(() -> new TokenFetcher(URL, null, CLIENT_SECRET, GRANT_TYPE, SCOPE));
     }
 
     @Test
-    void testConstructorWithEmptyClientSecret() {
+    void constructorWithEmptyClientSecret() {
         Assertions
             .assertThatIllegalArgumentException()
             .isThrownBy(() -> new TokenFetcher(URL, CLIENT_ID, null, GRANT_TYPE, SCOPE));
     }
 
     @Test
-    void testConstructorWithEmptyGrantType() {
+    void constructorWithEmptyGrantType() {
         Assertions
             .assertThatIllegalArgumentException()
             .isThrownBy(() -> new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, null, SCOPE));
     }
 
     @Test
-    void testConstructorWithEmptyScope() {
+    void constructorWithEmptyScope() {
         Assertions
             .assertThatIllegalArgumentException()
             .isThrownBy(() -> new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, null));
     }
 
     @Test
-    void testConstructorWithMalformedUrl() {
+    void constructorWithMalformedUrl() {
         Assertions
             .assertThatExceptionOfType(GenieClientException.class)
             .isThrownBy(() -> new TokenFetcher("foo", CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE));
     }
 
     @Test
-    void testConstructorWithValidParams() {
+    void constructorWithValidParams() {
         Assertions
             .assertThatCode(() -> new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE))
             .doesNotThrowAnyException();
@@ -87,7 +87,7 @@ class TokenFetcherTest {
 
     @Test
     @Disabled("Fails from time to time non-deterministically")
-    void testGetTokenFailure() {
+    void getTokenFailure() {
         Assertions
             .assertThatExceptionOfType(GenieClientException.class)
             .isThrownBy(

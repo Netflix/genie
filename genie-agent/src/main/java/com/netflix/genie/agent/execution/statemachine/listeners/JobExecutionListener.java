@@ -19,8 +19,7 @@ package com.netflix.genie.agent.execution.statemachine.listeners;
 
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
-
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Listener of job execution.

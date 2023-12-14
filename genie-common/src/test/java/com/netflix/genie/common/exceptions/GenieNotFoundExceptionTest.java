@@ -38,7 +38,7 @@ class GenieNotFoundExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testTwoArgConstructor() {
+    void twoArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieNotFoundException.class)
             .isThrownBy(
@@ -55,7 +55,7 @@ class GenieNotFoundExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testMessageArgConstructor() {
+    void messageArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieNotFoundException.class)
             .isThrownBy(

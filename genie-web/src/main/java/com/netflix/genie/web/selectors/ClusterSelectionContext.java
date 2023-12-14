@@ -21,13 +21,13 @@ import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.Command;
 import com.netflix.genie.common.internal.dtos.JobRequest;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.Set;
 

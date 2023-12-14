@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -76,7 +76,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testGetClusterNotExists() {
+    void getClusterNotExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -85,7 +85,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testCreateClusterAlreadyExists() {
+    void createClusterAlreadyExists() {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final ClusterRequest request = new ClusterRequest.Builder(
             new ClusterMetadata.Builder(
@@ -112,7 +112,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testUpdateClusterNoClusterExists() {
+    void updateClusterNoClusterExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -132,7 +132,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testUpdateClusterIdsDontMatch() {
+    void updateClusterIdsDontMatch() {
         final String id = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(this.jpaClusterRepository.existsByUniqueId(id)).thenReturn(true);
@@ -143,7 +143,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testAddConfigsToClusterNoCluster() {
+    void addConfigsToClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -152,7 +152,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testUpdateConfigsForClusterNoCluster() {
+    void updateConfigsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -161,7 +161,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testGetConfigsForClusterNoCluster() {
+    void getConfigsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -170,7 +170,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testAddDepsToClusterNoCluster() {
+    void addDepsToClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -179,7 +179,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testUpdateDepsForClusterNoCluster() {
+    void updateDepsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -188,7 +188,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testGetDepsForClusterNoCluster() {
+    void getDepsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -197,7 +197,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testRemoveAllDepsFromClusterNoCluster() {
+    void removeAllDepsFromClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -206,7 +206,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testRemoveDepFromClusterNoCluster() {
+    void removeDepFromClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -215,7 +215,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testAddTagsForClusterNoCluster() {
+    void addTagsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -224,7 +224,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testUpdateTagsForClusterNoCluster() {
+    void updateTagsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -233,7 +233,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testGetTagsForClusterNoCluster() {
+    void getTagsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -242,7 +242,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testRemoveAllTagsForClusterNoCluster() {
+    void removeAllTagsForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -251,7 +251,7 @@ class JpaPersistenceServiceImplClustersTest {
     }
 
     @Test
-    void testRemoveTagForClusterNoCluster() {
+    void removeTagForClusterNoCluster() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions

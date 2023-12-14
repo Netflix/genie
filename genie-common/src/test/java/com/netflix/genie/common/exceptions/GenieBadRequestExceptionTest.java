@@ -38,7 +38,7 @@ class GenieBadRequestExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testTwoArgConstructor() {
+    void twoArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieBadRequestException.class)
             .isThrownBy(
@@ -55,7 +55,7 @@ class GenieBadRequestExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testMessageArgConstructor() {
+    void messageArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieBadRequestException.class)
             .isThrownBy(

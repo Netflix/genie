@@ -29,11 +29,11 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
 import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.scheduling.TaskScheduler;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;

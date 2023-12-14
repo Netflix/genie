@@ -1468,8 +1468,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
                     .map(EntityModel::getContent)
                     .filter(Objects::nonNull)
                     .map(Cluster::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .flatMap(Optional::stream)
                     .collect(Collectors.toList())
             )
             .containsExactlyInAnyOrder(cluster1Id, cluster2Id, cluster3Id);
@@ -1555,7 +1554,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testCommandNotFound() {
+    void commandNotFound() {
         final List<String> paths = Lists.newArrayList("", "/applications", "/clusters", "/clusterCriteria");
 
         for (final String relationPath : paths) {
@@ -1572,7 +1571,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testGetClusterCriteria() throws Exception {
+    void getClusterCriteria() throws Exception {
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters
@@ -1600,7 +1599,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testRemoveAllClusterCriteriaFromCommand() throws Exception {
+    void removeAllClusterCriteriaFromCommand() throws Exception {
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM // Path parameters
@@ -1621,7 +1620,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testAddLowestPriorityClusterCriterion() throws Exception {
+    void addLowestPriorityClusterCriterion() throws Exception {
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters,
@@ -1659,7 +1658,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testSetClusterCriteriaForCommand() throws Exception {
+    void setClusterCriteriaForCommand() throws Exception {
         final RestDocumentationFilter setFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters,
@@ -1690,7 +1689,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testInsertClusterCriterionForCommand() throws Exception {
+    void insertClusterCriterionForCommand() throws Exception {
         final RestDocumentationFilter insertFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             // Path parameters
@@ -1733,7 +1732,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testRemoveClusterCriterionFromCommand() throws Exception {
+    void removeClusterCriterionFromCommand() throws Exception {
         final RestDocumentationFilter removeFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             // Path parameters
@@ -1773,7 +1772,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testResolveClustersForCommandClusterCriteria() throws Exception {
+    void resolveClustersForCommandClusterCriteria() throws Exception {
         final Cluster cluster0 = new Cluster.Builder(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),

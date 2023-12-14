@@ -66,9 +66,9 @@ import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.util.MetricsConstants;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
@@ -105,11 +105,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -182,7 +181,6 @@ public class JobRestController {
      * @param attachmentService         The attachment service to use to save attachments.
      * @param jobKillService            The service to kill running jobs
      */
-    @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
     public JobRestController(
         final JobLaunchService jobLaunchService,
@@ -407,7 +405,7 @@ public class JobRestController {
      * @throws GenieException For any error
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<Job> getJob(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Job> getJob(@PathVariable final String id) throws GenieException {
         log.info("[getJob] Called for job with id: {}", id);
         return this.jobModelAssembler.toModel(this.persistenceService.getJob(id));
     }
@@ -420,7 +418,7 @@ public class JobRestController {
      * @throws NotFoundException When no job with {@literal id} exists
      */
     @GetMapping(value = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JsonNode getJobStatus(@PathVariable("id") final String id) throws NotFoundException {
+    public JsonNode getJobStatus(@PathVariable final String id) throws NotFoundException {
         log.info("[getJobStatus] Called for job with id: {}", id);
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
@@ -458,30 +456,32 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.OK)
     @SuppressWarnings("checkstyle:parameternumber")
     public PagedModel<EntityModel<JobSearchResult>> findJobs(
-        @RequestParam(value = "id", required = false) @Nullable final String id,
-        @RequestParam(value = "name", required = false) @Nullable final String name,
-        @RequestParam(value = "user", required = false) @Nullable final String user,
+        @RequestParam(required = false) @Nullable final String id,
+        @RequestParam(required = false) @Nullable final String name,
+        @RequestParam(required = false) @Nullable final String user,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
         @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
-        @RequestParam(value = "clusterName", required = false) @Nullable final String clusterName,
-        @RequestParam(value = "clusterId", required = false) @Nullable final String clusterId,
-        @RequestParam(value = "commandName", required = false) @Nullable final String commandName,
-        @RequestParam(value = "commandId", required = false) @Nullable final String commandId,
-        @RequestParam(value = "minStarted", required = false) @Nullable final Long minStarted,
-        @RequestParam(value = "maxStarted", required = false) @Nullable final Long maxStarted,
-        @RequestParam(value = "minFinished", required = false) @Nullable final Long minFinished,
-        @RequestParam(value = "maxFinished", required = false) @Nullable final Long maxFinished,
-        @RequestParam(value = "grouping", required = false) @Nullable final String grouping,
-        @RequestParam(value = "groupingInstance", required = false) @Nullable final String groupingInstance,
+        @RequestParam(required = false) @Nullable final String clusterName,
+        @RequestParam(required = false) @Nullable final String clusterId,
+        @RequestParam(required = false) @Nullable final String commandName,
+        @RequestParam(required = false) @Nullable final String commandId,
+        @RequestParam(required = false) @Nullable final Long minStarted,
+        @RequestParam(required = false) @Nullable final Long maxStarted,
+        @RequestParam(required = false) @Nullable final Long minFinished,
+        @RequestParam(required = false) @Nullable final Long maxFinished,
+        @RequestParam(required = false) @Nullable final String grouping,
+        @RequestParam(required = false) @Nullable final String groupingInstance,
         @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.info(
-            "[getJobs] Called with "
-                + "[id | jobName | user | statuses | clusterName "
-                + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | grouping | groupingInstance "
-                + "| page]\n"
-                + "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
+            """
+            [getJobs] Called with \
+            [id | jobName | user | statuses | clusterName \
+            | clusterId | minStarted | maxStarted | minFinished | maxFinished | grouping | groupingInstance \
+            | page]
+            {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}\
+            """,
             id,
             name,
             user,
@@ -571,7 +571,7 @@ public class JobRestController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void killJob(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
         @Nullable final String forwardedFrom,
         final HttpServletRequest request
@@ -594,7 +594,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/request", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<JobRequest> getJobRequest(@PathVariable("id") final String id) throws NotFoundException {
+    public EntityModel<JobRequest> getJobRequest(@PathVariable final String id) throws NotFoundException {
         log.info("[getJobRequest] Called for job request with id {}", id);
         return this.jobRequestModelAssembler.toModel(
             new JobRequestModelAssembler.JobRequestWrapper(
@@ -614,7 +614,7 @@ public class JobRestController {
     @GetMapping(value = "/{id}/execution", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<JobExecution> getJobExecution(
-        @PathVariable("id") final String id
+        @PathVariable final String id
     ) throws GenieException {
         log.info("[getJobExecution] Called for job execution with id {}", id);
         return this.jobExecutionModelAssembler.toModel(this.persistenceService.getJobExecution(id));
@@ -630,7 +630,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/metadata", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<JobMetadata> getJobMetadata(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<JobMetadata> getJobMetadata(@PathVariable final String id) throws GenieException {
         log.info("[getJobMetadata] Called for job metadata with id {}", id);
         return this.jobMetadataModelAssembler.toModel(this.persistenceService.getJobMetadata(id));
     }
@@ -644,7 +644,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/cluster", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Cluster> getJobCluster(@PathVariable("id") final String id) throws NotFoundException {
+    public EntityModel<Cluster> getJobCluster(@PathVariable final String id) throws NotFoundException {
         log.info("[getJobCluster] Called for job with id {}", id);
         return this.clusterModelAssembler.toModel(DtoConverters.toV3Cluster(this.persistenceService.getJobCluster(id)));
     }
@@ -658,7 +658,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/command", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Command> getJobCommand(@PathVariable("id") final String id) throws NotFoundException {
+    public EntityModel<Command> getJobCommand(@PathVariable final String id) throws NotFoundException {
         log.info("[getJobCommand] Called for job with id {}", id);
         return this.commandModelAssembler.toModel(DtoConverters.toV3Command(this.persistenceService.getJobCommand(id)));
     }
@@ -673,7 +673,7 @@ public class JobRestController {
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<Application>> getJobApplications(
-        @PathVariable("id") final String id
+        @PathVariable final String id
     ) throws NotFoundException {
         log.info("[getJobApplications] Called for job with id {}", id);
 
@@ -703,7 +703,7 @@ public class JobRestController {
         }
     )
     public void getJobOutput(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
         @Nullable final String forwardedFrom,
         final HttpServletRequest request,

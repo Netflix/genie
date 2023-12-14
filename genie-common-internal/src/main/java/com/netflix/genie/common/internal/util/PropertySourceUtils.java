@@ -82,8 +82,8 @@ public final class PropertySourceUtils {
     ) {
         // Obtain properties sources from environment
         final PropertySources propertySources;
-        if (environment instanceof ConfigurableEnvironment) {
-            propertySources = ((ConfigurableEnvironment) environment).getPropertySources();
+        if (environment instanceof ConfigurableEnvironment configurableEnvironment) {
+            propertySources = configurableEnvironment.getPropertySources();
         } else {
             propertySources = new StandardEnvironment().getPropertySources();
         }
@@ -91,8 +91,8 @@ public final class PropertySourceUtils {
         // Create set of all properties that match the filter pattern
         final Set<String> filteredPropertyNames = Sets.newHashSet();
         for (final PropertySource<?> propertySource : propertySources) {
-            if (propertySource instanceof EnumerablePropertySource) {
-                for (final String propertyName : ((EnumerablePropertySource<?>) propertySource).getPropertyNames()) {
+            if (propertySource instanceof EnumerablePropertySource source) {
+                for (final String propertyName : source.getPropertyNames()) {
                     if (propertyName.startsWith(prefix)) {
                         log.debug("Adding matching property: {}", propertyName);
                         filteredPropertyNames.add(propertyName);

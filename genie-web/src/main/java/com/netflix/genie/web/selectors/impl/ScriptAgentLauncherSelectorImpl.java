@@ -32,7 +32,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -94,7 +94,7 @@ public class ScriptAgentLauncherSelectorImpl implements AgentLauncherSelector {
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<AgentLauncher> agentLauncherOptional = result.getResource();
-            if (!agentLauncherOptional.isPresent()) {
+            if (agentLauncherOptional.isEmpty()) {
                 final String rationale = result.getRationale().orElse(NULL_RATIONALE);
                 log.debug("No agent launcher selected due to: {}", rationale);
                 tags.add(Tag.of(MetricsConstants.TagKeys.AGENT_LAUNCHER_CLASS, NULL_TAG));

@@ -31,7 +31,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +86,7 @@ public class ScriptCommandSelectorImpl implements CommandSelector {
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Command> commandOptional = result.getResource();
-            if (!commandOptional.isPresent()) {
+            if (commandOptional.isEmpty()) {
                 final String rationale = result.getRationale().orElse(NULL_RATIONALE);
                 log.debug("No command selected due to: {}", rationale);
                 tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, NULL_TAG));

@@ -58,7 +58,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Optional;
@@ -246,7 +246,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testClaimJobErrorCases() {
+    void claimJobErrorCases() {
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString()))
             .thenReturn(Optional.empty());
@@ -281,7 +281,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testClaimJobValidBehavior() throws GenieCheckedException {
+    void claimJobValidBehavior() throws GenieCheckedException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         final AgentClientMetadata agentClientMetadata = Mockito.mock(AgentClientMetadata.class);
         final String id = UUID.randomUUID().toString();
@@ -307,7 +307,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testUpdateJobStatusErrorCases() throws NotFoundException {
+    void updateJobStatusErrorCases() throws NotFoundException {
         final String id = UUID.randomUUID().toString();
         Assertions
             .assertThat(this.persistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.CLAIMED, null))
@@ -339,7 +339,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testUpdateJobValidBehavior() throws GenieCheckedException {
+    void updateJobValidBehavior() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final String newStatusMessage = UUID.randomUUID().toString();
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
@@ -364,7 +364,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testGetJobStatus() throws GenieCheckedException {
+    void getJobStatus() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final JobStatus status = JobStatus.RUNNING;
 
@@ -380,7 +380,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testGetFinishedJobNonExisting() {
+    void getFinishedJobNonExisting() {
         final String id = UUID.randomUUID().toString();
 
         Mockito
@@ -396,7 +396,7 @@ class JpaPersistenceServiceImplJobsTest {
     // TODO: JpaJobPersistenceServiceImpl#getFinishedJob(String) successful
 
     @Test
-    void testIsApiJobNoJob() {
+    void isApiJobNoJob() {
         final String id = UUID.randomUUID().toString();
         Mockito
             .when(this.jobRepository.findByUniqueId(id, JobApiProjection.class))
@@ -614,7 +614,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testUpdateJobStatusWithTooLongMessage() throws GenieCheckedException {
+    void updateJobStatusWithTooLongMessage() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final JobEntity jobEntity = new JobEntity();
         jobEntity.setStatus(JobStatus.INIT.name());
@@ -628,7 +628,7 @@ class JpaPersistenceServiceImplJobsTest {
     }
 
     @Test
-    void testGetJobsWithStatusAndArchiveStatusUpdatedBefore() {
+    void getJobsWithStatusAndArchiveStatusUpdatedBefore() {
         Mockito
             .when(
                 this.jobRepository.getJobsWithStatusAndArchiveStatusUpdatedBefore(

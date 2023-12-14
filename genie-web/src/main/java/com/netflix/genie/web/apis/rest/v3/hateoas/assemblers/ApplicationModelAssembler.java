@@ -21,11 +21,10 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.ApplicationRestController;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
-import javax.annotation.Nonnull;
 
 /**
  * Assembles Application resources out of applications.

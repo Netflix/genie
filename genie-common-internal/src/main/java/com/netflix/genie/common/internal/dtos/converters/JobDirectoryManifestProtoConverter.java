@@ -24,7 +24,7 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieConversionExcep
 import com.netflix.genie.proto.AgentManifestMessage;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 
 /**

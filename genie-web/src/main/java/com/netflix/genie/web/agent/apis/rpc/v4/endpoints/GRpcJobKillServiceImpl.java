@@ -33,6 +33,7 @@ import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.RequestForwardingService;
 import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +41,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -156,8 +156,10 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
                 if (responseObserver == null) {
                     // This might happen when the agent has gone but its status is not updated
                     // In this case, we force updating the job status to KILLED.
-                    log.warn("Tried to kill Job {}, but expected local agent connection not found. "
-                            + "Trying to force updating the job status to {}",
+                    log.warn("""
+                            Tried to kill Job {}, but expected local agent connection not found. \
+                            Trying to force updating the job status to {}\
+                            """,
                         jobId,
                         JobStatus.KILLED
                     );
@@ -169,8 +171,10 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
                         );
                     } catch (final GenieInvalidStatusException e) {
                         log.error(
-                            "Failed to force updating the status of Job {} to {} "
-                                + "due to current status not being expected {}",
+                            """
+                            Failed to force updating the status of Job {} to {} \
+                            due to current status not being expected {}\
+                            """,
                             jobId,
                             JobStatus.KILLED,
                             currentJobStatus
@@ -240,8 +244,10 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
                     cancelObserverIfNecessary(observer);
                 }
             } catch (final Exception unexpectedException) {
-                log.error("Got unexpected exception while trying to cleanup jobID {}. Moving on. "
-                    + "Exception: {}", jobId, unexpectedException);
+                log.error("""
+                    Got unexpected exception while trying to cleanup jobID {}. Moving on. \
+                    Exception: {}\
+                    """, jobId, unexpectedException);
             }
         }
     }
@@ -269,8 +275,10 @@ public class GRpcJobKillServiceImpl extends JobKillServiceGrpc.JobKillServiceImp
             try {
                 observer.onCompleted();
             } catch (final Exception observerException) {
-                log.error("Got exception while trying to complete streamObserver during cleanup"
-                    + "for jobID {}. Exception: {}", "jobId", observerException);
+                log.error("""
+                    Got exception while trying to complete streamObserver during cleanup\
+                    for jobID {}. Exception: {}\
+                    """, "jobId", observerException);
             }
         }
     }

@@ -38,24 +38,26 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * The query used to select any dangling file references.
      */
     String SELECT_FOR_UPDATE_UNUSED_FILES_SQL =
-        "SELECT id "
-            + "FROM files "
-            + "WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) "
-            + "AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) "
-            + "AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) "
-            + "AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) "
-            + "AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) "
-            + "AND created <= :createdThresholdUpperBound "
-            + "AND created >= :createdThresholdLowerBound "
-            + "LIMIT :limit "
-            + "FOR UPDATE;";
+        """
+        SELECT id \
+        FROM files \
+        WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) \
+        AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) \
+        AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) \
+        AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) \
+        AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) \
+        AND created <= :createdThresholdUpperBound \
+        AND created >= :createdThresholdLowerBound \
+        LIMIT :limit \
+        FOR UPDATE;\
+        """;
 
     /**
      * Find a file by its unique file value.

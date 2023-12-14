@@ -989,7 +989,7 @@ class ApplicationRestControllerIntegrationTest extends RestControllerIntegration
     }
 
     @Test
-    void testApplicationNotFound() {
+    void applicationNotFound() {
         final List<String> paths = Lists.newArrayList("", "/commands");
 
         for (final String path : paths) {

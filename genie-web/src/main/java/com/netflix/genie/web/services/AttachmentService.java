@@ -18,10 +18,10 @@
 package com.netflix.genie.web.services;
 
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import jakarta.annotation.Nullable;
 import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Set;
 

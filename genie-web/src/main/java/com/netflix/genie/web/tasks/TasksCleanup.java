@@ -18,14 +18,13 @@
 package com.netflix.genie.web.tasks;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Performs any cleanup when the system is shutting down.
@@ -44,7 +43,6 @@ public class TasksCleanup {
      *
      * @param scheduler The task scheduler for the system.
      */
-    @Autowired
     public TasksCleanup(@Qualifier("genieTaskScheduler") @NotNull final ThreadPoolTaskScheduler scheduler) {
         this.scheduler = scheduler;
     }

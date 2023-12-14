@@ -110,6 +110,8 @@ import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -120,22 +122,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -1249,8 +1249,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final int batchSize
     ) {
         log.info(
-            "Attempting to update at most {} commands with statuses {} "
-                + "which were created before {} and haven't been used in jobs to new status {}",
+            """
+            Attempting to update at most {} commands with statuses {} \
+            which were created before {} and haven't been used in jobs to new status {}\
+            """,
             batchSize,
             currentStatuses,
             commandCreatedThreshold,
@@ -1265,8 +1267,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             )
         );
         log.info(
-            "Updated {} commands with statuses {} "
-                + "which were created before {} and haven't been used in any jobs to new status {}",
+            """
+            Updated {} commands with statuses {} \
+            which were created before {} and haven't been used in any jobs to new status {}\
+            """,
             updateCount,
             currentStatuses,
             commandCreatedThreshold,
@@ -1506,8 +1510,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final String excludeStatusesString = excludeStatuses.toString();
         final String creationThresholdString = creationThreshold.toString();
         log.info(
-            "[deleteJobsCreatedBefore] Attempting to delete at most {} jobs created before {} that do not have any of "
-                + "these statuses {}",
+            """
+            [deleteJobsCreatedBefore] Attempting to delete at most {} jobs created before {} that do not have any of \
+            these statuses {}\
+            """,
             batchSize,
             creationThresholdString,
             excludeStatusesString
@@ -1618,8 +1624,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             // Make sure if the job is resolvable otherwise don't do anything
             if (!DtoConverters.toV4JobStatus(entity.getStatus()).isResolvable()) {
                 log.error(
-                    "[saveResolvedJob] Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't "
-                        + "save resolved info",
+                    """
+                    [saveResolvedJob] Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't \
+                    save resolved info\
+                    """,
                     id,
                     entity.getStatus(),
                     JobStatus.getResolvableStatuses()

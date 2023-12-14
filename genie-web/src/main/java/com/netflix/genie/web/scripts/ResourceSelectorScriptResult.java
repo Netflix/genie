@@ -18,11 +18,11 @@
 package com.netflix.genie.web.scripts;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**

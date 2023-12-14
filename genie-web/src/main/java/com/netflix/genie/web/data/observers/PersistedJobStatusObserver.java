@@ -19,8 +19,7 @@ package com.netflix.genie.web.data.observers;
 
 
 import com.netflix.genie.common.internal.dtos.JobStatus;
-
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Interface for an observer that gets notified of job 'status' change after the latter is persisted.

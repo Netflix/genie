@@ -21,13 +21,11 @@ import com.netflix.genie.web.apis.rest.v3.controllers.GenieExceptionMapper;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -44,7 +42,6 @@ import java.util.UUID;
  * @author mprimi
  * @since 3.2.0
  */
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(UIController.class)
 @ActiveProfiles("integration")
 class UIControllerIntegrationTest {
@@ -61,7 +58,7 @@ class UIControllerIntegrationTest {
      * @throws Exception in case of error
      */
     @Test
-    void testForwardingToIndex() throws Exception {
+    void forwardingToIndex() throws Exception {
         final List<String> validPaths = Arrays.asList(
             "/",
             "/applications",
@@ -86,7 +83,7 @@ class UIControllerIntegrationTest {
      * @throws Exception in case of error
      */
     @Test
-    void testGetIndex() throws Exception {
+    void getIndex() throws Exception {
         final String indexContent;
 
         try (InputStream is = UIController.class.getResourceAsStream("/templates/index.html")) {

@@ -67,7 +67,7 @@ class AwsAutoConfigurationTest {
      * Test expected context.
      */
     @Test
-    void testExpectedContext() {
+    void expectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(AwsRegionProvider.class);
@@ -82,8 +82,7 @@ class AwsAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(SimpleStorageProtocolResolverConfigurer.class);
 
                 // And Make sure we ripped out the one from Spring Cloud AWS and put ours in instead
-                if (context instanceof AbstractApplicationContext) {
-                    final AbstractApplicationContext aac = (AbstractApplicationContext) context;
+                if (context instanceof AbstractApplicationContext aac) {
                     final Collection<ProtocolResolver> protocolResolvers = aac.getProtocolResolvers();
                     Assertions.assertThat(protocolResolvers).contains(context.getBean(S3ProtocolResolver.class));
                     Assertions

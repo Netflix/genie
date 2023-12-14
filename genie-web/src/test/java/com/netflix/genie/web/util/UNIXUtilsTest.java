@@ -45,7 +45,7 @@ class UNIXUtilsTest {
     }
 
     @Test
-    void testChangeOwnershipOfDirectoryMethodSuccess() throws IOException {
+    void changeOwnershipOfDirectoryMethodSuccess() throws IOException {
         final String user = "user";
         final String dir = "dir";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
@@ -57,7 +57,7 @@ class UNIXUtilsTest {
     }
 
     @Test
-    void testChangeOwnershipOfDirectoryMethodFailure() throws IOException {
+    void changeOwnershipOfDirectoryMethodFailure() throws IOException {
         final String user = "user";
         final String dir = "dir";
 
@@ -66,7 +66,7 @@ class UNIXUtilsTest {
     }
 
     @Test
-    void testCreateUserMethodSuccessAlreadyExists() throws IOException {
+    void createUserMethodSuccessAlreadyExists() throws IOException {
         final String user = "user";
         final String group = "group";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
@@ -78,7 +78,7 @@ class UNIXUtilsTest {
     }
 
     @Test
-    void testCreateUserMethodSuccessDoesNotExist1() throws IOException {
+    void createUserMethodSuccessDoesNotExist1() throws IOException {
         final String user = "user";
         final String group = "group";
 
@@ -101,7 +101,7 @@ class UNIXUtilsTest {
     }
 
     @Test
-    void testCreateUserMethodSuccessDoesNotExist2() throws IOException {
+    void createUserMethodSuccessDoesNotExist2() throws IOException {
         final String user = "user";
         final String group = "group";
 

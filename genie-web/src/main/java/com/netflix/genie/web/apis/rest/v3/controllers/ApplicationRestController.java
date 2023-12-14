@@ -38,8 +38,8 @@ import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -68,7 +68,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
@@ -97,7 +96,6 @@ public class ApplicationRestController {
      * @param dataServices          The {@link DataServices} encapsulation instance to use
      * @param entityModelAssemblers The encapsulation of all the available V3 resource assemblers
      */
-    @Autowired
     public ApplicationRestController(
         final DataServices dataServices,
         final EntityModelAssemblers entityModelAssemblers
@@ -158,11 +156,11 @@ public class ApplicationRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedModel<EntityModel<Application>> getApplications(
-        @RequestParam(value = "name", required = false) @Nullable final String name,
-        @RequestParam(value = "user", required = false) @Nullable final String user,
+        @RequestParam(required = false) @Nullable final String name,
+        @RequestParam(required = false) @Nullable final String user,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
         @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
-        @RequestParam(value = "type", required = false) @Nullable final String type,
+        @RequestParam(required = false) @Nullable final String type,
         @PageableDefault(sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Application> assembler
     ) throws GenieException {
@@ -256,7 +254,7 @@ public class ApplicationRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Application> getApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public EntityModel<Application> getApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called to get Application for id {}", id);
         return this.applicationModelAssembler.toModel(
             DtoConverters.toV3Application(this.persistenceService.getApplication(id))
@@ -274,7 +272,7 @@ public class ApplicationRestController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Application updateApp
     ) throws NotFoundException, PreconditionFailedException {
         log.info("called to update application {} with info {}", id, updateApp);
@@ -293,7 +291,7 @@ public class ApplicationRestController {
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final JsonPatch patch
     ) throws NotFoundException, PreconditionFailedException, GenieServerException {
         log.info("Called to patch application {} with patch {}", id, patch);
@@ -320,7 +318,7 @@ public class ApplicationRestController {
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteApplication(@PathVariable("id") final String id) throws PreconditionFailedException {
+    public void deleteApplication(@PathVariable final String id) throws PreconditionFailedException {
         log.info("Delete an application with id {}", id);
         this.persistenceService.deleteApplication(id);
     }
@@ -336,7 +334,7 @@ public class ApplicationRestController {
     @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsToApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> configs
     ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, configs);
@@ -357,7 +355,7 @@ public class ApplicationRestController {
      */
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getConfigsForApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getConfigsForApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         return this.persistenceService.getConfigsForResource(
             id,
@@ -377,7 +375,7 @@ public class ApplicationRestController {
     @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> configs
     ) throws NotFoundException {
         log.info("Called with id {} and configs {}", id, configs);
@@ -397,7 +395,7 @@ public class ApplicationRestController {
      */
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllConfigsForApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllConfigsForApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllConfigsForResource(
             id,
@@ -416,7 +414,7 @@ public class ApplicationRestController {
     @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> dependencies
     ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
@@ -437,7 +435,7 @@ public class ApplicationRestController {
      */
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getDependenciesForApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         return this.persistenceService.getDependenciesForResource(
             id,
@@ -457,7 +455,7 @@ public class ApplicationRestController {
     @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> dependencies
     ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
@@ -477,7 +475,7 @@ public class ApplicationRestController {
      */
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllDependenciesForApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllDependenciesForResource(
             id,
@@ -496,7 +494,7 @@ public class ApplicationRestController {
     @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, tags);
@@ -517,7 +515,7 @@ public class ApplicationRestController {
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public Set<String> getTagsForApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         // This is done so that the v3 tags (genie.id, genie.name) are added properly
         return DtoConverters.toV3Application(this.persistenceService.getApplication(id)).getTags();
@@ -535,7 +533,7 @@ public class ApplicationRestController {
     @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestBody final Set<String> tags
     ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
@@ -555,7 +553,7 @@ public class ApplicationRestController {
      */
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllTagsForApplication(@PathVariable("id") final String id) throws NotFoundException {
+    public void removeAllTagsForApplication(@PathVariable final String id) throws NotFoundException {
         log.info("Called with id {}", id);
         this.persistenceService.removeAllTagsForResource(
             id,
@@ -574,8 +572,8 @@ public class ApplicationRestController {
     @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForApplication(
-        @PathVariable("id") final String id,
-        @PathVariable("tag") final String tag
+        @PathVariable final String id,
+        @PathVariable final String tag
     ) throws NotFoundException {
         log.info("Called with id {} and tag {}", id, tag);
         this.persistenceService.removeTagForResource(
@@ -597,7 +595,7 @@ public class ApplicationRestController {
      */
     @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     public Set<EntityModel<Command>> getCommandsForApplication(
-        @PathVariable("id") final String id,
+        @PathVariable final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws NotFoundException, GeniePreconditionException {
         log.info("Called with id {} and statuses {}", id, statuses);

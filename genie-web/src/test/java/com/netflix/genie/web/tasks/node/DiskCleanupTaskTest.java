@@ -57,7 +57,7 @@ import java.util.UUID;
 class DiskCleanupTaskTest {
 
     @Test
-    public void cantConstruct() {
+    void cantConstruct() {
         final JobsProperties properties = JobsProperties.getJobsPropertiesDefaults();
         properties.getUsers().setRunAsUserEnabled(false);
         final Resource jobsDir = Mockito.mock(Resource.class);
@@ -148,7 +148,7 @@ class DiskCleanupTaskTest {
     }
 
     @Test
-    void canRunWithoutSudo(@TempDir final Path tempDir) throws IOException, GenieException {
+    void canRunWithoutSudo(@TempDir Path tempDir) throws IOException, GenieException {
         final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getUsers().setRunAsUserEnabled(false);
 

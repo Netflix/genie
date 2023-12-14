@@ -47,7 +47,7 @@ import java.util.UUID;
 abstract class CommandClientIntegrationTest extends ApplicationClientIntegrationTest {
 
     @Test
-    void testCanCreateAndGetCommand() throws Exception {
+    void canCreateAndGetCommand() throws Exception {
         final String id = UUID.randomUUID().toString();
         final Command command = this.constructCommandDTO(id);
 
@@ -69,7 +69,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
 
     @SuppressWarnings("deprecation")
     @Test
-    void testGetCommandsUsingParams() throws Exception {
+    void getCommandsUsingParams() throws Exception {
         final Set<String> command1Tags = Sets.newHashSet("foo", "pi");
         final Set<String> command2Tags = Sets.newHashSet("bar", "pi");
 
@@ -182,7 +182,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testGetCommandsUsingPagination() throws Exception {
+    void getCommandsUsingPagination() throws Exception {
         final String id1 = UUID.randomUUID() + "_1";
         final String id2 = UUID.randomUUID() + "_2";
         final String id3 = UUID.randomUUID() + "_3";
@@ -218,8 +218,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
         Assertions.assertThat(
             results.stream()
                 .map(Command::getId)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
         ).containsExactlyInAnyOrder(id1, id2, id3);
 
         // Paginate, 1 result per page
@@ -273,14 +272,14 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCommandNotExist() {
+    void commandNotExist() {
         Assertions
             .assertThatIOException()
             .isThrownBy(() -> this.commandClient.getCommand(UUID.randomUUID().toString()));
     }
 
     @Test
-    void testGetAllAndDeleteAllCommands() throws Exception {
+    void getAllAndDeleteAllCommands() throws Exception {
         Assertions.assertThat(this.commandClient.getCommands()).isEmpty();
 
         final Command command1 = this.constructCommandDTO(null);
@@ -302,7 +301,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testDeleteCommand() throws Exception {
+    void deleteCommand() throws Exception {
         final Command command = this.constructCommandDTO(null);
         final String commandId = this.commandClient.createCommand(command);
 
@@ -313,7 +312,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testUpdateCommand() throws Exception {
+    void updateCommand() throws Exception {
         final Command command1 = this.constructCommandDTO(null);
         final String commandId = this.commandClient.createCommand(command1);
 
@@ -348,7 +347,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCommandTagsMethods() throws Exception {
+    void commandTagsMethods() throws Exception {
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
@@ -381,7 +380,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCommandConfigsMethods() throws Exception {
+    void commandConfigsMethods() throws Exception {
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
@@ -413,7 +412,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCommandDependenciesMethods() throws Exception {
+    void commandDependenciesMethods() throws Exception {
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
         final List<String> executable = Lists.newArrayList("exec");
 
@@ -451,7 +450,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCommandApplicationsMethods() throws Exception {
+    void commandApplicationsMethods() throws Exception {
         final Application foo = new Application.Builder(
             "name",
             "user",
@@ -521,7 +520,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCommandPatchMethod() throws Exception {
+    void commandPatchMethod() throws Exception {
         final ObjectMapper mapper = GenieObjectMapper.getMapper();
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
@@ -536,7 +535,7 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
     }
 
     @Test
-    void testCanGetClustersForCommand() throws Exception {
+    void canGetClustersForCommand() throws Exception {
         final Cluster cluster1 = this.constructClusterDTO(null);
         final Cluster cluster2 = this.constructClusterDTO(null);
 

@@ -46,7 +46,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
 
 
     @Test
-    void testGetClustersUsingPagination() throws Exception {
+    void getClustersUsingPagination() throws Exception {
         final String id1 = UUID.randomUUID() + "_1";
         final String id2 = UUID.randomUUID() + "_2";
         final String id3 = UUID.randomUUID() + "_3";
@@ -82,8 +82,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
         Assertions.assertThat(
             results.stream()
                 .map(Cluster::getId)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
         ).containsExactlyInAnyOrder(id1, id2, id3);
 
         // Paginate, 1 result per page
@@ -140,7 +139,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
     }
 
     @Test
-    void testUpdateCluster() throws Exception {
+    void updateCluster() throws Exception {
         final Cluster cluster1 = constructClusterDTO(null);
         final String cluster1Id = this.clusterClient.createCluster(cluster1);
 
@@ -171,7 +170,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
     }
 
     @Test
-    void testClusterTagsMethods() throws Exception {
+    void clusterTagsMethods() throws Exception {
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
 
         final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
@@ -203,7 +202,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
     }
 
     @Test
-    void testClusterConfigsMethods() throws Exception {
+    void clusterConfigsMethods() throws Exception {
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
 
         final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
@@ -234,7 +233,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
     }
 
     @Test
-    void testClusterDependenciesMethods() throws Exception {
+    void clusterDependenciesMethods() throws Exception {
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
 
         final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
@@ -271,7 +270,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
     }
 
     @Test
-    void testClusterCommandsMethods() throws Exception {
+    void clusterCommandsMethods() throws Exception {
         final List<String> executableAndArgs = Lists.newArrayList("exec");
 
         final Command foo = new Command.Builder(
@@ -322,7 +321,7 @@ abstract class ClusterClientIntegrationTest extends CommandClientIntegrationTest
     }
 
     @Test
-    void testClusterPatchMethod() throws Exception {
+    void clusterPatchMethod() throws Exception {
         final ObjectMapper mapper = GenieObjectMapper.getMapper();
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";

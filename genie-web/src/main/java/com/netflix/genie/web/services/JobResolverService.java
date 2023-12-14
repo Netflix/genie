@@ -22,10 +22,10 @@ import com.netflix.genie.common.internal.dtos.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolutionRuntimeException;
 import com.netflix.genie.web.dtos.ResolvedJob;
+import jakarta.annotation.Nonnull;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nonnull;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Service API for taking inputs from a user and resolving them to concrete information that the Genie system will use

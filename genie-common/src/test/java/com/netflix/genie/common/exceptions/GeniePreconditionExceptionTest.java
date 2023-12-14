@@ -38,7 +38,7 @@ class GeniePreconditionExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testTwoArgConstructor() {
+    void twoArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(
@@ -55,7 +55,7 @@ class GeniePreconditionExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testMessageArgConstructor() {
+    void messageArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(

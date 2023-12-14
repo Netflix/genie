@@ -39,7 +39,7 @@ class GenieExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testThreeArgConstructor() {
+    void threeArgConstructor() {
         Assertions
             .assertThatExceptionOfType(GenieException.class)
             .isThrownBy(
@@ -56,7 +56,7 @@ class GenieExceptionTest {
      * Test the constructor.
      */
     @Test
-    void testTwoArgConstructorWithMessage() {
+    void twoArgConstructorWithMessage() {
         Assertions
             .assertThatExceptionOfType(GenieException.class)
             .isThrownBy(

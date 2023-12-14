@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.UUID;
 
 /**
@@ -83,7 +83,7 @@ class FileEntityTest extends EntityTestBase {
      * Test to make sure equals and hash code only care about the unique file.
      */
     @Test
-    void testEqualsAndHashCode() {
+    void equalsAndHashCode() {
         final String file = UUID.randomUUID().toString();
         final FileEntity one = new FileEntity();
         one.setFile(file);

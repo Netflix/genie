@@ -882,7 +882,7 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
      * @throws Exception on error
      */
     @Test
-    void testPagingDoubleEncoding() throws Exception {
+    void pagingDoubleEncoding() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -1012,7 +1012,7 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     @Test
-    void testClusterNotFound() {
+    void clusterNotFound() {
         final List<String> paths = Lists.newArrayList("", "/commands");
 
         for (final String path : paths) {

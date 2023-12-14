@@ -64,6 +64,7 @@ import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import jakarta.annotation.Nullable;
 import org.assertj.core.api.Assertions;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -209,7 +209,7 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/init.xml")
-    void canSaveAndVerifyJobSubmissionWithAttachments(@TempDir final Path tempDir) throws
+    void canSaveAndVerifyJobSubmissionWithAttachments(@TempDir Path tempDir) throws
         GenieCheckedException,
         IOException {
         final JobRequest jobRequest = this.createJobRequest(null, null);

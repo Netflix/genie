@@ -1,3 +1,7 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
 apply plugin: "java-library"
@@ -10,23 +14,93 @@ idea {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
 dependencies {
-    /*******************************
-     * API Dependencies
-     *******************************/
+    api("org.springdoc:springdoc-openapi-starter-webmvc-ui")
+    api("org.springdoc:springdoc-openapi-starter-webmvc-api")
 
-    api("org.springdoc:springdoc-openapi-hateoas")
-    api("org.springdoc:springdoc-openapi-ui")
-    api("org.springdoc:springdoc-openapi-webmvc-core")
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
+    compileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
 
     /*******************************
      * Implementation Dependencies
      *******************************/
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    integTestCompileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    integTestRuntimeClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    rewriteimplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    rewriteintegTestImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    rewritesmokeTestImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    rewritetestImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    runtimeClasspath "org.glassfish.jaxb:jaxb-runtime:4.0.4"
 
     /*******************************
      * Compile Only Dependencies
@@ -42,8 +116,28 @@ dependencies {
      * Test Dependencies
      *******************************/
 
+    smokeTestCompileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    smokeTestRuntimeClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testCompileClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
     testImplementation(project(":genie-test"))
     testImplementation(project(":genie-test-web"))
+
+    testRuntimeClasspath "org.glassfish.jaxb:jaxb-runtime:2.3.9"
 }
 
 jar {

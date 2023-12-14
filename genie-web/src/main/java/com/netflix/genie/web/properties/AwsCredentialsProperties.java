@@ -18,12 +18,11 @@
 package com.netflix.genie.web.properties;
 
 import com.amazonaws.regions.Regions;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import javax.annotation.Nullable;
 
 /**
  * Properties related to AWS credentials for Genie on top of what Spring Cloud AWS provides.

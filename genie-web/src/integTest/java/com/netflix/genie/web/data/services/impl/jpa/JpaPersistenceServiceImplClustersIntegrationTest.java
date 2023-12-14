@@ -27,6 +27,7 @@ import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.ExecutionEnvironment;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import jakarta.annotation.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -34,8 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.annotation.Nullable;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
@@ -69,7 +69,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetCluster() throws NotFoundException {
+    void getCluster() throws NotFoundException {
         final Cluster cluster1 = this.service.getCluster(CLUSTER_1_ID);
         Assertions.assertThat(cluster1.getId()).isEqualTo(CLUSTER_1_ID);
         final ClusterMetadata cluster1Metadata = cluster1.getMetadata();
@@ -95,7 +95,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersByName() {
+    void getClustersByName() {
         final Page<Cluster> clusters = this.service.findClusters(CLUSTER_2_NAME, null, null, null, null, PAGE);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
         Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
@@ -103,7 +103,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersByStatuses() {
+    void getClustersByStatuses() {
         final Set<ClusterStatus> statuses = EnumSet.of(ClusterStatus.UP);
         final Page<Cluster> clusters = this.service.findClusters(null, statuses, null, null, null, PAGE);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
@@ -113,7 +113,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersByTags() {
+    void getClustersByTags() {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Cluster> clusters = this.service.findClusters(null, null, tags, null, null, PAGE);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
@@ -139,7 +139,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersByMinUpdateTime() {
+    void getClustersByMinUpdateTime() {
         final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 9, 2, 58, 59, 0, ZoneId.of("UTC"));
         final Page<Cluster> clusters = this.service.findClusters(null, null, null, time.toInstant(), null, PAGE);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
@@ -148,7 +148,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersByMaxUpdateTime() {
+    void getClustersByMaxUpdateTime() {
         final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 8, 3, 0, 0, 0, ZoneId.of("UTC"));
         final Page<Cluster> clusters = this.service.findClusters(null, null, null, null, time.toInstant(), PAGE);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
@@ -157,7 +157,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersDescending() {
+    void getClustersDescending() {
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.findClusters(null, null, null, null, null, PAGE);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
@@ -167,7 +167,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersAscending() {
+    void getClustersAscending() {
         final Pageable ascendingPage = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.findClusters(null, null, null, null, null, ascendingPage);
@@ -178,7 +178,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersOrderBysUser() {
+    void getClustersOrderBysUser() {
         final Pageable userPage = PageRequest.of(0, 10, Sort.Direction.DESC, "user");
         final Page<Cluster> clusters = this.service.findClusters(null, null, null, null, null, userPage);
         Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
@@ -188,7 +188,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersOrderBysInvalidField() {
+    void getClustersOrderBysInvalidField() {
         final Pageable badPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         Assertions
             .assertThatExceptionOfType(RuntimeException.class)
@@ -197,7 +197,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetClustersWithTags() {
+    void getClustersWithTags() {
         final Set<ClusterStatus> activeStatuses = Sets.newHashSet(ClusterStatus.UP);
         final Set<ClusterStatus> inactiveStatuses = Sets.newHashSet(ClusterStatus.TERMINATED);
         final Set<String> tags = Sets.newHashSet("pig", "prod");
@@ -211,7 +211,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testCreateCluster() throws GenieCheckedException {
+    void createCluster() throws GenieCheckedException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
         final String id = UUID.randomUUID().toString();
@@ -243,7 +243,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testCreateClusterNoId() throws GenieCheckedException {
+    void createClusterNoId() throws GenieCheckedException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
         final ClusterRequest cluster = new ClusterRequest.Builder(
@@ -273,7 +273,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateClusterNoId() throws GenieCheckedException {
+    void updateClusterNoId() throws GenieCheckedException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
         Assertions.assertThat(getCluster.getMetadata().getUser()).isEqualTo(CLUSTER_1_USER);
         Assertions.assertThat(getCluster.getMetadata().getStatus()).isEqualByComparingTo(ClusterStatus.UP);
@@ -312,7 +312,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateClusterWithInvalidCluster() throws GenieCheckedException {
+    void updateClusterWithInvalidCluster() throws GenieCheckedException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
         Assertions.assertThat(getCluster.getMetadata().getUser()).isEqualTo(CLUSTER_1_USER);
         Assertions.assertThat(getCluster.getMetadata().getStatus()).isEqualByComparingTo(ClusterStatus.UP);
@@ -345,7 +345,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateCreateAndUpdate() throws GenieCheckedException {
+    void updateCreateAndUpdate() throws GenieCheckedException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
         final Instant created = getCluster.getCreated();
         final Instant updated = getCluster.getUpdated();
@@ -385,7 +385,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testDeleteAll() throws GenieCheckedException {
+    void deleteAll() throws GenieCheckedException {
         Assertions
             .assertThat(this.service.findClusters(null, null, null, null, null, PAGE).getNumberOfElements())
             .isEqualTo(2);
@@ -397,7 +397,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testDelete() throws GenieCheckedException {
+    void delete() throws GenieCheckedException {
         Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isTrue();
         this.service.deleteCluster(CLUSTER_1_ID);
         Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isFalse();
@@ -405,7 +405,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testAddConfigsToCluster() throws GenieCheckedException {
+    void addConfigsToCluster() throws GenieCheckedException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -421,7 +421,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateConfigsForCluster() throws GenieCheckedException {
+    void updateConfigsForCluster() throws GenieCheckedException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -437,13 +437,13 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetConfigsForCluster() throws GenieCheckedException {
+    void getConfigsForCluster() throws GenieCheckedException {
         Assertions.assertThat(this.service.getConfigsForResource(CLUSTER_1_ID, Cluster.class)).hasSize(1);
     }
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testAddDependenciesToCluster() throws GenieCheckedException {
+    void addDependenciesToCluster() throws GenieCheckedException {
         final String newDep1 = UUID.randomUUID().toString();
         final String newDep2 = UUID.randomUUID().toString();
         final String newDep3 = UUID.randomUUID().toString();
@@ -459,7 +459,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateDependenciesForCluster() throws GenieCheckedException {
+    void updateDependenciesForCluster() throws GenieCheckedException {
         final String newDep1 = UUID.randomUUID().toString();
         final String newDep2 = UUID.randomUUID().toString();
         final String newDep3 = UUID.randomUUID().toString();
@@ -475,13 +475,13 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetDependenciesForCluster() throws GenieCheckedException {
+    void getDependenciesForCluster() throws GenieCheckedException {
         Assertions.assertThat(this.service.getDependenciesForResource(CLUSTER_1_ID, Cluster.class)).hasSize(2);
     }
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testAddTagsToCluster() throws GenieCheckedException {
+    void addTagsToCluster() throws GenieCheckedException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -498,7 +498,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testUpdateTagsForCluster() throws GenieCheckedException {
+    void updateTagsForCluster() throws GenieCheckedException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -515,13 +515,13 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testGetTagsForCluster() throws GenieCheckedException {
+    void getTagsForCluster() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(CLUSTER_1_ID, Cluster.class)).hasSize(3);
     }
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testRemoveAllTagsForCluster() throws GenieCheckedException {
+    void removeAllTagsForCluster() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(CLUSTER_1_ID, Cluster.class)).hasSize(3);
         this.service.removeAllTagsForResource(CLUSTER_1_ID, Cluster.class);
         Assertions.assertThat(this.service.getTagsForResource(CLUSTER_1_ID, Cluster.class)).isEmpty();
@@ -529,7 +529,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testRemoveTagForCluster() throws GenieCheckedException {
+    void removeTagForCluster() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(CLUSTER_1_ID, Cluster.class)).contains("prod");
         this.service.removeTagForResource(CLUSTER_1_ID, "prod", Cluster.class);
         Assertions.assertThat(this.service.getTagsForResource(CLUSTER_1_ID, Cluster.class)).doesNotContain("prod");
@@ -537,7 +537,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/clusters/init.xml")
-    void testDeleteUnusedClusters() throws GenieCheckedException {
+    void deleteUnusedClusters() throws GenieCheckedException {
         final int batchSize = 10;
         Assertions.assertThat(this.clusterRepository.count()).isEqualTo(2L);
         final String testCluster0Id = this.createTestCluster(null, null, ClusterStatus.OUT_OF_SERVICE).getId();
@@ -575,7 +575,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testFindClustersMatchingCriterion() throws Exception {
+    void findClustersMatchingCriterion() throws Exception {
         // Create some clusters to test with
         final Cluster cluster0 = this.createTestCluster(null, null, null);
         final Cluster cluster1 = this.createTestCluster(null, null, null);
@@ -676,7 +676,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testFindClustersMatchingAnyCriterion() throws Exception {
+    void findClustersMatchingAnyCriterion() throws Exception {
         // Create some clusters to test with
         final Cluster cluster0 = this.createTestCluster(null, null, ClusterStatus.UP);
         final Cluster cluster1 = this.createTestCluster(null, null, ClusterStatus.UP);

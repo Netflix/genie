@@ -18,9 +18,9 @@
 package com.netflix.genie.web.agent.resources;
 
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
+import jakarta.annotation.Nullable;
 import org.springframework.core.io.Resource;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

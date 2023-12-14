@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * An {@link AgentMetadataInspector} that rejects agents whose version is older than a given version.
@@ -69,8 +69,8 @@ public class MinimumVersionAgentMetadataInspector implements AgentMetadataInspec
 
             return new InspectionReport(
                 deprecated ? InspectionReport.Decision.REJECT : InspectionReport.Decision.ACCEPT,
-                String.format(
-                    "Agent version: %s is %s than minimum: %s",
+                
+                    "Agent version: %s is %s than minimum: %s".formatted(
                     agentVersionString,
                     deprecated ? "older" : "newer or equal",
                     minimumVersionString

@@ -70,7 +70,7 @@ class FetchingCacheServiceImplTest {
     private ThreadPoolTaskExecutor cleanUpTaskExecutor;
 
     @BeforeEach
-    void setUp(@TempDir final Path temporaryFolder) throws Exception {
+    void setUp(@TempDir Path temporaryFolder) throws Exception {
         uri = new URI("https://my-server.com/path/to/config/config.xml");
         cacheArguments = Mockito.mock(ArgumentDelegates.CacheArguments.class);
         Mockito.when(

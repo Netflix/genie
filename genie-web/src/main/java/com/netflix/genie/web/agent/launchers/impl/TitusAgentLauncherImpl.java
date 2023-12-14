@@ -37,6 +37,7 @@ import com.netflix.genie.web.properties.TitusAgentLauncherProperties;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,6 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,8 +157,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         this.tracer = tracingComponents.getTracer();
         this.tracePropagator = tracingComponents.getTracePropagator();
         this.environment = environment;
-        if (this.environment instanceof ConfigurableEnvironment) {
-            final ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) this.environment;
+        if (this.environment instanceof ConfigurableEnvironment configurableEnvironment) {
             final ConversionService conversionService = configurableEnvironment.getConversionService();
             this.hasDataSizeConverters
                 = conversionService.canConvert(String.class, DataSize.class)
@@ -591,8 +590,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
             this.setExceptionClassifier(
                 (Classifier<Throwable, RetryPolicy>) classifiable -> {
-                    if (classifiable instanceof HttpStatusCodeException) {
-                        final HttpStatusCodeException httpException = (HttpStatusCodeException) classifiable;
+                    if (classifiable instanceof HttpStatusCodeException httpException) {
                         final HttpStatus status = httpException.getStatusCode();
                         if (retryCodes.contains(status)) {
                             return simpleRetryPolicy;

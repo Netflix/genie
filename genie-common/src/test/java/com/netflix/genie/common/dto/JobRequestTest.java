@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -511,7 +511,7 @@ class JobRequestTest {
      * Test to prove a bug with command args splitting with trailing whitespace was corrected.
      */
     @Test
-    void testCommandArgsEdgeCases() {
+    void commandArgsEdgeCases() {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet());
 
@@ -542,7 +542,7 @@ class JobRequestTest {
      */
     @ParameterizedTest
     @MethodSource("provideCommandArgsConstructorCases")
-    void testCommandArgsConstructorEdgeCases(
+    void commandArgsConstructorEdgeCases(
         @Nullable final String commandArgs,
         @Nullable final List<String> commandArguments,
         @Nullable final String expectedCommandArgs
@@ -557,8 +557,8 @@ class JobRequestTest {
             commandArguments
         ).build();
 
-        final String message = String.format(
-            "Unexpected result when constructing JobRequest with commandArgs: %s and commandArguments: %s",
+        final String message = 
+            "Unexpected result when constructing JobRequest with commandArgs: %s and commandArguments: %s".formatted(
             commandArgs,
             commandArguments
         );

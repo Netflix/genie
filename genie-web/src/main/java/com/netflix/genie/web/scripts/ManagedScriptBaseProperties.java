@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.scripts;
 
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.time.Duration;
 

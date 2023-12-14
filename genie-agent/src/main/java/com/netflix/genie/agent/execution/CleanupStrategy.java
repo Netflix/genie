@@ -43,10 +43,12 @@ public enum CleanupStrategy {
     /**
      * Section of the help message explaining the cleanup strategy.
      */
-    public static final String CLEANUP_HELP_MESSAGE = "JOB DIRECTORY CLEANUP:\n"
-        + "The default cleanup behavior is to delete downloaded dependencies after job execution completed\n"
-        + "(whether or not it was successful). A different strategy (no cleanup, full cleanup, ...) can be\n"
-        + "selected via command-line flags";
+    public static final String CLEANUP_HELP_MESSAGE = """
+        JOB DIRECTORY CLEANUP:
+        The default cleanup behavior is to delete downloaded dependencies after job execution completed
+        (whether or not it was successful). A different strategy (no cleanup, full cleanup, ...) can be
+        selected via command-line flags\
+        """;
 
     /**
      * The default strategy.

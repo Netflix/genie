@@ -35,7 +35,7 @@ class JobStatusTest {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    void testValidJobStatus() throws GeniePreconditionException {
+    void validJobStatus() throws GeniePreconditionException {
         Assertions
             .assertThat(JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()))
             .isEqualByComparingTo(JobStatus.RUNNING);
@@ -69,7 +69,7 @@ class JobStatusTest {
      * Tests whether an invalid job status returns null.
      */
     @Test
-    void testInvalidJobStatus() {
+    void invalidJobStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> JobStatus.parse("DOES_NOT_EXIST"));
@@ -79,7 +79,7 @@ class JobStatusTest {
      * Tests whether an invalid application status throws exception.
      */
     @Test
-    void testBlankJobStatus() {
+    void blankJobStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> JobStatus.parse("  "));
@@ -89,7 +89,7 @@ class JobStatusTest {
      * Test to make sure isActive is working properly.
      */
     @Test
-    void testIsActive() {
+    void isActive() {
         Assertions.assertThat(JobStatus.RUNNING.isActive()).isTrue();
         Assertions.assertThat(JobStatus.INIT.isActive()).isTrue();
         Assertions.assertThat(JobStatus.FAILED.isActive()).isFalse();
@@ -106,7 +106,7 @@ class JobStatusTest {
      * Test to make sure isFinished is working properly.
      */
     @Test
-    void testIsFinished() {
+    void isFinished() {
         Assertions.assertThat(JobStatus.RUNNING.isFinished()).isFalse();
         Assertions.assertThat(JobStatus.INIT.isFinished()).isFalse();
         Assertions.assertThat(JobStatus.FAILED.isFinished()).isTrue();
@@ -123,7 +123,7 @@ class JobStatusTest {
      * Test to make sure isResolvable is working properly.
      */
     @Test
-    void testIsResolvable() {
+    void isResolvable() {
         Assertions.assertThat(JobStatus.RUNNING.isResolvable()).isFalse();
         Assertions.assertThat(JobStatus.INIT.isResolvable()).isFalse();
         Assertions.assertThat(JobStatus.FAILED.isResolvable()).isFalse();
@@ -140,7 +140,7 @@ class JobStatusTest {
      * Test to make sure isClaimable is working properly.
      */
     @Test
-    void testIsClaimable() {
+    void isClaimable() {
         Assertions.assertThat(JobStatus.RUNNING.isClaimable()).isFalse();
         Assertions.assertThat(JobStatus.INIT.isClaimable()).isFalse();
         Assertions.assertThat(JobStatus.FAILED.isClaimable()).isFalse();
@@ -157,7 +157,7 @@ class JobStatusTest {
      * Make sure all the active statuses are present in the set.
      */
     @Test
-    void testGetActivesStatuses() {
+    void getActivesStatuses() {
         Assertions
             .assertThat(JobStatus.getActiveStatuses())
             .containsExactlyInAnyOrder(
@@ -174,7 +174,7 @@ class JobStatusTest {
      * Make sure all the finished statuses are present in the set.
      */
     @Test
-    void testGetFinishedStatuses() {
+    void getFinishedStatuses() {
         Assertions
             .assertThat(JobStatus.getFinishedStatuses())
             .containsExactlyInAnyOrder(JobStatus.INVALID, JobStatus.FAILED, JobStatus.KILLED, JobStatus.SUCCEEDED);
@@ -184,7 +184,7 @@ class JobStatusTest {
      * Make sure all the claimable status are present in the set.
      */
     @Test
-    void testGetResolvableStatuses() {
+    void getResolvableStatuses() {
         Assertions.assertThat(JobStatus.getResolvableStatuses()).containsExactlyInAnyOrder(JobStatus.RESERVED);
     }
 
@@ -192,7 +192,7 @@ class JobStatusTest {
      * Make sure all the claimable status are present in the set.
      */
     @Test
-    void testGetClaimableStatuses() {
+    void getClaimableStatuses() {
         Assertions
             .assertThat(JobStatus.getClaimableStatuses())
             .containsExactlyInAnyOrder(JobStatus.RESOLVED, JobStatus.ACCEPTED);

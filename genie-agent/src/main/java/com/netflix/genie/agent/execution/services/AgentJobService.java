@@ -32,8 +32,8 @@ import com.netflix.genie.common.internal.dtos.JobSpecification;
 import com.netflix.genie.common.internal.dtos.JobStatus;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**

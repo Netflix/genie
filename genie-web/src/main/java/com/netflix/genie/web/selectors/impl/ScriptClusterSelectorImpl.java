@@ -31,7 +31,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -87,7 +87,7 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Cluster> clusterOptional = result.getResource();
-            if (!clusterOptional.isPresent()) {
+            if (clusterOptional.isEmpty()) {
                 final String rationale = result.getRationale().orElse(NULL_RATIONALE);
                 log.debug("No cluster selected due to: {}", rationale);
                 tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, NULL_TAG));

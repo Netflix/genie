@@ -176,22 +176,24 @@ final class ArgumentConverters {
     }
 
     static final class UriOrLocalPathConverter implements IStringConverter<String> {
-        static final String ATTACHMENT_HELP_MESSAGE = "ATTACHMENTS:\n"
-            + "Different kinds of job-specific files can be attached to a job.\n"
-            + "These are broken down by Genie in 3 categories:\n"
-            + " - Configurations: to configure components or tools (e.g. properties files, XML, YAML. ...)\n"
-            + " - Dependencies: binaries or archives (e.g., jar, tar.gz, ...)\n"
-            + " - Setup: a shell script sourced before executing the job (to set environment, expand archives, ...)\n"
-            + "\n"
-            + "These job attachments are downloaded to the job folder during setup and they are archived after \n"
-            + "execution (conditional on cleanup and archival options).\n"
-            + "\n"
-            + "Attachments can either be valid URIs or paths to local files, example:\n"
-            + "  s3://configurations/hadoop/spark/1.6.1/hive-site.xml\n"
-            + "  http://some-domain.org/some-project/my-config.properties\n"
-            + "  file:///tmp/myscript.presto\n"
-            + "  file:/tmp/query.sql\n"
-            + "  ./myscript.sql (shortcut for file:/${PWD}/myscript.sql)\n";
+        static final String ATTACHMENT_HELP_MESSAGE = """
+            ATTACHMENTS:
+            Different kinds of job-specific files can be attached to a job.
+            These are broken down by Genie in 3 categories:
+             - Configurations: to configure components or tools (e.g. properties files, XML, YAML. ...)
+             - Dependencies: binaries or archives (e.g., jar, tar.gz, ...)
+             - Setup: a shell script sourced before executing the job (to set environment, expand archives, ...)
+            
+            These job attachments are downloaded to the job folder during setup and they are archived after\s
+            execution (conditional on cleanup and archival options).
+            
+            Attachments can either be valid URIs or paths to local files, example:
+              s3://configurations/hadoop/spark/1.6.1/hive-site.xml
+              http://some-domain.org/some-project/my-config.properties
+              file:///tmp/myscript.presto
+              file:/tmp/query.sql
+              ./myscript.sql (shortcut for file:/${PWD}/myscript.sql)
+            """;
 
         /**
          * {@inheritDoc}

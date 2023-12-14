@@ -94,7 +94,7 @@ class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    void testRetryOnMissingManifest() throws Exception {
+    void retryOnMissingManifest() throws Exception {
         Mockito
             .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of(ARCHIVE_LOCATION));
@@ -114,7 +114,7 @@ class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    void testNoRetryOnJobNotFound() throws Exception {
+    void noRetryOnJobNotFound() throws Exception {
         Mockito
             .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenThrow(new NotFoundException("blah"));
@@ -134,7 +134,7 @@ class ArchivedJobServiceImplIntegrationTest {
      * @throws GenieCheckedException If this happens something really bizarre happened
      */
     @Test
-    void testNoRetryOnUnexpectedException() throws GenieCheckedException {
+    void noRetryOnUnexpectedException() throws GenieCheckedException {
         Mockito
             .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of("Not a valid URI"));
@@ -154,7 +154,7 @@ class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    void testNoRetryOnJobNotArchived() throws Exception {
+    void noRetryOnJobNotArchived() throws Exception {
         Mockito
             .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.empty());

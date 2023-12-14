@@ -18,12 +18,12 @@
 package com.netflix.genie.web.properties;
 
 import com.netflix.genie.web.agent.services.AgentFilterService;
+import jakarta.annotation.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

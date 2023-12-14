@@ -61,9 +61,10 @@ public class HealthCheckMetricsAspect {
     /**
      * Pointcut that matches invocations of {@code HealthIndicator::getHealth(..)}.
      */
-    @Pointcut(""
-        + "target(org.springframework.boot.actuate.health.HealthIndicator+) && "
-        + "execution(org.springframework.boot.actuate.health.Health getHealth(..))"
+    @Pointcut("""
+        target(org.springframework.boot.actuate.health.HealthIndicator+) && \
+        execution(org.springframework.boot.actuate.health.Health getHealth(..))\
+        """
     )
     public void healthIndicatorGetHealth() {
     }

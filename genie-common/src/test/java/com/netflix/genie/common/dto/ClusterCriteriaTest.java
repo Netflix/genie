@@ -19,10 +19,13 @@ package com.netflix.genie.common.dto;
 
 import com.google.common.collect.Sets;
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import java.util.UUID;
 
 /**
@@ -67,8 +70,8 @@ class ClusterCriteriaTest {
         tags.add(UUID.randomUUID().toString());
         final ClusterCriteria clusterCriteria3 = new ClusterCriteria(tags);
 
-        Assert.assertEquals(clusterCriteria1, clusterCriteria2);
-        Assert.assertNotEquals(clusterCriteria1, clusterCriteria3);
+        assertEquals(clusterCriteria1, clusterCriteria2);
+        assertNotEquals(clusterCriteria1, clusterCriteria3);
     }
 
     /**
@@ -83,7 +86,7 @@ class ClusterCriteriaTest {
         tags.add(UUID.randomUUID().toString());
         final ClusterCriteria clusterCriteria3 = new ClusterCriteria(tags);
 
-        Assert.assertEquals(clusterCriteria1.hashCode(), clusterCriteria2.hashCode());
-        Assert.assertNotEquals(clusterCriteria1.hashCode(), clusterCriteria3.hashCode());
+        assertEquals(clusterCriteria1.hashCode(), clusterCriteria2.hashCode());
+        assertNotEquals(clusterCriteria1.hashCode(), clusterCriteria3.hashCode());
     }
 }

@@ -33,7 +33,7 @@ class AuditEntityTest {
      * Test to make sure objects are constructed properly.
      */
     @Test
-    void testConstructor() {
+    void constructor() {
         final AuditEntity a = new AuditEntity();
         Assertions.assertThat(a.getCreated()).isNotNull();
         Assertions.assertThat(a.getUpdated()).isNotNull();
@@ -45,7 +45,7 @@ class AuditEntityTest {
      * @throws InterruptedException If the process is interrupted
      */
     @Test
-    void testOnCreateAuditEntity() throws InterruptedException {
+    void onCreateAuditEntity() throws InterruptedException {
         final AuditEntity a = new AuditEntity();
         Assertions.assertThat(a.getCreated()).isNotNull();
         Assertions.assertThat(a.getUpdated()).isNotNull();
@@ -66,7 +66,7 @@ class AuditEntityTest {
      * @throws InterruptedException If the process is interrupted
      */
     @Test
-    void testOnUpdateAuditEntity() throws InterruptedException {
+    void onUpdateAuditEntity() throws InterruptedException {
         final AuditEntity a = new AuditEntity();
         Assertions.assertThat(a.getCreated()).isNotNull();
         Assertions.assertThat(a.getUpdated()).isNotNull();

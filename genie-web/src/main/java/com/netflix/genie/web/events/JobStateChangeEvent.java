@@ -18,11 +18,10 @@
 package com.netflix.genie.web.events;
 
 import com.netflix.genie.common.internal.dtos.JobStatus;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.context.ApplicationEvent;
-
-import javax.annotation.Nullable;
 
 /**
  * Event representing a job status change.

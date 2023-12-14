@@ -42,7 +42,7 @@ class ProtoConvertersAutoConfigurationIntegrationTest {
      * Test expected context.
      */
     @Test
-    void testExpectedContext() {
+    void expectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(JobServiceProtoConverter.class);

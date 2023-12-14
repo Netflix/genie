@@ -54,7 +54,7 @@ class CommonServicesAutoConfigurationTest {
      * Test expected context.
      */
     @Test
-    void testExpectedContext() {
+    void expectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
@@ -69,7 +69,7 @@ class CommonServicesAutoConfigurationTest {
      * Make sure when AWS configuration is involved it gives the right configuration.
      */
     @Test
-    void testExpectedContextWithAws() {
+    void expectedContextWithAws() {
         this.contextRunner
             .withPropertyValues(
                 "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
@@ -106,7 +106,7 @@ class CommonServicesAutoConfigurationTest {
      * Make JobDirectoryManifestService beans is configured as expected.
      */
     @Test
-    void testJobDirectoryManifestService() {
+    void jobDirectoryManifestService() {
         this.contextRunner.run(
             context -> Assertions.assertThat(context).hasSingleBean(JobDirectoryManifestCreatorService.class)
         );
@@ -116,7 +116,7 @@ class CommonServicesAutoConfigurationTest {
      * Make JobDirectoryManifest cache bean is configured as expected.
      */
     @Test
-    void testJobDirectoryManifestCache() {
+    void jobDirectoryManifestCache() {
         this.contextRunner.run(
             context -> Assertions.assertThat(context).getBean("jobDirectoryManifestCache").isNotNull()
         );
@@ -126,7 +126,7 @@ class CommonServicesAutoConfigurationTest {
      * Make sure DirectoryManifest.Factory bean is configured as expected.
      */
     @Test
-    void testDirectoryManifestFactory() {
+    void directoryManifestFactory() {
         this.contextRunner.run(
             context -> Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Factory.class)
         );
@@ -136,7 +136,7 @@ class CommonServicesAutoConfigurationTest {
      * Make JobDirectoryManifestService beans are configured as expected.
      */
     @Test
-    void testDirectoryManifestFilter() {
+    void directoryManifestFilter() {
         this.contextRunner.run(
             context -> Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Filter.class)
         );

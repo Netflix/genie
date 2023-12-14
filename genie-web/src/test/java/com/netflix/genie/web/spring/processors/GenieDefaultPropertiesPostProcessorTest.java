@@ -40,7 +40,7 @@ class GenieDefaultPropertiesPostProcessorTest {
      * Test to make sure the smoke property is in the environment after the post processor is invoked.
      */
     @Test
-    void testSmokeProperty() {
+    void smokeProperty() {
         this.contextRunner
             .run(
                 context -> {
@@ -79,7 +79,7 @@ class GenieDefaultPropertiesPostProcessorTest {
      * Test to make sure the prod smoke property is in the environment after the post processor is invoked.
      */
     @Test
-    void testProdSmokeProperty() {
+    void prodSmokeProperty() {
         this.contextRunner
             .withPropertyValues("spring.profiles.active=prod")
             .run(

@@ -30,8 +30,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -47,11 +47,13 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * The query used to find batches of jobs before a certain time.
      */
     String FIND_OLD_JOBS_QUERY =
-        "SELECT id"
-            + " FROM jobs"
-            + " WHERE created < :createdThreshold"
-            + " AND (status NOT IN (:excludedStatuses) OR (:excludedStatuses) IS NULL)"
-            + " LIMIT :batchSize"; // JPQL doesn't support limit so this needs to be native query
+        """
+        SELECT id\
+         FROM jobs\
+         WHERE created < :createdThreshold\
+         AND (status NOT IN (:excludedStatuses) OR (:excludedStatuses) IS NULL)\
+         LIMIT :batchSize\
+        """; // JPQL doesn't support limit so this needs to be native query
 
     // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
 
@@ -63,9 +65,11 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return The total memory used in MB
      */
     @Query(
-        "SELECT COALESCE(SUM(j.memoryUsed), 0)"
-            + " FROM JobEntity j"
-            + " WHERE j.agentHostname = :agentHostname AND j.status IN (:statuses)"
+        """
+        SELECT COALESCE(SUM(j.memoryUsed), 0)\
+         FROM JobEntity j\
+         WHERE j.agentHostname = :agentHostname AND j.status IN (:statuses)\
+        """
     )
     long getTotalMemoryUsedOnHost(
         @Param("agentHostname") String agentHostname,
@@ -82,22 +86,24 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return A {@link JobInfoAggregate} instance with the requested information
      */
     @Query(
-        value = "SELECT"
-            + " ("
-            + "SELECT COALESCE(SUM(j.memory_used), 0)"
-            + " FROM jobs j"
-            + " WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)"
-            + ") as totalMemoryAllocated,"
-            + " ("
-            + "SELECT COALESCE(SUM(j.memory_used), 0)"
-            + " FROM jobs j"
-            + " WHERE j.agent_hostname = :agentHostname and j.status IN (:usedStatuses)"
-            + ") as totalMemoryUsed,"
-            + " ("
-            + "SELECT COUNT(*)"
-            + " FROM jobs j"
-            + " WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)"
-            + ") as numberOfActiveJobs",
+        value = """
+            SELECT\
+             (\
+            SELECT COALESCE(SUM(j.memory_used), 0)\
+             FROM jobs j\
+             WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)\
+            ) as totalMemoryAllocated,\
+             (\
+            SELECT COALESCE(SUM(j.memory_used), 0)\
+             FROM jobs j\
+             WHERE j.agent_hostname = :agentHostname and j.status IN (:usedStatuses)\
+            ) as totalMemoryUsed,\
+             (\
+            SELECT COUNT(*)\
+             FROM jobs j\
+             WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)\
+            ) as numberOfActiveJobs\
+            """,
         nativeQuery = true // Native due to JPQL not allowing select queries without a from clause
     )
     JobInfoAggregate getHostJobInfo(
@@ -139,10 +145,12 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return The user resource aggregates
      */
     @Query(
-        "SELECT j.user AS user, COUNT(j) as runningJobsCount, COALESCE(SUM(j.memoryUsed), 0) as usedMemory"
-            + " FROM JobEntity j"
-            + " WHERE j.status IN (:statuses) AND j.api = :isApi"
-            + " GROUP BY j.user"
+        """
+        SELECT j.user AS user, COUNT(j) as runningJobsCount, COALESCE(SUM(j.memoryUsed), 0) as usedMemory\
+         FROM JobEntity j\
+         WHERE j.status IN (:statuses) AND j.api = :isApi\
+         GROUP BY j.user\
+        """
     )
     Set<UserJobResourcesAggregate> getUserJobResourcesAggregates(
         @Param("statuses") Set<String> statuses,
@@ -167,11 +175,13 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return a set of job ids
      */
     @Query(
-        "SELECT j.uniqueId"
-            + " FROM JobEntity j"
-            + " WHERE j.status IN (:statuses)"
-            + " AND j.archiveStatus IN (:archiveStatuses)"
-            + " AND j.updated < :updatedThreshold"
+        """
+        SELECT j.uniqueId\
+         FROM JobEntity j\
+         WHERE j.status IN (:statuses)\
+         AND j.archiveStatus IN (:archiveStatuses)\
+         AND j.updated < :updatedThreshold\
+        """
     )
     Set<String> getJobsWithStatusAndArchiveStatusUpdatedBefore(
         @Param("statuses") @NotEmpty Set<String> statuses,

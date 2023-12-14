@@ -43,10 +43,10 @@ import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;

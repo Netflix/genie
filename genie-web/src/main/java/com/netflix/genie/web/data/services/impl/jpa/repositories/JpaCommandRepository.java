@@ -36,16 +36,18 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
      * The query used to find commands that are in a certain status, not used in jobs and created some time ago.
      */
     String FIND_UNUSED_COMMANDS_IN_STATUS_CREATED_BEFORE_QUERY =
-        "SELECT id"
-            + " FROM commands"
-            + " WHERE status IN (:statuses)"
-            + " AND created < :commandCreatedThreshold"
-            + " AND id NOT IN ("
-            + "SELECT DISTINCT(command_id)"
-            + " FROM jobs"
-            + " WHERE command_id IS NOT NULL"
-            + ")"
-            + " LIMIT :limit";
+        """
+        SELECT id\
+         FROM commands\
+         WHERE status IN (:statuses)\
+         AND created < :commandCreatedThreshold\
+         AND id NOT IN (\
+        SELECT DISTINCT(command_id)\
+         FROM jobs\
+         WHERE command_id IS NOT NULL\
+        )\
+         LIMIT :limit\
+        """;
 
     /**
      * Bulk set the status of commands which match the given inputs.

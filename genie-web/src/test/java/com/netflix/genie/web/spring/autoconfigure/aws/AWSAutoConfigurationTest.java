@@ -61,7 +61,7 @@ class AWSAutoConfigurationTest {
      * Test expected context.
      */
     @Test
-    void testExpectedContext() {
+    void expectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
@@ -78,7 +78,7 @@ class AWSAutoConfigurationTest {
      * Test expected context with SNS disabled via property.
      */
     @Test
-    void testExpectedContextWhenSNSDisabled() {
+    void expectedContextWhenSNSDisabled() {
         this.contextRunner
             .withPropertyValues(
                 "genie.notifications.sns.enabled=false"
@@ -94,7 +94,7 @@ class AWSAutoConfigurationTest {
      * AWS Messaging configuration (and hence the latter is not created).
      */
     @Test
-    void testSpringCloudAWSBeanNameOverride() {
+    void springCloudAWSBeanNameOverride() {
         Assertions.assertThat(
             AmazonWebserviceClientConfigurationUtils.getBeanName(String.valueOf(AmazonSNS.class))
         ).isEqualTo(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);

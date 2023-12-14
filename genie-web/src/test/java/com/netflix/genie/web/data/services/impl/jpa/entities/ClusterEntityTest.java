@@ -23,7 +23,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Set;
 
 /**
@@ -54,7 +54,7 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         final ClusterEntity entity = new ClusterEntity();
         Assertions.assertThat(entity.getName()).isNull();
         Assertions.assertThat(entity.getStatus()).isNull();
@@ -66,12 +66,12 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         this.validate(this.c);
     }
 
     @Test
-    void testValidateNoName() {
+    void validateNoName() {
         this.c.setName("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -79,7 +79,7 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateNoUser() {
+    void validateNoUser() {
         this.c.setUser(" ");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -87,7 +87,7 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testValidateNoVersion() {
+    void validateNoVersion() {
         this.c.setVersion("\t");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -95,13 +95,13 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetStatus() {
+    void setStatus() {
         this.c.setStatus(ClusterStatus.TERMINATED.name());
         Assertions.assertThat(this.c.getStatus()).isEqualTo(ClusterStatus.TERMINATED.name());
     }
 
     @Test
-    void testSetTags() {
+    void setTags() {
         Assertions.assertThat(this.c.getTags()).isEmpty();
         final TagEntity prodTag = new TagEntity();
         prodTag.setTag("prod");
@@ -116,7 +116,7 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetConfigs() {
+    void setConfigs() {
         Assertions.assertThat(this.c.getConfigs()).isEmpty();
         this.c.setConfigs(this.configs);
         Assertions.assertThat(this.c.getConfigs()).isEqualTo(this.configs);
@@ -126,7 +126,7 @@ class ClusterEntityTest extends EntityTestBase {
     }
 
     @Test
-    void testSetDependencies() {
+    void setDependencies() {
         Assertions.assertThat(this.c.getDependencies()).isEmpty();
         final FileEntity dependency = new FileEntity();
         dependency.setFile("s3://netflix/jars/myJar.jar");

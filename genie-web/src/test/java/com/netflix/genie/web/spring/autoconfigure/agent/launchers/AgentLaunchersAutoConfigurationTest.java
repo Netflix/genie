@@ -64,7 +64,7 @@ class AgentLaunchersAutoConfigurationTest {
      * All the expected beans should exist when the auto configuration is applied.
      */
     @Test
-    void testExpectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner
             .withPropertyValues(
                 "genie.agent.launcher.local.enabled=true"
@@ -90,7 +90,7 @@ class AgentLaunchersAutoConfigurationTest {
      * .
      */
     @Test
-    void testTitusAgentLauncherOnlyBean() {
+    void titusAgentLauncherOnlyBean() {
         this.contextRunner
             .withPropertyValues(
                 "genie.agent.launcher.titus.enabled=true",

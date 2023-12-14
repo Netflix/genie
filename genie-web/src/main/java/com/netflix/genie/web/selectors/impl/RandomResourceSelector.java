@@ -21,11 +21,11 @@ import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.selectors.ResourceSelectionContext;
 import com.netflix.genie.web.selectors.ResourceSelector;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;

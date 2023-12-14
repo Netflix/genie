@@ -19,8 +19,8 @@ package com.netflix.genie.agent.execution.process;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.KillService;
+import jakarta.annotation.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.File;
 
 /**

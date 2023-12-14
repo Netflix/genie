@@ -23,9 +23,9 @@ import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.services.AttachmentService;
+import jakarta.annotation.Nullable;
 import org.springframework.core.io.Resource;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

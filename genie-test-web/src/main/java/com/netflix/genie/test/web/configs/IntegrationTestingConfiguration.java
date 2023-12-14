@@ -18,6 +18,7 @@
 package com.netflix.genie.test.web.configs;
 
 import com.google.common.io.Files;
+import jakarta.annotation.PreDestroy;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 

@@ -36,12 +36,14 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
      * a certain point in time.
      */
     String FIND_UNUSED_CLUSTERS_SQL =
-        "SELECT id"
-            + " FROM clusters"
-            + " WHERE status IN (:unusedStatuses)"
-            + " AND created < :clusterCreatedThreshold"
-            + " AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)"
-            + " LIMIT :limit";
+        """
+        SELECT id\
+         FROM clusters\
+         WHERE status IN (:unusedStatuses)\
+         AND created < :clusterCreatedThreshold\
+         AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)\
+         LIMIT :limit\
+        """;
 
     /**
      * Find all the clusters that aren't attached to any jobs in the database, were created before the given time

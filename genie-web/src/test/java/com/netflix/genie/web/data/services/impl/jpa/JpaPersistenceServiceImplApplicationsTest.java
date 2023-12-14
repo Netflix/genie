@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -71,7 +71,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testGetApplicationNotExists() {
+    void getApplicationNotExists() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.getApplicationDto(id)).thenReturn(Optional.empty());
         Assertions
@@ -80,7 +80,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testCreateApplicationAlreadyExists() {
+    void createApplicationAlreadyExists() {
         final ApplicationRequest request = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
@@ -102,7 +102,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testUpdateApplicationNoAppExists() {
+    void updateApplicationNoAppExists() {
         final Application app = new Application(
             APP_1_ID,
             Instant.now(),
@@ -123,7 +123,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testUpdateApplicationIdsDontMatch() {
+    void updateApplicationIdsDontMatch() {
         final String id = UUID.randomUUID().toString();
         final Application app = new Application(
             UUID.randomUUID().toString(),
@@ -145,7 +145,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testDeleteAllBlocked() {
+    void deleteAllBlocked() {
         final ApplicationEntity applicationEntity = Mockito.mock(ApplicationEntity.class);
         final CommandEntity commandEntity = Mockito.mock(CommandEntity.class);
         Mockito.when(this.jpaApplicationRepository.findAll()).thenReturn(Lists.newArrayList(applicationEntity));
@@ -156,7 +156,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testAddConfigsToApplicationNoApp() {
+    void addConfigsToApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         Assertions
@@ -165,7 +165,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testUpdateConfigsForApplicationNoApp() {
+    void updateConfigsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         Assertions
@@ -176,7 +176,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testGetConfigsForApplicationNoApp() {
+    void getConfigsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -185,7 +185,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testRemoveAllConfigsForApplicationNoApp() {
+    void removeAllConfigsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -194,7 +194,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testRemoveConfigForApplicationNoApp() {
+    void removeConfigForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -203,7 +203,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testAddDependenciesForApplicationNoApp() {
+    void addDependenciesForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -214,7 +214,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testUpdateDependenciesForApplicationNoApp() {
+    void updateDependenciesForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -225,7 +225,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testGetDependenciesForApplicationNoApp() {
+    void getDependenciesForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -234,7 +234,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testRemoveAllDependenciesForApplicationNoApp() {
+    void removeAllDependenciesForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -243,7 +243,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testRemoveDependencyForApplicationNoApp() {
+    void removeDependencyForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -252,7 +252,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testAddTagsForApplicationNoApp() {
+    void addTagsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -261,7 +261,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testUpdateTagsForApplicationNoApp() {
+    void updateTagsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -270,7 +270,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testGetTagsForApplicationNoApp() {
+    void getTagsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -279,7 +279,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testRemoveAllTagsForApplicationNoApp() {
+    void removeAllTagsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -288,7 +288,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testRemoveTagForApplicationNoApp() {
+    void removeTagForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions
@@ -297,7 +297,7 @@ class JpaPersistenceServiceImplApplicationsTest {
     }
 
     @Test
-    void testGetCommandsForApplicationNoApp() {
+    void getCommandsForApplicationNoApp() {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         Assertions

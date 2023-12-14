@@ -370,7 +370,7 @@ class JobTest {
      * Test to prove a bug with command args splitting with trailing whitespace was corrected.
      */
     @Test
-    void testCommandArgsEdgeCases() {
+    void commandArgsEdgeCases() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
         String commandArgs = " blah ";

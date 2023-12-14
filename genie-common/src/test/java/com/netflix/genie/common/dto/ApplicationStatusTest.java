@@ -35,7 +35,7 @@ class ApplicationStatusTest {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    void testValidApplicationStatus() throws GeniePreconditionException {
+    void validApplicationStatus() throws GeniePreconditionException {
         Assertions
             .assertThat(ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()))
             .isEqualByComparingTo(ApplicationStatus.ACTIVE);
@@ -51,7 +51,7 @@ class ApplicationStatusTest {
      * Tests whether an invalid application status throws exception.
      */
     @Test
-    void testInvalidApplicationStatus() {
+    void invalidApplicationStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> ApplicationStatus.parse("DOES_NOT_EXIST"));
@@ -61,7 +61,7 @@ class ApplicationStatusTest {
      * Tests whether an invalid application status throws exception.
      */
     @Test
-    void testBlankApplicationStatus() {
+    void blankApplicationStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> ApplicationStatus.parse(" "));

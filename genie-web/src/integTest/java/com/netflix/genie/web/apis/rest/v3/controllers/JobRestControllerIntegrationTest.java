@@ -40,6 +40,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.assertj.core.api.Assertions;
@@ -64,7 +65,6 @@ import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.test.context.TestPropertySource;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -207,12 +207,12 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodSuccess() throws Exception {
+    void submitJobMethodSuccess() throws Exception {
         this.submitAndCheckJob(1, true);
     }
 
     @Test
-    void testForTooManyCommandArgs() throws Exception {
+    void forTooManyCommandArgs() throws Exception {
         final JobRequest tooManyCommandArguments = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1038,7 +1038,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodMissingCluster() throws Exception {
+    void submitJobMethodMissingCluster() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -1088,7 +1088,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
+    void submitJobMethodInvalidClusterCriteria() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList
@@ -1129,7 +1129,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
+    void submitJobMethodInvalidCommandCriteria() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList
@@ -1170,7 +1170,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodMissingCommand() throws Exception {
+    void submitJobMethodMissingCommand() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -1207,7 +1207,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodKill() throws Exception {
+    void submitJobMethodKill() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -1315,7 +1315,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodKillOnTimeout() throws Exception {
+    void submitJobMethodKillOnTimeout() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -1368,7 +1368,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testKillJobImmediately() throws Exception {
+    void killJobImmediately() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
@@ -1439,7 +1439,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testSubmitJobMethodFailure() throws Exception {
+    void submitJobMethodFailure() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs;
         commandArgs = Lists.newArrayList("-c", "sleep 3 && exit 1");
@@ -1494,7 +1494,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testResponseContentType() throws Exception {
+    void responseContentType() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String utf8 = "UTF-8";
 
@@ -1561,7 +1561,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testJobNotFound() {
+    void jobNotFound() {
         Assertions.assertThat(this.jobRepository.count()).isEqualTo(0L);
 
         final String jobId = UUID.randomUUID().toString();
@@ -1602,7 +1602,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     @Test
-    void testFileNotFound() throws Exception {
+    void fileNotFound() throws Exception {
         Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String utf8 = "UTF-8";
 

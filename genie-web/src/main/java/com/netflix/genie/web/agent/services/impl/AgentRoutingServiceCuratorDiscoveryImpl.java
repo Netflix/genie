@@ -41,7 +41,7 @@ import org.apache.curator.x.discovery.ServiceType;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.scheduling.TaskScheduler;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;

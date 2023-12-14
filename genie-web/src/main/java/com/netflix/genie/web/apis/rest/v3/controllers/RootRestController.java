@@ -19,7 +19,6 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -50,7 +49,6 @@ public class RootRestController {
      *
      * @param rootModelAssembler The assembler to use to construct resources.
      */
-    @Autowired
     public RootRestController(final RootModelAssembler rootModelAssembler) {
         this.rootModelAssembler = rootModelAssembler;
         this.metadata = new HashMap<>();

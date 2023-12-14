@@ -23,7 +23,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Set;
 
 /**
@@ -54,7 +54,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test the default Constructor.
      */
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         final ApplicationEntity entity = new ApplicationEntity();
         Assertions.assertThat(entity.getSetupFile()).isNotPresent();
         Assertions.assertThat(entity.getStatus()).isNull();
@@ -71,7 +71,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Make sure validation works on valid apps.
      */
     @Test
-    void testValidate() {
+    void validate() {
         this.a.setName(NAME);
         this.a.setUser(USER);
         this.a.setVersion(VERSION);
@@ -83,7 +83,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Make sure validation works on with failure from super class.
      */
     @Test
-    void testValidateNoName() {
+    void validateNoName() {
         this.a.setName("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -94,7 +94,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Make sure validation works on with failure from super class.
      */
     @Test
-    void testValidateNoUser() {
+    void validateNoUser() {
         this.a.setUser("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -105,7 +105,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Make sure validation works on with failure from super class.
      */
     @Test
-    void testValidateNoVersion() {
+    void validateNoVersion() {
         this.a.setVersion("");
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
@@ -116,7 +116,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test setting the status.
      */
     @Test
-    void testSetStatus() {
+    void setStatus() {
         this.a.setStatus(ApplicationStatus.ACTIVE.name());
         Assertions.assertThat(this.a.getStatus()).isEqualTo(ApplicationStatus.ACTIVE.name());
     }
@@ -125,7 +125,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test setting the setup file.
      */
     @Test
-    void testSetSetupFile() {
+    void setSetupFile() {
         Assertions.assertThat(this.a.getSetupFile()).isNotPresent();
         final FileEntity setupFileEntity = new FileEntity("s3://netflix.propFile");
         this.a.setSetupFile(setupFileEntity);
@@ -136,7 +136,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test setting the configs.
      */
     @Test
-    void testSetConfigs() {
+    void setConfigs() {
         final Set<FileEntity> configs = Sets.newHashSet(new FileEntity("s3://netflix.configFile"));
         this.a.setConfigs(configs);
         Assertions.assertThat(this.a.getConfigs()).isEqualTo(configs);
@@ -149,7 +149,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test setting the jars.
      */
     @Test
-    void testSetDependencies() {
+    void setDependencies() {
         final Set<FileEntity> dependencies = Sets.newHashSet(new FileEntity("s3://netflix/jars/myJar.jar"));
         this.a.setDependencies(dependencies);
         Assertions.assertThat(this.a.getDependencies()).isEqualTo(dependencies);
@@ -162,7 +162,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test setting the tags.
      */
     @Test
-    void testSetTags() {
+    void setTags() {
         final TagEntity tag1 = new TagEntity("tag1");
         final TagEntity tag2 = new TagEntity("tag2");
         final Set<TagEntity> tags = Sets.newHashSet(tag1, tag2);
@@ -178,7 +178,7 @@ class ApplicationEntityTest extends EntityTestBase {
      * Test setting the commands.
      */
     @Test
-    void testSetCommands() {
+    void setCommands() {
         final Set<CommandEntity> commandEntities = Sets.newHashSet(new CommandEntity());
         this.a.setCommands(commandEntities);
         Assertions.assertThat(this.a.getCommands()).isEqualTo(commandEntities);

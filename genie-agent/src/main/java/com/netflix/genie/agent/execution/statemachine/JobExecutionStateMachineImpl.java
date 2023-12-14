@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
@@ -160,9 +160,9 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
                 );
                 this.executionContext.recordTransitionException(state, fatalJobExecutionException);
 
-            } else if (exception instanceof FatalJobExecutionException) {
+            } else if (exception instanceof FatalJobExecutionException executionException) {
                 // Save fatal exception
-                fatalJobExecutionException = (FatalJobExecutionException) exception;
+                fatalJobExecutionException = executionException;
             } else {
                 // Create fatal exception out of unexpected exception
                 fatalJobExecutionException = new FatalJobExecutionException(

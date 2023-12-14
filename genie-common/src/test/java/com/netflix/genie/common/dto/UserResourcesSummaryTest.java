@@ -29,7 +29,7 @@ class UserResourcesSummaryTest {
      * Test constructor, accessors, equality.
      */
     @Test
-    void testUserJobCount() {
+    void userJobCount() {
         final UserResourcesSummary dto = new UserResourcesSummary("foo", 3, 1024);
 
         Assertions.assertThat(dto.getUser()).isEqualTo("foo");

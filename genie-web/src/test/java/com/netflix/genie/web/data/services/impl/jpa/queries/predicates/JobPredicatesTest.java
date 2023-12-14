@@ -25,10 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -164,7 +164,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithAll() {
+    void findWithAll() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -209,7 +209,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithAllLikes() {
+    void findWithAllLikes() {
         final String newId = ID + "%";
         final String newName = JOB_NAME + "%";
         final String newUserName = USER_NAME + "%";
@@ -261,7 +261,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutId() {
+    void findWithOutId() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -307,7 +307,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutJobName() {
+    void findWithOutJobName() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -353,7 +353,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutUserName() {
+    void findWithOutUserName() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -399,7 +399,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutStatus() {
+    void findWithOutStatus() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -444,7 +444,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithEmptyStatus() {
+    void findWithEmptyStatus() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -489,7 +489,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutClusterName() {
+    void findWithOutClusterName() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -535,7 +535,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutClusterId() {
+    void findWithOutClusterId() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -580,7 +580,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutCommandName() {
+    void findWithOutCommandName() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -626,7 +626,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutCommandId() {
+    void findWithOutCommandId() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -671,7 +671,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutTags() {
+    void findWithOutTags() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -714,7 +714,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutMinStarted() {
+    void findWithOutMinStarted() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -759,7 +759,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutMaxStarted() {
+    void findWithOutMaxStarted() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -804,7 +804,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutMinFinished() {
+    void findWithOutMinFinished() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -849,7 +849,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutMaxFinished() {
+    void findWithOutMaxFinished() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -894,7 +894,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithEmptyTag() {
+    void findWithEmptyTag() {
         TAGS.add("");
         JobPredicates.getFindPredicate(
             this.root,
@@ -936,7 +936,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutGrouping() {
+    void findWithOutGrouping() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,
@@ -981,7 +981,7 @@ class JobPredicatesTest {
     }
 
     @Test
-    void testFindWithOutGroupingInstance() {
+    void findWithOutGroupingInstance() {
         JobPredicates.getFindPredicate(
             this.root,
             this.cb,

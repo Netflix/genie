@@ -35,7 +35,7 @@ class ClusterStatusTest {
      * @throws GeniePreconditionException if any precondition isn't met.
      */
     @Test
-    void testValidClusterStatus() throws GeniePreconditionException {
+    void validClusterStatus() throws GeniePreconditionException {
         Assertions
             .assertThat(ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()))
             .isEqualByComparingTo(ClusterStatus.UP);
@@ -51,7 +51,7 @@ class ClusterStatusTest {
      * Tests whether an invalid cluster status throws exception.
      */
     @Test
-    void testInvalidClusterStatus() {
+    void invalidClusterStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> ClusterStatus.parse("DOES_NOT_EXIST"));
@@ -61,7 +61,7 @@ class ClusterStatusTest {
      * Tests whether an invalid cluster status throws exception.
      */
     @Test
-    void testBlankClusterStatus() {
+    void blankClusterStatus() {
         Assertions
             .assertThatExceptionOfType(GeniePreconditionException.class)
             .isThrownBy(() -> ClusterStatus.parse("  "));

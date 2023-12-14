@@ -40,14 +40,13 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Set;
 
 /**
@@ -73,7 +72,6 @@ public class GenieExceptionMapper {
      *
      * @param registry The metrics registry
      */
-    @Autowired
     public GenieExceptionMapper(final MeterRegistry registry) {
         this.registry = registry;
     }
@@ -182,8 +180,7 @@ public class GenieExceptionMapper {
             Tags.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName())
         );
 
-        if (e instanceof GenieUserLimitExceededException) {
-            final GenieUserLimitExceededException userLimitExceededException = (GenieUserLimitExceededException) e;
+        if (e instanceof GenieUserLimitExceededException userLimitExceededException) {
             tags.add(Tag.of(USER_NAME_TAG_KEY, userLimitExceededException.getUser()));
             tags.add(Tag.of(LIMIT_TAG_KEY, userLimitExceededException.getExceededLimitName()));
         }

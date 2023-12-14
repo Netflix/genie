@@ -32,6 +32,7 @@ import com.netflix.genie.common.internal.dtos.Criterion;
 import com.netflix.genie.common.internal.dtos.Image;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import jakarta.annotation.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -39,8 +40,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.annotation.Nullable;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
@@ -85,7 +85,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommand() throws GenieCheckedException {
+    void getCommand() throws GenieCheckedException {
         final Command command1 = this.service.getCommand(COMMAND_1_ID);
         Assertions.assertThat(command1.getId()).isEqualTo(COMMAND_1_ID);
         Assertions.assertThat(command1.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
@@ -122,7 +122,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsByName() {
+    void getCommandsByName() {
         final Page<Command> commands = this.service.findCommands(COMMAND_2_NAME, null, null, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(1);
         Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
@@ -130,7 +130,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsByUserName() {
+    void getCommandsByUserName() {
         final Page<Command> commands = this.service.findCommands(null, COMMAND_1_USER, null, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_3_ID);
@@ -139,7 +139,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsByStatuses() {
+    void getCommandsByStatuses() {
         final Set<CommandStatus> statuses = Set.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED);
         final Page<Command> commands = this.service.findCommands(null, null, statuses, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
@@ -149,7 +149,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsByTags() {
+    void getCommandsByTags() {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
         Page<Command> commands = this.service.findCommands(null, null, null, tags, PAGE);
@@ -184,7 +184,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsDescending() {
+    void getCommandsDescending() {
         //Default to order by Updated
         final Page<Command> commands = this.service.findCommands(null, null, null, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
@@ -195,7 +195,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsAscending() {
+    void getCommandsAscending() {
         final Pageable ascending = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Command> commands = this.service.findCommands(null, null, null, null, ascending);
@@ -207,7 +207,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsOrderBysName() {
+    void getCommandsOrderBysName() {
         final Pageable name = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
         final Page<Command> commands = this.service.findCommands(null, null, null, null, name);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
@@ -218,7 +218,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsOrderBysInvalidField() {
+    void getCommandsOrderBysInvalidField() {
         final Pageable invalid = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         Assertions
             .assertThatExceptionOfType(RuntimeException.class)
@@ -227,7 +227,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetCommandsWithTags() {
+    void getCommandsWithTags() {
         final Set<CommandStatus> activeStatuses = Set.of(CommandStatus.ACTIVE);
         final Set<CommandStatus> inactiveStatuses = Set.of(CommandStatus.INACTIVE);
         final Set<String> tags = Set.of("prod", "hive");
@@ -240,7 +240,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testSaveCommand() throws GenieCheckedException {
+    void saveCommand() throws GenieCheckedException {
         final String id = UUID.randomUUID().toString();
         final ComputeResources computeResources = new ComputeResources.Builder()
             .withCpu(7)
@@ -292,7 +292,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testSaveCommandNoId() throws GenieCheckedException {
+    void saveCommandNoId() throws GenieCheckedException {
         final List<Criterion> clusterCriteria = List.of(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion
@@ -335,7 +335,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateCommand() throws GenieCheckedException {
+    void updateCommand() throws GenieCheckedException {
         final Command command = this.service.getCommand(COMMAND_1_ID);
         Assertions.assertThat(command.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(command.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
@@ -382,7 +382,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateCommandWithClusterCriteria() throws GenieCheckedException {
+    void updateCommandWithClusterCriteria() throws GenieCheckedException {
         Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
         final List<Criterion> criteria0 = List.of(
             new Criterion.Builder()
@@ -436,7 +436,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateCommandWithInvalidCommand() throws GenieCheckedException {
+    void updateCommandWithInvalidCommand() throws GenieCheckedException {
         final Command command = this.service.getCommand(COMMAND_1_ID);
 
         final Command updateCommand = new Command(
@@ -467,7 +467,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateCreateAndUpdate() throws GenieCheckedException {
+    void updateCreateAndUpdate() throws GenieCheckedException {
         final Command init = this.service.getCommand(COMMAND_1_ID);
         final Instant created = init.getCreated();
         final Instant updated = init.getUpdated();
@@ -493,7 +493,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testDeleteAll() throws GenieCheckedException {
+    void deleteAll() throws GenieCheckedException {
         Assertions.assertThat(this.commandRepository.count()).isEqualTo(3L);
         this.service.deleteAllCommands();
         Assertions.assertThat(this.commandRepository.count()).isEqualTo(0L);
@@ -501,7 +501,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testDelete() throws GenieCheckedException {
+    void delete() throws GenieCheckedException {
         Set<Command> appCommands = this.service.getCommandsForApplication(APP_1_ID, null);
         Assertions.assertThat(appCommands).hasSize(1);
         boolean found = false;
@@ -525,7 +525,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testAddConfigsToCommand() throws GenieCheckedException {
+    void addConfigsToCommand() throws GenieCheckedException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -540,7 +540,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateConfigsForCommand() throws GenieCheckedException {
+    void updateConfigsForCommand() throws GenieCheckedException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -555,13 +555,13 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetConfigsForCommand() throws GenieCheckedException {
+    void getConfigsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getConfigsForResource(COMMAND_1_ID, Command.class)).hasSize(2);
     }
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveAllConfigsForCommand() throws GenieCheckedException {
+    void removeAllConfigsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getConfigsForResource(COMMAND_1_ID, Command.class)).hasSize(2);
         this.service.removeAllConfigsForResource(COMMAND_1_ID, Command.class);
         Assertions.assertThat(this.service.getConfigsForResource(COMMAND_1_ID, Command.class)).isEmpty();
@@ -569,7 +569,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveConfigForCommand() throws GenieCheckedException {
+    void removeConfigForCommand() throws GenieCheckedException {
         final Set<String> configs = this.service.getConfigsForResource(COMMAND_1_ID, Command.class);
         Assertions.assertThat(configs).hasSize(2);
         final String removedConfig = configs.iterator().next();
@@ -581,7 +581,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testAddDependenciesToCommand() throws GenieCheckedException {
+    void addDependenciesToCommand() throws GenieCheckedException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
@@ -596,7 +596,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateDependenciesForCommand() throws GenieCheckedException {
+    void updateDependenciesForCommand() throws GenieCheckedException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
@@ -611,13 +611,13 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetDependenciesForCommand() throws GenieCheckedException {
+    void getDependenciesForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getDependenciesForResource(COMMAND_2_ID, Command.class)).hasSize(1);
     }
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveAllDependenciesForCommand() throws GenieCheckedException {
+    void removeAllDependenciesForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getDependenciesForResource(COMMAND_3_ID, Command.class)).hasSize(2);
         this.service.removeAllDependenciesForResource(COMMAND_3_ID, Command.class);
         Assertions.assertThat(this.service.getDependenciesForResource(COMMAND_3_ID, Command.class)).isEmpty();
@@ -625,7 +625,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveDependencyForCommand() throws GenieCheckedException {
+    void removeDependencyForCommand() throws GenieCheckedException {
         final Set<String> dependencies = this.service.getDependenciesForResource(COMMAND_3_ID, Command.class);
         Assertions.assertThat(dependencies).hasSize(2);
         final String removedDependency = dependencies.iterator().next();
@@ -641,7 +641,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 //        value = "persistence/commands/addApplicationsForCommand/after.xml",
 //        assertionMode = DatabaseAssertionMode.NON_STRICT
 //    )
-    void testAddApplicationsForCommand() throws GenieCheckedException {
+    void addApplicationsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
         final List<String> appIds = List.of(APP_1_ID);
@@ -668,7 +668,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testSetApplicationsForCommand() throws GenieCheckedException {
+    void setApplicationsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
         final List<String> appIds = List.of(APP_1_ID);
@@ -692,7 +692,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetApplicationsForCommand() throws GenieCheckedException {
+    void getApplicationsForCommand() throws GenieCheckedException {
         Assertions
             .assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID))
             .singleElement()
@@ -702,7 +702,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveApplicationsForCommand() throws GenieCheckedException {
+    void removeApplicationsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).hasSize(1);
         this.service.removeApplicationsForCommand(COMMAND_1_ID);
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).isEmpty();
@@ -710,7 +710,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveApplicationForCommand() throws GenieCheckedException {
+    void removeApplicationForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).hasSize(1);
         this.service.removeApplicationForCommand(COMMAND_1_ID, APP_1_ID);
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).isEmpty();
@@ -718,7 +718,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testAddTagsToCommand() throws GenieCheckedException {
+    void addTagsToCommand() throws GenieCheckedException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -733,7 +733,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testUpdateTagsForCommand() throws GenieCheckedException {
+    void updateTagsForCommand() throws GenieCheckedException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -748,13 +748,13 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testGetTagsForCommand() throws GenieCheckedException {
+    void getTagsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).hasSize(3);
     }
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveAllTagsForCommand() throws GenieCheckedException {
+    void removeAllTagsForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).hasSize(3);
         this.service.removeAllTagsForResource(COMMAND_1_ID, Command.class);
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).isEmpty();
@@ -762,7 +762,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
-    void testRemoveTagForCommand() throws GenieCheckedException {
+    void removeTagForCommand() throws GenieCheckedException {
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).contains("tez");
         this.service.removeTagForResource(COMMAND_1_ID, "tez", Command.class);
         Assertions.assertThat(this.service.getTagsForResource(COMMAND_1_ID, Command.class)).doesNotContain("tez");
@@ -770,7 +770,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
 
     @Test
     @DatabaseSetup("persistence/commands/getClustersForCommand/setup.xml")
-    void testGetClustersForCommand() throws GenieCheckedException {
+    void getClustersForCommand() throws GenieCheckedException {
         Assertions
             .assertThat(this.service.getClustersForCommand(COMMAND_1_ID, null))
             .hasSize(3)
@@ -794,14 +794,14 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testGetClustersForCommandNoId() {
+    void getClustersForCommandNoId() {
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.service.getClustersForCommand("", null));
     }
 
     @Test
-    void testClusterCriteriaManipulation() throws GenieCheckedException {
+    void clusterCriteriaManipulation() throws GenieCheckedException {
         final Criterion criterion0 = new Criterion.Builder().withId(UUID.randomUUID().toString()).build();
         final Criterion criterion1 = new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build();
         final Criterion criterion2 = new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build();
@@ -865,7 +865,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
-    void testFindCommandsMatchingCriterion() throws Exception {
+    void findCommandsMatchingCriterion() throws Exception {
         // Create some commands to test with
         final List<Criterion> clusterCriteria = List.of(
             new Criterion.Builder().withName("prodCluster").build()
@@ -976,7 +976,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         value = "persistence/commands/updateStatusForUnusedCommands/after.xml",
         assertionMode = DatabaseAssertionMode.NON_STRICT
     )
-    void testUpdateStatusForUnusedCommands() {
+    void updateStatusForUnusedCommands() {
         final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
         final Instant commandThreshold = present.minus(60, ChronoUnit.DAYS);
         final int batchSize = 100;
@@ -998,7 +998,7 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         value = "persistence/commands/deleteUnusedCommands/expected.xml",
         assertionMode = DatabaseAssertionMode.NON_STRICT
     )
-    void testDeleteUnusedCommands() {
+    void deleteUnusedCommands() {
         final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
         final Instant createdThreshold = present.minus(1, ChronoUnit.DAYS);
         Assertions.assertThat(this.commandRepository.count()).isEqualTo(8);
