@@ -97,7 +97,7 @@ configure((Set<Project>) ext.javaProjects) {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
             mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.4.1"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
-            mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
+            mavenBom "com.squareup.okhttp3:okhttp-bom:4.10.0"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
             mavenBom "org.spockframework:spock-bom:2.0-groovy-3.0"
             mavenBom "org.testcontainers:testcontainers-bom:1.16.3"
