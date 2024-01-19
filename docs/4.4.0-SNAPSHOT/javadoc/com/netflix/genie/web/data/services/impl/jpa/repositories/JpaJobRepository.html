@@ -474,7 +474,7 @@ long&nbsp;getTotalMemoryUsedOnHost&#8203;(@Param("agentHostname")
 <ul class="blockList">
 <li class="blockList">
 <h4>findJobsCreatedBefore</h4>
-<pre class="methodSignature">@Query(value="SELECT id FROM jobs WHERE created &lt; :createdThreshold AND (status NOT IN (:excludedStatuses) OR (:excludedStatuses) IS NULL) LIMIT :batchSize",
+<pre class="methodSignature">@Query(value="SELECT id FROM jobs WHERE created &lt; :createdThreshold AND status NOT IN (:excludedStatuses) LIMIT :batchSize",
        nativeQuery=true)
 java.util.Set&lt;java.lang.Long&gt;&nbsp;findJobsCreatedBefore&#8203;(@Param("createdThreshold")
                                                     java.time.Instant&nbsp;createdThreshold,
