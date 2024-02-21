@@ -683,22 +683,22 @@ public class JobResolverServiceImpl implements JobResolverService {
         context.setEnvironmentVariables(Collections.unmodifiableMap(envVariables));
     }
 
-    private static Stream<Map.Entry<String, String>> envEntriesFromMetadata(JsonNode metadataNode) {
+    private static Stream<Map.Entry<String, String>> envEntriesFromMetadata(final JsonNode metadataNode) {
         return StreamSupport.stream(fieldsToSpliterator(metadataNode), false)
             .filter(e -> metadataKeyMatches(e.getKey()))
             .map(e -> Map.entry(metadataKeyToEnv(e.getKey()), e.getValue().asText()));
     }
 
-    private static Spliterator<Map.Entry<String, JsonNode>> fieldsToSpliterator(JsonNode node) {
+    private static Spliterator<Map.Entry<String, JsonNode>> fieldsToSpliterator(final JsonNode node) {
         return Spliterators.spliteratorUnknownSize(node.fields(), Spliterator.ORDERED);
     }
 
-    private static boolean metadataKeyMatches(String key) {
+    private static boolean metadataKeyMatches(final String key) {
         // TODO: Do not use the hardcoded suffix.
         return key.startsWith("scheduler_");
     }
 
-    private static String metadataKeyToEnv(String key) {
+    private static String metadataKeyToEnv(final String key) {
         return RegExUtils.replaceAll(key.toUpperCase(), "[^A-Z0-9]", "_");
     }
 
