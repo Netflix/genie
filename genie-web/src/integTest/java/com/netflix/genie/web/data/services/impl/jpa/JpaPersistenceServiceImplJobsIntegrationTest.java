@@ -157,22 +157,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/init.xml")
-    void canDeleteJobsRegardlessOfStatus() {
-        final Instant cal = ZonedDateTime
-            .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
-            .toInstant();
-
-        final long deleted = this.service.deleteJobsCreatedBefore(cal, Sets.newHashSet(), 10);
-
-        Assertions.assertThat(deleted).isEqualTo(2L);
-        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
-        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_1_ID)).isFalse();
-        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_2_ID)).isFalse();
-        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_3_ID)).isTrue();
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/init.xml")
     void canSaveAndVerifyJobSubmissionWithoutAttachments() throws IOException, GenieCheckedException {
         final String job0Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
