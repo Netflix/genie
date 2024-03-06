@@ -6,13 +6,13 @@ apply plugin: "org.asciidoctor.jvm.convert"
 
 idea {
     module {
-        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_11)
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_17)
     }
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 

@@ -103,7 +103,7 @@ class ManagedScriptIntegrationTest {
     }
 
     @ParameterizedTest(name = "Evaluate NOOP script: {0}")
-    @ValueSource(strings = {"noop.js", "noop.groovy"})
+    @ValueSource(strings = {"noop.groovy"})
     void evaluateSuccessfully(
         final String scriptFilename
     ) throws Exception {
@@ -112,7 +112,7 @@ class ManagedScriptIntegrationTest {
     }
 
     @ParameterizedTest(name = "Timeout evaluating {0}")
-    @ValueSource(strings = {"sleep.js", "sleep.groovy"})
+    @ValueSource(strings = {"sleep.groovy"})
     void scriptEvaluationTimeoutTest(
         final String scriptFilename
     ) throws Exception {
