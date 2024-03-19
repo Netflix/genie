@@ -24,7 +24,6 @@ import spock.lang.Specification
 import spock.lang.Timeout
 
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeoutException
 
 class StreamBufferSpec extends Specification {
@@ -254,7 +253,7 @@ class StreamBufferSpec extends Specification {
         Thread writeThread = new Thread(new Runnable() {
             @Override
             void run() {
-                ThreadLocalRandom random = new ThreadLocalRandom()
+                Random random = new Random(System.nanoTime())
                 int offset = 0
 
                 while (offset < dataSize) {
@@ -277,7 +276,7 @@ class StreamBufferSpec extends Specification {
             @Override
             void run() {
 
-                ThreadLocalRandom random = new ThreadLocalRandom()
+                Random random = new Random(System.nanoTime())
 
                 int offset = 0
                 while (true) {
