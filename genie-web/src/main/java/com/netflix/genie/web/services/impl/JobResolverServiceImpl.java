@@ -19,6 +19,7 @@ package com.netflix.genie.web.services.impl;
 
 import brave.SpanCustomizer;
 import brave.Tracer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.internal.dtos.Application;
 import com.netflix.genie.common.internal.dtos.Cluster;
 import com.netflix.genie.common.internal.dtos.ClusterMetadata;
@@ -53,6 +54,10 @@ import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -671,7 +676,30 @@ public class JobResolverServiceImpl implements JobResolverService {
         envVariables.put(JobConstants.GENIE_USER_ENV_VAR, jobRequest.getMetadata().getUser());
         envVariables.put(JobConstants.GENIE_USER_GROUP_ENV_VAR, jobRequest.getMetadata().getGroup().orElse(""));
 
+        jobRequest.getMetadata().getMetadata().stream()
+            .flatMap(node -> envEntriesFromMetadata(node))
+            .forEach(e -> envVariables.put(e.getKey(), e.getValue()));
+
         context.setEnvironmentVariables(Collections.unmodifiableMap(envVariables));
+    }
+
+    private static Stream<Map.Entry<String, String>> envEntriesFromMetadata(final JsonNode metadataNode) {
+        return StreamSupport.stream(fieldsToSpliterator(metadataNode), false)
+            .filter(e -> metadataKeyMatches(e.getKey()))
+            .map(e -> Map.entry(metadataKeyToEnv(e.getKey()), e.getValue().asText()));
+    }
+
+    private static Spliterator<Map.Entry<String, JsonNode>> fieldsToSpliterator(final JsonNode node) {
+        return Spliterators.spliteratorUnknownSize(node.fields(), Spliterator.ORDERED);
+    }
+
+    private static boolean metadataKeyMatches(final String key) {
+        // TODO: Do not use the hardcoded suffix.
+        return key.startsWith("scheduler_");
+    }
+
+    private static String metadataKeyToEnv(final String key) {
+        return RegExUtils.replaceAll(key.toUpperCase(), "[^A-Z0-9]", "_");
     }
 
     private void resolveTimeout(final JobResolutionContext context) {
