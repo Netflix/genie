@@ -45,19 +45,6 @@ allprojects {
     }
 }
 
-idea {
-    project {
-        jdkName = "17"
-        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_17)
-        vcs = "Git"
-    }
-    module {
-        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_17)
-        downloadJavadoc true
-        downloadSources true
-    }
-}
-
 configure((Set<Project>) ext.javaProjects) {
     apply plugin: "nebula.netflixoss"
     apply plugin: "java"
@@ -74,12 +61,6 @@ configure((Set<Project>) ext.javaProjects) {
     }
 
     group = (String) "com.netflix.${githubProjectName}"
-
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
 
     facets {
         smokeTest {
