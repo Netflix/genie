@@ -53,6 +53,7 @@ dependencies {
     api("io.grpc:grpc-stub")
     api("io.grpc:grpc-core")
     api("io.micrometer:micrometer-core")
+    api("io.micrometer:micrometer-registry-prometheus")
     api("jakarta.persistence:jakarta.persistence-api")
     api("jakarta.validation:jakarta.validation-api")
     api("org.apache.commons:commons-exec")
