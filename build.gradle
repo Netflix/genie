@@ -47,12 +47,12 @@ allprojects {
 
 idea {
     project {
-        jdkName = "17"
-        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_17)
+        jdkName = "11"
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_1_8)
         vcs = "Git"
     }
     module {
-        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_17)
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_1_8)
         downloadJavadoc true
         downloadSources true
     }
@@ -77,7 +77,7 @@ configure((Set<Project>) ext.javaProjects) {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(8)
         }
     }
 
