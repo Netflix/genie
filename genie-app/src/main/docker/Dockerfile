@@ -1,4 +1,4 @@
-from openjdk:11-jre-slim
+from openjdk:17-jdk-slim
 MAINTAINER NetflixOSS <netflixoss@netflix.com>
 EXPOSE 8080
 VOLUME /tmp
