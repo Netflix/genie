@@ -26,13 +26,11 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import retrofit2.Retrofit;
 
@@ -40,7 +38,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 
 /**
  * Base class for all Genie client integration tests.
@@ -66,33 +63,15 @@ abstract class GenieClientIntegrationTestBase {
     // TODO: Improve genie-app image packaging to leverage unpacked (application plugin) based agent so that startup
     //       is faster as in agent mode the tests are much slower than embedded. Also once we move to boot 2.3 we can
     //       leverage their layered jars to produce less changing images.
-    private static GenericContainer genericContainer;
+    @Container
+    private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.release")
+        .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
+        .withExposedPorts(8080);
 
     protected ApplicationClient applicationClient;
     protected CommandClient commandClient;
     protected ClusterClient clusterClient;
     protected JobClient jobClient;
-
-    @BeforeAll
-    static void setupBeforeAll() {
-        try {
-            genericContainer = new GenericContainer("netflixoss/genie-app:latest.release")
-                .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
-                .withExposedPorts(8080);
-            genericContainer.start();
-        } catch (Exception e) {
-            // skip genie client integration tests for unblocking
-            Assumptions.assumeTrue(() -> false, "Docker is not available. Skipping tests.");
-        }
-    }
-
-    @AfterAll
-    static void teardownAfterAll() {
-        // Stop the container
-        if (genericContainer != null) {
-            genericContainer.stop();
-        }
-    }
 
     @BeforeEach
     void setup() throws Exception {
@@ -103,9 +82,7 @@ abstract class GenieClientIntegrationTestBase {
                 || this.clusterClient == null
                 || this.jobClient == null
         ) {
-            final String baseUrl = "http://" + genericContainer.getContainerIpAddress()
-                + ":" + genericContainer.getFirstMappedPort();
-
+            final String baseUrl = "http://" + GENIE.getContainerIpAddress() + ":" + GENIE.getFirstMappedPort();
             final Retrofit retrofit = GenieClientUtils.createRetrofitInstance(baseUrl, null, null);
             if (this.applicationClient == null) {
                 this.applicationClient = new ApplicationClient(retrofit);
