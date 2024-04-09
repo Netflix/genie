@@ -65,6 +65,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Tests for the exception mapper.
@@ -164,10 +165,9 @@ class GenieExceptionMapperTest {
         }.getClass().getEnclosingMethod();
         final MethodParameter parameter = Mockito.mock(MethodParameter.class);
         Mockito.when(parameter.getMethod()).thenReturn(method);
-        // Executable is a sealed class so can't mock it. Just use the current method.
-        final Executable executable = new Object() {
-        }.getClass().getEnclosingMethod();
+        final Executable executable = Mockito.mock(Executable.class);
         Mockito.when(parameter.getExecutable()).thenReturn(executable);
+        Mockito.when(executable.toGenericString()).thenReturn(UUID.randomUUID().toString());
 
         final BindingResult bindingResult = Mockito.mock(BindingResult.class);
         Mockito.when(bindingResult.getAllErrors()).thenReturn(Lists.newArrayList());
