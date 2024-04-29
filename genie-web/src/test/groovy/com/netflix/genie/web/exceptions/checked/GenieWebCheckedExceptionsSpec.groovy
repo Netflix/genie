@@ -66,6 +66,7 @@ class GenieWebCheckedExceptionsSpec extends Specification {
         exceptionClass                        | _
         AgentLaunchException                  | _
         AttachmentTooLargeException           | _
+        IllegalAttachmentFileNameException    | _
         IdAlreadyExistsException              | _
         JobDirectoryManifestNotFoundException | _
         JobNotArchivedException               | _

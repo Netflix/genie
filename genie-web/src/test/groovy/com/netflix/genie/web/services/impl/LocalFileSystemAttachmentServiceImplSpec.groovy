@@ -18,11 +18,13 @@
 package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Sets
+import com.netflix.genie.web.exceptions.checked.IllegalAttachmentFileNameException
 import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
 import com.netflix.genie.web.properties.AttachmentServiceProperties
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
+import org.mockito.Mockito
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.util.unit.DataSize
@@ -150,5 +152,18 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
 
         then:
         thrown(SaveAttachmentException)
+    }
+
+    def "reject attachments with illegal filename"() {
+        Set<Resource> attachments = new HashSet<Resource>()
+        Resource attachment = Mockito.mock(Resource.class)
+        Mockito.doReturn("../../../root/breakout.file").when(attachment).getFilename()
+        attachments.add(attachment)
+
+        when:
+        service.saveAttachments(null, attachments)
+
+        then:
+        thrown(IllegalAttachmentFileNameException)
     }
 }

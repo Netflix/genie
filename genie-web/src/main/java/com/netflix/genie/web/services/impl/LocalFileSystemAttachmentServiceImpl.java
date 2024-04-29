@@ -19,6 +19,7 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.netflix.genie.web.exceptions.checked.IllegalAttachmentFileNameException;
 import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.properties.AttachmentServiceProperties;
@@ -92,6 +93,11 @@ public class LocalFileSystemAttachmentServiceImpl implements AttachmentService {
             try (InputStream inputStream = attachment.getInputStream()) {
                 final long attachmentSize = attachment.contentLength();
                 final String filename = attachment.getFilename();
+
+                if (filename != null && filename.contains("/")) {
+                    throw new IllegalAttachmentFileNameException("Attachment filename " + filename + " is illegal. "
+                        + "It should not contain the char: /.");
+                }
 
                 if (attachmentSize > this.attachmentServiceProperties.getMaxSize().toBytes()) {
                     throw new AttachmentTooLargeException("Attachment is too large: " + filename);
