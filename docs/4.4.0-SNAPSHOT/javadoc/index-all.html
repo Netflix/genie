@@ -1196,9 +1196,9 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ShutdownStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartKillServiceStage</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartFileServiceStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopKillServiceStage</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopHeartbeatServiceStage</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusInit</a></dt>
 <dd>&nbsp;</dd>
@@ -7140,7 +7140,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the ID the user has requested for this resource if one was added.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/dtos/CommandRequest.html#getRequestedId()" class="member-name-link">getRequestedId()</a> - Method in class com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos">CommandRequest</a></dt>
+<dt><a href="com/netflix/genie/common/internal/dtos/ClusterRequest.html#getRequestedId()" class="member-name-link">getRequestedId()</a> - Method in class com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/ClusterRequest.html" title="class in com.netflix.genie.common.internal.dtos">ClusterRequest</a></dt>
 <dd>
 <div class="block">Get the ID the user has requested for this resource if one was added.</div>
 </dd>
@@ -8195,6 +8195,26 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/IdProjection.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">IdProjection</a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.projections</a></dt>
 <dd>
 <div class="block">A projection just for returning the id field of a given entity.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html" class="type-name-link" title="class in com.netflix.genie.web.exceptions.checked">IllegalAttachmentFileNameException</a> - Exception in <a href="com/netflix/genie/web/exceptions/checked/package-summary.html">com.netflix.genie.web.exceptions.checked</a></dt>
+<dd>
+<div class="block">Exception thrown when the attachment filename is illegal.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html#%3Cinit%3E()" class="member-name-link">IllegalAttachmentFileNameException()</a> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html" title="class in com.netflix.genie.web.exceptions.checked">IllegalAttachmentFileNameException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">IllegalAttachmentFileNameException(String)</a> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html" title="class in com.netflix.genie.web.exceptions.checked">IllegalAttachmentFileNameException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html#%3Cinit%3E(java.lang.String,java.lang.Throwable)" class="member-name-link">IllegalAttachmentFileNameException(String, Throwable)</a> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html" title="class in com.netflix.genie.web.exceptions.checked">IllegalAttachmentFileNameException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html#%3Cinit%3E(java.lang.Throwable)" class="member-name-link">IllegalAttachmentFileNameException(Throwable)</a> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/IllegalAttachmentFileNameException.html" title="class in com.netflix.genie.web.exceptions.checked">IllegalAttachmentFileNameException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/dtos/Image.html" class="type-name-link" title="class in com.netflix.genie.common.internal.dtos">Image</a> - Class in <a href="com/netflix/genie/common/internal/dtos/package-summary.html">com.netflix.genie.common.internal.dtos</a></dt>
 <dd>
@@ -10456,7 +10476,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Aspect implementation method of retrying the data service method on certain failures.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#properties" class="member-name-link">properties</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#properties" class="member-name-link">properties</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" class="type-name-link" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
 <dd>
@@ -10603,7 +10623,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Publish an event in a different thread than the calling thread.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#publishEvent(com.netflix.genie.web.events.AbstractSNSPublisher.EventType,java.util.HashMap)" class="member-name-link">publishEvent(AbstractSNSPublisher.EventType, HashMap&lt;String, Object&gt;)</a> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#publishEvent(com.netflix.genie.web.events.AbstractSNSPublisher.EventType,java.util.HashMap)" class="member-name-link">publishEvent(AbstractSNSPublisher.EventType, HashMap&lt;String, Object&gt;)</a> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/events/GenieEventBus.html#publishSynchronousEvent(org.springframework.context.ApplicationEvent)" class="member-name-link">publishSynchronousEvent(ApplicationEvent)</a> - Method in interface com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a></dt>
 <dd>
@@ -10700,7 +10720,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Register to be notified when a kill request for the job is received.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#registry" class="member-name-link">registry</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#registry" class="member-name-link">registry</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/RegexRuleSet.html#reject(java.lang.String)" class="member-name-link">reject(String)</a> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexRuleSet.html" title="class in com.netflix.genie.common.internal.util">RegexRuleSet</a></dt>
 <dd>
