@@ -40,6 +40,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.IllegalAttachmentFileNameException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
@@ -232,6 +233,7 @@ class GenieExceptionMapperTest {
         exceptions.put(new JobNotFoundException(), HttpStatus.NOT_FOUND);
         exceptions.put(new NotFoundException(), HttpStatus.NOT_FOUND);
         exceptions.put(new PreconditionFailedException(), HttpStatus.BAD_REQUEST);
+        exceptions.put(new IllegalAttachmentFileNameException(), HttpStatus.BAD_REQUEST);
         exceptions.put(new AttachmentTooLargeException(), HttpStatus.PAYLOAD_TOO_LARGE);
 
         for (final Map.Entry<GenieCheckedException, HttpStatus> exception : exceptions.entrySet()) {
