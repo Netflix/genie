@@ -94,9 +94,9 @@ public class LocalFileSystemAttachmentServiceImpl implements AttachmentService {
                 final long attachmentSize = attachment.contentLength();
                 final String filename = attachment.getFilename();
 
-                if (filename != null && filename.contains("/")) {
+                if (filename != null && (filename.contains("/") || filename.contains("\\"))) {
                     throw new IllegalAttachmentFileNameException("Attachment filename " + filename + " is illegal. "
-                        + "It should not contain the char: /.");
+                        + "Filenames should not contain / or \\.");
                 }
 
                 if (attachmentSize > this.attachmentServiceProperties.getMaxSize().toBytes()) {
