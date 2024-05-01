@@ -154,10 +154,23 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
         thrown(SaveAttachmentException)
     }
 
-    def "reject attachments with illegal filename"() {
+    def "reject attachments with illegal filename containing /"() {
         Set<Resource> attachments = new HashSet<Resource>()
         Resource attachment = Mockito.mock(Resource.class)
         Mockito.doReturn("../../../root/breakout.file").when(attachment).getFilename()
+        attachments.add(attachment)
+
+        when:
+        service.saveAttachments(null, attachments)
+
+        then:
+        thrown(IllegalAttachmentFileNameException)
+    }
+
+    def "reject attachments with illegal filename containing \\"() {
+        Set<Resource> attachments = new HashSet<Resource>()
+        Resource attachment = Mockito.mock(Resource.class)
+        Mockito.doReturn("c:\\root\\breakout.file").when(attachment).getFilename()
         attachments.add(attachment)
 
         when:
