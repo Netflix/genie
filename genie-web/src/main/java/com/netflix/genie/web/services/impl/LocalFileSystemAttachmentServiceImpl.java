@@ -27,6 +27,7 @@ import com.netflix.genie.web.services.AttachmentService;
 import org.springframework.core.io.Resource;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -94,9 +95,24 @@ public class LocalFileSystemAttachmentServiceImpl implements AttachmentService {
                 final long attachmentSize = attachment.contentLength();
                 final String filename = attachment.getFilename();
 
-                if (filename != null && (filename.contains("/") || filename.contains("\\"))) {
-                    throw new IllegalAttachmentFileNameException("Attachment filename " + filename + " is illegal. "
-                        + "Filenames should not contain / or \\.");
+                if (filename != null) {
+                    if ((filename.contains("/") || filename.contains("\\")
+                        || filename.equals(".") || filename.equals(".."))) {
+                        throw new IllegalAttachmentFileNameException("Attachment filename " + filename + " is illegal. "
+                            + "Filenames should not be . or .., or contain /, \\.");
+                    }
+
+                    final String attachmentCanonicalPath =
+                        createTempFile(String.valueOf(attachmentsBasePath), filename).getCanonicalPath();
+
+                    final String baseCanonicalPath =
+                        new File(String.valueOf(attachmentsBasePath)).getCanonicalPath();
+
+                    if (!attachmentCanonicalPath.startsWith(baseCanonicalPath)
+                        || attachmentCanonicalPath.equals(baseCanonicalPath)) {
+                        throw new IllegalAttachmentFileNameException("Attachment filename " + filename + " is illegal. "
+                            + "Filenames should not be a relative path.");
+                    }
                 }
 
                 if (attachmentSize > this.attachmentServiceProperties.getMaxSize().toBytes()) {
@@ -123,5 +139,10 @@ public class LocalFileSystemAttachmentServiceImpl implements AttachmentService {
         }
 
         return setBuilder.build();
+    }
+
+    /* for testing purposes */
+    File createTempFile(final String attachmentsBasePath, final String filename) {
+        return new File(attachmentsBasePath, filename);
     }
 }
