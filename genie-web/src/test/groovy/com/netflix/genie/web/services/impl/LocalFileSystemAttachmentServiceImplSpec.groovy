@@ -51,7 +51,7 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
         this.serviceProperties.setLocationPrefix(this.temporaryFolder.toUri())
         this.serviceProperties.setMaxSize(DataSize.ofBytes(100))
         this.serviceProperties.setMaxTotalSize(DataSize.ofBytes(150))
-        this.service = new LocalFileSystemAttachmentServiceImpl(serviceProperties)
+        this.service = Mockito.spy(new LocalFileSystemAttachmentServiceImpl(serviceProperties))
     }
 
     def "saveAttachments with no attachments"() {
@@ -171,6 +171,48 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
         Set<Resource> attachments = new HashSet<Resource>()
         Resource attachment = Mockito.mock(Resource.class)
         Mockito.doReturn("c:\\root\\breakout.file").when(attachment).getFilename()
+        attachments.add(attachment)
+
+        when:
+        service.saveAttachments(null, attachments)
+
+        then:
+        thrown(IllegalAttachmentFileNameException)
+    }
+
+    def "reject attachments with illegal filename is ."() {
+        Set<Resource> attachments = new HashSet<Resource>()
+        Resource attachment = Mockito.mock(Resource.class)
+        Mockito.doReturn(".").when(attachment).getFilename()
+        attachments.add(attachment)
+
+        when:
+        service.saveAttachments(null, attachments)
+
+        then:
+        thrown(IllegalAttachmentFileNameException)
+    }
+
+    def "reject attachments with illegal filename is .."() {
+        Set<Resource> attachments = new HashSet<Resource>()
+        Resource attachment = Mockito.mock(Resource.class)
+        Mockito.doReturn("..").when(attachment).getFilename()
+        attachments.add(attachment)
+
+        when:
+        service.saveAttachments(null, attachments)
+
+        then:
+        thrown(IllegalAttachmentFileNameException)
+    }
+
+    def "reject attachments with illegal filename for base path check"() {
+        Set<Resource> attachments = new HashSet<Resource>()
+        Resource attachment = Mockito.mock(Resource.class)
+        Mockito.doReturn("file1.text").when(attachment).getFilename()
+        File file = Mockito.mock(File.class)
+        Mockito.doReturn("/dummy").when(file).getCanonicalPath()
+        Mockito.doReturn(file).when(service).createTempFile(Mockito.anyString(), Mockito.anyString());
         attachments.add(attachment)
 
         when:
