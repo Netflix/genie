@@ -97,9 +97,9 @@ public class LocalFileSystemAttachmentServiceImpl implements AttachmentService {
 
                 if (filename != null) {
                     if ((filename.contains("/") || filename.contains("\\")
-                        || filename.equals(".") || filename.equals(".."))) {
+                        || filename.equals(".") || filename.contains(".."))) {
                         throw new IllegalAttachmentFileNameException("Attachment filename " + filename + " is illegal. "
-                            + "Filenames should not be . or .., or contain /, \\.");
+                            + "Filenames should not be ., or contain .., /, \\.");
                     }
 
                     final String attachmentCanonicalPath =
