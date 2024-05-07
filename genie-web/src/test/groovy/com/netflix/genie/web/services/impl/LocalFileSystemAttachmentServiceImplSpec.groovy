@@ -193,7 +193,7 @@ class LocalFileSystemAttachmentServiceImplSpec extends Specification {
         thrown(IllegalAttachmentFileNameException)
     }
 
-    def "reject attachments with illegal filename is .."() {
+    def "reject attachments with illegal filename containing .."() {
         Set<Resource> attachments = new HashSet<Resource>()
         Resource attachment = Mockito.mock(Resource.class)
         Mockito.doReturn("..").when(attachment).getFilename()
