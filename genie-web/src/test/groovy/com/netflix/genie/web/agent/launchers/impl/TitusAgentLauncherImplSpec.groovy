@@ -91,6 +91,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         this.requestedMemory = 1024L
         this.launcherProperties = new TitusAgentLauncherProperties()
         this.launcherProperties.setEndpoint(URI.create(TITUS_ENDPOINT_PREFIX))
+        this.launcherProperties.setAdditionalEnvironment(["BD_USER": USER])
 
         this.job = Mock(JobSpecification.ExecutionResource) {
             getId() >> JOB_ID
@@ -508,7 +509,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
-        requestCapture.getContainer().getEnv().isEmpty()
+        requestCapture.getContainer().getEnv() == ["BD_USER": USER]
 
         when:
         def prop1Key = "${UUID.randomUUID()}.${UUID.randomUUID()}.${UUID.randomUUID()}".toString()
@@ -529,7 +530,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
-        requestCapture.getContainer().getEnv().size() == 1
+        requestCapture.getContainer().getEnv().size() == 2
         requestCapture.getContainer().getEnv().get(prop1Key) == prop1Value
 
         when:
@@ -551,7 +552,7 @@ class TitusAgentLauncherImplSpec extends Specification {
         1 * this.cache.put(JOB_ID, TITUS_JOB_ID)
         launcherExt.isPresent()
         requestCapture != null
-        requestCapture.getContainer().getEnv().size() == 2
+        requestCapture.getContainer().getEnv().size() == 3
         requestCapture.getContainer().getEnv().get(prop1Key) == prop1Value
         requestCapture.getContainer().getEnv().get(prop2Key) == prop2Value
     }

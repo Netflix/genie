@@ -81,6 +81,7 @@ import java.util.stream.Collectors;
 public class TitusAgentLauncherImpl implements AgentLauncher {
 
     static final int MEGABYTE_TO_MEGABIT = 8;
+    private static final String BD_USER_ENV_VAR = "BD_USER";
     private static final String GENIE_USER_ATTR = "genie.user";
     private static final String GENIE_SOURCE_HOST_ATTR = "genie.sourceHost";
     private static final String GENIE_ENDPOINT_ATTR = "genie.endpoint";
@@ -246,6 +247,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
     private TitusBatchJobRequest createJobRequest(final ResolvedJob resolvedJob) throws AgentLaunchException {
         final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
+        final String jobUser = resolvedJob.getJobMetadata().getUser();
+
         // Map placeholders in entry point template to their values
         final Map<String, String> placeholdersMap = Map.of(
             TitusAgentLauncherProperties.JOB_ID_PLACEHOLDER,
@@ -267,7 +270,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         );
         final Duration runtimeLimit = this.titusAgentLauncherProperties.getRuntimeLimit();
 
-        final Map<String, String> jobAttributes = this.createJobAttributes(jobId, resolvedJob);
+        final Map<String, String> jobAttributes = this.createJobAttributes(jobId, jobUser);
 
         final TitusBatchJobRequest.TitusBatchJobRequestBuilder requestBuilder = TitusBatchJobRequest.builder()
             .owner(
@@ -299,7 +302,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
                     .image(this.getTitusImage(resolvedJob))
                     .entryPoint(entryPoint)
                     .command(command)
-                    .env(this.createJobEnvironment())
+                    .env(this.createJobEnvironment(jobUser))
                     .attributes(
                         this.binder
                             .bind(
@@ -408,9 +411,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         }
     }
 
-    private Map<String, String> createJobAttributes(final String jobId, final ResolvedJob resolvedJob) {
+    private Map<String, String> createJobAttributes(final String jobId, final String jobUser) {
         final Map<String, String> jobAttributes = new HashMap<>();
-        jobAttributes.put(GENIE_USER_ATTR, resolvedJob.getJobMetadata().getUser());
+        jobAttributes.put(GENIE_USER_ATTR, jobUser);
         jobAttributes.put(GENIE_SOURCE_HOST_ATTR, this.genieHostInfo.getHostname());
         jobAttributes.put(GENIE_ENDPOINT_ATTR, this.titusAgentLauncherProperties.getGenieServerHost());
         jobAttributes.put(GENIE_JOB_ID_ATTR, jobId);
@@ -425,7 +428,7 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         return jobAttributes;
     }
 
-    private Map<String, String> createJobEnvironment() {
+    private Map<String, String> createJobEnvironment(final String jobUser) {
         final Map<String, String> jobEnvironment = this.binder
             .bind(
                 TitusAgentLauncherProperties.ADDITIONAL_ENVIRONMENT_PROPERTY,
@@ -437,6 +440,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         if (currentSpan != null) {
             jobEnvironment.putAll(this.tracePropagator.injectForAgent(currentSpan.context()));
         }
+
+        jobEnvironment.putIfAbsent(BD_USER_ENV_VAR, jobUser);
 
         return jobEnvironment;
     }
