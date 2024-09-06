@@ -82,8 +82,8 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
     Set<FileEntity> findByFileIn(Set<String> files);
 
     /**
-     * Find the ids of all files from the database that aren't referenced which were created before the supplied created
-     * threshold.
+     * Find the ids of all files from the database that aren't referenced which were created between the supplied
+     * thresholds.
      *
      * @param createdThresholdLowerBound The instant in time when files created after this time that aren't referenced
      *                                   will be selected. Inclusive.

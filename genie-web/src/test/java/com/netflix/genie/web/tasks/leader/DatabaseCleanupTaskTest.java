@@ -133,6 +133,8 @@ class DatabaseCleanupTaskTest {
         Mockito.when(this.cleanupProperties.getBatchSize()).thenReturn(batchSize);
         Mockito.when(this.fileCleanupProperties.getBatchDaysWithin()).thenReturn(batchDaysWithin);
         Mockito.when(this.fileCleanupProperties.getRollingWindowHours()).thenReturn(rollingWindow);
+        Mockito.when(this.tagCleanupProperties.getBatchDaysWithin()).thenReturn(batchDaysWithin);
+        Mockito.when(this.tagCleanupProperties.getRollingWindowHours()).thenReturn(rollingWindow);
         Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
         Mockito.when(this.commandDeactivationProperties.getCommandCreationThreshold()).thenReturn(60);
@@ -169,7 +171,8 @@ class DatabaseCleanupTaskTest {
                 Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.eq(batchSize)))
             .thenReturn(3L, 0L, 4L, 0L);
         Mockito
-            .when(this.persistenceService.deleteUnusedTags(Mockito.any(Instant.class), Mockito.eq(batchSize)))
+            .when(this.persistenceService.deleteUnusedTags(
+                Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.eq(batchSize)))
             .thenReturn(5L, 0L, 6L, 0L);
         Mockito
             .when(this.persistenceService.deleteUnusedApplications(Mockito.any(Instant.class), Mockito.eq(batchSize)))
@@ -225,8 +228,8 @@ class DatabaseCleanupTaskTest {
                 .verify(this.persistenceService, Mockito.times(16))
                 .deleteUnusedFiles(Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.eq(batchSize));
             Mockito
-                .verify(this.persistenceService, Mockito.times(4))
-                .deleteUnusedTags(Mockito.any(Instant.class), Mockito.eq(batchSize));
+                .verify(this.persistenceService, Mockito.times(16))
+                .deleteUnusedTags(Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.eq(batchSize));
             Mockito
                 .verify(this.persistenceService, Mockito.times(5))
                 .deleteUnusedApplications(Mockito.any(Instant.class), Mockito.eq(batchSize));
@@ -332,6 +335,6 @@ class DatabaseCleanupTaskTest {
             .deleteUnusedFiles(Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.anyInt());
         Mockito
             .verify(this.persistenceService, Mockito.never())
-            .deleteUnusedTags(Mockito.any(Instant.class), Mockito.anyInt());
+            .deleteUnusedTags(Mockito.any(Instant.class), Mockito.any(Instant.class), Mockito.anyInt());
     }
 }

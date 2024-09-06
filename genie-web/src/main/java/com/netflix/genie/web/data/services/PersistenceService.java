@@ -1121,22 +1121,24 @@ public interface PersistenceService {
     //region Tag APIs
 
     /**
-     * Delete all tags from the database that aren't referenced which were created before the supplied created
-     * threshold.
+     * Delete all tags from the database that aren't referenced which were created between the supplied thresholds.
      *
-     * @param createdThreshold The instant in time where tags created before this time that aren't referenced
-     *                         will be deleted. Inclusive
-     * @param batchSize        The maximum number of tags to delete in a single transaction
+     * @param createdThresholdLowerBound The instant in time when tags created after this time that aren't referenced
+     *                                   will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when tags created before this time that aren't referenced
+     *                                   will be selected. Inclusive.
+     * @param batchSize                  The maximum number of tags to delete in a single transaction
      * @return The number of tags deleted
      */
-    long deleteUnusedTags(@NotNull Instant createdThreshold, @Min(1) int batchSize);
+    long deleteUnusedTags(@NotNull Instant createdThresholdLowerBound,
+                          @NotNull Instant createdThresholdUpperBound,
+                          @Min(1) int batchSize);
     //endregion
 
     //region File APIs
 
     /**
-     * Delete all files from the database that aren't referenced which were created before the supplied created
-     * threshold.
+     * Delete all files from the database that aren't referenced which were created between the supplied thresholds.
      *
      * @param createdThresholdLowerBound The instant in time when files created after this time that aren't referenced
      *                                   will be selected. Inclusive.
