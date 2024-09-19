@@ -75,12 +75,13 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
     Set<TagEntity> findByTagIn(Set<String> tags);
 
     /**
-     * Find all tags from the database that aren't referenced which were created between the supplied thresholds.
+     * Find all tags from the database that aren't referenced which were created between the
+     * supplied threshold bounds.
      *
-     * @param createdThresholdLowerBound The instant in time when tags created after this time that aren't referenced
-     *                                   will be selected. Inclusive.
-     * @param createdThresholdUpperBound The instant in time when tags created before this time that aren't referenced
-     *                                   will be selected. Inclusive.
+     * @param createdThresholdLowerBound The instant in time when tags created after this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when tags created before this time that
+     *                                   aren't referenced will be selected. Inclusive.
      * @param limit                      Maximum number of IDs to return
      * @return The number of tags deleted
      */

@@ -1121,34 +1121,38 @@ public interface PersistenceService {
     //region Tag APIs
 
     /**
-     * Delete all tags from the database that aren't referenced which were created between the supplied thresholds.
+     * Delete all tags from the database that aren't referenced which were created between the
+     * supplied threshold bounds.
      *
-     * @param createdThresholdLowerBound The instant in time when tags created after this time that aren't referenced
-     *                                   will be selected. Inclusive.
-     * @param createdThresholdUpperBound The instant in time when tags created before this time that aren't referenced
-     *                                   will be selected. Inclusive.
+     * @param createdThresholdLowerBound The instant in time when tags created after this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when tags created before this time that
+     *                                   aren't referenced will be selected. Inclusive.
      * @param batchSize                  The maximum number of tags to delete in a single transaction
      * @return The number of tags deleted
      */
-    long deleteUnusedTags(@NotNull Instant createdThresholdLowerBound,
-                          @NotNull Instant createdThresholdUpperBound,
-                          @Min(1) int batchSize);
+    long deleteUnusedTags(
+        @NotNull Instant createdThresholdLowerBound,
+        @NotNull Instant createdThresholdUpperBound,
+        @Min(1) int batchSize);
     //endregion
 
     //region File APIs
 
     /**
-     * Delete all files from the database that aren't referenced which were created between the supplied thresholds.
+     * Delete all files from the database that aren't referenced which were created between the
+     * supplied threshold bounds.
      *
-     * @param createdThresholdLowerBound The instant in time when files created after this time that aren't referenced
-     *                                   will be selected. Inclusive.
-     * @param createdThresholdUpperBound The instant in time when files created before this time that aren't referenced
-     *                                   will be selected. Inclusive.
-     * @param batchSize        The maximum number of files to delete in a single transaction
+     * @param createdThresholdLowerBound The instant in time when files created after this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when files created before this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param batchSize                  The maximum number of files to delete in a single transaction
      * @return The number of files deleted
      */
-    long deleteUnusedFiles(@NotNull Instant createdThresholdLowerBound,
-                           @NotNull Instant createdThresholdUpperBound,
-                           @Min(1) int batchSize);
+    long deleteUnusedFiles(
+        @NotNull Instant createdThresholdLowerBound,
+        @NotNull Instant createdThresholdUpperBound,
+        @Min(1) int batchSize);
     //endregion
 }
