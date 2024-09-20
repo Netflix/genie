@@ -1099,7 +1099,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Value</div>
 <div class="col-first even-row-color"><code id="com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository.SELECT_FOR_UPDATE_UNUSED_TAGS_SQL">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html#SELECT_FOR_UPDATE_UNUSED_TAGS_SQL">SELECT_FOR_UPDATE_UNUSED_TAGS_SQL</a></code></div>
-<div class="col-last even-row-color"><code>"SELECT id FROM tags WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) AND created &lt;= :createdThreshold LIMIT :limit FOR UPDATE;"</code></div>
+<div class="col-last even-row-color"><code>"SELECT id FROM tags WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) AND created &lt;= :createdThresholdUpperBound AND created &gt;= :createdThresholdLowerBound LIMIT :limit FOR UPDATE;"</code></div>
 </div>
 </li>
 </ul>
@@ -1366,6 +1366,12 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Constant Field</div>
 <div class="table-header col-last">Value</div>
+<div class="col-first even-row-color"><code id="com.netflix.genie.web.properties.DatabaseCleanupProperties.TagDatabaseCleanupProperties.BATCH_DAYS_WITHIN_PROPERTY">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#BATCH_DAYS_WITHIN_PROPERTY">BATCH_DAYS_WITHIN_PROPERTY</a></code></div>
+<div class="col-last even-row-color"><code>"genie.tasks.database-cleanup.tag-cleanup.batchDaysWithin"</code></div>
+<div class="col-first odd-row-color"><code id="com.netflix.genie.web.properties.DatabaseCleanupProperties.TagDatabaseCleanupProperties.ROLLING_WINDOW_HOURS_PROPERTY">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#ROLLING_WINDOW_HOURS_PROPERTY">ROLLING_WINDOW_HOURS_PROPERTY</a></code></div>
+<div class="col-last odd-row-color"><code>"genie.tasks.database-cleanup.tag-cleanup.rollingWindowHours"</code></div>
 <div class="col-first even-row-color"><code id="com.netflix.genie.web.properties.DatabaseCleanupProperties.TagDatabaseCleanupProperties.SKIP_PROPERTY">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></div>
 <div class="col-last even-row-color"><code>"genie.tasks.database-cleanup.tag-cleanup.skip"</code></div>

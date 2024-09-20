@@ -1196,11 +1196,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ShutdownStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartFileServiceStage</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartKillServiceStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopKillServiceStage</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopFileServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopFileServiceStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusInit</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusRunning.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusRunning.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusRunning</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></dt>
 <dd>&nbsp;</dd>
@@ -1281,6 +1281,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#BATCH_DAYS_WITHIN_PROPERTY" class="member-name-link">BATCH_DAYS_WITHIN_PROPERTY</a> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></dt>
 <dd>
 <div class="block">The number of days within current day that the unused files deletion will be running in batch mode.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#BATCH_DAYS_WITHIN_PROPERTY" class="member-name-link">BATCH_DAYS_WITHIN_PROPERTY</a> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The number of days within current day that the unused tags deletion will be running in batch mode.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#BATCH_SIZE_PROPERTY" class="member-name-link">BATCH_SIZE_PROPERTY</a> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a></dt>
 <dd>
@@ -3398,23 +3402,23 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#deleteUnusedFiles(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedFiles(Instant, Instant, int)</a> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
-<div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all files from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedFiles(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedFiles(Instant, Instant, int)</a> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
-<div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all files from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#deleteUnusedTags(java.time.Instant,int)" class="member-name-link">deleteUnusedTags(Instant, int)</a> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#deleteUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedTags(Instant, Instant, int)</a> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
-<div class="block">Delete all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedTags(java.time.Instant,int)" class="member-name-link">deleteUnusedTags(Instant, int)</a> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/PersistenceService.html#deleteUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedTags(Instant, Instant, int)</a> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
-<div class="block">Delete all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#dependencies" class="member-name-link">dependencies</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -4267,13 +4271,13 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html#findUnusedFiles(java.time.Instant,java.time.Instant,int)" class="member-name-link">findUnusedFiles(Instant, Instant, int)</a> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaFileRepository</a></dt>
 <dd>
-<div class="block">Find the ids of all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Find the ids of all files from the database that aren't referenced which were created
+ between the supplied threshold bounds.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html#findUnusedTags(java.time.Instant,int)" class="member-name-link">findUnusedTags(Instant, int)</a> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaTagRepository</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html#findUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">findUnusedTags(Instant, Instant, int)</a> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaTagRepository</a></dt>
 <dd>
-<div class="block">Find all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Find all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#finished" class="member-name-link">finished</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -7140,7 +7144,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the ID the user has requested for this resource if one was added.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/dtos/CommandRequest.html#getRequestedId()" class="member-name-link">getRequestedId()</a> - Method in class com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/CommandRequest.html" title="class in com.netflix.genie.common.internal.dtos">CommandRequest</a></dt>
+<dt><a href="com/netflix/genie/common/internal/dtos/ClusterRequest.html#getRequestedId()" class="member-name-link">getRequestedId()</a> - Method in class com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/ClusterRequest.html" title="class in com.netflix.genie.common.internal.dtos">ClusterRequest</a></dt>
 <dd>
 <div class="block">Get the ID the user has requested for this resource if one was added.</div>
 </dd>
@@ -10476,7 +10480,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Aspect implementation method of retrying the data service method on certain failures.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#properties" class="member-name-link">properties</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#properties" class="member-name-link">properties</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" class="type-name-link" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
 <dd>
@@ -10623,7 +10627,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Publish an event in a different thread than the calling thread.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#publishEvent(com.netflix.genie.web.events.AbstractSNSPublisher.EventType,java.util.HashMap)" class="member-name-link">publishEvent(AbstractSNSPublisher.EventType, HashMap&lt;String, Object&gt;)</a> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#publishEvent(com.netflix.genie.web.events.AbstractSNSPublisher.EventType,java.util.HashMap)" class="member-name-link">publishEvent(AbstractSNSPublisher.EventType, HashMap&lt;String, Object&gt;)</a> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/events/GenieEventBus.html#publishSynchronousEvent(org.springframework.context.ApplicationEvent)" class="member-name-link">publishSynchronousEvent(ApplicationEvent)</a> - Method in interface com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a></dt>
 <dd>
@@ -10720,7 +10724,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Register to be notified when a kill request for the job is received.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#registry" class="member-name-link">registry</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#registry" class="member-name-link">registry</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/RegexRuleSet.html#reject(java.lang.String)" class="member-name-link">reject(String)</a> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexRuleSet.html" title="class in com.netflix.genie.common.internal.util">RegexRuleSet</a></dt>
 <dd>
@@ -11412,6 +11416,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">The size of the rolling window used to delete unused files, units in hours.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#ROLLING_WINDOW_HOURS_PROPERTY" class="member-name-link">ROLLING_WINDOW_HOURS_PROPERTY</a> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The size of the rolling window used to delete unused tags, units in hours.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/RootModelAssembler.html" class="type-name-link" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">RootModelAssembler</a> - Class in <a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/package-summary.html">com.netflix.genie.web.apis.rest.v3.hateoas.assemblers</a></dt>
 <dd>
 <div class="block">Assembles root resource from a JsonNode.</div>
@@ -11788,7 +11796,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/selectors/impl/RandomCommandSelectorImpl.html#select(C)" class="member-name-link">select(CommandSelectionContext)</a> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/RandomCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomCommandSelectorImpl</a></dt>
+<dt><a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html#select(C)" class="member-name-link">select(AgentLauncherSelectionContext)</a> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomAgentLauncherSelectorImpl</a></dt>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>

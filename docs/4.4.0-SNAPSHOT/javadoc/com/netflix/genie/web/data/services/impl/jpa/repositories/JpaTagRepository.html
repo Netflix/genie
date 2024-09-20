@@ -109,8 +109,8 @@ loadScripts(document, 'script');</script>
 <h2>Method Summary</h2>
 <div id="method-summary-table">
 <div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
-<div id="method-summary-table.tabpanel" role="tabpanel">
-<div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
+<div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
+<div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
@@ -135,11 +135,12 @@ loadScripts(document, 'script');</script>
 <div class="block">Find tag entities where the tag value is in the given set of tags.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Number.html" title="class or interface in java.lang" class="external-link">Number</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findUnusedTags(java.time.Instant,int)" class="member-name-link">findUnusedTags</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThreshold,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">findUnusedTags</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  int&nbsp;limit)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Find all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Find all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </div>
 </div>
 </div>
@@ -233,20 +234,24 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="findUnusedTags(java.time.Instant,int)">
+<section class="detail" id="findUnusedTags(java.time.Instant,java.time.Instant,int)">
 <h3>findUnusedTags</h3>
-<div class="member-signature"><span class="annotations">@Query(value="SELECT id FROM tags WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) AND created &lt;= :createdThreshold LIMIT :limit FOR UPDATE;",
+<div class="member-signature"><span class="annotations">@Query(value="SELECT id FROM tags WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) AND created &lt;= :createdThresholdUpperBound AND created &gt;= :createdThresholdLowerBound LIMIT :limit FOR UPDATE;",
        nativeQuery=true)
-</span><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Number.html" title="class or interface in java.lang" class="external-link">Number</a>&gt;</span>&nbsp;<span class="element-name">findUnusedTags</span><wbr><span class="parameters">(@Param("createdThreshold")
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThreshold,
+</span><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Number.html" title="class or interface in java.lang" class="external-link">Number</a>&gt;</span>&nbsp;<span class="element-name">findUnusedTags</span><wbr><span class="parameters">(@Param("createdThresholdLowerBound")
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
+ @Param("createdThresholdUpperBound")
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Param("limit")
  int&nbsp;limit)</span></div>
-<div class="block">Find all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Find all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>createdThreshold</code> - The instant in time where tags created before this time that aren't referenced
-                         will be returned. Inclusive</dd>
+<dd><code>createdThresholdLowerBound</code> - The instant in time when tags created after this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
+<dd><code>createdThresholdUpperBound</code> - The instant in time when tags created before this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
 <dd><code>limit</code> - Maximum number of IDs to return</dd>
 <dt>Returns:</dt>
 <dd>The number of tags deleted</dd>

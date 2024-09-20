@@ -93,8 +93,8 @@ loadScripts(document, 'script');</script>
 <h2>Method Summary</h2>
 <div id="method-summary-table">
 <div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
-<div id="method-summary-table.tabpanel" role="tabpanel">
-<div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
+<div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
+<div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
@@ -208,15 +208,16 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all files from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedTags(java.time.Instant,int)" class="member-name-link">deleteUnusedTags</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThreshold,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedTags</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Delete all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.springframework.data.domain.Page&lt;<a href="../../../common/internal/dtos/Application.html" title="class in com.netflix.genie.common.internal.dtos">Application</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findApplications(java.lang.String,java.lang.String,java.util.Set,java.util.Set,java.lang.String,org.springframework.data.domain.Pageable)" class="member-name-link">findApplications</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
@@ -2260,18 +2261,22 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="deleteUnusedTags(java.time.Instant,int)">
+<section class="detail" id="deleteUnusedTags(java.time.Instant,java.time.Instant,int)">
 <h3>deleteUnusedTags</h3>
 <div class="member-signature"><span class="return-type">long</span>&nbsp;<span class="element-name">deleteUnusedTags</span><wbr><span class="parameters">(@NotNull
- @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThreshold,
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
+ @NotNull
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Min(1L)
  @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
-<div class="block">Delete all tags from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all tags from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>createdThreshold</code> - The instant in time where tags created before this time that aren't referenced
-                         will be deleted. Inclusive</dd>
+<dd><code>createdThresholdLowerBound</code> - The instant in time when tags created after this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
+<dd><code>createdThresholdUpperBound</code> - The instant in time when tags created before this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
 <dd><code>batchSize</code> - The maximum number of tags to delete in a single transaction</dd>
 <dt>Returns:</dt>
 <dd>The number of tags deleted</dd>
@@ -2287,14 +2292,14 @@ loadScripts(document, 'script');</script>
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Min(1L)
  @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
-<div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Delete all files from the database that aren't referenced which were created between the
+ supplied threshold bounds.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>createdThresholdLowerBound</code> - The instant in time when files created after this time that aren't referenced
-                                   will be selected. Inclusive.</dd>
-<dd><code>createdThresholdUpperBound</code> - The instant in time when files created before this time that aren't referenced
-                                   will be selected. Inclusive.</dd>
+<dd><code>createdThresholdLowerBound</code> - The instant in time when files created after this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
+<dd><code>createdThresholdUpperBound</code> - The instant in time when files created before this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
 <dd><code>batchSize</code> - The maximum number of files to delete in a single transaction</dd>
 <dt>Returns:</dt>
 <dd>The number of files deleted</dd>

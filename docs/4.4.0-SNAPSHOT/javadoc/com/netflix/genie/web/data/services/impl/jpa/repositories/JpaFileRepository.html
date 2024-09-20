@@ -109,8 +109,8 @@ loadScripts(document, 'script');</script>
 <h2>Method Summary</h2>
 <div id="method-summary-table">
 <div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
-<div id="method-summary-table.tabpanel" role="tabpanel">
-<div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
+<div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
+<div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
@@ -139,8 +139,8 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  int&nbsp;limit)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Find the ids of all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Find the ids of all files from the database that aren't referenced which were created
+ between the supplied threshold bounds.</div>
 </div>
 </div>
 </div>
@@ -244,14 +244,14 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Param("limit")
  int&nbsp;limit)</span></div>
-<div class="block">Find the ids of all files from the database that aren't referenced which were created before the supplied created
- threshold.</div>
+<div class="block">Find the ids of all files from the database that aren't referenced which were created
+ between the supplied threshold bounds.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>createdThresholdLowerBound</code> - The instant in time when files created after this time that aren't referenced
-                                   will be selected. Inclusive.</dd>
-<dd><code>createdThresholdUpperBound</code> - The instant in time when files created before this time that aren't referenced
-                                   will be selected. Inclusive.</dd>
+<dd><code>createdThresholdLowerBound</code> - The instant in time when files created after this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
+<dd><code>createdThresholdUpperBound</code> - The instant in time when files created before this time that
+                                   aren't referenced will be selected. Inclusive.</dd>
 <dd><code>limit</code> - The maximum number of file ids to retrieve</dd>
 <dt>Returns:</dt>
 <dd>The ids of the files which should be deleted</dd>
