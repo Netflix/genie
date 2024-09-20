@@ -61,7 +61,7 @@ class JpaPersistenceServiceImplTagsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(this.tagRepository.existsByTag(tag1)).isTrue();
         Assertions.assertThat(this.tagRepository.existsByTag(tag2)).isTrue();
 
-        Assertions.assertThat(this.service.deleteUnusedTags(Instant.now(), 10)).isEqualTo(1L);
+        Assertions.assertThat(this.service.deleteUnusedTags(Instant.EPOCH, Instant.now(), 10)).isEqualTo(1L);
 
         Assertions.assertThat(this.tagRepository.existsByTag(tag1)).isFalse();
         Assertions.assertThat(this.tagRepository.existsByTag(tag2)).isTrue();

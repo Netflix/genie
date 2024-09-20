@@ -82,14 +82,14 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
     Set<FileEntity> findByFileIn(Set<String> files);
 
     /**
-     * Find the ids of all files from the database that aren't referenced which were created before the supplied created
-     * threshold.
+     * Find the ids of all files from the database that aren't referenced which were created
+     * between the supplied threshold bounds.
      *
-     * @param createdThresholdLowerBound The instant in time when files created after this time that aren't referenced
-     *                                   will be selected. Inclusive.
-     * @param createdThresholdUpperBound The instant in time when files created before this time that aren't referenced
-     *                                   will be selected. Inclusive.
-     * @param limit            The maximum number of file ids to retrieve
+     * @param createdThresholdLowerBound The instant in time when files created after this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when files created before this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param limit                      The maximum number of file ids to retrieve
      * @return The ids of the files which should be deleted
      */
     @Query(value = SELECT_FOR_UPDATE_UNUSED_FILES_SQL, nativeQuery = true)

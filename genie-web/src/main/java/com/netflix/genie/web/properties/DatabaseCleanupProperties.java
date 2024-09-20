@@ -370,8 +370,30 @@ public class DatabaseCleanupProperties {
         public static final String SKIP_PROPERTY = TAG_CLEANUP_PROPERTY_PREFIX + ".skip";
 
         /**
+         * The number of days within current day that the unused tags deletion will be running in batch mode.
+         */
+        public static final String BATCH_DAYS_WITHIN_PROPERTY = TAG_CLEANUP_PROPERTY_PREFIX + ".batchDaysWithin";
+
+        /**
+         * The size of the rolling window used to delete unused tags, units in hours.
+         */
+        public static final String ROLLING_WINDOW_HOURS_PROPERTY = TAG_CLEANUP_PROPERTY_PREFIX + ".rollingWindowHours";
+
+        /**
          * Skip the Tags table when performing database cleanup.
          */
         private boolean skip;
+
+        /**
+         * The number of days within current day that the unused tags deletion will be running in batch mode.
+         */
+        @Min(1)
+        private int batchDaysWithin = 30;
+
+        /**
+         * The size of the rolling window used to delete unused tags, units in hours.
+         */
+        @Min(1)
+        private int rollingWindowHours = 12;
     }
 }

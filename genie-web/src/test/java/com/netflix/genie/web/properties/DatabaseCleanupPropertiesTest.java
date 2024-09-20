@@ -53,6 +53,8 @@ class DatabaseCleanupPropertiesTest {
         Assertions.assertThat(this.properties.getJobCleanup().getPageSize()).isEqualTo(1000);
         Assertions.assertThat(this.properties.getClusterCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getTagCleanup().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getTagCleanup().getBatchDaysWithin()).isEqualTo(30);
+        Assertions.assertThat(this.properties.getTagCleanup().getRollingWindowHours()).isEqualTo(12);
         Assertions.assertThat(this.properties.getFileCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getFileCleanup().getBatchDaysWithin()).isEqualTo(30);
         Assertions.assertThat(this.properties.getFileCleanup().getRollingWindowHours()).isEqualTo(12);

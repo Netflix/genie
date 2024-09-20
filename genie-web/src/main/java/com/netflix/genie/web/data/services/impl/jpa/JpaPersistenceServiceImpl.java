@@ -2301,11 +2301,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedTags(@NotNull final Instant createdThreshold, @Min(1) final int batchSize) {
-        log.info("[deleteUnusedTags] Called to delete unused tags created before {}", createdThreshold);
+    public long deleteUnusedTags(
+        @NotNull final Instant createdThresholdLowerBound,
+        @NotNull final Instant createdThresholdUpperBound,
+        @Min(1) final int batchSize
+    ) {
+        log.debug(
+            "[deleteUnusedTags] Called to delete unused tags created between {} and {}",
+            createdThresholdLowerBound,
+            createdThresholdUpperBound
+        );
         return this.tagRepository.deleteByIdIn(
             this.tagRepository
-                .findUnusedTags(createdThreshold, batchSize)
+                .findUnusedTags(createdThresholdLowerBound, createdThresholdUpperBound, batchSize)
                 .stream()
                 .map(Number::longValue)
                 .collect(Collectors.toSet())
@@ -2320,9 +2328,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public long deleteUnusedFiles(@NotNull final Instant createdThresholdLowerBound,
-                                  @NotNull final Instant createdThresholdUpperBound,
-                                  @Min(1) final int batchSize) {
+    public long deleteUnusedFiles(
+        @NotNull final Instant createdThresholdLowerBound,
+        @NotNull final Instant createdThresholdUpperBound,
+        @Min(1) final int batchSize
+    ) {
         log.debug(
             "[deleteUnusedFiles] Called to delete unused files created between {} and {}",
             createdThresholdLowerBound,

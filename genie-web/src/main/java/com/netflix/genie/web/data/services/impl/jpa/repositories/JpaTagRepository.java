@@ -45,7 +45,8 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) "
-            + "AND created <= :createdThreshold "
+            + "AND created <= :createdThresholdUpperBound "
+            + "AND created >= :createdThresholdLowerBound "
             + "LIMIT :limit "
             + "FOR UPDATE;";
 
@@ -74,17 +75,20 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
     Set<TagEntity> findByTagIn(Set<String> tags);
 
     /**
-     * Find all tags from the database that aren't referenced which were created before the supplied created
-     * threshold.
+     * Find all tags from the database that aren't referenced which were created between the
+     * supplied threshold bounds.
      *
-     * @param createdThreshold The instant in time where tags created before this time that aren't referenced
-     *                         will be returned. Inclusive
-     * @param limit            Maximum number of IDs to return
+     * @param createdThresholdLowerBound The instant in time when tags created after this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param createdThresholdUpperBound The instant in time when tags created before this time that
+     *                                   aren't referenced will be selected. Inclusive.
+     * @param limit                      Maximum number of IDs to return
      * @return The number of tags deleted
      */
     @Query(value = SELECT_FOR_UPDATE_UNUSED_TAGS_SQL, nativeQuery = true)
     Set<Number> findUnusedTags(
-        @Param("createdThreshold") Instant createdThreshold,
+        @Param("createdThresholdLowerBound") Instant createdThresholdLowerBound,
+        @Param("createdThresholdUpperBound") Instant createdThresholdUpperBound,
         @Param("limit") int limit
     );
 

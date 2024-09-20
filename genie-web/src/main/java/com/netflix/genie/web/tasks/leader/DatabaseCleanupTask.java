@@ -350,9 +350,12 @@ public class DatabaseCleanupTask extends LeaderTask {
                     this.cleanupProperties.getFileCleanup().getBatchDaysWithin()
                 );
                 log.info(
-                    "Attempting to delete unused files from before {} in batches of {}",
+                    "Attempting to delete unused files older than {} in batches of {}. Using a rolling window"
+                        + " of {} hours within last {} days",
                     creationThreshold,
-                    batchSize
+                    batchSize,
+                    rollingWindowHours,
+                    batchDaysWithin
                 );
 
                 long totalDeleted = 0L;
@@ -364,7 +367,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                     upperBound = lowerBound;
                     lowerBound = lowerBound.minus(rollingWindowHours, ChronoUnit.HOURS);
                 }
-                // do a final deletion of everything < batchLowerBound
+                // do a final deletion of everything <= batchLowerBound
                 totalDeleted += deleteUnusedFilesBetween(Instant.EPOCH, upperBound, batchSize);
                 log.info(
                     "Deleted {} files that were unused by any resource and created before {}",
@@ -411,19 +414,36 @@ public class DatabaseCleanupTask extends LeaderTask {
                     Integer.class,
                     this.cleanupProperties.getBatchSize()
                 );
-
+                final long rollingWindowHours = this.environment.getProperty(
+                    DatabaseCleanupProperties.TagDatabaseCleanupProperties.ROLLING_WINDOW_HOURS_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getTagCleanup().getRollingWindowHours()
+                );
+                final long batchDaysWithin = this.environment.getProperty(
+                    DatabaseCleanupProperties.TagDatabaseCleanupProperties.BATCH_DAYS_WITHIN_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getTagCleanup().getBatchDaysWithin()
+                );
                 log.info(
-                    "Attempting to delete unused tags from before {} in batches of {}",
+                    "Attempting to delete unused tags older than {} in batches of {}. Using a rolling window"
+                        + " of {} hours within last {} days",
                     creationThreshold,
-                    batchSize
+                    batchSize,
+                    rollingWindowHours,
+                    batchDaysWithin
                 );
 
-                long deleted;
                 long totalDeleted = 0L;
-                do {
-                    deleted = this.persistenceService.deleteUnusedTags(creationThreshold, batchSize);
-                    totalDeleted += deleted;
-                } while (deleted > 0);
+                Instant upperBound = creationThreshold;
+                Instant lowerBound = creationThreshold.minus(rollingWindowHours, ChronoUnit.HOURS);
+                final Instant batchLowerBound = creationThreshold.minus(batchDaysWithin, ChronoUnit.DAYS);
+                while (upperBound.isAfter(batchLowerBound)) {
+                    totalDeleted += deleteUnusedTagsBetween(lowerBound, upperBound, batchSize);
+                    upperBound = lowerBound;
+                    lowerBound = lowerBound.minus(rollingWindowHours, ChronoUnit.HOURS);
+                }
+                // do a final deletion of everything <= batchLowerBound
+                totalDeleted += deleteUnusedTagsBetween(Instant.EPOCH, upperBound, batchSize);
                 log.info(
                     "Deleted {} tags that were unused by any resource and created before {}",
                     totalDeleted,
@@ -439,6 +459,16 @@ public class DatabaseCleanupTask extends LeaderTask {
                 .timer(TAG_DELETION_TIMER, tags)
                 .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         }
+    }
+
+    private long deleteUnusedTagsBetween(final Instant lowerBound, final Instant upperBound, final int batchSize) {
+        long deleted;
+        long totalDeleted = 0L;
+        do {
+            deleted = this.persistenceService.deleteUnusedTags(lowerBound, upperBound, batchSize);
+            totalDeleted += deleted;
+        } while (deleted > 0);
+        return totalDeleted;
     }
 
     private void deactivateCommands(final Instant runtime) {

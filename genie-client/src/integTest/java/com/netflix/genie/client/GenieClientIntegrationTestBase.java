@@ -65,7 +65,7 @@ abstract class GenieClientIntegrationTestBase {
     //       leverage their layered jars to produce less changing images.
     @Container
     private static final GenericContainer GENIE = new GenericContainer("netflixoss/genie-app:latest.release")
-        .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(1L)))
+        .waitingFor(Wait.forHttp("/admin/health").forStatusCode(200).withStartupTimeout(Duration.ofMinutes(5L)))
         .withExposedPorts(8080);
 
     protected ApplicationClient applicationClient;
