@@ -54,35 +54,35 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         id: gradle-cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/dependency-locks/*.lockfile') }}
           restore-keys: |
             - ${{ runner.os }}-gradle-
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         id: gradle-wrapper-cache
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
           restore-keys: |
             - ${{ runner.os }}-gradlewrapper-
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         id: genie-ui-node-modules
         with:
           path: genie-ui/node_modules/
           key: ${{ runner.os }}-genie-ui-node-modules-${{ hashFiles('genie-ui/node_modules/*') }}
           restore-keys: |
             - ${{ runner.os }}-genie-ui-node-modules-
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         id: genie-ui-gradle-nodejs
         with:
           path: genie-ui/.gradle/nodejs
           key: ${{ runner.os }}-genie-ui-gradle-nodejs-${{ hashFiles('genie-ui/.gradle/nodejs/*') }}
           restore-keys: |
             - ${{ runner.os }}-genie-ui-gradle-nodejs-
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         id: genie-ui-gradle-npm
         with:
           path: genie-ui/.gradle/npm
