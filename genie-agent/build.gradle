@@ -1,4 +1,5 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
 apply plugin: "java-library"
 
@@ -8,6 +9,18 @@ license {
     exclude "*.txt"
     exclude "*.test.sh"
     exclude "META-INF/spring.factories"
+}
+
+idea {
+    module {
+        languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_17)
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 dependencies {
