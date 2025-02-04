@@ -25,6 +25,14 @@ license {
     exclude "*.txt"
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "com.amazonaws:aws-java-sdk-bom:1.12.99"
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1"
+        mavenBom "io.zipkin.brave:brave-bom:5.13.3"
+    }
+}
+
 dependencies {
     /*******************************
      * Implementation Dependencies

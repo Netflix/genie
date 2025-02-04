@@ -23,6 +23,14 @@ java {
     }
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "com.amazonaws:aws-java-sdk-bom:1.12.99"
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1"
+        mavenBom "io.zipkin.brave:brave-bom:5.13.3"
+    }
+}
+
 dependencies {
     /*******************************
      * Annotation Processors
@@ -53,7 +61,6 @@ dependencies {
      *******************************/
 
     implementation("io.grpc:grpc-netty")
-    implementation("io.awspring.cloud:spring-cloud-starter-aws")
     implementation("io.zipkin.brave:brave")
     implementation("io.zipkin.brave:brave-instrumentation-grpc")
     implementation("org.apache.commons:commons-lang3")
@@ -62,7 +69,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 
     /*******************************
      * Compile Only Dependencies

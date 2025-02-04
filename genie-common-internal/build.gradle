@@ -1,5 +1,13 @@
 apply plugin: "java-library"
 
+dependencyManagement {
+    imports {
+        mavenBom "com.amazonaws:aws-java-sdk-bom:1.12.99"
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1"
+        mavenBom "io.zipkin.brave:brave-bom:5.13.3"
+    }
+}
+
 dependencies {
     /*******************************
      * Annotation Processors
@@ -33,10 +41,8 @@ dependencies {
 
     implementation("com.google.guava:guava")
     implementation("com.google.protobuf:protobuf-java")
-    implementation("io.awspring.cloud:spring-cloud-starter-aws")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 
     /*******************************
      * Compile Only Dependencies
