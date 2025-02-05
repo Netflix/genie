@@ -267,6 +267,7 @@
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "2.4.1"
@@ -570,6 +571,7 @@
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.1.2"
@@ -795,6 +797,7 @@
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "2.4.1"
@@ -1065,6 +1068,7 @@
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.1.2"
@@ -1358,6 +1362,7 @@
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "2.4.1"
@@ -1661,6 +1666,7 @@
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.1.2"
@@ -1964,6 +1970,7 @@
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "2.4.1"
@@ -2267,6 +2274,7 @@
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.1.2"

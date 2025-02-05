@@ -95,7 +95,7 @@ configure((Set<Project>) ext.javaProjects) {
         imports {
             mavenBom SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
-            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.4.1"
+            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_version}"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
@@ -301,6 +301,27 @@ configure((Set<Project>) ext.javaProjects) {
             html.getRequired().set(true)
             xml.getRequired().set(true)
             csv.getRequired().set(false)
+        }
+    }
+}
+
+// Configuration for Spring Boot 3
+ext {
+    sb3DependencyManagement = {
+        dependencyManagement {
+            imports {
+                mavenBom module: "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
+                mavenBom module: "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
+                mavenBom module: "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
+                mavenBom "software.amazon.awssdk:bom:2.13.1"
+                mavenBom "io.zipkin.brave:brave-bom:5.13.3"
+            }
+        }
+    }
+
+    sb3Dependencies = {
+        dependencies {
+            // Add other dependencies here
         }
     }
 }

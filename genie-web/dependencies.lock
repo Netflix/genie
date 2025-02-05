@@ -733,6 +733,9 @@
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws-messaging": {
@@ -944,6 +947,9 @@
             "locked": "3.1.2"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "3.1.2"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
@@ -1116,6 +1122,9 @@
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws-messaging": {
@@ -1274,6 +1283,9 @@
             "locked": "2.7.17"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "3.1.2"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
@@ -1743,6 +1755,9 @@
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws-messaging": {
@@ -1948,6 +1963,9 @@
             "locked": "2.7.17"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "3.1.2"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
@@ -2427,6 +2445,9 @@
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "2.4.1"
         },
         "io.awspring.cloud:spring-cloud-starter-aws-messaging": {
@@ -2632,6 +2653,9 @@
             "locked": "2.7.17"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
             "locked": "3.1.2"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
