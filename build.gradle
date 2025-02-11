@@ -18,7 +18,7 @@ plugins {
     id "nebula.netflixoss" version "10.5.1"
     id "org.ajoberstar.grgit" version "4.1.1"
     id "org.ajoberstar.git-publish" version "3.0.1"
-    id "org.springframework.boot" version "${spring_boot_version}" apply false
+    id "org.springframework.boot" version "${spring_boot_3_version}" apply false
     id "org.asciidoctor.jvm.convert" version "3.3.2" apply false
     id "com.gorylenko.gradle-git-properties" version "2.3.2" apply false
     id "com.google.protobuf" version "0.8.18" apply false
@@ -305,23 +305,17 @@ configure((Set<Project>) ext.javaProjects) {
     }
 }
 
-// Configuration for Spring Boot 3
-ext {
-    sb3DependencyManagement = {
-        dependencyManagement {
-            imports {
-                mavenBom module: "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
-                mavenBom module: "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
-                mavenBom module: "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
-                mavenBom "software.amazon.awssdk:bom:2.13.1"
-                mavenBom "io.zipkin.brave:brave-bom:5.13.3"
-            }
+subprojects {
+    if (project.name == 'genie-agent' || project.name == 'genie-web') {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
+            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
+            mavenBom "software.amazon.awssdk:bom:2.13.1"
+            mavenBom "io.zipkin.brave:brave-bom:5.13.3"
         }
-    }
-
-    sb3Dependencies = {
         dependencies {
-            // Add other dependencies here
+            implementation("io.awspring.cloud:spring-cloud-aws-starter")
         }
     }
 }

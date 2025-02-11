@@ -1,10 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
-plugins {
-    id "org.springframework.boot" version "${spring_boot_3_version}"
-}
-
 apply plugin: "java-library"
 apply plugin: "org.asciidoctor.jvm.convert"
 
@@ -30,10 +26,6 @@ ext {
 configurations {
     genieAgent
 }
-
-// Apply Spring Boot 3 configurations
-sb3DependencyManagement()
-sb3Dependencies()
 
 dependencies {
     /*******************************
@@ -92,7 +84,6 @@ dependencies {
     implementation("commons-validator:commons-validator")
     implementation("io.grpc:grpc-netty")
     implementation("io.grpc:grpc-protobuf")
-    implementation("io.awspring.cloud:spring-cloud-starter-aws")
     implementation("io.awspring.cloud:spring-cloud-starter-aws-messaging")
     implementation("io.zipkin.brave:brave")
     implementation("io.zipkin.brave:brave-instrumentation-grpc")
