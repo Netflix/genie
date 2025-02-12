@@ -15,7 +15,8 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.12.0"
-    id "nebula.netflixoss" version "10.5.1"
+    id "com.netflix.nebula.netflixoss" version "11.4.0"
+    id "com.netflix.nebula.facet" version "11.0.0" apply false
     id "org.ajoberstar.grgit" version "4.1.1"
     id "org.ajoberstar.git-publish" version "3.0.1"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
@@ -59,7 +60,7 @@ idea {
 }
 
 configure((Set<Project>) ext.javaProjects) {
-    apply plugin: "nebula.netflixoss"
+    apply plugin: "com.netflix.nebula.netflixoss"
     apply plugin: "java"
     apply plugin: "checkstyle"
     apply plugin: "com.github.spotbugs"
@@ -67,7 +68,7 @@ configure((Set<Project>) ext.javaProjects) {
     apply plugin: "com.gorylenko.gradle-git-properties"
     apply plugin: "groovy"
     apply plugin: "io.franzbecker.gradle-lombok"
-    apply plugin: "nebula.facet"
+    apply plugin: "com.netflix.nebula.facet"
 
     lombok {
         version = '1.18.24'
@@ -140,6 +141,7 @@ configure((Set<Project>) ext.javaProjects) {
         generatedSourcesJavaDir = file("${project.generatedSourcesDir}/main/java")
     }
 
+    sourcesJar.dependsOn compileJava
     sourceSets {
         main {
             java {
@@ -272,6 +274,7 @@ configure((Set<Project>) ext.javaProjects) {
             }
     }
 
+    licenseMain.dependsOn compileJava
     license {
         ignoreFailures false
     }
@@ -313,6 +316,9 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
     dependsOn javaProjects*.test
+    dependsOn javaProjects*.integrationTest
+    dependsOn javaProjects*.smokeTest
+    dependsOn javaProjects*.javadoc
 
     javaProjects.each {
         sourceSets((SourceSet) it.sourceSets.main)
