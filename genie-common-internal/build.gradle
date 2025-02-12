@@ -1,5 +1,11 @@
 apply plugin: "java-library"
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 dependencies {
     /*******************************
      * Annotation Processors
