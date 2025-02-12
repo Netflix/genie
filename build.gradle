@@ -92,6 +92,21 @@ configure((Set<Project>) ext.javaProjects) {
         }
     }
 
+    subprojects {
+        if (project.name == 'genie-agent' || project.name == 'genie-web') {
+            imports {
+                mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
+                mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
+                mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
+                mavenBom "software.amazon.awssdk:bom:2.13.1"
+                mavenBom "io.zipkin.brave:brave-bom:5.13.3"
+            }
+            dependencies {
+                implementation("io.awspring.cloud:spring-cloud-aws-starter")
+            }
+        }
+    }
+
     dependencyManagement {
         imports {
             mavenBom SpringBootPlugin.BOM_COORDINATES
@@ -304,21 +319,6 @@ configure((Set<Project>) ext.javaProjects) {
             html.getRequired().set(true)
             xml.getRequired().set(true)
             csv.getRequired().set(false)
-        }
-    }
-}
-
-subprojects {
-    if (project.name == 'genie-agent' || project.name == 'genie-web') {
-        imports {
-            mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
-            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
-            mavenBom "software.amazon.awssdk:bom:2.13.1"
-            mavenBom "io.zipkin.brave:brave-bom:5.13.3"
-        }
-        dependencies {
-            implementation("io.awspring.cloud:spring-cloud-aws-starter")
         }
     }
 }
