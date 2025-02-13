@@ -26,7 +26,7 @@ import org.springframework.integration.leader.event.OnRevokedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;

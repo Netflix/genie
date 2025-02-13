@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 /**
  * Spring auto configuration class to contain all beans involved in the CLI for the Agent.

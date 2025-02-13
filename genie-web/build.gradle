@@ -32,9 +32,9 @@ dependencies {
      * Annotation Processors
      *******************************/
 
-    annotationProcessor("javax.annotation:javax.annotation-api")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("org.glassfish.jaxb:jaxb-runtime")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen")
+    annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen")
     annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -84,7 +84,8 @@ dependencies {
     implementation("commons-validator:commons-validator")
     implementation("io.grpc:grpc-netty")
     implementation("io.grpc:grpc-protobuf")
-    implementation("io.awspring.cloud:spring-cloud-starter-aws-messaging")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation("io.zipkin.brave:brave")
     implementation("io.zipkin.brave:brave-instrumentation-grpc")
     implementation("org.apache.commons:commons-lang3")
@@ -103,7 +104,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
     implementation("org.springframework.cloud:spring-cloud-starter-zookeeper")
     implementation("org.springframework.integration:spring-integration-zookeeper")
     implementation("org.apache.maven:maven-artifact") {

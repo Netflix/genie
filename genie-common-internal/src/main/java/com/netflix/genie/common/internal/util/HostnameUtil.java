@@ -18,7 +18,6 @@
 package com.netflix.genie.common.internal.util;
 
 import com.amazonaws.util.EC2MetadataUtils;
-import io.awspring.cloud.context.support.env.AwsCloudEnvironmentCheckUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetAddress;

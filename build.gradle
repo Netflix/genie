@@ -1,6 +1,5 @@
 import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     repositories {
@@ -35,6 +34,8 @@ ext.githubProjectName = rootProject.name
 ext.javaProjects = subprojects.findAll {
     it.name != "genie-demo" && it.name != "genie-ddl" && it.name != "genie-docs"
 }
+
+def springBoot3ProjectNames = ['genie-agent', 'genie-agent-app', 'genie-app', 'genie-common-internal', 'genie-swagger', 'genie-ui', 'genie-web']
 
 allprojects {
     apply plugin: "jacoco"
@@ -92,30 +93,32 @@ configure((Set<Project>) ext.javaProjects) {
         }
     }
 
-    subprojects {
-        if (project.name == 'genie-agent' || project.name == 'genie-web') {
+    dependencyManagement {
+        if (springBoot3ProjectNames.contains(project.name)) {
             imports {
                 mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
                 mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
                 mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
-                mavenBom "software.amazon.awssdk:bom:2.13.1"
-                mavenBom "io.zipkin.brave:brave-bom:5.13.3"
             }
             dependencies {
-                implementation("io.awspring.cloud:spring-cloud-aws-starter")
+                dependency("io.awspring.cloud:spring-cloud-aws-starter:${spring_cloud_aws_3_version}")
+            }
+        } else {
+            imports {
+                mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_2_version}"
+                mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_2_version}"
+                mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_2_version}"
             }
         }
-    }
 
-    dependencyManagement {
         imports {
-            mavenBom SpringBootPlugin.BOM_COORDINATES
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
-            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_version}"
+            mavenBom "com.amazonaws:aws-java-sdk-bom:1.12.780"
+            mavenBom "software.amazon.awssdk:bom:2.30.17"
+            mavenBom "io.zipkin.brave:brave-bom:5.13.3"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
-            mavenBom "org.spockframework:spock-bom:2.0-groovy-3.0"
+            mavenBom "org.spockframework:spock-bom:2.4-M5-groovy-3.0"
             mavenBom "org.testcontainers:testcontainers-bom:1.16.3"
         }
         dependencies {
@@ -172,6 +175,7 @@ configure((Set<Project>) ext.javaProjects) {
 
     configurations {
         all*.exclude group: "javax.servlet", module: "servlet-api"
+        all*.exclude group: "org.apache.groovy" // exclude groovy@4 dependencies
         all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
 
@@ -183,7 +187,15 @@ configure((Set<Project>) ext.javaProjects) {
         annotationProcessor("net.jcip:jcip-annotations")
         annotationProcessor("com.github.spotbugs:spotbugs-annotations")
 
-        implementation("javax.annotation:javax.annotation-api:1.3.2")
+        if (springBoot3ProjectNames.contains(project.name)) {
+            implementation platform("jakarta.platform:jakarta.jakartaee-bom:10.0.0")
+            implementation("jakarta.servlet:jakarta.servlet-api")
+            implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+            implementation("org.hibernate.validator:hibernate-validator:7.0.5.Final")
+            implementation("org.glassfish:jakarta.el:4.0.2")
+        } else {
+            implementation("javax.annotation:javax.annotation-api:1.3.2")
+        }
 
         /*******************************
          * Compile Dependencies
@@ -220,7 +232,6 @@ configure((Set<Project>) ext.javaProjects) {
         testCompileOnly("com.github.spotbugs:spotbugs-annotations")
 
         testRuntimeOnly("jakarta.el:jakarta.el-api")
-        testRuntimeOnly("org.glassfish:jakarta.el")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     }
 

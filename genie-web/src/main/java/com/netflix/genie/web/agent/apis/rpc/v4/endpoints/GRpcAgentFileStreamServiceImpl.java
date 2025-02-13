@@ -45,8 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
-import javax.annotation.Nullable;
-import javax.naming.LimitExceededException;
+import jakarta.annotation.Nullable;
+import jakarta.naming.LimitExceededException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
