@@ -34,8 +34,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.annotation.Nullable;
-import javax.validation.ConstraintViolationException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;

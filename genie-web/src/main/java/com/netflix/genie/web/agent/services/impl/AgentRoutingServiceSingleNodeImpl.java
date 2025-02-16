@@ -23,7 +23,7 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Optional;
 import java.util.Set;
 

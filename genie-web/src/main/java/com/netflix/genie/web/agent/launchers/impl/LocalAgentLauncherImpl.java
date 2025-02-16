@@ -54,8 +54,8 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.boot.actuate.health.Health;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;

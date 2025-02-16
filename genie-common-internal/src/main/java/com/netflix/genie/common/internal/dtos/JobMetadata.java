@@ -20,14 +20,14 @@ package com.netflix.genie.common.internal.dtos;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Size;
 import java.util.Optional;
 
 /**

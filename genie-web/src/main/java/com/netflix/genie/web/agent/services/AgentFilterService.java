@@ -21,7 +21,7 @@ import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Service to block agent/clients that the server wants to refuse service to.

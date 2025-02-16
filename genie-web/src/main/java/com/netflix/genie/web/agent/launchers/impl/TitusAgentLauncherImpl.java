@@ -58,7 +58,7 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;

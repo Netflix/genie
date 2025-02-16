@@ -19,7 +19,7 @@ package com.netflix.genie.agent.execution.statemachine;
 
 import lombok.Getter;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Fatal exception that should stop execution early. For example, claiming a job that is not in claimable state.

@@ -40,8 +40,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

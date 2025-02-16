@@ -21,9 +21,9 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotBlank;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Interface for services to kill jobs.

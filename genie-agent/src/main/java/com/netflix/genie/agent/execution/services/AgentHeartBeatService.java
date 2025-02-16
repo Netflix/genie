@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.services;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Service that maintains an active connection with a Genie server node by sending heart beats.

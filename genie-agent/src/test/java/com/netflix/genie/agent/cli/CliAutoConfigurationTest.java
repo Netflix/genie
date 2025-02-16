@@ -37,7 +37,7 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
-import javax.xml.validation.Validator;
+import jakarta.xml.validation.Validator;
 
 /**
  * Tests for {@link CliAutoConfiguration}.

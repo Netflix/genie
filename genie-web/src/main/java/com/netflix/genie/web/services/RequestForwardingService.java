@@ -18,8 +18,8 @@
 package com.netflix.genie.web.services;
 
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * A service whose implementation should be responsible for forwarding requests between Genie server nodes.

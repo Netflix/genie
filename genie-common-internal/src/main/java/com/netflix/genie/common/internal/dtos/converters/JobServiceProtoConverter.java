@@ -48,10 +48,10 @@ import com.netflix.genie.proto.HandshakeRequest;
 import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdRequest;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;

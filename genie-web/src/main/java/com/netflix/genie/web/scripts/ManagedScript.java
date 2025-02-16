@@ -24,8 +24,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.script.Bindings;
-import javax.script.SimpleBindings;
+import jakarta.script.Bindings;
+import jakarta.script.SimpleBindings;
 import java.net.URI;
 import java.util.Map;
 

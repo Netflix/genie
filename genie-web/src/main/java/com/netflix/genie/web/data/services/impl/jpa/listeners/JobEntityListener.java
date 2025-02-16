@@ -23,8 +23,8 @@ import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.PostLoad;
-import javax.persistence.PostUpdate;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostUpdate;
 import java.util.Optional;
 
 /**

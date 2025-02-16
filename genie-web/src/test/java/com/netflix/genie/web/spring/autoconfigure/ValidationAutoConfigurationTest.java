@@ -24,7 +24,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 /**
  * Tests for the bean validation configuration.

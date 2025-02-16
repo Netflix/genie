@@ -23,9 +23,9 @@ import com.netflix.genie.web.selectors.ResourceSelectionContext;
 import com.netflix.genie.web.selectors.ResourceSelector;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;

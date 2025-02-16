@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Optional;
 
 /**

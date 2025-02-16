@@ -22,7 +22,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 
 /**

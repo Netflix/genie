@@ -45,8 +45,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
-import javax.validation.Valid;
+import jakarta.annotation.Nonnull;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;

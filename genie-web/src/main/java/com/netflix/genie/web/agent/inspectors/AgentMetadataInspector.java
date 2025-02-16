@@ -20,7 +20,7 @@ package com.netflix.genie.web.agent.inspectors;
 import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Component that inspects an Agent client metadata and makes decision on whether it is allowed to proceed.

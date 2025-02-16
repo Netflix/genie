@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Job execution listener that prints messages visible to the user in the console.

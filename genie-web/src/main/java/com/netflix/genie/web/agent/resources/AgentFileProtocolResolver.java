@@ -26,7 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpRange;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;

@@ -21,10 +21,10 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
