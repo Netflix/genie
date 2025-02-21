@@ -36,10 +36,19 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.net.UnknownHostException;
 
+/**
+ * Configuration class for setting up agent-related beans.
+ */
 @Configuration
 @EnableConfigurationProperties(AgentProperties.class)
 public class AgentAutoConfiguration {
 
+    /**
+     * Provides the GenieHostInfo bean.
+     *
+     * @return a GenieHostInfo object containing the hostname
+     * @throws UnknownHostException if the hostname cannot be determined
+     */
     @Bean
     @ConditionalOnMissingBean(GenieHostInfo.class)
     public GenieHostInfo genieAgentHostInfo() throws UnknownHostException {
@@ -50,6 +59,12 @@ public class AgentAutoConfiguration {
         return new GenieHostInfo(hostname);
     }
 
+    /**
+     * Provides the AgentMetadata bean.
+     *
+     * @param genieHostInfo the GenieHostInfo containing the hostname
+     * @return an instance of AgentMetadataImpl
+     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentMetadata.class)
@@ -57,12 +72,23 @@ public class AgentAutoConfiguration {
         return new AgentMetadataImpl(genieHostInfo.getHostname());
     }
 
+    /**
+     * Provides the FileLockFactory bean.
+     *
+     * @return a new instance of FileLockFactory
+     */
     @Bean
     @Lazy
     public FileLockFactory fileLockFactory() {
         return new FileLockFactory();
     }
 
+    /**
+     * Provides a shared AsyncTaskExecutor bean.
+     *
+     * @param agentProperties the properties for configuring the agent
+     * @return a configured ThreadPoolTaskExecutor
+     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = AsyncTaskExecutor.class)
@@ -78,6 +104,12 @@ public class AgentAutoConfiguration {
         return executor;
     }
 
+    /**
+     * Provides a shared TaskScheduler bean.
+     *
+     * @param agentProperties the properties for configuring the agent
+     * @return a configured ThreadPoolTaskScheduler
+     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(name = "sharedAgentTaskScheduler")
@@ -93,6 +125,12 @@ public class AgentAutoConfiguration {
         return scheduler;
     }
 
+    /**
+     * Provides a TaskScheduler bean for the heart beat service.
+     *
+     * @param agentProperties the properties for configuring the agent
+     * @return a configured ThreadPoolTaskScheduler for heart beat service
+     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(name = "heartBeatServiceTaskScheduler")

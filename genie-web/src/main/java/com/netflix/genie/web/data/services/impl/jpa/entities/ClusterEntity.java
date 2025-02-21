@@ -65,7 +65,7 @@ import java.util.Set;
 public class ClusterEntity extends BaseEntity {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to construct a
      * Cluster DTO.
      */
     public static final String DTO_ENTITY_GRAPH = "Cluster.dto";

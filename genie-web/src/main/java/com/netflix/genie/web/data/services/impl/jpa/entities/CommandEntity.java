@@ -157,25 +157,25 @@ import java.util.Set;
 public class CommandEntity extends BaseEntity {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load the command base fields and
      * its associated applications base fields.
      */
     public static final String APPLICATIONS_ENTITY_GRAPH = "Command.applications";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load the command base fields and
      * its associated applications dto fields.
      */
     public static final String APPLICATIONS_DTO_ENTITY_GRAPH = "Command.applications.dto";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load the command base fields and
      * its associated cluster criteria.
      */
     public static final String CLUSTER_CRITERIA_ENTITY_GRAPH = "Command.clusterCriteria";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to construct a
      * Command DTO.
      */
     public static final String DTO_ENTITY_GRAPH = "Command.DTO";

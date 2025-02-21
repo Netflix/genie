@@ -53,7 +53,6 @@ public class AWSAutoConfiguration {
      * The name of the {@link AmazonSNS} client created specifically for job state notifications.
      * <p>
      * Note: this name must match the bean name defined in
-     * {@link io.awspring.cloud.messaging.config.annotation.SnsConfiguration} in order to override it.
      */
     public static final String SNS_CLIENT_BEAN_NAME = "amazonSNS";
     private static final String SNS_CLIENT_CONFIGURATION_BEAN_NAME = "SNSClientConfiguration";
