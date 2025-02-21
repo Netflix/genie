@@ -596,9 +596,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
             this.setExceptionClassifier(
                 (Classifier<Throwable, RetryPolicy>) classifiable -> {
-                    if (classifiable instanceof HttpStatusCodeException) {
-                        final HttpStatusCodeException httpException = (HttpStatusCodeException) classifiable;
-                        final HttpStatus status = httpException.getStatusCode();
+                    if (classifiable instanceof HttpStatusCodeException httpException) {
+                        final HttpStatus status = HttpStatus.valueOf(httpException.getStatusCode().value());
                         if (retryCodes.contains(status)) {
                             return simpleRetryPolicy;
                         }
