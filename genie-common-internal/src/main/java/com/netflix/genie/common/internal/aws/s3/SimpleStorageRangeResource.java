@@ -19,27 +19,25 @@ package com.netflix.genie.common.internal.aws.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
-import io.awspring.cloud.core.io.s3.AmazonS3ProxyFactory;
-import io.awspring.cloud.core.io.s3.SimpleStorageResource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 
 /**
- * This class extends {@link SimpleStorageResource} in order to efficiently handle range requests.
- * Rather than fetching the entire object and let the web tier skip, it only downloads the relevant object region and
- * returns a composite input stream that skips the unrequested bytes.
- *
- * @author mprimi
- * @since 4.0.0
+ * This class efficiently handles range requests for S3 objects.
+ * It downloads only the relevant object region and returns a composite input stream that skips the unrequested bytes.
  */
 @Slf4j
-public final class SimpleStorageRangeResource extends SimpleStorageResource {
+public final class SimpleStorageRangeResource implements Resource {
 
     private final AmazonS3 client;
     private final String bucket;
@@ -48,7 +46,7 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
     private final Pair<Integer, Integer> range;
     private final long contentLength;
 
-    SimpleStorageRangeResource(
+    public SimpleStorageRangeResource(
         final AmazonS3 client,
         final String bucket,
         final String key,
@@ -56,8 +54,7 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         final TaskExecutor s3TaskExecutor,
         final Pair<Integer, Integer> range
     ) throws IOException {
-        super(client, bucket, key, s3TaskExecutor, versionId, null);
-        this.client = AmazonS3ProxyFactory.createProxy(client);
+        this.client = client;
         this.bucket = bucket;
         this.key = key;
         this.versionId = versionId;
@@ -65,10 +62,8 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
 
         long tempContentLength = -1;
         try {
-            tempContentLength = super.contentLength();
-        } catch (FileNotFoundException e) {
-            // S3 object does not exist.
-            // Upstream code will handle this correctly by checking exists(), contentLength(), etc.
+            tempContentLength = this.client.getObjectMetadata(bucket, key).getContentLength();
+        } catch (Exception e) {
             log.warn("Returning non-existent S3 resource {}/{}", bucket, key);
         }
         this.contentLength = tempContentLength;
@@ -84,34 +79,24 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public InputStream getInputStream() throws IOException {
-
         if (!this.exists()) {
             throw new FileNotFoundException("No such object: " + this.bucket + "/" + key);
         }
 
-        // Index of first and last byte to fetch (inclusive)
         final long rangeStart;
         final long rangeEnd;
 
         if (this.range.getLeft() == null && this.range.getRight() == null) {
-            // Full object
             rangeStart = 0;
             rangeEnd = Math.max(0, this.contentLength - 1);
         } else if (this.range.getLeft() == null && this.range.getRight() != null) {
-            // Object suffix
             rangeStart = Math.max(0, this.contentLength - this.range.getRight());
             rangeEnd = Math.max(0, this.contentLength - 1);
         } else if (this.range.getLeft() != null && this.range.getRight() == null) {
-            // From offset to end
             rangeStart = this.range.getLeft();
             rangeEnd = Math.max(0, this.contentLength - 1);
         } else {
-            // Range start and end are provided
             rangeStart = this.range.getLeft();
             rangeEnd = Math.min(this.range.getRight(), this.contentLength - 1);
         }
@@ -141,18 +126,50 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         return new SkipInputStream(skipBytes, inputStream);
     }
 
-    @Override
     public boolean exists() {
-        if (this.contentLength == -1) {
-            return false;
-        }
-        return super.exists();
+        return this.contentLength != -1;
     }
 
-    /**
-     * An input stream that skips some amount of bytes because they are ignored by the web tier when sending back
-     * the response content.
-     */
+    @Override
+    public URL getURL() throws IOException {
+        return null;
+    }
+
+    @Override
+    public URI getURI() throws IOException {
+        return null;
+    }
+
+    @Override
+    public File getFile() throws IOException {
+        return null;
+    }
+
+    @Override
+    public long contentLength() throws IOException {
+        return 0;
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        return 0;
+    }
+
+    @Override
+    public Resource createRelative(String relativePath) throws IOException {
+        return null;
+    }
+
+    @Override
+    public String getFilename() {
+        return "";
+    }
+
+    @Override
+    public String getDescription() {
+        return "";
+    }
+
     private static class SkipInputStream extends InputStream {
         private final InputStream objectRangeInputStream;
         private long skipBytesLeft;
@@ -164,7 +181,6 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
 
         @Override
         public int read() throws IOException {
-            // Overriding other read(...) methods and hoping nobody is using this one directly.
             throw new NotImplementedException("Not implemented");
         }
 
@@ -174,7 +190,6 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
                 throw new IndexOutOfBoundsException("Invalid read( b[" + b.length + "], " + off + ", " + len + ")");
             }
 
-            // Efficiently skip over range of bytes that should be ignored
             if (this.skipBytesLeft > 0) {
                 final long skippedBytesRead = Math.min(this.skipBytesLeft, len);
                 this.skipBytesLeft -= skippedBytesRead;

@@ -23,10 +23,9 @@ import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.internal.util.HostnameUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.task.TaskExecutorCustomizer;
-import org.springframework.boot.task.TaskSchedulerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -37,39 +36,20 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.net.UnknownHostException;
 
-/**
- * Configuration for various agent beans.
- *
- * @author standon
- * @since 4.0.0
- */
 @Configuration
-@EnableConfigurationProperties(
-    {
-        AgentProperties.class
-    }
-)
+@EnableConfigurationProperties(AgentProperties.class)
 public class AgentAutoConfiguration {
 
-    /**
-     * Provide a bean of type {@link GenieHostInfo} if none already exists.
-     *
-     * @return A {@link GenieHostInfo} instance
-     * @throws UnknownHostException if hostname cannot be determined
-     */
     @Bean
     @ConditionalOnMissingBean(GenieHostInfo.class)
     public GenieHostInfo genieAgentHostInfo() throws UnknownHostException {
         final String hostname = HostnameUtil.getHostname();
+        if (StringUtils.isBlank(hostname)) {
+            throw new IllegalStateException("Unable to determine hostname.");
+        }
         return new GenieHostInfo(hostname);
     }
 
-    /**
-     * Provide a lazy bean definition for {@link AgentMetadata} if none already exists.
-     *
-     * @param genieHostInfo the host information
-     * @return A {@link AgentMetadataImpl} instance
-     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentMetadata.class)
@@ -77,24 +57,12 @@ public class AgentAutoConfiguration {
         return new AgentMetadataImpl(genieHostInfo.getHostname());
     }
 
-    /**
-     * Provide a lazy {@link FileLockFactory}.
-     *
-     * @return A {@link FileLockFactory} instance
-     */
     @Bean
     @Lazy
     public FileLockFactory fileLockFactory() {
         return new FileLockFactory();
     }
 
-    /**
-     * Get a lazy {@link AsyncTaskExecutor} bean which may be shared by different components if one isn't already
-     * defined.
-     *
-     * @param agentProperties the agent properties
-     * @return A {@link ThreadPoolTaskExecutor} instance
-     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = AsyncTaskExecutor.class)
@@ -106,79 +74,37 @@ public class AgentAutoConfiguration {
         executor.setAwaitTerminationSeconds(
             (int) agentProperties.getShutdown().getInternalExecutorsLeeway().getSeconds()
         );
+        executor.initialize();
         return executor;
     }
 
-    /**
-     * Provide a lazy {@link TaskScheduler} to be used by the Agent process if one isn't already defined.
-     *
-     * @param agentProperties the agent properties
-     * @return A {@link ThreadPoolTaskScheduler} instance
-     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(name = "sharedAgentTaskScheduler")
     public TaskScheduler sharedAgentTaskScheduler(final AgentProperties agentProperties) {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(5); // Big enough?
+        scheduler.setPoolSize(5);
         scheduler.setThreadNamePrefix("agent-task-scheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(
             (int) agentProperties.getShutdown().getInternalSchedulersLeeway().getSeconds()
         );
+        scheduler.initialize();
         return scheduler;
     }
 
-    /**
-     * Provide a lazy {@link TaskScheduler} bean for use by the heart beat service is none has already been
-     * defined in the context.
-     *
-     * @param agentProperties the agent properties
-     * @return A {@link TaskScheduler} that the heart beat service should use
-     */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(name = "heartBeatServiceTaskScheduler")
     public TaskScheduler heartBeatServiceTaskScheduler(final AgentProperties agentProperties) {
         final ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.setPoolSize(1);
-        taskScheduler.initialize();
+        taskScheduler.setThreadNamePrefix("heart-beat-scheduler-");
         taskScheduler.setWaitForTasksToCompleteOnShutdown(true);
         taskScheduler.setAwaitTerminationSeconds(
             (int) agentProperties.getShutdown().getInternalSchedulersLeeway().getSeconds()
         );
+        taskScheduler.initialize();
         return taskScheduler;
-    }
-
-    /**
-     * Customizer for Spring's task executor.
-     *
-     * @param agentProperties the agent properties
-     * @return a customizer for the task executor
-     */
-    @Bean
-    TaskExecutorCustomizer taskExecutorCustomizer(final AgentProperties agentProperties) {
-        return taskExecutor -> {
-            taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-            taskExecutor.setAwaitTerminationSeconds(
-                (int) agentProperties.getShutdown().getSystemExecutorLeeway().getSeconds()
-            );
-        };
-    }
-
-    /**
-     * Customizer for Spring's task scheduler.
-     *
-     * @param agentProperties the agent properties
-     * @return a customizer for the task scheduler
-     */
-    @Bean
-    TaskSchedulerCustomizer taskSchedulerCustomizer(final AgentProperties agentProperties) {
-        return taskScheduler -> {
-            taskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-            taskScheduler.setAwaitTerminationSeconds(
-                (int) agentProperties.getShutdown().getSystemSchedulerLeeway().getSeconds()
-            );
-        };
     }
 }
