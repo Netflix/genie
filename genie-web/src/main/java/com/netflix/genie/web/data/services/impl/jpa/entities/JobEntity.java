@@ -61,7 +61,6 @@ import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.NamedEntityGraphs;
 import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OrderColumn;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
@@ -284,37 +283,37 @@ public class JobEntity extends BaseEntity implements
     StatusProjection {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed
      * for a V3 Job DTO.
      */
     public static final String V3_JOB_DTO_ENTITY_GRAPH = "Job.v3.dto.job";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed
      * for a V4 Job Request DTO.
      */
     public static final String V4_JOB_REQUEST_DTO_ENTITY_GRAPH = "Job.v4.dto.request";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed
      * for a V4 Job Specification DTO.
      */
     public static final String V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH = "Job.v4.dto.specification";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed to get the
      * applications for a job.
      */
     public static final String JOB_APPLICATIONS_DTO_ENTITY_GRAPH = "Job.applications";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed to get the
      * cluster for a job.
      */
     public static final String JOB_CLUSTER_DTO_ENTITY_GRAPH = "Job.cluster";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed to get the
      * command for a job.
      */
     public static final String JOB_COMMAND_DTO_ENTITY_GRAPH = "Job.command";
@@ -730,7 +729,6 @@ public class JobEntity extends BaseEntity implements
     /**
      * Before a job is created, create the job search string.
      */
-    @PrePersist
     void onCreateJob() {
         if (!this.tags.isEmpty()) {
             // Tag search string length max is currently 1024 which will be caught by hibernate validator if this
