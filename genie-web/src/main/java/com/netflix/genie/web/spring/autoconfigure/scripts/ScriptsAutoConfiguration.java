@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
 
-import jakarta.script.ScriptEngineManager;
+import javax.script.ScriptEngineManager;
 import java.util.List;
 import java.util.concurrent.Executors;
 
