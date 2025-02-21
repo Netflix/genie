@@ -46,7 +46,7 @@ import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
 import jakarta.annotation.Nullable;
-import jakarta.naming.LimitExceededException;
+import javax.naming.LimitExceededException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
