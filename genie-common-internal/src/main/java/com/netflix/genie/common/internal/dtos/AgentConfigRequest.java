@@ -19,12 +19,12 @@ package com.netflix.genie.common.internal.dtos;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Min;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Optional;

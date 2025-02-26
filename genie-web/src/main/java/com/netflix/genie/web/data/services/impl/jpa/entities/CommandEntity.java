@@ -25,30 +25,30 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.NamedSubgraph;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -157,25 +157,25 @@ import java.util.Set;
 public class CommandEntity extends BaseEntity {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load the command base fields and
      * its associated applications base fields.
      */
     public static final String APPLICATIONS_ENTITY_GRAPH = "Command.applications";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load the command base fields and
      * its associated applications dto fields.
      */
     public static final String APPLICATIONS_DTO_ENTITY_GRAPH = "Command.applications.dto";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load the command base fields and
      * its associated cluster criteria.
      */
     public static final String CLUSTER_CRITERIA_ENTITY_GRAPH = "Command.clusterCriteria";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to construct a
      * Command DTO.
      */
     public static final String DTO_ENTITY_GRAPH = "Command.DTO";

@@ -23,10 +23,7 @@ import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.task.TaskExecutorCustomizer;
-import org.springframework.boot.task.TaskSchedulerCustomizer;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -67,29 +64,7 @@ class AgentAutoConfigurationTest {
                     .getBean("heartBeatServiceTaskScheduler")
                     .isOfAnyClassIn(ThreadPoolTaskScheduler.class);
                 Assertions.assertThat(context).hasSingleBean(AgentProperties.class);
-                Assertions.assertThat(context).hasSingleBean(TaskExecutorCustomizer.class);
-                Assertions.assertThat(context).hasSingleBean(TaskSchedulerCustomizer.class);
             }
         );
-    }
-
-    @Test
-    void testTaskExecutorCustomizer() {
-        final AgentProperties properties = new AgentProperties();
-        final TaskExecutorCustomizer customizer = new AgentAutoConfiguration().taskExecutorCustomizer(properties);
-        final ThreadPoolTaskExecutor taskExecutor = Mockito.mock(ThreadPoolTaskExecutor.class);
-        customizer.customize(taskExecutor);
-        Mockito.verify(taskExecutor).setWaitForTasksToCompleteOnShutdown(true);
-        Mockito.verify(taskExecutor).setAwaitTerminationSeconds(60);
-    }
-
-    @Test
-    void testTaskSchedulerCustomizer() {
-        final AgentProperties properties = new AgentProperties();
-        final TaskSchedulerCustomizer customizer = new AgentAutoConfiguration().taskSchedulerCustomizer(properties);
-        final ThreadPoolTaskScheduler taskScheduler = Mockito.mock(ThreadPoolTaskScheduler.class);
-        customizer.customize(taskScheduler);
-        Mockito.verify(taskScheduler).setWaitForTasksToCompleteOnShutdown(true);
-        Mockito.verify(taskScheduler).setAwaitTerminationSeconds(60);
     }
 }

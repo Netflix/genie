@@ -20,11 +20,10 @@ package com.netflix.genie.common.internal.dtos;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.validation.Valid;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import javax.validation.Valid;
 
 /**
  * Fields representing all the values users can set when creating a new Cluster resource.

@@ -33,10 +33,9 @@ dependencies {
 
     implementation("com.google.guava:guava")
     implementation("com.google.protobuf:protobuf-java")
-    implementation("io.awspring.cloud:spring-cloud-starter-aws")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 
     /*******************************
      * Compile Only Dependencies
@@ -53,4 +52,10 @@ dependencies {
      *******************************/
 
     testImplementation(project(":genie-test"))
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

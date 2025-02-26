@@ -19,13 +19,13 @@ package com.netflix.genie.common.internal.dtos;
 
 import com.google.common.collect.ImmutableList;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;

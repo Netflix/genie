@@ -17,37 +17,26 @@
  */
 package com.netflix.genie.common.internal.util;
 
-import com.amazonaws.util.EC2MetadataUtils;
-import io.awspring.cloud.context.support.env.AwsCloudEnvironmentCheckUtils;
-import org.apache.commons.lang3.StringUtils;
-
+import io.micrometer.common.util.StringUtils;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
-/**
- * Static utility class to determine the local hostname.
- *
- * @author mprimi
- * @since 4.0.0
- */
 public final class HostnameUtil {
+
+    private static final String EC2_METADATA_URL = "http://169.254.169.254/latest/meta-data/local-ipv4";
 
     private HostnameUtil() {
     }
 
-    /**
-     * Get the local hostname string.
-     * This implementation actually return an IP address string.
-     *
-     * @return a hostname string
-     * @throws UnknownHostException if hostname resolution fails
-     */
     public static String getHostname() throws UnknownHostException {
         final String hostname;
-        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
-            hostname = EC2MetadataUtils.getPrivateIpAddress();
+        if (isRunningOnAws()) {
+            hostname = getEc2PrivateIpAddress();
         } else {
-            // Fallback if not on AWS
             hostname = InetAddress.getLocalHost().getCanonicalHostName();
         }
 
@@ -56,5 +45,34 @@ public final class HostnameUtil {
         }
 
         return hostname;
+    }
+
+    private static boolean isRunningOnAws() {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(EC2_METADATA_URL).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(1000);
+            connection.setReadTimeout(1000);
+            return connection.getResponseCode() == 200;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private static String getEc2PrivateIpAddress() {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(EC2_METADATA_URL).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(1000);
+            connection.setReadTimeout(1000);
+            if (connection.getResponseCode() == 200) {
+                try (Scanner scanner = new Scanner(connection.getInputStream())) {
+                    return scanner.useDelimiter("\\A").next();
+                }
+            }
+        } catch (IOException e) {
+            // Handle exception
+        }
+        return null;
     }
 }

@@ -58,7 +58,7 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -596,9 +596,8 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
             this.setExceptionClassifier(
                 (Classifier<Throwable, RetryPolicy>) classifiable -> {
-                    if (classifiable instanceof HttpStatusCodeException) {
-                        final HttpStatusCodeException httpException = (HttpStatusCodeException) classifiable;
-                        final HttpStatus status = httpException.getStatusCode();
+                    if (classifiable instanceof HttpStatusCodeException httpException) {
+                        final HttpStatus status = HttpStatus.valueOf(httpException.getStatusCode().value());
                         if (retryCodes.contains(status)) {
                             return simpleRetryPolicy;
                         }

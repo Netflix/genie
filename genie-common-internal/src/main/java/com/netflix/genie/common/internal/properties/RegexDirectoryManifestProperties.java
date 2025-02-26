@@ -18,12 +18,12 @@
 package com.netflix.genie.common.internal.properties;
 
 import com.google.common.collect.Sets;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 /**

@@ -19,10 +19,10 @@ package com.netflix.genie.common.internal.util;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 
-import javax.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.Map;
 

@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 
-import javax.annotation.Nullable;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * An {@link AttributeConverter} to convert {@link JsonNode} objects into their String representations for storage
