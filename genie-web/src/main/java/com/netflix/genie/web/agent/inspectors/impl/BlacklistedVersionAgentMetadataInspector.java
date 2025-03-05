@@ -22,7 +22,7 @@ import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.properties.AgentFilterProperties;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * An {@link AgentMetadataInspector} that rejects agent whose version matches a regular expression

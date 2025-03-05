@@ -19,12 +19,11 @@ package com.netflix.genie;
 
 import com.netflix.genie.agent.cli.Util;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Genie Agent application.
@@ -33,8 +32,8 @@ import org.springframework.context.annotation.Configuration;
  * @author tgianos
  * @since 4.0.0
  */
-@Configuration
-@EnableAutoConfiguration(
+@SpringBootApplication(
+    scanBasePackages = {"com.netflix.genie"},
     exclude = {
         /*
          * Picked up by default but not believed to be needed currently

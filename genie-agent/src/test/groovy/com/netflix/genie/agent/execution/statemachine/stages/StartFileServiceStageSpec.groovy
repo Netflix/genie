@@ -47,6 +47,6 @@ class StartFileServiceStageSpec extends Specification {
         then:
         1 * executionContext.getJobDirectory() >> jobDir
         1 * jobDir.toPath() >> jobDirPath
-        1 * service.start(jobId, jobDir)
+        1 * service.start(jobId, jobDirPath)
     }
 }

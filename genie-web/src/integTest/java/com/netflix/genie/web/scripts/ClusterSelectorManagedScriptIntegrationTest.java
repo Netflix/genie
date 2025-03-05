@@ -44,7 +44,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
-import javax.script.ScriptEngineManager;
+import jakarta.script.ScriptEngineManager;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;

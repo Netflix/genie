@@ -35,12 +35,12 @@ import com.netflix.genie.common.internal.dtos.AgentClientMetadata;
 import com.netflix.genie.common.internal.dtos.AgentJobRequest;
 import com.netflix.genie.common.internal.dtos.JobSpecification;
 import com.netflix.genie.common.internal.dtos.JobStatus;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 
-import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

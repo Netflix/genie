@@ -32,10 +32,10 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobResolution
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**

@@ -41,34 +41,33 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.OrderColumn;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.NamedSubgraph;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -284,37 +283,36 @@ public class JobEntity extends BaseEntity implements
     StatusProjection {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
-     * for a V3 Job DTO.
+     * The name will load all the data needed for a V3 Job DTO.
      */
     public static final String V3_JOB_DTO_ENTITY_GRAPH = "Job.v3.dto.job";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed
      * for a V4 Job Request DTO.
      */
     public static final String V4_JOB_REQUEST_DTO_ENTITY_GRAPH = "Job.v4.dto.request";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed
      * for a V4 Job Specification DTO.
      */
     public static final String V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH = "Job.v4.dto.specification";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed to get the
      * applications for a job.
      */
     public static final String JOB_APPLICATIONS_DTO_ENTITY_GRAPH = "Job.applications";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed to get the
      * cluster for a job.
      */
     public static final String JOB_CLUSTER_DTO_ENTITY_GRAPH = "Job.cluster";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * The name of the {@link jakarta.persistence.EntityGraph} which will load all the data needed to get the
      * command for a job.
      */
     public static final String JOB_COMMAND_DTO_ENTITY_GRAPH = "Job.command";
@@ -730,7 +728,6 @@ public class JobEntity extends BaseEntity implements
     /**
      * Before a job is created, create the job search string.
      */
-    @PrePersist
     void onCreateJob() {
         if (!this.tags.isEmpty()) {
             // Tag search string length max is currently 1024 which will be caught by hibernate validator if this

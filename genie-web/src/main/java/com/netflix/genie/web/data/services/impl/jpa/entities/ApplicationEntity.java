@@ -21,19 +21,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.Table;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.NamedSubgraph;
+import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -106,19 +106,19 @@ import java.util.Set;
 public class ApplicationEntity extends BaseEntity {
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to access
      * an applications commands base fields.
      */
     public static final String COMMANDS_ENTITY_GRAPH = "Application.commands";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to access
      * an applications commands and create the command DTOs.
      */
     public static final String COMMANDS_DTO_ENTITY_GRAPH = "Application.commands.dto";
 
     /**
-     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct an
+     * The name of the {@link jakarta.persistence.EntityGraph} which will eagerly load everything needed to construct an
      * Application DTO.
      */
     public static final String DTO_ENTITY_GRAPH = "Application.dto";

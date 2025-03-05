@@ -28,7 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.regex.Matcher;
@@ -41,9 +41,6 @@ import java.util.regex.Pattern;
  * valid S3 resources to be loaded using the Spring {@link ResourceLoader} abstraction.
  * <p>
  * Leverages some work done by Spring Cloud AWS.
- *
- * @author tgianos
- * @since 4.0.0
  */
 @Slf4j
 public class S3ProtocolResolver implements ProtocolResolver {
@@ -145,8 +142,6 @@ public class S3ProtocolResolver implements ProtocolResolver {
         final AmazonS3 client = this.s3ClientFactory.getClient(s3URI);
         log.debug("{} is a valid S3 resource.", location);
 
-        // TODO: This implementation from Spring Cloud AWS always wraps the passed in client with a proxy that follows
-        //       redirects. I'm not sure if we want that or not. Probably ok for now but maybe revisit later?
         try {
             return new SimpleStorageRangeResource(
                 client,
