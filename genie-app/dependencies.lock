@@ -864,6 +864,8 @@
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
@@ -1443,6 +1445,8 @@
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
@@ -1982,6 +1986,8 @@
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
@@ -2864,6 +2870,8 @@
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
@@ -3789,6 +3797,8 @@
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"

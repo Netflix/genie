@@ -19,6 +19,9 @@
         "com.github.spotbugs:spotbugs-annotations": {
             "locked": "4.8.2"
         },
+        "io.zipkin.brave:brave": {
+            "locked": "5.13.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -76,6 +79,9 @@
         },
         "com.netflix.genie:genie-test-web": {
             "project": true
+        },
+        "io.zipkin.brave:brave": {
+            "locked": "5.13.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -1205,6 +1211,9 @@
         "com.netflix.genie:genie-test-web": {
             "project": true
         },
+        "io.zipkin.brave:brave": {
+            "locked": "5.13.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -1833,6 +1842,9 @@
         },
         "com.netflix.genie:genie-test-web": {
             "project": true
+        },
+        "io.zipkin.brave:brave": {
+            "locked": "5.13.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
