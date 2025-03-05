@@ -119,6 +119,9 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -296,6 +299,9 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -526,6 +532,13 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-agent",
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -829,6 +842,13 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-agent",
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.4.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -1096,6 +1116,13 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-agent",
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.4.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -1335,6 +1362,9 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -1564,6 +1594,13 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-agent",
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -1839,6 +1876,9 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -2068,6 +2108,13 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-agent",
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"

@@ -115,6 +115,9 @@
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -288,6 +291,9 @@
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -503,6 +509,12 @@
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.16.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -759,6 +771,12 @@
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.16.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
@@ -964,6 +982,9 @@
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -1179,6 +1200,12 @@
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.16.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -1421,6 +1448,9 @@
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
+        },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
         },
@@ -1635,6 +1665,12 @@
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.16.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"

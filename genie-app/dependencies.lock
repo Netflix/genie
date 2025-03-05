@@ -150,6 +150,9 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
+        },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -465,6 +468,9 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -875,6 +881,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -1457,6 +1472,15 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
+        },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -1998,6 +2022,15 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
+        },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -2472,6 +2505,9 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
+        },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -2881,6 +2917,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -3399,6 +3444,9 @@
             ],
             "locked": "6.0.3"
         },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
+        },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -3808,6 +3856,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
