@@ -23,10 +23,10 @@ import com.netflix.genie.agent.properties.AgentProperties;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.internal.util.HostnameUtil;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.task.TaskExecutorCustomizer;
-import org.springframework.boot.task.TaskSchedulerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -50,6 +50,10 @@ import java.net.UnknownHostException;
     }
 )
 public class AgentAutoConfiguration {
+
+    // Common bean names used by Spring Boot
+    private static final String APPLICATION_TASK_EXECUTOR_BEAN_NAME = "applicationTaskExecutor";
+    private static final String TASK_SCHEDULER_BEAN_NAME = "taskScheduler";
 
     /**
      * Provide a bean of type {@link GenieHostInfo} if none already exists.
@@ -151,34 +155,55 @@ public class AgentAutoConfiguration {
     }
 
     /**
-     * Customizer for Spring's task executor.
+     * Bean post processor to customize the task executor created by Spring Boot.
+     * This provides the functionality of TaskExecutorCustomizer which is no longer available in AWS Cloud v3.
      *
      * @param agentProperties the agent properties
-     * @return a customizer for the task executor
+     * @return A BeanPostProcessor that customizes task executors
      */
-    @Bean
-    TaskExecutorCustomizer taskExecutorCustomizer(final AgentProperties agentProperties) {
-        return taskExecutor -> {
-            taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-            taskExecutor.setAwaitTerminationSeconds(
-                (int) agentProperties.getShutdown().getSystemExecutorLeeway().getSeconds()
-            );
+    @Bean(name = "taskExecutorCustomizer")
+    public BeanPostProcessor taskExecutorCustomizer(final AgentProperties agentProperties) {
+        return new BeanPostProcessor() {
+            @Override
+            public Object postProcessAfterInitialization(final Object bean, final String beanName) {
+                // Customize the application task executor
+                if (bean instanceof ThreadPoolTaskExecutor
+                    && (TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME.equals(beanName)
+                    || APPLICATION_TASK_EXECUTOR_BEAN_NAME.equals(beanName))) {
+                    final ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) bean;
+                    executor.setWaitForTasksToCompleteOnShutdown(true);
+                    executor.setAwaitTerminationSeconds(
+                        (int) agentProperties.getShutdown().getSystemExecutorLeeway().getSeconds()
+                    );
+                }
+                return bean;
+            }
         };
     }
 
     /**
-     * Customizer for Spring's task scheduler.
+     * Bean post processor to customize the task scheduler created by Spring Boot.
+     * This provides the functionality of TaskSchedulerCustomizer which is no longer available in AWS Cloud v3.
      *
      * @param agentProperties the agent properties
-     * @return a customizer for the task scheduler
+     * @return A BeanPostProcessor that customizes task schedulers
      */
-    @Bean
-    TaskSchedulerCustomizer taskSchedulerCustomizer(final AgentProperties agentProperties) {
-        return taskScheduler -> {
-            taskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-            taskScheduler.setAwaitTerminationSeconds(
-                (int) agentProperties.getShutdown().getSystemSchedulerLeeway().getSeconds()
-            );
+    @Bean(name = "taskSchedulerCustomizer")
+    public BeanPostProcessor taskSchedulerCustomizer(final AgentProperties agentProperties) {
+        return new BeanPostProcessor() {
+            @Override
+            public Object postProcessAfterInitialization(final Object bean, final String beanName) {
+                // Customize the task scheduler
+                if (bean instanceof ThreadPoolTaskScheduler
+                    && TASK_SCHEDULER_BEAN_NAME.equals(beanName)) {
+                    final ThreadPoolTaskScheduler scheduler = (ThreadPoolTaskScheduler) bean;
+                    scheduler.setWaitForTasksToCompleteOnShutdown(true);
+                    scheduler.setAwaitTerminationSeconds(
+                        (int) agentProperties.getShutdown().getSystemSchedulerLeeway().getSeconds()
+                    );
+                }
+                return bean;
+            }
         };
     }
 }
