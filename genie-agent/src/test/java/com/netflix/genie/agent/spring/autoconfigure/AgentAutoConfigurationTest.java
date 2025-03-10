@@ -23,7 +23,10 @@ import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.task.ThreadPoolTaskExecutorCustomizer;
+import org.springframework.boot.task.ThreadPoolTaskSchedulerCustomizer;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -64,7 +67,31 @@ class AgentAutoConfigurationTest {
                     .getBean("heartBeatServiceTaskScheduler")
                     .isOfAnyClassIn(ThreadPoolTaskScheduler.class);
                 Assertions.assertThat(context).hasSingleBean(AgentProperties.class);
+                Assertions.assertThat(context).hasSingleBean(ThreadPoolTaskExecutorCustomizer.class);
+                Assertions.assertThat(context).hasSingleBean(ThreadPoolTaskSchedulerCustomizer.class);
             }
         );
+    }
+
+    @Test
+    void testTaskExecutorCustomizer() {
+        final AgentProperties properties = new AgentProperties();
+        final ThreadPoolTaskExecutorCustomizer customizer =
+            new AgentAutoConfiguration().taskExecutorCustomizer(properties);
+        final ThreadPoolTaskExecutor taskExecutor = Mockito.mock(ThreadPoolTaskExecutor.class);
+        customizer.customize(taskExecutor);
+        Mockito.verify(taskExecutor).setWaitForTasksToCompleteOnShutdown(true);
+        Mockito.verify(taskExecutor).setAwaitTerminationSeconds(60);
+    }
+
+    @Test
+    void testTaskSchedulerCustomizer() {
+        final AgentProperties properties = new AgentProperties();
+        final ThreadPoolTaskSchedulerCustomizer customizer =
+            new AgentAutoConfiguration().taskSchedulerCustomizer(properties);
+        final ThreadPoolTaskScheduler taskScheduler = Mockito.mock(ThreadPoolTaskScheduler.class);
+        customizer.customize(taskScheduler);
+        Mockito.verify(taskScheduler).setWaitForTasksToCompleteOnShutdown(true);
+        Mockito.verify(taskScheduler).setAwaitTerminationSeconds(60);
     }
 }
