@@ -34,7 +34,8 @@ import org.springframework.context.ApplicationContext;
  */
 @SpringBootTest(
     classes = GenieAgentApplication.class,
-    webEnvironment = SpringBootTest.WebEnvironment.NONE
+    webEnvironment = SpringBootTest.WebEnvironment.NONE,
+    properties = {"debug=true"}
 )
 @EnableAutoConfiguration
 class GenieAgentApplicationSmokeTest {
