@@ -240,10 +240,10 @@ public class CommandEntity extends BaseEntity {
     @JoinTable(
         name = "commands_configs",
         joinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -253,10 +253,10 @@ public class CommandEntity extends BaseEntity {
     @JoinTable(
         name = "commands_dependencies",
         joinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -266,10 +266,10 @@ public class CommandEntity extends BaseEntity {
     @JoinTable(
         name = "commands_tags",
         joinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -279,10 +279,10 @@ public class CommandEntity extends BaseEntity {
     @JoinTable(
         name = "commands_applications",
         joinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @OrderColumn(name = "application_order", nullable = false)
@@ -293,10 +293,10 @@ public class CommandEntity extends BaseEntity {
     @JoinTable(
         name = "commands_cluster_criteria",
         joinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @OrderColumn(name = "priority_order", nullable = false)

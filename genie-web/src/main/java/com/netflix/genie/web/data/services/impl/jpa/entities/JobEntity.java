@@ -597,10 +597,10 @@ public class JobEntity extends BaseEntity implements
     @CollectionTable(
         name = "job_command_arguments",
         joinColumns = {
-            @JoinColumn(name = "job_id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", nullable = false, insertable = false, updatable = false)
         }
     )
-    @Column(name = "argument", length = 10_000, nullable = false, updatable = false)
+    @Column(name = "argument", length = 10_000, nullable = false, insertable = false, updatable = false)
     @OrderColumn(name = "argument_order", nullable = false, updatable = false)
     @ToString.Exclude
     private List<@NotBlank @Size(max = 10_000) String> commandArgs = new ArrayList<>();
@@ -609,11 +609,11 @@ public class JobEntity extends BaseEntity implements
     @CollectionTable(
         name = "job_requested_environment_variables",
         joinColumns = {
-            @JoinColumn(name = "job_id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", nullable = false, insertable = false, updatable = false)
         }
     )
     @MapKeyColumn(name = "name", updatable = false)
-    @Column(name = "value", length = 1024, nullable = false, updatable = false)
+    @Column(name = "value", length = 1024, nullable = false, insertable = false, updatable = false)
     @ToString.Exclude
     private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
         requestedEnvironmentVariables = new HashMap<>();
@@ -649,10 +649,10 @@ public class JobEntity extends BaseEntity implements
     @JoinTable(
         name = "jobs_cluster_criteria",
         joinColumns = {
-            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @OrderColumn(name = "priority_order", nullable = false, updatable = false)
@@ -660,7 +660,7 @@ public class JobEntity extends BaseEntity implements
     private List<CriterionEntity> clusterCriteria = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "command_criterion", nullable = false, updatable = false)
+    @JoinColumn(name = "command_criterion", nullable = false, insertable = false, updatable = false)
     @ToString.Exclude
     private CriterionEntity commandCriterion;
 
@@ -668,10 +668,10 @@ public class JobEntity extends BaseEntity implements
     @CollectionTable(
         name = "job_requested_applications",
         joinColumns = {
-            @JoinColumn(name = "job_id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", nullable = false, insertable = false, updatable = false)
         }
     )
-    @Column(name = "application_id", nullable = false, updatable = false)
+    @Column(name = "application_id", nullable = false, insertable = false, updatable = false)
     @OrderColumn(name = "application_order", nullable = false, updatable = false)
     @ToString.Exclude
     private List<String> requestedApplications = new ArrayList<>();
@@ -680,10 +680,10 @@ public class JobEntity extends BaseEntity implements
     @JoinTable(
         name = "jobs_configs",
         joinColumns = {
-            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -693,10 +693,10 @@ public class JobEntity extends BaseEntity implements
     @JoinTable(
         name = "jobs_dependencies",
         joinColumns = {
-            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -706,10 +706,10 @@ public class JobEntity extends BaseEntity implements
     @JoinTable(
         name = "jobs_tags",
         joinColumns = {
-            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude

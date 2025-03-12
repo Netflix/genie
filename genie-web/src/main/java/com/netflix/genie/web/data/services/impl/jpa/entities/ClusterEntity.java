@@ -76,10 +76,10 @@ public class ClusterEntity extends BaseEntity {
     @JoinTable(
         name = "clusters_configs",
         joinColumns = {
-            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -89,10 +89,10 @@ public class ClusterEntity extends BaseEntity {
     @JoinTable(
         name = "clusters_dependencies",
         joinColumns = {
-            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
@@ -102,10 +102,10 @@ public class ClusterEntity extends BaseEntity {
     @JoinTable(
         name = "clusters_tags",
         joinColumns = {
-            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
