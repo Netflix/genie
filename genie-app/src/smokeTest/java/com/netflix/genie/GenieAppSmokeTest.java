@@ -23,7 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -56,7 +56,7 @@ class GenieAppSmokeTest {
                     .getForEntity("http://localhost:" + this.port + "/admin/health", String.class)
                     .getStatusCode()
             )
-            .isEqualByComparingTo(HttpStatus.OK);
+            .isEqualToComparingFieldByField(HttpStatus.OK);
     }
 
     // TODO: Could add more
