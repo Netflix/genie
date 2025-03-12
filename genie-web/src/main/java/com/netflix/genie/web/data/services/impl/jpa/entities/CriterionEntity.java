@@ -76,10 +76,10 @@ public class CriterionEntity extends IdEntity {
     @JoinTable(
         name = "criteria_tags",
         joinColumns = {
-            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
         }
     )
     @ToString.Exclude
