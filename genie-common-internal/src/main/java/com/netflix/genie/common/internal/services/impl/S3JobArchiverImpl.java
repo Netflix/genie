@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.common.internal.services.impl;
 
-import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
@@ -25,6 +24,7 @@ import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.S3UriClient;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -63,9 +63,9 @@ public class S3JobArchiverImpl implements JobArchiver {
         @NotNull final URI target
     ) throws JobArchiveException {
         final String uriString = target.toString();
-        final AmazonS3URI s3URI;
+        final S3UriClient s3URI;
         try {
-            s3URI = new AmazonS3URI(target);
+            s3URI = new S3UriClient(target);
         } catch (final IllegalArgumentException iae) {
             log.debug("{} is not a valid S3 URI", uriString);
             return false;

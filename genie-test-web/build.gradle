@@ -29,6 +29,8 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-test")
+    implementation "software.amazon.awssdk:apache-client:2.30.38"
+    implementation "software.amazon.awssdk:netty-nio-client:2.30.38"
 
     /*******************************
      * Compile Only Dependencies

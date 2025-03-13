@@ -16,9 +16,9 @@ dependencies {
     api(project(":genie-common"))
     api(project(":genie-common-external"))
 
-    api("com.amazonaws:aws-java-sdk-core")
-    api("com.amazonaws:aws-java-sdk-s3")
-    api("com.amazonaws:aws-java-sdk-sts")
+    api("software.amazon.awssdk:aws-core")
+    api("software.amazon.awssdk:s3")
+    api("software.amazon.awssdk:sts")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.github.ben-manes.caffeine:caffeine")
     api("io.awspring.cloud:spring-cloud-aws-autoconfigure")
@@ -37,6 +37,26 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    implementation "software.amazon.awssdk:apache-client:2.30.38"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    implementation "software.amazon.awssdk:netty-nio-client:2.30.38"
 
     /*******************************
      * Compile Only Dependencies

@@ -17,14 +17,14 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GetObjectRequest;
 import io.awspring.cloud.core.io.s3.AmazonS3ProxyFactory;
 import io.awspring.cloud.core.io.s3.SimpleStorageResource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.task.TaskExecutor;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.io.InputStream;
 @Slf4j
 public final class SimpleStorageRangeResource extends SimpleStorageResource {
 
-    private final AmazonS3 client;
+    private final S3Client client;
     private final String bucket;
     private final String key;
     private final String versionId;
@@ -49,7 +49,7 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
     private final long contentLength;
 
     SimpleStorageRangeResource(
-        final AmazonS3 client,
+        final S3Client client,
         final String bucket,
         final String key,
         final String versionId,
@@ -132,10 +132,11 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         if (rangeEnd - rangeStart < 0 || (rangeEnd == 0 && rangeStart == 0)) {
             inputStream = new EmptyInputStream();
         } else {
-            final GetObjectRequest getObjectRequest = new GetObjectRequest(this.bucket, this.key)
-                .withRange(rangeStart, rangeEnd)
-                .withVersionId(this.versionId);
-            inputStream = this.client.getObject(getObjectRequest).getObjectContent();
+            final GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(this.bucket).key(this.key)
+                .range(rangeStart, rangeEnd)
+                .versionId(this.versionId)
+                .build();
+            inputStream = this.client.getObject(getObjectRequest);
         }
 
         return new SkipInputStream(skipBytes, inputStream);

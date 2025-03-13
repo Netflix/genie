@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.events;
 
-import com.amazonaws.services.sns.AmazonSNS;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.internal.dtos.Cluster;
@@ -32,6 +31,7 @@ import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
+import software.amazon.awssdk.services.sns.SnsClient;
 
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -108,7 +108,7 @@ public class JobFinishedSNSPublisher
      * @param mapper       object mapper
      */
     public JobFinishedSNSPublisher(
-        final AmazonSNS snsClient,
+        final SnsClient snsClient,
         final SNSNotificationsProperties properties,
         final DataServices dataServices,
         final MeterRegistry registry,

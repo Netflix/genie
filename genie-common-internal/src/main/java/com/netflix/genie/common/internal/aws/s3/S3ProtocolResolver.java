@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3URI;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -27,6 +25,8 @@ import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3UriClient;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -120,10 +120,10 @@ public class S3ProtocolResolver implements ProtocolResolver {
             normalizedLocation = location;
         }
 
-        final AmazonS3URI s3URI;
+        final S3UriClient s3URI;
         final URI uri;
         try {
-            s3URI = new AmazonS3URI(normalizedLocation);
+            s3URI = new S3UriClient(normalizedLocation);
             uri = URI.create(location);
         } catch (final IllegalArgumentException iae) {
             log.debug("{} is not a valid S3 resource (Error message: {}).", normalizedLocation, iae.getMessage());
@@ -142,7 +142,7 @@ public class S3ProtocolResolver implements ProtocolResolver {
         final String rangeHeader = uri.getFragment();
         final Pair<Integer, Integer> range = parseRangeHeader(rangeHeader);
 
-        final AmazonS3 client = this.s3ClientFactory.getClient(s3URI);
+        final S3Client client = this.s3ClientFactory.getClient(s3URI);
         log.debug("{} is a valid S3 resource.", location);
 
         // TODO: This implementation from Spring Cloud AWS always wraps the passed in client with a proxy that follows

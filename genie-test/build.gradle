@@ -1,6 +1,8 @@
 apply plugin: "java-library"
 
 dependencies {
+    implementation "software.amazon.awssdk:apache-client:2.30.38"
+    implementation "software.amazon.awssdk:netty-nio-client:2.30.38"
     /*******************************
      * API Dependencies
      *******************************/

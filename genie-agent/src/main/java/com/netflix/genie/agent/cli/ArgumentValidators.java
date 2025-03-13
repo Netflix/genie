@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.agent.cli;
 
-import com.amazonaws.services.s3.AmazonS3URI;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.IValueValidator;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.validators.PositiveInteger;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.services.s3.S3UriClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -73,7 +73,7 @@ final class ArgumentValidators {
         public void validate(final String name, final String value) throws ParameterException {
             try {
                 //Check if a valid S3 uri can be created
-                new AmazonS3URI(value);
+                new S3UriClient(value);
             } catch (Exception e) {
                 throw new ParameterException(name + " is not a valid S3 uri");
             }

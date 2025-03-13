@@ -41,6 +41,34 @@ dependencies {
      * Test Dependencies
      *******************************/
 
+    implementation "software.amazon.awssdk:apache-client:2.30.38"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    implementation "software.amazon.awssdk:netty-nio-client:2.30.38"
+
+    /*******************************
+     * Compile Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Only Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
     testImplementation(project(":genie-test"))
     testImplementation(project(":genie-test-web"))
 

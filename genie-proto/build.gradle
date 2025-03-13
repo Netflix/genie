@@ -18,6 +18,8 @@ dependencies {
      *******************************/
 
     implementation("io.grpc:grpc-stub")
+    implementation "software.amazon.awssdk:apache-client:2.30.38"
+    implementation "software.amazon.awssdk:netty-nio-client:2.30.38"
     implementation("io.grpc:grpc-protobuf")
 
     /*******************************

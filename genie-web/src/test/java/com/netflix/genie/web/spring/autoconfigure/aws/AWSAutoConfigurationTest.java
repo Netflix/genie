@@ -18,7 +18,6 @@
 package com.netflix.genie.web.spring.autoconfigure.aws;
 
 import com.amazonaws.retry.RetryPolicy;
-import com.amazonaws.services.sns.AmazonSNS;
 import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
@@ -27,6 +26,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import software.amazon.awssdk.services.sns.SnsClient;
 
 /**
  * Tests for behavior of {@link AWSAutoConfiguration}.
@@ -96,7 +96,7 @@ class AWSAutoConfigurationTest {
     @Test
     void testSpringCloudAWSBeanNameOverride() {
         Assertions.assertThat(
-            AmazonWebserviceClientConfigurationUtils.getBeanName(String.valueOf(AmazonSNS.class))
+            AmazonWebserviceClientConfigurationUtils.getBeanName(String.valueOf(SnsClient.class))
         ).isEqualTo(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
     }
 }

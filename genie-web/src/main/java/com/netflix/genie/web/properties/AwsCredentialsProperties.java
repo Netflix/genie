@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.properties;
 
-import com.amazonaws.regions.Regions;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
+import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nullable;
 
@@ -67,7 +67,7 @@ public class AwsCredentialsProperties {
         private boolean auto;
 
         @Getter
-        private Regions region = Regions.US_EAST_1;
+        private Region region = Region.US_EAST_1;
 
         /**
          * Get the region.
@@ -75,7 +75,7 @@ public class AwsCredentialsProperties {
          * @return The region
          */
         public String getStatic() {
-            return this.region.getName();
+            return this.region.id();
         }
 
         /**
@@ -83,10 +83,10 @@ public class AwsCredentialsProperties {
          *
          * @param newStatic The new static region value
          * @throws IllegalArgumentException When {@literal newStatic} can't be parsed by
-         *                                  {@link Regions#fromName(String)}
+         *                                  {@link Region#of(String)}
          */
         public void setStatic(final String newStatic) {
-            this.region = Regions.fromName(newStatic);
+            this.region = Region.of(newStatic);
         }
     }
 }

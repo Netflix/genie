@@ -17,10 +17,6 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3URI;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
@@ -34,6 +30,10 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3UriClient;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class S3AttachmentServiceImpl implements AttachmentService {
     private final S3ClientFactory s3ClientFactory;
     private final AttachmentServiceProperties properties;
     private final MeterRegistry meterRegistry;
-    private final AmazonS3URI s3BaseURI;
+    private final S3UriClient s3BaseURI;
 
     /**
      * Constructor.
@@ -81,7 +81,7 @@ public class S3AttachmentServiceImpl implements AttachmentService {
         this.s3ClientFactory = s3ClientFactory;
         this.properties = attachmentServiceProperties;
         this.meterRegistry = meterRegistry;
-        this.s3BaseURI = new AmazonS3URI(attachmentServiceProperties.getLocationPrefix());
+        this.s3BaseURI = new S3UriClient(attachmentServiceProperties.getLocationPrefix());
     }
 
     /**
@@ -173,7 +173,7 @@ public class S3AttachmentServiceImpl implements AttachmentService {
         @Nullable final String jobId,
         final Set<Resource> attachments
     ) throws SaveAttachmentException {
-        final AmazonS3 s3Client = this.s3ClientFactory.getClient(this.s3BaseURI);
+        final S3Client s3Client = this.s3ClientFactory.getClient(this.s3BaseURI);
         final String bundleId = UUID.randomUUID().toString();
         final String commonPrefix = this.s3BaseURI.getKey() + SLASH + bundleId + SLASH;
 
@@ -194,12 +194,13 @@ public class S3AttachmentServiceImpl implements AttachmentService {
             final String objectBucket = this.s3BaseURI.getBucket();
             final String objectKey = commonPrefix + filename;
 
-            final ObjectMetadata metadata = new ObjectMetadata();
+            final HeadObjectResponse metadata = HeadObjectResponse.builder()
+                .build();
             URI attachmentURI = null;
 
             try (InputStream inputStream = attachment.getInputStream()) {
                 // Prepare object
-                metadata.setContentLength(attachment.contentLength());
+                metadata.contentLength(attachment.contentLength());
                 attachmentURI = new URI(S3, objectBucket, SLASH + objectKey, null);
                 // Upload
                 s3Client.putObject(
