@@ -22,15 +22,6 @@
         }
     },
     "compileClasspath": {
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -72,13 +63,22 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
+        },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
         },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -111,11 +111,26 @@
         "org.projectlombok:lombok": {
             "locked": "1.18.24"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "locked": "6.2.2"
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "integTestAnnotationProcessor": {
@@ -133,15 +148,6 @@
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
         },
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -186,13 +192,22 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
+        },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
         },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -240,6 +255,9 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "3.4.2"
         },
@@ -248,20 +266,23 @@
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "integTestRuntimeClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -321,10 +342,13 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
@@ -338,8 +362,14 @@
             ],
             "locked": "1.38.1"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -409,6 +439,9 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "3.4.2"
         },
@@ -417,6 +450,18 @@
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "jacocoAgent": {
@@ -430,15 +475,6 @@
         }
     },
     "runtimeClasspath": {
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -494,10 +530,13 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
@@ -511,8 +550,14 @@
             ],
             "locked": "1.38.1"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -560,11 +605,26 @@
             ],
             "locked": "7.0.5.Final"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "locked": "6.2.2"
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -582,15 +642,6 @@
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
         },
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -635,13 +686,22 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
+        },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
         },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -689,6 +749,9 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "3.4.2"
         },
@@ -697,20 +760,23 @@
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "smokeTestRuntimeClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -770,10 +836,13 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
@@ -787,8 +856,14 @@
             ],
             "locked": "1.38.1"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -858,6 +933,9 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "3.4.2"
         },
@@ -866,6 +944,18 @@
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "spotbugs": {
@@ -893,15 +983,6 @@
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
         },
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -946,13 +1027,22 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
+        },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
         },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.platform:jakarta.jakartaee-bom": {
             "locked": "10.0.0"
@@ -1000,6 +1090,9 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "3.4.2"
         },
@@ -1008,20 +1101,23 @@
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     },
     "testRuntimeClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -1081,10 +1177,13 @@
             "project": true
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
@@ -1098,8 +1197,14 @@
             ],
             "locked": "1.38.1"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "locked": "5.13.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "2.16.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -1169,6 +1274,9 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "3.4.2"
         },
@@ -1177,6 +1285,18 @@
         },
         "org.springframework:spring-core": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "locked": "2.30.17"
         }
     }
 }

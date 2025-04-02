@@ -112,7 +112,6 @@ configure((Set<Project>) ext.javaProjects) {
         }
 
         imports {
-            mavenBom "com.amazonaws:aws-java-sdk-bom:1.12.780"
             mavenBom "software.amazon.awssdk:bom:2.30.17"
             mavenBom "io.zipkin.brave:brave-bom:5.13.3"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
@@ -189,6 +188,7 @@ configure((Set<Project>) ext.javaProjects) {
 
         if (springBoot3ProjectNames.contains(project.name)) {
             implementation("org.springframework.boot:spring-boot-actuator-autoconfigure")
+            implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:${spring_cloud_aws_3_version}")
             implementation("io.micrometer:micrometer-tracing-bridge-brave")
             implementation platform("jakarta.platform:jakarta.jakartaee-bom:10.0.0")
             implementation("jakarta.servlet:jakarta.servlet-api")

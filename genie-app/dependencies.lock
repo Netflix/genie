@@ -16,30 +16,6 @@
         }
     },
     "compileClasspath": {
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -118,7 +94,10 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -144,11 +123,17 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -243,6 +228,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -304,6 +292,36 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
         }
     },
     "genieAgent": {
@@ -326,30 +344,6 @@
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
         },
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -434,7 +428,10 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -460,11 +457,17 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -574,6 +577,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -638,37 +644,41 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
         }
     },
     "integTestRuntimeClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -808,20 +818,29 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-sqs": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -861,6 +880,15 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
@@ -873,6 +901,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -1076,6 +1113,15 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -1164,7 +1210,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "4.2.0"
+            "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
             "firstLevelTransitive": [
@@ -1221,6 +1267,38 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
         }
     },
     "jacocoAgent": {
@@ -1234,32 +1312,6 @@
         }
     },
     "productionRuntimeClasspath": {
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -1387,20 +1439,29 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-sqs": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -1440,6 +1501,15 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
@@ -1452,6 +1522,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -1632,6 +1711,15 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -1713,7 +1801,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "4.2.0"
+            "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
             "firstLevelTransitive": [
@@ -1770,35 +1858,41 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
         }
     },
     "runtimeClasspath": {
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -1926,20 +2020,29 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-sqs": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -1979,6 +2082,15 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
@@ -1991,6 +2103,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -2171,6 +2292,15 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -2252,7 +2382,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "4.2.0"
+            "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
             "firstLevelTransitive": [
@@ -2309,6 +2439,38 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -2326,30 +2488,6 @@
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
         },
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
@@ -2434,7 +2572,10 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -2460,11 +2601,17 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -2574,6 +2721,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -2638,37 +2788,41 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
         }
     },
     "smokeTestRuntimeClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -2808,20 +2962,29 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-sqs": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -2861,6 +3024,15 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
@@ -2873,6 +3045,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -3076,6 +3257,15 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -3164,7 +3354,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "4.2.0"
+            "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
             "firstLevelTransitive": [
@@ -3224,6 +3414,38 @@
         },
         "org.springframework:spring-webflux": {
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
         }
     },
     "spotbugs": {
@@ -3250,30 +3472,6 @@
     "testCompileClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -3359,7 +3557,10 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -3385,11 +3586,17 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "locked": "3.4.3"
         },
         "jakarta.persistence:jakarta.persistence-api": {
             "firstLevelTransitive": [
@@ -3499,6 +3706,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -3563,37 +3773,41 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
         }
     },
     "testRuntimeClasspath": {
         "cglib:cglib-nodep": {
             "locked": "3.3.0"
-        },
-        "com.amazonaws:aws-java-sdk-core": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-s3": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sns": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
-        },
-        "com.amazonaws:aws-java-sdk-sts": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
-                "com.netflix.genie:genie-web"
-            ],
-            "locked": "1.12.780"
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "firstLevelTransitive": [
@@ -3733,20 +3947,29 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-starter-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-sqs": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.2.1"
+            "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
             "firstLevelTransitive": [
@@ -3786,6 +4009,15 @@
             ],
             "locked": "1.14.3"
         },
+        "io.micrometer:micrometer-tracing-bridge-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "1.4.2"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
@@ -3798,6 +4030,15 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.0.3"
+        },
+        "io.zipkin.reporter2:zipkin-reporter": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -4001,6 +4242,15 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-actuator-autoconfigure": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-swagger",
+                "com.netflix.genie:genie-ui",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "3.4.2"
+        },
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
@@ -4089,7 +4339,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "4.2.0"
+            "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
             "firstLevelTransitive": [
@@ -4146,6 +4396,38 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "6.2.2"
+        },
+        "software.amazon.awssdk:aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:s3-transfer-manager": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sns": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
+        },
+        "software.amazon.awssdk:sts": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "2.30.17"
         }
     }
 }

@@ -46,7 +46,7 @@ dependencies {
     api(project(":genie-common-external"))
     api(project(":genie-common-internal"))
     api(project(":genie-proto"))
-    api("com.amazonaws:aws-java-sdk-sns")
+    api("software.amazon.awssdk:sns")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.github.fge:json-patch")
     api("com.google.protobuf:protobuf-java")
@@ -77,8 +77,8 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
-    implementation("com.amazonaws:aws-java-sdk-s3")
-    implementation("com.amazonaws:aws-java-sdk-sts")
+    implementation("software.amazon.awssdk:s3")
+    implementation("software.amazon.awssdk:sts")
     implementation("com.google.guava:guava")
     implementation("commons-io:commons-io")
     implementation("commons-validator:commons-validator")

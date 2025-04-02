@@ -17,11 +17,6 @@
  */
 package com.netflix.genie.common.internal.configs;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.regions.AwsRegionProvider;
-import com.amazonaws.regions.DefaultAwsRegionProviderChain;
-import com.amazonaws.regions.Regions;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
@@ -48,6 +43,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.providers.AwsRegionProvider;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 
 /**
  * Spring Boot auto configuration for AWS related beans for the Genie Agent. Should be configured after all the
@@ -67,7 +67,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
         ContextStackAutoConfiguration.class
     }
 )
-@ConditionalOnBean(AWSCredentialsProvider.class)
+@ConditionalOnBean(AwsCredentialsProvider.class)
 @Slf4j
 public class AwsAutoConfiguration {
 
@@ -93,7 +93,7 @@ public class AwsAutoConfiguration {
         final String staticRegion = awsRegionProperties.getStatic();
         if (StringUtils.isNotBlank(staticRegion)) {
             // Make sure we have a valid region. Will throw runtime exception if not.
-            final Regions region = Regions.fromName(staticRegion);
+            final Region region = Region.of(staticRegion);
             return new AwsRegionProvider() {
                 /**
                  * Always return the static configured region.
@@ -102,7 +102,7 @@ public class AwsAutoConfiguration {
                  */
                 @Override
                 public String getRegion() throws SdkClientException {
-                    return region.getName();
+                    return region.id();
                 }
             };
         } else {
@@ -113,7 +113,7 @@ public class AwsAutoConfiguration {
     /**
      * Provide a lazy {@link S3ClientFactory} instance if one is needed by the system.
      *
-     * @param awsCredentialsProvider The {@link AWSCredentialsProvider} to use
+     * @param awsCredentialsProvider The {@link AwsCredentialsProvider} to use
      * @param awsRegionProvider      The {@link AwsRegionProvider} to use
      * @param environment            The Spring application {@link Environment} to bind properties from
      * @return A {@link S3ClientFactory} instance
@@ -121,7 +121,7 @@ public class AwsAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(S3ClientFactory.class)
     public S3ClientFactory s3ClientFactory(
-        final AWSCredentialsProvider awsCredentialsProvider,
+        final AwsCredentialsProvider awsCredentialsProvider,
         final AwsRegionProvider awsRegionProvider,
         final Environment environment
     ) {

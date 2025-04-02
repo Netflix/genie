@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3URI;
+import io.awspring.cloud.s3.InMemoryBufferingS3OutputStreamProvider;
+import io.awspring.cloud.s3.PropertiesS3ObjectContentTypeResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -27,6 +27,9 @@ import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.util.Assert;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Uri;
 
 import jakarta.annotation.Nullable;
 import java.io.IOException;
@@ -120,10 +123,13 @@ public class S3ProtocolResolver implements ProtocolResolver {
             normalizedLocation = location;
         }
 
-        final AmazonS3URI s3URI;
+        final S3Uri s3Uri;
         final URI uri;
         try {
-            s3URI = new AmazonS3URI(normalizedLocation);
+            s3Uri = this.s3ClientFactory.getS3Uri(URI.create(normalizedLocation));
+            Assert.notNull(s3Uri.bucket(), "bucket is required");
+            Assert.notNull(s3Uri.key(), "key is required");
+
             uri = URI.create(location);
         } catch (final IllegalArgumentException iae) {
             log.debug("{} is not a valid S3 resource (Error message: {}).", normalizedLocation, iae.getMessage());
@@ -131,29 +137,30 @@ public class S3ProtocolResolver implements ProtocolResolver {
         }
 
         // Remove the fragment portion of the URI path (which stores the range requested, if any)
-        final int fragmentIndex = s3URI.getKey().lastIndexOf("#");
+        final int fragmentIndex = s3Uri.key().orElse(null).lastIndexOf("#");
         final String normalizedKey;
         if (fragmentIndex == -1) {
-            normalizedKey = s3URI.getKey();
+            normalizedKey = s3Uri.key().orElse(null);
         } else {
-            normalizedKey = s3URI.getKey().substring(0, fragmentIndex);
+            normalizedKey = s3Uri.key().orElse(null).substring(0, fragmentIndex);
         }
 
         final String rangeHeader = uri.getFragment();
         final Pair<Integer, Integer> range = parseRangeHeader(rangeHeader);
 
-        final AmazonS3 client = this.s3ClientFactory.getClient(s3URI);
+        final S3Client client = this.s3ClientFactory.getClient(s3Uri);
         log.debug("{} is a valid S3 resource.", location);
 
         // TODO: This implementation from Spring Cloud AWS always wraps the passed in client with a proxy that follows
         //       redirects. I'm not sure if we want that or not. Probably ok for now but maybe revisit later?
         try {
             return new SimpleStorageRangeResource(
-                client,
-                s3URI.getBucket(),
+                s3Uri.bucket().orElse(null),
                 normalizedKey,
-                s3URI.getVersionId(),
-                this.s3TaskExecutor,
+                client,
+                // TODO: It needs to move this part to S3ClientFactory for caching
+                new InMemoryBufferingS3OutputStreamProvider(
+                    client, new PropertiesS3ObjectContentTypeResolver()),
                 range
             );
         } catch (IOException e) {
