@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.common.internal.util;
 
-import com.amazonaws.util.EC2MetadataUtils;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.regions.internal.util.EC2MetadataUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
