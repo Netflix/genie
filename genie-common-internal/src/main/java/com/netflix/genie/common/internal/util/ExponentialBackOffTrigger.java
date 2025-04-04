@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.common.internal.util;
 
-import com.amazonaws.annotation.ThreadSafe;
 import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
+import software.amazon.awssdk.annotations.ThreadSafe;
 
 import java.time.Instant;
 import java.util.Date;
