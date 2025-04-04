@@ -37,6 +37,7 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
+    implementation("commons-codec:commons-codec")
 
     /*******************************
      * Compile Only Dependencies
