@@ -58,7 +58,7 @@ public class S3ProtocolResolverRegistrar implements ApplicationContextAware {
      * {@inheritDoc}
      * <p>
      * Add the {@link S3ProtocolResolver} to the set of protocol resolvers in the application context. Remove any
-     * instances of {@link S3ProtocolResolver}.
+     * instances of {@link ProtocolResolver}.
      */
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {

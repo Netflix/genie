@@ -192,12 +192,12 @@ public class AwsAutoConfiguration {
      * Provide an implementation of {@link JobArchiver} to handle archiving
      * to S3.
      *
-     * @param s3ClientFactory The factory for creating S3 client
+     * @param s3TransferManagerFactory The factory for creating S3 transfer manager
      * @return A {@link S3JobArchiverImpl} instance
      */
     @Bean
     @Order(S3_JOB_ARCHIVER_PRECEDENCE)
-    public S3JobArchiverImpl s3JobArchiver(final S3ClientFactory s3ClientFactory) {
-        return new S3JobArchiverImpl(s3ClientFactory);
+    public S3JobArchiverImpl s3JobArchiver(final S3TransferManagerFactory s3TransferManagerFactory) {
+        return new S3JobArchiverImpl(s3TransferManagerFactory);
     }
 }

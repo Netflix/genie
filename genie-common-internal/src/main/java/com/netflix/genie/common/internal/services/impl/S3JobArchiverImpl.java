@@ -17,21 +17,22 @@
  */
 package com.netflix.genie.common.internal.services.impl;
 
-import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Uri;
-import software.amazon.awssdk.services.s3.S3Utilities;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.transfer.s3.S3TransferManager;
+import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload;
+import software.amazon.awssdk.transfer.s3.model.FileUpload;
+import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
 
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Implementation of {@link JobArchiver} for S3 destinations.
@@ -39,18 +40,15 @@ import java.util.List;
 @Slf4j
 public class S3JobArchiverImpl implements JobArchiver {
 
-    private final S3ClientFactory s3ClientFactory;
-
-    private final S3Utilities s3Utilities;
+    private final S3TransferManagerFactory transferManagerFactory;
 
     /**
      * Constructor.
      *
-     * @param s3ClientFactory The factory to use to get S3 client instances for a given S3 bucket.
+     * @param transferManagerFactory The factory to use to get S3 transfer manager instances for a given S3 bucket.
      */
-    public S3JobArchiverImpl(final S3ClientFactory s3ClientFactory) {
-        this.s3ClientFactory = s3ClientFactory;
-        this.s3Utilities = S3Utilities.builder().build();
+    public S3JobArchiverImpl(final S3TransferManagerFactory transferManagerFactory) {
+        this.transferManagerFactory = transferManagerFactory;
     }
 
     /**
@@ -63,52 +61,54 @@ public class S3JobArchiverImpl implements JobArchiver {
         @NotNull final URI target
     ) throws JobArchiveException {
         final String uriString = target.toString();
-        final S3Uri s3Uri = s3Utilities.parseUri(target);
-
-        final String bucketName = String.valueOf(s3Uri.bucket());
-        final String keyPrefix = String.valueOf(s3Uri.key());
-
-        log.debug(
-            "{} is a valid S3 location. Proceeding to archive {} to location: {}",
-            uriString,
-            directory,
-            uriString
-        );
 
         try {
-            final S3Client s3Client = this.s3ClientFactory.getClient(s3Uri);
+            final S3Uri s3Uri = this.transferManagerFactory.getS3Uri(target);
+            final String bucketName = s3Uri.bucket().orElseThrow(() ->
+                new IllegalArgumentException("No bucket specified in URI: " + uriString));
+            final String keyPrefix = s3Uri.key().orElse("");
 
-            for (File file : filesList) {
-                String key = keyPrefix + "/" + directory.relativize(file.toPath()).toString();
-                PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build();
+            log.debug(
+                "{} is a valid S3 location. Proceeding to archive {} to location: {}",
+                uriString,
+                directory,
+                uriString
+            );
 
-                s3Client.putObject(putObjectRequest, RequestBody.fromFile(file.toPath()));
+            final S3TransferManager transferManager = this.transferManagerFactory.getTransferManager(s3Uri);
+
+            // Create a list of upload futures
+            List<CompletableFuture<CompletedFileUpload>> uploadFutures = filesList.stream()
+                .map(file -> {
+                    String key = keyPrefix + "/" + directory.relativize(file.toPath()).toString();
+                    UploadFileRequest uploadFileRequest = UploadFileRequest.builder()
+                        .putObjectRequest(b -> b.bucket(bucketName).key(key))
+                        .source(file.toPath())
+                        .build();
+
+                    FileUpload fileUpload = transferManager.uploadFile(uploadFileRequest);
+                    return fileUpload.completionFuture();
+                })
+                .toList();
+
+            // Wait for all uploads to complete
+            CompletableFuture.allOf(uploadFutures.toArray(new CompletableFuture[0])).join();
+
+            // Check for any failures
+            for (CompletableFuture<CompletedFileUpload> future : uploadFutures) {
+                CompletedFileUpload result = future.get();
+                if (result.response().sdkHttpResponse().isSuccessful()) {
+                    log.debug("Successfully uploaded file: {}", result.response().eTag());
+                } else {
+                    log.error("Failed to upload file: {}", result.response().sdkHttpResponse().statusText());
+                    return false;
+                }
             }
+
             return true;
         } catch (final Exception e) {
             log.error("Error archiving to S3 location: {} ", uriString, e);
             throw new JobArchiveException("Error archiving " + directory.toString(), e);
         }
-    }
-
-    private String extractBucketName(URI uri) {
-        // Implement logic to extract bucket name from URI
-        String host = uri.getHost();
-        if (host == null) {
-            throw new IllegalArgumentException("Invalid S3 URI: " + uri);
-        }
-        return host;
-    }
-
-    private String extractKeyPrefix(URI uri) {
-        // Implement logic to extract key prefix from URI
-        String path = uri.getPath();
-        if (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        return path;
     }
 }
