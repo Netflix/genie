@@ -827,7 +827,8 @@
         },
         "commons-codec:commons-codec": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
             ],
             "locked": "1.17.2"
         },
@@ -1031,6 +1032,12 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "firstLevelTransitive": [
@@ -1466,7 +1473,8 @@
         },
         "commons-codec:commons-codec": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
             ],
             "locked": "1.17.2"
         },
@@ -1664,6 +1672,12 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "firstLevelTransitive": [
@@ -2064,7 +2078,8 @@
         },
         "commons-codec:commons-codec": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
             ],
             "locked": "1.17.2"
         },
@@ -2262,6 +2277,12 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "firstLevelTransitive": [
@@ -3034,7 +3055,8 @@
         },
         "commons-codec:commons-codec": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
             ],
             "locked": "1.17.2"
         },
@@ -3238,6 +3260,12 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "firstLevelTransitive": [
@@ -4048,7 +4076,8 @@
         },
         "commons-codec:commons-codec": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal"
+                "com.netflix.genie:genie-common-internal",
+                "com.netflix.genie:genie-web"
             ],
             "locked": "1.17.2"
         },
@@ -4252,6 +4281,12 @@
                 "com.netflix.genie:genie-web"
             ],
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "firstLevelTransitive": [

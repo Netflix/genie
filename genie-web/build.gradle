@@ -82,6 +82,8 @@ dependencies {
     implementation("com.google.guava:guava")
     implementation("commons-io:commons-io")
     implementation("commons-validator:commons-validator")
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("commons-codec:commons-codec:1.15")
     implementation("io.grpc:grpc-netty")
     implementation("io.grpc:grpc-protobuf")
     implementation("io.awspring.cloud:spring-cloud-aws-starter")

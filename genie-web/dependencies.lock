@@ -88,6 +88,9 @@
             ],
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.15"
+        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -185,6 +188,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -399,6 +405,9 @@
         "com.netflix.genie:genie-test-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.15"
+        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -502,6 +511,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -766,7 +778,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
@@ -915,6 +927,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -1211,7 +1226,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "locked": "2.11.0"
@@ -1346,6 +1361,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -1578,6 +1596,9 @@
         "com.netflix.genie:genie-test-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.15"
+        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -1678,6 +1699,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -1930,7 +1954,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
@@ -2076,6 +2100,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -2354,6 +2381,9 @@
         "com.netflix.genie:genie-test-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.15"
+        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -2454,6 +2484,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
@@ -2706,7 +2739,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
@@ -2852,6 +2885,9 @@
         },
         "org.apache.curator:curator-x-discovery": {
             "locked": "5.7.1"
+        },
+        "org.apache.httpcomponents:httpclient": {
+            "locked": "4.5.14"
         },
         "org.apache.maven:maven-artifact": {
             "locked": "3.6.3"
