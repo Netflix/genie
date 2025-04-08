@@ -42,11 +42,20 @@ public final class HostnameUtil {
      * @throws UnknownHostException if hostname resolution fails
      */
     public static String getHostname() throws UnknownHostException {
-        final String hostname;
-        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
-            hostname = EC2MetadataUtils.getPrivateIpAddress();
-        } else {
-            // Fallback if not on AWS
+        String hostname;
+
+        // Check if running on AWS cloud environment
+        try {
+            String instanceId = EC2MetadataUtils.getInstanceId();
+            if (instanceId != null && !instanceId.isEmpty()) {
+                // Running on AWS, use private IP address
+                hostname = EC2MetadataUtils.getPrivateIpAddress();
+            } else {
+                // Not running on AWS or couldn't determine
+                hostname = InetAddress.getLocalHost().getCanonicalHostName();
+            }
+        } catch (Exception e) {
+            // Exception occurred while checking AWS environment, fallback to local hostname
             hostname = InetAddress.getLocalHost().getCanonicalHostName();
         }
 
