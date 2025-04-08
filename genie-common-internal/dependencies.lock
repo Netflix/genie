@@ -62,10 +62,16 @@
         "com.netflix.genie:genie-proto": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -191,10 +197,16 @@
         "com.netflix.genie:genie-test": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -341,10 +353,16 @@
         "com.netflix.genie:genie-test": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -529,10 +547,16 @@
         "com.netflix.genie:genie-proto": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -685,10 +709,16 @@
         "com.netflix.genie:genie-test": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -835,10 +865,16 @@
         "com.netflix.genie:genie-test": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -1026,10 +1062,16 @@
         "com.netflix.genie:genie-test": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
@@ -1176,10 +1218,16 @@
         "com.netflix.genie:genie-test": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "locked": "1.17.2"
+        },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "locked": "3.3.0"
         },
-        "io.awspring.cloud:spring-cloud-aws-starter": {
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
             "locked": "3.3.0"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {

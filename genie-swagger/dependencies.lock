@@ -268,6 +268,12 @@
         "com.netflix.genie:genie-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "1.17.2"
+        },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web",
@@ -287,9 +293,20 @@
             ],
             "locked": "3.3.0"
         },
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.3.0"
@@ -842,6 +859,12 @@
         "com.netflix.genie:genie-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "1.17.2"
+        },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -860,9 +883,20 @@
             ],
             "locked": "3.3.0"
         },
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.3.0"
@@ -1476,6 +1510,12 @@
         "com.netflix.genie:genie-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "1.17.2"
+        },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web",
@@ -1495,9 +1535,20 @@
             ],
             "locked": "3.3.0"
         },
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.3.0"
@@ -2151,6 +2202,12 @@
         "com.netflix.genie:genie-web": {
             "project": true
         },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "1.17.2"
+        },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web",
@@ -2170,9 +2227,20 @@
             ],
             "locked": "3.3.0"
         },
+        "io.awspring.cloud:spring-cloud-aws-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
+        "io.awspring.cloud:spring-cloud-aws-s3": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "3.3.0"
+        },
         "io.awspring.cloud:spring-cloud-aws-starter": {
             "firstLevelTransitive": [
-                "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
             "locked": "3.3.0"

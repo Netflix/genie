@@ -20,21 +20,21 @@ package com.netflix.genie.common.internal.configs;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
+import com.netflix.genie.common.internal.aws.s3.S3ResourceLoaderProperties;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
-import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextInstanceDataAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextStackAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties;
-import io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties;
+import io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.core.RegionProperties;
+import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
+import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,14 +57,11 @@ import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
  * @since 4.0.0
  */
 @Configuration
-@EnableConfigurationProperties
+@ConfigurationPropertiesScan
 @AutoConfigureAfter(
     {
-        ContextCredentialsAutoConfiguration.class,
-        ContextInstanceDataAutoConfiguration.class,
-        ContextRegionProviderAutoConfiguration.class,
-        ContextResourceLoaderAutoConfiguration.class,
-        ContextStackAutoConfiguration.class
+        CredentialsProviderAutoConfiguration.class,
+        RegionProviderAutoConfiguration.class
     }
 )
 @ConditionalOnBean(AwsCredentialsProvider.class)
@@ -84,25 +81,25 @@ public class AwsAutoConfiguration {
      * <p>
      * See: <a href="https://tinyurl.com/y9edl6yr">Spring Cloud AWS Region Documentation</a>
      *
-     * @param awsRegionProperties The cloud.aws.region.* properties
+     * @param regionProperties The cloud.aws.region.* properties
      * @return A region provider based on whether static was set by user, else auto, else default of us-east-1
      */
     @Bean
     @ConditionalOnMissingBean(AwsRegionProvider.class)
-    public AwsRegionProvider awsRegionProvider(final AwsRegionProperties awsRegionProperties) {
-        final String staticRegion = awsRegionProperties.getStatic();
+    public AwsRegionProvider awsRegionProvider(final RegionProperties regionProperties) {
+        final String staticRegion = regionProperties.getStatic();
         if (StringUtils.isNotBlank(staticRegion)) {
             // Make sure we have a valid region. Will throw runtime exception if not.
             final Region region = Region.of(staticRegion);
             return new AwsRegionProvider() {
                 /**
                  * Always return the static configured region.
-                 *
+                 * <p>
                  * {@inheritDoc}
                  */
                 @Override
-                public String getRegion() throws SdkClientException {
-                    return region.id();
+                public Region getRegion() throws SdkClientException {
+                    return region;
                 }
             };
         } else {
@@ -130,32 +127,28 @@ public class AwsAutoConfiguration {
 
     /**
      * Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
-     * the {@link ContextResourceLoaderAutoConfiguration} isn't applied by the agent app.
+     * the {@link S3AutoConfiguration} isn't applied by the agent app.
      *
-     * @return A {@link AwsS3ResourceLoaderProperties} instance with the bindings from cloud.aws.loader values
+     * @return A {@link S3Properties} instance with the bindings from cloud.aws.loader values
      */
     @Bean
-    @ConditionalOnMissingBean(AwsS3ResourceLoaderProperties.class)
-    @ConfigurationProperties(ContextResourceLoaderAutoConfiguration.AWS_LOADER_PROPERTY_PREFIX)
-    public AwsS3ResourceLoaderProperties awsS3ResourceLoaderProperties() {
-        return new AwsS3ResourceLoaderProperties();
+    @ConditionalOnMissingBean(S3Properties.class)
+    @ConfigurationProperties(S3Properties.PREFIX)
+    public S3Properties s3Properties() {
+        return new S3Properties();
     }
 
     /**
-     * Provide an protocol resolver which will allow resources with s3:// prefixes to be resolved by the
-     * application {@link org.springframework.core.io.ResourceLoader} provided this bean is eventually added to the
-     * context via the
-     * {@link org.springframework.context.ConfigurableApplicationContext#addProtocolResolver(ProtocolResolver)}
-     * method.
+     * Provide a protocol resolver which will allow resources with s3:// prefixes
      *
-     * @param resourceLoaderProperties The {@link AwsS3ResourceLoaderProperties} instance to use
+     * @param resourceLoaderProperties The {@link S3ResourceLoaderProperties} instance to use
      * @param s3ClientFactory          The {@link S3ClientFactory} instance to use
      * @return A {@link S3ProtocolResolver} instance
      */
     @Bean
     @ConditionalOnMissingBean(S3ProtocolResolver.class)
     public S3ProtocolResolver s3ProtocolResolver(
-        final AwsS3ResourceLoaderProperties resourceLoaderProperties,
+        final S3ResourceLoaderProperties resourceLoaderProperties,
         final S3ClientFactory s3ClientFactory
     ) {
         final ThreadPoolTaskExecutor s3TaskExecutor = new ThreadPoolTaskExecutor();

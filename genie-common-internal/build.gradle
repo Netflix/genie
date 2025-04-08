@@ -16,13 +16,17 @@ dependencies {
     api(project(":genie-common"))
     api(project(":genie-common-external"))
 
+    api("io.awspring.cloud:spring-cloud-aws-core:${spring_cloud_aws_3_version}")
+    api("io.awspring.cloud:spring-cloud-aws-s3:${spring_cloud_aws_3_version}")
+
     api("software.amazon.awssdk:aws-core")
     api("software.amazon.awssdk:s3")
     api("software.amazon.awssdk:sts")
     api("software.amazon.awssdk:s3-transfer-manager")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.github.ben-manes.caffeine:caffeine")
-    api("io.awspring.cloud:spring-cloud-aws-autoconfigure")
+    api("io.awspring.cloud:spring-cloud-aws-autoconfigure:${spring_cloud_aws_3_version}")
+    api("io.awspring.cloud:spring-cloud-aws-s3:${spring_cloud_aws_3_version}")
     api("io.zipkin.brave:brave")
     api("jakarta.validation:jakarta.validation-api")
     api("org.springframework:spring-context")
@@ -34,7 +38,6 @@ dependencies {
 
     implementation("com.google.guava:guava")
     implementation("com.google.protobuf:protobuf-java")
-    implementation("io.awspring.cloud:spring-cloud-aws-starter")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
     implementation("commons-codec:commons-codec")
