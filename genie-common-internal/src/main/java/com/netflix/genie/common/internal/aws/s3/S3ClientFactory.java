@@ -35,7 +35,6 @@ import software.amazon.awssdk.services.s3.S3Uri;
 import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
 import jakarta.annotation.Nullable;
 import java.net.URI;
@@ -58,12 +57,27 @@ public class S3ClientFactory {
     @VisibleForTesting
     static final String BUCKET_PROPERTIES_ROOT_KEY = "genie.aws.s3.buckets";
 
+    /**
+     *  Get the AWS credentials provider used by this factory.
+     */
+    @Getter
     private final AwsCredentialsProvider awsCredentialsProvider;
     private final Map<String, S3ClientKey> bucketToClientKey;
     private final ConcurrentHashMap<S3ClientKey, S3Client> clientCache;
-    private final ConcurrentHashMap<S3Client, S3TransferManager> transferManagerCache;
+    /**
+     *  Get the bucket properties used by this factory.
+     */
+    @Getter
     private final Map<String, BucketProperties> bucketProperties;
+    /**
+     *  Get the STS client used by this factory.
+     */
+    @Getter
     private final StsClient stsClient;
+    /**
+     *  Get the default region used by this factory.
+     */
+    @Getter
     private final Region defaultRegion;
     private final S3Utilities s3Utils;
 
@@ -106,7 +120,6 @@ public class S3ClientFactory {
         // NOTE: Should we proactively create all necessary clients or be lazy about it? For now, lazy.
         final int initialCapacity = this.bucketProperties.size() + 1;
         this.clientCache = new ConcurrentHashMap<>(initialCapacity);
-        this.transferManagerCache = new ConcurrentHashMap<>(initialCapacity);
 
         Region tmpRegion;
         try {
@@ -144,9 +157,38 @@ public class S3ClientFactory {
      * @return A S3 client instance which should be used to access the S3 resource
      */
     public S3Client getClient(final S3Uri s3Uri) {
-        final String bucketName = s3Uri.bucket().orElse(null);
+        final S3ClientKey s3ClientKey = getS3ClientKey(s3Uri);
+        return this.clientCache.computeIfAbsent(s3ClientKey, this::buildS3Client);
+    }
 
-        final S3ClientKey s3ClientKey;
+    /**
+     * Get a {@link S3Uri} from a URI.
+     *
+     * @param uri The URI to parse
+     * @return A {@link S3Uri} instance
+     */
+    public S3Uri getS3Uri(final URI uri) {
+        return this.s3Utils.parseUri(uri);
+    }
+
+    /**
+     * Get a {@link S3Uri} from a string.
+     *
+     * @param uri The URI string to parse
+     * @return A {@link S3Uri} instance
+     */
+    public S3Uri getS3Uri(final String uri) {
+        return this.getS3Uri(URI.create(uri));
+    }
+
+    /**
+     * Get the S3 client key for a given S3 URI.
+     *
+     * @param s3Uri The S3 URI
+     * @return The S3 client key
+     */
+    public S3ClientKey getS3ClientKey(final S3Uri s3Uri) {
+        final String bucketName = s3Uri.bucket().orElse(null);
 
         /*
          * The purpose of the dual maps is to make sure we don't create an unnecessary number of S3 clients.
@@ -155,7 +197,7 @@ public class S3ClientFactory {
          * combination. This way we first map the bucket name to a key of role/region and then use that key
          * to find a re-usable client for those dimensions.
          */
-        s3ClientKey = this.bucketToClientKey.computeIfAbsent(
+        return this.bucketToClientKey.computeIfAbsent(
             bucketName,
             key -> {
                 // We've never seen this bucket before. Calculate the key.
@@ -189,22 +231,6 @@ public class S3ClientFactory {
                 return new S3ClientKey(bucketRegion, roleARN);
             }
         );
-
-        return this.clientCache.computeIfAbsent(s3ClientKey, this::buildS3Client);
-    }
-
-    /**
-     * Get a {@link S3TransferManager} instance for use with the given {@code s3Uri}.
-     *
-     * @param s3Uri The S3 URI this transfer manager will be interacting with
-     * @return An instance of {@link S3TransferManager} backed by an appropriate S3 client for the given URI
-     */
-    public S3TransferManager getTransferManager(final S3Uri s3Uri) {
-        return this.transferManagerCache.computeIfAbsent(this.getClient(s3Uri), this::buildTransferManager);
-    }
-
-    public S3Uri getS3Uri(final URI uri) {
-        return this.s3Utils.parseUri(uri);
     }
 
     private S3Client buildS3Client(final S3ClientKey s3ClientKey) {
@@ -232,13 +258,6 @@ public class S3ClientFactory {
             .build();
     }
 
-    private S3TransferManager buildTransferManager(final S3Client s3Client) {
-        // TODO: Perhaps want to supply more options?
-
-        // Maybe move all S3TransferManager related logic to another factory with AsyncS3Client?
-        return S3TransferManager.builder().s3Client(s3Client).build();
-    }
-
     /**
      * A simple class used as a key to see if we already have a S3Client created for the combination of properties
      * that make up this class.
@@ -248,7 +267,7 @@ public class S3ClientFactory {
      */
     @Getter
     @EqualsAndHashCode(doNotUseGetters = true)
-    private static class S3ClientKey {
+    public static class S3ClientKey {
         private final Region region;
         private final String roleARN;
 
@@ -263,7 +282,12 @@ public class S3ClientFactory {
             this.roleARN = roleARN;
         }
 
-        Optional<String> getRoleARN() {
+        /**
+         * Get the role ARN.
+         *
+         * @return The role ARN as an Optional
+         */
+        public Optional<String> getRoleARN() {
             return Optional.ofNullable(this.roleARN);
         }
     }

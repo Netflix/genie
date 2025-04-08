@@ -21,6 +21,7 @@ import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
 import com.netflix.genie.common.internal.aws.s3.S3ResourceLoaderProperties;
+import com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration;
@@ -174,10 +175,24 @@ public class AwsAutoConfiguration {
     }
 
     /**
+     * Provide a {@link S3TransferManagerFactory} instance if one is needed by the system.
+     * This factory is responsible for creating and managing {@link software.amazon.awssdk.transfer.s3.S3TransferManager}
+     * instances, which are used for efficient transfer of files to and from S3.
+     *
+     * @param s3ClientFactory The {@link S3ClientFactory} instance to use for configuration and utilities
+     * @return A {@link S3TransferManagerFactory} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(S3TransferManagerFactory.class)
+    public S3TransferManagerFactory s3TransferManagerFactory(final S3ClientFactory s3ClientFactory) {
+        return new S3TransferManagerFactory(s3ClientFactory);
+    }
+
+    /**
      * Provide an implementation of {@link JobArchiver} to handle archiving
      * to S3.
      *
-     * @param s3ClientFactory The factory for creating S3 clients
+     * @param s3ClientFactory The factory for creating S3 client
      * @return A {@link S3JobArchiverImpl} instance
      */
     @Bean
