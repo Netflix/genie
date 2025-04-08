@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.agent.cli;
 
-import software.amazon.awssdk.services.s3.S3Uri;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.IValueValidator;
 import com.beust.jcommander.ParameterException;

@@ -82,5 +82,11 @@ public class RetryProperties {
 
         @Min(1)
         private int noOfRetries = 5;
+
+        @Min(1)
+        private int apiCallTimeoutSeconds = 60;
+
+        @Min(1)
+        private int apiCallAttemptTimeoutSeconds = 10;
     }
 }
