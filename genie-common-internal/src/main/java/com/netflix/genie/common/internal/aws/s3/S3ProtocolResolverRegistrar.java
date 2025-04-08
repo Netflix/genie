@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import io.awspring.cloud.core.io.s3.SimpleStorageProtocolResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -33,9 +32,9 @@ import java.util.stream.Collectors;
 /**
  * A class which takes an instance of {@link S3ProtocolResolver} and adds it to the Spring {@link ApplicationContext}
  * set of {@link ProtocolResolver}. This class will also search for any existing instances of
- * {@link SimpleStorageProtocolResolver} within the current protocol resolver set. Since the protocol resolvers are
+ * {@link S3ProtocolResolver} within the current protocol resolver set. Since the protocol resolvers are
  * iterated in the order they're added, due to being backed by {@link java.util.LinkedHashMap}, any call to
- * {@link ApplicationContext#getResource(String)} would always use {@link SimpleStorageProtocolResolver} for S3
+ * {@link ApplicationContext#getResource(String)} would always use {@link S3ProtocolResolver} for S3
  * resources if it was already in the set before this class is invoked.
  *
  * @author tgianos
@@ -59,24 +58,20 @@ public class S3ProtocolResolverRegistrar implements ApplicationContextAware {
      * {@inheritDoc}
      * <p>
      * Add the {@link S3ProtocolResolver} to the set of protocol resolvers in the application context. Remove any
-     * instances of {@link SimpleStorageProtocolResolver}.
+     * instances of {@link S3ProtocolResolver}.
      */
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        if (applicationContext instanceof ConfigurableApplicationContext) {
-            final ConfigurableApplicationContext configurableApplicationContext
-                = (ConfigurableApplicationContext) applicationContext;
+        if (applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext) {
 
-            if (configurableApplicationContext instanceof AbstractApplicationContext) {
-                final AbstractApplicationContext abstractApplicationContext
-                    = (AbstractApplicationContext) configurableApplicationContext;
+            if (configurableApplicationContext instanceof AbstractApplicationContext abstractApplicationContext) {
 
                 final Collection<ProtocolResolver> protocolResolvers
                     = abstractApplicationContext.getProtocolResolvers();
 
                 final Set<ProtocolResolver> simpleStorageProtocolResolvers = protocolResolvers
                     .stream()
-                    .filter(SimpleStorageProtocolResolver.class::isInstance)
+                    .filter(S3ProtocolResolver.class::isInstance)
                     .collect(Collectors.toSet());
 
                 protocolResolvers.removeAll(simpleStorageProtocolResolvers);
