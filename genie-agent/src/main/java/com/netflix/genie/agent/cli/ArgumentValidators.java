@@ -22,6 +22,7 @@ import com.beust.jcommander.IValueValidator;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.validators.PositiveInteger;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Utilities;
 
 import java.net.URI;
@@ -39,8 +40,8 @@ import java.util.List;
  */
 final class ArgumentValidators {
 
-    private static final S3Utilities S3_UTILITIES = S3Utilities.builder().build();
-
+    // NOTE: region isn't used for parsing URIs...
+    private static final S3Utilities S3_UTILITIES = S3Utilities.builder().region(Region.US_EAST_1).build();
     /**
      * Hide constructor.
      */
@@ -74,10 +75,9 @@ final class ArgumentValidators {
         @Override
         public void validate(final String name, final String value) throws ParameterException {
             try {
-                //Check if a valid S3 uri can be created
-                S3_UTILITIES.parseUri(new URI(value));
+                S3_UTILITIES.parseUri(URI.create(value));
             } catch (Exception e) {
-                throw new ParameterException(name + " is not a valid S3 uri");
+                throw new ParameterException(name + " " + value + " is not a valid S3 uri");
             }
         }
     }
