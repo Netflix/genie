@@ -30,6 +30,7 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Uri;
 import software.amazon.awssdk.services.s3.S3Utilities;
@@ -37,6 +38,8 @@ import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 
 import jakarta.annotation.Nullable;
+import software.amazon.awssdk.transfer.s3.S3TransferManager;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
@@ -64,6 +67,8 @@ public class S3ClientFactory {
     private final AwsCredentialsProvider awsCredentialsProvider;
     private final Map<String, S3ClientKey> bucketToClientKey;
     private final ConcurrentHashMap<S3ClientKey, S3Client> clientCache;
+    private final ConcurrentHashMap<S3ClientFactory.S3ClientKey, S3AsyncClient> asyncClientCache;
+    private final ConcurrentHashMap<S3AsyncClient, S3TransferManager> transferManagerCache;
     /**
      *  Get the bucket properties used by this factory.
      */
@@ -148,6 +153,8 @@ public class S3ClientFactory {
             .build();
 
         this.bucketToClientKey = new ConcurrentHashMap<>();
+        this.asyncClientCache = new ConcurrentHashMap<>(initialCapacity);
+        this.transferManagerCache = new ConcurrentHashMap<>(initialCapacity);
     }
 
     /**
@@ -209,8 +216,9 @@ public class S3ClientFactory {
                  * 3. Fall back to whatever the default is for this process
                  */
                 final Region bucketRegion;
-                if (s3Uri.region().isPresent()) {
-                    bucketRegion = s3Uri.region().get();
+                final Optional<Region> regionOptional = s3Uri.region();
+                if (regionOptional.isPresent()) {
+                    bucketRegion = regionOptional.get();
                 } else {
                     final String propertyBucketRegion = this.bucketProperties.containsKey(key)
                         ? this.bucketProperties.get(key).getRegion().orElse(null)
@@ -290,5 +298,55 @@ public class S3ClientFactory {
         public Optional<String> getRoleARN() {
             return Optional.ofNullable(this.roleARN);
         }
+    }
+
+    /**
+     * Get an {@link S3AsyncClient} client instance appropriate for the given {@link S3Uri}.
+     *
+     * @param s3Uri The URI of the S3 resource this client is expected to access.
+     * @return A S3 async client instance which should be used to access the S3 resource
+     */
+    public S3AsyncClient getAsyncClient(final S3Uri s3Uri) {
+        final S3ClientKey s3ClientKey = getS3ClientKey(s3Uri);
+        return this.asyncClientCache.computeIfAbsent(s3ClientKey, this::buildS3AsyncClient);
+    }
+
+    /**
+     * Get a {@link S3TransferManager} instance for use with the given {@code s3Uri}.
+     *
+     * @param s3Uri The S3 URI this transfer manager will be interacting with
+     * @return An instance of {@link S3TransferManager} backed by an appropriate S3 async client for the given URI
+     */
+    public S3TransferManager getTransferManager(final S3Uri s3Uri) {
+        return this.transferManagerCache.computeIfAbsent(this.getAsyncClient(s3Uri), this::buildTransferManager);
+    }
+
+    private S3AsyncClient buildS3AsyncClient(final S3ClientKey s3ClientKey) {
+        final AwsCredentialsProvider credentialsProvider = s3ClientKey
+            .getRoleARN()
+            .map(
+                roleARN -> {
+                    final String roleSession = "Genie-Agent-" + UUID.randomUUID().toString();
+
+                    return (AwsCredentialsProvider) StsAssumeRoleCredentialsProvider.builder()
+                        .stsClient(getStsClient())
+                        .refreshRequest(
+                            request -> request.roleArn(roleARN).roleSessionName(roleSession)
+                        )
+                        .build();
+                }
+            )
+            .orElse(getAwsCredentialsProvider());
+
+        return S3AsyncClient.builder()
+            .region(s3ClientKey.getRegion())
+            .credentialsProvider(credentialsProvider)
+            .build();
+    }
+
+    private S3TransferManager buildTransferManager(final S3AsyncClient s3AsyncClient) {
+        return S3TransferManager.builder()
+            .s3Client(s3AsyncClient)
+            .build();
     }
 }
