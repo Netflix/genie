@@ -18,9 +18,6 @@
 package com.netflix.genie.web.spring.autoconfigure.aws;
 
 import software.amazon.awssdk.core.retry.RetryMode;
-import software.amazon.awssdk.core.retry.RetryPolicy;
-import software.amazon.awssdk.core.retry.conditions.RetryCondition;
-import software.amazon.awssdk.core.retry.backoff.FixedDelayBackoffStrategy;
 import org.springframework.context.annotation.Bean;
 import java.time.Duration;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
