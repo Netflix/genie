@@ -167,6 +167,9 @@
         "org.springframework.boot:spring-boot-starter": {
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -391,6 +394,9 @@
             "locked": "3.4.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "3.4.2"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
             "locked": "3.4.2"
         },
         "org.springframework:spring-context": {
@@ -737,6 +743,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -1060,6 +1069,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -1373,6 +1385,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -1597,6 +1612,9 @@
             "locked": "3.4.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "3.4.2"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
             "locked": "3.4.2"
         },
         "org.springframework:spring-context": {
@@ -1943,6 +1961,9 @@
             ],
             "locked": "3.4.2"
         },
+        "org.springframework.boot:spring-boot-starter-web": {
+            "locked": "3.4.2"
+        },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
@@ -2177,6 +2198,9 @@
             "locked": "3.4.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "3.4.2"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
             "locked": "3.4.2"
         },
         "org.springframework:spring-context": {
@@ -2521,6 +2545,9 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
+            "locked": "3.4.2"
+        },
+        "org.springframework.boot:spring-boot-starter-web": {
             "locked": "3.4.2"
         },
         "org.springframework:spring-context": {
