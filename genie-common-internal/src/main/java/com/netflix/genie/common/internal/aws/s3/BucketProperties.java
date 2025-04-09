@@ -64,15 +64,27 @@ public class BucketProperties {
     }
 
     /**
-     * Set the AWS region from a string name representation e.g. us-east-1.
+     * Set the AWS region from a string name representation (e.g., us-east-1).
+     * This method validates that the provided region is a valid AWS region.
      *
-     * @param region The name of the region to use
+     * @param region The name of the region to use, or null to clear the region setting
+     * @throws IllegalArgumentException If the provided region is not a valid AWS region
      * @see Region#of(String)
      */
     public void setRegion(@Nullable final String region) {
         if (region != null) {
+            // Check if the region ID is in the list of predefined AWS regions
+            boolean isValidRegion = Region.regions().stream()
+                .anyMatch(r -> r.id().equals(region));
+
+            if (!isValidRegion) {
+                throw new IllegalArgumentException("Invalid AWS region: " + region);
+            }
+
+            // Convert the validated region string to a Region object
             this.region = Region.of(region);
         } else {
+            // Clear the region if null is provided
             this.region = null;
         }
     }
