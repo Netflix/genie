@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @Component
-@ConfigurationProperties(prefix = "cloud.aws.s3")
+@ConfigurationProperties(prefix = "spring.cloud.aws.s3.loader")
 public class S3ResourceLoaderProperties {
     private int corePoolSize = 1;
     private int maxPoolSize = Integer.MAX_VALUE;

@@ -34,9 +34,10 @@ import org.springframework.context.ApplicationContext;
  */
 @SpringBootTest(
     classes = GenieAgentApplication.class,
-    webEnvironment = SpringBootTest.WebEnvironment.NONE,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
-        "debug=true"
+        "debug=true",
+        "spring.cloud.aws.s3.region=us-east-1"
     }
 )
 @EnableAutoConfiguration

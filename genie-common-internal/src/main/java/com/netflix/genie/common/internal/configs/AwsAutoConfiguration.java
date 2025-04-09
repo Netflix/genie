@@ -27,6 +27,7 @@ import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProperties;
+import io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration;
 import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
 import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +63,7 @@ import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 @AutoConfigureAfter(
     {
         CredentialsProviderAutoConfiguration.class,
-        RegionProviderAutoConfiguration.class,
-        S3AutoConfiguration.class
+        RegionProviderAutoConfiguration.class
     }
 )
 @ConditionalOnBean(AwsCredentialsProvider.class)
@@ -128,7 +128,7 @@ public class AwsAutoConfiguration {
      * @return A {@link S3Properties} instance with the bindings from cloud.aws.loader values
      */
     @Bean
-    @ConditionalOnMissingBean(S3Properties.class)
+    @Primary
     @ConfigurationProperties(S3Properties.PREFIX)
     public S3Properties s3Properties() {
         return new S3Properties();
@@ -178,7 +178,7 @@ public class AwsAutoConfiguration {
      * @return A {@link S3TransferManagerFactory} instance
      */
     @Bean
-    @ConditionalOnMissingBean(S3TransferManagerFactory.class)
+    @Primary
     public S3TransferManagerFactory s3TransferManagerFactory(final S3ClientFactory s3ClientFactory) {
         return new S3TransferManagerFactory(s3ClientFactory);
     }
