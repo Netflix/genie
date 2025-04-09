@@ -16,16 +16,6 @@
 #
 ##
 
-cloud:
-  aws:
-    credentials:
-      useDefaultAwsCredentialsChain: true
-    region:
-      auto: false
-      static: us-east-1
-    stack:
-      auto: false
-
 genie:
   agent:
     connection-tracking:
@@ -126,6 +116,17 @@ management:
       show-details: always
 
 spring:
+  cloud:
+    aws:
+      credentials:
+        useDefaultAwsCredentialsChain: true
+      region:
+        auto: false
+        static: us-east-1
+      stack:
+        auto: false
+    zookeeper:
+      enabled: false
   application:
     name: genie
   banner:
@@ -133,9 +134,7 @@ spring:
   cache:
     caffeine:
       spec: maximumSize=100,expireAfterAccess=600s
-  cloud:
-    zookeeper:
-      enabled: false
+
   data:
     redis:
       repositories:

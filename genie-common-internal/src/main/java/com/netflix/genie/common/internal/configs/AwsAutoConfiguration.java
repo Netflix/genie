@@ -29,17 +29,17 @@ import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProperties;
 import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
 import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
-import io.awspring.cloud.autoconfigure.sns.SnsAutoConfiguration;
-import io.awspring.cloud.autoconfigure.sqs.SqsAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
@@ -84,7 +84,7 @@ public class AwsAutoConfiguration {
      * @return A region provider based on whether static was set by user, else auto, else default of us-east-1
      */
     @Bean
-    @ConditionalOnMissingBean(AwsRegionProvider.class)
+    @Primary
     public AwsRegionProvider awsRegionProvider(final RegionProperties regionProperties) {
         final String staticRegion = regionProperties.getStatic();
         if (StringUtils.isNotBlank(staticRegion)) {
