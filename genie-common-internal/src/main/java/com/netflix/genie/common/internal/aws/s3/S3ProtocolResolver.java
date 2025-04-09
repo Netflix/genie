@@ -59,20 +59,15 @@ public class S3ProtocolResolver implements ProtocolResolver {
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d*)-(\\d*)");
 
     private final S3ClientFactory s3ClientFactory;
-    private final TaskExecutor s3TaskExecutor;
 
     /**
      * Constructor.
      *
      * @param s3ClientFactory The S3 client factory to use to get S3 client instances
-     * @param s3TaskExecutor  A task executor to use for uploading files to S3
      */
     public S3ProtocolResolver(
-        final S3ClientFactory s3ClientFactory,
-        final TaskExecutor s3TaskExecutor
-    ) {
+        final S3ClientFactory s3ClientFactory) {
         this.s3ClientFactory = s3ClientFactory;
-        this.s3TaskExecutor = s3TaskExecutor;
     }
 
     /**

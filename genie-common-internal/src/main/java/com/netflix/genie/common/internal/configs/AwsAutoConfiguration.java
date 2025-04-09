@@ -20,17 +20,14 @@ package com.netflix.genie.common.internal.configs;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
-import com.netflix.genie.common.internal.aws.s3.S3ResourceLoaderProperties;
 import com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProperties;
-import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,7 +39,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ProtocolResolver;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
@@ -119,36 +115,15 @@ public class AwsAutoConfiguration {
     }
 
     /**
-     * Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
-     * the {@link S3AutoConfiguration} isn't applied by the agent app.
-     *
-     * @return A {@link S3ResourceLoaderProperties} instance with the bindings from cloud.aws.loader values
-     */
-    @Bean
-    public S3ResourceLoaderProperties s3ResourceLoaderProperties() {
-        return new S3ResourceLoaderProperties();
-    }
-
-    /**
      * Provide a protocol resolver which will allow resources with s3:// prefixes
      *
-     * @param resourceLoaderProperties The {@link S3ResourceLoaderProperties} instance to use
      * @param s3ClientFactory          The {@link S3ClientFactory} instance to use
      * @return A {@link S3ProtocolResolver} instance
      */
     @Bean
     @ConditionalOnMissingBean(S3ProtocolResolver.class)
-    public S3ProtocolResolver s3ProtocolResolver(
-        final S3ResourceLoaderProperties resourceLoaderProperties,
-        final S3ClientFactory s3ClientFactory
-    ) {
-        final ThreadPoolTaskExecutor s3TaskExecutor = new ThreadPoolTaskExecutor();
-        s3TaskExecutor.setCorePoolSize(resourceLoaderProperties.getCorePoolSize());
-        s3TaskExecutor.setMaxPoolSize(resourceLoaderProperties.getMaxPoolSize());
-        s3TaskExecutor.setQueueCapacity(resourceLoaderProperties.getQueueCapacity());
-        s3TaskExecutor.setThreadGroupName("Genie-S3-Resource-Loader-Thread-Pool");
-        s3TaskExecutor.setThreadNamePrefix("S3-resource-loader-thread");
-        return new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor);
+    public S3ProtocolResolver s3ProtocolResolver(final S3ClientFactory s3ClientFactory) {
+        return new S3ProtocolResolver(s3ClientFactory);
     }
 
     /**
