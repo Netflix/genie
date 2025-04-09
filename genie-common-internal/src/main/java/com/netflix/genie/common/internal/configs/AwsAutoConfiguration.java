@@ -27,16 +27,13 @@ import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProperties;
-import io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration;
-import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
 import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,7 +56,7 @@ import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
  * @since 4.0.0
  */
 @Configuration
-@EnableConfigurationProperties({S3ResourceLoaderProperties.class, S3Properties.class})
+@EnableConfigurationProperties
 @AutoConfigureAfter(
     {
         CredentialsProviderAutoConfiguration.class,
@@ -125,13 +122,11 @@ public class AwsAutoConfiguration {
      * Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
      * the {@link S3AutoConfiguration} isn't applied by the agent app.
      *
-     * @return A {@link S3Properties} instance with the bindings from cloud.aws.loader values
+     * @return A {@link S3ResourceLoaderProperties} instance with the bindings from cloud.aws.loader values
      */
     @Bean
-    @Primary
-    @ConfigurationProperties(S3Properties.PREFIX)
-    public S3Properties s3Properties() {
-        return new S3Properties();
+    public S3ResourceLoaderProperties s3ResourceLoaderProperties() {
+        return new S3ResourceLoaderProperties();
     }
 
     /**

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "spring.cloud.aws.s3.loader")
 public class S3ResourceLoaderProperties {
-    private int corePoolSize = 1;
-    private int maxPoolSize = Integer.MAX_VALUE;
-    private int queueCapacity = Integer.MAX_VALUE;
+    private int corePoolSize = 10;
+    private int maxPoolSize = 20;
+    private int queueCapacity = 100;
 }
