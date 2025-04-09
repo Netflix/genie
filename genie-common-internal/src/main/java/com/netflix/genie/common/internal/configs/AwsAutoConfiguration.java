@@ -29,13 +29,14 @@ import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
 import io.awspring.cloud.autoconfigure.core.RegionProperties;
 import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
 import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
+import io.awspring.cloud.autoconfigure.sns.SnsAutoConfiguration;
+import io.awspring.cloud.autoconfigure.sqs.SqsAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
@@ -58,11 +58,12 @@ import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
  * @since 4.0.0
  */
 @Configuration
-@ConfigurationPropertiesScan
+@EnableConfigurationProperties({S3ResourceLoaderProperties.class, S3Properties.class})
 @AutoConfigureAfter(
     {
         CredentialsProviderAutoConfiguration.class,
-        RegionProviderAutoConfiguration.class
+        RegionProviderAutoConfiguration.class,
+        S3AutoConfiguration.class
     }
 )
 @ConditionalOnBean(AwsCredentialsProvider.class)
@@ -77,10 +78,7 @@ public class AwsAutoConfiguration {
     public static final int S3_JOB_ARCHIVER_PRECEDENCE = Ordered.HIGHEST_PRECEDENCE + 10;
 
     /**
-     * Get an AWS region provider instance. The rules for this basically follow what Spring Cloud AWS does but uses
-     * the interface from the AWS SDK instead and provides a sensible default.
-     * <p>
-     * See: <a href="https://tinyurl.com/y9edl6yr">Spring Cloud AWS Region Documentation</a>
+     * Get an AWS region provider instance.
      *
      * @param regionProperties The cloud.aws.region.* properties
      * @return A region provider based on whether static was set by user, else auto, else default of us-east-1
@@ -91,20 +89,17 @@ public class AwsAutoConfiguration {
         final String staticRegion = regionProperties.getStatic();
         if (StringUtils.isNotBlank(staticRegion)) {
             // Make sure we have a valid region. Will throw runtime exception if not.
-            final Region region = Region.of(staticRegion);
-            return new AwsRegionProvider() {
-                /**
-                 * Always return the static configured region.
-                 * <p>
-                 * {@inheritDoc}
-                 */
-                @Override
-                public Region getRegion() throws SdkClientException {
-                    return region;
-                }
-            };
+            return () -> Region.of(staticRegion);
         } else {
-            return new DefaultAwsRegionProviderChain();
+            // Try DefaultAwsRegionProviderChain, but fall back to us-east-1 if it fails
+            try {
+                DefaultAwsRegionProviderChain providerChain = new DefaultAwsRegionProviderChain();
+                Region region = providerChain.getRegion();
+                return () -> region;
+            } catch (Exception e) {
+                log.warn("Failed to get region from DefaultAwsRegionProviderChain, falling back to us-east-1", e);
+                return () -> Region.US_EAST_1;
+            }
         }
     }
 
