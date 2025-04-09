@@ -97,7 +97,7 @@ public class AgentAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = AsyncTaskExecutor.class)
+    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor")
     public AsyncTaskExecutor sharedAgentTaskExecutor(final AgentProperties agentProperties) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
