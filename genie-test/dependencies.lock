@@ -63,13 +63,13 @@
             "locked": "1.18.24"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.7.17"
@@ -95,13 +95,13 @@
             "locked": "5.8.2"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.7.17"
@@ -156,13 +156,13 @@
             "locked": "1.18.24"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.7.17"
@@ -188,13 +188,13 @@
             "locked": "5.8.2"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.7.17"
@@ -244,13 +244,13 @@
             "locked": "1.18.24"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.7.17"
@@ -276,13 +276,13 @@
             "locked": "5.8.2"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "locked": "2.7.17"
