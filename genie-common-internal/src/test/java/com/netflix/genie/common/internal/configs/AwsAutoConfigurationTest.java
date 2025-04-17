@@ -55,7 +55,7 @@ class AwsAutoConfigurationTest {
 
         @Bean
         public RegionProperties regionProperties() {
-            RegionProperties properties = new RegionProperties();
+            final RegionProperties properties = new RegionProperties();
             properties.setStatic("us-east-1");
             return properties;
         }
