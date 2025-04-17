@@ -74,7 +74,7 @@ public class BucketProperties {
     public void setRegion(@Nullable final String region) {
         if (region != null) {
             // Check if the region ID is in the list of predefined AWS regions
-            boolean isValidRegion = Region.regions().stream()
+            final boolean isValidRegion = Region.regions().stream()
                 .anyMatch(r -> r.id().equals(region));
 
             if (!isValidRegion) {

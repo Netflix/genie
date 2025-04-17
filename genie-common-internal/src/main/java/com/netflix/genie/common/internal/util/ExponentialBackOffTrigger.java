@@ -125,7 +125,7 @@ public class ExponentialBackOffTrigger implements Trigger {
     }
 
     @Override
-    public Instant nextExecution(TriggerContext triggerContext) {
+    public Instant nextExecution(final TriggerContext triggerContext) {
         return null;
     }
 

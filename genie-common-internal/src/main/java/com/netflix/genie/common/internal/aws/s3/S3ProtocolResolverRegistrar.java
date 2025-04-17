@@ -62,17 +62,21 @@ public class S3ProtocolResolverRegistrar implements ApplicationContextAware {
      */
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        if (applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext) {
+        if (applicationContext instanceof ConfigurableApplicationContext) {
+            final ConfigurableApplicationContext configurableApplicationContext =
+                (ConfigurableApplicationContext) applicationContext;
 
-            if (configurableApplicationContext instanceof AbstractApplicationContext abstractApplicationContext) {
+            if (configurableApplicationContext instanceof AbstractApplicationContext) {
+                final AbstractApplicationContext abstractApplicationContext =
+                    (AbstractApplicationContext) configurableApplicationContext;
 
                 final Collection<ProtocolResolver> protocolResolvers
                     = abstractApplicationContext.getProtocolResolvers();
 
                 final Set<ProtocolResolver> simpleStorageProtocolResolvers = protocolResolvers
                     .stream()
-                    .filter(resolver -> resolver.getClass().getName().contains("S3ProtocolResolver") ||
-                        resolver.getClass().getName().contains("SimpleStorageProtocolResolver"))
+                    .filter(resolver -> resolver.getClass().getName().contains("S3ProtocolResolver")
+                        || resolver.getClass().getName().contains("SimpleStorageProtocolResolver"))
                     .collect(Collectors.toSet());
 
                 protocolResolvers.removeAll(simpleStorageProtocolResolvers);

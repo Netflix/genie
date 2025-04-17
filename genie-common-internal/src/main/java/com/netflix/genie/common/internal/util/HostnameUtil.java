@@ -46,7 +46,7 @@ public final class HostnameUtil {
 
         // Check if running on AWS cloud environment
         try {
-            String instanceId = EC2MetadataUtils.getInstanceId();
+           final String instanceId = EC2MetadataUtils.getInstanceId();
             if (instanceId != null && !instanceId.isEmpty()) {
                 // Running on AWS, use private IP address
                 hostname = EC2MetadataUtils.getPrivateIpAddress();

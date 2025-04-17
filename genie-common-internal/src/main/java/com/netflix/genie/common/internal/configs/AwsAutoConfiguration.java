@@ -86,8 +86,8 @@ public class AwsAutoConfiguration {
         } else {
             // Try DefaultAwsRegionProviderChain, but fall back to us-east-1 if it fails
             try {
-                DefaultAwsRegionProviderChain providerChain = new DefaultAwsRegionProviderChain();
-                Region region = providerChain.getRegion();
+                final DefaultAwsRegionProviderChain providerChain = new DefaultAwsRegionProviderChain();
+                final Region region = providerChain.getRegion();
                 return () -> region;
             } catch (Exception e) {
                 log.warn("Failed to get region from DefaultAwsRegionProviderChain, falling back to us-east-1", e);
@@ -115,7 +115,7 @@ public class AwsAutoConfiguration {
     }
 
     /**
-     * Provide a protocol resolver which will allow resources with s3:// prefixes
+     * Provide a protocol resolver which will allow resources with s3:// prefixes.
      *
      * @param s3ClientFactory          The {@link S3ClientFactory} instance to use
      * @return A {@link S3ProtocolResolver} instance
@@ -141,7 +141,7 @@ public class AwsAutoConfiguration {
 
     /**
      * Provide a {@link S3TransferManagerFactory} instance if one is needed by the system.
-     * This factory is responsible for creating and managing {@link software.amazon.awssdk.transfer.s3.S3TransferManager}
+     * This factory is for creating and managing {@link software.amazon.awssdk.transfer.s3.S3TransferManager}
      * instances, which are used for efficient transfer of files to and from S3.
      *
      * @param s3ClientFactory The {@link S3ClientFactory} instance to use for configuration and utilities

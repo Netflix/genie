@@ -78,15 +78,15 @@ public class S3JobArchiverImpl implements JobArchiver {
             final S3TransferManager transferManager = this.transferManagerFactory.getTransferManager(s3Uri);
 
             // Create a list of upload futures
-            List<CompletableFuture<CompletedFileUpload>> uploadFutures = filesList.stream()
+            final List<CompletableFuture<CompletedFileUpload>> uploadFutures = filesList.stream()
                 .map(file -> {
-                    String key = keyPrefix + "/" + directory.relativize(file.toPath()).toString();
-                    UploadFileRequest uploadFileRequest = UploadFileRequest.builder()
+                    final String key = keyPrefix + "/" + directory.relativize(file.toPath()).toString();
+                    final UploadFileRequest uploadFileRequest = UploadFileRequest.builder()
                         .putObjectRequest(b -> b.bucket(bucketName).key(key))
                         .source(file.toPath())
                         .build();
 
-                    FileUpload fileUpload = transferManager.uploadFile(uploadFileRequest);
+                    final FileUpload fileUpload = transferManager.uploadFile(uploadFileRequest);
                     return fileUpload.completionFuture();
                 })
                 .toList();
@@ -96,7 +96,7 @@ public class S3JobArchiverImpl implements JobArchiver {
 
             // Check for any failures
             for (CompletableFuture<CompletedFileUpload> future : uploadFutures) {
-                CompletedFileUpload result = future.get();
+                final CompletedFileUpload result = future.get();
                 if (result.response().sdkHttpResponse().isSuccessful()) {
                     log.debug("Successfully uploaded file: {}", result.response().eTag());
                 } else {

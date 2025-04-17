@@ -26,7 +26,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Uri;
