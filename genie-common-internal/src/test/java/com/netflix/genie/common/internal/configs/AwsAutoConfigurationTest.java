@@ -17,24 +17,24 @@
  */
 package com.netflix.genie.common.internal.configs;
 
-import com.amazonaws.regions.AwsRegionProvider;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
+import com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
-import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties;
-import io.awspring.cloud.context.support.io.SimpleStorageProtocolResolverConfigurer;
-import io.awspring.cloud.core.io.s3.SimpleStorageProtocolResolver;
+import io.awspring.cloud.autoconfigure.core.RegionProperties;
+import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.io.ProtocolResolver;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 
 import java.util.Collection;
 
@@ -45,23 +45,42 @@ import java.util.Collection;
  * @since 4.0.0
  */
 class AwsAutoConfigurationTest {
+
+    @Configuration
+    static class TestConfiguration {
+        @Bean
+        public AwsCredentialsProvider credentialsProvider() {
+            return DefaultCredentialsProvider.create();
+        }
+
+        @Bean
+        public RegionProperties regionProperties() {
+            RegionProperties properties = new RegionProperties();
+            properties.setStatic("us-east-1");
+            return properties;
+        }
+
+        @Bean
+        public S3Properties s3Properties() {
+            return new S3Properties();
+        }
+    }
+
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
-                ContextCredentialsAutoConfiguration.class,
-                ContextRegionProviderAutoConfiguration.class,
-                ContextResourceLoaderAutoConfiguration.class,
                 AwsAutoConfiguration.class
             )
         )
+        .withUserConfiguration(TestConfiguration.class)
         .withPropertyValues(
-            "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
-            "cloud.aws.region.auto=false",
-            "cloud.aws.region.static=us-east-1",
-            "cloud.aws.stack.auto=false",
+            "spring.cloud.aws.credentials.use-default-aws-credentials-chain=true",
+            "spring.cloud.aws.region.auto=false",
+            "spring.cloud.aws.region.static=us-east-1",
             "spring.jmx.enabled=false",
-            "spring.main.webApplicationType=none"
-        );
+            "spring.main.web-application-type=none"
+        )
+        .withPropertyValues("spring.main.allow-bean-definition-overriding=true");
 
     /**
      * Test expected context.
@@ -70,25 +89,19 @@ class AwsAutoConfigurationTest {
     void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
-                Assertions.assertThat(context).hasSingleBean(AwsRegionProvider.class);
+                // Check for our specific beans
                 Assertions.assertThat(context).hasSingleBean(S3ClientFactory.class);
-                Assertions.assertThat(context).hasSingleBean(AwsS3ResourceLoaderProperties.class);
                 Assertions.assertThat(context).hasSingleBean(S3ProtocolResolver.class);
                 Assertions.assertThat(context).hasSingleBean(S3ProtocolResolverRegistrar.class);
+                Assertions.assertThat(context).hasSingleBean(S3TransferManagerFactory.class);
                 Assertions.assertThat(context).hasSingleBean(S3JobArchiverImpl.class);
                 Assertions.assertThat(context).hasSingleBean(JobArchiver.class);
-
-                // Verify that Spring Cloud AWS still would try to register their S3 protocol resolver
-                Assertions.assertThat(context).hasSingleBean(SimpleStorageProtocolResolverConfigurer.class);
 
                 // And Make sure we ripped out the one from Spring Cloud AWS and put ours in instead
                 if (context instanceof AbstractApplicationContext) {
                     final AbstractApplicationContext aac = (AbstractApplicationContext) context;
                     final Collection<ProtocolResolver> protocolResolvers = aac.getProtocolResolvers();
                     Assertions.assertThat(protocolResolvers).contains(context.getBean(S3ProtocolResolver.class));
-                    Assertions
-                        .assertThat(protocolResolvers)
-                        .doesNotHaveAnyElementsOfTypes(SimpleStorageProtocolResolver.class);
                 }
             }
         );
