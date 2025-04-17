@@ -71,7 +71,8 @@ public class S3ProtocolResolverRegistrar implements ApplicationContextAware {
 
                 final Set<ProtocolResolver> simpleStorageProtocolResolvers = protocolResolvers
                     .stream()
-                    .filter(S3ProtocolResolver.class::isInstance)
+                    .filter(resolver -> resolver.getClass().getName().contains("S3ProtocolResolver") ||
+                        resolver.getClass().getName().contains("SimpleStorageProtocolResolver"))
                     .collect(Collectors.toSet());
 
                 protocolResolvers.removeAll(simpleStorageProtocolResolvers);
