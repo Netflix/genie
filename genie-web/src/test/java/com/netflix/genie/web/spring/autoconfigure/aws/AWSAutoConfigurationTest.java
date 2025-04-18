@@ -17,12 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.aws;
 
-import com.amazonaws.retry.RetryPolicy;
-import com.amazonaws.services.sns.AmazonSNS;
-import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import io.awspring.cloud.core.config.AmazonWebserviceClientConfigurationUtils;
+import io.awspring.cloud.autoconfigure.sns.SnsAutoConfiguration;
+import io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration;
+import io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.services.sns.SnsClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -40,19 +39,20 @@ class AWSAutoConfigurationTest {
         .withConfiguration(
             AutoConfigurations.of(
                 AWSAutoConfiguration.class,
-                ContextCredentialsAutoConfiguration.class,
-                ContextRegionProviderAutoConfiguration.class,
-                ContextResourceLoaderAutoConfiguration.class,
+                CredentialsProviderAutoConfiguration.class,
+                RegionProviderAutoConfiguration.class,
+                SnsAutoConfiguration.class,
                 com.netflix.genie.common.internal.configs.AwsAutoConfiguration.class
             )
         )
         .withPropertyValues(
-            "genie.retry.sns.noOfRetries=3",
+            "genie.retry.sns.api-call-timeout-seconds=10",
+            "genie.retry.sns.api-call-attempt-timeout-seconds=5",
             "genie.notifications.sns.enabled=true",
-            "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
-            "cloud.aws.region.auto=false",
-            "cloud.aws.region.static=us-east-1",
-            "cloud.aws.stack.auto=false",
+            "spring.cloud.aws.credentials.use-default-aws-credentials-chain=true",
+            "spring.cloud.aws.region.auto=false",
+            "spring.cloud.aws.region.static=us-east-1",
+            "spring.cloud.aws.stack.auto=false",
             "spring.jmx.enabled=false",
             "spring.main.webApplicationType=none"
         );
@@ -64,12 +64,28 @@ class AWSAutoConfigurationTest {
     void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
+                // Verify beans exist
                 Assertions.assertThat(context).hasBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
-                Assertions.assertThat(context).hasBean("SNSClientRetryPolicy");
-                Assertions.assertThat(context).hasBean("SNSClientConfiguration");
-                Assertions.assertThat(
-                    context.getBean("SNSClientRetryPolicy", RetryPolicy.class).getMaxErrorRetry()
-                ).isEqualTo(3);
+                Assertions.assertThat(context).hasBean(AWSAutoConfiguration.SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME);
+
+                // Verify configuration
+                ClientOverrideConfiguration overrideConfig = context.getBean(
+                    AWSAutoConfiguration.SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME,
+                    ClientOverrideConfiguration.class
+                );
+
+                // Verify retry strategy is set (we can't directly check the mode)
+                Assertions.assertThat(overrideConfig.retryStrategy()).isPresent();
+
+                // Verify timeouts
+                Assertions.assertThat(overrideConfig.apiCallTimeout()).isPresent();
+                Assertions.assertThat(overrideConfig.apiCallTimeout().get().getSeconds()).isEqualTo(10);
+
+                Assertions.assertThat(overrideConfig.apiCallAttemptTimeout()).isPresent();
+                Assertions.assertThat(overrideConfig.apiCallAttemptTimeout().get().getSeconds()).isEqualTo(5);
+
+                // Verify SnsClient is created
+                Assertions.assertThat(context.getBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME)).isInstanceOf(SnsClient.class);
             }
         );
     }
@@ -85,18 +101,17 @@ class AWSAutoConfigurationTest {
             ).run(
                 (context) -> {
                     Assertions.assertThat(context).doesNotHaveBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
+                    // The override config should still be created
+                    Assertions.assertThat(context).hasBean(AWSAutoConfiguration.SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME);
                 }
             );
     }
 
     /**
-     * Test that the name qualifier for the custom AmazonSNS bean matches the one generated as part of Spring Cloud
-     * AWS Messaging configuration (and hence the latter is not created).
+     * Test that the SNS client bean name matches the expected constant.
      */
     @Test
-    void testSpringCloudAWSBeanNameOverride() {
-        Assertions.assertThat(
-            AmazonWebserviceClientConfigurationUtils.getBeanName(String.valueOf(AmazonSNS.class))
-        ).isEqualTo(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
+    void testSNSClientBeanName() {
+        Assertions.assertThat(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME).isEqualTo("snsClient");
     }
 }
