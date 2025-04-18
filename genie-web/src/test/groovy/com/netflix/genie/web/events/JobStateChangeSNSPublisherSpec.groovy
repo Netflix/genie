@@ -94,9 +94,9 @@ class JobStateChangeSNSPublisherSpec extends Specification {
     def "Publish event (when previous state is #prevState)"() {
         setup:
         this.extraKeysMap.putAll([foo: "bar", bar: "foo"])
-        String message = null
         def tags = MetricsUtils.newSuccessTagsSet()
         tags.add(AbstractSNSPublisher.EventType.JOB_STATUS_CHANGE.getTypeTag())
+        PublishRequest capturedRequest = null
 
         when:
         this.publisher.onApplicationEvent(event)
@@ -108,38 +108,38 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
-        1 * snsClient.publish({ PublishRequest request ->
-            message == request.message()
-            request.topicArn() == topicARN
-            return true
-        }) >> PublishResponse.builder().build()
+        1 * snsClient.publish(_ as PublishRequest) >> { args ->
+            capturedRequest = args[0]
+            return PublishResponse.builder().build()
+        }
         1 * registry.counter(
             "genie.notifications.sns.publish.counter",
             tags
         ) >> counter
         1 * counter.increment()
 
-        expect:
+        and: "Verify message content"
+        capturedRequest != null
+        capturedRequest.topicArn() == topicARN
+        def message = capturedRequest.message()
         message != null
-        Map<String, Object> parsedMessage = GenieObjectMapper.getMapper().readValue(
-            message,
-            Map.class
-        )
 
+        def parsedMessage = new groovy.json.JsonSlurper().parseText(message)
         parsedMessage.size() == 7
-        parsedMessage.get("foo") as String == "bar"
-        parsedMessage.get("bar") as String == "foo"
-        parsedMessage.get("type") as String == "JOB_STATUS_CHANGE"
-        parsedMessage.get("id") != null
-        parsedMessage.get("timestamp") != null
-        parsedMessage.get("timestamp") instanceof Long
-        parsedMessage.get("isoTimestamp") != null
-        parsedMessage.get("isoTimestamp") instanceof String
-        Map<String, String> eventDetails = parsedMessage.get("details") as Map<String, String>
+        parsedMessage.foo == "bar"
+        parsedMessage.bar == "foo"
+        parsedMessage.type == "JOB_STATUS_CHANGE"
+        parsedMessage.id != null
+        parsedMessage.timestamp != null
+        parsedMessage.timestamp instanceof Number
+        parsedMessage.isoTimestamp != null
+        parsedMessage.isoTimestamp instanceof String
+        def eventDetails = parsedMessage.details
+
         eventDetails != null
-        eventDetails.get("jobId") == jobId
-        eventDetails.get("fromState") == String.valueOf(prevState)
-        eventDetails.get("toState") == JobStatus.RUNNING.name()
+        eventDetails.jobId == jobId
+        eventDetails.fromState == String.valueOf(prevState)
+        eventDetails.toState == JobStatus.RUNNING.name()
 
         where:
         prevState      | _
