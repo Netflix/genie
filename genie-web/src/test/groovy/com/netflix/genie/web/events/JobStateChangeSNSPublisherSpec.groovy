@@ -17,9 +17,6 @@
  */
 package com.netflix.genie.web.events
 
-import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.AuthorizationErrorException
-import com.amazonaws.services.sns.model.PublishResult
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Maps
 import com.netflix.genie.common.external.util.GenieObjectMapper
@@ -28,12 +25,16 @@ import com.netflix.genie.web.properties.SNSNotificationsProperties
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import software.amazon.awssdk.awscore.exception.AwsServiceException
+import software.amazon.awssdk.services.sns.SnsClient
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import software.amazon.awssdk.services.sns.model.PublishResponse
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class JobStateChangeSNSPublisherSpec extends Specification {
     JobStateChangeSNSPublisher publisher
-    AmazonSNS snsClient
+    SnsClient snsClient
     SNSNotificationsProperties snsProperties
     MeterRegistry registry
     ObjectMapper mapper
@@ -44,7 +45,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
     Counter counter
 
     void setup() {
-        this.snsClient = Mock(AmazonSNS)
+        this.snsClient = Mock(SnsClient)
         this.snsProperties = Mock(SNSNotificationsProperties)
         this.registry = Mock(MeterRegistry)
         this.mapper = GenieObjectMapper.getMapper()
@@ -68,7 +69,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         0 * event.getJobId()
         0 * event.getPreviousStatus()
         0 * event.getNewStatus()
-        0 * snsClient.publish(_, _)
+        0 * snsClient.publish(_)
         0 * registry.counter(_, _)
     }
 
@@ -85,7 +86,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * event.getNewStatus() >> JobStatus.INIT
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> ""
-        0 * snsClient.publish(_, _)
+        0 * snsClient.publish(_)
         0 * registry.counter(_, _)
     }
 
@@ -107,11 +108,11 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
-        1 * snsClient.publish(topicARN, _ as String) >> {
-            args ->
-                message = args[1] as String
-                return Mock(PublishResult)
-        }
+        1 * snsClient.publish({ PublishRequest request ->
+            message == request.message()
+            request.topicArn() == topicARN
+            return true
+        }) >> PublishResponse.builder().build()
         1 * registry.counter(
             "genie.notifications.sns.publish.counter",
             tags
@@ -148,7 +149,9 @@ class JobStateChangeSNSPublisherSpec extends Specification {
 
     def "Publish event exception"() {
         setup:
-        Exception e = new AuthorizationErrorException("...")
+        AwsServiceException e = AwsServiceException.builder()
+            .message("Authorization error")
+            .build()
         def tags = MetricsUtils.newFailureTagsSetForException(e)
         tags.add(AbstractSNSPublisher.EventType.JOB_STATUS_CHANGE.getTypeTag())
 
@@ -162,7 +165,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * event.getNewStatus() >> JobStatus.RUNNING
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsProperties.getTopicARN() >> topicARN
-        1 * snsClient.publish(topicARN, _ as String) >> {
+        1 * snsClient.publish(_ as PublishRequest) >> {
             throw e
         }
         1 * registry.counter(
