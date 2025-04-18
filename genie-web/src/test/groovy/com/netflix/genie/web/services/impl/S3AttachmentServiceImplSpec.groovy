@@ -63,6 +63,10 @@ class S3AttachmentServiceImplSpec extends Specification {
 
         this.serviceProperties.setLocationPrefix(URI.create("s3://" + BUCKET_NAME + "/" + S3_PREFIX))
 
+        s3ClientFactory.getS3Uri(serviceProperties.getLocationPrefix()) >> s3Uri
+        s3Uri.bucket() >> Optional.of(BUCKET_NAME)
+        s3Uri.key() >> Optional.of(S3_PREFIX)
+
         this.service = new S3AttachmentServiceImpl(s3ClientFactory, serviceProperties, registry)
     }
 
@@ -149,9 +153,6 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(5 * 1024 * 1024)
         1 * distributionSummary.record((5 + 3) * 1024 * 1024)
-        1 * s3ClientFactory.getS3Uri(serviceProperties.getLocationPrefix()) >> s3Uri
-        1 * s3Uri.bucket() >> Optional.of(BUCKET_NAME)
-        1 * s3Uri.key() >> Optional.of(S3_PREFIX)
         1 * s3ClientFactory.getClient(s3Uri) >> s3Client
 
         1 * attachment1.getFilename() >> "script1.sql"
@@ -189,6 +190,7 @@ class S3AttachmentServiceImplSpec extends Specification {
         setup:
         String jobId = jobIdPresent ? UUID.randomUUID().toString() : null
         Resource attachment1 = Mock(Resource)
+        s3ClientFactory.getClient(s3Uri) >> s3Client
 
         when: "S3 upload fails"
         this.service.saveAttachments(jobId, Sets.newHashSet(attachment1))
@@ -202,10 +204,6 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(3 * 1024 * 1024)
         1 * distributionSummary.record(3 * 1024 * 1024)
-        1 * s3ClientFactory.getS3Uri(serviceProperties.getLocationPrefix()) >> s3Uri
-        1 * s3Uri.bucket() >> Optional.of(BUCKET_NAME)
-        1 * s3Uri.key() >> Optional.of(S3_PREFIX)
-        1 * s3ClientFactory.getClient(s3Uri) >> s3Client
         1 * attachment1.getFilename() >> "script.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
         1 * attachment1.getInputStream() >> inputStream
@@ -234,6 +232,7 @@ class S3AttachmentServiceImplSpec extends Specification {
         setup:
         String jobId = UUID.randomUUID().toString()
         Resource attachment1 = Mock(Resource)
+        s3ClientFactory.getClient(s3Uri) >> s3Client
 
         when: "Attachment has invalid filename"
         this.service.saveAttachments(jobId, Sets.newHashSet(attachment1))
@@ -247,10 +246,6 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(3 * 1024 * 1024)
         1 * distributionSummary.record(3 * 1024 * 1024)
-        1 * s3ClientFactory.getS3Uri(serviceProperties.getLocationPrefix()) >> s3Uri
-        1 * s3Uri.bucket() >> Optional.of(BUCKET_NAME)
-        1 * s3Uri.key() >> Optional.of(S3_PREFIX)
-        1 * s3ClientFactory.getClient(s3Uri) >> s3Client
         1 * attachment1.getFilename() >> attachmentFilename
         0 * attachment1.getInputStream()
         0 * s3Client.putObject(*_)
