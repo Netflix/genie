@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
+import brave.Tracer;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.netflix.genie.common.internal.spring.autoconfigure.CommonTracingAutoConfiguration;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
@@ -30,16 +31,14 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepositor
 import com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
@@ -50,7 +49,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 4.0.0
  */
 @DataJpaTest
-@ExtendWith(MockitoExtension.class)
 @TestExecutionListeners(
     {
         DependencyInjectionTestExecutionListener.class,
@@ -74,7 +72,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 //)
 class JpaPersistenceServiceIntegrationTestBase {
 
-    @Mock
+    @Autowired
     protected PersistedJobStatusObserver persistedJobStatusObserver;
 
     @Autowired
@@ -119,14 +117,24 @@ class JpaPersistenceServiceIntegrationTestBase {
         /**
          * Provide a mock PersistedJobStatusObserver.
          *
-         * @param observer The mocked observer
-         * @return The observer bean
+         * @return A mock PersistedJobStatusObserver
          */
         @Bean
-        PersistedJobStatusObserver persistedJobStatusObserver(
-            @Autowired final PersistedJobStatusObserver observer
-        ) {
-            return observer;
+        @Primary
+        PersistedJobStatusObserver persistedJobStatusObserver() {
+            // Create a new mock for the bean
+            return Mockito.mock(PersistedJobStatusObserver.class);
+        }
+
+        /**
+         * Provide a mock Tracer.
+         *
+         * @return A mock Tracer
+         */
+        @Bean
+        @Primary
+        Tracer tracer() {
+            return Mockito.mock(Tracer.class);
         }
     }
 }
