@@ -37,8 +37,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
 
 import java.util.Arrays;
@@ -909,7 +909,7 @@ class ApplicationRestControllerIntegrationTest extends RestControllerIntegration
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters
-            RequestDocumentation.requestParameters(
+            RequestDocumentation.queryParameters(
                 RequestDocumentation
                     .parameterWithName("status")
                     .description("The status of commands to search for")

@@ -44,7 +44,7 @@ import org.mockito.Mockito;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
-import jakarta.script.ScriptEngineManager;
+import javax.script.ScriptEngineManager;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

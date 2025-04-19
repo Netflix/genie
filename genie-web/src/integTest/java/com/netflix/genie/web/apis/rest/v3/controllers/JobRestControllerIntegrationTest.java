@@ -60,8 +60,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.TestPropertySource;
 
 import jakarta.annotation.Nullable;

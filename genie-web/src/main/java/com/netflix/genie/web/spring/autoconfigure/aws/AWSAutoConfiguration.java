@@ -51,6 +51,10 @@ public class AWSAutoConfiguration {
      * The name of the {@link SnsClient} client created specifically for job state notifications.
      */
     public static final String SNS_CLIENT_BEAN_NAME = "snsClient";
+    /**
+     * Bean name for the SNS client override configuration.
+     * This constant is used to identify the bean that provides custom configuration for the AWS SNS client.
+     */
     public static final String SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME = "snsClientOverrideConfig";
 
     /**

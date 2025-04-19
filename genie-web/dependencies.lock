@@ -462,6 +462,9 @@
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.2"
         },
+        "io.rest-assured:rest-assured": {
+            "locked": "4.4.0"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
@@ -624,7 +627,7 @@
             "locked": "3.0.3"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.3"
+            "locked": "3.0.0"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -848,6 +851,9 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "1.4.2"
+        },
+        "io.rest-assured:rest-assured": {
+            "locked": "4.4.0"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1075,7 +1081,7 @@
             "locked": "3.0.3"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.3"
+            "locked": "3.0.0"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -1653,6 +1659,9 @@
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.2"
         },
+        "io.rest-assured:rest-assured": {
+            "locked": "4.4.0"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
@@ -1804,6 +1813,9 @@
         },
         "org.springframework.integration:spring-integration-zookeeper": {
             "locked": "6.4.1"
+        },
+        "org.springframework.restdocs:spring-restdocs-restassured": {
+            "locked": "3.0.0"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -2025,6 +2037,9 @@
             ],
             "locked": "1.4.2"
         },
+        "io.rest-assured:rest-assured": {
+            "locked": "4.4.0"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
@@ -2241,6 +2256,9 @@
         "org.springframework.integration:spring-integration-zookeeper": {
             "locked": "6.4.1"
         },
+        "org.springframework.restdocs:spring-restdocs-restassured": {
+            "locked": "3.0.0"
+        },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
         },
@@ -2438,6 +2456,9 @@
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.2"
         },
+        "io.rest-assured:rest-assured": {
+            "locked": "4.4.0"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
@@ -2589,6 +2610,9 @@
         },
         "org.springframework.integration:spring-integration-zookeeper": {
             "locked": "6.4.1"
+        },
+        "org.springframework.restdocs:spring-restdocs-restassured": {
+            "locked": "3.0.0"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -2810,6 +2834,9 @@
             ],
             "locked": "1.4.2"
         },
+        "io.rest-assured:rest-assured": {
+            "locked": "4.4.0"
+        },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
@@ -3025,6 +3052,9 @@
         },
         "org.springframework.integration:spring-integration-zookeeper": {
             "locked": "6.4.1"
+        },
+        "org.springframework.restdocs:spring-restdocs-restassured": {
+            "locked": "3.0.0"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"

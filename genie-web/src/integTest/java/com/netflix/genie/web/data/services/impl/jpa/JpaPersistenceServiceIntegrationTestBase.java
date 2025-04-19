@@ -30,12 +30,15 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepositor
 import com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -47,6 +50,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 4.0.0
  */
 @DataJpaTest
+@ExtendWith(MockitoExtension.class)
 @TestExecutionListeners(
     {
         DependencyInjectionTestExecutionListener.class,
@@ -57,13 +61,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
     {
         DataAutoConfiguration.class,
         ValidationAutoConfiguration.class,
-        BraveAutoConfiguration.class,
-        CommonTracingAutoConfiguration.class
-    }
-)
-@MockBean(
-    {
-        PersistedJobStatusObserver.class //TODO: Needed for JobEntityListener but should be in DataAutoConfiguration
+        CommonTracingAutoConfiguration.class,
+        JpaPersistenceServiceIntegrationTestBase.TestConfig.class
     }
 )
 //@TestPropertySource(
@@ -74,6 +73,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 //    }
 //)
 class JpaPersistenceServiceIntegrationTestBase {
+
+    @Mock
+    protected PersistedJobStatusObserver persistedJobStatusObserver;
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;
@@ -100,14 +102,31 @@ class JpaPersistenceServiceIntegrationTestBase {
     protected JpaPersistenceServiceImpl service;
 
     @Autowired
-    protected PersistedJobStatusObserver persistedJobStatusObserver;
-
-    @Autowired
     protected TestEntityManager entityManager;
 
     @AfterEach
     void resetMocks() {
         // Could use @DirtiesContext but seems excessive
         Mockito.reset(this.persistedJobStatusObserver);
+    }
+
+    /**
+     * Test configuration to provide mock beans.
+     */
+    @Configuration
+    static class TestConfig {
+
+        /**
+         * Provide a mock PersistedJobStatusObserver.
+         *
+         * @param observer The mocked observer
+         * @return The observer bean
+         */
+        @Bean
+        PersistedJobStatusObserver persistedJobStatusObserver(
+            @Autowired final PersistedJobStatusObserver observer
+        ) {
+            return observer;
+        }
     }
 }

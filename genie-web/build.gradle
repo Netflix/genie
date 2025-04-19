@@ -144,6 +144,8 @@ dependencies {
     integTestImplementation("org.springframework.restdocs:spring-restdocs-core")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-restassured")
     integTestRuntimeOnly("org.springframework:spring-webflux")
+    testImplementation("org.springframework.restdocs:spring-restdocs-restassured:3.0.0")
+    testImplementation("io.rest-assured:rest-assured:4.4.0")
 
     /*******************************
      * Agent Dependencies
