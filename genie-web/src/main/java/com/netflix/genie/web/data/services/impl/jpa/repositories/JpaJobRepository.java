@@ -249,7 +249,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return The {@link JobRequestProjection} data or {@link Optional#empty()} if the job doesn't exist
      */
     @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
-    @EntityGraph(value = JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(value = JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.FETCH)
     Optional<JobRequestProjection> getV4JobRequest(@Param("id") String id);
 
     /**
