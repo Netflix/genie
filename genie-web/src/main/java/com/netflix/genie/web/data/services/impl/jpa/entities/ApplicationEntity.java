@@ -133,10 +133,10 @@ public class ApplicationEntity extends BaseEntity {
     @JoinTable(
         name = "applications_configs",
         joinColumns = {
-            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false)
         }
     )
     @ToString.Exclude
@@ -146,10 +146,10 @@ public class ApplicationEntity extends BaseEntity {
     @JoinTable(
         name = "applications_dependencies",
         joinColumns = {
-            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false)
         }
     )
     private Set<FileEntity> dependencies = new HashSet<>();
@@ -158,10 +158,10 @@ public class ApplicationEntity extends BaseEntity {
     @JoinTable(
         name = "applications_tags",
         joinColumns = {
-            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false)
         }
     )
     @ToString.Exclude
