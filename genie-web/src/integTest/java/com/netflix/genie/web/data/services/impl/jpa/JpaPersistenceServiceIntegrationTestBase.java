@@ -17,9 +17,13 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
+import brave.SpanCustomizer;
 import brave.Tracer;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.netflix.genie.common.internal.spring.autoconfigure.CommonTracingAutoConfiguration;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
@@ -40,6 +44,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
@@ -49,6 +54,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 4.0.0
  */
 @DataJpaTest
+@TestPropertySource(properties = {
+    "spring.main.allow-bean-definition-overriding=true"
+})
 @TestExecutionListeners(
     {
         DependencyInjectionTestExecutionListener.class,
@@ -74,6 +82,9 @@ class JpaPersistenceServiceIntegrationTestBase {
 
     @Autowired
     protected PersistedJobStatusObserver persistedJobStatusObserver;
+
+    @Autowired
+    protected CommonTracingAutoConfiguration commonTracingAutoConfiguration;
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;
@@ -106,6 +117,7 @@ class JpaPersistenceServiceIntegrationTestBase {
     void resetMocks() {
         // Could use @DirtiesContext but seems excessive
         Mockito.reset(this.persistedJobStatusObserver);
+        Mockito.reset(this.commonTracingAutoConfiguration);
     }
 
     /**
@@ -113,28 +125,51 @@ class JpaPersistenceServiceIntegrationTestBase {
      */
     @Configuration
     static class TestConfig {
-
-        /**
-         * Provide a mock PersistedJobStatusObserver.
-         *
-         * @return A mock PersistedJobStatusObserver
-         */
         @Bean
         @Primary
-        PersistedJobStatusObserver persistedJobStatusObserver() {
-            // Create a new mock for the bean
+        public Tracer tracer() {
+            final Tracer mockTracer = Mockito.mock(Tracer.class);
+            final SpanCustomizer mockSpanCustomizer = Mockito.mock(SpanCustomizer.class);
+            Mockito.when(mockTracer.currentSpanCustomizer()).thenReturn(mockSpanCustomizer);
+            return mockTracer;
+        }
+
+        @Bean
+        @Primary
+        public BraveTagAdapter braveTagAdapter() {
+            return Mockito.mock(BraveTagAdapter.class);
+        }
+
+        @Bean
+        @Primary
+        public BraveTracePropagator braveTracePropagator() {
+            return Mockito.mock(BraveTracePropagator.class);
+        }
+
+        @Bean
+        @Primary
+        public BraveTracingComponents braveTracingComponents(
+            final Tracer tracer,
+            final BraveTagAdapter tagAdapter,
+            final BraveTracePropagator tracePropagator
+        ) {
+            final BraveTracingComponents mockComponents = Mockito.mock(BraveTracingComponents.class);
+            Mockito.when(mockComponents.getTracer()).thenReturn(tracer);
+            Mockito.when(mockComponents.getTagAdapter()).thenReturn(tagAdapter);
+            Mockito.when(mockComponents.getTracePropagator()).thenReturn(tracePropagator);
+            return mockComponents;
+        }
+
+        @Bean
+        @Primary
+        public PersistedJobStatusObserver persistedJobStatusObserver() {
             return Mockito.mock(PersistedJobStatusObserver.class);
         }
 
-        /**
-         * Provide a mock Tracer.
-         *
-         * @return A mock Tracer
-         */
         @Bean
         @Primary
-        Tracer tracer() {
-            return Mockito.mock(Tracer.class);
+        public CommonTracingAutoConfiguration commonTracingAutoConfiguration() {
+            return Mockito.mock(CommonTracingAutoConfiguration.class);
         }
     }
 }
