@@ -463,7 +463,7 @@
             "locked": "1.4.2"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "4.4.0"
+            "locked": "5.3.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -853,7 +853,7 @@
             "locked": "1.4.2"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "4.4.0"
+            "locked": "5.3.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1660,7 +1660,7 @@
             "locked": "1.4.2"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "4.4.0"
+            "locked": "5.3.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2038,7 +2038,7 @@
             "locked": "1.4.2"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "4.4.0"
+            "locked": "5.3.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2457,7 +2457,7 @@
             "locked": "1.4.2"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "4.4.0"
+            "locked": "5.3.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2835,7 +2835,7 @@
             "locked": "1.4.2"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "4.4.0"
+            "locked": "5.3.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
