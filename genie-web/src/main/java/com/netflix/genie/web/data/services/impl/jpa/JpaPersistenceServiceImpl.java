@@ -196,7 +196,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         .map(Enum::name)
         .collect(Collectors.toSet());
 
-    private static final String LOAD_GRAPH_HINT = "javax.persistence.loadgraph";
+    private static final String LOAD_GRAPH_HINT = "jakarta.persistence.loadgraph";
     private static final int MAX_STATUS_MESSAGE_LENGTH = 255;
 
     private final EntityManager entityManager;
@@ -383,8 +383,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final Root<ApplicationEntity> contentQueryRoot = contentQuery.from(ApplicationEntity.class);
         contentQuery.select(contentQueryRoot);
         contentQuery.where(contentQueryRoot.get(ApplicationEntity_.id).in(applicationIds));
+
         // Need to make the same order by or results won't be accurate
-        contentQuery.orderBy(orders);
+        final List<Order> contentOrders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    contentOrders.add(criteriaBuilder.asc(contentQueryRoot.get(order.getProperty())));
+                } else {
+                    contentOrders.add(criteriaBuilder.desc(contentQueryRoot.get(order.getProperty())));
+                }
+            }
+        );
+        contentQuery.orderBy(contentOrders);
 
         final List<Application> applications = this.entityManager
             .createQuery(contentQuery)
@@ -620,8 +631,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final Root<ClusterEntity> contentQueryRoot = contentQuery.from(ClusterEntity.class);
         contentQuery.select(contentQueryRoot);
         contentQuery.where(contentQueryRoot.get(ClusterEntity_.id).in(clusterIds));
+
         // Need to make the same order by or results won't be accurate
-        contentQuery.orderBy(orders);
+        final List<Order> contentOrders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    contentOrders.add(criteriaBuilder.asc(contentQueryRoot.get(order.getProperty())));
+                } else {
+                    contentOrders.add(criteriaBuilder.desc(contentQueryRoot.get(order.getProperty())));
+                }
+            }
+        );
+        contentQuery.orderBy(contentOrders);
 
         final List<Cluster> clusters = this.entityManager
             .createQuery(contentQuery)
@@ -925,7 +947,17 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         contentQuery.select(contentQueryRoot);
         contentQuery.where(contentQueryRoot.get(CommandEntity_.id).in(commandIds));
         // Need to make the same order by or results won't be accurate
-        contentQuery.orderBy(orders);
+        final List<Order> contentOrders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    contentOrders.add(criteriaBuilder.asc(contentQueryRoot.get(order.getProperty())));
+                } else {
+                    contentOrders.add(criteriaBuilder.desc(contentQueryRoot.get(order.getProperty())));
+                }
+            }
+        );
+        contentQuery.orderBy(contentOrders);
 
         final List<Command> commands = this.entityManager
             .createQuery(contentQuery)
@@ -1473,9 +1505,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         sort.iterator().forEachRemaining(
             order -> {
                 if (order.isAscending()) {
-                    orders.add(cb.asc(root.get(order.getProperty())));
+                    orders.add(cb.asc(contentQueryRoot.get(order.getProperty())));
                 } else {
-                    orders.add(cb.desc(root.get(order.getProperty())));
+                    orders.add(cb.desc(contentQueryRoot.get(order.getProperty())));
                 }
             }
         );
@@ -1595,7 +1627,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         return this.jobRepository
             .getV4JobRequest(id)
             .map(EntityV4DtoConverters::toV4JobRequestDto)
-            .orElseThrow(() -> new NotFoundException("No job ith id " + id + " exists"));
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"));
     }
 
     /**
