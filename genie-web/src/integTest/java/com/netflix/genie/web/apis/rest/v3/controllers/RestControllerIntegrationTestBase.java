@@ -39,6 +39,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -195,6 +196,11 @@ abstract class RestControllerIntegrationTestBase {
                 }
             }
         }
+    }
+
+    @BeforeAll
+    static void setUp() {
+        System.setProperty("aws.region", "us-east-1");
     }
 
     @BeforeEach
