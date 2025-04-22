@@ -18,7 +18,6 @@
 package com.netflix.genie;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -47,11 +46,6 @@ class GenieAppSmokeTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @BeforeAll
-    static void setUp() {
-        System.setProperty("aws.region", "us-east-1");
-    }
 
     @Test
     void testAppStarts() {

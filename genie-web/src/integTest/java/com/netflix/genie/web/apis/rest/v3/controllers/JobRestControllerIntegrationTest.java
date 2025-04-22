@@ -90,6 +90,7 @@ import java.util.UUID;
 @TestPropertySource(
     properties = {
         LocalAgentLauncherProperties.PROPERTY_PREFIX + ".run-as-user=false",
+        "debug=true"
     }
 )
 class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {

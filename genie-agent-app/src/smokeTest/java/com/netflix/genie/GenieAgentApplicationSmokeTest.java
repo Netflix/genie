@@ -20,7 +20,6 @@ package com.netflix.genie;
 import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.GenieAgentRunner;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -45,11 +44,6 @@ class GenieAgentApplicationSmokeTest {
 
     @Autowired
     private ApplicationContext context;
-
-    @BeforeAll
-    static void setUp() {
-        System.setProperty("aws.region", "us-east-1");
-    }
 
     @Test
     public void smokeTestCommands() throws Exception {
