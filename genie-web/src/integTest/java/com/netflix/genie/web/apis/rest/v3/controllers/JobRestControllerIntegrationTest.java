@@ -237,7 +237,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
             .body(
                 EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString("The maximum number of characters for the command arguments is 10,000"
+                Matchers.containsString("Max length of an individual command line argument is 10,000 characters"
                 )
             );
     }
