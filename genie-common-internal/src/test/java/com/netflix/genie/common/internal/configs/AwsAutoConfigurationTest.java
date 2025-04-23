@@ -79,8 +79,7 @@ class AwsAutoConfigurationTest {
             "spring.cloud.aws.region.static=us-east-1",
             "spring.jmx.enabled=false",
             "spring.main.web-application-type=none"
-        )
-        .withPropertyValues("spring.main.allow-bean-definition-overriding=true");
+        );
 
     /**
      * Test expected context.

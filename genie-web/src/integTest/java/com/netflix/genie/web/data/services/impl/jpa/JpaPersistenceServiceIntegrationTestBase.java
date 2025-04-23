@@ -35,6 +35,7 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepositor
 import com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration;
 import org.junit.jupiter.api.AfterEach;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -44,7 +45,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
@@ -54,9 +54,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 4.0.0
  */
 @DataJpaTest
-@TestPropertySource(properties = {
-    "spring.main.allow-bean-definition-overriding=true"
-})
 @TestExecutionListeners(
     {
         DependencyInjectionTestExecutionListener.class,
@@ -128,8 +125,8 @@ class JpaPersistenceServiceIntegrationTestBase {
         @Bean
         @Primary
         public Tracer tracer() {
-            final Tracer mockTracer = Mockito.mock(Tracer.class);
-            final SpanCustomizer mockSpanCustomizer = Mockito.mock(SpanCustomizer.class);
+            final Tracer mockTracer = Mockito.mock(Tracer.class, Answers.RETURNS_DEEP_STUBS);
+            final SpanCustomizer mockSpanCustomizer = Mockito.mock(SpanCustomizer.class, Answers.RETURNS_DEEP_STUBS);
             Mockito.when(mockTracer.currentSpanCustomizer()).thenReturn(mockSpanCustomizer);
             return mockTracer;
         }
