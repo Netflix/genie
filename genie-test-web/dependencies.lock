@@ -38,10 +38,10 @@
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "integTestAnnotationProcessor": {
@@ -96,10 +96,10 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "integTestRuntimeClasspath": {
@@ -143,10 +143,10 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "jacocoAgent": {
@@ -176,10 +176,10 @@
             "locked": "1.3.2"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -234,10 +234,10 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -281,10 +281,10 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "spotbugs": {
@@ -349,10 +349,10 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "testRuntimeClasspath": {
@@ -396,10 +396,10 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     }
 }

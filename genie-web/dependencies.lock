@@ -58,13 +58,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -125,16 +125,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -369,13 +369,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -442,16 +442,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -732,13 +732,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.h2database:h2": {
             "locked": "2.3.232"
@@ -823,22 +823,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -959,10 +959,10 @@
             "locked": "2.7.3"
         },
         "org.flywaydb:flyway-core": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.glassfish.jaxb:jaxb-runtime": {
             "locked": "4.0.5"
@@ -1192,13 +1192,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.h2database:h2": {
             "locked": "2.3.232"
@@ -1271,22 +1271,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -1387,10 +1387,10 @@
             "locked": "3.0.9"
         },
         "org.flywaydb:flyway-core": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.glassfish.jaxb:jaxb-runtime": {
             "locked": "4.0.5"
@@ -1566,13 +1566,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -1639,16 +1639,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -1917,13 +1917,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.h2database:h2": {
             "locked": "2.3.232"
@@ -2008,22 +2008,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -2141,10 +2141,10 @@
             "locked": "2.7.3"
         },
         "org.flywaydb:flyway-core": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.glassfish.jaxb:jaxb-runtime": {
             "locked": "4.0.5"
@@ -2363,13 +2363,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -2436,16 +2436,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -2714,13 +2714,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.16.1"
+            "locked": "3.22.2"
         },
         "com.h2database:h2": {
             "locked": "2.3.232"
@@ -2805,22 +2805,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.38.1"
+            "locked": "1.39.0"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -2938,10 +2938,10 @@
             "locked": "2.7.3"
         },
         "org.flywaydb:flyway-core": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {
-            "locked": "9.1.3"
+            "locked": "10.20.1"
         },
         "org.glassfish.jaxb:jaxb-runtime": {
             "locked": "4.0.5"
