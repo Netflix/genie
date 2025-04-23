@@ -329,7 +329,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
             .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString("must not be empty"
+                Matchers.containsString("is required"
                 )
             );
 
