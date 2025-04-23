@@ -115,7 +115,6 @@ configure((Set<Project>) ext.javaProjects) {
 
         imports {
             mavenBom "software.amazon.awssdk:bom:2.30.17"
-            mavenBom "io.zipkin.brave:brave-bom:5.13.3"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
