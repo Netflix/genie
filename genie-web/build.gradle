@@ -160,6 +160,7 @@ dependencies {
 license {
     exclude "*.yml"
     exclude "META-INF/spring.factories"
+    exclude "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
     exclude "genie-banner.txt"
     exclude "db/**/*.sql"
     exclude "**/com/netflix/genie/web/data/services/impl/jpa/entities/*_.java"
