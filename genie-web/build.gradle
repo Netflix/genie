@@ -25,6 +25,15 @@ ext {
 
 configurations {
     genieAgent
+
+    configureEach {
+        exclude group: "org.eclipse.jetty"
+        exclude group: "org.eclipse.jetty.websocket"
+    }
+
+    integTestImplementation {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-jetty"
+    }
 }
 
 dependencies {
@@ -137,7 +146,6 @@ dependencies {
     testImplementation("net.sf.jtidy:jtidy")
     testImplementation("org.apache.tomcat:tomcat-jdbc")
     testImplementation("org.dbunit:dbunit")
-    testImplementation("org.springframework.boot:spring-boot-starter-jetty")
     integTestImplementation("com.github.ppodgorsek:spring-test-dbunit-core")
     integTestImplementation("org.apache.curator:curator-test:5.1.0")
     integTestImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")

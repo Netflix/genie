@@ -587,9 +587,6 @@
         "org.springframework.boot:spring-boot-starter-integration": {
             "locked": "3.4.4"
         },
-        "org.springframework.boot:spring-boot-starter-jetty": {
-            "locked": "3.4.4"
-        },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "3.4.4"
         },
@@ -1036,9 +1033,6 @@
             "locked": "3.4.4"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
-        },
-        "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "3.4.4"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
@@ -1781,9 +1775,6 @@
         "org.springframework.boot:spring-boot-starter-integration": {
             "locked": "3.4.4"
         },
-        "org.springframework.boot:spring-boot-starter-jetty": {
-            "locked": "3.4.4"
-        },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "3.4.4"
         },
@@ -2220,9 +2211,6 @@
         "org.springframework.boot:spring-boot-starter-integration": {
             "locked": "3.4.4"
         },
-        "org.springframework.boot:spring-boot-starter-jetty": {
-            "locked": "3.4.4"
-        },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "locked": "3.4.4"
         },
@@ -2576,9 +2564,6 @@
             "locked": "3.4.4"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
-        },
-        "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "3.4.4"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
@@ -3015,9 +3000,6 @@
             "locked": "3.4.4"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
-        },
-        "org.springframework.boot:spring-boot-starter-jetty": {
             "locked": "3.4.4"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
