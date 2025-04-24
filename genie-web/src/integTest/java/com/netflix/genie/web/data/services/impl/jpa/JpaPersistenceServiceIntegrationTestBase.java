@@ -64,7 +64,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
     {
         DataAutoConfiguration.class,
         ValidationAutoConfiguration.class,
-        CommonTracingAutoConfiguration.class,
         JpaPersistenceServiceIntegrationTestBase.TestConfig.class
     }
 )
