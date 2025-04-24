@@ -98,7 +98,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
 
     private static final long SLEEP_TIME = 500L;
-    private static final long MAX_COUNT_FOR_POLLING_JOB_STATUS = 100;
+    private static final long MAX_COUNT_FOR_POLLING_JOB_STATUS = 60;
     private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
     private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
     private static final String COMMAND_ARGS_PATH = "commandArgs";
