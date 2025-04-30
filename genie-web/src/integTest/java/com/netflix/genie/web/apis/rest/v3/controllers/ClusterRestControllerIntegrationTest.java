@@ -42,6 +42,7 @@ import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.web.util.UriUtils;
+import static org.springframework.restdocs.snippet.Attributes.key;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -87,17 +88,39 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
                 "{class-name}/{method-name}/create",
                 HeaderDocumentation.requestHeaders(
                     HeaderDocumentation.headerWithName("Content-Type").description("Content type")
-            ),
-            PayloadDocumentation.requestFields(
-                PayloadDocumentation.fieldWithPath("name").description("Cluster name"),
-                PayloadDocumentation.fieldWithPath("user").description("User who created the cluster"),
-                PayloadDocumentation.fieldWithPath("version").description("Version of the cluster"),
-                PayloadDocumentation.fieldWithPath("status").description("Status of the cluster")
-            ),
-            HeaderDocumentation.responseHeaders(
-                HeaderDocumentation.headerWithName("Location").description("Location of the created resource")
-            )
-        );
+                ),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("name").description("Cluster name")
+                        .attributes(key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("user").description("User who created the cluster")
+                        .attributes(key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("version").description("Version of the cluster")
+                        .attributes(key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("status").description("Status of the cluster")
+                        .attributes(key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("id").description("Cluster ID (null when creating)")
+                        .optional().attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("created").description("Creation timestamp (set by server)")
+                        .optional().attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("updated").description("Last update timestamp (set by server)")
+                        .optional().attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("description").description("Cluster description")
+                        .optional().attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("metadata").description("Cluster metadata")
+                        .optional().attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("tags").description("Tags associated with the cluster")
+                        .attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("configs").description("Configuration files for the cluster")
+                        .attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("dependencies").description("Dependencies for the cluster")
+                        .attributes(key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("setupFile").description("Setup file location")
+                        .optional().attributes(key("constraints").value("Optional"))
+                ),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName("Location").description("Location of the created resource")
+                )
+            );
 
         // Create the cluster resource
         final String id = this.createConfigResource(
@@ -115,18 +138,34 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
                 HeaderDocumentation.headerWithName("Content-Type").description("HAL JSON content type")
             ),
             PayloadDocumentation.responseFields(
-                PayloadDocumentation.fieldWithPath("id").description("Cluster ID"),
-                PayloadDocumentation.fieldWithPath("created").description("Creation timestamp"),
-                PayloadDocumentation.fieldWithPath("updated").description("Last update timestamp"),
-                PayloadDocumentation.fieldWithPath("name").description("Cluster name"),
-                PayloadDocumentation.fieldWithPath("user").description("User who created the cluster"),
-                PayloadDocumentation.fieldWithPath("version").description("Version of the cluster"),
-                PayloadDocumentation.fieldWithPath("tags").description("Tags associated with the cluster"),
-                PayloadDocumentation.fieldWithPath("setupFile").description("Setup file location").optional(),
-                PayloadDocumentation.fieldWithPath("status").description("Status of the cluster"),
-                PayloadDocumentation.fieldWithPath("configs").description("Configuration files"),
-                PayloadDocumentation.fieldWithPath("dependencies").description("Dependencies"),
+                PayloadDocumentation.fieldWithPath("id").description("Cluster ID")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("created").description("Creation timestamp")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("updated").description("Last update timestamp")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("name").description("Cluster name")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("user").description("User who created the cluster")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("version").description("Version of the cluster")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("tags").description("Tags associated with the cluster")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("setupFile").description("Setup file location").optional()
+                    .attributes(key("constraints").value("Optional")),
+                PayloadDocumentation.fieldWithPath("status").description("Status of the cluster")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("configs").description("Configuration files")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("dependencies").description("Dependencies")
+                    .attributes(key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("description").description("Cluster description").optional()
+                    .attributes(key("constraints").value("Optional")),
+                PayloadDocumentation.fieldWithPath("metadata").description("Cluster metadata").optional()
+                    .attributes(key("constraints").value("Optional")),
                 PayloadDocumentation.subsectionWithPath("_links").description("Links to other resources")
+                    .attributes(key("constraints").value("Required"))
             ),
             HypermediaDocumentation.links(
                 HypermediaDocumentation.halLinks(),
