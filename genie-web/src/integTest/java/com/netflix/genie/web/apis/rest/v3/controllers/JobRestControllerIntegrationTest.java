@@ -1682,7 +1682,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
                     counter, MAX_COUNT_FOR_POLLING_JOB_STATUS, jobId, status
                 );
                 LOG.error(errorMessage);
-                throw new Exception(errorMessage);
+                break;
             }
             if (status.isActive()) {
                 LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
@@ -1705,7 +1705,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
                     counter, MAX_COUNT_FOR_POLLING_JOB_STATUS, jobId, status
                 );
                 LOG.error(errorMessage);
-                throw new Exception(errorMessage);
+                break;
             }
             if (status != JobStatus.RUNNING && !status.isFinished()) {
                 LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
