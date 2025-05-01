@@ -1,0 +1,483 @@
+{
+    "annotationProcessor": {
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        }
+    },
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.27"
+        }
+    },
+    "compileClasspath": {
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.3.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        }
+    },
+    "integTestAnnotationProcessor": {
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        }
+    },
+    "integTestCompileClasspath": {
+        "cglib:cglib-nodep": {
+            "locked": "3.3.0"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "com.netflix.genie:genie-test": {
+            "project": true
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.3.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.junit.jupiter:junit-jupiter-api": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-params": {
+            "locked": "5.8.2"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        },
+        "org.spockframework:spock-core": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-junit4": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-spring": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "2.7.17"
+        }
+    },
+    "integTestRuntimeClasspath": {
+        "cglib:cglib-nodep": {
+            "locked": "3.3.0"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "com.netflix.genie:genie-test": {
+            "project": true
+        },
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-test"
+            ],
+            "locked": "1.3.2"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.glassfish:jakarta.el": {
+            "locked": "3.0.4"
+        },
+        "org.hibernate.validator:hibernate-validator": {
+            "locked": "6.2.5.Final"
+        },
+        "org.junit.jupiter:junit-jupiter-api": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-engine": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-params": {
+            "locked": "5.8.2"
+        },
+        "org.spockframework:spock-core": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-junit4": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-spring": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "2.7.17"
+        }
+    },
+    "jacocoAgent": {
+        "org.jacoco:org.jacoco.agent": {
+            "locked": "0.8.12"
+        }
+    },
+    "jacocoAnt": {
+        "org.jacoco:org.jacoco.ant": {
+            "locked": "0.8.12"
+        }
+    },
+    "runtimeClasspath": {
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.3.2"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.hibernate.validator:hibernate-validator": {
+            "locked": "6.2.5.Final"
+        }
+    },
+    "smokeTestAnnotationProcessor": {
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        }
+    },
+    "smokeTestCompileClasspath": {
+        "cglib:cglib-nodep": {
+            "locked": "3.3.0"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "com.netflix.genie:genie-test": {
+            "project": true
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.3.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.junit.jupiter:junit-jupiter-api": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-params": {
+            "locked": "5.8.2"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        },
+        "org.spockframework:spock-core": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-junit4": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-spring": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "2.7.17"
+        }
+    },
+    "smokeTestRuntimeClasspath": {
+        "cglib:cglib-nodep": {
+            "locked": "3.3.0"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "com.netflix.genie:genie-test": {
+            "project": true
+        },
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-test"
+            ],
+            "locked": "1.3.2"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.glassfish:jakarta.el": {
+            "locked": "3.0.4"
+        },
+        "org.hibernate.validator:hibernate-validator": {
+            "locked": "6.2.5.Final"
+        },
+        "org.junit.jupiter:junit-jupiter-api": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-engine": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-params": {
+            "locked": "5.8.2"
+        },
+        "org.spockframework:spock-core": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-junit4": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-spring": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "2.7.17"
+        }
+    },
+    "spotbugs": {
+        "com.github.spotbugs:spotbugs": {
+            "locked": "4.8.2"
+        }
+    },
+    "spotbugsSlf4j": {
+        "org.slf4j:slf4j-simple": {
+            "locked": "2.0.0"
+        }
+    },
+    "testAnnotationProcessor": {
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        }
+    },
+    "testCompileClasspath": {
+        "cglib:cglib-nodep": {
+            "locked": "3.3.0"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.github.spotbugs:spotbugs-annotations": {
+            "locked": "4.8.2"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "com.netflix.genie:genie-test": {
+            "project": true
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.3.2"
+        },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.junit.jupiter:junit-jupiter-api": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-params": {
+            "locked": "5.8.2"
+        },
+        "org.projectlombok:lombok": {
+            "locked": "1.18.24"
+        },
+        "org.spockframework:spock-core": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-junit4": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-spring": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "2.7.17"
+        }
+    },
+    "testRuntimeClasspath": {
+        "cglib:cglib-nodep": {
+            "locked": "3.3.0"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
+            "locked": "2.13.5"
+        },
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
+            "locked": "2.13.5"
+        },
+        "com.google.guava:guava": {
+            "locked": "20.0"
+        },
+        "com.netflix.genie:genie-test": {
+            "project": true
+        },
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
+        },
+        "jakarta.validation:jakarta.validation-api": {
+            "locked": "2.0.2"
+        },
+        "javax.annotation:javax.annotation-api": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-test"
+            ],
+            "locked": "1.3.2"
+        },
+        "org.apache.commons:commons-lang3": {
+            "locked": "3.12.0"
+        },
+        "org.glassfish:jakarta.el": {
+            "locked": "3.0.4"
+        },
+        "org.hibernate.validator:hibernate-validator": {
+            "locked": "6.2.5.Final"
+        },
+        "org.junit.jupiter:junit-jupiter-api": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-engine": {
+            "locked": "5.8.2"
+        },
+        "org.junit.jupiter:junit-jupiter-params": {
+            "locked": "5.8.2"
+        },
+        "org.spockframework:spock-core": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-junit4": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.spockframework:spock-spring": {
+            "locked": "2.0-groovy-3.0"
+        },
+        "org.springframework.boot:spring-boot-starter-test": {
+            "locked": "2.7.17"
+        }
+    }
+}
