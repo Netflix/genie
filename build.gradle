@@ -173,7 +173,6 @@ configure((Set<Project>) ext.javaProjects) {
     }
 
     configurations {
-        all*.exclude group: "javax.servlet", module: "servlet-api"
         all*.exclude group: "org.apache.groovy" // exclude groovy@4 dependencies
         all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
