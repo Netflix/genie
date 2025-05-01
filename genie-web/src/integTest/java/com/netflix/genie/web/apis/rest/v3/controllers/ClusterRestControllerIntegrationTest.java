@@ -42,7 +42,6 @@ import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.web.util.UriUtils;
-import org.springframework.restdocs.snippet.Attributes;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
