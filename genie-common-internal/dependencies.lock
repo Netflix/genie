@@ -86,8 +86,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -107,9 +107,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -221,8 +218,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -242,9 +239,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -392,9 +386,6 @@
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
-        },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
         },
@@ -428,9 +419,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -583,8 +571,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -618,9 +606,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -733,8 +718,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -754,9 +739,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -904,9 +886,6 @@
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
-        },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
         },
@@ -940,9 +919,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -1086,8 +1062,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -1107,9 +1083,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -1257,9 +1230,6 @@
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
-        },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
         },
@@ -1293,9 +1263,6 @@
         },
         "org.apache.tika:tika-core": {
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [

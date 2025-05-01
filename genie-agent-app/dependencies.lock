@@ -122,8 +122,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -145,9 +145,6 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "2.24.3"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -333,8 +330,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -356,9 +353,6 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "2.24.3"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -609,14 +603,11 @@
             "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
-            "locked": "3.0.3"
-        },
-        "jakarta.platform:jakarta.jakartaee-bom": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "10.0.0"
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
@@ -668,13 +659,6 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-agent",
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -959,12 +943,12 @@
             ],
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
+        "jakarta.el:jakarta.el-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "10.0.0"
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
@@ -1015,13 +999,6 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-agent",
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -1275,12 +1252,12 @@
             ],
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
+        "jakarta.el:jakarta.el-api": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "10.0.0"
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
@@ -1331,13 +1308,6 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-agent",
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -1551,8 +1521,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -1574,9 +1544,6 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "2.24.3"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -1827,14 +1794,11 @@
             "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
-            "locked": "3.0.3"
-        },
-        "jakarta.platform:jakarta.jakartaee-bom": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "10.0.0"
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
@@ -1886,13 +1850,6 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-agent",
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -2137,8 +2094,8 @@
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
         },
-        "jakarta.platform:jakarta.jakartaee-bom": {
-            "locked": "10.0.0"
+        "jakarta.el:jakarta.el-api": {
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "locked": "6.0.0"
@@ -2160,9 +2117,6 @@
                 "com.netflix.genie:genie-agent"
             ],
             "locked": "2.24.3"
-        },
-        "org.glassfish:jakarta.el": {
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "7.0.5.Final"
@@ -2413,14 +2367,11 @@
             "locked": "3.4.3"
         },
         "jakarta.el:jakarta.el-api": {
-            "locked": "3.0.3"
-        },
-        "jakarta.platform:jakarta.jakartaee-bom": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "10.0.0"
+            "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
@@ -2472,13 +2423,6 @@
                 "com.netflix.genie:genie-common-internal"
             ],
             "locked": "2.3.0"
-        },
-        "org.glassfish:jakarta.el": {
-            "firstLevelTransitive": [
-                "com.netflix.genie:genie-agent",
-                "com.netflix.genie:genie-common-internal"
-            ],
-            "locked": "4.0.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
