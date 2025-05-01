@@ -147,24 +147,24 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "integTestAnnotationProcessor": {
@@ -331,27 +331,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "integTestRuntimeClasspath": {
@@ -599,28 +599,28 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -634,14 +634,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "jacocoAgent": {
@@ -868,25 +868,25 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -900,14 +900,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "runtimeClasspath": {
@@ -1124,25 +1124,25 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -1156,14 +1156,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -1330,27 +1330,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -1598,28 +1598,28 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -1633,14 +1633,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "spotbugs": {
@@ -1817,27 +1817,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "testRuntimeClasspath": {
@@ -2085,28 +2085,28 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -2120,14 +2120,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     }
 }

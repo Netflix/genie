@@ -10,10 +10,10 @@
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-configuration-processor": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "checkstyle": {
@@ -106,10 +106,10 @@
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "integTestAnnotationProcessor": {
@@ -226,16 +226,16 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "integTestRuntimeClasspath": {
@@ -392,16 +392,16 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "jacocoAgent": {
@@ -540,10 +540,10 @@
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -660,16 +660,16 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -826,16 +826,16 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "spotbugs": {
@@ -962,16 +962,16 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "testRuntimeClasspath": {
@@ -1128,16 +1128,16 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
         },
         "org.springframework:spring-context": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     }
 }

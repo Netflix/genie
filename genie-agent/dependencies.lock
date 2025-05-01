@@ -10,10 +10,10 @@
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-configuration-processor": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "checkstyle": {
@@ -148,16 +148,16 @@
             "locked": "1.7.36"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
@@ -166,13 +166,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "integTestAnnotationProcessor": {
@@ -337,19 +337,19 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
@@ -358,13 +358,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "integTestRuntimeClasspath": {
@@ -580,19 +580,19 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -604,13 +604,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "jacocoAgent": {
@@ -802,16 +802,16 @@
             "locked": "1.7.36"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -823,13 +823,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -994,19 +994,19 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
@@ -1015,13 +1015,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -1237,19 +1237,19 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -1261,13 +1261,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "spotbugs": {
@@ -1442,19 +1442,19 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "locked": "3.1.2"
@@ -1463,13 +1463,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     },
     "testRuntimeClasspath": {
@@ -1685,19 +1685,19 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         },
         "org.springframework.cloud:spring-cloud-starter-sleuth": {
             "firstLevelTransitive": [
@@ -1709,13 +1709,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "5.3.30"
+            "locked": "5.3.31"
         }
     }
 }

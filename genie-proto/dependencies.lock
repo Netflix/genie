@@ -125,7 +125,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "integTestCompileProtoPath": {
@@ -178,7 +178,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "integTestRuntimeClasspath": {
@@ -231,7 +231,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "jacocoAgent": {
@@ -329,7 +329,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "smokeTestCompileProtoPath": {
@@ -382,7 +382,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -435,7 +435,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "spotbugs": {
@@ -506,7 +506,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "testCompileProtoPath": {
@@ -559,7 +559,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     },
     "testRuntimeClasspath": {
@@ -612,7 +612,7 @@
             "locked": "2.0-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "2.7.17"
+            "locked": "2.7.18"
         }
     }
 }
