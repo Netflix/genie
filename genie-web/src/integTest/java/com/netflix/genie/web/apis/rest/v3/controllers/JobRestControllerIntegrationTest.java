@@ -206,10 +206,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         this.createAllClusters();
         this.createAllCommands();
         this.linkAllEntities();
-
-        // add sleep to validate an assumption that requests are made too early
-        // when server is not ready yet
-        Thread.sleep(1000);
     }
 
     @Test
