@@ -151,12 +151,12 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.12"
+            "locked": "0.8.13"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.12"
+            "locked": "0.8.13"
         }
     },
     "runtimeClasspath": {
