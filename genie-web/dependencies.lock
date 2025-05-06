@@ -125,16 +125,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -439,16 +439,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -814,22 +814,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -1250,22 +1250,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -1612,16 +1612,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -1975,22 +1975,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -2391,16 +2391,16 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"
@@ -2754,22 +2754,22 @@
             "locked": "3.3.0"
         },
         "io.grpc:grpc-core": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "locked": "1.14.5"

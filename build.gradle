@@ -118,6 +118,7 @@ configure((Set<Project>) ext.javaProjects) {
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
+            mavenBom "io.netty:netty-bom:${netty_version}"
             mavenBom "org.testcontainers:testcontainers-bom:1.16.3"
         }
         dependencies {
@@ -149,6 +150,18 @@ configure((Set<Project>) ext.javaProjects) {
                 entry "springdoc-openapi-hateoas"
                 entry "springdoc-openapi-ui"
                 entry "springdoc-openapi-webmvc-core"
+            }
+            dependencySet(group: "io.netty", version: "${netty_version}") {
+                entry "netty-buffer"
+                entry "netty-codec"
+                entry "netty-codec-http"
+                entry "netty-codec-http2"
+                entry "netty-common"
+                entry "netty-handler"
+                entry "netty-resolver"
+                entry "netty-transport"
+                entry "netty-transport-native-epoll"
+                entry "netty-transport-native-unix-common"
             }
         }
     }

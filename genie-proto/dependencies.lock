@@ -26,10 +26,10 @@
             "locked": "3.22.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -52,10 +52,10 @@
             "locked": "3.22.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -95,10 +95,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -145,10 +145,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -195,10 +195,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -243,7 +243,7 @@
     },
     "protobufToolsLocator_grpc": {
         "io.grpc:protoc-gen-grpc-java": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         }
     },
     "protobufToolsLocator_protoc": {
@@ -259,10 +259,10 @@
             "locked": "3.22.2"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -296,10 +296,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -346,10 +346,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -396,10 +396,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -470,10 +470,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -520,10 +520,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -570,10 +570,10 @@
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"

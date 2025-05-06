@@ -115,13 +115,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -458,13 +458,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -882,27 +882,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -1515,27 +1515,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -2111,27 +2111,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -2653,13 +2653,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -3077,27 +3077,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -3659,13 +3659,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
@@ -4083,27 +4083,27 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-netty": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.39.0"
+            "locked": "1.50.2"
         },
         "io.micrometer:micrometer-core": {
             "firstLevelTransitive": [
