@@ -20,10 +20,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "io.grpc:grpc-protobuf": {
             "locked": "1.63.1"
@@ -46,10 +46,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "io.grpc:grpc-protobuf": {
             "locked": "1.63.1"
@@ -86,10 +86,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -136,10 +136,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -186,10 +186,10 @@
             "locked": "3.3.0"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -248,15 +248,15 @@
     },
     "protobufToolsLocator_protoc": {
         "com.google.protobuf:protoc": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         }
     },
     "runtimeClasspath": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "io.grpc:grpc-protobuf": {
             "locked": "1.63.1"
@@ -287,10 +287,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -337,10 +337,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -387,10 +387,10 @@
             "locked": "3.3.0"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -461,10 +461,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -511,10 +511,10 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
@@ -561,10 +561,10 @@
             "locked": "3.3.0"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-test": {
             "project": true
