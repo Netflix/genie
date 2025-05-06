@@ -23,7 +23,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
@@ -56,10 +56,10 @@
             "locked": "1.6.6"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         }
     },
     "integTestAnnotationProcessor": {
@@ -90,7 +90,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
@@ -138,13 +138,13 @@
             "locked": "1.6.6"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         }
     },
     "integTestRuntimeClasspath": {
@@ -349,20 +349,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -477,7 +477,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "firstLevelTransitive": [
@@ -525,7 +525,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "firstLevelTransitive": [
@@ -555,93 +555,93 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "firstLevelTransitive": [
@@ -653,7 +653,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "firstLevelTransitive": [
@@ -665,7 +665,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.retry:spring-retry": {
             "firstLevelTransitive": [
@@ -677,33 +677,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -936,20 +936,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1062,7 +1062,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "firstLevelTransitive": [
@@ -1101,7 +1101,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "firstLevelTransitive": [
@@ -1122,86 +1122,86 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "firstLevelTransitive": [
@@ -1213,7 +1213,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "firstLevelTransitive": [
@@ -1225,7 +1225,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.retry:spring-retry": {
             "firstLevelTransitive": [
@@ -1237,33 +1237,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1326,7 +1326,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
@@ -1374,13 +1374,13 @@
             "locked": "1.6.6"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -1585,20 +1585,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1713,7 +1713,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "firstLevelTransitive": [
@@ -1761,7 +1761,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "firstLevelTransitive": [
@@ -1791,93 +1791,93 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "firstLevelTransitive": [
@@ -1889,7 +1889,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "firstLevelTransitive": [
@@ -1901,7 +1901,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.retry:spring-retry": {
             "firstLevelTransitive": [
@@ -1913,33 +1913,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -2012,7 +2012,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "locked": "3.4.3"
@@ -2060,13 +2060,13 @@
             "locked": "1.6.6"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         }
     },
     "testRuntimeClasspath": {
@@ -2271,20 +2271,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2399,7 +2399,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "firstLevelTransitive": [
@@ -2447,7 +2447,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "firstLevelTransitive": [
@@ -2477,93 +2477,93 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "firstLevelTransitive": [
@@ -2575,7 +2575,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "firstLevelTransitive": [
@@ -2587,7 +2587,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.retry:spring-retry": {
             "firstLevelTransitive": [
@@ -2599,33 +2599,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [

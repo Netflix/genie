@@ -13,16 +13,16 @@
             "locked": "4.0.5"
         },
         "org.hibernate.orm:hibernate-jpamodelgen": {
-            "locked": "6.6.11.Final"
+            "locked": "6.6.13.Final"
         },
         "org.projectlombok:lombok": {
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-configuration-processor": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         }
     },
     "checkstyle": {
@@ -137,13 +137,13 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -196,7 +196,7 @@
             "locked": "3.6.3"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -211,82 +211,82 @@
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -451,13 +451,13 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
             "locked": "5.3.1"
@@ -519,10 +519,10 @@
             "locked": "3.6.3"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "10.1.39"
+            "locked": "10.1.40"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -555,49 +555,49 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-contract-wiremock": {
             "locked": "4.2.1"
@@ -606,13 +606,13 @@
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-core": {
             "locked": "3.0.3"
@@ -624,25 +624,25 @@
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -832,16 +832,16 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
             "locked": "5.3.1"
@@ -935,10 +935,10 @@
             "locked": "2.3.0"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "10.1.39"
+            "locked": "10.1.40"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -973,7 +973,7 @@
             "locked": "5.11.4"
         },
         "org.mariadb.jdbc:mariadb-java-client": {
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "locked": "42.7.5"
@@ -988,58 +988,58 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-contract-wiremock": {
             "locked": "4.2.1"
@@ -1048,13 +1048,13 @@
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-core": {
             "locked": "3.0.3"
@@ -1066,28 +1066,28 @@
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-webflux": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1268,16 +1268,16 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1360,7 +1360,7 @@
             "locked": "2.3.0"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -1383,91 +1383,91 @@
             "locked": "7.0.5.Final"
         },
         "org.mariadb.jdbc:mariadb-java-client": {
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "locked": "42.7.5"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1624,13 +1624,13 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
             "locked": "5.3.1"
@@ -1689,10 +1689,10 @@
             "locked": "3.6.3"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "10.1.39"
+            "locked": "10.1.40"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -1725,61 +1725,61 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
             "locked": "3.0.0"
@@ -1788,25 +1788,25 @@
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1993,16 +1993,16 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
             "locked": "5.3.1"
@@ -2093,10 +2093,10 @@
             "locked": "2.3.0"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "10.1.39"
+            "locked": "10.1.40"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -2131,7 +2131,7 @@
             "locked": "5.11.4"
         },
         "org.mariadb.jdbc:mariadb-java-client": {
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "locked": "42.7.5"
@@ -2146,70 +2146,70 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
             "locked": "3.0.0"
@@ -2218,25 +2218,25 @@
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -2403,13 +2403,13 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
             "locked": "5.3.1"
@@ -2468,10 +2468,10 @@
             "locked": "3.6.3"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "10.1.39"
+            "locked": "10.1.40"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -2504,61 +2504,61 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
             "locked": "3.0.0"
@@ -2567,25 +2567,25 @@
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -2772,16 +2772,16 @@
             "locked": "1.58.0"
         },
         "io.micrometer:micrometer-core": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-registry-prometheus": {
-            "locked": "1.14.5"
+            "locked": "1.14.6"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
             "locked": "5.3.1"
@@ -2872,10 +2872,10 @@
             "locked": "2.3.0"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "10.1.39"
+            "locked": "10.1.40"
         },
         "org.aspectj:aspectjweaver": {
-            "locked": "1.9.23"
+            "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
             "locked": "3.0.9"
@@ -2910,7 +2910,7 @@
             "locked": "5.11.4"
         },
         "org.mariadb.jdbc:mariadb-java-client": {
-            "locked": "3.4.1"
+            "locked": "3.4.2"
         },
         "org.postgresql:postgresql": {
             "locked": "42.7.5"
@@ -2925,70 +2925,70 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-actuator": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-cache": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-hateoas": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-integration": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-mail": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-web": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.cloud:spring-cloud-starter-zookeeper": {
             "locked": "4.2.1"
         },
         "org.springframework.data:spring-data-jpa": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.hateoas:spring-hateoas": {
             "locked": "2.4.1"
         },
         "org.springframework.integration:spring-integration-zookeeper": {
-            "locked": "6.4.3"
+            "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
             "locked": "3.0.0"
@@ -2997,25 +2997,25 @@
             "locked": "2.0.10"
         },
         "org.springframework:spring-beans": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-context-support": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-web": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
