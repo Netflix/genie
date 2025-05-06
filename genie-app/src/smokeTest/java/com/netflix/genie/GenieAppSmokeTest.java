@@ -55,7 +55,8 @@ class GenieAppSmokeTest {
                     .getForEntity("http://localhost:" + this.port + "/admin/health", String.class)
                     .getStatusCode()
             )
-            .isEqualToComparingFieldByField(HttpStatus.OK);
+            .usingRecursiveComparison()
+            .isEqualTo(HttpStatus.OK);
     }
 
     // TODO: Could add more
