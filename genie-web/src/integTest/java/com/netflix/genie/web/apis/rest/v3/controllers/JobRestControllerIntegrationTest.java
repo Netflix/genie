@@ -98,7 +98,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
 
     private static final long SLEEP_TIME = 500L;
-    private static final long MAX_COUNT_FOR_POLLING_JOB_STATUS = 60;
     private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
     private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
     private static final String COMMAND_ARGS_PATH = "commandArgs";
@@ -1671,15 +1670,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         int counter = 0;
         while (true) {
             final JobStatus status = this.getStatus(jobId);
-            if (counter > MAX_COUNT_FOR_POLLING_JOB_STATUS) {
-                final String errorMessage = String.format(
-                    "waitForDone: Polling iteration %d exceeded the maximum threshold of %d for job ID: %s, "
-                        + "currently in status: %s",
-                    counter, MAX_COUNT_FOR_POLLING_JOB_STATUS, jobId, status
-                );
-                LOG.error(errorMessage);
-                break;
-            }
             if (status.isActive()) {
                 LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
                 Thread.sleep(SLEEP_TIME);
@@ -1694,15 +1684,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         int counter = 0;
         while (true) {
             final JobStatus status = this.getStatus(jobId);
-            if (counter > MAX_COUNT_FOR_POLLING_JOB_STATUS) {
-                final String errorMessage = String.format(
-                    "waitForRunning: Polling iteration %d exceeded the maximum threshold of %d for job ID: %s, "
-                        + "currently in status: %s",
-                    counter, MAX_COUNT_FOR_POLLING_JOB_STATUS, jobId, status
-                );
-                LOG.error(errorMessage);
-                break;
-            }
             if (status != JobStatus.RUNNING && !status.isFinished()) {
                 LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
                 Thread.sleep(SLEEP_TIME);
