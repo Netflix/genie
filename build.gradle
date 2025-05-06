@@ -548,10 +548,10 @@ task dockerBuildAllImages(group: "Docker", description: "Container task for all 
     dependsOn ":genie-demo:dockerBuildClientImage"
 }
 
-gradleEnterprise {
+develocity {
     buildScan {
-        publishAlways()
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
+        publishing.onlyIf { true }
+        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        termsOfUseAgree = "yes"
     }
 }
