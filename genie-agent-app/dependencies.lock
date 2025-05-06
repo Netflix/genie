@@ -44,14 +44,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -108,7 +108,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -249,14 +249,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -316,7 +316,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -483,14 +483,14 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -560,20 +560,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -827,14 +827,14 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -901,20 +901,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -1136,14 +1136,14 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -1210,20 +1210,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -1440,14 +1440,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -1507,7 +1507,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -1674,14 +1674,14 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -1751,20 +1751,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -2013,14 +2013,14 @@
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -2080,7 +2080,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -2247,14 +2247,14 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-agent": {
             "project": true
@@ -2324,20 +2324,20 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-agent",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [

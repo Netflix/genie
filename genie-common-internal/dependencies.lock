@@ -42,13 +42,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -171,13 +171,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -324,13 +324,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -366,13 +366,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -515,13 +515,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -554,13 +554,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -671,13 +671,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -824,13 +824,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -866,13 +866,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
@@ -1015,13 +1015,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -1168,13 +1168,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-common": {
             "project": true
@@ -1210,13 +1210,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.4"
