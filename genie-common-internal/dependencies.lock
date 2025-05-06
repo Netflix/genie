@@ -10,10 +10,10 @@
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-configuration-processor": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         }
     },
     "checkstyle": {
@@ -78,7 +78,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -115,13 +115,13 @@
             "locked": "1.18.24"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -210,7 +210,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -262,16 +262,16 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -375,7 +375,7 @@
             "locked": "1.50.2"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -446,16 +446,16 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -563,7 +563,7 @@
             "locked": "1.50.2"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -615,13 +615,13 @@
             "locked": "7.0.5.Final"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -710,7 +710,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -762,16 +762,16 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -875,7 +875,7 @@
             "locked": "1.50.2"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -946,16 +946,16 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -1054,7 +1054,7 @@
             "locked": "3.3.0"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -1106,16 +1106,16 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
@@ -1219,7 +1219,7 @@
             "locked": "1.50.2"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.4"
+            "locked": "1.4.5"
         },
         "io.zipkin.brave:brave": {
             "locked": "6.0.3"
@@ -1290,16 +1290,16 @@
             "locked": "2.4-M5-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.4"
+            "locked": "3.4.5"
         },
         "org.springframework:spring-context": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "org.springframework:spring-core": {
-            "locked": "6.2.5"
+            "locked": "6.2.6"
         },
         "software.amazon.awssdk:aws-core": {
             "locked": "2.30.17"
