@@ -7,7 +7,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "checkstyle": {
@@ -39,7 +39,7 @@
             "project": true
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -64,7 +64,7 @@
             "locked": "3.12.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.36"
@@ -78,7 +78,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "integTestCompileClasspath": {
@@ -111,10 +111,10 @@
             "project": true
         },
         "com.squareup.okhttp3:mockwebserver": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -148,7 +148,7 @@
             "locked": "5.8.2"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.36"
@@ -166,10 +166,10 @@
             "locked": "2.7.18"
         },
         "org.testcontainers:junit-jupiter": {
-            "locked": "1.16.3"
+            "locked": "1.21.0"
         },
         "org.testcontainers:testcontainers": {
-            "locked": "1.16.3"
+            "locked": "1.21.0"
         }
     },
     "integTestRuntimeClasspath": {
@@ -219,10 +219,10 @@
             "project": true
         },
         "com.squareup.okhttp3:mockwebserver": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -295,10 +295,10 @@
             "locked": "2.7.18"
         },
         "org.testcontainers:junit-jupiter": {
-            "locked": "1.16.3"
+            "locked": "1.21.0"
         },
         "org.testcontainers:testcontainers": {
-            "locked": "1.16.3"
+            "locked": "1.21.0"
         }
     },
     "jacocoAgent": {
@@ -352,7 +352,7 @@
             "project": true
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -405,7 +405,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "smokeTestCompileClasspath": {
@@ -438,10 +438,10 @@
             "project": true
         },
         "com.squareup.okhttp3:mockwebserver": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -472,7 +472,7 @@
             "locked": "5.8.2"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.36"
@@ -537,10 +537,10 @@
             "project": true
         },
         "com.squareup.okhttp3:mockwebserver": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -628,7 +628,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "testCompileClasspath": {
@@ -661,10 +661,10 @@
             "project": true
         },
         "com.squareup.okhttp3:mockwebserver": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"
@@ -695,7 +695,7 @@
             "locked": "5.8.2"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.36"
@@ -760,10 +760,10 @@
             "project": true
         },
         "com.squareup.okhttp3:mockwebserver": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.okhttp3:okhttp": {
-            "locked": "4.9.2"
+            "locked": "4.12.0"
         },
         "com.squareup.retrofit2:converter-jackson": {
             "locked": "2.9.0"

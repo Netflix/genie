@@ -7,7 +7,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "checkstyle": {
@@ -35,7 +35,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot-starter-aop": {
             "locked": "2.7.18"
@@ -52,7 +52,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "integTestCompileClasspath": {
@@ -84,7 +84,7 @@
             "locked": "5.8.2"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
             "locked": "2.0-groovy-3.0"
@@ -190,7 +190,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "smokeTestCompileClasspath": {
@@ -222,7 +222,7 @@
             "locked": "5.8.2"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
             "locked": "2.0-groovy-3.0"
@@ -305,7 +305,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "testCompileClasspath": {
@@ -337,7 +337,7 @@
             "locked": "5.8.2"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
             "locked": "2.0-groovy-3.0"

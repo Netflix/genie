@@ -7,7 +7,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "checkstyle": {
@@ -199,7 +199,7 @@
             "locked": "7.0.5.Final"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -282,31 +282,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "integTestAnnotationProcessor": {
@@ -317,7 +317,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "integTestCompileClasspath": {
@@ -522,7 +522,7 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M5-groovy-3.0"
@@ -617,31 +617,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "integTestRuntimeClasspath": {
@@ -1200,33 +1200,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "jacocoAgent": {
@@ -1754,33 +1754,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -1791,7 +1791,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "smokeTestCompileClasspath": {
@@ -1993,7 +1993,7 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M5-groovy-3.0"
@@ -2088,31 +2088,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -2671,33 +2671,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "spotbugs": {
@@ -2718,7 +2718,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "testCompileClasspath": {
@@ -2920,7 +2920,7 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M5-groovy-3.0"
@@ -3015,31 +3015,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     },
     "testRuntimeClasspath": {
@@ -3598,33 +3598,33 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sns": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         },
         "software.amazon.awssdk:sts": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.30.17"
+            "locked": "2.31.35"
         }
     }
 }

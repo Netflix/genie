@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.12.0"
-    id "com.netflix.nebula.netflixoss" version "11.4.0"
+    id "com.netflix.nebula.netflixoss" version "11.5.0"
     id "com.netflix.nebula.facet" version "11.0.0" apply false
     id "org.ajoberstar.grgit" version "4.1.1"
     id "org.ajoberstar.git-publish" version "3.0.1"
@@ -72,7 +72,7 @@ configure((Set<Project>) ext.javaProjects) {
     apply plugin: "com.netflix.nebula.facet"
 
     lombok {
-        version = '1.18.24'
+        version = '1.18.38'
     }
 
     group = (String) "com.netflix.${githubProjectName}"
@@ -114,12 +114,12 @@ configure((Set<Project>) ext.javaProjects) {
         }
 
         imports {
-            mavenBom "software.amazon.awssdk:bom:2.30.17"
+            mavenBom "software.amazon.awssdk:bom:2.31.35"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
-            mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
+            mavenBom "com.squareup.okhttp3:okhttp-bom:4.12.0"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
             mavenBom "io.netty:netty-bom:${netty_version}"
-            mavenBom "org.testcontainers:testcontainers-bom:1.16.3"
+            mavenBom "org.testcontainers:testcontainers-bom:1.21.0"
         }
         dependencies {
             dependency("com.beust:jcommander:1.82")
