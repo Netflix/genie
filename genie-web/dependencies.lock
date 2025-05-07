@@ -460,7 +460,7 @@
             "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "5.3.1"
+            "locked": "5.5.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -618,7 +618,7 @@
             "locked": "3.0.3"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.0"
+            "locked": "3.0.3"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -844,7 +844,7 @@
             "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "5.3.1"
+            "locked": "5.5.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1060,7 +1060,7 @@
             "locked": "3.0.3"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.0"
+            "locked": "3.0.3"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -1633,7 +1633,7 @@
             "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "5.3.1"
+            "locked": "5.5.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -1782,7 +1782,7 @@
             "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.0"
+            "locked": "3.0.3"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -2005,7 +2005,7 @@
             "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "5.3.1"
+            "locked": "5.5.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2212,7 +2212,7 @@
             "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.0"
+            "locked": "3.0.3"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -2412,7 +2412,7 @@
             "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "5.3.1"
+            "locked": "5.5.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2561,7 +2561,7 @@
             "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.0"
+            "locked": "3.0.3"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
@@ -2784,7 +2784,7 @@
             "locked": "1.4.5"
         },
         "io.rest-assured:rest-assured": {
-            "locked": "5.3.1"
+            "locked": "5.5.1"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
@@ -2991,7 +2991,7 @@
             "locked": "6.4.4"
         },
         "org.springframework.restdocs:spring-restdocs-restassured": {
-            "locked": "3.0.0"
+            "locked": "3.0.3"
         },
         "org.springframework.retry:spring-retry": {
             "locked": "2.0.10"
