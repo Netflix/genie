@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.12.0"
-    id "com.netflix.nebula.netflixoss" version "11.5.0"
+    id "com.netflix.nebula.netflixoss" version "11.4.0"
     id "com.netflix.nebula.facet" version "11.0.0" apply false
     id "org.ajoberstar.grgit" version "4.1.1"
     id "org.ajoberstar.git-publish" version "3.0.1"
