@@ -133,8 +133,8 @@ public class GRpcAgentFileStreamServiceImpl
         log.debug("Attempting to stream file: {} of job: {}", relativePath, jobId);
         final Optional<DirectoryManifest> optionalManifest = this.getManifest(jobId);
 
-        if (!optionalManifest.isPresent()) {
-            log.warn("No manifest found for job: {}" + jobId);
+        if (optionalManifest.isEmpty()) {
+            log.warn("No manifest found for job: {}", jobId);
             return Optional.empty();
         }
 
