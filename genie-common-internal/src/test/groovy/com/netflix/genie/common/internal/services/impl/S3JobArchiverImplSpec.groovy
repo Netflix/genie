@@ -194,22 +194,11 @@ class S3JobArchiverImplSpec extends Specification {
         !result
     }
 
-    def "Archival Exception thrown if there is error archiving"() {
+    def "If it is not a valid S3 URI archival is not attempted with this implementation"() {
         when:
-        this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationURI)
+        def result = this.s3ArchivalService.archiveDirectory(jobDir.toPath(), [], new URI("file://abc"))
 
         then:
-        1 * this.s3TransferManagerFactory.getS3Uri(this.archivalLocationURI) >> { throw new S3Exception("test") }
-        thrown(JobArchiveException)
-    }
-
-    def "If bucket is missing in URI, an exception is thrown"() {
-        when:
-        this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationURI)
-
-        then:
-        1 * this.s3TransferManagerFactory.getS3Uri(this.archivalLocationURI) >> this.s3Uri
-        1 * this.s3Uri.bucket() >> Optional.empty()
-        thrown(JobArchiveException)
+        !result
     }
 }

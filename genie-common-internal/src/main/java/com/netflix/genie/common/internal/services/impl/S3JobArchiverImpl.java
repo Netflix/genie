@@ -61,11 +61,19 @@ public class S3JobArchiverImpl implements JobArchiver {
         @NotNull final URI target
     ) throws JobArchiveException {
         final String uriString = target.toString();
+        final S3Uri s3Uri;
+        final String bucketName;
 
         try {
-            final S3Uri s3Uri = this.transferManagerFactory.getS3Uri(target);
-            final String bucketName = s3Uri.bucket().orElseThrow(() ->
+            s3Uri = this.transferManagerFactory.getS3Uri(target);
+            bucketName = s3Uri.bucket().orElseThrow(() ->
                 new IllegalArgumentException("No bucket specified in URI: " + uriString));
+        } catch (final Exception e) {
+            log.debug("{} is not a valid S3 URI", uriString);
+            return false;
+        }
+
+        try {
             final String keyPrefix = s3Uri.key().orElse("");
 
             log.debug(
