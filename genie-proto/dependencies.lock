@@ -20,16 +20,16 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -46,16 +46,16 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -86,19 +86,19 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -136,19 +136,19 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -186,19 +186,19 @@
             "locked": "3.3.0"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -243,26 +243,26 @@
     },
     "protobufToolsLocator_grpc": {
         "io.grpc:protoc-gen-grpc-java": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         }
     },
     "protobufToolsLocator_protoc": {
         "com.google.protobuf:protoc": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         }
     },
     "runtimeClasspath": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -287,19 +287,19 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -337,19 +337,19 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -387,19 +387,19 @@
             "locked": "3.3.0"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -461,19 +461,19 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -511,19 +511,19 @@
             "locked": "4.8.2"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -561,19 +561,19 @@
             "locked": "3.3.0"
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.22.2"
+            "locked": "3.24.0"
         },
         "com.netflix.genie:genie-test": {
             "project": true
         },
         "io.grpc:grpc-protobuf": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.50.2"
+            "locked": "1.58.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
