@@ -300,7 +300,12 @@ configure((Set<Project>) ext.javaProjects) {
                 systemProperty "spring.profiles.include", "githubactions"
             }
 
-            reports.html.outputLocation = new File("${reporting.baseDirectory}/test/${task.name}")
+            reports {
+                html.required = false
+                junitXml.required = true
+            }
+
+            // reports.html.outputLocation = new File("${reporting.baseDirectory}/test/${task.name}")
             (jacocoTestReport.getExecutionData() + files("$buildDir/jacoco/${task.name}.exec"))
 
             // Customize test logging on CI and everywhere else
