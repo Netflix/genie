@@ -31,14 +31,24 @@ import org.springframework.scheduling.TaskScheduler;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Implementation of the {@link AgentJobKillService}, listens for kill coming from server using long-polling.
+ * Implementation of the {@link AgentJobKillService} that listens for kill signals from the server
+ * using event listeners.
  * <p>
- * Note: this implementation still suffers from a serious flaw: because it is implemented with a unary call,
+ * This implementation works by sending a unary gRPC request to the server, which holds the response
+ * until it has a kill signal to send or until the request times out. It attaches event listeners
+ * to the response future, which automatically process the response when it arrives.
+ * If a request fails, a periodic task with exponential backoff is used to retry creating a new request.
+ * The implementation properly handles request cancellation during shutdown.
+ * <p>
+ * Note: this implementation still suffers from a limitation: because it uses unary gRPC calls,
  * the server will never realize the client is gone if the connection is broken. This can lead to an accumulation of
- * parked calls on the server. A new protocol (based on a bidirectional stream) is necessary to solve this problem.
+ * parked calls on the server if clients disconnect abnormally. A protocol based on bidirectional streaming
+ * would be necessary to fully solve this problem.
  *
  * @author mprimi
  * @since 4.0.0
@@ -46,13 +56,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
 
+    private static final int REQUEST_TIMEOUT_SECONDS = 5;
+
     private final JobKillServiceGrpc.JobKillServiceFutureStub client;
     private final KillService killService;
     private final TaskScheduler taskScheduler;
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final JobKillServiceProperties properties;
     private final ExponentialBackOffTrigger trigger;
-    private ScheduledFuture<?> periodicTaskScheduledFuture;
+
+    // Using volatile to ensure visibility across threads
+    private volatile PeriodicTask periodicTask;
+    private volatile ScheduledFuture<?> periodicTaskScheduledFuture;
+    private String jobId;
 
     /**
      * Constructor.
@@ -73,22 +89,29 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
         this.taskScheduler = taskScheduler;
         this.properties = properties;
         this.trigger = new ExponentialBackOffTrigger(this.properties.getResponseCheckBackOff());
+        log.debug("GRpcAgentJobKillServiceImpl initialized with non-blocking implementation");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized void start(@NotBlank(message = "Job id cannot be blank") final String jobId) {
-        //Service can be started only once
+    public synchronized void start(@NotBlank(message = "Job id cannot be blank") final String requestedJobId) {
+        this.jobId = requestedJobId;
+
         if (started.compareAndSet(false, true)) {
-            final PeriodicTask periodicTask = new PeriodicTask(client, killService, jobId, this.trigger);
+            log.info("Starting job kill service for job: {}", requestedJobId);
+
+            // Create the periodic task
+            this.periodicTask = new PeriodicTask(client, killService, requestedJobId, this.trigger);
 
             // Run once immediately
-            periodicTask.run();
+            this.periodicTask.run();
 
             // Then run on task scheduler periodically
-            this.periodicTaskScheduledFuture = this.taskScheduler.schedule(periodicTask, this.trigger);
+            this.periodicTaskScheduledFuture = this.taskScheduler.schedule(this.periodicTask, this.trigger);
+        } else {
+            log.debug("Service already running for job: {}, ignoring start request", this.jobId);
         }
     }
 
@@ -96,20 +119,46 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
      * {@inheritDoc}
      */
     @Override
-    public void stop() {
+    public synchronized void stop() {
         if (this.started.compareAndSet(true, false)) {
-            this.periodicTaskScheduledFuture.cancel(true);
-            this.periodicTaskScheduledFuture = null;
+            log.info("Stopping job kill service for job: {}", this.jobId);
+
+            // Cancel the scheduled periodic task
+            final ScheduledFuture<?> scheduledFutureToCancel = this.periodicTaskScheduledFuture;
+            if (scheduledFutureToCancel != null) {
+                scheduledFutureToCancel.cancel(true);
+                this.periodicTaskScheduledFuture = null;
+            }
+
+            final PeriodicTask taskToCancel = this.periodicTask;
+            if (taskToCancel != null) {
+                taskToCancel.cancelPendingRequest();
+                this.periodicTask = null;
+            }
         }
     }
 
+    /**
+     * Task that periodically checks for kill requests and handles responses.
+     */
     private static final class PeriodicTask implements Runnable {
         private final JobKillServiceGrpc.JobKillServiceFutureStub client;
         private final KillService killService;
         private final String jobId;
         private final ExponentialBackOffTrigger trigger;
-        private ListenableFuture<JobKillRegistrationResponse> pendingKillRequestFuture;
 
+        // Using AtomicReference for thread-safe updates
+        private final AtomicReference<ListenableFuture<JobKillRegistrationResponse>> pendingKillRequestFutureRef =
+            new AtomicReference<>();
+
+        /**
+         * Constructor.
+         *
+         * @param client      The gRPC client
+         * @param killService The kill service
+         * @param jobId       The job ID
+         * @param trigger     The exponential backoff trigger
+         */
         PeriodicTask(
             final JobKillServiceGrpc.JobKillServiceFutureStub client,
             final KillService killService,
@@ -129,52 +178,89 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
         public void run() {
             try {
                 this.periodicCheckForKill();
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 log.error("Error in periodic kill check task: {}", t.getMessage(), t);
             }
         }
 
-        private void periodicCheckForKill() throws InterruptedException {
+        /**
+         * Check for kill requests and create new ones if needed.
+         */
+        private void periodicCheckForKill() {
+            // Get the current future atomically
+            final ListenableFuture<JobKillRegistrationResponse> currentFuture = pendingKillRequestFutureRef.get();
 
-            if (this.pendingKillRequestFuture == null) {
-                // No pending kill request, create one
-                this.pendingKillRequestFuture = this.client
-                    .registerForKillNotification(
-                        JobKillRegistrationRequest.newBuilder()
-                            .setJobId(jobId)
-                            .build()
-                    );
-            }
-
-            if (!this.pendingKillRequestFuture.isDone()) {
-                // Still waiting for a kill, nothing to do
-                log.debug("Kill request still pending");
-
+            // Create a new request if there isn't one already
+            if (currentFuture == null) {
+                createNewKillRequest();
+            } else if (currentFuture.isDone()) {
+                // Request is done, clear the reference and create a new request
+                pendingKillRequestFutureRef.compareAndSet(currentFuture, null);
+                createNewKillRequest();
             } else {
-                // Kill response received or error
-                JobKillRegistrationResponse killResponse = null;
-                Throwable exception = null;
+                // Request is still pending, nothing to do
+                log.debug("Kill request still pending for job: {}", jobId);
+            }
+        }
 
+        /**
+         * Create a new kill notification request.
+         */
+        private void createNewKillRequest() {
+            final JobKillServiceGrpc.JobKillServiceFutureStub clientWithDeadline =
+                this.client.withDeadlineAfter(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            final JobKillRegistrationRequest request = JobKillRegistrationRequest.newBuilder()
+                .setJobId(jobId)
+                .build();
+
+            // Send request and store the future atomically
+            final ListenableFuture<JobKillRegistrationResponse> future =
+                clientWithDeadline.registerForKillNotification(request);
+            pendingKillRequestFutureRef.set(future);
+
+            // Add listener to handle response
+            future.addListener(() -> {
                 try {
-                    killResponse = this.pendingKillRequestFuture.get();
-                } catch (ExecutionException e) {
-                    log.warn("Kill request failed");
-                    exception = e.getCause() != null ? e.getCause() : e;
-                }
+                    // Wait for the response
+                    future.get();
 
-                // Delete current pending so a new one will be re-created
-                this.pendingKillRequestFuture = null;
+                    // Process the kill signal
+                    log.info("Received kill signal from server for job: {}", jobId);
+                    killService.kill(KillService.KillSource.API_KILL_REQUEST);
 
-                if (killResponse != null) {
-                    log.info("Received kill signal from server");
-                    this.killService.kill(KillService.KillSource.API_KILL_REQUEST);
-                }
+                    // Reset trigger for next request
+                    trigger.reset();
+                } catch (final InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.debug("Kill request interrupted for job: {}", jobId);
+                } catch (final ExecutionException e) {
+                    final Throwable cause = e.getCause() != null ? e.getCause() : e;
+                    log.debug("Kill request failed for job {}: {}", jobId, cause.getMessage());
 
-                if (exception != null) {
-                    log.warn("Kill request produced an error", exception);
-                    // Re-schedule this task soon
-                    this.trigger.reset();
+                    // Reset trigger to retry sooner
+                    trigger.reset();
+                } finally {
+                    // Clear the reference if it still points to this future
+                    pendingKillRequestFutureRef.compareAndSet(future, null);
                 }
+            }, Runnable::run);
+
+            log.debug("Created new kill notification request for job: {}", jobId);
+        }
+
+        /**
+         * Cancel any pending kill request.
+         */
+        void cancelPendingRequest() {
+            // Atomically get and clear the reference
+            final ListenableFuture<JobKillRegistrationResponse> futureToCancel =
+                pendingKillRequestFutureRef.getAndSet(null);
+
+            if (futureToCancel != null && !futureToCancel.isDone()) {
+                final boolean cancelled = futureToCancel.cancel(true);
+                log.debug("Cancelled pending kill request for job {}: {}", jobId,
+                    cancelled ? "success" : "failed");
             }
         }
     }
