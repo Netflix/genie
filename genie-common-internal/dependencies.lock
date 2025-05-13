@@ -366,13 +366,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.5"
@@ -554,13 +554,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.5"
@@ -866,13 +866,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.5"
@@ -1210,13 +1210,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.58.0"
+            "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.4.5"
