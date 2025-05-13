@@ -709,7 +709,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         // Comment out this test for now as
         // Spring boot 3 has a know issue to handle 416 errors
         // see https://github.com/spring-projects/spring-framework/issues/34490
-        /*
+
         // Range request -- out of range
         RestAssured
             .given(this.getRequestSpecification())
@@ -719,8 +719,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
             .then()
             .statusCode(Matchers.is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-            .header(HttpHeaders.CONTENT_LENGTH, Matchers.blankOrNullString());
-        */
+            .header(HttpHeaders.CONTENT_LENGTH, Matchers.equalTo("0"));
     }
 
     private void checkJobRequest(
