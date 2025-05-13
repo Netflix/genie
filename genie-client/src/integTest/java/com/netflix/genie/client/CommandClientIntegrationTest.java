@@ -256,21 +256,6 @@ abstract class CommandClientIntegrationTest extends ApplicationClientIntegration
             Assertions.assertThat(page.size()).isEqualTo(1);
             Assertions.assertThat(page.get(0).getId().orElse(null)).isEqualTo(ids.get(i));
         }
-
-        /* Comment out this test for now as it fails integration test and blocks an urgent fix
-        // Ask for page beyond end of results
-        Assertions.assertThat(
-            this.commandClient.getCommands(
-                null,
-                null,
-                null,
-                null,
-                3,
-                null,
-                null,
-                1
-            )
-        ).isEmpty(); */
     }
 
     @Test

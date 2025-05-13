@@ -706,7 +706,6 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .header(HttpHeaders.CONTENT_LENGTH, Integer.toString(EXPECTED_STDOUT_LENGTH))
             .body(Matchers.equalTo(EXPECTED_STDOUT_CONTENT));
 
-        // Comment out this test for now as
         // Spring boot 3 has a know issue to handle 416 errors
         // see https://github.com/spring-projects/spring-framework/issues/34490
 
