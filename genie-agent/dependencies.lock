@@ -46,13 +46,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -241,13 +241,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -468,13 +468,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -762,13 +762,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -1013,13 +1013,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -1240,13 +1240,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -1529,13 +1529,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [
@@ -1756,13 +1756,13 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.netflix.genie:genie-common": {
             "firstLevelTransitive": [

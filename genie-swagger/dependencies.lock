@@ -202,13 +202,13 @@
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.h2database:h2": {
             "firstLevelTransitive": [
@@ -799,13 +799,13 @@
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.h2database:h2": {
             "firstLevelTransitive": [
@@ -1438,13 +1438,13 @@
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.h2database:h2": {
             "firstLevelTransitive": [
@@ -2124,13 +2124,13 @@
                 "com.netflix.genie:genie-proto",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.google.protobuf:protobuf-java-util": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "3.24.0"
+            "locked": "3.25.5"
         },
         "com.h2database:h2": {
             "firstLevelTransitive": [
