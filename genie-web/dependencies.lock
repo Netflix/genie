@@ -949,6 +949,9 @@
         "org.flywaydb:flyway-core": {
             "locked": "10.20.1"
         },
+        "org.flywaydb:flyway-database-postgresql": {
+            "locked": "10.20.1"
+        },
         "org.flywaydb:flyway-mysql": {
             "locked": "10.20.1"
         },
@@ -1366,6 +1369,9 @@
             "locked": "3.0.9"
         },
         "org.flywaydb:flyway-core": {
+            "locked": "10.20.1"
+        },
+        "org.flywaydb:flyway-database-postgresql": {
             "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {
@@ -2105,6 +2111,9 @@
             "locked": "2.7.3"
         },
         "org.flywaydb:flyway-core": {
+            "locked": "10.20.1"
+        },
+        "org.flywaydb:flyway-database-postgresql": {
             "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {
@@ -2884,6 +2893,9 @@
             "locked": "2.7.3"
         },
         "org.flywaydb:flyway-core": {
+            "locked": "10.20.1"
+        },
+        "org.flywaydb:flyway-database-postgresql": {
             "locked": "10.20.1"
         },
         "org.flywaydb:flyway-mysql": {

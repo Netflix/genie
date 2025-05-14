@@ -988,6 +988,12 @@
             ],
             "locked": "10.20.1"
         },
+        "org.flywaydb:flyway-database-postgresql": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "10.20.1"
+        },
         "org.flywaydb:flyway-mysql": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
@@ -1562,6 +1568,12 @@
             "locked": "3.0.9"
         },
         "org.flywaydb:flyway-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "10.20.1"
+        },
+        "org.flywaydb:flyway-database-postgresql": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
@@ -2454,6 +2466,12 @@
             "locked": "3.0.9"
         },
         "org.flywaydb:flyway-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "10.20.1"
+        },
+        "org.flywaydb:flyway-database-postgresql": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
@@ -3381,6 +3399,12 @@
             "locked": "3.0.9"
         },
         "org.flywaydb:flyway-core": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-web"
+            ],
+            "locked": "10.20.1"
+        },
+        "org.flywaydb:flyway-database-postgresql": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
