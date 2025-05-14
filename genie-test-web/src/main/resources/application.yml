@@ -132,7 +132,7 @@ spring:
       write-dates-as-timestamps: false
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
         jdbc:
