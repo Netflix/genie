@@ -95,8 +95,8 @@ jobs:
           ((!startsWith(github.ref, 'refs/tags/v')) && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev-snapshot')
         run: |
           ./gradlew --stacktrace build codeCoverageReport coveralls
-          INTEGRATION_TEST_DB=mysql ./gradlew --stacktrace genie-web:integrationTest genie-web:createMissingSnippets genie-web:asciidoctor
-          INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest genie-web:createMissingSnippets genie-web:asciidoctor
+          INTEGRATION_TEST_DB=mysql ./gradlew --stacktrace genie-web:integrationTest genie-web:createAllMissingSnippets genie-web:asciidoctor
+          INTEGRATION_TEST_DB=postgresql ./gradlew --stacktrace genie-web:integrationTest
           ./gradlew --stacktrace javadoc asciidoc dockerBuildAllImages
       - name: Publish snapshot
         if: |
