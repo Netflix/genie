@@ -208,7 +208,7 @@ configure((Set<Project>) ext.javaProjects) {
             implementation("io.micrometer:micrometer-tracing-bridge-brave")
             implementation("jakarta.servlet:jakarta.servlet-api")
             implementation("jakarta.validation:jakarta.validation-api")
-            implementation("org.hibernate.validator:hibernate-validator:7.0.5.Final")
+            implementation("org.hibernate.validator:hibernate-validator")
             implementation("jakarta.el:jakarta.el-api")
             implementation("io.zipkin.reporter2:zipkin-reporter")
         } else {

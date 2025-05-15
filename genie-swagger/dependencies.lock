@@ -41,7 +41,7 @@
             "locked": "1.0"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.projectlombok:lombok": {
             "locked": "1.18.24"
@@ -108,7 +108,7 @@
             "locked": "1.0"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
             "locked": "5.11.4"
@@ -516,7 +516,7 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
             "locked": "5.11.4"
@@ -1107,7 +1107,7 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.mariadb.jdbc:mariadb-java-client": {
             "firstLevelTransitive": [
@@ -1356,7 +1356,7 @@
             "locked": "1.0"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
             "locked": "5.11.4"
@@ -1764,7 +1764,7 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
             "locked": "5.11.4"
@@ -2048,7 +2048,7 @@
             "locked": "1.0"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
             "locked": "5.11.4"
@@ -2456,7 +2456,7 @@
                 "com.netflix.genie:genie-common-internal",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "7.0.5.Final"
+            "locked": "8.0.2.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
             "locked": "5.11.4"
