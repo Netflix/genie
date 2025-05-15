@@ -154,9 +154,9 @@ dependencies {
     integTestImplementation("org.springframework.restdocs:spring-restdocs-restassured")
     integTestRuntimeOnly("org.springframework:spring-webflux")
 
-    testImplementation("org.springframework.restdocs:spring-restdocs-restassured:3.0.0")
-    testImplementation("org.springframework.restdocs:spring-restdocs-restassured:3.0.0")
-    testImplementation("io.rest-assured:rest-assured:5.3.1") {
+    testImplementation("org.springframework.restdocs:spring-restdocs-restassured:3.0.3")
+    testImplementation("org.springframework.restdocs:spring-restdocs-restassured:3.0.3")
+    testImplementation("io.rest-assured:rest-assured:5.5.1") {
         exclude group: "javax.xml.bind", module: "jaxb-api"
     }
     /*******************************
