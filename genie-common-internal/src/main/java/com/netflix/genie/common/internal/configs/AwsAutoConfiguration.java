@@ -37,7 +37,7 @@ import io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderPro
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -67,7 +67,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
         ContextStackAutoConfiguration.class
     }
 )
-@ConditionalOnBean(AWSCredentialsProvider.class)
+@ConditionalOnClass(name = "com.amazonaws.auth.AWSCredentialsProvider")
 @Slf4j
 public class AwsAutoConfiguration {
 
