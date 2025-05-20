@@ -29,7 +29,7 @@ import io.awspring.cloud.autoconfigure.core.RegionProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -59,7 +59,7 @@ import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
         RegionProviderAutoConfiguration.class
     }
 )
-@ConditionalOnBean(AwsCredentialsProvider.class)
+@ConditionalOnClass(name = "software.amazon.awssdk.auth.credentials.AwsCredentialsProvider")
 @Slf4j
 public class AwsAutoConfiguration {
 
