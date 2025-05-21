@@ -22,6 +22,7 @@ import com.netflix.genie.web.services.ClusterLeaderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 
 import java.util.Map;
@@ -71,7 +72,7 @@ public class LeaderElectionActuator {
      * @param action the action to perform
      */
     @WriteOperation
-    public void doAction(final Action action) {
+    public void doAction(@Selector final Action action) {
         switch (action) {
             case START:
                 log.info("Starting leader election service");
