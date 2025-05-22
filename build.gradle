@@ -271,8 +271,12 @@ configure((Set<Project>) ext.javaProjects) {
         ]
     }
 
-    tasks.withType(JavaCompile) {
-        options.compilerArgs.add('-parameters')
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs.add("-parameters")
+    }
+
+    tasks.withType(GroovyCompile).configureEach {
+        groovyOptions.parameters = true
     }
 
     compileTestJava {
