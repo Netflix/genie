@@ -27,7 +27,6 @@ import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collections;
 import java.util.Map;
 
 
@@ -73,57 +72,57 @@ public class LeaderElectionActuator {
      * Forces the node to perform leader election related actions.
      * This method uses direct request access to retrieve parameters,
      * avoiding issues with parameter name resolution when compiled without the '-parameters' flag.
-     * Required request parameter:
      * <p>
+     * Required request parameter:
      * - action: The action to perform. Must be one of: START, STOP, RESTART
+     * <p>
      * Example usage:
      * POST /actuator/leaderElection?action=RESTART
      *
-     * @return A map containing the result of the operation
+     * @throws IllegalStateException if no request context is available
+     * @throws IllegalArgumentException if the action parameter is missing or invalid
+     * @throws UnsupportedOperationException if the action is not supported
+     * @throws RuntimeException if there is an error executing the requested action
      */
     @WriteOperation
-    public Map<String, Object> doAction() {
+    public void doAction() {
         final ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
-            return Collections.singletonMap("error", "No request context available");
+            throw new IllegalStateException("No request context available");
         }
 
         final HttpServletRequest request = attributes.getRequest();
         final String actionStr = request.getParameter("action");
 
         if (actionStr == null || actionStr.trim().isEmpty()) {
-            return Collections.singletonMap("error", "Missing required parameter: action");
+            throw new IllegalArgumentException("Missing required parameter: action");
         }
 
         final Action action;
         try {
             action = Action.valueOf(actionStr.toUpperCase());
         } catch (final IllegalArgumentException e) {
-            return Collections.singletonMap("error", "Invalid action value: " + actionStr);
+            log.warn("Invalid action value provided: {}", actionStr);
+            throw new IllegalArgumentException("Invalid action value: " + actionStr, e);
         }
 
-        try {
-            switch (action) {
-                case START:
-                    log.info("Starting leader election service");
-                    this.clusterLeaderService.start();
-                    return Collections.singletonMap("result", "Started leader election service");
-                case STOP:
-                    log.info("Stopping leader election service");
-                    this.clusterLeaderService.stop();
-                    return Collections.singletonMap("result", "Stopped leader election service");
-                case RESTART:
-                    log.info("Restarting leader election service");
-                    this.clusterLeaderService.stop();
-                    this.clusterLeaderService.start();
-                    return Collections.singletonMap("result", "Restarted leader election service");
-                default:
-                    log.error("Unknown action: " + action);
-                    return Collections.singletonMap("error", "Unknown action: " + action.name());
-            }
-        } catch (Exception e) {
-            log.error("Error executing action", e);
-            return Collections.singletonMap("error", e.getMessage());
+        switch (action) {
+            case START:
+                log.info("Starting leader election service");
+                this.clusterLeaderService.start();
+                break;
+            case STOP:
+                log.info("Stopping leader election service");
+                this.clusterLeaderService.stop();
+                break;
+            case RESTART:
+                log.info("Restarting leader election service");
+                this.clusterLeaderService.stop();
+                this.clusterLeaderService.start();
+                break;
+            default:
+                log.error("Unknown action: {}", action);
+                throw new UnsupportedOperationException("Unknown action: " + action.name());
         }
     }
 

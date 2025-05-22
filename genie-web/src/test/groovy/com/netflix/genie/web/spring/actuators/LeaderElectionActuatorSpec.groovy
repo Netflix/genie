@@ -58,65 +58,65 @@ class LeaderElectionActuatorSpec extends Specification {
     def "Actions"() {
         when:
         request.addParameter("action", "START")
-        Map<String, Object> result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
         1 * clusterLeaderService.start()
-        result.containsKey("result")
+        noExceptionThrown()
 
         when:
         request = new MockHttpServletRequest()
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
         request.addParameter("action", "STOP")
-        result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
         1 * clusterLeaderService.stop()
-        result.containsKey("result")
+        noExceptionThrown()
 
         when:
         request = new MockHttpServletRequest()
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
         request.addParameter("action", "RESTART")
-        result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
         1 * clusterLeaderService.stop()
         1 * clusterLeaderService.start()
-        result.containsKey("result")
+        noExceptionThrown()
 
         when:
         request = new MockHttpServletRequest()
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
         request.addParameter("action", "TEST")
-        result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
         0 * clusterLeaderService._
-        result.containsKey("error")
+        thrown(UnsupportedOperationException)
     }
 
     def "Action with invalid or missing parameters"() {
         when:
         RequestContextHolder.resetRequestAttributes()
-        Map<String, Object> result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
-        result.containsKey("error")
+        thrown(IllegalStateException)
 
         when:
         request = new MockHttpServletRequest()
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
-        result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
-        result.containsKey("error")
+        thrown(IllegalArgumentException)
 
         when:
         request.addParameter("action", "INVALID_ACTION")
-        result = this.actuator.doAction()
+        this.actuator.doAction()
 
         then:
-        result.containsKey("error")
+        thrown(IllegalArgumentException)
     }
 }
