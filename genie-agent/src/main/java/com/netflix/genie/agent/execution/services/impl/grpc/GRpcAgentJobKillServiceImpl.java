@@ -28,10 +28,10 @@ import com.netflix.genie.proto.JobKillServiceGrpc;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
+import java.util.concurrent.CancellationException;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -55,8 +55,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
-
-    private static final int REQUEST_TIMEOUT_SECONDS = 5;
 
     private final JobKillServiceGrpc.JobKillServiceFutureStub client;
     private final KillService killService;
@@ -89,7 +87,6 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
         this.taskScheduler = taskScheduler;
         this.properties = properties;
         this.trigger = new ExponentialBackOffTrigger(this.properties.getResponseCheckBackOff());
-        log.debug("GRpcAgentJobKillServiceImpl initialized with non-blocking implementation");
     }
 
     /**
@@ -207,16 +204,14 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
          * Create a new kill notification request.
          */
         private void createNewKillRequest() {
-            final JobKillServiceGrpc.JobKillServiceFutureStub clientWithDeadline =
-                this.client.withDeadlineAfter(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-
+            // Create the request
             final JobKillRegistrationRequest request = JobKillRegistrationRequest.newBuilder()
                 .setJobId(jobId)
                 .build();
 
             // Send request and store the future atomically
             final ListenableFuture<JobKillRegistrationResponse> future =
-                clientWithDeadline.registerForKillNotification(request);
+                this.client.registerForKillNotification(request);
             pendingKillRequestFutureRef.set(future);
 
             // Add listener to handle response
@@ -231,6 +226,8 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
 
                     // Reset trigger for next request
                     trigger.reset();
+                } catch (CancellationException e) {
+                    log.debug("Kill request was cancelled for job: {}", jobId);
                 } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                     log.debug("Kill request interrupted for job: {}", jobId);
