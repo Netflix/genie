@@ -166,10 +166,10 @@
             "locked": "2.7.18"
         },
         "org.testcontainers:junit-jupiter": {
-            "locked": "1.21.0"
+            "locked": "1.21.1"
         },
         "org.testcontainers:testcontainers": {
-            "locked": "1.21.0"
+            "locked": "1.21.1"
         }
     },
     "integTestRuntimeClasspath": {
@@ -295,10 +295,10 @@
             "locked": "2.7.18"
         },
         "org.testcontainers:junit-jupiter": {
-            "locked": "1.21.0"
+            "locked": "1.21.1"
         },
         "org.testcontainers:testcontainers": {
-            "locked": "1.21.0"
+            "locked": "1.21.1"
         }
     },
     "jacocoAgent": {

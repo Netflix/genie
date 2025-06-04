@@ -99,7 +99,7 @@ configure((Set<Project>) ext.javaProjects) {
                 mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
                 mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
                 mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
-                mavenBom "org.spockframework:spock-bom:2.4-M5-groovy-3.0"
+                mavenBom "org.spockframework:spock-bom:2.4-M6-groovy-3.0"
             }
             dependencies {
                 dependency("io.awspring.cloud:spring-cloud-aws-starter:${spring_cloud_aws_3_version}")
@@ -114,12 +114,10 @@ configure((Set<Project>) ext.javaProjects) {
         }
 
         imports {
-            mavenBom "software.amazon.awssdk:bom:2.31.35"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
             mavenBom "com.squareup.okhttp3:okhttp-bom:4.12.0"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
-            mavenBom "io.netty:netty-bom:${netty_version}"
-            mavenBom "org.testcontainers:testcontainers-bom:1.21.0"
+            mavenBom "org.testcontainers:testcontainers-bom:${testcontainers_version}"
         }
         dependencies {
             dependency("com.beust:jcommander:1.82")
@@ -150,18 +148,6 @@ configure((Set<Project>) ext.javaProjects) {
                 entry "springdoc-openapi-hateoas"
                 entry "springdoc-openapi-ui"
                 entry "springdoc-openapi-webmvc-core"
-            }
-            dependencySet(group: "io.netty", version: "${netty_version}") {
-                entry "netty-buffer"
-                entry "netty-codec"
-                entry "netty-codec-http"
-                entry "netty-codec-http2"
-                entry "netty-common"
-                entry "netty-handler"
-                entry "netty-resolver"
-                entry "netty-transport"
-                entry "netty-transport-native-epoll"
-                entry "netty-transport-native-unix-common"
             }
         }
     }
@@ -200,11 +186,11 @@ configure((Set<Project>) ext.javaProjects) {
 
         if (springBoot3ProjectNames.contains(project.name)) {
             implementation("org.springframework.boot:spring-boot-actuator-autoconfigure")
-            implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:${spring_cloud_aws_3_version}")
+            implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
             implementation("io.micrometer:micrometer-tracing-bridge-brave")
             implementation("jakarta.servlet:jakarta.servlet-api")
             implementation("jakarta.validation:jakarta.validation-api")
-            implementation("org.hibernate.validator:hibernate-validator:7.0.5.Final")
+            implementation("org.hibernate.validator:hibernate-validator")
             implementation("jakarta.el:jakarta.el-api")
             implementation("io.zipkin.reporter2:zipkin-reporter")
         } else {
@@ -300,7 +286,7 @@ configure((Set<Project>) ext.javaProjects) {
                 systemProperty "spring.profiles.include", "githubactions"
             }
 
-            reports.html.outputLocation = new File("${reporting.baseDirectory}/test/${task.name}")
+            reports.html.destination(new File("${reporting.baseDir}/test/${task.name}"))
             (jacocoTestReport.getExecutionData() + files("$buildDir/jacoco/${task.name}.exec"))
 
             // Customize test logging on CI and everywhere else
