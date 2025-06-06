@@ -20,12 +20,12 @@ package com.netflix.genie.agent.cli
 import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.common.internal.dtos.AgentJobRequest
 import com.netflix.genie.common.internal.dtos.Criterion
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Validator
 import org.assertj.core.util.Sets
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.validation.ConstraintViolation
-import javax.validation.Validator
 
 class JobRequestConverterSpec extends Specification {
 

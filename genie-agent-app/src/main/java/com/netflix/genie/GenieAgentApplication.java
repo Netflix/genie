@@ -18,6 +18,7 @@
 package com.netflix.genie;
 
 import com.netflix.genie.agent.cli.Util;
+import io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
@@ -42,7 +43,8 @@ import org.springframework.context.annotation.Configuration;
         GsonAutoConfiguration.class,
         JacksonAutoConfiguration.class,
         PersistenceExceptionTranslationAutoConfiguration.class,
-        TransactionAutoConfiguration.class,
+        S3TransferManagerAutoConfiguration.class,
+        TransactionAutoConfiguration.class
     }
 )
 public class GenieAgentApplication {

@@ -17,21 +17,19 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.aws;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.ClientConfigurationFactory;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.regions.AwsRegionProvider;
-import com.amazonaws.retry.PredefinedRetryPolicies;
-import com.amazonaws.retry.RetryPolicy;
-import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import software.amazon.awssdk.core.retry.RetryMode;
+import org.springframework.context.annotation.Bean;
+import java.time.Duration;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.regions.providers.AwsRegionProvider;
+import software.amazon.awssdk.services.sns.SnsClient;
 import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -50,70 +48,55 @@ import org.springframework.context.annotation.Configuration;
 public class AWSAutoConfiguration {
 
     /**
-     * The name of the {@link AmazonSNS} client created specifically for job state notifications.
-     * <p>
-     * Note: this name must match the bean name defined in
-     * {@link io.awspring.cloud.messaging.config.annotation.SnsConfiguration} in order to override it.
+     * The name of the {@link SnsClient} client created specifically for job state notifications.
      */
-    public static final String SNS_CLIENT_BEAN_NAME = "amazonSNS";
-    private static final String SNS_CLIENT_CONFIGURATION_BEAN_NAME = "SNSClientConfiguration";
-    private static final String SNS_CLIENT_RETRY_POLICY_BEAN_NAME = "SNSClientRetryPolicy";
+    public static final String SNS_CLIENT_BEAN_NAME = "snsClient";
+    /**
+     * Bean name for the SNS client override configuration.
+     * This constant is used to identify the bean that provides custom configuration for the AWS SNS client.
+     */
+    public static final String SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME = "snsClientOverrideConfig";
 
     /**
-     * Create a named {@link RetryPolicy} to be used by the {@link AmazonSNS} client, unless a bean by that name
+     * Create a named {@link ClientOverrideConfiguration} to be used by the {@link SnsClient}, unless a bean by that name
      * already exists in context.
      *
      * @param retryProperties The retry properties
-     * @return a named {@link RetryPolicy}
+     * @return a named {@link ClientOverrideConfiguration}
      */
-    @Bean(name = SNS_CLIENT_RETRY_POLICY_BEAN_NAME)
-    @ConditionalOnMissingBean(name = SNS_CLIENT_RETRY_POLICY_BEAN_NAME)
-    public RetryPolicy jobNotificationsSNSClientRetryPolicy(
+    @Bean(name = SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME)
+    @ConditionalOnMissingBean(name = SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME)
+    public ClientOverrideConfiguration jobNotificationsSNSClientOverrideConfig(
         final RetryProperties retryProperties
     ) {
-        return PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(
-            retryProperties.getSns().getNoOfRetries()
-        );
+        return ClientOverrideConfiguration.builder()
+            .retryStrategy(RetryMode.STANDARD)
+            .apiCallTimeout(Duration.ofSeconds(retryProperties.getSns().getApiCallTimeoutSeconds()))
+            .apiCallAttemptTimeout(Duration.ofSeconds(retryProperties.getSns().getApiCallAttemptTimeoutSeconds()))
+            .build();
     }
 
     /**
-     * Create a named {@link ClientConfiguration} to be used by the {@link AmazonSNS} client, unless a bean by that
-     * name already exists in context.
-     *
-     * @param retryPolicy The retry policy
-     * @return a named {@link ClientConfiguration}
-     */
-    @Bean(name = SNS_CLIENT_CONFIGURATION_BEAN_NAME)
-    @ConditionalOnMissingBean(name = SNS_CLIENT_CONFIGURATION_BEAN_NAME)
-    public ClientConfiguration jobNotificationsSNSClientConfiguration(
-        @Qualifier(SNS_CLIENT_RETRY_POLICY_BEAN_NAME) final RetryPolicy retryPolicy
-    ) {
-        final ClientConfiguration configuration = new ClientConfigurationFactory().getConfig();
-        configuration.setRetryPolicy(retryPolicy);
-        return configuration;
-    }
-
-    /**
-     * Create a named {@link AmazonSNS} client to be used by JobNotification SNS publishers, unless a bean by that
+     * Create a named {@link SnsClient} to be used by JobNotification SNS publishers, unless a bean by that
      * name already exists in context.
      *
      * @param credentialsProvider The credentials provider
      * @param awsRegionProvider   The region provider
-     * @param clientConfiguration The client configuration
-     * @return an {@link AmazonSNS} client
+     * @param overrideConfig      The client override configuration
+     * @return an {@link SnsClient}
      */
     @Bean(name = SNS_CLIENT_BEAN_NAME)
     @ConditionalOnMissingBean(name = SNS_CLIENT_BEAN_NAME)
     @ConditionalOnProperty(value = SNSNotificationsProperties.ENABLED_PROPERTY, havingValue = "true")
-    public AmazonSNS jobNotificationsSNSClient(
-        final AWSCredentialsProvider credentialsProvider,
+    public SnsClient jobNotificationsSNSClient(
+        final AwsCredentialsProvider credentialsProvider,
         final AwsRegionProvider awsRegionProvider,
-        @Qualifier(SNS_CLIENT_CONFIGURATION_BEAN_NAME) final ClientConfiguration clientConfiguration
+        @Qualifier(SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME) final ClientOverrideConfiguration overrideConfig
     ) {
-        return AmazonSNSClientBuilder.standard()
-            .withCredentials(credentialsProvider)
-            .withRegion(awsRegionProvider.getRegion())
-            .withClientConfiguration(clientConfiguration)
+        return SnsClient.builder()
+            .credentialsProvider(credentialsProvider)
+            .region(awsRegionProvider.getRegion())
+            .overrideConfiguration(overrideConfig)
             .build();
     }
 }

@@ -17,13 +17,15 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.events
 
-import com.amazonaws.services.sns.AmazonSNS
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.events.GenieEventBus
+import com.netflix.genie.web.events.JobFinishedSNSPublisher
 import com.netflix.genie.web.events.JobNotificationMetricPublisher
 import com.netflix.genie.web.events.JobStateChangeSNSPublisher
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.MeterRegistry
+import software.amazon.awssdk.services.sns.SnsClient
 import spock.lang.Specification
 
 class NotificationsAutoConfigurationSpec extends Specification {
@@ -56,13 +58,31 @@ class NotificationsAutoConfigurationSpec extends Specification {
     }
 
     def "jobNotificationsSNSPublisher"() {
-        AmazonSNS snsClient = Mock(AmazonSNS)
+        SnsClient snsClient = Mock(SnsClient)
         SNSNotificationsProperties snsProperties = Mock(SNSNotificationsProperties)
+
         when:
         JobStateChangeSNSPublisher publisher = this.config.jobNotificationsSNSPublisher(
             snsProperties,
             registry,
             snsClient
+        )
+
+        then:
+        publisher != null
+    }
+
+    def "jobFinishedSNSPublisher"() {
+        SnsClient snsClient = Mock(SnsClient)
+        SNSNotificationsProperties snsProperties = Mock(SNSNotificationsProperties)
+        DataServices dataServices = Mock(DataServices)
+
+        when:
+        JobFinishedSNSPublisher publisher = this.config.jobFinishedSNSPublisher(
+            snsProperties,
+            registry,
+            snsClient,
+            dataServices
         )
 
         then:

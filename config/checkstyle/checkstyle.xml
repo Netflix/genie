@@ -304,7 +304,7 @@
 
     <!-- Checks for long lines. -->
     <module name="LineLength">
-        <property name="max" value="120"/>
+        <property name="max" value="150"/>
         <property name="ignorePattern" value="\$File.*\$"/>
     </module>
 

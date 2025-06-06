@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.services;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Register an agent to listen for job kill messages from the server

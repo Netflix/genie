@@ -26,7 +26,7 @@ import com.netflix.genie.web.properties.AttachmentServiceProperties;
 import com.netflix.genie.web.services.AttachmentService;
 import org.springframework.core.io.Resource;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

@@ -31,7 +31,7 @@ import com.netflix.genie.web.services.RequestForwardingService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
 
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletRequest
 
 /**
  * Specifications for the {@link GRpcJobKillServiceImpl} class.

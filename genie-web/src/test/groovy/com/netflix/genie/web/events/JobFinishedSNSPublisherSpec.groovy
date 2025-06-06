@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.events
 
-import com.amazonaws.services.sns.AmazonSNS
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Lists
@@ -38,7 +37,9 @@ import com.netflix.genie.web.exceptions.checked.NotFoundException
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import org.spockframework.util.Assert
+import software.amazon.awssdk.services.sns.SnsClient
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import software.amazon.awssdk.services.sns.model.PublishResponse
 import spock.lang.Specification
 
 import java.time.Instant
@@ -48,7 +49,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
     Map<String, String> extraKeysMap
     String jobId
     String topicARN
-    AmazonSNS snsClient
+    SnsClient snsClient
     SNSNotificationsProperties snsProperties
     PersistenceService persistenceService
     MeterRegistry registry
@@ -61,7 +62,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         this.extraKeysMap = Maps.newHashMap()
         this.jobId = UUID.randomUUID().toString()
         this.topicARN = UUID.randomUUID().toString()
-        this.snsClient = Mock(AmazonSNS)
+        this.snsClient = Mock(SnsClient)
         this.snsProperties = Mock(SNSNotificationsProperties)
         this.persistenceService = Mock(PersistenceService)
         this.registry = Mock(MeterRegistry)
@@ -144,12 +145,21 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * persistenceService.getFinishedJob(jobId) >> finishedJob
         1 * snsProperties.topicARN >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
-        1 * snsClient.publish(topicARN, _ as String) >> {
-            args ->
-                Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
-                Assert.that(eventDetails.entrySet().size() == 47)
-                Assert.that(eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 35)
-        }
+        1 * snsClient.publish({ PublishRequest request ->
+            def messageJson = request.message()
+            def topicArn = request.topicArn()
+
+            topicArn == topicARN &&
+                messageJson != null &&
+                {
+                    Map<String, Object> eventDetails = mapper.convertValue(
+                        mapper.readTree(messageJson).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME),
+                        Map.class
+                    )
+                    return eventDetails.entrySet().size() == 47 &&
+                        eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 35
+                }()
+        }) >> PublishResponse.builder().build()
         1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
         1 * counter.increment()
     }
@@ -230,12 +240,21 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * persistenceService.getFinishedJob(jobId) >> finishedJob
         1 * snsProperties.topicARN >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
-        1 * snsClient.publish(topicARN, _ as String) >> {
-            args ->
-                Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
-                Assert.that(eventDetails.entrySet().size() == 47)
-                Assert.that(eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 0)
-        }
+        1 * snsClient.publish({ PublishRequest request ->
+            def messageJson = request.message()
+            def topicArn = request.topicArn()
+
+            topicArn == topicARN &&
+                messageJson != null &&
+                {
+                    Map<String, Object> eventDetails = mapper.convertValue(
+                        mapper.readTree(messageJson).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME),
+                        Map.class
+                    )
+                    return eventDetails.entrySet().size() == 47 &&
+                        eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 0
+                }()
+        }) >> PublishResponse.builder().build()
         1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
         1 * counter.increment()
     }

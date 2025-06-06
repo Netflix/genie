@@ -55,7 +55,7 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSp
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 import java.util.Map;

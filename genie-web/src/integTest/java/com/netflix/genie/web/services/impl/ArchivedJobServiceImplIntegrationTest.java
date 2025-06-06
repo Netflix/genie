@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -85,7 +85,7 @@ class ArchivedJobServiceImplIntegrationTest {
     @Autowired
     private ArchivedJobService archivedJobService;
 
-    @MockBean
+    @MockitoBean
     private PersistenceService persistenceService;
 
     /**

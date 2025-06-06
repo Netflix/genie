@@ -26,8 +26,8 @@ import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
-import javax.servlet.http.Cookie
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletRequest
 
 /**
  * Specifications for {@link RequestForwardingServiceImpl}.

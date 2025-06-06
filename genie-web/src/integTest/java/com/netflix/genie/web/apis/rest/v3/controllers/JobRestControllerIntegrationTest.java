@@ -60,11 +60,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.TestPropertySource;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -90,6 +90,7 @@ import java.util.UUID;
 @TestPropertySource(
     properties = {
         LocalAgentLauncherProperties.PROPERTY_PREFIX + ".run-as-user=false",
+        "debug=true"
     }
 )
 class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
@@ -235,7 +236,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
             .body(
                 EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString("The maximum number of characters for the command arguments is 10,000"
+                Matchers.containsString("Max length of an individual command line argument is 10,000 characters"
                 )
             );
     }

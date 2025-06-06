@@ -22,31 +22,34 @@ import com.sun.management.OperatingSystemMXBean
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.springframework.boot.actuate.health.Status
-import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler
+import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
  * Unit tests for GenieCpuHealthIndicator.
  *
- * @author amajumdar* @since 3.0.0
+ * @author amajumdar
+ * @since 3.0.0
  */
 @Unroll
 class GenieCpuHealthIndicatorSpec extends Specification {
     OperatingSystemMXBean operatingSystemMXBean
     GenieCpuHealthIndicator cpuHealthIndicator
     DistributionSummary summary
+    TaskScheduler taskScheduler
 
     def setup() {
         operatingSystemMXBean = Mock(OperatingSystemMXBean)
         summary = Mock(DistributionSummary)
+        taskScheduler = Mock(TaskScheduler)
         def props = new HealthProperties()
         cpuHealthIndicator = new GenieCpuHealthIndicator(
             props.getMaxCpuLoadPercent(),
             1,
             operatingSystemMXBean,
             summary,
-            new DefaultManagedTaskScheduler())
+            taskScheduler)
     }
 
     def 'Health should be #status when totalCpuLoad is #cpuLoad'() {
@@ -71,24 +74,27 @@ class GenieCpuHealthIndicatorSpec extends Specification {
         when:
         def okOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         okOperatingSystemMXBean.getSystemCpuLoad() >> 0.75
+        def mockTaskScheduler = Mock(TaskScheduler)
         def indicator = new GenieCpuHealthIndicator(
             80,
             1,
             okOperatingSystemMXBean,
             DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
-            new DefaultManagedTaskScheduler()
+            mockTaskScheduler
         )
         then:
         indicator.health().getStatus() == Status.UP
+
         when:
         def outOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         outOperatingSystemMXBean.getSystemCpuLoad() >> 0.85
+        mockTaskScheduler = Mock(TaskScheduler)
         indicator = new GenieCpuHealthIndicator(
             80,
             1,
             outOperatingSystemMXBean,
             DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
-            new DefaultManagedTaskScheduler()
+            mockTaskScheduler
         )
         then:
         indicator.health().getStatus() == Status.DOWN

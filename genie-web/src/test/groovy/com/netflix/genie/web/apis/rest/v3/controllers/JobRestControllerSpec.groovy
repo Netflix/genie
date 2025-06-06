@@ -37,7 +37,7 @@ import org.springframework.core.env.Environment
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletRequest
 
 class JobRestControllerSpec extends Specification {
     JobRestController controller

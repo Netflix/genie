@@ -66,9 +66,14 @@ public class ZookeeperAutoConfiguration {
         final CuratorFramework client,
         final ZookeeperProperties zookeeperProperties
     ) {
+        String leaderPath = zookeeperProperties.getLeaderPath();
+        if (leaderPath.endsWith("/")) {
+            leaderPath = leaderPath.substring(0, leaderPath.length() - 1);
+        }
+
         final LeaderInitiatorFactoryBean factoryBean = new LeaderInitiatorFactoryBean();
         factoryBean.setClient(client);
-        factoryBean.setPath(zookeeperProperties.getLeaderPath());
+        factoryBean.setPath(leaderPath);
         factoryBean.setRole("cluster");
         return factoryBean;
     }
@@ -86,8 +91,14 @@ public class ZookeeperAutoConfiguration {
         final CuratorFramework client,
         final ZookeeperProperties zookeeperProperties
     ) {
+        // Remove trailing slash if present
+        String discoveryPath = zookeeperProperties.getDiscoveryPath();
+        if (discoveryPath.endsWith("/")) {
+            discoveryPath = discoveryPath.substring(0, discoveryPath.length() - 1);
+        }
+
         return ServiceDiscoveryBuilder.builder(AgentRoutingServiceCuratorDiscoveryImpl.Agent.class)
-            .basePath(zookeeperProperties.getDiscoveryPath())
+            .basePath(discoveryPath)
             .client(client)
             .build();
     }

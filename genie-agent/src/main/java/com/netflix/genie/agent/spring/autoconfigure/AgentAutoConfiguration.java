@@ -25,8 +25,8 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.internal.util.HostnameUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.task.TaskExecutorCustomizer;
-import org.springframework.boot.task.TaskSchedulerCustomizer;
+import org.springframework.boot.task.ThreadPoolTaskExecutorCustomizer;
+import org.springframework.boot.task.ThreadPoolTaskSchedulerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -97,7 +97,7 @@ public class AgentAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = AsyncTaskExecutor.class)
+    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor")
     public AsyncTaskExecutor sharedAgentTaskExecutor(final AgentProperties agentProperties) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
@@ -157,7 +157,7 @@ public class AgentAutoConfiguration {
      * @return a customizer for the task executor
      */
     @Bean
-    TaskExecutorCustomizer taskExecutorCustomizer(final AgentProperties agentProperties) {
+    ThreadPoolTaskExecutorCustomizer taskExecutorCustomizer(final AgentProperties agentProperties) {
         return taskExecutor -> {
             taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
             taskExecutor.setAwaitTerminationSeconds(
@@ -173,7 +173,7 @@ public class AgentAutoConfiguration {
      * @return a customizer for the task scheduler
      */
     @Bean
-    TaskSchedulerCustomizer taskSchedulerCustomizer(final AgentProperties agentProperties) {
+    ThreadPoolTaskSchedulerCustomizer taskSchedulerCustomizer(final AgentProperties agentProperties) {
         return taskScheduler -> {
             taskScheduler.setWaitForTasksToCompleteOnShutdown(true);
             taskScheduler.setAwaitTerminationSeconds(

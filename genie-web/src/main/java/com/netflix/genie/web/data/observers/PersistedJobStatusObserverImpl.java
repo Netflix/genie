@@ -22,7 +22,7 @@ import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobStateChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Observer of persisted entities modifications that publishes events on the event bus to be consumed asynchronously by

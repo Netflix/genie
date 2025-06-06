@@ -18,6 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.web.services.ClusterLeaderService;
+import org.springframework.integration.leader.Context;
 import org.springframework.integration.zookeeper.leader.LeaderInitiator;
 
 /**
@@ -69,6 +70,7 @@ public class ClusterLeaderServiceCuratorImpl implements ClusterLeaderService {
      */
     @Override
     public boolean isLeader() {
-        return this.leaderInitiator.getContext().isLeader();
+        final Context context = this.leaderInitiator.getContext();
+        return context != null && context.isLeader();
     }
 }

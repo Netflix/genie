@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.common.internal.configs
 
-import com.amazonaws.regions.DefaultAwsRegionProviderChain
-import com.amazonaws.regions.Regions
-import io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties
+import io.awspring.cloud.autoconfigure.core.RegionProperties
+import software.amazon.awssdk.regions.Region
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -33,23 +32,30 @@ class AwsAutoConfigurationSpec extends Specification {
     @Unroll
     def "Can create the expected AwsRegionProvider instance when static is #staticRegion"() {
         def config = new AwsAutoConfiguration()
-        def properties = new AwsRegionProperties()
+        def properties = new RegionProperties()
 
         when:
         properties.setStatic(staticRegion)
         def regionProvider = config.awsRegionProvider(properties)
 
         then:
-        if (!(regionProvider instanceof DefaultAwsRegionProviderChain)) {
-            regionProvider.getRegion() == expectedRegion
+        if (staticRegion) {
+            regionProvider.getRegion() == Region.of(staticRegion)
         } else {
-            // We expect the default to be returned when these conditions are true
-            staticRegion == null
+            // For null static region, we should get a provider that either uses DefaultAwsRegionProviderChain
+            // or falls back to US_EAST_1
+            try {
+                def region = regionProvider.getRegion()
+                assert region != null
+            } catch (Exception e) {
+                // If DefaultAwsRegionProviderChain fails, we should fall back to US_EAST_1
+                assert regionProvider.getRegion() == Region.US_EAST_1
+            }
         }
 
         where:
-        staticRegion                | expectedRegion
-        Regions.US_WEST_2.getName() | Regions.US_WEST_2.getName()
-        null                        | "shouldn't matter"
+        staticRegion    | _
+        "us-west-2"     | _
+        null            | _
     }
 }

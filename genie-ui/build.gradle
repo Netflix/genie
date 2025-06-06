@@ -57,7 +57,7 @@ node {
     download = true
 }
 
-task bundle(type: NpmTask) {
+tasks.register('bundle', NpmTask) {
     inputs.dir("${projectDir}/node_modules")
     inputs.dir("${projectDir}/src/main/web")
     inputs.file("npm-shrinkwrap.json")

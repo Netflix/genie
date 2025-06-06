@@ -42,7 +42,7 @@ import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdError;
 import com.netflix.genie.proto.ReserveJobIdResponse;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Map;
 
 /**

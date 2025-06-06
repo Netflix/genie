@@ -137,7 +137,7 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC # SEE: https://moelholm.com/2016/11/09/spring-boot-controlling-timezones-with-hibernate/
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
   test:
     database:
       replace: none

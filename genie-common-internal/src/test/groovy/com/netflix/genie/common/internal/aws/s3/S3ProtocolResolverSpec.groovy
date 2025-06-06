@@ -17,17 +17,20 @@
  */
 package com.netflix.genie.common.internal.aws.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.AmazonS3URI
-import com.amazonaws.services.s3.model.AmazonS3Exception
-import com.amazonaws.services.s3.model.GetObjectMetadataRequest
-import com.amazonaws.services.s3.model.ObjectMetadata
 import org.apache.commons.lang3.tuple.ImmutablePair
 import org.apache.commons.lang3.tuple.Pair
 import org.springframework.core.io.ResourceLoader
-import org.springframework.core.task.TaskExecutor
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException
+import software.amazon.awssdk.services.s3.model.S3Exception
+import software.amazon.awssdk.services.s3.S3Uri
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.time.Instant
+import java.util.function.Consumer
 
 /**
  * Specifications for {@link S3ProtocolResolver}.
@@ -38,18 +41,35 @@ class S3ProtocolResolverSpec extends Specification {
 
     @Unroll
     def "can resolve #location"() {
-        def s3TaskExecutor = Mock(TaskExecutor)
-        def s3ObjectMetadata = Mock(ObjectMetadata) {
-            getContentLength() >> 100
+        def headObjectResponse = HeadObjectResponse.builder()
+            .contentLength(100L)
+            .lastModified(Instant.now())
+            .contentType("application/octet-stream")
+            .build()
+
+        def s3Client = Mock(S3Client) {
+            headObject(_ as Consumer) >> { Consumer consumer ->
+                def builder = HeadObjectRequest.builder()
+                consumer.accept(builder)
+                def request = builder.build()
+                assert request.bucket() == "aBucket"
+                assert request.key() == "key/path/file.tar.gz"
+                return headObjectResponse
+            }
         }
-        def s3Client = Mock(AmazonS3) {
-            getObjectMetadata(_) >> s3ObjectMetadata
+
+        def mockS3Uri = Mock(S3Uri) {
+            bucket() >> Optional.of("aBucket")
+            key() >> Optional.of("key/path/file.tar.gz")
         }
+
         def s3ClientFactory = Mock(S3ClientFactory) {
-            getClient(_ as AmazonS3URI) >> s3Client
+            getClient(_ as S3Uri) >> s3Client
+            getS3Uri(_ as URI) >> mockS3Uri
         }
+
         def resourceLoader = Mock(ResourceLoader)
-        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory)
 
         when:
         def resource = s3ProtocolResolver.resolve(location, resourceLoader)
@@ -69,18 +89,11 @@ class S3ProtocolResolverSpec extends Specification {
 
     @Unroll
     def "can't resolve #location"() {
-        def s3TaskExecutor = Mock(TaskExecutor)
-        def s3ObjectMetadata = Mock(ObjectMetadata) {
-            getContentLength() >> 100
-        }
-        def s3Client = Mock(AmazonS3) {
-            getObjectMetadata(_) >> s3ObjectMetadata
-        }
         def s3ClientFactory = Mock(S3ClientFactory) {
-            getClient(_ as AmazonS3URI) >> s3Client
+            getS3Uri(_ as URI) >> { throw new IllegalArgumentException("Not a valid S3 URI") }
         }
         def resourceLoader = Mock(ResourceLoader)
-        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory)
 
         when:
         def resource = s3ProtocolResolver.resolve(location, resourceLoader)
@@ -97,29 +110,42 @@ class S3ProtocolResolverSpec extends Specification {
 
     @Unroll
     def "can resolve #location with valid range"() {
-        def s3TaskExecutor = Mock(TaskExecutor)
+        def headObjectResponse = HeadObjectResponse.builder()
+            .contentLength(100L)
+            .lastModified(Instant.now())
+            .contentType("application/octet-stream")
+            .build()
+
+        def s3Client = Mock(S3Client) {
+            headObject(_ as Consumer) >> { Consumer consumer ->
+                def builder = HeadObjectRequest.builder()
+                consumer.accept(builder)
+                def request = builder.build()
+                assert request.bucket() == "aBucket"
+                assert request.key() == "key/path/file.tar.gz"
+                return headObjectResponse
+            }
+        }
+
+        def mockS3Uri = Mock(S3Uri) {
+            bucket() >> Optional.of("aBucket")
+            key() >> Optional.of("key/path/file.tar.gz")
+        }
+
+        def s3ClientFactory = Mock(S3ClientFactory) {
+            getClient(_ as S3Uri) >> s3Client
+            getS3Uri(_ as URI) >> mockS3Uri
+        }
+
         def resourceLoader = Mock(ResourceLoader)
-        def s3Client = Mock(AmazonS3)
-        def s3ClientFactory = Mock(S3ClientFactory)
-        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
-        def s3ObjectMetadata = Mock(ObjectMetadata)
-        GetObjectMetadataRequest requestCapture
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory)
 
         when:
         def resource = s3ProtocolResolver.resolve(location, resourceLoader)
 
         then:
-        1 * s3ClientFactory.getClient(_ as AmazonS3URI) >> s3Client
-        1 * s3Client.getObjectMetadata(_ as GetObjectMetadataRequest) >> {
-            args ->
-                requestCapture = args[0] as GetObjectMetadataRequest
-                return s3ObjectMetadata
-        }
-        1 * s3ObjectMetadata.getContentLength() >> 100
-        requestCapture != null
-        requestCapture.getBucketName() == "aBucket"
-        requestCapture.getKey() == "key/path/file.tar.gz"
         resource != null
+        resource instanceof SimpleStorageRangeResource
 
         where:
         location                                        | _
@@ -130,20 +156,25 @@ class S3ProtocolResolverSpec extends Specification {
         "s3://aBucket/key/path/file.tar.gz"             | _
     }
 
-
     def "can handle resource not existing in S3"() {
-        def exception = new AmazonS3Exception("...")
-        exception.setStatusCode(404)
+        def exception = NoSuchKeyException.builder().build()
 
-        def s3TaskExecutor = Mock(TaskExecutor)
-        def s3Client = Mock(AmazonS3) {
-            getObjectMetadata(_) >> { throw exception }
+        def s3Client = Mock(S3Client) {
+            headObject(_ as Consumer) >> { throw exception }
         }
+
+        def mockS3Uri = Mock(S3Uri) {
+            bucket() >> Optional.of("aBucket")
+            key() >> Optional.of("key/path/file.tar.gz")
+        }
+
         def s3ClientFactory = Mock(S3ClientFactory) {
-            getClient(_ as AmazonS3URI) >> s3Client
+            getS3Uri(_ as URI) >> mockS3Uri
+            getClient(_ as S3Uri) >> s3Client
         }
+
         def resourceLoader = Mock(ResourceLoader)
-        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory)
 
         when:
         def resource = s3ProtocolResolver.resolve("s3://aBucket/key/path/file.tar.gz", resourceLoader)
@@ -159,39 +190,51 @@ class S3ProtocolResolverSpec extends Specification {
     }
 
     def "can handle resource error"() {
-        def exception = new AmazonS3Exception("...")
-        exception.setStatusCode(406)
+        def exception = S3Exception.builder().statusCode(406).build()
 
-        def s3TaskExecutor = Mock(TaskExecutor)
-        def s3Client = Mock(AmazonS3) {
-            getObjectMetadata(_) >> { throw exception }
+        def s3Client = Mock(S3Client) {
+            headObject(_ as Consumer) >> { throw exception }
         }
+
+        def mockS3Uri = Mock(S3Uri) {
+            bucket() >> Optional.of("aBucket")
+            key() >> Optional.of("key/path/file.tar.gz")
+        }
+
         def s3ClientFactory = Mock(S3ClientFactory) {
-            getClient(_ as AmazonS3URI) >> s3Client
+            getS3Uri(_ as URI) >> mockS3Uri
+            getClient(_ as S3Uri) >> s3Client
         }
+
         def resourceLoader = Mock(ResourceLoader)
-        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory)
 
         when:
-        def resource = s3ProtocolResolver.resolve("s3://aBucket/key/path/file.tar.gz", resourceLoader)
+        s3ProtocolResolver.resolve("s3://aBucket/key/path/file.tar.gz", resourceLoader)
 
         then:
-        resource == null
-        thrown(AmazonS3Exception)
+        thrown(S3Exception)
     }
 
     def "can handle other runtime exception"() {
-        def exception = new RuntimeException()
+        def exception = new RuntimeException("Test exception")
 
-        def s3TaskExecutor = Mock(TaskExecutor)
-        def s3Client = Mock(AmazonS3) {
-            getObjectMetadata(_) >> { throw exception }
+        def s3Client = Mock(S3Client) {
+            headObject(_ as Consumer) >> { throw exception }
         }
+
+        def mockS3Uri = Mock(S3Uri) {
+            bucket() >> Optional.of("aBucket")
+            key() >> Optional.of("key/path/file.tar.gz")
+        }
+
         def s3ClientFactory = Mock(S3ClientFactory) {
-            getClient(_ as AmazonS3URI) >> s3Client
+            getS3Uri(_ as URI) >> mockS3Uri
+            getClient(_ as S3Uri) >> s3Client
         }
+
         def resourceLoader = Mock(ResourceLoader)
-        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory, s3TaskExecutor)
+        def s3ProtocolResolver = new S3ProtocolResolver(s3ClientFactory)
 
         when:
         s3ProtocolResolver.resolve("s3://aBucket/key/path/file.tar.gz", resourceLoader)
@@ -220,5 +263,4 @@ class S3ProtocolResolverSpec extends Specification {
         "bytes=10-20" | ImmutablePair.of(10, 20)
         "bytes=10-"   | ImmutablePair.of(10, null)
     }
-
 }

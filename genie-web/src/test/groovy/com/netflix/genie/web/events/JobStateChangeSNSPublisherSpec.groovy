@@ -17,9 +17,6 @@
  */
 package com.netflix.genie.web.events
 
-import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.AuthorizationErrorException
-import com.amazonaws.services.sns.model.PublishResult
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Maps
 import com.netflix.genie.common.external.util.GenieObjectMapper
@@ -28,12 +25,16 @@ import com.netflix.genie.web.properties.SNSNotificationsProperties
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import software.amazon.awssdk.awscore.exception.AwsServiceException
+import software.amazon.awssdk.services.sns.SnsClient
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import software.amazon.awssdk.services.sns.model.PublishResponse
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class JobStateChangeSNSPublisherSpec extends Specification {
     JobStateChangeSNSPublisher publisher
-    AmazonSNS snsClient
+    SnsClient snsClient
     SNSNotificationsProperties snsProperties
     MeterRegistry registry
     ObjectMapper mapper
@@ -44,7 +45,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
     Counter counter
 
     void setup() {
-        this.snsClient = Mock(AmazonSNS)
+        this.snsClient = Mock(SnsClient)
         this.snsProperties = Mock(SNSNotificationsProperties)
         this.registry = Mock(MeterRegistry)
         this.mapper = GenieObjectMapper.getMapper()
@@ -68,7 +69,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         0 * event.getJobId()
         0 * event.getPreviousStatus()
         0 * event.getNewStatus()
-        0 * snsClient.publish(_, _)
+        0 * snsClient.publish(_)
         0 * registry.counter(_, _)
     }
 
@@ -85,7 +86,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * event.getNewStatus() >> JobStatus.INIT
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> ""
-        0 * snsClient.publish(_, _)
+        0 * snsClient.publish(_)
         0 * registry.counter(_, _)
     }
 
@@ -93,9 +94,9 @@ class JobStateChangeSNSPublisherSpec extends Specification {
     def "Publish event (when previous state is #prevState)"() {
         setup:
         this.extraKeysMap.putAll([foo: "bar", bar: "foo"])
-        String message = null
         def tags = MetricsUtils.newSuccessTagsSet()
         tags.add(AbstractSNSPublisher.EventType.JOB_STATUS_CHANGE.getTypeTag())
+        PublishRequest capturedRequest = null
 
         when:
         this.publisher.onApplicationEvent(event)
@@ -107,10 +108,9 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
-        1 * snsClient.publish(topicARN, _ as String) >> {
-            args ->
-                message = args[1] as String
-                return Mock(PublishResult)
+        1 * snsClient.publish(_ as PublishRequest) >> { args ->
+            capturedRequest = args[0]
+            return PublishResponse.builder().build()
         }
         1 * registry.counter(
             "genie.notifications.sns.publish.counter",
@@ -118,27 +118,28 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         ) >> counter
         1 * counter.increment()
 
-        expect:
+        and: "Verify message content"
+        capturedRequest != null
+        capturedRequest.topicArn() == topicARN
+        def message = capturedRequest.message()
         message != null
-        Map<String, Object> parsedMessage = GenieObjectMapper.getMapper().readValue(
-            message,
-            Map.class
-        )
 
+        def parsedMessage = new groovy.json.JsonSlurper().parseText(message)
         parsedMessage.size() == 7
-        parsedMessage.get("foo") as String == "bar"
-        parsedMessage.get("bar") as String == "foo"
-        parsedMessage.get("type") as String == "JOB_STATUS_CHANGE"
-        parsedMessage.get("id") != null
-        parsedMessage.get("timestamp") != null
-        parsedMessage.get("timestamp") instanceof Long
-        parsedMessage.get("isoTimestamp") != null
-        parsedMessage.get("isoTimestamp") instanceof String
-        Map<String, String> eventDetails = parsedMessage.get("details") as Map<String, String>
+        parsedMessage.foo == "bar"
+        parsedMessage.bar == "foo"
+        parsedMessage.type == "JOB_STATUS_CHANGE"
+        parsedMessage.id != null
+        parsedMessage.timestamp != null
+        parsedMessage.timestamp instanceof Number
+        parsedMessage.isoTimestamp != null
+        parsedMessage.isoTimestamp instanceof String
+        def eventDetails = parsedMessage.details
+
         eventDetails != null
-        eventDetails.get("jobId") == jobId
-        eventDetails.get("fromState") == String.valueOf(prevState)
-        eventDetails.get("toState") == JobStatus.RUNNING.name()
+        eventDetails.jobId == jobId
+        eventDetails.fromState == String.valueOf(prevState)
+        eventDetails.toState == JobStatus.RUNNING.name()
 
         where:
         prevState      | _
@@ -148,7 +149,9 @@ class JobStateChangeSNSPublisherSpec extends Specification {
 
     def "Publish event exception"() {
         setup:
-        Exception e = new AuthorizationErrorException("...")
+        AwsServiceException e = AwsServiceException.builder()
+            .message("Authorization error")
+            .build()
         def tags = MetricsUtils.newFailureTagsSetForException(e)
         tags.add(AbstractSNSPublisher.EventType.JOB_STATUS_CHANGE.getTypeTag())
 
@@ -162,7 +165,7 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         1 * event.getNewStatus() >> JobStatus.RUNNING
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsProperties.getTopicARN() >> topicARN
-        1 * snsClient.publish(topicARN, _ as String) >> {
+        1 * snsClient.publish(_ as PublishRequest) >> {
             throw e
         }
         1 * registry.counter(

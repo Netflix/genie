@@ -1,6 +1,5 @@
 import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     repositories {
@@ -19,10 +18,10 @@ plugins {
     id "com.netflix.nebula.facet" version "11.0.0" apply false
     id "org.ajoberstar.grgit" version "4.1.1"
     id "org.ajoberstar.git-publish" version "3.0.1"
-    id "org.springframework.boot" version "${spring_boot_version}" apply false
+    id "org.springframework.boot" version "${spring_boot_3_version}" apply false
     id "org.asciidoctor.jvm.convert" version "3.3.2" apply false
     id "com.gorylenko.gradle-git-properties" version "2.3.2" apply false
-    id "com.google.protobuf" version "0.8.18" apply false
+    id "com.google.protobuf" version "0.8.19" apply false
     id "io.franzbecker.gradle-lombok" version "5.0.0" apply false
     id "nebula.node" version "2.0.1" apply false
     id "com.github.spotbugs" version "5.2.5" apply false
@@ -35,6 +34,8 @@ ext.githubProjectName = rootProject.name
 ext.javaProjects = subprojects.findAll {
     it.name != "genie-demo" && it.name != "genie-ddl" && it.name != "genie-docs"
 }
+
+def springBoot3ProjectNames = ['genie-agent', 'genie-agent-app', 'genie-app', 'genie-common-internal', 'genie-swagger', 'genie-ui', 'genie-web']
 
 allprojects {
     apply plugin: "jacoco"
@@ -54,8 +55,8 @@ idea {
     }
     module {
         languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_1_8)
-        downloadJavadoc true
-        downloadSources true
+        downloadJavadoc = true
+        downloadSources = true
     }
 }
 
@@ -71,7 +72,7 @@ configure((Set<Project>) ext.javaProjects) {
     apply plugin: "com.netflix.nebula.facet"
 
     lombok {
-        version = '1.18.24'
+        version = '1.18.38'
     }
 
     group = (String) "com.netflix.${githubProjectName}"
@@ -93,15 +94,32 @@ configure((Set<Project>) ext.javaProjects) {
     }
 
     dependencyManagement {
+        if (springBoot3ProjectNames.contains(project.name)) {
+            imports {
+                mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
+                mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
+                mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
+                mavenBom "org.spockframework:spock-bom:2.4-M5-groovy-3.0"
+            }
+            dependencies {
+                dependency("io.awspring.cloud:spring-cloud-aws-starter:${spring_cloud_aws_3_version}")
+            }
+        } else {
+            imports {
+                mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_2_version}"
+                mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_2_version}"
+                mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_2_version}"
+                mavenBom "org.spockframework:spock-bom:2.0-groovy-3.0"
+            }
+        }
+
         imports {
-            mavenBom SpringBootPlugin.BOM_COORDINATES
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
-            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.4.1"
+            mavenBom "software.amazon.awssdk:bom:2.31.35"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
-            mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
+            mavenBom "com.squareup.okhttp3:okhttp-bom:4.12.0"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
-            mavenBom "org.spockframework:spock-bom:2.0-groovy-3.0"
-            mavenBom "org.testcontainers:testcontainers-bom:1.16.3"
+            mavenBom "io.netty:netty-bom:${netty_version}"
+            mavenBom "org.testcontainers:testcontainers-bom:1.21.0"
         }
         dependencies {
             dependency("com.beust:jcommander:1.82")
@@ -133,6 +151,18 @@ configure((Set<Project>) ext.javaProjects) {
                 entry "springdoc-openapi-ui"
                 entry "springdoc-openapi-webmvc-core"
             }
+            dependencySet(group: "io.netty", version: "${netty_version}") {
+                entry "netty-buffer"
+                entry "netty-codec"
+                entry "netty-codec-http"
+                entry "netty-codec-http2"
+                entry "netty-common"
+                entry "netty-handler"
+                entry "netty-resolver"
+                entry "netty-transport"
+                entry "netty-transport-native-epoll"
+                entry "netty-transport-native-unix-common"
+            }
         }
     }
 
@@ -156,7 +186,7 @@ configure((Set<Project>) ext.javaProjects) {
     }
 
     configurations {
-        all*.exclude group: "javax.servlet", module: "servlet-api"
+        all*.exclude group: "org.apache.groovy" // exclude groovy@4 dependencies
         all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
 
@@ -168,7 +198,18 @@ configure((Set<Project>) ext.javaProjects) {
         annotationProcessor("net.jcip:jcip-annotations")
         annotationProcessor("com.github.spotbugs:spotbugs-annotations")
 
-        implementation("javax.annotation:javax.annotation-api:1.3.2")
+        if (springBoot3ProjectNames.contains(project.name)) {
+            implementation("org.springframework.boot:spring-boot-actuator-autoconfigure")
+            implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:${spring_cloud_aws_3_version}")
+            implementation("io.micrometer:micrometer-tracing-bridge-brave")
+            implementation("jakarta.servlet:jakarta.servlet-api")
+            implementation("jakarta.validation:jakarta.validation-api")
+            implementation("org.hibernate.validator:hibernate-validator:7.0.5.Final")
+            implementation("jakarta.el:jakarta.el-api")
+            implementation("io.zipkin.reporter2:zipkin-reporter")
+        } else {
+            implementation("javax.annotation:javax.annotation-api:1.3.2")
+        }
 
         /*******************************
          * Compile Dependencies
@@ -205,15 +246,14 @@ configure((Set<Project>) ext.javaProjects) {
         testCompileOnly("com.github.spotbugs:spotbugs-annotations")
 
         testRuntimeOnly("jakarta.el:jakarta.el-api")
-        testRuntimeOnly("org.glassfish:jakarta.el")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     }
 
-    task removeGeneratedSources(type: Delete) {
+    tasks.register('removeGeneratedSources', Delete) {
         project.generatedSourcesDir.deleteDir()
     }
 
-    task removeIdeaOutDirectory(type: Delete) {
+    tasks.register('removeIdeaOutDirectory', Delete) {
         file("${projectDir}/out").deleteDir()
     }
 
@@ -260,7 +300,7 @@ configure((Set<Project>) ext.javaProjects) {
                 systemProperty "spring.profiles.include", "githubactions"
             }
 
-            reports.html.destination(new File("${reporting.baseDir}/test/${task.name}"))
+            reports.html.outputLocation = new File("${reporting.baseDirectory}/test/${task.name}")
             (jacocoTestReport.getExecutionData() + files("$buildDir/jacoco/${task.name}.exec"))
 
             // Customize test logging on CI and everywhere else
@@ -276,7 +316,7 @@ configure((Set<Project>) ext.javaProjects) {
 
     licenseMain.dependsOn compileJava
     license {
-        ignoreFailures false
+        ignoreFailures = false
     }
 
     checkstyle {
@@ -326,9 +366,9 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
 
     reports {
         xml.getRequired().set(true)
-        xml.destination new File("${buildDir}/reports/jacoco/report.xml")
+        xml.outputLocation = new File("${buildDir}/reports/jacoco/report.xml")
         html.getRequired().set(true)
-        html.destination new File("${buildDir}/reports/jacoco/html")
+        html.outputLocation = new File("${buildDir}/reports/jacoco/html")
         csv.getRequired().set(false)
     }
     afterEvaluate {
@@ -371,7 +411,9 @@ tasks.coveralls {
  * Github Pages Tasks
  **********************************/
 
-task collectDocumentation(group: "documentation", description: "Copy the documentation from sub-projects") {
+tasks.register('collectDocumentation') {
+    group = "documentation"
+    description = "Copy the documentation from sub-projects"
     dependsOn "aggregateJavadocs"
 
     def restDocs = new File(project(":genie-web").buildDir, "docs/asciidoc")
@@ -484,14 +526,18 @@ ext.getDockerTags = { String appName, String projectVersion ->
     return tags
 }
 
-task dockerLogout(type: Exec, group: "Docker", description: "Logout of docker hub") {
+tasks.register('dockerLogout', Exec) {
+    group = "Docker"
+    description = "Logout of docker hub"
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
     commandLine "docker", "logout"
 }
 
-task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub using DOCKER_USER and DOCKER_PASSWORD environment variables") {
+tasks.register('dockerLogin', Exec) {
+    group = "Docker"
+    description = "Login to docker hub using DOCKER_USER and DOCKER_PASSWORD environment variables"
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
@@ -499,7 +545,9 @@ task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub 
     commandLine "docker", "login", "-u", System.getenv("DOCKER_USER") ?: "", "-p", System.getenv("DOCKER_PASSWORD") ?: ""
 }
 
-task dockerBuildAllImages(group: "Docker", description: "Container task for all docker image builds") {
+tasks.register('dockerBuildAllImages') {
+    group = "Docker"
+    description = "Container task for all docker image builds"
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
@@ -508,10 +556,10 @@ task dockerBuildAllImages(group: "Docker", description: "Container task for all 
     dependsOn ":genie-demo:dockerBuildClientImage"
 }
 
-gradleEnterprise {
+develocity {
     buildScan {
-        publishAlways()
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
+        publishing.onlyIf { true }
+        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        termsOfUseAgree = "yes"
     }
 }

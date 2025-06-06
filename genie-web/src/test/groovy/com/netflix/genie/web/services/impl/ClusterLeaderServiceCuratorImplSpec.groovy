@@ -18,9 +18,9 @@
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.web.services.ClusterLeaderService
-import org.springframework.integration.leader.Context
-import org.springframework.integration.zookeeper.leader.LeaderInitiator
 import spock.lang.Specification
+import org.springframework.integration.zookeeper.leader.LeaderInitiator
+import org.springframework.integration.zookeeper.leader.LeaderInitiator.CuratorContext
 
 class ClusterLeaderServiceCuratorImplSpec extends Specification {
     LeaderInitiator leaderInitiator
@@ -48,15 +48,16 @@ class ClusterLeaderServiceCuratorImplSpec extends Specification {
     }
 
     def "isLeader"() {
-        Context context = Mock(Context)
-        when:
-        boolean isLeader = this.service.isLeader()
+        def mockContext = Mock(CuratorContext)
+        mockContext.isLeader() >> true
 
+        def mockLeaderInitiator = Mock(LeaderInitiator)
+        mockLeaderInitiator.getContext() >> mockContext
 
-        then:
-        1 * leaderInitiator.getContext() >> context
-        1 * context.isLeader() >> true
-        isLeader
+        def service = new ClusterLeaderServiceCuratorImpl(mockLeaderInitiator)
+
+        expect:
+        service.isLeader()
     }
 
 

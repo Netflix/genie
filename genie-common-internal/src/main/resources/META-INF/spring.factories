@@ -1,5 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.netflix.genie.common.internal.configs.AwsAutoConfiguration,\
-  com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration,\
-  com.netflix.genie.common.internal.configs.ProtoConvertersAutoConfiguration, \
-  com.netflix.genie.common.internal.spring.autoconfigure.CommonTracingAutoConfiguration

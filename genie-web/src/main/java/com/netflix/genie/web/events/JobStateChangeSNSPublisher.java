@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.events;
 
-import com.amazonaws.services.sns.AmazonSNS;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.internal.dtos.JobStatus;
@@ -25,6 +24,7 @@ import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
+import software.amazon.awssdk.services.sns.SnsClient;
 
 import java.util.HashMap;
 
@@ -52,7 +52,7 @@ public class JobStateChangeSNSPublisher
      * @param mapper     object mapper
      */
     public JobStateChangeSNSPublisher(
-        final AmazonSNS snsClient,
+        final SnsClient snsClient,
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
         final ObjectMapper mapper

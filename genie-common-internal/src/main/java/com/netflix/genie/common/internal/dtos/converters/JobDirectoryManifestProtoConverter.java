@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.proto.AgentManifestMessage;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
 /**

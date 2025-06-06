@@ -55,7 +55,7 @@ import org.assertj.core.util.Sets
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.validation.ConstraintViolationException
+import jakarta.validation.ConstraintViolationException
 import java.util.concurrent.TimeUnit
 
 /**

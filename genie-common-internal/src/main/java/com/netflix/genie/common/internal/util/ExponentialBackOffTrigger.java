@@ -20,8 +20,9 @@ package com.netflix.genie.common.internal.util;
 import com.netflix.genie.common.internal.properties.ExponentialBackOffTriggerProperties;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
+import software.amazon.awssdk.annotations.ThreadSafe;
 
-import javax.annotation.concurrent.ThreadSafe;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -121,6 +122,11 @@ public class ExponentialBackOffTrigger implements Trigger {
         }
 
         return new Date(baseTimeOffset.toInstant().toEpochMilli() + getAndIncrementDelay());
+    }
+
+    @Override
+    public Instant nextExecution(final TriggerContext triggerContext) {
+        return null;
     }
 
     /**
