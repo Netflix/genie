@@ -18,15 +18,25 @@
 package com.netflix.genie.web.spring.actuators
 
 import com.netflix.genie.web.services.ClusterLeaderService
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 import spock.lang.Specification
 
 class LeaderElectionActuatorSpec extends Specification {
     ClusterLeaderService clusterLeaderService
     LeaderElectionActuator actuator
+    MockHttpServletRequest request
 
     void setup() {
         this.clusterLeaderService = Mock(ClusterLeaderService)
         this.actuator = new LeaderElectionActuator(clusterLeaderService)
+        this.request = new MockHttpServletRequest()
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
+    }
+
+    void cleanup() {
+        RequestContextHolder.resetRequestAttributes()
     }
 
     def "Status"() {
@@ -36,40 +46,77 @@ class LeaderElectionActuatorSpec extends Specification {
         then:
         1 * clusterLeaderService.isRunning() >> running
         1 * clusterLeaderService.isLeader() >> leader
-        status.get(LeaderElectionActuator.RUNNING) == running
-        status.get(LeaderElectionActuator.LEADER) == leader
+        status.get("running") == running
+        status.get("leader") == leader
 
         where:
         running | leader
         true    | false
         false   | true
-
     }
 
     def "Actions"() {
         when:
-        this.actuator.doAction(LeaderElectionActuator.Action.START)
+        request.addParameter("action", "START")
+        this.actuator.doAction()
 
         then:
         1 * clusterLeaderService.start()
+        noExceptionThrown()
 
         when:
-        this.actuator.doAction(LeaderElectionActuator.Action.STOP)
+        request = new MockHttpServletRequest()
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
+        request.addParameter("action", "STOP")
+        this.actuator.doAction()
 
         then:
         1 * clusterLeaderService.stop()
+        noExceptionThrown()
 
         when:
-        this.actuator.doAction(LeaderElectionActuator.Action.RESTART)
+        request = new MockHttpServletRequest()
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
+        request.addParameter("action", "RESTART")
+        this.actuator.doAction()
 
         then:
         1 * clusterLeaderService.stop()
         1 * clusterLeaderService.start()
+        noExceptionThrown()
 
         when:
-        this.actuator.doAction(LeaderElectionActuator.Action.TEST)
+        request = new MockHttpServletRequest()
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
+        request.addParameter("action", "TEST")
+        this.actuator.doAction()
 
         then:
+        0 * clusterLeaderService._
         thrown(UnsupportedOperationException)
+    }
+
+    def "Action with invalid or missing parameters"() {
+        when:
+        RequestContextHolder.resetRequestAttributes()
+        this.actuator.doAction()
+
+        then:
+        thrown(IllegalStateException)
+
+        when:
+        request = new MockHttpServletRequest()
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request))
+        this.actuator.doAction()
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        request.addParameter("action", "INVALID_ACTION")
+        this.actuator.doAction()
+
+        then:
+        thrown(IllegalArgumentException)
     }
 }

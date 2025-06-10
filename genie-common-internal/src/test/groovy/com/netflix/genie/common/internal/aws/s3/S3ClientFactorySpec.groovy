@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.common.internal.aws.s3
 
-import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.regions.AwsRegionProvider
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3URI
 import org.springframework.mock.env.MockEnvironment
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.regions.providers.AwsRegionProvider
+import software.amazon.awssdk.services.s3.S3Uri
 import spock.lang.Specification
 
 /**
@@ -33,15 +33,15 @@ class S3ClientFactorySpec extends Specification {
 
     def "Can construct with empty bucket mapping properties"() {
         def environment = new MockEnvironment()
-        def credentialsProvider = Mock(AWSCredentialsProvider)
+        def credentialsProvider = Mock(AwsCredentialsProvider)
         def regionProvider = Mock(AwsRegionProvider)
 
         when:
         def factory = new S3ClientFactory(credentialsProvider, regionProvider, environment)
 
         then:
-        1 * regionProvider.getRegion() >> Regions.US_EAST_1.getName()
-        factory.defaultRegion == Regions.US_EAST_1
+        1 * regionProvider.getRegion() >> Region.US_EAST_1
+        factory.defaultRegion == Region.US_EAST_1
         factory.bucketProperties.isEmpty()
         factory.stsClient != null
         factory.bucketToClientKey.isEmpty()
@@ -50,18 +50,18 @@ class S3ClientFactorySpec extends Specification {
 
     def "Can construct with bucket mapping properties"() {
         def environment = new MockEnvironment()
-        def credentialsProvider = Mock(AWSCredentialsProvider)
+        def credentialsProvider = Mock(AwsCredentialsProvider)
         def regionProvider = Mock(AwsRegionProvider)
 
         def bucket0Name = UUID.randomUUID().toString()
         def bucket0Role = "arn:aws:iam::accountNumber:role/someRole"
 
         def bucket1Name = UUID.randomUUID().toString()
-        def bucket1Region = Regions.EU_WEST_2.getName()
+        def bucket1Region = Region.EU_WEST_2.id()
 
         def bucket2Name = UUID.randomUUID().toString()
         def bucket2Role = "arn:aws:iam::accountNumber:role/someRole"
-        def bucket2Region = Regions.US_WEST_2.getName()
+        def bucket2Region = Region.US_WEST_2.id()
 
         environment.withProperty(
             S3ClientFactory.BUCKET_PROPERTIES_ROOT_KEY + "." + bucket0Name + ".roleARN",
@@ -86,8 +86,8 @@ class S3ClientFactorySpec extends Specification {
         def factory = new S3ClientFactory(credentialsProvider, regionProvider, environment)
 
         then:
-        1 * regionProvider.getRegion() >> Regions.US_EAST_1.getName()
-        factory.defaultRegion == Regions.US_EAST_1
+        1 * regionProvider.getRegion() >> Region.US_EAST_1
+        factory.defaultRegion == Region.US_EAST_1
         factory.bucketProperties.size() == 3
         factory.bucketProperties.containsKey(bucket0Name)
         !factory.bucketProperties.get(bucket0Name).getRegion().isPresent()
@@ -105,22 +105,22 @@ class S3ClientFactorySpec extends Specification {
 
     def "Can get clients for various scenarios"() {
         def environment = new MockEnvironment()
-        def credentialsProvider = Mock(AWSCredentialsProvider)
+        def credentialsProvider = Mock(AwsCredentialsProvider)
         def regionProvider = Mock(AwsRegionProvider)
 
         def bucket0Name = UUID.randomUUID().toString()
         def bucket0Role = "arn:aws:iam::accountNumber:role/someRole"
 
         def bucket1Name = UUID.randomUUID().toString()
-        def bucket1Region = Regions.EU_WEST_2.getName()
+        def bucket1Region = Region.EU_WEST_2.id()
 
         def bucket2Name = UUID.randomUUID().toString()
         def bucket2Role = "arn:aws:iam::accountNumber:role/someRole"
-        def bucket2Region = Regions.US_WEST_2.getName()
+        def bucket2Region = Region.US_WEST_2.id()
 
         def bucket3Name = UUID.randomUUID().toString()
         def bucket3Role = "arn:aws:iam::accountNumber:role2/someRole2"
-        def bucket3Region = Regions.US_WEST_2.getName()
+        def bucket3Region = Region.US_WEST_2.id()
 
         environment.withProperty(
             S3ClientFactory.BUCKET_PROPERTIES_ROOT_KEY + "." + bucket0Name + ".roleARN",
@@ -150,122 +150,117 @@ class S3ClientFactorySpec extends Specification {
             bucket3Region
         )
 
-        def s3URI = Mock(AmazonS3URI)
+        def s3Uri = Mock(S3Uri)
         def bucket4Name = UUID.randomUUID().toString()
 
         when:
         def factory = new S3ClientFactory(credentialsProvider, regionProvider, environment)
 
         then:
-        1 * regionProvider.getRegion() >> Regions.US_EAST_1.getName()
+        1 * regionProvider.getRegion() >> Region.US_EAST_1
         factory.stsClient != null
         factory.bucketToClientKey.isEmpty()
         factory.clientCache.isEmpty()
-        factory.transferManagerCache.isEmpty()
 
         when: "A client is requested for a bucket and region combination"
-        def amazonS3Client0 = factory.getClient(s3URI)
+        def s3Client0 = factory.getClient(s3Uri)
 
         then: "A default role client is created and returned for the region"
-        1 * s3URI.getBucket() >> bucket4Name
-        1 * s3URI.getRegion() >> Regions.EU_CENTRAL_1.getName()
+        1 * s3Uri.bucket() >> Optional.of(bucket4Name)
+        1 * s3Uri.region() >> Optional.of(Region.EU_CENTRAL_1)
         factory.bucketToClientKey.size() == 1
-        factory.clientCache.size() == 1
 
         when: "The same bucket is requested"
-        def amazonS3Client1 = factory.getClient(s3URI)
+        def s3Client1 = factory.getClient(s3Uri)
 
         then: "The same client is returned"
-        1 * s3URI.getBucket() >> bucket4Name
-        0 * s3URI.getRegion()
+        1 * s3Uri.bucket() >> Optional.of(bucket4Name)
+        0 * s3Uri.region()
         factory.bucketToClientKey.size() == 1
         factory.clientCache.size() == 1
-        amazonS3Client0 == amazonS3Client1
-
-        when: "A transfer manager is requested for the same s3URI"
-        def transferManager1 = factory.getTransferManager(s3URI)
-
-        then: "A new transfer manager is created and cached but reuses the same S3 client"
-        1 * s3URI.getBucket() >> bucket4Name
-        0 * s3URI.getRegion()
-        factory.bucketToClientKey.size() == 1
-        factory.clientCache.size() == 1
-        factory.transferManagerCache.size() == 1
-        transferManager1.getAmazonS3Client() == amazonS3Client1
-        transferManager1.getAmazonS3Client() == amazonS3Client0
-
-        when: "The same S3 URI is used to request a transfer manager"
-        def transferManager2 = factory.getTransferManager(s3URI)
-
-        then: "The same transfer manager is returned"
-        1 * s3URI.getBucket() >> bucket4Name
-        factory.bucketToClientKey.size() == 1
-        factory.clientCache.size() == 1
-        factory.transferManagerCache.size() == 1
-        transferManager2 == transferManager1
+        s3Client0 == s3Client1
 
         when: "A different bucket in the same region is requested"
-        def amazonS3Client2 = factory.getClient(s3URI)
+        def s3Client2 = factory.getClient(s3Uri)
 
         then: "The same client is returned"
-        1 * s3URI.getBucket() >> UUID.randomUUID().toString()
-        1 * s3URI.getRegion() >> Regions.EU_CENTRAL_1.getName()
+        1 * s3Uri.bucket() >> Optional.of(UUID.randomUUID().toString())
+        1 * s3Uri.region() >> Optional.of(Region.EU_CENTRAL_1)
         factory.bucketToClientKey.size() == 2
         factory.clientCache.size() == 1
-        amazonS3Client0 == amazonS3Client2
+        s3Client0 == s3Client2
 
         when: "A bucket which needs a role is requested"
-        def amazonS3Client3 = factory.getClient(s3URI)
+        def s3Client3 = factory.getClient(s3Uri)
 
         then: "A new client with assume role is created"
-        1 * s3URI.getBucket() >> bucket2Name
-        1 * s3URI.getRegion() >> null
+        1 * s3Uri.bucket() >> Optional.of(bucket2Name)
+        1 * s3Uri.region() >> Optional.empty()
         factory.bucketToClientKey.size() == 3
         factory.clientCache.size() == 2
-        amazonS3Client0 != amazonS3Client3
+        s3Client0 != s3Client3
 
         when: "Same role and region but different bucket"
-        def amazonS3Client4 = factory.getClient(s3URI)
+        def s3Client4 = factory.getClient(s3Uri)
 
         then: "The same client is returned"
-        1 * s3URI.getBucket() >> bucket0Name
-        1 * s3URI.getRegion() >> Regions.US_WEST_2.getName()
+        1 * s3Uri.bucket() >> Optional.of(bucket0Name)
+        1 * s3Uri.region() >> Optional.of(Region.US_WEST_2)
         factory.bucketToClientKey.size() == 4
         factory.clientCache.size() == 2
-        amazonS3Client0 != amazonS3Client4
-        amazonS3Client3 == amazonS3Client4
+        s3Client0 != s3Client4
+        s3Client3 == s3Client4
 
         when: "No bucket region or role are provided"
-        def amazonS3Client5 = factory.getClient(s3URI)
+        def s3Client5 = factory.getClient(s3Uri)
 
         then: "The default region is used in a new client"
-        1 * s3URI.getBucket() >> UUID.randomUUID().toString()
-        1 * s3URI.getRegion() >> null
+        1 * s3Uri.bucket() >> Optional.of(UUID.randomUUID().toString())
+        1 * s3Uri.region() >> Optional.empty()
         factory.bucketToClientKey.size() == 5
         factory.clientCache.size() == 3
-        amazonS3Client0 != amazonS3Client5
-        amazonS3Client3 != amazonS3Client5
+        s3Client0 != s3Client5
+        s3Client3 != s3Client5
 
         when: "Another bucket with no region or role information is requested"
-        def amazonS3Client6 = factory.getClient(s3URI)
+        def s3Client6 = factory.getClient(s3Uri)
 
         then: "The same default client is returned"
-        1 * s3URI.getBucket() >> UUID.randomUUID().toString()
-        1 * s3URI.getRegion() >> null
+        1 * s3Uri.bucket() >> Optional.of(UUID.randomUUID().toString())
+        1 * s3Uri.region() >> Optional.empty()
         factory.bucketToClientKey.size() == 6
         factory.clientCache.size() == 3
-        amazonS3Client0 != amazonS3Client6
-        amazonS3Client3 != amazonS3Client6
-        amazonS3Client5 == amazonS3Client6
+        s3Client0 != s3Client6
+        s3Client3 != s3Client6
+        s3Client5 == s3Client6
 
         when: "A bucket is requested in a region that already has a client but it's a different role than before"
-        def amazonS3Client7 = factory.getClient(s3URI)
+        def s3Client7 = factory.getClient(s3Uri)
 
         then: "A new client is returned"
-        1 * s3URI.getBucket() >> bucket3Name
-        1 * s3URI.getRegion() >> null
+        1 * s3Uri.bucket() >> Optional.of(bucket3Name)
+        1 * s3Uri.region() >> Optional.empty()
         factory.bucketToClientKey.size() == 7
         factory.clientCache.size() == 4
-        amazonS3Client3 != amazonS3Client7
+        s3Client3 != s3Client7
+    }
+
+    def "Can get S3Uri from URI"() {
+        def environment = new MockEnvironment()
+        def credentialsProvider = Mock(AwsCredentialsProvider)
+        def regionProvider = Mock(AwsRegionProvider)
+        def uri = new URI("s3://bucket-name/key/path")
+
+        when:
+        def factory = new S3ClientFactory(credentialsProvider, regionProvider, environment)
+        def s3Uri = factory.getS3Uri(uri)
+
+        then:
+        1 * regionProvider.getRegion() >> Region.US_EAST_1
+        s3Uri != null
+        s3Uri.bucket().isPresent()
+        s3Uri.bucket().get() == "bucket-name"
+        s3Uri.key().isPresent()
+        s3Uri.key().get() == "key/path"
     }
 }

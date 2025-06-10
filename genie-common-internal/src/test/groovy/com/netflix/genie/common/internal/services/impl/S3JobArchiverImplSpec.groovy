@@ -17,17 +17,22 @@
  */
 package com.netflix.genie.common.internal.services.impl
 
-import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.s3.AmazonS3URI
-import com.amazonaws.services.s3.transfer.MultipleFileUpload
-import com.amazonaws.services.s3.transfer.TransferManager
-import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
+import com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
+import software.amazon.awssdk.http.SdkHttpResponse
+import software.amazon.awssdk.services.s3.S3Uri
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
+import software.amazon.awssdk.services.s3.model.S3Exception
+import software.amazon.awssdk.transfer.s3.S3TransferManager
+import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload
+import software.amazon.awssdk.transfer.s3.model.FileUpload
+import software.amazon.awssdk.transfer.s3.model.UploadFileRequest
 import spock.lang.Specification
 import spock.lang.TempDir
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.CompletableFuture
 
 /**
  * Specifications for {@link S3JobArchiverImpl}.
@@ -37,8 +42,8 @@ import java.nio.file.Path
 class S3JobArchiverImplSpec extends Specification {
     @TempDir
     Path temporaryFolder
-    S3ClientFactory s3ClientFactory
-    TransferManager transferManager
+    S3TransferManagerFactory s3TransferManagerFactory
+    S3TransferManager transferManager
     S3JobArchiverImpl s3ArchivalService
 
     File jobDir
@@ -49,7 +54,7 @@ class S3JobArchiverImplSpec extends Specification {
     File run
     File genieDir
     File applicationsDir
-    //Empty dir
+
     File sparkDir
     File clustersDir
     File hadoopH2Dir
@@ -61,12 +66,14 @@ class S3JobArchiverImplSpec extends Specification {
     File logFile
     List<File> allFiles
 
-    AmazonS3URI archivalLocationS3URI
+    URI archivalLocationURI
+    S3Uri s3Uri
 
     void setup() {
-        this.s3ClientFactory = Mock(S3ClientFactory)
-        this.transferManager = Mock(TransferManager)
-        this.s3ArchivalService = new S3JobArchiverImpl(this.s3ClientFactory)
+        this.s3TransferManagerFactory = Mock(S3TransferManagerFactory)
+        this.transferManager = Mock(S3TransferManager)
+        this.s3Uri = Mock(S3Uri)
+        this.s3ArchivalService = new S3JobArchiverImpl(this.s3TransferManagerFactory)
         this.jobDir = Files.createDirectory(this.temporaryFolder.resolve(UUID.randomUUID().toString())).toFile()
         this.stdout = new File(jobDir, "stdout")
         this.stdout.createNewFile()
@@ -84,7 +91,6 @@ class S3JobArchiverImplSpec extends Specification {
         this.applicationsDir = new File(this.genieDir, "applications")
         this.applicationsDir.mkdirs()
 
-        //empty dir
         this.sparkDir = new File(this.applicationsDir, "spark")
         this.sparkDir.mkdirs()
 
@@ -114,7 +120,7 @@ class S3JobArchiverImplSpec extends Specification {
         this.logFile = new File(this.logsDir, "genie.log")
         this.logFile.write("logs")
 
-        this.archivalLocationS3URI = new AmazonS3URI(
+        this.archivalLocationURI = new URI(
             "s3://" + bucketName + File.separator + baseLocation + File.separator + jobDir.getName()
         )
 
@@ -129,21 +135,63 @@ class S3JobArchiverImplSpec extends Specification {
     }
 
     def "Archiving a job folder defers to the S3 Transfer Manager returned by the factory"() {
-        def upload = Mock(MultipleFileUpload)
+        given:
+        def fileUpload = Mock(FileUpload)
+        def completedFileUpload = Mock(CompletedFileUpload)
+        def putObjectResponse = Mock(PutObjectResponse)
+        def sdkHttpResponse = Mock(SdkHttpResponse)
+        def completableFuture = CompletableFuture.completedFuture(completedFileUpload)
 
         when:
-        def result = this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationS3URI.getURI())
+        def result = this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationURI)
 
         then:
-        1 * this.s3ClientFactory.getTransferManager(_ as AmazonS3URI) >> this.transferManager
-        1 * this.transferManager.uploadFileList(
-            this.archivalLocationS3URI.getBucket(),
-            this.archivalLocationS3URI.getKey(),
-            this.jobDir,
-            this.allFiles
-        ) >> upload
-        1 * upload.waitForCompletion()
+        1 * this.s3TransferManagerFactory.getS3Uri(this.archivalLocationURI) >> this.s3Uri
+        1 * this.s3Uri.bucket() >> Optional.of(this.bucketName)
+        1 * this.s3Uri.key() >> Optional.of(this.baseLocation)
+        1 * this.s3TransferManagerFactory.getTransferManager(this.s3Uri) >> this.transferManager
+
+        this.allFiles.size() * this.transferManager.uploadFile(_ as UploadFileRequest) >> fileUpload
+        this.allFiles.size() * fileUpload.completionFuture() >> completableFuture
+
+        _ * completedFileUpload.response() >> putObjectResponse
+        _ * putObjectResponse.sdkHttpResponse() >> sdkHttpResponse
+        _ * sdkHttpResponse.isSuccessful() >> true
+        _ * putObjectResponse.eTag() >> "etag-value"
+
         result
+    }
+
+    def "If there is a failure during upload, the method returns false"() {
+        given:
+        def fileUpload = Mock(FileUpload)
+        def completedFileUpload = Mock(CompletedFileUpload)
+        def putObjectResponse = Mock(PutObjectResponse)
+        def sdkHttpResponse = Mock(SdkHttpResponse)
+        def completableFuture = CompletableFuture.completedFuture(completedFileUpload)
+
+        when:
+        def result = this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationURI)
+
+        then:
+        1 * this.s3TransferManagerFactory.getS3Uri(this.archivalLocationURI) >> this.s3Uri
+        1 * this.s3Uri.bucket() >> Optional.of(this.bucketName)
+        1 * this.s3Uri.key() >> Optional.of(this.baseLocation)
+        1 * this.s3TransferManagerFactory.getTransferManager(this.s3Uri) >> this.transferManager
+
+        this.allFiles.size() * this.transferManager.uploadFile(_ as UploadFileRequest) >> fileUpload
+        this.allFiles.size() * fileUpload.completionFuture() >> completableFuture
+
+        _ * completedFileUpload.response() >> putObjectResponse
+        _ * putObjectResponse.sdkHttpResponse() >> sdkHttpResponse
+
+        1 * sdkHttpResponse.isSuccessful() >> false
+        _ * sdkHttpResponse.isSuccessful() >> true
+
+        _ * sdkHttpResponse.statusText() >> Optional.of("Failed")
+        _ * putObjectResponse.eTag() >> "etag-value"
+
+        !result
     }
 
     def "If it is not a valid S3 URI archival is not attempted with this implementation"() {
@@ -153,20 +201,4 @@ class S3JobArchiverImplSpec extends Specification {
         then:
         !result
     }
-
-    def "Archival Exception thrown if there is error archiving"() {
-        when:
-        this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationS3URI.getURI())
-
-        then:
-        1 * this.s3ClientFactory.getTransferManager(_ as AmazonS3URI) >> this.transferManager
-        1 * this.transferManager.uploadFileList(
-            this.archivalLocationS3URI.getBucket(),
-            this.archivalLocationS3URI.getKey(),
-            this.jobDir,
-            this.allFiles
-        ) >> { throw new AmazonServiceException("test") }
-        thrown(JobArchiveException)
-    }
 }
-

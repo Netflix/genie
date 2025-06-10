@@ -17,21 +17,21 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import io.awspring.cloud.core.io.s3.AmazonS3ProxyFactory;
-import io.awspring.cloud.core.io.s3.SimpleStorageResource;
+import io.awspring.cloud.s3.S3OutputStreamProvider;
+import io.awspring.cloud.s3.S3Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.core.task.TaskExecutor;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This class extends {@link SimpleStorageResource} in order to efficiently handle range requests.
+ * This class extends {@link S3Resource} in order to efficiently handle range requests.
  * Rather than fetching the entire object and let the web tier skip, it only downloads the relevant object region and
  * returns a composite input stream that skips the unrequested bytes.
  *
@@ -39,34 +39,31 @@ import java.io.InputStream;
  * @since 4.0.0
  */
 @Slf4j
-public final class SimpleStorageRangeResource extends SimpleStorageResource {
+public final class SimpleStorageRangeResource extends S3Resource {
 
-    private final AmazonS3 client;
+    private final S3Client client;
     private final String bucket;
     private final String key;
-    private final String versionId;
     private final Pair<Integer, Integer> range;
     private final long contentLength;
 
     SimpleStorageRangeResource(
-        final AmazonS3 client,
         final String bucket,
         final String key,
-        final String versionId,
-        final TaskExecutor s3TaskExecutor,
+        final S3Client client,
+        final S3OutputStreamProvider s3OutputStreamProvider,
         final Pair<Integer, Integer> range
     ) throws IOException {
-        super(client, bucket, key, s3TaskExecutor, versionId, null);
-        this.client = AmazonS3ProxyFactory.createProxy(client);
+        super(bucket, key, client, s3OutputStreamProvider);
+        this.client = client;
         this.bucket = bucket;
         this.key = key;
-        this.versionId = versionId;
         this.range = range;
 
         long tempContentLength = -1;
         try {
             tempContentLength = super.contentLength();
-        } catch (FileNotFoundException e) {
+        } catch (NoSuchKeyException e) {
             // S3 object does not exist.
             // Upstream code will handle this correctly by checking exists(), contentLength(), etc.
             log.warn("Returning non-existent S3 resource {}/{}", bucket, key);
@@ -132,10 +129,13 @@ public final class SimpleStorageRangeResource extends SimpleStorageResource {
         if (rangeEnd - rangeStart < 0 || (rangeEnd == 0 && rangeStart == 0)) {
             inputStream = new EmptyInputStream();
         } else {
-            final GetObjectRequest getObjectRequest = new GetObjectRequest(this.bucket, this.key)
-                .withRange(rangeStart, rangeEnd)
-                .withVersionId(this.versionId);
-            inputStream = this.client.getObject(getObjectRequest).getObjectContent();
+            final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(this.bucket)
+                .key(this.key)
+                .range("bytes=" + rangeStart + "-" + rangeEnd)
+                .versionId(this.location.getVersion())
+                .build();
+            inputStream = this.client.getObject(getObjectRequest);
         }
 
         return new SkipInputStream(skipBytes, inputStream);

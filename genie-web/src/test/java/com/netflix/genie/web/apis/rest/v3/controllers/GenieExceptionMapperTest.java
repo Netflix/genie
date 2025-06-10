@@ -60,7 +60,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -117,7 +117,7 @@ class GenieExceptionMapperTest {
             final HttpStatus expectedStatus = HttpStatus.resolve(exception.getErrorCode()) != null
                 ? HttpStatus.resolve(exception.getErrorCode())
                 : HttpStatus.INTERNAL_SERVER_ERROR;
-            Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(expectedStatus);
+            Assertions.assertThat(response.getStatusCode()).isEqualTo(expectedStatus);
             Mockito
                 .verify(this.registry, Mockito.times(1))
                 .counter(
@@ -140,7 +140,7 @@ class GenieExceptionMapperTest {
     void canHandleConstraintViolationExceptions() {
         final ConstraintViolationException exception = new ConstraintViolationException("cve", null);
         final ResponseEntity<GeniePreconditionException> response = this.mapper.handleConstraintViolation(exception);
-        Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PRECONDITION_FAILED);
         Mockito
             .verify(this.registry, Mockito.times(1))
             .counter(
@@ -180,7 +180,7 @@ class GenieExceptionMapperTest {
 
         final ResponseEntity<GeniePreconditionException> response =
             this.mapper.handleMethodArgumentNotValidException(exception);
-        Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PRECONDITION_FAILED);
         Mockito
             .verify(this.registry, Mockito.times(1))
             .counter(
@@ -212,7 +212,7 @@ class GenieExceptionMapperTest {
         for (final Map.Entry<GenieRuntimeException, HttpStatus> exception : exceptions.entrySet()) {
             final ResponseEntity<GenieRuntimeException> response =
                 this.mapper.handleGenieRuntimeException(exception.getKey());
-            Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
+            Assertions.assertThat(response.getStatusCode()).isEqualTo(exception.getValue());
         }
     }
 
@@ -239,7 +239,7 @@ class GenieExceptionMapperTest {
         for (final Map.Entry<GenieCheckedException, HttpStatus> exception : exceptions.entrySet()) {
             final ResponseEntity<GenieCheckedException> response =
                 this.mapper.handleGenieCheckedException(exception.getKey());
-            Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
+            Assertions.assertThat(response.getStatusCode()).isEqualTo(exception.getValue());
         }
     }
 }

@@ -17,39 +17,43 @@
  */
 package com.netflix.genie.common.internal.aws.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.AmazonS3Exception
-import com.amazonaws.services.s3.model.GetObjectMetadataRequest
-import com.amazonaws.services.s3.model.GetObjectRequest
-import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.model.S3Object
-import com.amazonaws.services.s3.model.S3ObjectInputStream
+import io.awspring.cloud.s3.InMemoryBufferingS3OutputStreamProvider
+import io.awspring.cloud.s3.PropertiesS3ObjectContentTypeResolver
 import org.apache.commons.lang3.tuple.ImmutablePair
 import org.apache.commons.lang3.tuple.Pair
 import org.springframework.core.io.Resource
-import org.springframework.core.task.TaskExecutor
+import software.amazon.awssdk.core.ResponseInputStream
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectResponse
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException
+import software.amazon.awssdk.services.s3.model.S3Exception
 import spock.lang.Specification
 import spock.lang.Unroll
+import java.time.Instant
+import java.util.function.Consumer
 
 class SimpleStorageRangeResourceSpec extends Specification {
 
     String bucket = "some-bucket"
     String key = "some/object"
-    String version = null
-    AmazonS3 client
-    TaskExecutor taskExecutor
-    ObjectMetadata objectMetadata
-    S3Object object
-    S3ObjectInputStream objectInputStream
+    S3Client client
+    HeadObjectResponse headObjectResponse
+    ResponseInputStream<GetObjectResponse> objectInputStream
     byte[] data = new byte[1024]
     Pair<Integer, Integer> nullRange = ImmutablePair.of(null, null)
+    InMemoryBufferingS3OutputStreamProvider outputStreamProvider
 
     void setup() {
-        this.client = Mock(AmazonS3)
-        this.taskExecutor = Mock(TaskExecutor)
-        this.objectMetadata = Mock(ObjectMetadata)
-        this.object = Mock(S3Object)
-        this.objectInputStream = Mock(S3ObjectInputStream)
+        this.client = Mock(S3Client)
+        this.headObjectResponse = HeadObjectResponse.builder()
+            .contentLength(100L)
+            .lastModified(Instant.now())
+            .build() as HeadObjectResponse
+        this.objectInputStream = Mock(ResponseInputStream)
+        this.outputStreamProvider = new InMemoryBufferingS3OutputStreamProvider(client, new PropertiesS3ObjectContentTypeResolver())
 
         new Random().nextBytes(data)
     }
@@ -58,23 +62,33 @@ class SimpleStorageRangeResourceSpec extends Specification {
     def "Read entire object (range: #range)"() {
         setup:
         byte[] buffer = new byte[512]
-        GetObjectRequest getObjectRequestCapture
+        GetObjectRequest capturedRequest
 
         when:
-        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, range as Pair<Integer, Integer>)
+        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
         InputStream inputStream = resource.getInputStream()
 
         then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> objectMetadata
-        1 * objectMetadata.getContentLength() >> 100
-        1 * client.getObject(_ as GetObjectRequest) >> {
-            args ->
-                getObjectRequestCapture = args[0] as GetObjectRequest
-                return object
+        // Allow headObject to be called 1-2 times
+        (1..2) * client.headObject(_ as Consumer) >> { Consumer consumer ->
+            def builder = HeadObjectRequest.builder()
+            consumer.accept(builder)
+            def request = builder.build()
+            assert request.bucket() == bucket
+            assert request.key() == key
+            return headObjectResponse
         }
-        1 * object.getObjectContent() >> objectInputStream
-        getObjectRequestCapture != null
-        getObjectRequestCapture.range == [0, 99] as long[]
+
+        // Exactly one call to getObject with specific parameters
+        1 * client.getObject(_ as GetObjectRequest) >> { GetObjectRequest request ->
+            capturedRequest = request
+            return objectInputStream
+        }
+
+        capturedRequest != null
+        capturedRequest.bucket() == bucket
+        capturedRequest.key() == key
+        capturedRequest.range() == "bytes=0-99"
         resource != null
         inputStream != null
 
@@ -82,13 +96,13 @@ class SimpleStorageRangeResourceSpec extends Specification {
         inputStream.read(buffer, 0, buffer.size())
 
         then:
-        1 * this.objectInputStream.read(buffer, 0, buffer.size()) >> 100
+        1 * objectInputStream.read(buffer, 0, buffer.size()) >> 100
 
         when:
         inputStream.close()
 
         then:
-        1 * this.objectInputStream.close()
+        1 * objectInputStream.close()
 
         where:
         range                        | _
@@ -101,27 +115,37 @@ class SimpleStorageRangeResourceSpec extends Specification {
     def "Read object with range #rangeHeader (using skip()? #useSkip)"() {
         setup:
         byte[] buffer = new byte[512]
-        GetObjectRequest getObjectRequestCapture
         long bytesRead
         int contentLength = 100
         assert skippedBytes + readBytes == contentLength
         ImmutablePair<Integer, Integer> range = ImmutablePair.of(rangeStart, rangeEnd)
+        GetObjectRequest capturedRequest
 
         when:
-        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, range as Pair<Integer, Integer>)
+        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
         InputStream inputStream = resource.getInputStream()
 
         then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> objectMetadata
-        1 * objectMetadata.getContentLength() >> contentLength
-        1 * client.getObject(_ as GetObjectRequest) >> {
-            args ->
-                getObjectRequestCapture = args[0] as GetObjectRequest
-                return object
+        // Allow headObject to be called 1-2 times
+        (1..2) * client.headObject(_ as Consumer) >> { Consumer consumer ->
+            def builder = HeadObjectRequest.builder()
+            consumer.accept(builder)
+            def request = builder.build()
+            assert request.bucket() == bucket
+            assert request.key() == key
+            return headObjectResponse
         }
-        1 * object.getObjectContent() >> objectInputStream
-        getObjectRequestCapture != null
-        getObjectRequestCapture.range == [requestedRangeStart, requestedRangeEnd] as long[]
+
+        // Exactly one call to getObject with specific parameters
+        1 * client.getObject(_ as GetObjectRequest) >> { GetObjectRequest request ->
+            capturedRequest = request
+            return objectInputStream
+        }
+
+        capturedRequest != null
+        capturedRequest.bucket() == bucket
+        capturedRequest.key() == key
+        capturedRequest.range() == "bytes=${requestedRangeStart}-${requestedRangeEnd}"
         resource != null
         inputStream != null
 
@@ -134,20 +158,20 @@ class SimpleStorageRangeResourceSpec extends Specification {
 
         then:
         bytesRead == skippedBytes
-        0 * this.objectInputStream.read(_, _, _)
+        0 * objectInputStream.read(_, _, _)
 
         when:
         bytesRead = inputStream.read(buffer, 0, buffer.size())
 
         then:
         bytesRead == readBytes
-        1 * this.objectInputStream.read(buffer, 0, buffer.size()) >> (requestedRangeEnd - requestedRangeStart) + 1
+        1 * objectInputStream.read(buffer, 0, buffer.size()) >> (requestedRangeEnd - requestedRangeStart) + 1
 
         when:
         inputStream.close()
 
         then:
-        1 * this.objectInputStream.close()
+        1 * objectInputStream.close()
 
         where:
         rangeHeader    | rangeStart | rangeEnd | requestedRangeStart | requestedRangeEnd | skippedBytes | readBytes | useSkip
@@ -165,14 +189,19 @@ class SimpleStorageRangeResourceSpec extends Specification {
 
     @Unroll
     def "Invalid range #range"() {
-        def contentLength = 100
-
         when:
-        new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, range as Pair<Integer, Integer>)
+        new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
 
         then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> objectMetadata
-        1 * objectMetadata.getContentLength() >> contentLength
+        // Exactly one call to headObject
+        1 * client.headObject(_ as Consumer) >> { Consumer consumer ->
+            def builder = HeadObjectRequest.builder()
+            consumer.accept(builder)
+            def request = builder.build()
+            assert request.bucket() == bucket
+            assert request.key() == key
+            return headObjectResponse
+        }
         thrown(IllegalArgumentException)
 
         where:
@@ -188,12 +217,22 @@ class SimpleStorageRangeResourceSpec extends Specification {
         long bytesRead
 
         when:
-        resource = new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, range as Pair<Integer, Integer>)
+        resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
 
         then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> objectMetadata
-        1 * objectMetadata.getContentLength() >> contentLength
-        0 * client.getObject(_)
+        1 * client.headObject(_ as Consumer) >> { Consumer consumer ->
+            def builder = HeadObjectRequest.builder()
+            consumer.accept(builder)
+            def request = builder.build()
+            assert request.bucket() == bucket
+            assert request.key() == key
+            return HeadObjectResponse.builder()
+                .contentLength(contentLength)
+                .lastModified(Instant.now())
+                .contentType("application/octet-stream")
+                .metadata(Collections.emptyMap())
+                .build()
+        }
         resource != null
 
         when:
@@ -201,6 +240,19 @@ class SimpleStorageRangeResourceSpec extends Specification {
         bytesRead = inputStream.skip(skip)
 
         then:
+        1 * client.headObject(_ as Consumer) >> { Consumer consumer ->
+            def builder = HeadObjectRequest.builder()
+            consumer.accept(builder)
+            def request = builder.build()
+            assert request.bucket() == bucket
+            assert request.key() == key
+            return HeadObjectResponse.builder()
+                .contentLength(contentLength)
+                .lastModified(Instant.now())
+                .contentType("application/octet-stream")
+                .metadata(Collections.emptyMap())
+                .build()
+        }
         bytesRead == skip
 
         when:
@@ -218,33 +270,31 @@ class SimpleStorageRangeResourceSpec extends Specification {
     @Unroll
     def "Handle metadata error #exception"() {
         when:
-        new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, nullRange)
+        new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, nullRange)
 
         then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> {
-            throw exception
-        }
+        // Exactly one call to headObject that throws an exception
+        1 * client.headObject(_ as Consumer) >> { throw exception }
         thrown(Exception)
 
         where:
-        exception                         | _
-        new FileNotFoundException("...")  | _
-        new InvalidObjectException("...") | _
-        new IOException("...")            | _
-        new AmazonS3Exception("...")      | _
+        exception                                                | _
+        new FileNotFoundException("...")                         | _
+        new InvalidObjectException("...")                        | _
+        new IOException("...")                                   | _
+        S3Exception.builder().message("...").build()             | _
     }
 
     @Unroll
     def "Handle non-existent object (status code: #statusCode)"() {
         when:
-        def resource = new SimpleStorageRangeResource(client, bucket, key, version, taskExecutor, nullRange)
+        def resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, nullRange)
         def exists = resource.exists()
 
         then:
-        1 * client.getObjectMetadata(_ as GetObjectMetadataRequest) >> {
-            def exception = new AmazonS3Exception("...")
-            exception.setStatusCode(statusCode)
-            throw exception
+        // Exactly one call to headObject that throws NoSuchKeyException
+        1 * client.headObject(_ as Consumer) >> {
+            throw NoSuchKeyException.builder().statusCode(statusCode).build()
         }
         !exists
 

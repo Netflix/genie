@@ -21,7 +21,7 @@ import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.net.URI;
 import java.util.Set;
 

@@ -32,4 +32,4 @@ spring:
     properties:
       hibernate:
         auto_quote_keyword: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect

@@ -1,5 +1,5 @@
 plugins {
-    id "com.gradle.enterprise" version "3.5.2"
+    id "com.gradle.develocity" version "4.0.1"
 }
 
 rootProject.name = "genie"

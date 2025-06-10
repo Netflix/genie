@@ -44,8 +44,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
 
 import java.util.Arrays;
@@ -329,7 +329,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
             .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString("must not be empty"
+                Matchers.containsString("is required"
                 )
             );
 
@@ -1478,7 +1478,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters
-            RequestDocumentation.requestParameters(
+            RequestDocumentation.queryParameters(
                 RequestDocumentation
                     .parameterWithName("status")
                     .description("The status of clusters to search for")
@@ -1821,7 +1821,7 @@ class CommandRestControllerIntegrationTest extends RestControllerIntegrationTest
             // Path parameters
             Snippets.ID_PATH_PARAM,
             // Request parameters
-            RequestDocumentation.requestParameters(
+            RequestDocumentation.queryParameters(
                 RequestDocumentation
                     .parameterWithName("addDefaultStatus")
                     .description(

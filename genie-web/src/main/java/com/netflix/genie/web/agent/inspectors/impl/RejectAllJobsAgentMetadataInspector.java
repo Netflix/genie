@@ -23,7 +23,7 @@ import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import org.springframework.core.env.Environment;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * An {@link AgentMetadataInspector} that accepts or rejects all agents based on the value of an environment property.

@@ -24,7 +24,7 @@ import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionList
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 

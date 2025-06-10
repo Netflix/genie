@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.common.internal.util;
 
-import com.amazonaws.util.EC2MetadataUtils;
-import io.awspring.cloud.context.support.env.AwsCloudEnvironmentCheckUtils;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.regions.internal.util.EC2MetadataUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -43,11 +42,20 @@ public final class HostnameUtil {
      * @throws UnknownHostException if hostname resolution fails
      */
     public static String getHostname() throws UnknownHostException {
-        final String hostname;
-        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
-            hostname = EC2MetadataUtils.getPrivateIpAddress();
-        } else {
-            // Fallback if not on AWS
+        String hostname;
+
+        // Check if running on AWS cloud environment
+        try {
+           final String instanceId = EC2MetadataUtils.getInstanceId();
+            if (instanceId != null && !instanceId.isEmpty()) {
+                // Running on AWS, use private IP address
+                hostname = EC2MetadataUtils.getPrivateIpAddress();
+            } else {
+                // Not running on AWS or couldn't determine
+                hostname = InetAddress.getLocalHost().getCanonicalHostName();
+            }
+        } catch (Exception e) {
+            // Exception occurred while checking AWS environment, fallback to local hostname
             hostname = InetAddress.getLocalHost().getCanonicalHostName();
         }
 

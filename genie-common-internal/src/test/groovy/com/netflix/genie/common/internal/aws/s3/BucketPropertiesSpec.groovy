@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.aws.s3
 
-import com.amazonaws.regions.Regions
+import software.amazon.awssdk.regions.Region
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -79,11 +79,11 @@ class BucketPropertiesSpec extends Specification {
         def roleARN = "arn:aws:iam::accountNumber:role/someRole"
 
         when:
-        properties.setRegion(Regions.US_EAST_1.getName())
+        properties.setRegion(Region.US_EAST_1.id())
         properties.setRoleARN(roleARN)
 
         then:
-        properties.getRegion().orElseThrow({ new IllegalArgumentException() }) == Regions.US_EAST_1.getName()
+        properties.getRegion().orElseThrow({ new IllegalArgumentException() }) == Region.US_EAST_1.id()
         properties.getRoleARN().orElseThrow({ new IllegalArgumentException() }) == roleARN
     }
 }

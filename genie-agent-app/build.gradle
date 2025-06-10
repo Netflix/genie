@@ -32,6 +32,7 @@ dependencies {
 
     implementation(project(":genie-agent"))
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     /*******************************
      * Compile Only Dependencies
@@ -46,6 +47,7 @@ dependencies {
      *******************************/
 
     testImplementation(project(":genie-test"))
+    testImplementation("org.springframework.boot:spring-boot-starter-web")
 }
 
 springBoot {

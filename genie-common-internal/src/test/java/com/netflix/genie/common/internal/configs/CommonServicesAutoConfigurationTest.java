@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.configs;
 
+import com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
@@ -24,13 +25,13 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorSer
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import com.netflix.genie.common.internal.util.PropertiesMapCache;
-import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Tests for behavior of {@link CommonServicesAutoConfiguration}.
@@ -47,7 +48,7 @@ class CommonServicesAutoConfigurationTest {
         )
         .withPropertyValues(
             "spring.jmx.enabled=false",
-            "spring.main.webApplicationType=none"
+            "spring.main.web-application-type=none"
         );
 
     /**
@@ -71,20 +72,7 @@ class CommonServicesAutoConfigurationTest {
     @Test
     void testExpectedContextWithAws() {
         this.contextRunner
-            .withPropertyValues(
-                "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
-                "cloud.aws.region.auto=false",
-                "cloud.aws.region.static=us-east-1",
-                "cloud.aws.stack.auto=false"
-            )
-            .withConfiguration(
-                AutoConfigurations.of(
-                    ContextCredentialsAutoConfiguration.class,
-                    ContextRegionProviderAutoConfiguration.class,
-                    ContextResourceLoaderAutoConfiguration.class,
-                    AwsAutoConfiguration.class
-                )
-            )
+            .withUserConfiguration(TestAwsConfiguration.class)
             .run(
                 (context) -> {
                     Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
@@ -140,5 +128,32 @@ class CommonServicesAutoConfigurationTest {
         this.contextRunner.run(
             context -> Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Filter.class)
         );
+    }
+
+    /**
+     * Test configuration class that provides the necessary AWS beans for testing.
+     */
+    @Configuration
+    static class TestAwsConfiguration {
+        /**
+         * Provides a mock S3TransferManagerFactory for testing.
+         *
+         * @return A mock S3TransferManagerFactory
+         */
+        @Bean
+        public S3TransferManagerFactory s3TransferManagerFactory() {
+            return Mockito.mock(S3TransferManagerFactory.class);
+        }
+
+        /**
+         * Provides an S3JobArchiverImpl for testing.
+         *
+         * @param transferManagerFactory The S3TransferManagerFactory to use
+         * @return An S3JobArchiverImpl instance
+         */
+        @Bean
+        public S3JobArchiverImpl s3JobArchiver(final S3TransferManagerFactory transferManagerFactory) {
+            return new S3JobArchiverImpl(transferManagerFactory);
+        }
     }
 }

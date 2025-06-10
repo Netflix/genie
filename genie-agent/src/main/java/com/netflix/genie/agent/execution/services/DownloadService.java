@@ -20,7 +20,7 @@ package com.netflix.genie.agent.execution.services;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.net.URI;
 import java.util.Set;

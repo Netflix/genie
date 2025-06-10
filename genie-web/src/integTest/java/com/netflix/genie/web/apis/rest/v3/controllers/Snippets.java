@@ -50,8 +50,8 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.restdocs.request.PathParametersSnippet;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.request.RequestParametersSnippet;
 import org.springframework.restdocs.snippet.Attributes;
+import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -397,8 +397,9 @@ final class Snippets {
                 .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS)
         );
-    static final RequestParametersSnippet APPLICATION_SEARCH_QUERY_PARAMETERS = RequestDocumentation.requestParameters(
-        ArrayUtils.addAll(
+    static final org.springframework.restdocs.snippet.Snippet APPLICATION_SEARCH_QUERY_PARAMETERS =
+        RequestDocumentation.queryParameters(
+            ArrayUtils.addAll(
             getCommonSearchParameters(),
             RequestDocumentation
                 .parameterWithName("name")
@@ -425,7 +426,7 @@ final class Snippets {
                 .optional()
         )
     );
-    static final RequestParametersSnippet CLUSTER_SEARCH_QUERY_PARAMETERS = RequestDocumentation.requestParameters(
+    static final Snippet CLUSTER_SEARCH_QUERY_PARAMETERS = RequestDocumentation.queryParameters(
         ArrayUtils.addAll(
             getCommonSearchParameters(),
             RequestDocumentation
@@ -453,7 +454,7 @@ final class Snippets {
                 .optional()
         )
     );
-    static final RequestParametersSnippet COMMAND_SEARCH_QUERY_PARAMETERS = RequestDocumentation.requestParameters(
+    static final Snippet COMMAND_SEARCH_QUERY_PARAMETERS = RequestDocumentation.queryParameters(
         ArrayUtils.addAll(
             getCommonSearchParameters(),
             RequestDocumentation
@@ -477,7 +478,7 @@ final class Snippets {
                 .optional()
         )
     );
-    static final RequestParametersSnippet JOB_SEARCH_QUERY_PARAMETERS = RequestDocumentation.requestParameters(
+    static final Snippet JOB_SEARCH_QUERY_PARAMETERS = RequestDocumentation.queryParameters(
         ArrayUtils.addAll(
             getCommonSearchParameters(),
             RequestDocumentation
