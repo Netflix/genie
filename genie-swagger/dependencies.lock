@@ -46,14 +46,11 @@
         "org.projectlombok:lombok": {
             "locked": "1.18.24"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.5"
@@ -128,14 +125,11 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.5"
@@ -548,14 +542,11 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -1121,14 +1112,11 @@
             ],
             "locked": "42.7.5"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -1376,14 +1364,11 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.5"
@@ -1796,14 +1781,11 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -2068,14 +2050,11 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.5"
@@ -2488,14 +2467,11 @@
         "org.spockframework:spock-spring": {
             "locked": "2.4-M5-groovy-3.0"
         },
-        "org.springdoc:springdoc-openapi-hateoas": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-api": {
+            "locked": "2.8.8"
         },
-        "org.springdoc:springdoc-openapi-ui": {
-            "locked": "1.6.6"
-        },
-        "org.springdoc:springdoc-openapi-webmvc-core": {
-            "locked": "1.6.6"
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui": {
+            "locked": "2.8.8"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [

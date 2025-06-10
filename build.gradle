@@ -150,10 +150,9 @@ configure((Set<Project>) ext.javaProjects) {
             dependency("org.codehaus.groovy:groovy-all:3.0.9")
             dependency("org.codehaus.janino:janino:3.1.6")
             dependency("org.dbunit:dbunit:2.7.3")
-            dependencySet(group: "org.springdoc", version: "1.6.6") {
-                entry "springdoc-openapi-hateoas"
-                entry "springdoc-openapi-ui"
-                entry "springdoc-openapi-webmvc-core"
+            dependencySet(group: "org.springdoc", version: "2.8.8") {
+                entry "springdoc-openapi-starter-webmvc-api"
+                entry "springdoc-openapi-starter-webmvc-ui"
             }
             dependencySet(group: "io.netty", version: "${netty_version}") {
                 entry "netty-buffer"
