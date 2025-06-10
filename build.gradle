@@ -367,6 +367,7 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     dependsOn javaProjects*.integrationTest
     dependsOn javaProjects*.smokeTest
     dependsOn javaProjects*.javadoc
+    dependsOn 'collectDocumentation'
 
     javaProjects.each {
         sourceSets((SourceSet) it.sourceSets.main)
