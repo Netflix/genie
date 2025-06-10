@@ -17,24 +17,25 @@
  */
 package com.netflix.genie.web.services.impl
 
-import com.amazonaws.SdkClientException
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.AmazonS3URI
-import com.amazonaws.services.s3.model.ObjectMetadata
-import com.google.common.collect.Sets
-import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
-import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
-import com.netflix.genie.web.properties.AttachmentServiceProperties
-import io.micrometer.core.instrument.DistributionSummary
-import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Timer
-import org.springframework.core.io.Resource
-import org.springframework.util.unit.DataSize
-import spock.lang.Specification
-import spock.lang.Unroll
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.web.exceptions.checked.AttachmentTooLargeException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import com.netflix.genie.web.properties.AttachmentServiceProperties;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import org.springframework.core.io.Resource;
+import org.springframework.util.unit.DataSize;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Uri;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import spock.lang.Specification;
+import spock.lang.Unroll;
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit;
 
 class S3AttachmentServiceImplSpec extends Specification {
     public static final String BUCKET_NAME = "some-bucket"
@@ -45,14 +46,16 @@ class S3AttachmentServiceImplSpec extends Specification {
     S3AttachmentServiceImpl service
     DistributionSummary distributionSummary
     Timer timer
-    AmazonS3 s3Client
+    S3Client s3Client
     InputStream inputStream
+    S3Uri s3Uri
 
     void setup() {
         this.distributionSummary = Mock(DistributionSummary)
         this.timer = Mock(Timer)
-        this.s3Client = Mock(AmazonS3)
+        this.s3Client = Mock(S3Client)
         this.inputStream = Mock(InputStream)
+        this.s3Uri = Mock(S3Uri)
 
         this.s3ClientFactory = Mock(S3ClientFactory)
         this.serviceProperties = new AttachmentServiceProperties()
@@ -60,8 +63,11 @@ class S3AttachmentServiceImplSpec extends Specification {
 
         this.serviceProperties.setLocationPrefix(URI.create("s3://" + BUCKET_NAME + "/" + S3_PREFIX))
 
-        this.service = new S3AttachmentServiceImpl(s3ClientFactory, serviceProperties, registry)
+        s3ClientFactory.getS3Uri(serviceProperties.getLocationPrefix()) >> s3Uri
+        s3Uri.bucket() >> Optional.of(BUCKET_NAME)
+        s3Uri.key() >> Optional.of(S3_PREFIX)
 
+        this.service = new S3AttachmentServiceImpl(s3ClientFactory, serviceProperties, registry)
     }
 
     @Unroll
@@ -132,10 +138,8 @@ class S3AttachmentServiceImplSpec extends Specification {
         String jobId = jobIdPresent ? UUID.randomUUID().toString() : null
         Resource attachment1 = Mock(Resource)
         Resource attachment2 = Mock(Resource)
-        URL url1 = new URL("https://" + BUCKET_NAME + "/" + S3_PREFIX + "/bundle-uuid/script1.sql")
-        URL url2 = new URL("https://" + BUCKET_NAME + "/" + S3_PREFIX + "/bundle-uuid/script2.sql")
 
-        when: "Attachments total size too large"
+        when: "Attachments upload successfully"
         Set<URI> attachmentUris = this.service.saveAttachments(jobId, Sets.newHashSet(attachment1, attachment2))
 
         then:
@@ -149,27 +153,31 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(5 * 1024 * 1024)
         1 * distributionSummary.record((5 + 3) * 1024 * 1024)
-        1 * s3ClientFactory.getClient(_ as AmazonS3URI) >> {
-            AmazonS3URI s3Uri ->
-                assert s3Uri.getBucket() == BUCKET_NAME
-                assert s3Uri.getKey() == S3_PREFIX
-                return s3Client
-        }
+        1 * s3ClientFactory.getClient(s3Uri) >> s3Client
+
         1 * attachment1.getFilename() >> "script1.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
         1 * attachment1.getInputStream() >> inputStream
+        1 * inputStream.available() >> DataSize.ofMegabytes(3).toBytes()
+
         1 * attachment2.getFilename() >> "script2.sql"
         1 * attachment2.contentLength() >> DataSize.ofMegabytes(5).toBytes()
         1 * attachment2.getInputStream() >> inputStream
+        1 * inputStream.available() >> DataSize.ofMegabytes(5).toBytes()
+
         2 * inputStream.close()
         2 * s3Client.putObject(
-            BUCKET_NAME,
-            { it as String ==~ /some\/prefix\/.+\/script[12]\.sql/ },
-            inputStream,
-            !null as ObjectMetadata
+            { PutObjectRequest request ->
+                request.bucket() == BUCKET_NAME &&
+                    request.key() =~ /some\/prefix\/.+\/script[12]\.sql/ &&
+                    (request.contentLength() == DataSize.ofMegabytes(3).toBytes() ||
+                        request.contentLength() == DataSize.ofMegabytes(5).toBytes())
+            },
+            _ as RequestBody
         )
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
         1 * timer.record(_, TimeUnit.NANOSECONDS)
+
         attachmentUris.size() == 2
         attachmentUris.findAll({ it.toString() ==~ /s3:\/\/some-bucket\/some\/prefix\/.+\/script[12]\.sql/ }).size() == 2
 
@@ -182,8 +190,9 @@ class S3AttachmentServiceImplSpec extends Specification {
         setup:
         String jobId = jobIdPresent ? UUID.randomUUID().toString() : null
         Resource attachment1 = Mock(Resource)
+        s3ClientFactory.getClient(s3Uri) >> s3Client
 
-        when: "Attachments total size too large"
+        when: "S3 upload fails"
         this.service.saveAttachments(jobId, Sets.newHashSet(attachment1))
 
         then:
@@ -195,23 +204,20 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(3 * 1024 * 1024)
         1 * distributionSummary.record(3 * 1024 * 1024)
-        1 * s3ClientFactory.getClient(_ as AmazonS3URI) >> {
-            AmazonS3URI s3Uri ->
-                assert s3Uri.getBucket() == BUCKET_NAME
-                assert s3Uri.getKey() == S3_PREFIX
-                return s3Client
-        }
         1 * attachment1.getFilename() >> "script.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
         1 * attachment1.getInputStream() >> inputStream
+        1 * inputStream.available() >> DataSize.ofMegabytes(3).toBytes()
         1 * inputStream.close()
         1 * s3Client.putObject(
-            BUCKET_NAME,
-            { it as String ==~ /some\/prefix\/.+\/script\.sql/ },
-            inputStream,
-            !null as ObjectMetadata
+            { PutObjectRequest request ->
+                request.bucket() == BUCKET_NAME &&
+                    request.key() =~ /some\/prefix\/.+\/script\.sql/ &&
+                    request.contentLength() == DataSize.ofMegabytes(3).toBytes()
+            },
+            _ as RequestBody
         ) >> {
-            throw new SdkClientException("...")
+            throw SdkClientException.builder().message("...").build()
         }
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
         1 * timer.record(_, TimeUnit.NANOSECONDS)
@@ -226,8 +232,9 @@ class S3AttachmentServiceImplSpec extends Specification {
         setup:
         String jobId = UUID.randomUUID().toString()
         Resource attachment1 = Mock(Resource)
+        s3ClientFactory.getClient(s3Uri) >> s3Client
 
-        when: "Attachments total size too large"
+        when: "Attachment has invalid filename"
         this.service.saveAttachments(jobId, Sets.newHashSet(attachment1))
 
         then:
@@ -239,16 +246,9 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(3 * 1024 * 1024)
         1 * distributionSummary.record(3 * 1024 * 1024)
-        1 * s3ClientFactory.getClient(_ as AmazonS3URI) >> {
-            AmazonS3URI s3Uri ->
-                assert s3Uri.getBucket() == BUCKET_NAME
-                assert s3Uri.getKey() == S3_PREFIX
-                return s3Client
-        }
         1 * attachment1.getFilename() >> attachmentFilename
         0 * attachment1.getInputStream()
         0 * s3Client.putObject(*_)
-        0 * s3Client.getUrl(*_)
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
         1 * timer.record(_, TimeUnit.NANOSECONDS)
         thrown(SaveAttachmentException)

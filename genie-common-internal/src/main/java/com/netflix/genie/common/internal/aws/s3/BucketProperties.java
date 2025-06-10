@@ -17,15 +17,15 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import com.amazonaws.regions.Regions;
-import io.awspring.cloud.core.naming.AmazonResourceName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.validation.annotation.Validated;
+import software.amazon.awssdk.arns.Arn;
+import software.amazon.awssdk.regions.Region;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Optional;
 
 /**
@@ -46,33 +46,45 @@ public class BucketProperties {
      */
     private static final String IAM_SERVICE_NAMESPACE = "iam";
 
-    private AmazonResourceName roleARN;
-    private Regions region;
+    private Arn roleARN;
+    private Region region;
 
     /**
-     * Get the {@link Regions} this bucket is in.
+     * Get the {@link Region} this bucket is in.
      *
-     * @return The {@link Regions#getName()} wrapped in an {@link Optional}. If the optional is empty it indicates that
+     * @return The {@link Region#id()} wrapped in an {@link Optional}. If the optional is empty it indicates that
      * the default or current region should be used
      */
     public Optional<String> getRegion() {
         if (this.region == null) {
             return Optional.empty();
         } else {
-            return Optional.of(this.region.getName());
+            return Optional.of(this.region.id());
         }
     }
 
     /**
-     * Set the AWS region from a string name representation e.g. us-east-1.
+     * Set the AWS region from a string name representation (e.g., us-east-1).
+     * This method validates that the provided region is a valid AWS region.
      *
-     * @param region The name of the region to use
-     * @see Regions#fromName(String)
+     * @param region The name of the region to use, or null to clear the region setting
+     * @throws IllegalArgumentException If the provided region is not a valid AWS region
+     * @see Region#of(String)
      */
     public void setRegion(@Nullable final String region) {
         if (region != null) {
-            this.region = Regions.fromName(region);
+            // Check if the region ID is in the list of predefined AWS regions
+            final boolean isValidRegion = Region.regions().stream()
+                .anyMatch(r -> r.id().equals(region));
+
+            if (!isValidRegion) {
+                throw new IllegalArgumentException("Invalid AWS region: " + region);
+            }
+
+            // Convert the validated region string to a Region object
+            this.region = Region.of(region);
         } else {
+            // Clear the region if null is provided
             this.region = null;
         }
     }
@@ -99,8 +111,8 @@ public class BucketProperties {
      */
     public void setRoleARN(@Nullable final String roleARN) {
         if (roleARN != null) {
-            final AmazonResourceName arn = AmazonResourceName.fromString(roleARN);
-            final String awsService = arn.getService();
+            final Arn arn = Arn.fromString(roleARN);
+            final String awsService = arn.service();
             if (awsService.equals(IAM_SERVICE_NAMESPACE)) {
                 this.roleARN = arn;
             } else {

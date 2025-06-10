@@ -22,16 +22,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.annotation.Nullable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.Size;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -76,10 +76,10 @@ public class CriterionEntity extends IdEntity {
     @JoinTable(
         name = "criteria_tags",
         joinColumns = {
-            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false)
         }
     )
     @ToString.Exclude

@@ -54,8 +54,8 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
-import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -63,8 +63,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -564,7 +564,7 @@ abstract class RestControllerIntegrationTestBase {
 
     <R extends ExecutionEnvironmentDTO> String createConfigResource(
         @NotNull final R resource,
-        @Nullable final RestDocumentationFilter documentationFilter
+        @Nullable final org.springframework.restdocs.restassured.RestDocumentationFilter documentationFilter
     ) throws Exception {
         final String endpoint;
         if (resource instanceof Application) {
@@ -598,7 +598,6 @@ abstract class RestControllerIntegrationTestBase {
                 .header(HttpHeaders.LOCATION)
         );
     }
-
     String getIdFromLocation(@Nullable final String location) {
         if (location == null) {
             Assertions.fail("No location provided");

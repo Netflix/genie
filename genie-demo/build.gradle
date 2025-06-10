@@ -16,7 +16,9 @@ asciidoctorj {
 def apacheImageName = "genie-demo-apache"
 def clientImageName = "genie-demo-client"
 
-task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build docker image for demo apache") {
+tasks.register('dockerBuildApacheImage', Exec) {
+    group = "Docker"
+    description = "Build docker image for demo apache"
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
@@ -36,7 +38,9 @@ task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build doc
     commandLine commandArgs
 }
 
-task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build docker image for demo client") {
+tasks.register('dockerBuildClientImage', Exec) {
+    group = "Docker"
+    description = "Build docker image for demo client"
     onlyIf {
         rootProject.ext.isDockerRunning()
     }
@@ -56,7 +60,9 @@ task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build doc
     commandLine commandArgs
 }
 
-task dockerPush(group: "Docker", description: "Push the demo docker images to docker hub") {
+tasks.register('dockerPush') {
+    group = "Docker"
+    description = "Push the demo docker images to docker hub"
     dependsOn parent.tasks.dockerLogin, tasks.dockerBuildApacheImage, tasks.dockerBuildClientImage
     onlyIf {
         System.env."CI" && rootProject.ext.isDockerRunning()

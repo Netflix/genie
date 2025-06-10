@@ -30,8 +30,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -249,7 +249,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return The {@link JobRequestProjection} data or {@link Optional#empty()} if the job doesn't exist
      */
     @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
-    @EntityGraph(value = JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(value = JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.FETCH)
     Optional<JobRequestProjection> getV4JobRequest(@Param("id") String id);
 
     /**

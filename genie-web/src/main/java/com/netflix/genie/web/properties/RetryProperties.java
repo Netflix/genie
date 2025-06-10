@@ -22,9 +22,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 /**
  * All properties related to Http retry template in Genie.
@@ -82,5 +82,11 @@ public class RetryProperties {
 
         @Min(1)
         private int noOfRetries = 5;
+
+        @Min(1)
+        private int apiCallTimeoutSeconds = 60;
+
+        @Min(1)
+        private int apiCallAttemptTimeoutSeconds = 10;
     }
 }

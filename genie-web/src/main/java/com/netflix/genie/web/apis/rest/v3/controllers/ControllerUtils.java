@@ -22,8 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerMapping;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 

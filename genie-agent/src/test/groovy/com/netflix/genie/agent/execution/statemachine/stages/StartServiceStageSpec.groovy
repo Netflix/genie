@@ -21,9 +21,8 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
+import jakarta.validation.constraints.NotBlank
 import spock.lang.Specification
-
-import javax.validation.constraints.NotBlank
 
 class StartServiceStageSpec extends Specification {
     ExecutionStage stage

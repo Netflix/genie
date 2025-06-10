@@ -71,7 +71,7 @@ class WaitJobCompletionStageSpec extends Specification {
         1 * executionContext.getJobDirectory() >> jobDirectory
         1 * executionContext.getClaimedJobId() >> jobId
         1 * jobDirectory.toPath() >> jobDirectoryPath
-        1 * jobMonitorService.start(jobId, jobDirectory)
+        1 * jobMonitorService.start(jobId, jobDirectoryPath)
         1 * jobProcessManager.waitFor() >> jobProcessResult
         1 * jobMonitorService.stop()
         1 * executionContext.setJobProcessResult(jobProcessResult)
@@ -90,7 +90,7 @@ class WaitJobCompletionStageSpec extends Specification {
         1 * executionContext.getJobDirectory() >> jobDirectory
         1 * executionContext.getClaimedJobId() >> jobId
         1 * jobDirectory.toPath() >> jobDirectoryPath
-        1 * jobMonitorService.start(jobId, jobDirectory)
+        1 * jobMonitorService.start(jobId, jobDirectoryPath)
         1 * jobProcessManager.waitFor() >> { throw interruptedException }
         1 * jobMonitorService.stop()
         def e = thrown(FatalJobExecutionException)

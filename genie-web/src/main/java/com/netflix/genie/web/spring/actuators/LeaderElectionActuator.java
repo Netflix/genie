@@ -19,10 +19,13 @@ package com.netflix.genie.web.spring.actuators;
 
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.web.services.ClusterLeaderService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Map;
 
@@ -66,12 +69,43 @@ public class LeaderElectionActuator {
     }
 
     /**
-     * Forces the node to leave the leader election, then re-join it.
+     * Forces the node to perform leader election related actions.
+     * This method uses direct request access to retrieve parameters,
+     * avoiding issues with parameter name resolution when compiled without the '-parameters' flag.
+     * <p>
+     * Required request parameter:
+     * - action: The action to perform. Must be one of: START, STOP, RESTART
+     * <p>
+     * Example usage:
+     * POST /actuator/leaderElection?action=RESTART
      *
-     * @param action the action to perform
+     * @throws IllegalStateException if no request context is available
+     * @throws IllegalArgumentException if the action parameter is missing or invalid
+     * @throws UnsupportedOperationException if the action is not supported
+     * @throws RuntimeException if there is an error executing the requested action
      */
     @WriteOperation
-    public void doAction(final Action action) {
+    public void doAction() {
+        final ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            throw new IllegalStateException("No request context available");
+        }
+
+        final HttpServletRequest request = attributes.getRequest();
+        final String actionStr = request.getParameter("action");
+
+        if (actionStr == null || actionStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("Missing required parameter: action");
+        }
+
+        final Action action;
+        try {
+            action = Action.valueOf(actionStr.toUpperCase());
+        } catch (final IllegalArgumentException e) {
+            log.warn("Invalid action value provided: {}", actionStr);
+            throw new IllegalArgumentException("Invalid action value: " + actionStr, e);
+        }
+
         switch (action) {
             case START:
                 log.info("Starting leader election service");
@@ -87,7 +121,7 @@ public class LeaderElectionActuator {
                 this.clusterLeaderService.start();
                 break;
             default:
-                log.error("Unknown action: " + action);
+                log.error("Unknown action: {}", action);
                 throw new UnsupportedOperationException("Unknown action: " + action.name());
         }
     }

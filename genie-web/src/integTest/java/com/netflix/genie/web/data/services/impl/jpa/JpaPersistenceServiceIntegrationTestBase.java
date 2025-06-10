@@ -17,8 +17,13 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa;
 
+import brave.SpanCustomizer;
+import brave.Tracer;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.netflix.genie.common.internal.spring.autoconfigure.CommonTracingAutoConfiguration;
+import com.netflix.genie.common.internal.tracing.brave.BraveTagAdapter;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracePropagator;
+import com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
@@ -30,13 +35,15 @@ import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepositor
 import com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration;
 import org.junit.jupiter.api.AfterEach;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.sleuth.autoconfig.brave.BraveAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
@@ -57,13 +64,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
     {
         DataAutoConfiguration.class,
         ValidationAutoConfiguration.class,
-        BraveAutoConfiguration.class,
-        CommonTracingAutoConfiguration.class
-    }
-)
-@MockBean(
-    {
-        PersistedJobStatusObserver.class //TODO: Needed for JobEntityListener but should be in DataAutoConfiguration
+        JpaPersistenceServiceIntegrationTestBase.TestConfig.class
     }
 )
 //@TestPropertySource(
@@ -74,6 +75,12 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 //    }
 //)
 class JpaPersistenceServiceIntegrationTestBase {
+
+    @Autowired
+    protected PersistedJobStatusObserver persistedJobStatusObserver;
+
+    @Autowired
+    protected CommonTracingAutoConfiguration commonTracingAutoConfiguration;
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;
@@ -100,14 +107,65 @@ class JpaPersistenceServiceIntegrationTestBase {
     protected JpaPersistenceServiceImpl service;
 
     @Autowired
-    protected PersistedJobStatusObserver persistedJobStatusObserver;
-
-    @Autowired
     protected TestEntityManager entityManager;
 
     @AfterEach
     void resetMocks() {
         // Could use @DirtiesContext but seems excessive
         Mockito.reset(this.persistedJobStatusObserver);
+        Mockito.reset(this.commonTracingAutoConfiguration);
+    }
+
+    /**
+     * Test configuration to provide mock beans.
+     */
+    @Configuration
+    static class TestConfig {
+        @Bean
+        @Primary
+        public Tracer tracer() {
+            final Tracer mockTracer = Mockito.mock(Tracer.class, Answers.RETURNS_DEEP_STUBS);
+            final SpanCustomizer mockSpanCustomizer = Mockito.mock(SpanCustomizer.class, Answers.RETURNS_DEEP_STUBS);
+            Mockito.when(mockTracer.currentSpanCustomizer()).thenReturn(mockSpanCustomizer);
+            return mockTracer;
+        }
+
+        @Bean
+        @Primary
+        public BraveTagAdapter braveTagAdapter() {
+            return Mockito.mock(BraveTagAdapter.class);
+        }
+
+        @Bean
+        @Primary
+        public BraveTracePropagator braveTracePropagator() {
+            return Mockito.mock(BraveTracePropagator.class);
+        }
+
+        @Bean
+        @Primary
+        public BraveTracingComponents braveTracingComponents(
+            final Tracer tracer,
+            final BraveTagAdapter tagAdapter,
+            final BraveTracePropagator tracePropagator
+        ) {
+            final BraveTracingComponents mockComponents = Mockito.mock(BraveTracingComponents.class);
+            Mockito.when(mockComponents.getTracer()).thenReturn(tracer);
+            Mockito.when(mockComponents.getTagAdapter()).thenReturn(tagAdapter);
+            Mockito.when(mockComponents.getTracePropagator()).thenReturn(tracePropagator);
+            return mockComponents;
+        }
+
+        @Bean
+        @Primary
+        public PersistedJobStatusObserver persistedJobStatusObserver() {
+            return Mockito.mock(PersistedJobStatusObserver.class);
+        }
+
+        @Bean
+        @Primary
+        public CommonTracingAutoConfiguration commonTracingAutoConfiguration() {
+            return Mockito.mock(CommonTracingAutoConfiguration.class);
+        }
     }
 }

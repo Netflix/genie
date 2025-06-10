@@ -22,7 +22,5 @@
  * @author mprimi
  * @since 4.0.0
  */
-@ParametersAreNonnullByDefault
+@jakarta.annotation.Nonnull
 package com.netflix.genie.web.spring.actuators;
-
-import javax.annotation.ParametersAreNonnullByDefault;

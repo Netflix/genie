@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.events;
 
-import com.amazonaws.services.sns.AmazonSNS;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -30,6 +29,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.services.sns.model.PublishRequest;
+import software.amazon.awssdk.services.sns.SnsClient;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -56,7 +57,7 @@ abstract class AbstractSNSPublisher {
     protected final SNSNotificationsProperties properties;
     protected final MeterRegistry registry;
 
-    private final AmazonSNS snsClient;
+    private final SnsClient snsClient;
     private final ObjectMapper mapper;
 
     /**
@@ -70,7 +71,7 @@ abstract class AbstractSNSPublisher {
     AbstractSNSPublisher(
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
-        final AmazonSNS snsClient,
+        final SnsClient snsClient,
         final ObjectMapper mapper
     ) {
         this.properties = properties;
@@ -109,7 +110,7 @@ abstract class AbstractSNSPublisher {
             // Serialize message
             final String serializedMessage = this.mapper.writeValueAsString(eventMap);
             // Send message
-            this.snsClient.publish(topic, serializedMessage);
+            this.snsClient.publish(PublishRequest.builder().message(serializedMessage).topicArn(topic).build());
             log.debug("Published SNS notification (type: {})", eventType.name());
             metricTags.addAll(MetricsUtils.newSuccessTagsSet());
         } catch (JsonProcessingException | RuntimeException e) {

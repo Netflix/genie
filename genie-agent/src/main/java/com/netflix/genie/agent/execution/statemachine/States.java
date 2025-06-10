@@ -20,7 +20,7 @@ package com.netflix.genie.agent.execution.statemachine;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import lombok.Getter;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 /**
  * Execution state machine states.

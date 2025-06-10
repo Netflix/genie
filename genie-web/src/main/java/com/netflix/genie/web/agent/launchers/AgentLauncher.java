@@ -22,7 +22,7 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import org.springframework.boot.actuate.health.HealthIndicator;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Optional;
 
 /**

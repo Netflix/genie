@@ -44,8 +44,8 @@ import org.springframework.http.MediaType
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import java.util.concurrent.TimeUnit
 
 //TODO serving of a directory entry is not covered by this test due to the usage of static resources.

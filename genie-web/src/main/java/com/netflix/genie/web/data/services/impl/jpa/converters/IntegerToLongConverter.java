@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.converters;
 
-import javax.annotation.Nullable;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * An {@link AttributeConverter} to convert {@link Integer} objects into {@link Long} for storage and vice versa.

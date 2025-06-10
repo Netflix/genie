@@ -36,6 +36,7 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration
 #  # Leaving this in for reference as it can be helpful for debugging
 #  jpa:
 #    show-sql: true

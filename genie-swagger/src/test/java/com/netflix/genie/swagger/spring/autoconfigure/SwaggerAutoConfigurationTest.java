@@ -20,7 +20,7 @@ package com.netflix.genie.swagger.spring.autoconfigure;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 

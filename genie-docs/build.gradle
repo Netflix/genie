@@ -16,8 +16,8 @@ asciidoctorj {
             "revnumber"         : genieVersion,
             "docinfo1"          : "",
             "isSnapshot"        : isSnapshot,
-            "springBootVersion" : "${spring_boot_version}",
-            "springCloudVersion": "${spring_cloud_version}"
+            "springBootVersion" : "${spring_boot_2_version}",
+            "springCloudVersion": "${spring_cloud_2_version}"
         ]
     )
 }

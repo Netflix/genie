@@ -17,6 +17,7 @@
  */
 package com.netflix.genie;
 
+import io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -31,6 +32,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
     // TODO: We probably should handle these in an environment post processor so that it's universal
     exclude = {
         RedisAutoConfiguration.class,
+        S3TransferManagerAutoConfiguration.class
     }
 )
 public class GenieApp {

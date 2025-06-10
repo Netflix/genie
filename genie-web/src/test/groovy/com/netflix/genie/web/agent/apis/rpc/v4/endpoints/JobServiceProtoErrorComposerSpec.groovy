@@ -43,8 +43,8 @@ import org.assertj.core.util.Sets
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.validation.ConstraintViolation
-import javax.validation.ConstraintViolationException
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.ConstraintViolationException
 
 class JobServiceProtoErrorComposerSpec extends Specification {
     static final String MESSAGE = "some message"

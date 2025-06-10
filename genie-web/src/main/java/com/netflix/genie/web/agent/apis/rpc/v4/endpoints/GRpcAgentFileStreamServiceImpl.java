@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRange;
 import org.springframework.scheduling.TaskScheduler;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.naming.LimitExceededException;
 import java.io.InputStream;
 import java.net.URI;
@@ -133,8 +133,8 @@ public class GRpcAgentFileStreamServiceImpl
         log.debug("Attempting to stream file: {} of job: {}", relativePath, jobId);
         final Optional<DirectoryManifest> optionalManifest = this.getManifest(jobId);
 
-        if (!optionalManifest.isPresent()) {
-            log.warn("No manifest found for job: {}" + jobId);
+        if (optionalManifest.isEmpty()) {
+            log.warn("No manifest found for job: {}", jobId);
             return Optional.empty();
         }
 

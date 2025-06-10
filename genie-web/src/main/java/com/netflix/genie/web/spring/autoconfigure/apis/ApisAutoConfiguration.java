@@ -85,8 +85,8 @@ public class ApisAutoConfiguration {
         final RestTemplateBuilder restTemplateBuilder
     ) {
         return restTemplateBuilder
-            .setConnectTimeout(Duration.of(httpProperties.getConnect().getTimeout(), ChronoUnit.MILLIS))
-            .setReadTimeout(Duration.of(httpProperties.getRead().getTimeout(), ChronoUnit.MILLIS))
+            .connectTimeout(Duration.of(httpProperties.getConnect().getTimeout(), ChronoUnit.MILLIS))
+            .readTimeout(Duration.of(httpProperties.getRead().getTimeout(), ChronoUnit.MILLIS))
             .build();
     }
 

@@ -28,9 +28,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.unit.DataSize;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

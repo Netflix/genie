@@ -29,7 +29,6 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import io.restassured.RestAssured;
-import org.apache.catalina.util.URLEncoder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
@@ -39,17 +38,22 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
-import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
+import org.springframework.web.util.UriUtils;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.springframework.restdocs.headers.HeaderDocumentation;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.hypermedia.HypermediaDocumentation;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
 
 /**
  * Integration tests for the Clusters REST API.
@@ -62,7 +66,7 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = "h2prod";
     private static final String USER = "genie";
-    private static final String VERSION = "2.7.1";
+    private static final String VERSION = "3.4.2";
 
     private static final String CLUSTERS_LIST_PATH = EMBEDDED_PATH + ".clusterList";
     private static final String CLUSTERS_ID_LIST_PATH = CLUSTERS_LIST_PATH + ".id";
@@ -77,26 +81,99 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
 
     @Test
     void canCreateClusterWithoutId() throws Exception {
-        final RestDocumentationFilter createFilter = RestAssuredRestDocumentation.document(
-            "{class-name}/{method-name}/{step}/",
-            Snippets.CONTENT_TYPE_HEADER, // Request headers
-            Snippets.getClusterRequestPayload(), // Request fields
-            Snippets.LOCATION_HEADER // Response headers
-        );
+        // Create documentation filter using Spring Boot 3 compatible approach
+        final org.springframework.restdocs.restassured.RestDocumentationFilter createFilter =
+            RestAssuredRestDocumentation.document(
+                "{class-name}/{method-name}/create",
+                HeaderDocumentation.requestHeaders(
+                    HeaderDocumentation.headerWithName("Content-Type").description("Content type")
+                ),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("name").description("Cluster name")
+                        .attributes(Attributes.key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("user").description("User who created the cluster")
+                        .attributes(Attributes.key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("version").description("Version of the cluster")
+                        .attributes(Attributes.key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("status").description("Status of the cluster")
+                        .attributes(Attributes.key("constraints").value("Required")),
+                    PayloadDocumentation.fieldWithPath("id").description("Cluster ID (null when creating)")
+                        .optional().attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("created").description("Creation timestamp (set by server)")
+                        .optional().attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("updated").description("Last update timestamp (set by server)")
+                        .optional().attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("description").description("Cluster description")
+                        .optional().attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("metadata").description("Cluster metadata")
+                        .optional().attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("tags").description("Tags associated with the cluster")
+                        .attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("configs").description("Configuration files for the cluster")
+                        .attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("dependencies").description("Dependencies for the cluster")
+                        .attributes(Attributes.key("constraints").value("Optional")),
+                    PayloadDocumentation.fieldWithPath("setupFile").description("Setup file location")
+                        .optional().attributes(Attributes.key("constraints").value("Optional"))
+                ),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName("Location").description("Location of the created resource")
+                )
+            );
 
+        // Create the cluster resource
         final String id = this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(),
             createFilter
         );
 
+        // Create documentation filter for GET request
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
-            "{class-name}/{method-name}/{step}/",
-            Snippets.ID_PATH_PARAM, // path parameters
-            Snippets.HAL_CONTENT_TYPE_HEADER, // response headers
-            Snippets.getClusterResponsePayload(), // response payload
-            Snippets.CLUSTER_LINKS // response links
+            "{class-name}/{method-name}/get",
+            RequestDocumentation.pathParameters(
+                RequestDocumentation.parameterWithName("id").description("Cluster ID")
+            ),
+            HeaderDocumentation.responseHeaders(
+                HeaderDocumentation.headerWithName("Content-Type").description("HAL JSON content type")
+            ),
+            PayloadDocumentation.responseFields(
+                PayloadDocumentation.fieldWithPath("id").description("Cluster ID")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("created").description("Creation timestamp")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("updated").description("Last update timestamp")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("name").description("Cluster name")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("user").description("User who created the cluster")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("version").description("Version of the cluster")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("tags").description("Tags associated with the cluster")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("setupFile").description("Setup file location").optional()
+                    .attributes(Attributes.key("constraints").value("Optional")),
+                PayloadDocumentation.fieldWithPath("status").description("Status of the cluster")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("configs").description("Configuration files")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("dependencies").description("Dependencies")
+                    .attributes(Attributes.key("constraints").value("Required")),
+                PayloadDocumentation.fieldWithPath("description").description("Cluster description").optional()
+                    .attributes(Attributes.key("constraints").value("Optional")),
+                PayloadDocumentation.fieldWithPath("metadata").description("Cluster metadata").optional()
+                    .attributes(Attributes.key("constraints").value("Optional")),
+                PayloadDocumentation.subsectionWithPath("_links").description("Links to other resources")
+                    .attributes(Attributes.key("constraints").value("Required"))
+            ),
+            HypermediaDocumentation.links(
+                HypermediaDocumentation.halLinks(),
+                HypermediaDocumentation.linkWithRel("self").description("Link to this cluster"),
+                HypermediaDocumentation.linkWithRel("commands").description("Link to commands for this cluster")
+            )
         );
 
+        // Verify the created cluster
         RestAssured
             .given(this.getRequestSpecification())
             .filter(getFilter)
@@ -129,6 +206,7 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
                 )
             );
 
+        // Verify the cluster was created in the repository
         Assertions.assertThat(this.clusterRepository.count()).isEqualTo(1L);
     }
 
@@ -225,12 +303,15 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
             null
         );
 
+        // Use a simpler approach for documentation
         final RestDocumentationFilter findFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Snippets.CLUSTER_SEARCH_QUERY_PARAMETERS, // Request query parameters
-            Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
-            Snippets.CLUSTER_SEARCH_RESULT_FIELDS, // Result fields
-            Snippets.SEARCH_LINKS // HAL Links
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CLUSTER_SEARCH_QUERY_PARAMETERS,
+            Snippets.HAL_CONTENT_TYPE_HEADER,
+            Snippets.CLUSTER_SEARCH_RESULT_FIELDS,
+            Snippets.SEARCH_LINKS
         );
 
         // Test finding all clusters
@@ -675,8 +756,7 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
             Snippets.CONTENT_TYPE_HEADER, // Request Headers
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(
-                PayloadDocumentation
-                    .fieldWithPath("[]")
+                PayloadDocumentation.fieldWithPath("[]")
                     .description("Array of command ids (in preferred order) to append to the existing list of commands")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             ) // Request payload
@@ -701,17 +781,16 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Snippets.ID_PATH_PARAM, // Path parameters
-            RequestDocumentation.requestParameters(
-                RequestDocumentation
-                    .parameterWithName("status")
+            // Use queryParameters instead of requestParameters
+            RequestDocumentation.queryParameters(
+                RequestDocumentation.parameterWithName("status")
                     .description("The status of commands to search for")
                     .attributes(Attributes.key(Snippets.CONSTRAINTS).value(CommandStatus.values()))
                     .optional()
             ), // Query Parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
-                PayloadDocumentation
-                    .subsectionWithPath("[]")
+                PayloadDocumentation.subsectionWithPath("[]")
                     .description("The list of commands found")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
@@ -750,8 +829,7 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
             Snippets.CONTENT_TYPE_HEADER, // Request Headers
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(
-                PayloadDocumentation
-                    .fieldWithPath("[]")
+                PayloadDocumentation.fieldWithPath("[]")
                     .description("Array of command ids (in preferred order) to replace the existing list of commands")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             ) // Request payload
@@ -874,15 +952,12 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
     }
 
     /**
-     * This test "documents" a known bug in Spring HATEOAS links that resulted in doubly-encoded pagination links.
-     * https://github.com/spring-projects/spring-hateoas/issues/559
-     * We worked around this bug in the UI by decoding these elements (see Pagination.js).
-     * This test now documents the contract that this bug should be fixed.
+     * This test verifies that the pagination links are correctly encoded in Spring 3.
      *
      * @throws Exception on error
      */
     @Test
-    void testPagingDoubleEncoding() throws Exception {
+    void testPagingEncoding() throws Exception {
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -913,10 +988,9 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
 
         Assertions.assertThat(this.clusterRepository.count()).isEqualTo(3L);
 
-        final URLEncoder urlEncoder = new URLEncoder();
-
+        // Use a name query with special characters that need encoding
         final String unencodedNameQuery = "Test %";
-        final String singleEncodedNameQuery = urlEncoder.encode(unencodedNameQuery, StandardCharsets.UTF_8);
+        final String encodedNameQuery = UriUtils.encode(unencodedNameQuery, StandardCharsets.UTF_8);
 
         // Query by name with wildcard and get the second page containing a single result (out of 3)
         final JsonNode responseJsonNode = GenieObjectMapper
@@ -938,36 +1012,41 @@ class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTest
                     .asByteArray()
             );
 
-        // Self link is not double-encoded
-        Assertions
-            .assertThat(
-                responseJsonNode
-                    .get("_links")
-                    .get("self")
-                    .get("href")
-                    .asText()
-            )
-            .contains(singleEncodedNameQuery);
+        // Self link should contain the correctly encoded query parameter (not double-encoded)
+        final String selfLink = responseJsonNode
+            .get("_links")
+            .get("self")
+            .get("href")
+            .asText();
 
-        // Pagination links that were double-encoded
-        final String[] doubleEncodedHREFS = new String[]{
+        Assertions.assertThat(selfLink).contains(encodedNameQuery);
+
+        // Pagination links should also be correctly encoded (not double-encoded)
+        final String[] paginationLinks = new String[]{
             "first", "next", "prev", "last",
         };
 
-        for (String doubleEncodedHref : doubleEncodedHREFS) {
+        for (String linkRel : paginationLinks) {
             final String linkString = responseJsonNode
                 .get("_links")
-                .get(doubleEncodedHref)
+                .get(linkRel)
                 .get("href")
                 .asText();
+
             Assertions.assertThat(linkString).isNotBlank();
+
+            // Parse the URL to get the query parameters
             final Map<String, String> params = Maps.newHashMap();
             URLEncodedUtils
                 .parse(new URI(linkString), StandardCharsets.UTF_8)
                 .forEach(nameValuePair -> params.put(nameValuePair.getName(), nameValuePair.getValue()));
 
+            // Verify the name parameter is correctly decoded (not double-encoded)
             Assertions.assertThat(params).containsKey("name");
             Assertions.assertThat(params.get("name")).isEqualTo(unencodedNameQuery);
+
+            // Also verify the link itself contains the correctly encoded value
+            Assertions.assertThat(linkString).contains(encodedNameQuery);
         }
     }
 

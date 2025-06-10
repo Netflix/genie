@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;

@@ -20,7 +20,7 @@ package com.netflix.genie.ui.controllers
 import com.fasterxml.jackson.databind.JsonNode
 import spock.lang.Specification
 
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal
 
 /**

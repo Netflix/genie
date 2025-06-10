@@ -17,18 +17,6 @@
  */
 package com.netflix.genie.common.internal.aws.s3;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
-import com.amazonaws.regions.AwsRegionProvider;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.AmazonS3URI;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,8 +25,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.providers.AwsRegionProvider;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Uri;
+import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
+import software.amazon.awssdk.transfer.s3.S3TransferManager;
+
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +48,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * An {@link AmazonS3} client factory class. Given {@link AmazonS3URI} instances and the configuration of the system
+ * An {@link S3Client} client factory class. Given {@link S3Uri} instances and the configuration of the system
  * this factory is expected to return a valid client instance for the S3 URI which can then be used to access that URI.
  *
  * @author tgianos
@@ -58,23 +60,41 @@ public class S3ClientFactory {
     @VisibleForTesting
     static final String BUCKET_PROPERTIES_ROOT_KEY = "genie.aws.s3.buckets";
 
-    private final AWSCredentialsProvider awsCredentialsProvider;
+    /**
+     *  Get the AWS credentials provider used by this factory.
+     */
+    @Getter
+    private final AwsCredentialsProvider awsCredentialsProvider;
     private final Map<String, S3ClientKey> bucketToClientKey;
-    private final ConcurrentHashMap<S3ClientKey, AmazonS3> clientCache;
-    private final ConcurrentHashMap<AmazonS3, TransferManager> transferManagerCache;
+    private final ConcurrentHashMap<S3ClientKey, S3Client> clientCache;
+    private final ConcurrentHashMap<S3ClientFactory.S3ClientKey, S3AsyncClient> asyncClientCache;
+    private final ConcurrentHashMap<S3AsyncClient, S3TransferManager> transferManagerCache;
+    /**
+     *  Get the bucket properties used by this factory.
+     */
+    @Getter
     private final Map<String, BucketProperties> bucketProperties;
-    private final AWSSecurityTokenService stsClient;
-    private final Regions defaultRegion;
+    /**
+     *  Get the STS client used by this factory.
+     */
+    @Getter
+    private final StsClient stsClient;
+    /**
+     *  Get the default region used by this factory.
+     */
+    @Getter
+    private final Region defaultRegion;
+    private final S3Utilities s3Utils;
 
     /**
      * Constructor.
      *
      * @param awsCredentialsProvider The base AWS credentials provider to use for the generated S3 clients
-     * @param regionProvider         How this factory should determine the default {@link Regions}
+     * @param regionProvider         How this factory should determine the default {@link Region}
      * @param environment            The Spring application {@link Environment}
      */
     public S3ClientFactory(
-        final AWSCredentialsProvider awsCredentialsProvider,
+        final AwsCredentialsProvider awsCredentialsProvider,
         final AwsRegionProvider regionProvider,
         final Environment environment
     ) {
@@ -105,44 +125,77 @@ public class S3ClientFactory {
         // NOTE: Should we proactively create all necessary clients or be lazy about it? For now, lazy.
         final int initialCapacity = this.bucketProperties.size() + 1;
         this.clientCache = new ConcurrentHashMap<>(initialCapacity);
-        this.transferManagerCache = new ConcurrentHashMap<>(initialCapacity);
 
-        String tmpRegion;
+        Region tmpRegion;
         try {
             tmpRegion = regionProvider.getRegion();
         } catch (final SdkClientException e) {
-            tmpRegion = Regions.getCurrentRegion() != null
-                ? Regions.getCurrentRegion().getName()
-                : Regions.US_EAST_1.getName();
+            try {
+                tmpRegion = new DefaultAwsRegionProviderChain().getRegion();
+            } catch (final SdkClientException e2) {
+                tmpRegion = Region.US_EAST_1;
+            }
             log.warn(
                 "Couldn't determine the AWS region from the provider ({}) supplied. Defaulting to {}",
                 regionProvider.toString(),
                 tmpRegion
             );
         }
-        this.defaultRegion = Regions.fromName(tmpRegion);
+        this.defaultRegion = tmpRegion;
+
+        this.s3Utils = S3Utilities.builder().region(this.defaultRegion).build();
 
         // Create a token service client to use if we ever need to assume a role
         // TODO: Perhaps this should be just set to null if the bucket properties are empty as we'll never need it?
-        this.stsClient = AWSSecurityTokenServiceClientBuilder
-            .standard()
-            .withRegion(this.defaultRegion)
-            .withCredentials(this.awsCredentialsProvider)
+        this.stsClient = StsClient.builder()
+            .region(this.defaultRegion)
+            .credentialsProvider(this.awsCredentialsProvider)
             .build();
 
         this.bucketToClientKey = new ConcurrentHashMap<>();
+        this.asyncClientCache = new ConcurrentHashMap<>(initialCapacity);
+        this.transferManagerCache = new ConcurrentHashMap<>(initialCapacity);
     }
 
     /**
-     * Get an {@link AmazonS3} client instance appropriate for the given {@link AmazonS3URI}.
+     * Get an {@link S3Client} client instance appropriate for the given {@link S3Uri}.
      *
-     * @param s3URI The URI of the S3 resource this client is expected to access.
+     * @param s3Uri The URI of the S3 resource this client is expected to access.
      * @return A S3 client instance which should be used to access the S3 resource
      */
-    public AmazonS3 getClient(final AmazonS3URI s3URI) {
-        final String bucketName = s3URI.getBucket();
+    public S3Client getClient(final S3Uri s3Uri) {
+        final S3ClientKey s3ClientKey = getS3ClientKey(s3Uri);
+        return this.clientCache.computeIfAbsent(s3ClientKey, this::buildS3Client);
+    }
 
-        final S3ClientKey s3ClientKey;
+    /**
+     * Get a {@link S3Uri} from a URI.
+     *
+     * @param uri The URI to parse
+     * @return A {@link S3Uri} instance
+     */
+    public S3Uri getS3Uri(final URI uri) {
+        return this.s3Utils.parseUri(uri);
+    }
+
+    /**
+     * Get a {@link S3Uri} from a string.
+     *
+     * @param uri The URI string to parse
+     * @return A {@link S3Uri} instance
+     */
+    public S3Uri getS3Uri(final String uri) {
+        return this.getS3Uri(URI.create(uri));
+    }
+
+    /**
+     * Get the S3 client key for a given S3 URI.
+     *
+     * @param s3Uri The S3 URI
+     * @return The S3 client key
+     */
+    public S3ClientKey getS3ClientKey(final S3Uri s3Uri) {
+        final String bucketName = s3Uri.bucket().orElse(null);
 
         /*
          * The purpose of the dual maps is to make sure we don't create an unnecessary number of S3 clients.
@@ -151,7 +204,7 @@ public class S3ClientFactory {
          * combination. This way we first map the bucket name to a key of role/region and then use that key
          * to find a re-usable client for those dimensions.
          */
-        s3ClientKey = this.bucketToClientKey.computeIfAbsent(
+        return this.bucketToClientKey.computeIfAbsent(
             bucketName,
             key -> {
                 // We've never seen this bucket before. Calculate the key.
@@ -162,17 +215,17 @@ public class S3ClientFactory {
                  * 2. Is it part of the properties passed in by admin/user Use that
                  * 3. Fall back to whatever the default is for this process
                  */
-                final Regions bucketRegion;
-                final String uriBucketRegion = s3URI.getRegion();
-                if (StringUtils.isNotBlank(uriBucketRegion)) {
-                    bucketRegion = Regions.fromName(uriBucketRegion);
+                final Region bucketRegion;
+                final Optional<Region> regionOptional = s3Uri.region();
+                if (regionOptional.isPresent()) {
+                    bucketRegion = regionOptional.get();
                 } else {
                     final String propertyBucketRegion = this.bucketProperties.containsKey(key)
                         ? this.bucketProperties.get(key).getRegion().orElse(null)
                         : null;
 
                     if (StringUtils.isNotBlank(propertyBucketRegion)) {
-                        bucketRegion = Regions.fromName(propertyBucketRegion);
+                        bucketRegion = Region.of(propertyBucketRegion);
                     } else {
                         bucketRegion = this.defaultRegion;
                     }
@@ -186,27 +239,13 @@ public class S3ClientFactory {
                 return new S3ClientKey(bucketRegion, roleARN);
             }
         );
-
-        return this.clientCache.computeIfAbsent(s3ClientKey, this::buildS3Client);
     }
 
-    /**
-     * Get a {@link TransferManager} instance for use with the given {@code s3URI}.
-     *
-     * @param s3URI The S3 URI this transfer manager will be interacting with
-     * @return An instance of {@link TransferManager} backed by an appropriate S3 client for the given URI
-     */
-    public TransferManager getTransferManager(final AmazonS3URI s3URI) {
-        return this.transferManagerCache.computeIfAbsent(this.getClient(s3URI), this::buildTransferManager);
-    }
-
-    private AmazonS3 buildS3Client(final S3ClientKey s3ClientKey) {
+    private S3Client buildS3Client(final S3ClientKey s3ClientKey) {
         // TODO: Do something about allowing ClientConfiguration to be passed in
-        return AmazonS3ClientBuilder
-            .standard()
-            .withRegion(s3ClientKey.getRegion())
-            .withForceGlobalBucketAccessEnabled(true)
-            .withCredentials(
+        return S3Client.builder()
+            .region(s3ClientKey.getRegion())
+            .credentialsProvider(
                 s3ClientKey
                     .getRoleARN()
                     .map(
@@ -214,20 +253,17 @@ public class S3ClientFactory {
                             // TODO: Perhaps rename with more detailed info?
                             final String roleSession = "Genie-Agent-" + UUID.randomUUID().toString();
 
-                            return (AWSCredentialsProvider) new STSAssumeRoleSessionCredentialsProvider
-                                .Builder(roleARN, roleSession)
-                                .withStsClient(this.stsClient)
+                            return (AwsCredentialsProvider) StsAssumeRoleCredentialsProvider.builder()
+                                .stsClient(this.stsClient)
+                                .refreshRequest(
+                                    request -> request.roleArn(roleARN).roleSessionName(roleSession)
+                                )
                                 .build();
                         }
                     )
                     .orElse(this.awsCredentialsProvider)
             )
             .build();
-    }
-
-    private TransferManager buildTransferManager(final AmazonS3 s3Client) {
-        // TODO: Perhaps want to supply more options?
-        return TransferManagerBuilder.standard().withS3Client(s3Client).build();
     }
 
     /**
@@ -239,8 +275,8 @@ public class S3ClientFactory {
      */
     @Getter
     @EqualsAndHashCode(doNotUseGetters = true)
-    private static class S3ClientKey {
-        private final Regions region;
+    public static class S3ClientKey {
+        private final Region region;
         private final String roleARN;
 
         /**
@@ -249,13 +285,68 @@ public class S3ClientFactory {
          * @param region  The region the S3 client is configured to access.
          * @param roleARN The role the S3 client is configured to assume if any. Null if no assumption is necessary.
          */
-        S3ClientKey(final Regions region, @Nullable final String roleARN) {
+        S3ClientKey(final Region region, @Nullable final String roleARN) {
             this.region = region;
             this.roleARN = roleARN;
         }
 
-        Optional<String> getRoleARN() {
+        /**
+         * Get the role ARN.
+         *
+         * @return The role ARN as an Optional
+         */
+        public Optional<String> getRoleARN() {
             return Optional.ofNullable(this.roleARN);
         }
+    }
+
+    /**
+     * Get an {@link S3AsyncClient} client instance appropriate for the given {@link S3Uri}.
+     *
+     * @param s3Uri The URI of the S3 resource this client is expected to access.
+     * @return A S3 async client instance which should be used to access the S3 resource
+     */
+    public S3AsyncClient getAsyncClient(final S3Uri s3Uri) {
+        final S3ClientKey s3ClientKey = getS3ClientKey(s3Uri);
+        return this.asyncClientCache.computeIfAbsent(s3ClientKey, this::buildS3AsyncClient);
+    }
+
+    /**
+     * Get a {@link S3TransferManager} instance for use with the given {@code s3Uri}.
+     *
+     * @param s3Uri The S3 URI this transfer manager will be interacting with
+     * @return An instance of {@link S3TransferManager} backed by an appropriate S3 async client for the given URI
+     */
+    public S3TransferManager getTransferManager(final S3Uri s3Uri) {
+        return this.transferManagerCache.computeIfAbsent(this.getAsyncClient(s3Uri), this::buildTransferManager);
+    }
+
+    private S3AsyncClient buildS3AsyncClient(final S3ClientKey s3ClientKey) {
+        final AwsCredentialsProvider credentialsProvider = s3ClientKey
+            .getRoleARN()
+            .map(
+                roleARN -> {
+                    final String roleSession = "Genie-Agent-" + UUID.randomUUID().toString();
+
+                    return (AwsCredentialsProvider) StsAssumeRoleCredentialsProvider.builder()
+                        .stsClient(getStsClient())
+                        .refreshRequest(
+                            request -> request.roleArn(roleARN).roleSessionName(roleSession)
+                        )
+                        .build();
+                }
+            )
+            .orElse(getAwsCredentialsProvider());
+
+        return S3AsyncClient.builder()
+            .region(s3ClientKey.getRegion())
+            .credentialsProvider(credentialsProvider)
+            .build();
+    }
+
+    private S3TransferManager buildTransferManager(final S3AsyncClient s3AsyncClient) {
+        return S3TransferManager.builder()
+            .s3Client(s3AsyncClient)
+            .build();
     }
 }

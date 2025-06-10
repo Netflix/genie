@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.common.internal.aws.s3
 
-import com.amazonaws.services.s3.AmazonS3
-import io.awspring.cloud.core.io.s3.SimpleStorageProtocolResolver
+import io.awspring.cloud.s3.S3ProtocolResolver as SpringS3ProtocolResolver
 import org.springframework.context.support.AbstractApplicationContext
 import org.springframework.core.io.ProtocolResolver
+import software.amazon.awssdk.services.s3.S3Client
 import spock.lang.Specification
 
 /**
@@ -41,24 +41,23 @@ class S3ProtocolResolverRegistrarSpec extends Specification {
         then: "The S3 protocol resolver is added"
         1 * context.addProtocolResolver(resolver)
         1 * context.getProtocolResolvers() >> new LinkedHashSet<>()
-
     }
 
-    def "SimpleResourceResolver is removed if is present"() {
+    def "Spring S3ProtocolResolver is removed if is present"() {
         def resolvers = new LinkedHashSet<ProtocolResolver>()
         def context = Mock(AbstractApplicationContext)
         def resolver = Mock(S3ProtocolResolver)
         def configurer = new S3ProtocolResolverRegistrar(resolver)
-        def amazonS3 = Mock(AmazonS3)
-        def simpleStorageResolver = new SimpleStorageProtocolResolver(amazonS3)
-        resolvers.add(simpleStorageResolver)
+        def s3Client = Mock(S3Client)
+        def springS3ProtocolResolver = new SpringS3ProtocolResolver(s3Client)
+        resolvers.add(springS3ProtocolResolver)
 
-        when: "Context with a SimpleStorageProtocolResolver already present is passed in"
+        when: "Context with a Spring S3ProtocolResolver already present is passed in"
         configurer.setApplicationContext(context)
 
-        then: "The S3ProtocolResolver is added and the SimpleStorageProtocolResolver is removed"
+        then: "The S3ProtocolResolver is added and the Spring S3ProtocolResolver is removed"
         1 * context.addProtocolResolver(resolver)
         1 * context.getProtocolResolvers() >> resolvers
-        !resolvers.contains(simpleStorageResolver)
+        !resolvers.contains(springS3ProtocolResolver)
     }
 }
