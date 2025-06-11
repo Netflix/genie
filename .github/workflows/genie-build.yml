@@ -1,5 +1,4 @@
 name: Genie Build
-
 on:
   push:
     branches:
@@ -8,9 +7,6 @@ on:
       - v*.*.*
       - v*.*.*-rc.*
   pull_request:
-
-permissions:
-    contents: write
 
 jobs:
   build:
