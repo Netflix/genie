@@ -76,7 +76,7 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <hr>
-<div class="type-signature"><span class="annotations">@SpringBootApplication(exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class)
+<div class="type-signature"><span class="annotations">@SpringBootApplication(exclude={org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class,io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration.class})
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">GenieApp</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Main Genie Spring Configuration class.</div>

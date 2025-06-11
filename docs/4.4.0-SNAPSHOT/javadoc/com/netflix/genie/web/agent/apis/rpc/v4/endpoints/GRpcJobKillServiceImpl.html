@@ -79,7 +79,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../../../../../services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code>, <code>io.grpc.BindableService</code></dd>
+<dd><code>com.netflix.genie.proto.JobKillServiceGrpc.AsyncService</code>, <code><a href="../../../../../services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code>, <code>io.grpc.BindableService</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GRpcJobKillServiceImpl</span>
@@ -134,9 +134,9 @@ implements <a href="../../../../../services/JobKillService.html" title="interfac
  whether the observer is cancelled or not.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">killJob</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jobId,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">killJob</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jobId,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;reason,
- javax.servlet.http.HttpServletRequest&nbsp;request)</code></div>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Kill the job with the given id if possible.</div>
 </div>
@@ -197,8 +197,8 @@ implements <a href="../../../../../services/JobKillService.html" title="interfac
  io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.JobKillRegistrationResponse&gt;&nbsp;responseObserver)</span></div>
 <div class="block">Register to be notified when a kill request for the job is received.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>registerForKillNotification</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase</code></dd>
+<dt>Specified by:</dt>
+<dd><code>registerForKillNotification</code>&nbsp;in interface&nbsp;<code>com.netflix.genie.proto.JobKillServiceGrpc.AsyncService</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - Request to register for getting notified when server gets a job kill request.</dd>
 <dd><code>responseObserver</code> - The response observer</dd>
@@ -206,20 +206,20 @@ implements <a href="../../../../../services/JobKillService.html" title="interfac
 </section>
 </li>
 <li>
-<section class="detail" id="killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)">
+<section class="detail" id="killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)">
 <h3>killJob</h3>
 <div class="member-signature"><span class="annotations">@Retryable(value={<a href="../../../../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException.class</a>,<a href="../../../../../../common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException.class</a>},
            backoff=@Backoff(delay=1000L))
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">killJob</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jobId,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;reason,
  @Nullable
- javax.servlet.http.HttpServletRequest&nbsp;request)</span>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request)</span>
              throws <span class="exceptions"><a href="../../../../../../common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a>,
 <a href="../../../../../../common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></span></div>
 <div class="block">Kill the job with the given id if possible.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../../services/JobKillService.html#killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)">killJob</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code></dd>
+<dd><code><a href="../../../../../services/JobKillService.html#killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)">killJob</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>jobId</code> - id of job to kill</dd>
 <dd><code>reason</code> - brief reason for requesting the job be killed</dd>

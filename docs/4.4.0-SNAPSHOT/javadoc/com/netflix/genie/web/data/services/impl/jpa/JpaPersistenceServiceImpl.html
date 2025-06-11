@@ -80,7 +80,7 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="../../PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
 </dl>
 <hr>
-<div class="type-signature"><span class="annotations">@Transactional(rollbackFor={<a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException.class</a>,<a href="../../../../../common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieCheckedException.class</a>,<a href="../../../../../common/internal/exceptions/unchecked/GenieRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieRuntimeException.class</a>,javax.validation.ConstraintViolationException.class})
+<div class="type-signature"><span class="annotations">@Transactional(rollbackFor={<a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException.class</a>,<a href="../../../../../common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieCheckedException.class</a>,<a href="../../../../../common/internal/exceptions/unchecked/GenieRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieRuntimeException.class</a>,jakarta.validation.ConstraintViolationException.class})
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">JpaPersistenceServiceImpl</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="../../PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></span></div>
@@ -100,7 +100,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(javax.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)" class="member-name-link">JpaPersistenceServiceImpl</a><wbr>(javax.persistence.EntityManager&nbsp;entityManager,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(jakarta.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)" class="member-name-link">JpaPersistenceServiceImpl</a><wbr>(jakarta.persistence.EntityManager&nbsp;entityManager,
  <a href="repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories,
  <a href="../../../../../common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</code></div>
 <div class="col-last even-row-color">
@@ -135,7 +135,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion,int)" class="member-name-link">addClusterCriterionForCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Add a new <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.</div>
 </div>
@@ -199,7 +199,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteJobsCreatedBefore(java.time.Instant,java.util.Set,int)" class="member-name-link">deleteJobsCreatedBefore</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;creationThreshold,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../../../common/internal/dtos/JobStatus.html" title="enum class in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;excludeStatuses,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 </div>
@@ -228,7 +228,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteUnusedFiles(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedFiles</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Delete all files from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
@@ -236,7 +236,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedTags</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Delete all tags from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
@@ -514,7 +514,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeClusterCriterionForCommand(java.lang.String,int)" class="member-name-link">removeClusterCriterionForCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Remove the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
  associated with the command identified by id.</div>
@@ -672,9 +672,9 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(javax.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)">
+<section class="detail" id="&lt;init&gt;(jakarta.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)">
 <h3>JpaPersistenceServiceImpl</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">JpaPersistenceServiceImpl</span><wbr><span class="parameters">(javax.persistence.EntityManager&nbsp;entityManager,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">JpaPersistenceServiceImpl</span><wbr><span class="parameters">(jakarta.persistence.EntityManager&nbsp;entityManager,
  <a href="repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a>&nbsp;jpaRepositories,
  <a href="../../../../../common/internal/tracing/brave/BraveTracingComponents.html" title="class in com.netflix.genie.common.internal.tracing.brave">BraveTracingComponents</a>&nbsp;tracingComponents)</span></div>
 <div class="block">Constructor.</div>
@@ -1334,7 +1334,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
  @Valid
  @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
  @Min(0L)
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</span>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</span>
                                    throws <span class="exceptions"><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
 <div class="block">Add a new <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.
  The priority is the place in the list this new criterion should be placed. A value of 0
@@ -1377,7 +1377,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
 <h3>removeClusterCriterionForCommand</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">removeClusterCriterionForCommand</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @Min(0L)
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</span>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</span>
                                       throws <span class="exceptions"><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
 <div class="block">Remove the <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
  associated with the command identified by id. A value of 0 for priority
@@ -1602,7 +1602,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../../../common/internal/dtos/JobStatus.html" title="enum class in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;excludeStatuses,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
@@ -2490,7 +2490,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Delete all tags from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
 <dl class="notes">
@@ -2516,7 +2516,7 @@ implements <a href="../../PersistenceService.html" title="interface in com.netfl
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Delete all files from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
 <dl class="notes">

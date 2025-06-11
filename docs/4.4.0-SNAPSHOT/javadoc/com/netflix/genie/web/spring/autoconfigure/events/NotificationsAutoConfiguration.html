@@ -113,9 +113,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobFinishedSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.data.services.DataServices)" class="member-name-link">jobFinishedSNSPublisher</a><wbr>(<a href="../../../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobFinishedSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.data.services.DataServices)" class="member-name-link">jobFinishedSNSPublisher</a><wbr>(<a href="../../../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
- com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
+ software.amazon.awssdk.services.sns.SnsClient&nbsp;snsClient,
  <a href="../../../data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Create a <a href="../../../events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobFinishedSNSPublisher</code></a> unless one exists in the context already.</div>
@@ -127,9 +127,9 @@ loadScripts(document, 'script');</script>
  notifications.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.amazonaws.services.sns.AmazonSNS)" class="member-name-link">jobNotificationsSNSPublisher</a><wbr>(<a href="../../../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,software.amazon.awssdk.services.sns.SnsClient)" class="member-name-link">jobNotificationsSNSPublisher</a><wbr>(<a href="../../../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
- com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient)</code></div>
+ software.amazon.awssdk.services.sns.SnsClient&nbsp;snsClient)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Create a <a href="../../../events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobStateChangeSNSPublisher</code></a> unless one exists in the context already.</div>
 </div>
@@ -201,7 +201,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="jobNotificationsSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.amazonaws.services.sns.AmazonSNS)">
+<section class="detail" id="jobNotificationsSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,software.amazon.awssdk.services.sns.SnsClient)">
 <h3>jobNotificationsSNSPublisher</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @ConditionalOnProperty(value="genie.notifications.sns.enabled",
@@ -209,7 +209,7 @@ loadScripts(document, 'script');</script>
 @ConditionalOnMissingBean(<a href="../../../events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher.class</a>)
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></span>&nbsp;<span class="element-name">jobNotificationsSNSPublisher</span><wbr><span class="parameters">(<a href="../../../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
- com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient)</span></div>
+ software.amazon.awssdk.services.sns.SnsClient&nbsp;snsClient)</span></div>
 <div class="block">Create a <a href="../../../events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobStateChangeSNSPublisher</code></a> unless one exists in the context already.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -222,7 +222,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="jobFinishedSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.data.services.DataServices)">
+<section class="detail" id="jobFinishedSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.data.services.DataServices)">
 <h3>jobFinishedSNSPublisher</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @ConditionalOnProperty(value="genie.notifications.sns.enabled",
@@ -230,7 +230,7 @@ loadScripts(document, 'script');</script>
 @ConditionalOnMissingBean(<a href="../../../events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher.class</a>)
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></span>&nbsp;<span class="element-name">jobFinishedSNSPublisher</span><wbr><span class="parameters">(<a href="../../../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
- com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
+ software.amazon.awssdk.services.sns.SnsClient&nbsp;snsClient,
  <a href="../../../data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices)</span></div>
 <div class="block">Create a <a href="../../../events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobFinishedSNSPublisher</code></a> unless one exists in the context already.</div>
 <dl class="notes">

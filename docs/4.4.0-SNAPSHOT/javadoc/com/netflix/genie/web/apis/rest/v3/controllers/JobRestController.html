@@ -177,10 +177,10 @@ loadScripts(document, 'script');</script>
 <div class="block">Get the metadata information about a job.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJobOutput(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)" class="member-name-link">getJobOutput</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJobOutput(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)" class="member-name-link">getJobOutput</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;forwardedFrom,
- javax.servlet.http.HttpServletRequest&nbsp;request,
- javax.servlet.http.HttpServletResponse&nbsp;response)</code></div>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request,
+ jakarta.servlet.http.HttpServletResponse&nbsp;response)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the job output directory.</div>
 </div>
@@ -195,26 +195,26 @@ loadScripts(document, 'script');</script>
 <div class="block">Get the status of the given job if it exists.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">killJob</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">killJob</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;forwardedFrom,
- javax.servlet.http.HttpServletRequest&nbsp;request)</code></div>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Kill job based on given job ID.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">submitJob</a><wbr>(@Valid <a href="../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">submitJob</a><wbr>(@Valid <a href="../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;clientHost,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userAgent,
- javax.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</code></div>
+ jakarta.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Submit a new job.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Void.html" title="class or interface in java.lang" class="external-link">Void</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#submitJob(com.netflix.genie.common.dto.JobRequest,org.springframework.web.multipart.MultipartFile%5B%5D,java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">submitJob</a><wbr>(@Valid <a href="../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#submitJob(com.netflix.genie.common.dto.JobRequest,org.springframework.web.multipart.MultipartFile%5B%5D,java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">submitJob</a><wbr>(@Valid <a href="../../../../../common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest,
  org.springframework.web.multipart.MultipartFile[]&nbsp;attachments,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;clientHost,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userAgent,
- javax.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</code></div>
+ jakarta.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Submit a new job with attachments.</div>
 </div>
@@ -279,7 +279,7 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)">
+<section class="detail" id="submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)">
 <h3>submitJob</h3>
 <div class="member-signature"><span class="annotations">@PostMapping(consumes="application/json")
 @ResponseStatus(ACCEPTED)
@@ -289,7 +289,7 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;clientHost,
  @RequestHeader(value="User-Agent",required=false) @Nullable
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userAgent,
- javax.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</span>
+ jakarta.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</span>
                                                         throws <span class="exceptions"><a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a>,
 <a href="../../../../../common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieCheckedException</a></span></div>
 <div class="block">Submit a new job.</div>
@@ -308,7 +308,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="submitJob(com.netflix.genie.common.dto.JobRequest,org.springframework.web.multipart.MultipartFile[],java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)">
+<section class="detail" id="submitJob(com.netflix.genie.common.dto.JobRequest,org.springframework.web.multipart.MultipartFile[],java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)">
 <h3>submitJob</h3>
 <div class="member-signature"><span class="annotations">@PostMapping(consumes="multipart/form-data")
 @ResponseStatus(ACCEPTED)
@@ -320,7 +320,7 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;clientHost,
  @RequestHeader(value="User-Agent",required=false) @Nullable
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userAgent,
- javax.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</span>
+ jakarta.servlet.http.HttpServletRequest&nbsp;httpServletRequest)</span>
                                                         throws <span class="exceptions"><a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a>,
 <a href="../../../../../common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieCheckedException</a></span></div>
 <div class="block">Submit a new job with attachments.</div>
@@ -444,7 +444,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)">
+<section class="detail" id="killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)">
 <h3>killJob</h3>
 <div class="member-signature"><span class="annotations">@DeleteMapping("/{id}")
 @ResponseStatus(ACCEPTED)
@@ -452,7 +452,7 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @RequestHeader(name="Genie-Forwarded-From",required=false) @Nullable
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;forwardedFrom,
- javax.servlet.http.HttpServletRequest&nbsp;request)</span>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request)</span>
              throws <span class="exceptions"><a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></span></div>
 <div class="block">Kill job based on given job ID.</div>
 <dl class="notes">
@@ -589,15 +589,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getJobOutput(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)">
+<section class="detail" id="getJobOutput(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)">
 <h3>getJobOutput</h3>
 <div class="member-signature"><span class="annotations">@GetMapping({"/{id}/output","/{id}/output/","/{id}/output/**"})
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">getJobOutput</span><wbr><span class="parameters">(@PathVariable("id")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @RequestHeader(name="Genie-Forwarded-From",required=false) @Nullable
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;forwardedFrom,
- javax.servlet.http.HttpServletRequest&nbsp;request,
- javax.servlet.http.HttpServletResponse&nbsp;response)</span>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request,
+ jakarta.servlet.http.HttpServletResponse&nbsp;response)</span>
                   throws <span class="exceptions"><a href="../../../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a>,
 <a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
 <div class="block">Get the job output directory.</div>

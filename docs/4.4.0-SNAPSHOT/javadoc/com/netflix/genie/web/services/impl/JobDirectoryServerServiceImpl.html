@@ -123,11 +123,11 @@ implements <a href="../JobDirectoryServerService.html" title="interface in com.n
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#serveResource(java.lang.String,java.net.URL,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)" class="member-name-link">serveResource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#serveResource(java.lang.String,java.net.URL,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)" class="member-name-link">serveResource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URL.html" title="class or interface in java.net" class="external-link">URL</a>&nbsp;baseUrl,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;relativePath,
- javax.servlet.http.HttpServletRequest&nbsp;request,
- javax.servlet.http.HttpServletResponse&nbsp;response)</code></div>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request,
+ jakarta.servlet.http.HttpServletResponse&nbsp;response)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Given the <code>request</code> this API will write the resource to <code>response</code> if possible.</div>
 </div>
@@ -179,20 +179,20 @@ implements <a href="../JobDirectoryServerService.html" title="interface in com.n
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="serveResource(java.lang.String,java.net.URL,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)">
+<section class="detail" id="serveResource(java.lang.String,java.net.URL,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)">
 <h3>serveResource</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">serveResource</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URL.html" title="class or interface in java.net" class="external-link">URL</a>&nbsp;baseUrl,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;relativePath,
- javax.servlet.http.HttpServletRequest&nbsp;request,
- javax.servlet.http.HttpServletResponse&nbsp;response)</span>
+ jakarta.servlet.http.HttpServletRequest&nbsp;request,
+ jakarta.servlet.http.HttpServletResponse&nbsp;response)</span>
                    throws <span class="exceptions"><a href="../../../common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></span></div>
 <div class="block">Given the <code>request</code> this API will write the resource to <code>response</code> if possible. If the resource
  doesn't exist or an error is generated an appropriate HTTP error response will be written to <code>response</code>
  instead.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../JobDirectoryServerService.html#serveResource(java.lang.String,java.net.URL,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)">serveResource</a></code>&nbsp;in interface&nbsp;<code><a href="../JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a></code></dd>
+<dd><code><a href="../JobDirectoryServerService.html#serveResource(java.lang.String,java.net.URL,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)">serveResource</a></code>&nbsp;in interface&nbsp;<code><a href="../JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>id</code> - The id of the job this request is for</dd>
 <dd><code>baseUrl</code> - The base URL used to generate all URLs for resources</dd>

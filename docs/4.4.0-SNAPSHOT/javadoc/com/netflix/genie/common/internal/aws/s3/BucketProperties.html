@@ -114,7 +114,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRegion()" class="member-name-link">getRegion</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the <code>Regions</code> this bucket is in.</div>
+<div class="block">Get the <code>Region</code> this bucket is in.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRoleARN()" class="member-name-link">getRoleARN</a>()</code></div>
@@ -124,7 +124,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setRegion(java.lang.String)" class="member-name-link">setRegion</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;region)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Set the AWS region from a string name representation e.g.</div>
+<div class="block">Set the AWS region from a string name representation (e.g., us-east-1).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setRoleARN(java.lang.String)" class="member-name-link">setRoleARN</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;roleARN)</code></div>
@@ -166,10 +166,10 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getRegion()">
 <h3>getRegion</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getRegion</span>()</div>
-<div class="block">Get the <code>Regions</code> this bucket is in.</div>
+<div class="block">Get the <code>Region</code> this bucket is in.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>The <code>Regions.getName()</code> wrapped in an <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link"><code>Optional</code></a>. If the optional is empty it indicates that
+<dd>The <code>Region.id()</code> wrapped in an <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link"><code>Optional</code></a>. If the optional is empty it indicates that
  the default or current region should be used</dd>
 </dl>
 </section>
@@ -179,14 +179,17 @@ loadScripts(document, 'script');</script>
 <h3>setRegion</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setRegion</span><wbr><span class="parameters">(@Nullable
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;region)</span></div>
-<div class="block">Set the AWS region from a string name representation e.g. us-east-1.</div>
+<div class="block">Set the AWS region from a string name representation (e.g., us-east-1).
+ This method validates that the provided region is a valid AWS region.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>region</code> - The name of the region to use</dd>
+<dd><code>region</code> - The name of the region to use, or null to clear the region setting</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IllegalArgumentException.html" title="class or interface in java.lang" class="external-link">IllegalArgumentException</a></code> - If the provided region is not a valid AWS region</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">
-<li><code>Regions.fromName(String)</code></li>
+<li><code>Region.of(String)</code></li>
 </ul>
 </dd>
 </dl>

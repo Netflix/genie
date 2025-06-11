@@ -79,7 +79,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../../../../services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a></code>, <code>io.grpc.BindableService</code></dd>
+<dd><code>com.netflix.genie.proto.FileStreamServiceGrpc.AsyncService</code>, <code><a href="../../../../services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a></code>, <code>io.grpc.BindableService</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GRpcAgentFileStreamServiceImpl</span>
@@ -257,8 +257,8 @@ implements <a href="../../../../services/AgentFileStreamService.html" title="int
 <h3>sync</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.AgentManifestMessage&gt;</span>&nbsp;<span class="element-name">sync</span><wbr><span class="parameters">(io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ServerControlMessage&gt;&nbsp;responseObserver)</span></div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>sync</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase</code></dd>
+<dt>Specified by:</dt>
+<dd><code>sync</code>&nbsp;in interface&nbsp;<code>com.netflix.genie.proto.FileStreamServiceGrpc.AsyncService</code></dd>
 </dl>
 </section>
 </li>
@@ -267,8 +267,8 @@ implements <a href="../../../../services/AgentFileStreamService.html" title="int
 <h3>transmit</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.AgentFileMessage&gt;</span>&nbsp;<span class="element-name">transmit</span><wbr><span class="parameters">(io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ServerAckMessage&gt;&nbsp;responseObserver)</span></div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>transmit</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase</code></dd>
+<dt>Specified by:</dt>
+<dd><code>transmit</code>&nbsp;in interface&nbsp;<code>com.netflix.genie.proto.FileStreamServiceGrpc.AsyncService</code></dd>
 </dl>
 </section>
 </li>

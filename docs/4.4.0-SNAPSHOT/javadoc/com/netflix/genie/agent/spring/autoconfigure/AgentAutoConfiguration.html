@@ -225,8 +225,7 @@ loadScripts(document, 'script');</script>
 <h3>sharedAgentTaskExecutor</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @Lazy
-@ConditionalOnMissingBean(name="sharedAgentTaskExecutor",
-                          value=org.springframework.core.task.AsyncTaskExecutor.class)
+@ConditionalOnMissingBean(name="sharedAgentTaskExecutor")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.core.task.AsyncTaskExecutor</span>&nbsp;<span class="element-name">sharedAgentTaskExecutor</span><wbr><span class="parameters">(<a href="../../properties/AgentProperties.html" title="class in com.netflix.genie.agent.properties">AgentProperties</a>&nbsp;agentProperties)</span></div>
 <div class="block">Get a lazy <code>AsyncTaskExecutor</code> bean which may be shared by different components if one isn't already
  defined.</div>

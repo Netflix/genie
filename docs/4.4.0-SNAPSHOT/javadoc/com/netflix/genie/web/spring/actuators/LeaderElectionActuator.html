@@ -133,9 +133,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#doAction(com.netflix.genie.web.spring.actuators.LeaderElectionActuator.Action)" class="member-name-link">doAction</a><wbr>(<a href="LeaderElectionActuator.Action.html" title="enum class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator.Action</a>&nbsp;action)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#doAction()" class="member-name-link">doAction</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Forces the node to leave the leader election, then re-join it.</div>
+<div class="block">Forces the node to perform leader election related actions.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getStatus()" class="member-name-link">getStatus</a>()</code></div>
@@ -191,14 +191,25 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="doAction(com.netflix.genie.web.spring.actuators.LeaderElectionActuator.Action)">
+<section class="detail" id="doAction()">
 <h3>doAction</h3>
 <div class="member-signature"><span class="annotations">@WriteOperation
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">doAction</span><wbr><span class="parameters">(<a href="LeaderElectionActuator.Action.html" title="enum class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator.Action</a>&nbsp;action)</span></div>
-<div class="block">Forces the node to leave the leader election, then re-join it.</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">doAction</span>()</div>
+<div class="block">Forces the node to perform leader election related actions.
+ This method uses direct request access to retrieve parameters,
+ avoiding issues with parameter name resolution when compiled without the '-parameters' flag.
+ <p>
+ Required request parameter:
+ - action: The action to perform. Must be one of: START, STOP, RESTART
+ <p>
+ Example usage:
+ POST /actuator/leaderElection?action=RESTART</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>action</code> - the action to perform</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IllegalStateException.html" title="class or interface in java.lang" class="external-link">IllegalStateException</a></code> - if no request context is available</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IllegalArgumentException.html" title="class or interface in java.lang" class="external-link">IllegalArgumentException</a></code> - if the action parameter is missing or invalid</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link">UnsupportedOperationException</a></code> - if the action is not supported</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/RuntimeException.html" title="class or interface in java.lang" class="external-link">RuntimeException</a></code> - if there is an error executing the requested action</dd>
 </dl>
 </section>
 </li>

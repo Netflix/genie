@@ -1196,11 +1196,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ShutdownStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StartHeartbeatServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartHeartbeatServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartHeartbeatServiceStage</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartFileServiceStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopKillServiceStage</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopHeartbeatServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopHeartbeatServiceStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusRunning.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusRunning.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusRunning</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">SetJobStatusInit</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#attemptStageAction(com.netflix.genie.agent.execution.statemachine.ExecutionContext)" class="member-name-link">attemptStageAction(ExecutionContext)</a> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></dt>
 <dd>&nbsp;</dd>
@@ -1240,14 +1240,9 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Property bindings for Spring Cloud AWS region specific properties.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#awsRegionProvider(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties)" class="member-name-link">awsRegionProvider(AwsRegionProperties)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#awsRegionProvider(io.awspring.cloud.autoconfigure.core.RegionProperties)" class="member-name-link">awsRegionProvider(RegionProperties)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an AWS region provider instance.</div>
-</dd>
-<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#awsS3ResourceLoaderProperties()" class="member-name-link">awsS3ResourceLoaderProperties()</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
-<dd>
-<div class="block">Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
- the <code>ContextResourceLoaderAutoConfiguration</code> isn't applied by the agent app.</div>
 </dd>
 </dl>
 <h2 class="title" id="I:B">B</h2>
@@ -1780,6 +1775,28 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/AuditEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/AuditEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AuditEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/FileEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/IdEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/IdEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">IdEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/TagEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/TagEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/UniqueIdEntity_.html#class_" class="member-name-link">class_</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/UniqueIdEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity_</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#CLASS_NAME" class="member-name-link">CLASS_NAME</a> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>
 <div class="block">Key to tag a class name.</div>
@@ -3560,9 +3577,9 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.DisruptionBudget.html#%3Cinit%3E()" class="member-name-link">DisruptionBudget()</a> - Constructor for class com.netflix.genie.web.agent.launchers.dtos.<a href="com/netflix/genie/web/agent/launchers/dtos/TitusBatchJobRequest.DisruptionBudget.html" title="class in com.netflix.genie.web.agent.launchers.dtos">TitusBatchJobRequest.DisruptionBudget</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#doAction(com.netflix.genie.web.spring.actuators.LeaderElectionActuator.Action)" class="member-name-link">doAction(LeaderElectionActuator.Action)</a> - Method in class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
+<dt><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#doAction()" class="member-name-link">doAction()</a> - Method in class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
 <dd>
-<div class="block">Forces the node to leave the leader election, then re-join it.</div>
+<div class="block">Forces the node to perform leader election related actions.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/States.html#DONE" class="member-name-link">DONE</a> - Enum constant in enum class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/States.html" title="enum class in com.netflix.genie.agent.execution.statemachine">States</a></dt>
 <dd>
@@ -4124,15 +4141,15 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Final pseudo-state.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html#find(javax.persistence.criteria.Root,javax.persistence.criteria.AbstractQuery,javax.persistence.criteria.CriteriaBuilder,java.lang.String,java.lang.String,java.util.Set,java.util.Set,java.lang.String)" class="member-name-link">find(Root&lt;ApplicationEntity&gt;, AbstractQuery&lt;?&gt;, CriteriaBuilder, String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, String)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ApplicationPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html#find(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.AbstractQuery,jakarta.persistence.criteria.CriteriaBuilder,java.lang.String,java.lang.String,java.util.Set,java.util.Set,java.lang.String)" class="member-name-link">find(Root&lt;ApplicationEntity&gt;, AbstractQuery&lt;?&gt;, CriteriaBuilder, String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, String)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ApplicationPredicates</a></dt>
 <dd>
 <div class="block">Get a <code>Predicate</code> using the specified parameters.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#find(javax.persistence.criteria.Root,javax.persistence.criteria.AbstractQuery,javax.persistence.criteria.CriteriaBuilder,java.lang.String,java.util.Set,java.util.Set,java.time.Instant,java.time.Instant)" class="member-name-link">find(Root&lt;ClusterEntity&gt;, AbstractQuery&lt;?&gt;, CriteriaBuilder, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, Instant, Instant)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#find(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.AbstractQuery,jakarta.persistence.criteria.CriteriaBuilder,java.lang.String,java.util.Set,java.util.Set,java.time.Instant,java.time.Instant)" class="member-name-link">find(Root&lt;ClusterEntity&gt;, AbstractQuery&lt;?&gt;, CriteriaBuilder, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, Instant, Instant)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
 <dd>
 <div class="block">Generate a <code>Predicate</code> given the parameters.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html#find(javax.persistence.criteria.Root,javax.persistence.criteria.AbstractQuery,javax.persistence.criteria.CriteriaBuilder,java.lang.String,java.lang.String,java.util.Set,java.util.Set)" class="member-name-link">find(Root&lt;CommandEntity&gt;, AbstractQuery&lt;?&gt;, CriteriaBuilder, String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html#find(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.AbstractQuery,jakarta.persistence.criteria.CriteriaBuilder,java.lang.String,java.lang.String,java.util.Set,java.util.Set)" class="member-name-link">find(Root&lt;CommandEntity&gt;, AbstractQuery&lt;?&gt;, CriteriaBuilder, String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></dt>
 <dd>
 <div class="block">Get a predicate using the specified parameters.</div>
 </dd>
@@ -4202,7 +4219,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s that match any of the given <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#findClustersMatchingAnyCriterion(javax.persistence.criteria.Root,javax.persistence.criteria.CriteriaQuery,javax.persistence.criteria.CriteriaBuilder,java.util.Set)" class="member-name-link">findClustersMatchingAnyCriterion(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Set&lt;Criterion&gt;)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#findClustersMatchingAnyCriterion(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.CriteriaQuery,jakarta.persistence.criteria.CriteriaBuilder,java.util.Set)" class="member-name-link">findClustersMatchingAnyCriterion(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Set&lt;Criterion&gt;)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
 <dd>
 <div class="block">Get the specification for the query which will find the clusters which match any of the given criterion.</div>
 </dd>
@@ -4214,7 +4231,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/internal/dtos/Cluster.html" title="class in com.netflix.genie.common.internal.dtos"><code>Cluster</code></a>'s that match the given <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#findClustersMatchingCriterion(javax.persistence.criteria.Root,javax.persistence.criteria.CriteriaQuery,javax.persistence.criteria.CriteriaBuilder,com.netflix.genie.common.internal.dtos.Criterion)" class="member-name-link">findClustersMatchingCriterion(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Criterion)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#findClustersMatchingCriterion(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.CriteriaQuery,jakarta.persistence.criteria.CriteriaBuilder,com.netflix.genie.common.internal.dtos.Criterion)" class="member-name-link">findClustersMatchingCriterion(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Criterion)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
 <dd>
 <div class="block">Get the <code>Predicate</code> for the query which will find the clusters which match the given criterion.</div>
 </dd>
@@ -4234,7 +4251,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/internal/dtos/Command.html" title="class in com.netflix.genie.common.internal.dtos"><code>Command</code></a>'s that match the given <a href="com/netflix/genie/common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a>.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html#findCommandsMatchingCriterion(javax.persistence.criteria.Root,javax.persistence.criteria.CriteriaQuery,javax.persistence.criteria.CriteriaBuilder,com.netflix.genie.common.internal.dtos.Criterion)" class="member-name-link">findCommandsMatchingCriterion(Root&lt;CommandEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Criterion)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html#findCommandsMatchingCriterion(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.CriteriaQuery,jakarta.persistence.criteria.CriteriaBuilder,com.netflix.genie.common.internal.dtos.Criterion)" class="member-name-link">findCommandsMatchingCriterion(Root&lt;CommandEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Criterion)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></dt>
 <dd>
 <div class="block">Get the specification for the query which will find the commands which match the given criterion.</div>
 </dd>
@@ -4915,7 +4932,7 @@ loadScripts(document, 'script');</script>
 <div class="block">A singleton for sharing a Jackson Object Mapper instance across Genie and not having to redefine the Object Mapper
  everywhere.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService(javax.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)" class="member-name-link">geniePersistenceService(EntityManager, JpaRepositories, BraveTracingComponents)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService(jakarta.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)" class="member-name-link">geniePersistenceService(EntityManager, JpaRepositories, BraveTracingComponents)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a default implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> if no other has been defined.</div>
 </dd>
@@ -5317,6 +5334,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the list of arguments that should be used when launching the image.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getAsyncClient(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getAsyncClient(S3Uri)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dd>
+<div class="block">Get an <code>S3AsyncClient</code> client instance appropriate for the given <code>S3Uri</code>.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html#getAsyncClient(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getAsyncClient(S3Uri)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></dt>
+<dd>
+<div class="block">Get an <code>S3AsyncClient</code> client instance appropriate for the given <code>S3Uri</code>.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/properties/AgentFilterProperties.html#getBlacklistedVersions()" class="member-name-link">getBlacklistedVersions()</a> - Method in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentFilterProperties.html" title="class in com.netflix.genie.web.properties">AgentFilterProperties</a></dt>
 <dd>
 <div class="block">Get the (dynamic) property value containing a regular expression used to blacklist agent versions.</div>
@@ -5337,9 +5362,9 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html#getCleanupStrategy()" class="member-name-link">getCleanupStrategy()</a> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CleanupArguments</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getClient(com.amazonaws.services.s3.AmazonS3URI)" class="member-name-link">getClient(AmazonS3URI)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getClient(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getClient(S3Uri)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
 <dd>
-<div class="block">Get an <code>AmazonS3</code> client instance appropriate for the given <code>AmazonS3URI</code>.</div>
+<div class="block">Get an <code>S3Client</code> client instance appropriate for the given <code>S3Uri</code>.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/dto/JobMetadata.html#getClientHost()" class="member-name-link">getClientHost()</a> - Method in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobMetadata.html" title="class in com.netflix.genie.common.dto">JobMetadata</a></dt>
 <dd>
@@ -6065,7 +6090,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Get the extension variables to the agent configuration as a JSON blob.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#getFile()" class="member-name-link">getFile()</a> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
-<dt><a href="com/netflix/genie/ui/controllers/UIController.html#getFile(java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">getFile(String, HttpServletRequest)</a> - Method in class com.netflix.genie.ui.controllers.<a href="com/netflix/genie/ui/controllers/UIController.html" title="class in com.netflix.genie.ui.controllers">UIController</a></dt>
+<dt><a href="com/netflix/genie/ui/controllers/UIController.html#getFile(java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">getFile(String, HttpServletRequest)</a> - Method in class com.netflix.genie.ui.controllers.<a href="com/netflix/genie/ui/controllers/UIController.html" title="class in com.netflix.genie.ui.controllers">UIController</a></dt>
 <dd>
 <div class="block">Forward the file request to the API.</div>
 </dd>
@@ -6074,7 +6099,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get all the entries that are files for this manifest.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html#getFindPredicate(javax.persistence.criteria.Root,javax.persistence.criteria.CriteriaBuilder,java.lang.String,java.lang.String,java.lang.String,java.util.Set,java.util.Set,java.lang.String,com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity,java.lang.String,com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity,java.time.Instant,java.time.Instant,java.time.Instant,java.time.Instant,java.lang.String,java.lang.String)" class="member-name-link">getFindPredicate(Root&lt;JobEntity&gt;, CriteriaBuilder, String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, ClusterEntity, String, CommandEntity, Instant, Instant, Instant, Instant, String, String)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">JobPredicates</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html#getFindPredicate(jakarta.persistence.criteria.Root,jakarta.persistence.criteria.CriteriaBuilder,java.lang.String,java.lang.String,java.lang.String,java.util.Set,java.util.Set,java.lang.String,com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity,java.lang.String,com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity,java.time.Instant,java.time.Instant,java.time.Instant,java.time.Instant,java.lang.String,java.lang.String)" class="member-name-link">getFindPredicate(Root&lt;JobEntity&gt;, CriteriaBuilder, String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, ClusterEntity, String, CommandEntity, Instant, Instant, Instant, Instant, String, String)</a> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">JobPredicates</a></dt>
 <dd>
 <div class="block">Generate a criteria query predicate for a where clause based on the given parameters.</div>
 </dd>
@@ -6532,7 +6557,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobName()" class="member-name-link">getJobName()</a> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobOutput(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)" class="member-name-link">getJobOutput(String, String, HttpServletRequest, HttpServletResponse)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobOutput(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)" class="member-name-link">getJobOutput(String, String, HttpServletRequest, HttpServletResponse)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Get the job output directory.</div>
 </dd>
@@ -7010,9 +7035,9 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html#getRegion()" class="member-name-link">getRegion()</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html" title="class in com.netflix.genie.common.internal.aws.s3">BucketProperties</a></dt>
 <dd>
-<div class="block">Get the <code>Regions</code> this bucket is in.</div>
+<div class="block">Get the <code>Region</code> this bucket is in.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/ControllerUtils.html#getRemainingPath(javax.servlet.http.HttpServletRequest)" class="member-name-link">getRemainingPath(HttpServletRequest)</a> - Static method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/ControllerUtils.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ControllerUtils</a></dt>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/ControllerUtils.html#getRemainingPath(jakarta.servlet.http.HttpServletRequest)" class="member-name-link">getRemainingPath(HttpServletRequest)</a> - Static method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/ControllerUtils.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ControllerUtils</a></dt>
 <dd>
 <div class="block">Get the remaining path from a given request.</div>
 </dd>
@@ -7286,6 +7311,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the ARN of the role to assume from this instance when working with the given bucket.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.S3ClientKey.html#getRoleARN()" class="member-name-link">getRoleARN()</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.S3ClientKey.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a></dt>
+<dd>
+<div class="block">Get the role ARN.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/RootRestController.html#getRoot()" class="member-name-link">getRoot()</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/RootRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">RootRestController</a></dt>
 <dd>
 <div class="block">Get a simple HAL+JSON object which represents the various links available in Genie REST API as an entry point.</div>
@@ -7295,6 +7324,26 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/UserJobResourcesAggregate.html#getRunningJobsCount()" class="member-name-link">getRunningJobsCount()</a> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.aggregates">UserJobResourcesAggregate</a></dt>
 <dd>
 <div class="block">Get the number of running jobs for the user.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getS3ClientKey(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getS3ClientKey(S3Uri)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dd>
+<div class="block">Get the S3 client key for a given S3 URI.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getS3Uri(java.lang.String)" class="member-name-link">getS3Uri(String)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dd>
+<div class="block">Get a <code>S3Uri</code> from a string.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html#getS3Uri(java.lang.String)" class="member-name-link">getS3Uri(String)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></dt>
+<dd>
+<div class="block">Get a <code>S3Uri</code> from a string.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getS3Uri(java.net.URI)" class="member-name-link">getS3Uri(URI)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dd>
+<div class="block">Get a <code>S3Uri</code> from a URI.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html#getS3Uri(java.net.URI)" class="member-name-link">getS3Uri(URI)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></dt>
+<dd>
+<div class="block">Get a <code>S3Uri</code> from a URI string.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/tasks/GenieTask.html#getScheduleType()" class="member-name-link">getScheduleType()</a> - Method in class com.netflix.genie.web.tasks.<a href="com/netflix/genie/web/tasks/GenieTask.html" title="class in com.netflix.genie.web.tasks">GenieTask</a></dt>
 <dd>
@@ -7634,9 +7683,13 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the total size of the files contained in this manifest.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getTransferManager(com.amazonaws.services.s3.AmazonS3URI)" class="member-name-link">getTransferManager(AmazonS3URI)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#getTransferManager(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getTransferManager(S3Uri)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
 <dd>
-<div class="block">Get a <code>TransferManager</code> instance for use with the given <code>s3URI</code>.</div>
+<div class="block">Get a <code>S3TransferManager</code> instance for use with the given <code>s3Uri</code>.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html#getTransferManager(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getTransferManager(S3Uri)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></dt>
+<dd>
+<div class="block">Get a <code>S3TransferManager</code> instance for use with the given <code>s3Uri</code>.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/tasks/GenieTask.html#getTrigger()" class="member-name-link">getTrigger()</a> - Method in class com.netflix.genie.web.tasks.<a href="com/netflix/genie/web/tasks/GenieTask.html" title="class in com.netflix.genie.web.tasks">GenieTask</a></dt>
 <dd>
@@ -7746,7 +7799,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the user agent string for the client.</div>
 </dd>
-<dt><a href="com/netflix/genie/ui/controllers/UserRestController.html#getUserInfo(javax.servlet.http.HttpServletRequest)" class="member-name-link">getUserInfo(HttpServletRequest)</a> - Method in class com.netflix.genie.ui.controllers.<a href="com/netflix/genie/ui/controllers/UserRestController.html" title="class in com.netflix.genie.ui.controllers">UserRestController</a></dt>
+<dt><a href="com/netflix/genie/ui/controllers/UserRestController.html#getUserInfo(jakarta.servlet.http.HttpServletRequest)" class="member-name-link">getUserInfo(HttpServletRequest)</a> - Method in class com.netflix.genie.ui.controllers.<a href="com/netflix/genie/ui/controllers/UserRestController.html" title="class in com.netflix.genie.ui.controllers">UserRestController</a></dt>
 <dd>
 <div class="block">Get the information about the current session user.</div>
 </dd>
@@ -7818,6 +7871,34 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#gpuUsed" class="member-name-link">gpuUsed</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#GRAPH_APPLICATION_COMMANDS" class="member-name-link">GRAPH_APPLICATION_COMMANDS</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#GRAPH_APPLICATION_COMMANDS_DTO" class="member-name-link">GRAPH_APPLICATION_COMMANDS_DTO</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html#GRAPH_APPLICATION_DTO" class="member-name-link">GRAPH_APPLICATION_DTO</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html#GRAPH_CLUSTER_DTO" class="member-name-link">GRAPH_CLUSTER_DTO</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#GRAPH_COMMAND__DTO" class="member-name-link">GRAPH_COMMAND__DTO</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#GRAPH_COMMAND_APPLICATIONS" class="member-name-link">GRAPH_COMMAND_APPLICATIONS</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#GRAPH_COMMAND_APPLICATIONS_DTO" class="member-name-link">GRAPH_COMMAND_APPLICATIONS_DTO</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#GRAPH_COMMAND_CLUSTER_CRITERIA" class="member-name-link">GRAPH_COMMAND_CLUSTER_CRITERIA</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GRAPH_JOB_APPLICATIONS" class="member-name-link">GRAPH_JOB_APPLICATIONS</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GRAPH_JOB_CLUSTER" class="member-name-link">GRAPH_JOB_CLUSTER</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GRAPH_JOB_COMMAND" class="member-name-link">GRAPH_JOB_COMMAND</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GRAPH_JOB_V3_DTO_JOB" class="member-name-link">GRAPH_JOB_V3_DTO_JOB</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GRAPH_JOB_V4_DTO_REQUEST" class="member-name-link">GRAPH_JOB_V4_DTO_REQUEST</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#GRAPH_JOB_V4_DTO_SPECIFICATION" class="member-name-link">GRAPH_JOB_V4_DTO_SPECIFICATION</a> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" class="type-name-link" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a> - Class in <a href="com/netflix/genie/web/scripts/package-summary.html">com.netflix.genie.web.scripts</a></dt>
 <dd>
 <div class="block">Utility functions that can be used within Groovy scripts executed from Genie.</div>
@@ -7849,7 +7930,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a> - Class in <a href="com/netflix/genie/agent/execution/services/impl/grpc/package-summary.html">com.netflix.genie.agent.execution.services.impl.grpc</a></dt>
 <dd>
-<div class="block">Implementation of the <a href="com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a>, listens for kill coming from server using long-polling.</div>
+<div class="block">Implementation of the <a href="com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a> that listens for kill signals from the server
+ using event listeners.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#%3Cinit%3E(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub,com.netflix.genie.agent.execution.services.KillService,org.springframework.scheduling.TaskScheduler,com.netflix.genie.agent.properties.JobKillServiceProperties)" class="member-name-link">GRpcAgentJobKillServiceImpl(JobKillServiceGrpc.JobKillServiceFutureStub, KillService, TaskScheduler, JobKillServiceProperties)</a> - Constructor for class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></dt>
 <dd>
@@ -7976,7 +8058,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Handle connected agent disconnection.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/GenieExceptionMapper.html#handleConstraintViolation(javax.validation.ConstraintViolationException)" class="member-name-link">handleConstraintViolation(ConstraintViolationException)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/GenieExceptionMapper.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">GenieExceptionMapper</a></dt>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/GenieExceptionMapper.html#handleConstraintViolation(jakarta.validation.ConstraintViolationException)" class="member-name-link">handleConstraintViolation(ConstraintViolationException)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/GenieExceptionMapper.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">GenieExceptionMapper</a></dt>
 <dd>
 <div class="block">Handle constraint violation exceptions.</div>
 </dd>
@@ -9010,7 +9092,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Provide an instance of <a href="com/netflix/genie/agent/execution/statemachine/listeners/TracingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>TracingListener</code></a> which will add metadata to spans based on events through the
  execution state machine.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html#jobFinishedSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.data.services.DataServices)" class="member-name-link">jobFinishedSNSPublisher(SNSNotificationsProperties, MeterRegistry, AmazonSNS, DataServices)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.events.<a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events">NotificationsAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html#jobFinishedSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.data.services.DataServices)" class="member-name-link">jobFinishedSNSPublisher(SNSNotificationsProperties, MeterRegistry, SnsClient, DataServices)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.events.<a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events">NotificationsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobFinishedSNSPublisher</code></a> unless one exists in the context already.</div>
 </dd>
@@ -9018,7 +9100,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Publishes Amazon SNS notifications with detailed information about each completed job.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#%3Cinit%3E(com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.properties.SNSNotificationsProperties,com.netflix.genie.web.data.services.DataServices,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)" class="member-name-link">JobFinishedSNSPublisher(AmazonSNS, SNSNotificationsProperties, DataServices, MeterRegistry, ObjectMapper)</a> - Constructor for class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#%3Cinit%3E(software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.properties.SNSNotificationsProperties,com.netflix.genie.web.data.services.DataServices,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)" class="member-name-link">JobFinishedSNSPublisher(SnsClient, SNSNotificationsProperties, DataServices, MeterRegistry, ObjectMapper)</a> - Constructor for class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9203,22 +9285,17 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#jobNotificationsSNSClient(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,com.amazonaws.ClientConfiguration)" class="member-name-link">jobNotificationsSNSClient(AWSCredentialsProvider, AwsRegionProvider, ClientConfiguration)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#jobNotificationsSNSClient(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,software.amazon.awssdk.core.client.config.ClientOverrideConfiguration)" class="member-name-link">jobNotificationsSNSClient(AwsCredentialsProvider, AwsRegionProvider, ClientOverrideConfiguration)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
 <dd>
-<div class="block">Create a named <code>AmazonSNS</code> client to be used by JobNotification SNS publishers, unless a bean by that
+<div class="block">Create a named <code>SnsClient</code> to be used by JobNotification SNS publishers, unless a bean by that
  name already exists in context.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#jobNotificationsSNSClientConfiguration(com.amazonaws.retry.RetryPolicy)" class="member-name-link">jobNotificationsSNSClientConfiguration(RetryPolicy)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#jobNotificationsSNSClientOverrideConfig(com.netflix.genie.web.properties.RetryProperties)" class="member-name-link">jobNotificationsSNSClientOverrideConfig(RetryProperties)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
 <dd>
-<div class="block">Create a named <code>ClientConfiguration</code> to be used by the <code>AmazonSNS</code> client, unless a bean by that
- name already exists in context.</div>
-</dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#jobNotificationsSNSClientRetryPolicy(com.netflix.genie.web.properties.RetryProperties)" class="member-name-link">jobNotificationsSNSClientRetryPolicy(RetryProperties)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
-<dd>
-<div class="block">Create a named <code>RetryPolicy</code> to be used by the <code>AmazonSNS</code> client, unless a bean by that name
+<div class="block">Create a named <code>ClientOverrideConfiguration</code> to be used by the <code>SnsClient</code>, unless a bean by that name
  already exists in context.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html#jobNotificationsSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.amazonaws.services.sns.AmazonSNS)" class="member-name-link">jobNotificationsSNSPublisher(SNSNotificationsProperties, MeterRegistry, AmazonSNS)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.events.<a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events">NotificationsAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html#jobNotificationsSNSPublisher(com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,software.amazon.awssdk.services.sns.SnsClient)" class="member-name-link">jobNotificationsSNSPublisher(SNSNotificationsProperties, MeterRegistry, SnsClient)</a> - Method in class com.netflix.genie.web.spring.autoconfigure.events.<a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events">NotificationsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobStateChangeSNSPublisher</code></a> unless one exists in the context already.</div>
 </dd>
@@ -9274,7 +9351,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.JobRequestArguments</code></a>.</div>
 </dd>
-<dt><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#jobRequestConverter(javax.validation.Validator)" class="member-name-link">jobRequestConverter(Validator)</a> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#jobRequestConverter(jakarta.validation.Validator)" class="member-name-link">jobRequestConverter(Validator)</a> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide an instance of <a href="com/netflix/genie/agent/cli/JobRequestConverter.html" title="class in com.netflix.genie.agent.cli"><code>JobRequestConverter</code></a>.</div>
 </dd>
@@ -9552,7 +9629,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Publishes Amazon SNS notifications for fine-grained job state changes.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#%3Cinit%3E(com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)" class="member-name-link">JobStateChangeSNSPublisher(AmazonSNS, SNSNotificationsProperties, MeterRegistry, ObjectMapper)</a> - Constructor for class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#%3Cinit%3E(software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)" class="member-name-link">JobStateChangeSNSPublisher(SnsClient, SNSNotificationsProperties, MeterRegistry, ObjectMapper)</a> - Constructor for class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9631,7 +9708,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> using JPA.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#%3Cinit%3E(javax.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)" class="member-name-link">JpaPersistenceServiceImpl(EntityManager, JpaRepositories, BraveTracingComponents)</a> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#%3Cinit%3E(jakarta.persistence.EntityManager,com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories,com.netflix.genie.common.internal.tracing.brave.BraveTracingComponents)" class="member-name-link">JpaPersistenceServiceImpl(EntityManager, JpaRepositories, BraveTracingComponents)</a> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9689,11 +9766,11 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#kill(com.netflix.genie.agent.execution.services.KillService.KillSource)" class="member-name-link">kill(KillService.KillSource)</a> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html#kill(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">kill(String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl">RequestForwardingServiceImpl</a></dt>
+<dt><a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html#kill(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">kill(String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/RequestForwardingServiceImpl.html" title="class in com.netflix.genie.web.services.impl">RequestForwardingServiceImpl</a></dt>
 <dd>
 <div class="block">Send a kill request for the given job id to another Genie host.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/services/RequestForwardingService.html#kill(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">kill(String, String, HttpServletRequest)</a> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services">RequestForwardingService</a></dt>
+<dt><a href="com/netflix/genie/web/services/RequestForwardingService.html#kill(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">kill(String, String, HttpServletRequest)</a> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/RequestForwardingService.html" title="interface in com.netflix.genie.web.services">RequestForwardingService</a></dt>
 <dd>
 <div class="block">Send a kill request for the given job id to another Genie host.</div>
 </dd>
@@ -9709,7 +9786,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">The exit code that will be set to indicate a job is killed.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/services/JobKillService.html#killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">killJob(String, String, HttpServletRequest)</a> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></dt>
+<dt><a href="com/netflix/genie/web/services/JobKillService.html#killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">killJob(String, String, HttpServletRequest)</a> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a></dt>
 <dd>
 <div class="block">Kill the job with the given id if possible.</div>
 </dd>
@@ -9721,11 +9798,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Method to send a kill job request to Genie.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">killJob(String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
+<dt><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">killJob(String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
 <dd>
 <div class="block">Kill the job with the given id if possible.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#killJob(java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">killJob(String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#killJob(java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">killJob(String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Kill job based on given job ID.</div>
 </dd>
@@ -10156,6 +10233,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Convenience method that creates a tag set pre-populated with success status.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html#nextExecution(org.springframework.scheduling.TriggerContext)" class="member-name-link">nextExecution(TriggerContext)</a> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html" title="class in com.netflix.genie.common.internal.util">ExponentialBackOffTrigger</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html#nextExecutionTime(org.springframework.scheduling.TriggerContext)" class="member-name-link">nextExecutionTime(TriggerContext)</a> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html" title="class in com.netflix.genie.common.internal.util">ExponentialBackOffTrigger</a></dt>
 <dt><a href="com/netflix/genie/agent/execution/CleanupStrategy.html#NO_CLEANUP" class="member-name-link">NO_CLEANUP</a> - Enum constant in enum class com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/CleanupStrategy.html" title="enum class in com.netflix.genie.agent.execution">CleanupStrategy</a></dt>
 <dd>
@@ -10480,7 +10559,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Aspect implementation method of retrying the data service method on certain failures.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#properties" class="member-name-link">properties</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#properties" class="member-name-link">properties</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/PropertiesMapCache.html" class="type-name-link" title="class in com.netflix.genie.common.internal.util">PropertiesMapCache</a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
 <dd>
@@ -10627,7 +10706,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Publish an event in a different thread than the calling thread.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#publishEvent(com.netflix.genie.web.events.AbstractSNSPublisher.EventType,java.util.HashMap)" class="member-name-link">publishEvent(AbstractSNSPublisher.EventType, HashMap&lt;String, Object&gt;)</a> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#publishEvent(com.netflix.genie.web.events.AbstractSNSPublisher.EventType,java.util.HashMap)" class="member-name-link">publishEvent(AbstractSNSPublisher.EventType, HashMap&lt;String, Object&gt;)</a> - Method in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/events/GenieEventBus.html#publishSynchronousEvent(org.springframework.context.ApplicationEvent)" class="member-name-link">publishSynchronousEvent(ApplicationEvent)</a> - Method in interface com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a></dt>
 <dd>
@@ -10724,7 +10803,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Register to be notified when a kill request for the job is received.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html#registry" class="member-name-link">registry</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events">JobStateChangeSNSPublisher</a></dt>
+<dt><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#registry" class="member-name-link">registry</a> - Variable in class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/RegexRuleSet.html#reject(java.lang.String)" class="member-name-link">reject(String)</a> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexRuleSet.html" title="class in com.netflix.genie.common.internal.util">RegexRuleSet</a></dt>
 <dd>
@@ -11514,44 +11593,45 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3ClientFactory(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">s3ClientFactory(AWSCredentialsProvider, AwsRegionProvider, Environment)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3ClientFactory(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">s3ClientFactory(AwsCredentialsProvider, AwsRegionProvider, Environment)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ClientFactory</code></a> instance if one is needed by the system.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
 <dd>
-<div class="block">An <code>AmazonS3</code> client factory class.</div>
+<div class="block">An <code>S3Client</code> client factory class.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#%3Cinit%3E(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">S3ClientFactory(AWSCredentialsProvider, AwsRegionProvider, Environment)</a> - Constructor for class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html#%3Cinit%3E(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">S3ClientFactory(AwsCredentialsProvider, AwsRegionProvider, Environment)</a> - Constructor for class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3JobArchiver(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3JobArchiver(S3ClientFactory)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.S3ClientKey.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
+<dd>
+<div class="block">A simple class used as a key to see if we already have a S3Client created for the combination of properties
+ that make up this class.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3JobArchiver(com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory)" class="member-name-link">s3JobArchiver(S3TransferManagerFactory)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide an implementation of <a href="com/netflix/genie/common/internal/services/JobArchiver.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiver</code></a> to handle archiving
  to S3.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html" class="type-name-link" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a> - Class in <a href="com/netflix/genie/common/internal/services/impl/package-summary.html">com.netflix.genie.common.internal.services.impl</a></dt>
 <dd>
-<div class="block">Implementation of <a href="com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiveService</code></a> for S3 destinations.</div>
+<div class="block">Implementation of <a href="com/netflix/genie/common/internal/services/JobArchiver.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiver</code></a> for S3 destinations.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html#%3Cinit%3E(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">S3JobArchiverImpl(S3ClientFactory)</a> - Constructor for class com.netflix.genie.common.internal.services.impl.<a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></dt>
+<dt><a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html#%3Cinit%3E(com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory)" class="member-name-link">S3JobArchiverImpl(S3TransferManagerFactory)</a> - Constructor for class com.netflix.genie.common.internal.services.impl.<a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3ProtocolResolver(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties,com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3ProtocolResolver(AwsS3ResourceLoaderProperties, S3ClientFactory)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3ProtocolResolver(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3ProtocolResolver(S3ClientFactory)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
 <dd>
-<div class="block">Provide an protocol resolver which will allow resources with s3:// prefixes to be resolved by the
- application <code>ResourceLoader</code> provided this bean is eventually added to the
- context via the
- <code>ConfigurableApplicationContext.addProtocolResolver(ProtocolResolver)</code>
- method.</div>
+<div class="block">Provide a protocol resolver which will allow resources with s3:// prefixes.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
 <dd>
 <div class="block">This class implements the <code>ProtocolResolver</code> interface.</div>
 </dd>
-<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html#%3Cinit%3E(com.netflix.genie.common.internal.aws.s3.S3ClientFactory,org.springframework.core.task.TaskExecutor)" class="member-name-link">S3ProtocolResolver(S3ClientFactory, TaskExecutor)</a> - Constructor for class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></dt>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html#%3Cinit%3E(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">S3ProtocolResolver(S3ClientFactory)</a> - Constructor for class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -11566,6 +11646,18 @@ loadScripts(document, 'script');</script>
  set of <code>ProtocolResolver</code>.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html#%3Cinit%3E(com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver)" class="member-name-link">S3ProtocolResolverRegistrar(S3ProtocolResolver)</a> - Constructor for class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html#s3TransferManagerFactory(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3TransferManagerFactory(S3ClientFactory)</a> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/AwsAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">AwsAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a <a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3TransferManagerFactory</code></a> instance if one is needed by the system.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
+<dd>
+<div class="block">A factory class for creating and managing <code>S3TransferManager</code> instances.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html#%3Cinit%3E(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">S3TransferManagerFactory(S3ClientFactory)</a> - Constructor for class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -11796,7 +11888,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/selectors/impl/RandomClusterSelectorImpl.html#select(C)" class="member-name-link">select(ClusterSelectionContext)</a> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/RandomClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomClusterSelectorImpl</a></dt>
+<dt><a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html#select(C)" class="member-name-link">select(AgentLauncherSelectionContext)</a> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/RandomAgentLauncherSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomAgentLauncherSelectorImpl</a></dt>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>
@@ -11866,11 +11958,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.ServerArguments</code></a>.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#serveResource(java.lang.String,java.net.URL,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)" class="member-name-link">serveResource(String, URL, String, HttpServletRequest, HttpServletResponse)</a> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobDirectoryServerServiceImpl</a></dt>
+<dt><a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#serveResource(java.lang.String,java.net.URL,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)" class="member-name-link">serveResource(String, URL, String, HttpServletRequest, HttpServletResponse)</a> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobDirectoryServerServiceImpl</a></dt>
 <dd>
 <div class="block">Given the <code>request</code> this API will write the resource to <code>response</code> if possible.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/services/JobDirectoryServerService.html#serveResource(java.lang.String,java.net.URL,java.lang.String,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)" class="member-name-link">serveResource(String, URL, String, HttpServletRequest, HttpServletResponse)</a> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a></dt>
+<dt><a href="com/netflix/genie/web/services/JobDirectoryServerService.html#serveResource(java.lang.String,java.net.URL,java.lang.String,jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)" class="member-name-link">serveResource(String, URL, String, HttpServletRequest, HttpServletResponse)</a> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a></dt>
 <dd>
 <div class="block">Given the <code>request</code> this API will write the resource to <code>response</code> if possible.</div>
 </dd>
@@ -12116,7 +12208,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html#setRegion(java.lang.String)" class="member-name-link">setRegion(String)</a> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html" title="class in com.netflix.genie.common.internal.aws.s3">BucketProperties</a></dt>
 <dd>
-<div class="block">Set the AWS region from a string name representation e.g.</div>
+<div class="block">Set the AWS region from a string name representation (e.g., us-east-1).</div>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#setRequestedEnvironmentVariables(java.util.Map)" class="member-name-link">setRequestedEnvironmentVariables(Map&lt;String, String&gt;)</a> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
 <dd>
@@ -12269,7 +12361,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/aws/s3/SimpleStorageRangeResource.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">SimpleStorageRangeResource</a> - Class in <a href="com/netflix/genie/common/internal/aws/s3/package-summary.html">com.netflix.genie.common.internal.aws.s3</a></dt>
 <dd>
-<div class="block">This class extends <code>SimpleStorageResource</code> in order to efficiently handle range requests.</div>
+<div class="block">This class extends <code>S3Resource</code> in order to efficiently handle range requests.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#SKIP_PROPERTY" class="member-name-link">SKIP_PROPERTY</a> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></dt>
 <dd>
@@ -12301,7 +12393,11 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#SNS_CLIENT_BEAN_NAME" class="member-name-link">SNS_CLIENT_BEAN_NAME</a> - Static variable in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
 <dd>
-<div class="block">The name of the <code>AmazonSNS</code> client created specifically for job state notifications.</div>
+<div class="block">The name of the <code>SnsClient</code> client created specifically for job state notifications.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME" class="member-name-link">SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME</a> - Static variable in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
+<dd>
+<div class="block">Bean name for the SNS client override configuration.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/properties/SNSNotificationsProperties.html" class="type-name-link" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
@@ -12662,11 +12758,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get a random String.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">submitJob(JobRequest, String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#submitJob(com.netflix.genie.common.dto.JobRequest,java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">submitJob(JobRequest, String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Submit a new job.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#submitJob(com.netflix.genie.common.dto.JobRequest,org.springframework.web.multipart.MultipartFile%5B%5D,java.lang.String,java.lang.String,javax.servlet.http.HttpServletRequest)" class="member-name-link">submitJob(JobRequest, MultipartFile[], String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#submitJob(com.netflix.genie.common.dto.JobRequest,org.springframework.web.multipart.MultipartFile%5B%5D,java.lang.String,java.lang.String,jakarta.servlet.http.HttpServletRequest)" class="member-name-link">submitJob(JobRequest, MultipartFile[], String, String, HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Submit a new job with attachments.</div>
 </dd>

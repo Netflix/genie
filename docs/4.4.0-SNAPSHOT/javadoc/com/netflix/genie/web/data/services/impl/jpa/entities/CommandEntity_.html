@@ -80,7 +80,7 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <hr>
-<div class="type-signature"><span class="annotations">@Generated("org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor")
+<div class="type-signature"><span class="annotations">@Generated("org.hibernate.processor.HibernateProcessor")
 </span><span class="modifiers">public abstract class </span><span class="element-name type-name-label">CommandEntity_</span>
 <span class="extends-implements">extends <a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity_</a></span></div>
 </section>
@@ -95,84 +95,99 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt;</code></div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#applications" class="member-name-link">applications</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#APPLICATIONS" class="member-name-link">APPLICATIONS</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#CLUSTER_CRITERIA" class="member-name-link">CLUSTER_CRITERIA</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#clusterCriteria" class="member-name-link">clusterCriteria</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#configs" class="member-name-link">configs</a></code></div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.EntityType&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#class_" class="member-name-link">class_</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#CONFIGS" class="member-name-link">CONFIGS</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#CLUSTER_CRITERIA" class="member-name-link">CLUSTER_CRITERIA</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#cpu" class="member-name-link">cpu</a></code></div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#clusterCriteria" class="member-name-link">clusterCriteria</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#CPU" class="member-name-link">CPU</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#dependencies" class="member-name-link">dependencies</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#DEPENDENCIES" class="member-name-link">DEPENDENCIES</a></code></div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#configs" class="member-name-link">configs</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#DISK_MB" class="member-name-link">DISK_MB</a></code></div>
+<div class="col-second even-row-color"><code><a href="#CONFIGS" class="member-name-link">CONFIGS</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#diskMb" class="member-name-link">diskMb</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#executable" class="member-name-link">executable</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#EXECUTABLE" class="member-name-link">EXECUTABLE</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#gpu" class="member-name-link">gpu</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#GPU" class="member-name-link">GPU</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#images" class="member-name-link">images</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#IMAGES" class="member-name-link">IMAGES</a></code></div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#cpu" class="member-name-link">cpu</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#LAUNCHER_EXT" class="member-name-link">LAUNCHER_EXT</a></code></div>
+<div class="col-second even-row-color"><code><a href="#CPU" class="member-name-link">CPU</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#launcherExt" class="member-name-link">launcherExt</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#memory" class="member-name-link">memory</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#MEMORY" class="member-name-link">MEMORY</a></code></div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#dependencies" class="member-name-link">dependencies</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#NETWORK_MBPS" class="member-name-link">NETWORK_MBPS</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#networkMbps" class="member-name-link">networkMbps</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#tags" class="member-name-link">tags</a></code></div>
+<div class="col-second even-row-color"><code><a href="#DEPENDENCIES" class="member-name-link">DEPENDENCIES</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#TAGS" class="member-name-link">TAGS</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#DISK_MB" class="member-name-link">DISK_MB</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#diskMb" class="member-name-link">diskMb</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#executable" class="member-name-link">executable</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#EXECUTABLE" class="member-name-link">EXECUTABLE</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#gpu" class="member-name-link">gpu</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#GPU" class="member-name-link">GPU</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#GRAPH_COMMAND__DTO" class="member-name-link">GRAPH_COMMAND__DTO</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#GRAPH_COMMAND_APPLICATIONS" class="member-name-link">GRAPH_COMMAND_APPLICATIONS</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#GRAPH_COMMAND_APPLICATIONS_DTO" class="member-name-link">GRAPH_COMMAND_APPLICATIONS_DTO</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#GRAPH_COMMAND_CLUSTER_CRITERIA" class="member-name-link">GRAPH_COMMAND_CLUSTER_CRITERIA</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#images" class="member-name-link">images</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#IMAGES" class="member-name-link">IMAGES</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#LAUNCHER_EXT" class="member-name-link">LAUNCHER_EXT</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#launcherExt" class="member-name-link">launcherExt</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#memory" class="member-name-link">memory</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MEMORY" class="member-name-link">MEMORY</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#NETWORK_MBPS" class="member-name-link">NETWORK_MBPS</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#networkMbps" class="member-name-link">networkMbps</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static jakarta.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#tags" class="member-name-link">tags</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TAGS" class="member-name-link">TAGS</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-com.netflix.genie.web.data.services.impl.jpa.entities.BaseEntity_">Fields inherited from class&nbsp;com.netflix.genie.web.data.services.impl.jpa.entities.<a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity_</a></h3>
@@ -219,84 +234,6 @@ loadScripts(document, 'script');</script>
 <section class="field-details" id="field-detail">
 <h2>Field Details</h2>
 <ul class="member-list">
-<li>
-<section class="detail" id="configs">
-<h3>configs</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</span>&nbsp;<span class="element-name">configs</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="images">
-<h3>images</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</span>&nbsp;<span class="element-name">images</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="memory">
-<h3>memory</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</span>&nbsp;<span class="element-name">memory</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="cpu">
-<h3>cpu</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</span>&nbsp;<span class="element-name">cpu</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="gpu">
-<h3>gpu</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</span>&nbsp;<span class="element-name">gpu</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="executable">
-<h3>executable</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">executable</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="dependencies">
-<h3>dependencies</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</span>&nbsp;<span class="element-name">dependencies</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="tags">
-<h3>tags</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt;</span>&nbsp;<span class="element-name">tags</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="diskMb">
-<h3>diskMb</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</span>&nbsp;<span class="element-name">diskMb</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="networkMbps">
-<h3>networkMbps</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</span>&nbsp;<span class="element-name">networkMbps</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="clusterCriteria">
-<h3>clusterCriteria</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt;</span>&nbsp;<span class="element-name">clusterCriteria</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="launcherExt">
-<h3>launcherExt</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</span>&nbsp;<span class="element-name">launcherExt</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="applications">
-<h3>applications</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt;</span>&nbsp;<span class="element-name">applications</span></div>
-</section>
-</li>
 <li>
 <section class="detail" id="CONFIGS">
 <h3>CONFIGS</h3>
@@ -424,6 +361,62 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="GRAPH_COMMAND_APPLICATIONS">
+<h3>GRAPH_COMMAND_APPLICATIONS</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">GRAPH_COMMAND_APPLICATIONS</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.GRAPH_COMMAND_APPLICATIONS">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="GRAPH_COMMAND_APPLICATIONS_DTO">
+<h3>GRAPH_COMMAND_APPLICATIONS_DTO</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">GRAPH_COMMAND_APPLICATIONS_DTO</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.GRAPH_COMMAND_APPLICATIONS_DTO">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="GRAPH_COMMAND_CLUSTER_CRITERIA">
+<h3>GRAPH_COMMAND_CLUSTER_CRITERIA</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">GRAPH_COMMAND_CLUSTER_CRITERIA</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.GRAPH_COMMAND_CLUSTER_CRITERIA">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="GRAPH_COMMAND__DTO">
+<h3>GRAPH_COMMAND__DTO</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">GRAPH_COMMAND__DTO</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.GRAPH_COMMAND__DTO">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="NETWORK_MBPS">
 <h3>NETWORK_MBPS</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">NETWORK_MBPS</span></div>
@@ -474,6 +467,202 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_.APPLICATIONS">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="configs">
+<h3>configs</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</span>&nbsp;<span class="element-name">configs</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.configs</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="images">
+<h3>images</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</span>&nbsp;<span class="element-name">images</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.images</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="memory">
+<h3>memory</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</span>&nbsp;<span class="element-name">memory</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.memory</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="cpu">
+<h3>cpu</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</span>&nbsp;<span class="element-name">cpu</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.cpu</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="gpu">
+<h3>gpu</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</span>&nbsp;<span class="element-name">gpu</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.gpu</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="executable">
+<h3>executable</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">executable</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.executable</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="dependencies">
+<h3>dependencies</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="FileEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">FileEntity</a>&gt;</span>&nbsp;<span class="element-name">dependencies</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.dependencies</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="tags">
+<h3>tags</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SetAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="TagEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">TagEntity</a>&gt;</span>&nbsp;<span class="element-name">tags</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.tags</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="diskMb">
+<h3>diskMb</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</span>&nbsp;<span class="element-name">diskMb</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.diskMb</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="networkMbps">
+<h3>networkMbps</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</span>&nbsp;<span class="element-name">networkMbps</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.networkMbps</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="clusterCriteria">
+<h3>clusterCriteria</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a>&gt;</span>&nbsp;<span class="element-name">clusterCriteria</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.clusterCriteria</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="class_">
+<h3>class_</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.EntityType&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</span>&nbsp;<span class="element-name">class_</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CommandEntity</code></a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="launcherExt">
+<h3>launcherExt</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr>com.fasterxml.jackson.databind.JsonNode&gt;</span>&nbsp;<span class="element-name">launcherExt</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.launcherExt</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="applications">
+<h3>applications</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.ListAttribute&lt;<a href="CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>,<wbr><a href="ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a>&gt;</span>&nbsp;<span class="element-name">applications</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>CommandEntity.applications</code></li>
 </ul>
 </dd>
 </dl>

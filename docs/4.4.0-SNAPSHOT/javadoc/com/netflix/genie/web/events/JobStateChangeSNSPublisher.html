@@ -117,7 +117,7 @@ implements org.springframework.context.ApplicationListener&lt;<a href="JobStateC
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)" class="member-name-link">JobStateChangeSNSPublisher</a><wbr>(com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)" class="member-name-link">JobStateChangeSNSPublisher</a><wbr>(software.amazon.awssdk.services.sns.SnsClient&nbsp;snsClient,
  <a href="../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
  com.fasterxml.jackson.databind.ObjectMapper&nbsp;mapper)</code></div>
@@ -151,6 +151,9 @@ implements org.springframework.context.ApplicationListener&lt;<a href="JobStateC
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.springframework.context.ApplicationListener">Methods inherited from interface&nbsp;org.springframework.context.ApplicationListener</h3>
+<code>supportsAsyncExecution</code></div>
 </section>
 </li>
 </ul>
@@ -183,9 +186,9 @@ implements org.springframework.context.ApplicationListener&lt;<a href="JobStateC
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(com.amazonaws.services.sns.AmazonSNS,com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)">
+<section class="detail" id="&lt;init&gt;(software.amazon.awssdk.services.sns.SnsClient,com.netflix.genie.web.properties.SNSNotificationsProperties,io.micrometer.core.instrument.MeterRegistry,com.fasterxml.jackson.databind.ObjectMapper)">
 <h3>JobStateChangeSNSPublisher</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">JobStateChangeSNSPublisher</span><wbr><span class="parameters">(com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">JobStateChangeSNSPublisher</span><wbr><span class="parameters">(software.amazon.awssdk.services.sns.SnsClient&nbsp;snsClient,
  <a href="../properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
  com.fasterxml.jackson.databind.ObjectMapper&nbsp;mapper)</span></div>

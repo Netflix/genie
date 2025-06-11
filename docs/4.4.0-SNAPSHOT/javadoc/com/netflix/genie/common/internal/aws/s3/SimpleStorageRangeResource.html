@@ -45,7 +45,7 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field-summary">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
@@ -73,7 +73,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance">org.springframework.core.io.AbstractResource
-<div class="inheritance">io.awspring.cloud.core.io.s3.SimpleStorageResource
+<div class="inheritance">io.awspring.cloud.s3.S3Resource
 <div class="inheritance">com.netflix.genie.common.internal.aws.s3.SimpleStorageRangeResource</div>
 </div>
 </div>
@@ -85,8 +85,8 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">SimpleStorageRangeResource</span>
-<span class="extends-implements">extends io.awspring.cloud.core.io.s3.SimpleStorageResource</span></div>
-<div class="block">This class extends <code>SimpleStorageResource</code> in order to efficiently handle range requests.
+<span class="extends-implements">extends io.awspring.cloud.s3.S3Resource</span></div>
+<div class="block">This class extends <code>S3Resource</code> in order to efficiently handle range requests.
  Rather than fetching the entire object and let the web tier skip, it only downloads the relevant object region and
  returns a composite input stream that skips the unrequested bytes.</div>
 <dl class="notes">
@@ -96,6 +96,15 @@ loadScripts(document, 'script');</script>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- =========== FIELD SUMMARY =========== -->
+<li>
+<section class="field-summary" id="field-summary">
+<h2>Field Summary</h2>
+<div class="inherited-list">
+<h3 id="fields-inherited-from-class-io.awspring.cloud.s3.S3Resource">Fields inherited from class&nbsp;io.awspring.cloud.s3.S3Resource</h3>
+<code>location, s3Client, s3OutputStreamProvider</code></div>
+</section>
+</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
@@ -117,8 +126,8 @@ loadScripts(document, 'script');</script>
 </div>
 </div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-io.awspring.cloud.core.io.s3.SimpleStorageResource">Methods inherited from class&nbsp;io.awspring.cloud.core.io.s3.SimpleStorageResource</h3>
-<code>contentLength, createRelative, getAmazonS3, getDescription, getFile, getFilename, getOutputStream, getS3Uri, getURL, isWritable, lastModified</code></div>
+<h3 id="methods-inherited-from-class-io.awspring.cloud.s3.S3Resource">Methods inherited from class&nbsp;io.awspring.cloud.s3.S3Resource</h3>
+<code>contentLength, contentType, create, createRelative, getDescription, getFile, getFilename, getLocation, getOutputStream, getURL, lastModified, metadata, setObjectMetadata</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.springframework.core.io.AbstractResource">Methods inherited from class&nbsp;org.springframework.core.io.AbstractResource</h3>
 <code>equals, getFileForLastModifiedCheck, getURI, hashCode, isFile, isOpen, isReadable, readableChannel, toString</code></div>
@@ -127,10 +136,10 @@ loadScripts(document, 'script');</script>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.springframework.core.io.Resource">Methods inherited from interface&nbsp;org.springframework.core.io.Resource</h3>
-<code>getURI, isFile, isOpen, isReadable, readableChannel</code></div>
+<code>getContentAsByteArray, getContentAsString, getURI, isFile, isOpen, isReadable, readableChannel</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.springframework.core.io.WritableResource">Methods inherited from interface&nbsp;org.springframework.core.io.WritableResource</h3>
-<code>writableChannel</code></div>
+<code>isWritable, writableChannel</code></div>
 </section>
 </li>
 </ul>
@@ -151,7 +160,7 @@ loadScripts(document, 'script');</script>
 <dt>Specified by:</dt>
 <dd><code>getInputStream</code>&nbsp;in interface&nbsp;<code>org.springframework.core.io.InputStreamSource</code></dd>
 <dt>Overrides:</dt>
-<dd><code>getInputStream</code>&nbsp;in class&nbsp;<code>io.awspring.cloud.core.io.s3.SimpleStorageResource</code></dd>
+<dd><code>getInputStream</code>&nbsp;in class&nbsp;<code>io.awspring.cloud.s3.S3Resource</code></dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
 </dl>
@@ -165,7 +174,7 @@ loadScripts(document, 'script');</script>
 <dt>Specified by:</dt>
 <dd><code>exists</code>&nbsp;in interface&nbsp;<code>org.springframework.core.io.Resource</code></dd>
 <dt>Overrides:</dt>
-<dd><code>exists</code>&nbsp;in class&nbsp;<code>io.awspring.cloud.core.io.s3.SimpleStorageResource</code></dd>
+<dd><code>exists</code>&nbsp;in class&nbsp;<code>io.awspring.cloud.s3.S3Resource</code></dd>
 </dl>
 </section>
 </li>

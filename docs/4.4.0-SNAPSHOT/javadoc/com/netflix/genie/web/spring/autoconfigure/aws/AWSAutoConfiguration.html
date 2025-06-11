@@ -100,7 +100,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#SNS_CLIENT_BEAN_NAME" class="member-name-link">SNS_CLIENT_BEAN_NAME</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The name of the <code>AmazonSNS</code> client created specifically for job state notifications.</div>
+<div class="block">The name of the <code>SnsClient</code> client created specifically for job state notifications.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME" class="member-name-link">SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Bean name for the SNS client override configuration.</div>
 </div>
 </div>
 </section>
@@ -129,24 +134,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.amazonaws.services.sns.AmazonSNS</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSClient(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,com.amazonaws.ClientConfiguration)" class="member-name-link">jobNotificationsSNSClient</a><wbr>(com.amazonaws.auth.AWSCredentialsProvider&nbsp;credentialsProvider,
- com.amazonaws.regions.AwsRegionProvider&nbsp;awsRegionProvider,
- com.amazonaws.ClientConfiguration&nbsp;clientConfiguration)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.services.sns.SnsClient</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSClient(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,software.amazon.awssdk.core.client.config.ClientOverrideConfiguration)" class="member-name-link">jobNotificationsSNSClient</a><wbr>(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider&nbsp;credentialsProvider,
+ software.amazon.awssdk.regions.providers.AwsRegionProvider&nbsp;awsRegionProvider,
+ software.amazon.awssdk.core.client.config.ClientOverrideConfiguration&nbsp;overrideConfig)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Create a named <code>AmazonSNS</code> client to be used by JobNotification SNS publishers, unless a bean by that
+<div class="block">Create a named <code>SnsClient</code> to be used by JobNotification SNS publishers, unless a bean by that
  name already exists in context.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.amazonaws.ClientConfiguration</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSClientConfiguration(com.amazonaws.retry.RetryPolicy)" class="member-name-link">jobNotificationsSNSClientConfiguration</a><wbr>(com.amazonaws.retry.RetryPolicy&nbsp;retryPolicy)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.core.client.config.ClientOverrideConfiguration</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSClientOverrideConfig(com.netflix.genie.web.properties.RetryProperties)" class="member-name-link">jobNotificationsSNSClientOverrideConfig</a><wbr>(<a href="../../../properties/RetryProperties.html" title="class in com.netflix.genie.web.properties">RetryProperties</a>&nbsp;retryProperties)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Create a named <code>ClientConfiguration</code> to be used by the <code>AmazonSNS</code> client, unless a bean by that
- name already exists in context.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.amazonaws.retry.RetryPolicy</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#jobNotificationsSNSClientRetryPolicy(com.netflix.genie.web.properties.RetryProperties)" class="member-name-link">jobNotificationsSNSClientRetryPolicy</a><wbr>(<a href="../../../properties/RetryProperties.html" title="class in com.netflix.genie.web.properties">RetryProperties</a>&nbsp;retryProperties)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Create a named <code>RetryPolicy</code> to be used by the <code>AmazonSNS</code> client, unless a bean by that name
+<div class="block">Create a named <code>ClientOverrideConfiguration</code> to be used by the <code>SnsClient</code>, unless a bean by that name
  already exists in context.</div>
 </div>
 </div>
@@ -170,15 +169,28 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="SNS_CLIENT_BEAN_NAME">
 <h3>SNS_CLIENT_BEAN_NAME</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">SNS_CLIENT_BEAN_NAME</span></div>
-<div class="block">The name of the <code>AmazonSNS</code> client created specifically for job state notifications.
- <p>
- Note: this name must match the bean name defined in
- <code>SnsConfiguration</code> in order to override it.</div>
+<div class="block">The name of the <code>SnsClient</code> client created specifically for job state notifications.</div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../../../../constant-values.html#com.netflix.genie.web.spring.autoconfigure.aws.AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME">
+<h3>SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME</span></div>
+<div class="block">Bean name for the SNS client override configuration.
+ This constant is used to identify the bean that provides custom configuration for the AWS SNS client.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../../../constant-values.html#com.netflix.genie.web.spring.autoconfigure.aws.AWSAutoConfiguration.SNS_CLIENT_OVERRIDE_CONFIG_BEAN_NAME">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -207,58 +219,41 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="jobNotificationsSNSClientRetryPolicy(com.netflix.genie.web.properties.RetryProperties)">
-<h3>jobNotificationsSNSClientRetryPolicy</h3>
-<div class="member-signature"><span class="annotations">@Bean(name="SNSClientRetryPolicy")
-@ConditionalOnMissingBean(name="SNSClientRetryPolicy")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.amazonaws.retry.RetryPolicy</span>&nbsp;<span class="element-name">jobNotificationsSNSClientRetryPolicy</span><wbr><span class="parameters">(<a href="../../../properties/RetryProperties.html" title="class in com.netflix.genie.web.properties">RetryProperties</a>&nbsp;retryProperties)</span></div>
-<div class="block">Create a named <code>RetryPolicy</code> to be used by the <code>AmazonSNS</code> client, unless a bean by that name
+<section class="detail" id="jobNotificationsSNSClientOverrideConfig(com.netflix.genie.web.properties.RetryProperties)">
+<h3>jobNotificationsSNSClientOverrideConfig</h3>
+<div class="member-signature"><span class="annotations">@Bean(name="snsClientOverrideConfig")
+@ConditionalOnMissingBean(name="snsClientOverrideConfig")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.core.client.config.ClientOverrideConfiguration</span>&nbsp;<span class="element-name">jobNotificationsSNSClientOverrideConfig</span><wbr><span class="parameters">(<a href="../../../properties/RetryProperties.html" title="class in com.netflix.genie.web.properties">RetryProperties</a>&nbsp;retryProperties)</span></div>
+<div class="block">Create a named <code>ClientOverrideConfiguration</code> to be used by the <code>SnsClient</code>, unless a bean by that name
  already exists in context.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>retryProperties</code> - The retry properties</dd>
 <dt>Returns:</dt>
-<dd>a named <code>RetryPolicy</code></dd>
+<dd>a named <code>ClientOverrideConfiguration</code></dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="jobNotificationsSNSClientConfiguration(com.amazonaws.retry.RetryPolicy)">
-<h3>jobNotificationsSNSClientConfiguration</h3>
-<div class="member-signature"><span class="annotations">@Bean(name="SNSClientConfiguration")
-@ConditionalOnMissingBean(name="SNSClientConfiguration")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.amazonaws.ClientConfiguration</span>&nbsp;<span class="element-name">jobNotificationsSNSClientConfiguration</span><wbr><span class="parameters">(@Qualifier("SNSClientRetryPolicy")
- com.amazonaws.retry.RetryPolicy&nbsp;retryPolicy)</span></div>
-<div class="block">Create a named <code>ClientConfiguration</code> to be used by the <code>AmazonSNS</code> client, unless a bean by that
- name already exists in context.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>retryPolicy</code> - The retry policy</dd>
-<dt>Returns:</dt>
-<dd>a named <code>ClientConfiguration</code></dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="jobNotificationsSNSClient(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,com.amazonaws.ClientConfiguration)">
+<section class="detail" id="jobNotificationsSNSClient(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,software.amazon.awssdk.core.client.config.ClientOverrideConfiguration)">
 <h3>jobNotificationsSNSClient</h3>
-<div class="member-signature"><span class="annotations">@Bean(name="amazonSNS")
-@ConditionalOnMissingBean(name="amazonSNS")
+<div class="member-signature"><span class="annotations">@Bean(name="snsClient")
+@ConditionalOnMissingBean(name="snsClient")
 @ConditionalOnProperty(value="genie.notifications.sns.enabled",
                        havingValue="true")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.amazonaws.services.sns.AmazonSNS</span>&nbsp;<span class="element-name">jobNotificationsSNSClient</span><wbr><span class="parameters">(com.amazonaws.auth.AWSCredentialsProvider&nbsp;credentialsProvider,
- com.amazonaws.regions.AwsRegionProvider&nbsp;awsRegionProvider,
- @Qualifier("SNSClientConfiguration")
- com.amazonaws.ClientConfiguration&nbsp;clientConfiguration)</span></div>
-<div class="block">Create a named <code>AmazonSNS</code> client to be used by JobNotification SNS publishers, unless a bean by that
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.services.sns.SnsClient</span>&nbsp;<span class="element-name">jobNotificationsSNSClient</span><wbr><span class="parameters">(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider&nbsp;credentialsProvider,
+ software.amazon.awssdk.regions.providers.AwsRegionProvider&nbsp;awsRegionProvider,
+ @Qualifier("snsClientOverrideConfig")
+ software.amazon.awssdk.core.client.config.ClientOverrideConfiguration&nbsp;overrideConfig)</span></div>
+<div class="block">Create a named <code>SnsClient</code> to be used by JobNotification SNS publishers, unless a bean by that
  name already exists in context.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>credentialsProvider</code> - The credentials provider</dd>
 <dd><code>awsRegionProvider</code> - The region provider</dd>
-<dd><code>clientConfiguration</code> - The client configuration</dd>
+<dd><code>overrideConfig</code> - The client override configuration</dd>
 <dt>Returns:</dt>
-<dd>an <code>AmazonSNS</code> client</dd>
+<dd>an <code>SnsClient</code></dd>
 </dl>
 </section>
 </li>

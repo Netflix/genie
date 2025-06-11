@@ -180,7 +180,7 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">org.springframework.core.io.AbstractResource (implements org.springframework.core.io.Resource)
 <ul>
-<li class="circle">io.awspring.cloud.core.io.s3.SimpleStorageResource (implements org.springframework.core.io.WritableResource)
+<li class="circle">io.awspring.cloud.s3.S3Resource (implements org.springframework.core.io.WritableResource)
 <ul>
 <li class="circle">com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/SimpleStorageRangeResource.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">SimpleStorageRangeResource</a></li>
 </ul>
@@ -428,7 +428,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.common.internal.properties.<a href="com/netflix/genie/common/internal/properties/ExponentialBackOffTriggerProperties.html" class="type-name-link" title="class in com.netflix.genie.common.internal.properties">ExponentialBackOffTriggerProperties</a></li>
 <li class="circle">com.netflix.genie.agent.utils.locks.impl.<a href="com/netflix/genie/agent/utils/locks/impl/FileLock.html" class="type-name-link" title="class in com.netflix.genie.agent.utils.locks.impl">FileLock</a> (implements com.netflix.genie.agent.utils.locks.<a href="com/netflix/genie/agent/utils/locks/CloseableLock.html" title="interface in com.netflix.genie.agent.utils.locks">CloseableLock</a>)</li>
 <li class="circle">com.netflix.genie.agent.utils.locks.impl.<a href="com/netflix/genie/agent/utils/locks/impl/FileLockFactory.html" class="type-name-link" title="class in com.netflix.genie.agent.utils.locks.impl">FileLockFactory</a></li>
-<li class="circle">com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase (implements io.grpc.BindableService)
+<li class="circle">com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase (implements io.grpc.BindableService, com.netflix.genie.proto.FileStreamServiceGrpc.AsyncService)
 <ul>
 <li class="circle">com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a> (implements com.netflix.genie.web.agent.services.<a href="com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a>)</li>
 </ul>
@@ -479,7 +479,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.web.aspects.<a href="com/netflix/genie/web/aspects/HealthCheckMetricsAspect.html" class="type-name-link" title="class in com.netflix.genie.web.aspects">HealthCheckMetricsAspect</a></li>
 <li class="circle">com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HealthProperties.html" class="type-name-link" title="class in com.netflix.genie.web.properties">HealthProperties</a></li>
 <li class="circle">com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HeartBeatProperties.html" class="type-name-link" title="class in com.netflix.genie.web.properties">HeartBeatProperties</a></li>
-<li class="circle">com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase (implements io.grpc.BindableService)
+<li class="circle">com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase (implements io.grpc.BindableService, com.netflix.genie.proto.HeartBeatServiceGrpc.AsyncService)
 <ul>
 <li class="circle">com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a></li>
 </ul>
@@ -538,7 +538,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/Image.html" class="type-name-link" title="class in com.netflix.genie.common.internal.dtos">Image</a> (implements java.io.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)</li>
 <li class="circle">com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/Image.Builder.html" class="type-name-link" title="class in com.netflix.genie.common.internal.dtos">Image.Builder</a></li>
 <li class="circle">com.netflix.genie.web.agent.inspectors.<a href="com/netflix/genie/web/agent/inspectors/InspectionReport.html" class="type-name-link" title="class in com.netflix.genie.web.agent.inspectors">InspectionReport</a></li>
-<li class="circle">com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/IntegerToLongConverter.html" class="type-name-link" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">IntegerToLongConverter</a> (implements javax.persistence.AttributeConverter&lt;X,<wbr>Y&gt;)</li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/IntegerToLongConverter.html" class="type-name-link" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">IntegerToLongConverter</a> (implements jakarta.persistence.AttributeConverter&lt;X,<wbr>Y&gt;)</li>
 <li class="circle">com.netflix.genie.test.web.configs.<a href="com/netflix/genie/test/web/configs/IntegrationTestingConfiguration.html" class="type-name-link" title="class in com.netflix.genie.test.web.configs">IntegrationTestingConfiguration</a></li>
 <li class="circle">com.netflix.genie.web.spring.autoconfigure.introspection.<a href="com/netflix/genie/web/spring/autoconfigure/introspection/IntrospectionAutoConfiguration.html" class="type-name-link" title="class in com.netflix.genie.web.spring.autoconfigure.introspection">IntrospectionAutoConfiguration</a></li>
 <li class="circle">com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/JCommanderAutoConfiguration.html" class="type-name-link" title="class in com.netflix.genie.agent.cli">JCommanderAutoConfiguration</a></li>
@@ -556,7 +556,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.<a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/JobExecutionModelAssembler.html" class="type-name-link" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">JobExecutionModelAssembler</a> (implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;T,<wbr>D&gt;)</li>
 <li class="circle">com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" class="type-name-link" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a> (implements com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a>)</li>
 <li class="circle">com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" class="type-name-link" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a> (implements org.springframework.context.ApplicationListener&lt;E&gt;)</li>
-<li class="circle">com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase (implements io.grpc.BindableService)
+<li class="circle">com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase (implements io.grpc.BindableService, com.netflix.genie.proto.JobKillServiceGrpc.AsyncService)
 <ul>
 <li class="circle">com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a> (implements com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a>)</li>
 </ul>
@@ -584,7 +584,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" class="type-name-link" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></li>
 <li class="circle">com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/JobsActiveLimitProperties.html" class="type-name-link" title="class in com.netflix.genie.web.properties">JobsActiveLimitProperties</a> (implements org.springframework.context.EnvironmentAware)</li>
 <li class="circle">com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.<a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/JobSearchResultModelAssembler.html" class="type-name-link" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">JobSearchResultModelAssembler</a> (implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;T,<wbr>D&gt;)</li>
-<li class="circle">com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase (implements io.grpc.BindableService)
+<li class="circle">com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase (implements io.grpc.BindableService, com.netflix.genie.proto.JobServiceGrpc.AsyncService)
 <ul>
 <li class="circle">com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobServiceImpl</a></li>
 </ul>
@@ -605,7 +605,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/JobsUsersProperties.html" class="type-name-link" title="class in com.netflix.genie.web.properties">JobsUsersProperties</a></li>
 <li class="circle">com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a> (implements com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>)</li>
 <li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" class="type-name-link" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a></li>
-<li class="circle">com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" class="type-name-link" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a> (implements javax.persistence.AttributeConverter&lt;X,<wbr>Y&gt;)</li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.converters.<a href="com/netflix/genie/web/data/services/impl/jpa/converters/JsonAttributeConverter.html" class="type-name-link" title="class in com.netflix.genie.web.data.services.impl.jpa.converters">JsonAttributeConverter</a> (implements jakarta.persistence.AttributeConverter&lt;X,<wbr>Y&gt;)</li>
 <li class="circle">com.fasterxml.jackson.databind.JsonSerializer&lt;T&gt; (implements com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable)
 <ul>
 <li class="circle">com.netflix.genie.common.util.<a href="com/netflix/genie/common/util/JsonUtils.InstantMillisecondSerializer.html" class="type-name-link" title="class in com.netflix.genie.common.util">JsonUtils.InstantMillisecondSerializer</a></li>
@@ -650,7 +650,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.client.security.oauth2.impl.<a href="com/netflix/genie/client/security/oauth2/impl/OAuth2SecurityInterceptor.html" class="type-name-link" title="class in com.netflix.genie.client.security.oauth2.impl">OAuth2SecurityInterceptor</a> (implements com.netflix.genie.client.interceptors.<a href="com/netflix/genie/client/interceptors/SecurityInterceptor.html" title="interface in com.netflix.genie.client.interceptors">SecurityInterceptor</a>)</li>
 <li class="circle">com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" class="type-name-link" title="class in com.netflix.genie.agent.utils">PathUtils</a></li>
 <li class="circle">com.netflix.genie.web.data.observers.<a href="com/netflix/genie/web/data/observers/PersistedJobStatusObserverImpl.html" class="type-name-link" title="class in com.netflix.genie.web.data.observers">PersistedJobStatusObserverImpl</a> (implements com.netflix.genie.web.data.observers.<a href="com/netflix/genie/web/data/observers/PersistedJobStatusObserver.html" title="interface in com.netflix.genie.web.data.observers">PersistedJobStatusObserver</a>)</li>
-<li class="circle">com.netflix.genie.proto.PingServiceGrpc.PingServiceImplBase (implements io.grpc.BindableService)
+<li class="circle">com.netflix.genie.proto.PingServiceGrpc.PingServiceImplBase (implements io.grpc.BindableService, com.netflix.genie.proto.PingServiceGrpc.AsyncService)
 <ul>
 <li class="circle">com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcPingServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcPingServiceImpl</a></li>
 </ul>
@@ -699,9 +699,11 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/RuntimeResources.Builder.html" class="type-name-link" title="class in com.netflix.genie.common.dto">RuntimeResources.Builder</a></li>
 <li class="circle">com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/S3AttachmentServiceImpl.html" class="type-name-link" title="class in com.netflix.genie.web.services.impl">S3AttachmentServiceImpl</a> (implements com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>)</li>
 <li class="circle">com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></li>
+<li class="circle">com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.S3ClientKey.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a></li>
 <li class="circle">com.netflix.genie.common.internal.services.impl.<a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html" class="type-name-link" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a> (implements com.netflix.genie.common.internal.services.<a href="com/netflix/genie/common/internal/services/JobArchiver.html" title="interface in com.netflix.genie.common.internal.services">JobArchiver</a>)</li>
 <li class="circle">com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a> (implements org.springframework.core.io.ProtocolResolver)</li>
 <li class="circle">com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a> (implements org.springframework.context.ApplicationContextAware)</li>
+<li class="circle">com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></li>
 <li class="circle">com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptAgentLauncherSelectorImpl.html" class="type-name-link" title="class in com.netflix.genie.web.selectors.impl">ScriptAgentLauncherSelectorImpl</a> (implements com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/AgentLauncherSelector.html" title="interface in com.netflix.genie.web.selectors">AgentLauncherSelector</a>)</li>
 <li class="circle">com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" class="type-name-link" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a> (implements com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>)</li>
 <li class="circle">com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html" class="type-name-link" title="class in com.netflix.genie.web.selectors.impl">ScriptCommandSelectorImpl</a> (implements com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>)</li>
@@ -999,7 +1001,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></li>
 <li class="circle">org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;
 <ul>
-<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.PagingAndSortingRepository&lt;T,<wbr>ID&gt;)
+<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.ListCrudRepository&lt;T,<wbr>ID&gt;, org.springframework.data.repository.ListPagingAndSortingRepository&lt;T,<wbr>ID&gt;)
 <ul>
 <li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.JpaIdRepository&lt;E&gt; (also extends org.springframework.data.jpa.repository.JpaSpecificationExecutor&lt;T&gt;)
 <ul>
@@ -1024,9 +1026,36 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">org.springframework.data.repository.CrudRepository&lt;T,<wbr>ID&gt;
 <ul>
+<li class="circle">org.springframework.data.repository.ListCrudRepository&lt;T,<wbr>ID&gt;
+<ul>
+<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.ListPagingAndSortingRepository&lt;T,<wbr>ID&gt;, org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;)
+<ul>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.JpaIdRepository&lt;E&gt; (also extends org.springframework.data.jpa.repository.JpaSpecificationExecutor&lt;T&gt;)
+<ul>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaBaseRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaBaseRepository</a>&lt;E&gt;
+<ul>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaApplicationRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaClusterRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></li>
+</ul>
+</li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCriterionRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCriterionRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaFileRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaTagRepository</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="circle">org.springframework.data.repository.PagingAndSortingRepository&lt;T,<wbr>ID&gt;
 <ul>
-<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;)
+<li class="circle">org.springframework.data.repository.ListPagingAndSortingRepository&lt;T,<wbr>ID&gt;
+<ul>
+<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.ListCrudRepository&lt;T,<wbr>ID&gt;, org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;)
 <ul>
 <li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.JpaIdRepository&lt;E&gt; (also extends org.springframework.data.jpa.repository.JpaSpecificationExecutor&lt;T&gt;)
 <ul>

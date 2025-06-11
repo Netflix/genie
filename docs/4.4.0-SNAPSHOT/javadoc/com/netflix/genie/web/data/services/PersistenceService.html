@@ -113,7 +113,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addClusterCriterionForCommand(java.lang.String,com.netflix.genie.common.internal.dtos.Criterion,int)" class="member-name-link">addClusterCriterionForCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Add a new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.</div>
 </div>
@@ -177,20 +177,20 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteJobsCreatedBefore(java.time.Instant,java.util.Set,int)" class="member-name-link">deleteJobsCreatedBefore</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;creationThreshold,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum class in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;excludeStatuses,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedApplications(java.time.Instant,int)" class="member-name-link">deleteUnusedApplications</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThreshold,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Delete any unused applications that were created before the given time.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedClusters(java.util.Set,java.time.Instant,int)" class="member-name-link">deleteUnusedClusters</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../common/internal/dtos/ClusterStatus.html" title="enum class in com.netflix.genie.common.internal.dtos">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;clusterCreatedThreshold,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
  the given time.</div>
@@ -198,7 +198,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedCommands(java.util.Set,java.time.Instant,int)" class="member-name-link">deleteUnusedCommands</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../common/internal/dtos/CommandStatus.html" title="enum class in com.netflix.genie.common.internal.dtos">CommandStatus</a>&gt;&nbsp;deleteStatuses,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;commandCreatedThreshold,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
@@ -206,7 +206,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedFiles(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedFiles</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Delete all files from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
@@ -214,7 +214,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>long</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#deleteUnusedTags(java.time.Instant,java.time.Instant,int)" class="member-name-link">deleteUnusedTags</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdLowerBound,
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Delete all tags from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
@@ -492,7 +492,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#removeClusterCriterionForCommand(java.lang.String,int)" class="member-name-link">removeClusterCriterionForCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Remove the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
  associated with the command identified by id.</div>
@@ -781,7 +781,7 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="return-type">long</span>&nbsp;<span class="element-name">deleteUnusedApplications</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThreshold,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Delete any unused applications that were created before the given time.
  Unused means they aren't linked to any other resources in the Genie system like jobs or commands and therefore
  referential integrity is maintained.</div>
@@ -912,7 +912,7 @@ loadScripts(document, 'script');</script>
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;clusterCreatedThreshold,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
  the given time.</div>
 <dl class="notes">
@@ -1223,7 +1223,7 @@ loadScripts(document, 'script');</script>
  @Valid
  @Valid <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion,
  @Min(0L)
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</span>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</span>
                             throws <span class="exceptions"><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
 <div class="block">Add a new <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> to the existing list of cluster criteria for the command identified by id.
  The priority is the place in the list this new criterion should be placed. A value of 0
@@ -1262,7 +1262,7 @@ loadScripts(document, 'script');</script>
 <h3>removeClusterCriterionForCommand</h3>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">removeClusterCriterionForCommand</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @Min(0L)
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</span>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</span>
                                throws <span class="exceptions"><a href="../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
 <div class="block">Remove the <a href="../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos"><code>Criterion</code></a> with the given priority from the current list of cluster criteria
  associated with the command identified by id. A value of 0 for priority
@@ -1335,7 +1335,7 @@ loadScripts(document, 'script');</script>
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;commandCreatedThreshold,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 <dl class="notes">
@@ -1467,7 +1467,7 @@ loadScripts(document, 'script');</script>
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../common/internal/dtos/JobStatus.html" title="enum class in com.netflix.genie.common.internal.dtos">JobStatus</a>&gt;&nbsp;excludeStatuses,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -2268,7 +2268,7 @@ loadScripts(document, 'script');</script>
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Delete all tags from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
 <dl class="notes">
@@ -2291,7 +2291,7 @@ loadScripts(document, 'script');</script>
  @NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;createdThresholdUpperBound,
  @Min(1L)
- @javax.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
+ @jakarta.validation.constraints.Min(1L) int&nbsp;batchSize)</span></div>
 <div class="block">Delete all files from the database that aren't referenced which were created between the
  supplied threshold bounds.</div>
 <dl class="notes">

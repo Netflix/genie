@@ -88,7 +88,7 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="circle">org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;
 <ul>
-<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.PagingAndSortingRepository&lt;T,<wbr>ID&gt;)
+<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.ListCrudRepository&lt;T,<wbr>ID&gt;, org.springframework.data.repository.ListPagingAndSortingRepository&lt;T,<wbr>ID&gt;)
 <ul>
 <li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.JpaIdRepository&lt;E&gt; (also extends org.springframework.data.jpa.repository.JpaSpecificationExecutor&lt;T&gt;)
 <ul>
@@ -113,9 +113,36 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">org.springframework.data.repository.CrudRepository&lt;T,<wbr>ID&gt;
 <ul>
+<li class="circle">org.springframework.data.repository.ListCrudRepository&lt;T,<wbr>ID&gt;
+<ul>
+<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.ListPagingAndSortingRepository&lt;T,<wbr>ID&gt;, org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;)
+<ul>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.JpaIdRepository&lt;E&gt; (also extends org.springframework.data.jpa.repository.JpaSpecificationExecutor&lt;T&gt;)
+<ul>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaBaseRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaBaseRepository</a>&lt;E&gt;
+<ul>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaApplicationRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaApplicationRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaClusterRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaClusterRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaCommandRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaJobRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></li>
+</ul>
+</li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaCriterionRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCriterionRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaFileRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaFileRepository</a></li>
+<li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="JpaTagRepository.html" class="type-name-link" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaTagRepository</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="circle">org.springframework.data.repository.PagingAndSortingRepository&lt;T,<wbr>ID&gt;
 <ul>
-<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;)
+<li class="circle">org.springframework.data.repository.ListPagingAndSortingRepository&lt;T,<wbr>ID&gt;
+<ul>
+<li class="circle">org.springframework.data.jpa.repository.JpaRepository&lt;T,<wbr>ID&gt; (also extends org.springframework.data.repository.ListCrudRepository&lt;T,<wbr>ID&gt;, org.springframework.data.repository.query.QueryByExampleExecutor&lt;T&gt;)
 <ul>
 <li class="circle">com.netflix.genie.web.data.services.impl.jpa.repositories.JpaIdRepository&lt;E&gt; (also extends org.springframework.data.jpa.repository.JpaSpecificationExecutor&lt;T&gt;)
 <ul>

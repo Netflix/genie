@@ -85,9 +85,9 @@ loadScripts(document, 'script');</script>
 implements org.springframework.context.ApplicationContextAware</span></div>
 <div class="block">A class which takes an instance of <a href="S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> and adds it to the Spring <code>ApplicationContext</code>
  set of <code>ProtocolResolver</code>. This class will also search for any existing instances of
- <code>SimpleStorageProtocolResolver</code> within the current protocol resolver set. Since the protocol resolvers are
+ <a href="S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> within the current protocol resolver set. Since the protocol resolvers are
  iterated in the order they're added, due to being backed by <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html" title="class or interface in java.util" class="external-link"><code>LinkedHashMap</code></a>, any call to
- <code>ResourceLoader.getResource(String)</code> would always use <code>SimpleStorageProtocolResolver</code> for S3
+ <code>ResourceLoader.getResource(String)</code> would always use <a href="S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> for S3
  resources if it was already in the set before this class is invoked.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -169,7 +169,7 @@ implements org.springframework.context.ApplicationContextAware</span></div>
 <div class="block">
  <p>
  Add the <a href="S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> to the set of protocol resolvers in the application context. Remove any
- instances of <code>SimpleStorageProtocolResolver</code>.</div>
+ instances of <code>ProtocolResolver</code>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>setApplicationContext</code>&nbsp;in interface&nbsp;<code>org.springframework.context.ApplicationContextAware</code></dd>

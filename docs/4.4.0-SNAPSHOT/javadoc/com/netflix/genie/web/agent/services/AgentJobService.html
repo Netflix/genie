@@ -180,7 +180,7 @@ loadScripts(document, 'script');</script>
 <dd><code>agentMetadata</code> - The metadata about the agent starting to run a given job</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieAgentRejectedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieAgentRejectedException</a></code> - If the server rejects the client based on its metadata</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -196,7 +196,7 @@ loadScripts(document, 'script');</script>
 <dt>Returns:</dt>
 <dd>a map of properties for the agent</dd>
 <dt>Throws:</dt>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -216,7 +216,7 @@ loadScripts(document, 'script');</script>
 <dd>The unique id of the job which was saved in the database</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieIdAlreadyExistsException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieIdAlreadyExistsException</a></code> - If the id requested along with the job request is already in use</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -236,7 +236,7 @@ loadScripts(document, 'script');</script>
 <dd>The job specification if one could be resolved</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></code> - On error resolving the job given the input parameters and system state</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobResolutionRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobResolutionRuntimeException</a></code> - If job resolution fails due to a runtime error (as opposed to
                                             unsatisfiable constraints)</dd>
 </dl>
@@ -257,7 +257,7 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a></code> - If the job has not yet had its ID reserved and/or can't be found</dd>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobSpecificationNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobSpecificationNotFoundException</a></code> - If the job exists but the specification hasn't been
                                                 resolved or saved yet</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -275,7 +275,7 @@ loadScripts(document, 'script');</script>
 <dd>The job specification that would have been resolved for the given input</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></code> - On error resolving the job given the input parameters and system state</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -297,7 +297,7 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobAlreadyClaimedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobAlreadyClaimedException</a></code> - if the job with the given <code>id</code> already has been claimed</dd>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></code> - if the current job status is not
                                          <a href="../../../common/dto/JobStatus.html#RESOLVED"><code>JobStatus.RESOLVED</code></a></dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -326,7 +326,7 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieInvalidStatusException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieInvalidStatusException</a></code> - if the current status of the job identified by <code>id</code> in the system
                                       doesn't match the supplied <code>currentStatus</code>.
                                       Also if the <code>currentStatus</code> equals the <code>newStatus</code>.</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -343,7 +343,7 @@ loadScripts(document, 'script');</script>
 <dd>the current status of the job, as seen by this node</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a></code> - if no job with the given <code>id</code> exists</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>
@@ -361,7 +361,7 @@ loadScripts(document, 'script');</script>
 <dd><code>newArchiveStatus</code> - The new archive status the caller would like to update the status to</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/internal/exceptions/unchecked/GenieJobNotFoundException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked">GenieJobNotFoundException</a></code> - if no job with the given <code>id</code> exists</dd>
-<dd><code>javax.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
+<dd><code>jakarta.validation.ConstraintViolationException</code> - If the arguments fail validation</dd>
 </dl>
 </section>
 </li>

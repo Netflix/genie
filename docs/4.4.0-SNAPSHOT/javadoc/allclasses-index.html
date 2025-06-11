@@ -1258,7 +1258,8 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">Implementation of the <a href="com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a>, listens for kill coming from server using long-polling.</div>
+<div class="block">Implementation of the <a href="com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a> that listens for kill signals from the server
+ using event listeners.</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/agent/rpc/GRpcAutoConfiguration.html" title="class in com.netflix.genie.agent.rpc">GRpcAutoConfiguration</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
@@ -2209,20 +2210,29 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">An <code>AmazonS3</code> client factory class.</div>
+<div class="block">An <code>S3Client</code> client factory class.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3ClientFactory.S3ClientKey.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">Implementation of <a href="com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiveService</code></a> for S3 destinations.</div>
+<div class="block">A simple class used as a key to see if we already have a S3Client created for the combination of properties
+ that make up this class.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">Implementation of <a href="com/netflix/genie/common/internal/services/JobArchiver.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiver</code></a> for S3 destinations.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">This class implements the <code>ProtocolResolver</code> interface.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A class which takes an instance of <a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> and adds it to the Spring <code>ApplicationContext</code>
  set of <code>ProtocolResolver</code>.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">A factory class for creating and managing <code>S3TransferManager</code> instances.</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab5"><a href="com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab5">
@@ -2319,7 +2329,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/common/internal/aws/s3/SimpleStorageRangeResource.html" title="class in com.netflix.genie.common.internal.aws.s3">SimpleStorageRangeResource</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">This class extends <code>SimpleStorageResource</code> in order to efficiently handle range requests.</div>
+<div class="block">This class extends <code>S3Resource</code> in order to efficiently handle range requests.</div>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="com/netflix/genie/web/properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">

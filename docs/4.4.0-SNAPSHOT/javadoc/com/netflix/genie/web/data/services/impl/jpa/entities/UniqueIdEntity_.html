@@ -80,7 +80,7 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="BaseEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity_</a></code></dd>
 </dl>
 <hr>
-<div class="type-signature"><span class="annotations">@Generated("org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor")
+<div class="type-signature"><span class="annotations">@Generated("org.hibernate.processor.HibernateProcessor")
 </span><span class="modifiers">public abstract class </span><span class="element-name type-name-label">UniqueIdEntity_</span>
 <span class="extends-implements">extends <a href="AuditEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AuditEntity_</a></span></div>
 </section>
@@ -95,18 +95,21 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#REQUESTED_ID" class="member-name-link">REQUESTED_ID</a></code></div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.MappedSuperclassType&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#class_" class="member-name-link">class_</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#requestedId" class="member-name-link">requestedId</a></code></div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#REQUESTED_ID" class="member-name-link">REQUESTED_ID</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#UNIQUE_ID" class="member-name-link">UNIQUE_ID</a></code></div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#requestedId" class="member-name-link">requestedId</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static javax.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#uniqueId" class="member-name-link">uniqueId</a></code></div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#UNIQUE_ID" class="member-name-link">UNIQUE_ID</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static jakarta.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#uniqueId" class="member-name-link">uniqueId</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-com.netflix.genie.web.data.services.impl.jpa.entities.AuditEntity_">Fields inherited from class&nbsp;com.netflix.genie.web.data.services.impl.jpa.entities.<a href="AuditEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">AuditEntity_</a></h3>
@@ -148,18 +151,6 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="requestedId">
-<h3>requestedId</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</span>&nbsp;<span class="element-name">requestedId</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="uniqueId">
-<h3>uniqueId</h3>
-<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">javax.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">uniqueId</span></div>
-</section>
-</li>
-<li>
 <section class="detail" id="REQUESTED_ID">
 <h3>REQUESTED_ID</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">REQUESTED_ID</span></div>
@@ -182,6 +173,48 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.UniqueIdEntity_.UNIQUE_ID">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="class_">
+<h3>class_</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.MappedSuperclassType&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>&gt;</span>&nbsp;<span class="element-name">class_</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>UniqueIdEntity</code></a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="requestedId">
+<h3>requestedId</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</span>&nbsp;<span class="element-name">requestedId</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>UniqueIdEntity.requestedId</code></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="uniqueId">
+<h3>uniqueId</h3>
+<div class="member-signature"><span class="modifiers">public static volatile</span>&nbsp;<span class="return-type">jakarta.persistence.metamodel.SingularAttribute&lt;<a href="UniqueIdEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">UniqueIdEntity</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">uniqueId</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><code>UniqueIdEntity.uniqueId</code></li>
 </ul>
 </dd>
 </dl>

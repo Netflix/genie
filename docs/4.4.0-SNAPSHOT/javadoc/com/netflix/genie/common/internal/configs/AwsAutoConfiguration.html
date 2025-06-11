@@ -78,8 +78,8 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="annotations">@Configuration
 @EnableConfigurationProperties
-@AutoConfigureAfter({io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextInstanceDataAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextRegionProviderAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration.class,io.awspring.cloud.autoconfigure.context.ContextStackAutoConfiguration.class})
-@ConditionalOnBean(com.amazonaws.auth.AWSCredentialsProvider.class)
+@AutoConfigureAfter({io.awspring.cloud.autoconfigure.core.CredentialsProviderAutoConfiguration.class,io.awspring.cloud.autoconfigure.core.RegionProviderAutoConfiguration.class})
+@ConditionalOnClass(name="software.amazon.awssdk.auth.credentials.AwsCredentialsProvider")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">AwsAutoConfiguration</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Spring Boot auto configuration for AWS related beans for the Genie Agent. Should be configured after all the
@@ -132,45 +132,39 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.amazonaws.regions.AwsRegionProvider</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#awsRegionProvider(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties)" class="member-name-link">awsRegionProvider</a><wbr>(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties&nbsp;awsRegionProperties)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.regions.providers.AwsRegionProvider</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#awsRegionProvider(io.awspring.cloud.autoconfigure.core.RegionProperties)" class="member-name-link">awsRegionProvider</a><wbr>(io.awspring.cloud.autoconfigure.core.RegionProperties&nbsp;regionProperties)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get an AWS region provider instance.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#awsS3ResourceLoaderProperties()" class="member-name-link">awsS3ResourceLoaderProperties</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
- the <code>ContextResourceLoaderAutoConfiguration</code> isn't applied by the agent app.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3ClientFactory(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">s3ClientFactory</a><wbr>(com.amazonaws.auth.AWSCredentialsProvider&nbsp;awsCredentialsProvider,
- com.amazonaws.regions.AwsRegionProvider&nbsp;awsRegionProvider,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3ClientFactory(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">s3ClientFactory</a><wbr>(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider&nbsp;awsCredentialsProvider,
+ software.amazon.awssdk.regions.providers.AwsRegionProvider&nbsp;awsRegionProvider,
  org.springframework.core.env.Environment&nbsp;environment)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Provide a lazy <a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ClientFactory</code></a> instance if one is needed by the system.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3JobArchiver(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3JobArchiver</a><wbr>(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3JobArchiver(com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory)" class="member-name-link">s3JobArchiver</a><wbr>(<a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a>&nbsp;s3TransferManagerFactory)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Provide an implementation of <a href="../services/JobArchiver.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiver</code></a> to handle archiving
  to S3.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3ProtocolResolver(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties,com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3ProtocolResolver</a><wbr>(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;resourceLoaderProperties,
- <a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Provide an protocol resolver which will allow resources with s3:// prefixes to be resolved by the
- application <code>ResourceLoader</code> provided this bean is eventually added to the
- context via the
- <code>ConfigurableApplicationContext.addProtocolResolver(ProtocolResolver)</code>
- method.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3ProtocolResolverRegistrar(com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver)" class="member-name-link">s3ProtocolResolverRegistrar</a><wbr>(<a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a>&nbsp;s3ProtocolResolver)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3ProtocolResolver(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3ProtocolResolver</a><wbr>(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Provide a protocol resolver which will allow resources with s3:// prefixes.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3ProtocolResolverRegistrar(com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver)" class="member-name-link">s3ProtocolResolverRegistrar</a><wbr>(<a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a>&nbsp;s3ProtocolResolver)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Configurer bean which will add the <a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> to the set of <code>ProtocolResolver</code> in the
  application context.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#s3TransferManagerFactory(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)" class="member-name-link">s3TransferManagerFactory</a><wbr>(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Provide a <a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3TransferManagerFactory</code></a> instance if one is needed by the system.</div>
 </div>
 </div>
 </div>
@@ -228,35 +222,32 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="awsRegionProvider(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties)">
+<section class="detail" id="awsRegionProvider(io.awspring.cloud.autoconfigure.core.RegionProperties)">
 <h3>awsRegionProvider</h3>
 <div class="member-signature"><span class="annotations">@Bean
-@ConditionalOnMissingBean(com.amazonaws.regions.AwsRegionProvider.class)
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.amazonaws.regions.AwsRegionProvider</span>&nbsp;<span class="element-name">awsRegionProvider</span><wbr><span class="parameters">(io.awspring.cloud.autoconfigure.context.properties.AwsRegionProperties&nbsp;awsRegionProperties)</span></div>
-<div class="block">Get an AWS region provider instance. The rules for this basically follow what Spring Cloud AWS does but uses
- the interface from the AWS SDK instead and provides a sensible default.
- <p>
- See: <a href="https://tinyurl.com/y9edl6yr">Spring Cloud AWS Region Documentation</a></div>
+@Primary
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.regions.providers.AwsRegionProvider</span>&nbsp;<span class="element-name">awsRegionProvider</span><wbr><span class="parameters">(io.awspring.cloud.autoconfigure.core.RegionProperties&nbsp;regionProperties)</span></div>
+<div class="block">Get an AWS region provider instance.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>awsRegionProperties</code> - The cloud.aws.region.* properties</dd>
+<dd><code>regionProperties</code> - The cloud.aws.region.* properties</dd>
 <dt>Returns:</dt>
 <dd>A region provider based on whether static was set by user, else auto, else default of us-east-1</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="s3ClientFactory(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,org.springframework.core.env.Environment)">
+<section class="detail" id="s3ClientFactory(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,org.springframework.core.env.Environment)">
 <h3>s3ClientFactory</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @ConditionalOnMissingBean(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.class</a>)
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></span>&nbsp;<span class="element-name">s3ClientFactory</span><wbr><span class="parameters">(com.amazonaws.auth.AWSCredentialsProvider&nbsp;awsCredentialsProvider,
- com.amazonaws.regions.AwsRegionProvider&nbsp;awsRegionProvider,
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a></span>&nbsp;<span class="element-name">s3ClientFactory</span><wbr><span class="parameters">(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider&nbsp;awsCredentialsProvider,
+ software.amazon.awssdk.regions.providers.AwsRegionProvider&nbsp;awsRegionProvider,
  org.springframework.core.env.Environment&nbsp;environment)</span></div>
 <div class="block">Provide a lazy <a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ClientFactory</code></a> instance if one is needed by the system.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>awsCredentialsProvider</code> - The <code>AWSCredentialsProvider</code> to use</dd>
+<dd><code>awsCredentialsProvider</code> - The <code>AwsCredentialsProvider</code> to use</dd>
 <dd><code>awsRegionProvider</code> - The <code>AwsRegionProvider</code> to use</dd>
 <dd><code>environment</code> - The Spring application <code>Environment</code> to bind properties from</dd>
 <dt>Returns:</dt>
@@ -265,35 +256,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="awsS3ResourceLoaderProperties()">
-<h3>awsS3ResourceLoaderProperties</h3>
-<div class="member-signature"><span class="annotations">@Bean
-@ConditionalOnMissingBean(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties.class)
-@ConfigurationProperties("cloud.aws.loader")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties</span>&nbsp;<span class="element-name">awsS3ResourceLoaderProperties</span>()</div>
-<div class="block">Provide a configuration properties bean for Spring Cloud resource loader properties if for whatever reason
- the <code>ContextResourceLoaderAutoConfiguration</code> isn't applied by the agent app.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>A <code>AwsS3ResourceLoaderProperties</code> instance with the bindings from cloud.aws.loader values</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="s3ProtocolResolver(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties,com.netflix.genie.common.internal.aws.s3.S3ClientFactory)">
+<section class="detail" id="s3ProtocolResolver(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)">
 <h3>s3ProtocolResolver</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @ConditionalOnMissingBean(<a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver.class</a>)
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></span>&nbsp;<span class="element-name">s3ProtocolResolver</span><wbr><span class="parameters">(io.awspring.cloud.autoconfigure.context.properties.AwsS3ResourceLoaderProperties&nbsp;resourceLoaderProperties,
- <a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</span></div>
-<div class="block">Provide an protocol resolver which will allow resources with s3:// prefixes to be resolved by the
- application <code>ResourceLoader</code> provided this bean is eventually added to the
- context via the
- <code>ConfigurableApplicationContext.addProtocolResolver(ProtocolResolver)</code>
- method.</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></span>&nbsp;<span class="element-name">s3ProtocolResolver</span><wbr><span class="parameters">(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</span></div>
+<div class="block">Provide a protocol resolver which will allow resources with s3:// prefixes.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>resourceLoaderProperties</code> - The <code>AwsS3ResourceLoaderProperties</code> instance to use</dd>
 <dd><code>s3ClientFactory</code> - The <a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ClientFactory</code></a> instance to use</dd>
 <dt>Returns:</dt>
 <dd>A <a href="../aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ProtocolResolver</code></a> instance</dd>
@@ -317,16 +287,33 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="s3JobArchiver(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)">
+<section class="detail" id="s3TransferManagerFactory(com.netflix.genie.common.internal.aws.s3.S3ClientFactory)">
+<h3>s3TransferManagerFactory</h3>
+<div class="member-signature"><span class="annotations">@Bean
+@Primary
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a></span>&nbsp;<span class="element-name">s3TransferManagerFactory</span><wbr><span class="parameters">(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</span></div>
+<div class="block">Provide a <a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3TransferManagerFactory</code></a> instance if one is needed by the system.
+ This factory is for creating and managing <code>S3TransferManager</code>
+ instances, which are used for efficient transfer of files to and from S3.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>s3ClientFactory</code> - The <a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3ClientFactory</code></a> instance to use for configuration and utilities</dd>
+<dt>Returns:</dt>
+<dd>A <a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3"><code>S3TransferManagerFactory</code></a> instance</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="s3JobArchiver(com.netflix.genie.common.internal.aws.s3.S3TransferManagerFactory)">
 <h3>s3JobArchiver</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @Order(-2147483638)
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></span>&nbsp;<span class="element-name">s3JobArchiver</span><wbr><span class="parameters">(<a href="../aws/s3/S3ClientFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory</a>&nbsp;s3ClientFactory)</span></div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl">S3JobArchiverImpl</a></span>&nbsp;<span class="element-name">s3JobArchiver</span><wbr><span class="parameters">(<a href="../aws/s3/S3TransferManagerFactory.html" title="class in com.netflix.genie.common.internal.aws.s3">S3TransferManagerFactory</a>&nbsp;s3TransferManagerFactory)</span></div>
 <div class="block">Provide an implementation of <a href="../services/JobArchiver.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiver</code></a> to handle archiving
  to S3.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>s3ClientFactory</code> - The factory for creating S3 clients</dd>
+<dd><code>s3TransferManagerFactory</code> - The factory for creating S3 transfer manager</dd>
 <dt>Returns:</dt>
 <dd>A <a href="../services/impl/S3JobArchiverImpl.html" title="class in com.netflix.genie.common.internal.services.impl"><code>S3JobArchiverImpl</code></a> instance</dd>
 </dl>

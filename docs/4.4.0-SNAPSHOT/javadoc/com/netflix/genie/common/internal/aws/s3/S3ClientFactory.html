@@ -44,7 +44,7 @@ loadScripts(document, 'script');</script>
 <div>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
@@ -78,7 +78,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">S3ClientFactory</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">An <code>AmazonS3</code> client factory class. Given <code>AmazonS3URI</code> instances and the configuration of the system
+<div class="block">An <code>S3Client</code> client factory class. Given <code>S3Uri</code> instances and the configuration of the system
  this factory is expected to return a valid client instance for the S3 URI which can then be used to access that URI.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -87,6 +87,24 @@ loadScripts(document, 'script');</script>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="caption"><span>Nested Classes</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="S3ClientFactory.S3ClientKey.html" class="type-name-link" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">A simple class used as a key to see if we already have a S3Client created for the combination of properties
+ that make up this class.</div>
+</div>
+</div>
+</section>
+</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -95,8 +113,8 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">S3ClientFactory</a><wbr>(com.amazonaws.auth.AWSCredentialsProvider&nbsp;awsCredentialsProvider,
- com.amazonaws.regions.AwsRegionProvider&nbsp;regionProvider,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,org.springframework.core.env.Environment)" class="member-name-link">S3ClientFactory</a><wbr>(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider&nbsp;awsCredentialsProvider,
+ software.amazon.awssdk.regions.providers.AwsRegionProvider&nbsp;regionProvider,
  org.springframework.core.env.Environment&nbsp;environment)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Constructor.</div>
@@ -115,15 +133,35 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.amazonaws.services.s3.AmazonS3</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getClient(com.amazonaws.services.s3.AmazonS3URI)" class="member-name-link">getClient</a><wbr>(com.amazonaws.services.s3.AmazonS3URI&nbsp;s3URI)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.services.s3.S3AsyncClient</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAsyncClient(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getAsyncClient</a><wbr>(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get an <code>AmazonS3</code> client instance appropriate for the given <code>AmazonS3URI</code>.</div>
+<div class="block">Get an <code>S3AsyncClient</code> client instance appropriate for the given <code>S3Uri</code>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.amazonaws.services.s3.transfer.TransferManager</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransferManager(com.amazonaws.services.s3.AmazonS3URI)" class="member-name-link">getTransferManager</a><wbr>(com.amazonaws.services.s3.AmazonS3URI&nbsp;s3URI)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.services.s3.S3Client</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getClient(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getClient</a><wbr>(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get a <code>TransferManager</code> instance for use with the given <code>s3URI</code>.</div>
+<div class="block">Get an <code>S3Client</code> client instance appropriate for the given <code>S3Uri</code>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="S3ClientFactory.S3ClientKey.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getS3ClientKey(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getS3ClientKey</a><wbr>(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the S3 client key for a given S3 URI.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.services.s3.S3Uri</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getS3Uri(java.lang.String)" class="member-name-link">getS3Uri</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uri)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get a <code>S3Uri</code> from a string.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.services.s3.S3Uri</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getS3Uri(java.net.URI)" class="member-name-link">getS3Uri</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;uri)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get a <code>S3Uri</code> from a URI.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.transfer.s3.S3TransferManager</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransferManager(software.amazon.awssdk.services.s3.S3Uri)" class="member-name-link">getTransferManager</a><wbr>(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get a <code>S3TransferManager</code> instance for use with the given <code>s3Uri</code>.</div>
 </div>
 </div>
 </div>
@@ -143,16 +181,16 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(com.amazonaws.auth.AWSCredentialsProvider,com.amazonaws.regions.AwsRegionProvider,org.springframework.core.env.Environment)">
+<section class="detail" id="&lt;init&gt;(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider,software.amazon.awssdk.regions.providers.AwsRegionProvider,org.springframework.core.env.Environment)">
 <h3>S3ClientFactory</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">S3ClientFactory</span><wbr><span class="parameters">(com.amazonaws.auth.AWSCredentialsProvider&nbsp;awsCredentialsProvider,
- com.amazonaws.regions.AwsRegionProvider&nbsp;regionProvider,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">S3ClientFactory</span><wbr><span class="parameters">(software.amazon.awssdk.auth.credentials.AwsCredentialsProvider&nbsp;awsCredentialsProvider,
+ software.amazon.awssdk.regions.providers.AwsRegionProvider&nbsp;regionProvider,
  org.springframework.core.env.Environment&nbsp;environment)</span></div>
 <div class="block">Constructor.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>awsCredentialsProvider</code> - The base AWS credentials provider to use for the generated S3 clients</dd>
-<dd><code>regionProvider</code> - How this factory should determine the default <code>Regions</code></dd>
+<dd><code>regionProvider</code> - How this factory should determine the default <code>Region</code></dd>
 <dd><code>environment</code> - The Spring application <code>Environment</code></dd>
 </dl>
 </section>
@@ -166,28 +204,80 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="getClient(com.amazonaws.services.s3.AmazonS3URI)">
+<section class="detail" id="getClient(software.amazon.awssdk.services.s3.S3Uri)">
 <h3>getClient</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.amazonaws.services.s3.AmazonS3</span>&nbsp;<span class="element-name">getClient</span><wbr><span class="parameters">(com.amazonaws.services.s3.AmazonS3URI&nbsp;s3URI)</span></div>
-<div class="block">Get an <code>AmazonS3</code> client instance appropriate for the given <code>AmazonS3URI</code>.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.services.s3.S3Client</span>&nbsp;<span class="element-name">getClient</span><wbr><span class="parameters">(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</span></div>
+<div class="block">Get an <code>S3Client</code> client instance appropriate for the given <code>S3Uri</code>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>s3URI</code> - The URI of the S3 resource this client is expected to access.</dd>
+<dd><code>s3Uri</code> - The URI of the S3 resource this client is expected to access.</dd>
 <dt>Returns:</dt>
 <dd>A S3 client instance which should be used to access the S3 resource</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getTransferManager(com.amazonaws.services.s3.AmazonS3URI)">
-<h3>getTransferManager</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.amazonaws.services.s3.transfer.TransferManager</span>&nbsp;<span class="element-name">getTransferManager</span><wbr><span class="parameters">(com.amazonaws.services.s3.AmazonS3URI&nbsp;s3URI)</span></div>
-<div class="block">Get a <code>TransferManager</code> instance for use with the given <code>s3URI</code>.</div>
+<section class="detail" id="getS3Uri(java.net.URI)">
+<h3>getS3Uri</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.services.s3.S3Uri</span>&nbsp;<span class="element-name">getS3Uri</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;uri)</span></div>
+<div class="block">Get a <code>S3Uri</code> from a URI.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>s3URI</code> - The S3 URI this transfer manager will be interacting with</dd>
+<dd><code>uri</code> - The URI to parse</dd>
 <dt>Returns:</dt>
-<dd>An instance of <code>TransferManager</code> backed by an appropriate S3 client for the given URI</dd>
+<dd>A <code>S3Uri</code> instance</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getS3Uri(java.lang.String)">
+<h3>getS3Uri</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.services.s3.S3Uri</span>&nbsp;<span class="element-name">getS3Uri</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uri)</span></div>
+<div class="block">Get a <code>S3Uri</code> from a string.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>uri</code> - The URI string to parse</dd>
+<dt>Returns:</dt>
+<dd>A <code>S3Uri</code> instance</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getS3ClientKey(software.amazon.awssdk.services.s3.S3Uri)">
+<h3>getS3ClientKey</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="S3ClientFactory.S3ClientKey.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ClientFactory.S3ClientKey</a></span>&nbsp;<span class="element-name">getS3ClientKey</span><wbr><span class="parameters">(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</span></div>
+<div class="block">Get the S3 client key for a given S3 URI.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>s3Uri</code> - The S3 URI</dd>
+<dt>Returns:</dt>
+<dd>The S3 client key</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getAsyncClient(software.amazon.awssdk.services.s3.S3Uri)">
+<h3>getAsyncClient</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.services.s3.S3AsyncClient</span>&nbsp;<span class="element-name">getAsyncClient</span><wbr><span class="parameters">(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</span></div>
+<div class="block">Get an <code>S3AsyncClient</code> client instance appropriate for the given <code>S3Uri</code>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>s3Uri</code> - The URI of the S3 resource this client is expected to access.</dd>
+<dt>Returns:</dt>
+<dd>A S3 async client instance which should be used to access the S3 resource</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getTransferManager(software.amazon.awssdk.services.s3.S3Uri)">
+<h3>getTransferManager</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.transfer.s3.S3TransferManager</span>&nbsp;<span class="element-name">getTransferManager</span><wbr><span class="parameters">(software.amazon.awssdk.services.s3.S3Uri&nbsp;s3Uri)</span></div>
+<div class="block">Get a <code>S3TransferManager</code> instance for use with the given <code>s3Uri</code>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>s3Uri</code> - The S3 URI this transfer manager will be interacting with</dd>
+<dt>Returns:</dt>
+<dd>An instance of <code>S3TransferManager</code> backed by an appropriate S3 async client for the given URI</dd>
 </dl>
 </section>
 </li>

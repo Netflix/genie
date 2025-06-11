@@ -79,7 +79,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code>io.grpc.BindableService</code></dd>
+<dd><code>com.netflix.genie.proto.JobServiceGrpc.AsyncService</code>, <code>io.grpc.BindableService</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GRpcJobServiceImpl</span>
@@ -236,8 +236,6 @@ loadScripts(document, 'script');</script>
  io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.HandshakeResponse&gt;&nbsp;responseObserver)</span></div>
 <div class="block">This API gives the server a chance to reject a client/agent based on its metadata (version, location, ...).</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>handshake</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing client metadata</dd>
 <dd><code>responseObserver</code> - To send the response</dd>
@@ -251,8 +249,6 @@ loadScripts(document, 'script');</script>
  io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ConfigureResponse&gt;&nbsp;responseObserver)</span></div>
 <div class="block">This API provides runtime configuration to the agent (example: timeouts, parallelism, etc.).</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>configure</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The agent request</dd>
 <dd><code>responseObserver</code> - To send the response</dd>
@@ -266,8 +262,6 @@ loadScripts(document, 'script');</script>
  io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ReserveJobIdResponse&gt;&nbsp;responseObserver)</span></div>
 <div class="block">This API will reserve a job id using the supplied metadata in the request and return the reserved job id.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>reserveJobId</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing all the metadata necessary to reserve a job id in the system</dd>
 <dd><code>responseObserver</code> - To send the response</dd>
@@ -283,8 +277,6 @@ loadScripts(document, 'script');</script>
  needed to flesh out a job specification for the Agent to run. The request parameters will be stored in the
  database.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>resolveJobSpecification</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request information</dd>
 <dd><code>responseObserver</code> - How to send a response</dd>
@@ -299,8 +291,6 @@ loadScripts(document, 'script');</script>
 <div class="block">Assuming a specification has already been resolved the agent will call this API with a job id to fetch the
  specification.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>getJobSpecification</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing the job id to return the specification for</dd>
 <dd><code>responseObserver</code> - How to send a response</dd>
@@ -316,8 +306,6 @@ loadScripts(document, 'script');</script>
  operation is completely transient and just reflects what the job specification would look like given the
  current state of the system and the input parameters.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>resolveJobSpecificationDryRun</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing all the metadata required to resolve a job specification</dd>
 <dd><code>responseObserver</code> - The observer to send a response with</dd>
@@ -331,8 +319,6 @@ loadScripts(document, 'script');</script>
  io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ClaimJobResponse&gt;&nbsp;responseObserver)</span></div>
 <div class="block">When an agent is claiming responsibility and ownership for a job this API is called.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>claimJob</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing the job id being claimed and other pertinent metadata</dd>
 <dd><code>responseObserver</code> - The observer to send a response with</dd>
@@ -346,8 +332,6 @@ loadScripts(document, 'script');</script>
  io.grpc.stub.StreamObserver&lt;com.netflix.genie.proto.ChangeJobStatusResponse&gt;&nbsp;responseObserver)</span></div>
 <div class="block">When the agent wants to tell the system that the status of a job is changed this API is called.</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>changeJobStatus</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing the necessary metadata to change job status for a given job</dd>
 <dd><code>responseObserver</code> - The observer to send a response with</dd>
@@ -362,8 +346,6 @@ loadScripts(document, 'script');</script>
 <div class="block">When the agent wants to confirm it's status is still the expected one (i.e. that the leader didn't mark the
  job failed).</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>getJobStatus</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing the job id to look up</dd>
 <dd><code>responseObserver</code> - The observer to send a response with</dd>
@@ -378,8 +360,6 @@ loadScripts(document, 'script');</script>
 <div class="block">When the agent wants to set the archival status of a job post-execution (i.e. archived successfully, or failed
  to archive).</div>
 <dl class="notes">
-<dt>Overrides:</dt>
-<dd><code>changeJobArchiveStatus</code>&nbsp;in class&nbsp;<code>com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - The request containing the job id to look up</dd>
 <dd><code>responseObserver</code> - The observer to send a response with</dd>

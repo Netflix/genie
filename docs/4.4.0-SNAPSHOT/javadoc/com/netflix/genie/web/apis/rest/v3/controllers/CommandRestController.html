@@ -208,7 +208,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#insertClusterCriterionForCommand(java.lang.String,int,com.netflix.genie.common.internal.dtos.Criterion)" class="member-name-link">insertClusterCriterionForCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
- @javax.validation.constraints.Min(0L) int&nbsp;priority,
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority,
  @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Insert a new cluster criterion for the given command at the supplied priority.</div>
@@ -252,7 +252,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeClusterCriterionFromCommand(java.lang.String,int)" class="member-name-link">removeClusterCriterionFromCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Remove the criterion with the given priority from the given command.</div>
 </div>
@@ -971,7 +971,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">insertClusterCriterionForCommand</span><wbr><span class="parameters">(@PathVariable("id")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @PathVariable("priority") @Min(0L)
- @javax.validation.constraints.Min(0L) int&nbsp;priority,
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority,
  @RequestBody @Valid
  @Valid <a href="../../../../../common/internal/dtos/Criterion.html" title="class in com.netflix.genie.common.internal.dtos">Criterion</a>&nbsp;criterion)</span>
                                       throws <span class="exceptions"><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
@@ -994,7 +994,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">removeClusterCriterionFromCommand</span><wbr><span class="parameters">(@PathVariable("id")
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
  @PathVariable("priority") @Min(0L)
- @javax.validation.constraints.Min(0L) int&nbsp;priority)</span>
+ @jakarta.validation.constraints.Min(0L) int&nbsp;priority)</span>
                                        throws <span class="exceptions"><a href="../../../../exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></span></div>
 <div class="block">Remove the criterion with the given priority from the given command.</div>
 <dl class="notes">

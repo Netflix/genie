@@ -144,12 +144,15 @@ implements org.springframework.scheduling.Trigger</span></div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nextExecutionTime(org.springframework.scheduling.TriggerContext)" class="member-name-link">nextExecutionTime</a><wbr>(org.springframework.scheduling.TriggerContext&nbsp;triggerContext)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"></div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nextExecution(org.springframework.scheduling.TriggerContext)" class="member-name-link">nextExecution</a><wbr>(org.springframework.scheduling.TriggerContext&nbsp;triggerContext)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nextExecutionTime(org.springframework.scheduling.TriggerContext)" class="member-name-link">nextExecutionTime</a><wbr>(org.springframework.scheduling.TriggerContext&nbsp;triggerContext)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Reset the delay to the minimum given at construction time.</div>
 </div>
 </div>
@@ -216,6 +219,16 @@ implements org.springframework.scheduling.Trigger</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>nextExecutionTime</code>&nbsp;in interface&nbsp;<code>org.springframework.scheduling.Trigger</code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="nextExecution(org.springframework.scheduling.TriggerContext)">
+<h3>nextExecution</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a></span>&nbsp;<span class="element-name">nextExecution</span><wbr><span class="parameters">(org.springframework.scheduling.TriggerContext&nbsp;triggerContext)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code>nextExecution</code>&nbsp;in interface&nbsp;<code>org.springframework.scheduling.Trigger</code></dd>
 </dl>
 </section>
 </li>
