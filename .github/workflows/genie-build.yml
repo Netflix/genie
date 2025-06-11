@@ -9,6 +9,9 @@ on:
       - v*.*.*-rc.*
   pull_request:
 
+permissions:
+    contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
