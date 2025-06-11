@@ -370,7 +370,6 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     dependsOn 'collectDocumentation'
     dependsOn 'gitPublishCopy'
     dependsOn tasks.named('gitPublishCommit')
-    dependsOn 'gitPublishPush'
 
     javaProjects.each {
         sourceSets((SourceSet) it.sourceSets.main)
