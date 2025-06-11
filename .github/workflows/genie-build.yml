@@ -1,4 +1,5 @@
 name: Genie Build
+
 on:
   push:
     branches:
@@ -39,11 +40,19 @@ jobs:
       NETFLIX_OSS_REPO_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_PASSWORD }}
       DOCKER_USER: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.ORG_NETFLIXOSS_DOCKERHUB_PASSWORD }}
-      GRGIT_USER: ${{ secrets.GRGIT_USER }}
+      GRGIT_USER: github-actions[bot]
       GRGIT_PASS: ${{ secrets.GITHUB_TOKEN }}
       GRADLE_OPTS: -Djava.io.tmpdir=/tmp/ --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
     steps:
       - uses: actions/checkout@v1
+
+      - name: Set up git remote with token for pushing
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Check git remote
+        run: git remote -v
+
       - name: Configure MySQL database
         run: |
           "${{ format('{0}/.github/configure-mysql.sh', github.workspace) }}"
