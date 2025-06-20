@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  genie:
+    image: netflixoss/genie-app:0.1.0-SNAPSHOT
+    ports:
+      - "8080:8080"
+    depends_on:
+      - genie-hadoop-prod
+      - genie-hadoop-test
+      - genie-apache
+      - genie-trino
+    tty: true
+    container_name: genie_demo_app_0.1.0-SNAPSHOT
+  genie-apache:
+    image: netflixoss/genie-demo-apache:0.1.0-SNAPSHOT
+    tty: true
+    container_name: genie_demo_apache_0.1.0-SNAPSHOT
+  genie-client:
+    image: netflixoss/genie-demo-client:0.1.0-SNAPSHOT
+    depends_on:
+      - genie
+    tty: true
+    container_name: genie_demo_client_0.1.0-SNAPSHOT
+  genie-hadoop-prod:
+    image: sequenceiq/hadoop-docker:2.7.1
+    command: /bin/bash -c "/usr/local/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver && /etc/bootstrap.sh -bash"
+    ports:
+      - "19888:19888"
+      - "50070:50070"
+      - "50075:50075"
+      - "8088:8088"
+      - "8042:8042"
+    tty: true
+    container_name: genie_demo_hadoop_prod_0.1.0-SNAPSHOT
+  genie-hadoop-test:
+    image: sequenceiq/hadoop-docker:2.7.1
+    command: /bin/bash -c "/usr/local/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver && /etc/bootstrap.sh -bash"
+    ports:
+      - "19889:19888"
+      - "50071:50070"
+      - "50076:50075"
+      - "8089:8088"
+      - "8043:8042"
+    tty: true
+    container_name: genie_demo_hadoop_test_0.1.0-SNAPSHOT
+  genie-trino:
+    image: trinodb/trino:374
+    ports:
+      - "9090:8080"
+    tty: true
+    container_name: genie_demo_trino_0.1.0-SNAPSHOT
