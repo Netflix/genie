@@ -133,8 +133,10 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             if (!this.activeFileTransfers.isEmpty()) {
                 this.drain();
             }
-            this.scheduledTask.cancel(false);
-            this.scheduledTask = null;
+            if (this.scheduledTask != null) {
+                this.scheduledTask.cancel(false);
+                this.scheduledTask = null;
+            }
             this.discardCurrentStream(true);
             while (!this.activeFileTransfers.isEmpty()) {
                 log.debug("{} transfers are still active after waiting", this.activeFileTransfers.size());
