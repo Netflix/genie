@@ -69,6 +69,6 @@ public class AgentFileStreamProperties {
     /**
      * How long to store a manifest before considering it stale and evicting it.
      */
-    private Duration manifestCacheExpiration = Duration.ofSeconds(30);
+    private Duration manifestCacheExpiration = Duration.ofSeconds(120);
 
 }
