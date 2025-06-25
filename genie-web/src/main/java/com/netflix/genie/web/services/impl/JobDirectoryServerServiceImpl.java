@@ -275,7 +275,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                     parentPath -> {
                         final DirectoryManifest.ManifestEntry parentEntry = manifest
                             .getEntry(parentPath)
-                            .orElseThrow(IllegalArgumentException::new);
+                            .orElseThrow(() ->
+                                new IllegalArgumentException("Parent entry not found: " + parentPath));
                         directory.setParent(createEntry(parentEntry, baseUri));
                     }
                 );
@@ -283,7 +284,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 for (final String childPath : entry.getChildren()) {
                     final DirectoryManifest.ManifestEntry childEntry = manifest
                         .getEntry(childPath)
-                        .orElseThrow(IllegalArgumentException::new);
+                        .orElseThrow(() ->
+                            new IllegalArgumentException("Child entry not found: " + childPath));
 
                     if (childEntry.isDirectory()) {
                         directories.add(this.createEntry(childEntry, baseUri));
@@ -292,7 +294,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                     }
                 }
             } catch (final IllegalArgumentException iae) {
-                throw new GenieServerException("Error while traversing files manifest: " + iae.getMessage(), iae);
+                throw new GenieNotFoundException("Requested resource not found in manifest: " + iae.getMessage(), iae);
             }
 
             directories.sort(Comparator.comparing(DefaultDirectoryWriter.Entry::getName));
