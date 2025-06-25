@@ -197,7 +197,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                         throw new GenieServerUnavailableException("Agent connection has moved or was terminated");
                     }
                     manifest = this.agentFileStreamService.getManifest(id).orElseThrow(
-                        () -> new GenieNotFoundException("Manifest not found for job " + id + " generally due to job not started or agent disconnected.")
+                        () -> new GenieNotFoundException("Manifest not found for job " + id + " generally due to job not started.")
                     );
                     jobDirRoot = AgentFileProtocolResolver.createUri(
                         id,
