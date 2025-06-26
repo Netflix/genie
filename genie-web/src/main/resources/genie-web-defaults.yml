@@ -125,6 +125,8 @@ spring:
         static: us-east-1
       stack:
         auto: false
+    compatibility-verifier:
+      enabled: false
     zookeeper:
       enabled: false
   application:
