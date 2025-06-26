@@ -271,12 +271,15 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
             if (controlStreamDisconnected) {
                 log.warn("Control stream disconnected, immediately trying to reconnect and push manifest");
+                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 pushManifest();
             } else if (hasChanges) {
                 log.debug("Directory changes detected, pushing manifest");
+                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 pushManifest();
             } else if (timeThresholdExceeded) {
                 log.debug("Time threshold exceeded ({} seconds), pushing manifest", MANIFEST_PUSH_INTERVAL_SECONDS);
+                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 pushManifest();
             }
         } catch (Exception e) {

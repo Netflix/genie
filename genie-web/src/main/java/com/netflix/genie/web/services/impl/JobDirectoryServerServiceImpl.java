@@ -64,6 +64,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -282,15 +283,17 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 );
 
                 for (final String childPath : entry.getChildren()) {
-                    final DirectoryManifest.ManifestEntry childEntry = manifest
-                        .getEntry(childPath)
-                        .orElseThrow(() ->
-                            new IllegalArgumentException("Child entry not found: " + childPath));
+                    final Optional<DirectoryManifest.ManifestEntry> childEntryOpt = manifest.getEntry(childPath);
 
-                    if (childEntry.isDirectory()) {
-                        directories.add(this.createEntry(childEntry, baseUri));
+                    if (childEntryOpt.isPresent()) {
+                        final DirectoryManifest.ManifestEntry childEntry = childEntryOpt.get();
+                        if (childEntry.isDirectory()) {
+                            directories.add(this.createEntry(childEntry, baseUri));
+                        } else {
+                            files.add(this.createEntry(childEntry, baseUri));
+                        }
                     } else {
-                        files.add(this.createEntry(childEntry, baseUri));
+                        log.warn("Child entry not found in manifest, skipping: {}", childPath);
                     }
                 }
             } catch (final IllegalArgumentException iae) {

@@ -312,27 +312,15 @@ public class GRpcAgentFileStreamServiceImpl
         ) {
             log.debug("Control stream {}", t == null ? "completed" : "error: " + t.getMessage());
 
-            String removedJobId = null;
-            for (Map.Entry<String, ControlStreamObserver> entry : this.controlStreamMap.entrySet()) {
-                if (entry.getValue() == controlStreamObserver) {
-                    removedJobId = entry.getKey();
-                    break;
-                }
-            }
-
-            boolean foundAndRemoved = false;
-            if (removedJobId != null) {
-                this.controlStreamMap.remove(removedJobId);
-                foundAndRemoved = true;
-            }
+            final boolean foundAndRemoved = this.controlStreamMap
+                .entrySet()
+                .removeIf(entry -> entry.getValue() == controlStreamObserver);
 
             if (foundAndRemoved) {
                 log.debug(
                     "Removed a control stream due to {}",
                     t == null ? "completion" : "error: " + t.getMessage()
                 );
-                this.manifestCache.invalidate(removedJobId);
-                log.debug("Invalidated manifest cache for jobId={}", removedJobId);
             }
         }
     }

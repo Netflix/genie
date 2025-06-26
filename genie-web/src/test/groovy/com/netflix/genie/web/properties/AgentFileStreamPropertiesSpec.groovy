@@ -33,7 +33,7 @@ class AgentFileStreamPropertiesSpec extends Specification {
         props.getStalledTransferTimeout() == Duration.ofSeconds(20)
         props.getStalledTransferCheckInterval() == Duration.ofSeconds(5)
         props.getWriteRetryDelay() == Duration.ofMillis(300)
-        props.getManifestCacheExpiration() == Duration.ofSeconds(120)
+        props.getManifestCacheExpiration() == Duration.ofSeconds(60)
 
         when:
         props.setMaxConcurrentTransfers(3)
@@ -41,7 +41,7 @@ class AgentFileStreamPropertiesSpec extends Specification {
         props.setStalledTransferTimeout(Duration.ofSeconds(40))
         props.setStalledTransferCheckInterval(Duration.ofSeconds(10))
         props.setWriteRetryDelay(Duration.ofMillis(600))
-        props.setManifestCacheExpiration(Duration.ofSeconds(60))
+        props.setManifestCacheExpiration(Duration.ofSeconds(120))
 
         then:
         props.getMaxConcurrentTransfers() == 3
@@ -49,6 +49,6 @@ class AgentFileStreamPropertiesSpec extends Specification {
         props.getStalledTransferTimeout() == Duration.ofSeconds(40)
         props.getStalledTransferCheckInterval() == Duration.ofSeconds(10)
         props.getWriteRetryDelay() == Duration.ofMillis(600)
-        props.getManifestCacheExpiration() == Duration.ofSeconds(60)
+        props.getManifestCacheExpiration() == Duration.ofSeconds(120)
     }
 }
