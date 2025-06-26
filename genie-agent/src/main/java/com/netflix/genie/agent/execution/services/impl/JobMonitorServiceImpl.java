@@ -97,7 +97,7 @@ class JobMonitorServiceImpl implements JobMonitorService {
         try {
             manifest = this.manifestCreatorService.getDirectoryManifest(jobDirectory);
         } catch (IOException e) {
-            log.warn("Failed to obtain manifest: {}" + e.getMessage());
+            log.warn("Failed to obtain manifest: {}", e.getMessage());
             return false;
         }
 

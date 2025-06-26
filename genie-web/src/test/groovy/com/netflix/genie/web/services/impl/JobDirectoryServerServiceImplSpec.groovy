@@ -280,6 +280,6 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.empty()
         1 * this.timer.record(_ as Long, TimeUnit.NANOSECONDS)
-        thrown(GenieServerUnavailableException)
+        thrown(GenieNotFoundException)
     }
 }
