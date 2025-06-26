@@ -23,14 +23,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.assertj.core.api.Assertions;
 
 /**
  * Unit tests for {@link RangeErrorController}.
@@ -58,11 +53,11 @@ class RangeErrorControllerTest {
         final ResponseEntity<Object> responseEntity = this.controller.handleError(this.request);
 
         // Verify response
-        assertThat(responseEntity).isNotNull();
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
-        assertThat(responseEntity.getHeaders().getFirst("Content-Range")).isEqualTo("bytes */0");
-        assertThat(responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_LENGTH)).isEqualTo("0");
-        assertThat(responseEntity.getBody()).isNull();
+        Assertions.assertThat(responseEntity).isNotNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        Assertions.assertThat(responseEntity.getHeaders().getFirst("Content-Range")).isEqualTo("bytes */0");
+        Assertions.assertThat(responseEntity.getHeaders().getFirst(HttpHeaders.CONTENT_LENGTH)).isEqualTo("0");
+        Assertions.assertThat(responseEntity.getBody()).isNull();
     }
 
     /**
@@ -77,7 +72,7 @@ class RangeErrorControllerTest {
         final ResponseEntity<Object> responseEntity = this.controller.handleError(this.request);
 
         // Verify response is null (letting Spring handle it)
-        assertThat(responseEntity).isNull();
+        Assertions.assertThat(responseEntity).isNull();
     }
 
     /**
@@ -91,7 +86,7 @@ class RangeErrorControllerTest {
         final ResponseEntity<Object> responseEntity = this.controller.handleError(this.request);
 
         // Verify response is null (letting Spring handle it)
-        assertThat(responseEntity).isNull();
+        Assertions.assertThat(responseEntity).isNull();
     }
 
     /**
@@ -106,24 +101,6 @@ class RangeErrorControllerTest {
         final ResponseEntity<Object> responseEntity = this.controller.handleError(this.request);
 
         // Verify response is null (letting Spring handle it)
-        assertThat(responseEntity).isNull();
-    }
-
-    /**
-     * Test with mocked request to verify attribute access.
-     */
-    @Test
-    void testWithMockedRequest() {
-        // Create mock request
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        when(mockRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
-            .thenReturn(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value());
-
-        // Call the controller
-        final ResponseEntity<Object> responseEntity = this.controller.handleError(mockRequest);
-
-        // Verify response
-        assertThat(responseEntity).isNotNull();
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        Assertions.assertThat(responseEntity).isNull();
     }
 }
