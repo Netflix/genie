@@ -103,7 +103,7 @@ configure((Set<Project>) ext.javaProjects) {
                 mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
                 mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
                 mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
-                mavenBom "org.spockframework:spock-bom:2.4-M5-groovy-3.0"
+                mavenBom "org.spockframework:spock-bom:${spock_spring_boot_3_version}"
             }
             dependencies {
                 dependency("io.awspring.cloud:spring-cloud-aws-starter:${spring_cloud_aws_3_version}")
@@ -113,14 +113,14 @@ configure((Set<Project>) ext.javaProjects) {
                 mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_2_version}"
                 mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_2_version}"
                 mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_2_version}"
-                mavenBom "org.spockframework:spock-bom:2.0-groovy-3.0"
+                mavenBom "org.spockframework:spock-bom:${spock_spring_boot_2_version}"
             }
         }
 
         imports {
-            mavenBom "software.amazon.awssdk:bom:2.30.17"
+            mavenBom "software.amazon.awssdk:bom:${aws_sdk_version}"
             mavenBom "com.google.protobuf:protobuf-bom:${protobuf_version}"
-            mavenBom "com.squareup.okhttp3:okhttp-bom:4.9.2"
+            mavenBom "com.squareup.okhttp3:okhttp-bom:${okhttp_version}"
             mavenBom "io.grpc:grpc-bom:${grpc_version}"
             mavenBom "io.netty:netty-bom:${netty_version}"
             mavenBom "org.testcontainers:testcontainers-bom:1.16.3"
