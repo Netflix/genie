@@ -45,7 +45,6 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
@@ -58,16 +57,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 
 /**
  * Implementation of {@link AgentFileStreamService} over gRPC.
  * Sets up a persistent 2-way stream ('sync') to push manifest updates and receive file requests.
  * When a file request is received, a creates a new 2 way stream ('transmit') and pushes file chunks, waits for ACK,
  * sends the next chunk, ... until the file range requested is transmitted. Then the stream is shut down.
- * This implementation periodically pushes manifests at a fixed interval, and also checks for directory changes
- * every 5 seconds, pushing immediately if changes are detected or if 30 seconds have passed since the last push.
  *
  * @author mprimi
  * @since 4.0.0
@@ -75,13 +70,6 @@ import java.util.stream.Stream;
 @Slf4j
 public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
-    // Manifest push interval in seconds
-    private static final int MANIFEST_PUSH_INTERVAL_SECONDS = 30;
-
-    // Directory check interval in seconds
-    private static final int DIRECTORY_CHECK_INTERVAL_SECONDS = 5;
-
-    // Service dependencies
     private final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub;
     private final TaskScheduler taskScheduler;
     private final ExponentialBackOffTrigger trigger;
@@ -93,29 +81,12 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
     private final int maxStreams;
 
-    // Service state
     private StreamObserver<AgentManifestMessage> controlStreamObserver;
     private String jobId;
     private Path jobDirectoryPath;
     private final AtomicBoolean started = new AtomicBoolean();
-    private ScheduledFuture<?> scheduledCheckTask;
+    private ScheduledFuture<?> scheduledTask;
 
-    // Directory state tracking
-    private Set<String> directoryEntries = Sets.newHashSet();
-    private final AtomicLong lastManifestPushTime = new AtomicLong(0);
-
-    // Monitoring counters
-    private final AtomicInteger manifestPushCount = new AtomicInteger(0);
-
-    /**
-     * Constructor.
-     *
-     * @param fileStreamServiceStub              The gRPC stub for file streaming
-     * @param taskScheduler                      The task scheduler for periodic operations
-     * @param manifestProtoConverter             Converter for manifest proto messages
-     * @param jobDirectoryManifestCreatorService Service to create directory manifests
-     * @param properties                         Configuration properties
-     */
     GRpcAgentFileStreamServiceImpl(
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         final TaskScheduler taskScheduler,
@@ -138,34 +109,21 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
     /**
      * {@inheritDoc}
-     * Start the file stream service for a specific job.
      */
     @Override
     public synchronized void start(final String claimedJobId, final Path jobDirectoryRoot) {
-        // Service can be started only once
+        //Service can be started only once
         if (!this.started.compareAndSet(false, true)) {
             throw new IllegalStateException("Service can be started only once");
         }
         this.jobId = claimedJobId;
         this.jobDirectoryPath = jobDirectoryRoot;
-
-        // Schedule initial push immediately
-        this.taskScheduler.schedule(this::pushManifest, Instant.now());
-        this.lastManifestPushTime.set(System.currentTimeMillis());
-
-        // Schedule periodic directory checks
-        this.scheduledCheckTask = this.taskScheduler.scheduleAtFixedRate(
-            this::checkDirectoryAndPushIfNeeded,
-            Duration.ofSeconds(DIRECTORY_CHECK_INTERVAL_SECONDS)
-        );
-
-        log.debug("Started with periodic manifest push every {} seconds and directory checks every {} seconds",
-            MANIFEST_PUSH_INTERVAL_SECONDS, DIRECTORY_CHECK_INTERVAL_SECONDS);
+        this.scheduledTask = this.taskScheduler.schedule(this::pushManifestSync, trigger);
+        log.debug("Started");
     }
 
     /**
      * {@inheritDoc}
-     * Stop the file stream service and clean up resources.
      */
     @Override
     public synchronized void stop() {
@@ -175,9 +133,9 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             if (!this.activeFileTransfers.isEmpty()) {
                 this.drain();
             }
-            if (this.scheduledCheckTask != null) {
-                this.scheduledCheckTask.cancel(false);
-                this.scheduledCheckTask = null;
+            if (this.scheduledTask != null) {
+                this.scheduledTask.cancel(false);
+                this.scheduledTask = null;
             }
             this.discardCurrentStream(true);
             while (!this.activeFileTransfers.isEmpty()) {
@@ -197,32 +155,20 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
     /**
      * {@inheritDoc}
-     * Force an immediate manifest push to the server.
      */
     @Override
     public synchronized Optional<ScheduledFuture<?>> forceServerSync() {
         if (started.get()) {
             try {
-                log.debug("Forcing a manifest refresh");
-                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
-
-                // Schedule immediate push
-                final ScheduledFuture<?> future = this.taskScheduler.schedule(
-                    this::pushManifest,
-                    Instant.now()
-                );
-
-                return Optional.of(future);
+                log.debug("Forcing an immediate manifest refresh");
+                return Optional.of(this.taskScheduler.schedule(this::pushManifestSync, Instant.now()));
             } catch (Exception e) {
-                log.error("Failed to force push a fresh manifest", e);
+                log.error("Failed to force an immediate manifest refresh", e);
             }
         }
         return Optional.empty();
     }
 
-    /**
-     * Wait for all active transfers to complete or timeout.
-     */
     private void drain() {
         final AtomicInteger acquiredPermitsCount = new AtomicInteger();
         // Task that attempts to acquire all available transfer permits.
@@ -255,72 +201,11 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         }
     }
 
-    /**
-     * Check for directory changes and push manifest if needed.
-     */
-    private synchronized void checkDirectoryAndPushIfNeeded() {
-        if (!started.get()) {
-            return;
-        }
-
-        try {
-            final boolean controlStreamDisconnected = (this.controlStreamObserver == null);
-            final boolean hasChanges = this.checkForDirectoryChanges();
-            final long timeSinceLastPush = System.currentTimeMillis() - this.lastManifestPushTime.get();
-            final boolean timeThresholdExceeded = timeSinceLastPush >= TimeUnit.SECONDS.toMillis(MANIFEST_PUSH_INTERVAL_SECONDS);
-
-            if (controlStreamDisconnected) {
-                log.warn("Control stream disconnected, immediately trying to reconnect and push manifest");
-                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
-                pushManifest();
-            } else if (hasChanges) {
-                log.debug("Directory changes detected, pushing manifest");
-                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
-                pushManifest();
-            } else if (timeThresholdExceeded) {
-                log.debug("Time threshold exceeded ({} seconds), pushing manifest", MANIFEST_PUSH_INTERVAL_SECONDS);
-                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
-                pushManifest();
-            }
-        } catch (Exception e) {
-            log.error("Error during directory check", e);
-        }
-    }
-
-    /**
-     * Check for changes in the directory structure.
-     *
-     * @return true if changes were detected, false otherwise
-     * @throws IOException if there's an error accessing the file system
-     */
-    private boolean checkForDirectoryChanges() throws IOException {
-        final Set<String> currentEntries = Sets.newHashSet();
-
-        try (Stream<Path> pathStream = Files.walk(jobDirectoryPath)) {
-            pathStream
-                .filter(Files::exists)
-                .forEach(path -> currentEntries.add(jobDirectoryPath.relativize(path).toString()));
-        }
-
-        // Check if files/directories were added or removed
-        if (!currentEntries.equals(directoryEntries)) {
-            directoryEntries = currentEntries;
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Push the current job directory manifest to the server.
-     */
-    private synchronized void pushManifest() {
+    private synchronized void pushManifestSync() {
         if (started.get()) {
-            final int pushAttempt = manifestPushCount.incrementAndGet();
-            log.debug("Pushing manifest (attempt #{})", pushAttempt);
-
             final AgentManifestMessage jobFileManifest;
             try {
+                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 jobFileManifest = manifestProtoConverter.manifestToProtoMessage(
                     this.jobId,
                     this.jobDirectoryManifestCreatorService.getDirectoryManifest(this.jobDirectoryPath)
@@ -344,36 +229,20 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
 
             log.debug("Sending manifest via control stream");
             this.controlStreamObserver.onNext(jobFileManifest);
-
-            // Update last push time
-            this.lastManifestPushTime.set(System.currentTimeMillis());
         }
     }
 
-    /**
-     * Handle errors on the control stream.
-     *
-     * @param t The error that occurred
-     */
     private void handleControlStreamError(final Throwable t) {
         log.warn("Control stream error: {}", t.getMessage(), t);
         this.trigger.reset();
         this.discardCurrentStream(false);
     }
 
-    /**
-     * Handle normal completion of the control stream.
-     */
     private void handleControlStreamCompletion() {
         log.debug("Control stream completed");
         this.discardCurrentStream(false);
     }
 
-    /**
-     * Discard the current control stream.
-     *
-     * @param sendStreamCompletion Whether to send a completion message before discarding
-     */
     private synchronized void discardCurrentStream(final boolean sendStreamCompletion) {
         if (this.controlStreamObserver != null) {
             log.debug("Discarding current control stream");
@@ -385,14 +254,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         }
     }
 
-    /**
-     * Handle a file request from the server.
-     *
-     * @param streamId     The ID of the stream for this file transfer
-     * @param relativePath The path of the requested file relative to job directory
-     * @param startOffset  The starting byte offset
-     * @param endOffset    The ending byte offset
-     */
     private synchronized void handleFileRequest(
         final String streamId,
         final String relativePath,
@@ -442,37 +303,22 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
                 log.debug("Created and started new file transfer: {}", fileTransfer.streamId);
             }
         );
+
     }
 
-    /**
-     * Handle completion of a file transfer.
-     *
-     * @param fileTransfer The completed file transfer
-     */
     private void handleTransferComplete(final FileTransfer fileTransfer) {
         this.activeFileTransfers.remove(fileTransfer);
         this.concurrentTransfersSemaphore.release();
         log.debug("File transfer completed: {}", fileTransfer.streamId);
     }
 
-    /**
-     * Observer for server control messages.
-     */
     private static class ServerControlStreamObserver implements StreamObserver<ServerControlMessage> {
         private final GRpcAgentFileStreamServiceImpl gRpcAgentFileManifestService;
 
-        /**
-         * Constructor.
-         *
-         * @param gRpcAgentFileManifestService The file stream service
-         */
         ServerControlStreamObserver(final GRpcAgentFileStreamServiceImpl gRpcAgentFileManifestService) {
             this.gRpcAgentFileManifestService = gRpcAgentFileManifestService;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onNext(final ServerControlMessage value) {
             if (value.getMessageCase() == ServerControlMessage.MessageCase.SERVER_FILE_REQUEST) {
@@ -489,18 +335,12 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onError(final Throwable t) {
             log.debug("Received control stream error: {}", t.getClass().getSimpleName());
             this.gRpcAgentFileManifestService.handleControlStreamError(t);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onCompleted() {
             log.debug("Received control stream completion");
@@ -508,9 +348,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         }
     }
 
-    /**
-     * Represents an active file transfer.
-     */
     private static class FileTransfer implements StreamObserver<ServerAckMessage> {
         private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
         private final String streamId;
@@ -522,16 +359,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         private final AtomicBoolean completed = new AtomicBoolean();
         private long watermark;
 
-        /**
-         * Constructor.
-         *
-         * @param gRpcAgentFileStreamService The file stream service
-         * @param streamId                   The ID for this transfer stream
-         * @param absolutePath               The absolute path to the file
-         * @param startOffset                The starting byte offset
-         * @param endOffset                  The ending byte offset
-         * @param maxChunkSize               The maximum size of each chunk
-         */
         FileTransfer(
             final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService,
             final String streamId,
@@ -557,9 +384,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             );
         }
 
-        /**
-         * Start the file transfer.
-         */
         void start() {
             log.debug("Starting file transfer: {}", streamId);
             try {
@@ -570,12 +394,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
 
-        /**
-         * Complete the file transfer.
-         *
-         * @param shutdownStream Whether to shut down the stream
-         * @param error          The error that occurred, if any
-         */
         private void completeTransfer(final boolean shutdownStream, @Nullable final Exception error) {
             if (this.completed.compareAndSet(false, true)) {
                 log.debug(
@@ -599,16 +417,12 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
 
-        /**
-         * Send the next chunk of the file.
-         *
-         * @throws IOException If there's an error reading the file
-         */
         @SuppressFBWarnings(
             value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE",
             justification = "https://github.com/spotbugs/spotbugs/issues/756"
         )
         private void sendChunk() throws IOException {
+
             if (this.watermark < this.endOffset - 1) {
                 // Reset mark before reading into the buffer
                 readBuffer.rewind();
@@ -638,9 +452,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onNext(final ServerAckMessage value) {
             log.debug("Received chunk acknowledgement");
@@ -652,18 +463,12 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onError(final Throwable t) {
             log.warn("Stream error: {} : {}", t.getClass().getSimpleName(), t.getMessage());
             this.completeTransfer(false, null);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onCompleted() {
             log.debug("Stream completed");

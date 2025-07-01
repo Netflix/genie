@@ -126,7 +126,8 @@ public class ExponentialBackOffTrigger implements Trigger {
 
     @Override
     public Instant nextExecution(final TriggerContext triggerContext) {
-        return null;
+        final Date next = nextExecutionTime(triggerContext);
+        return next != null ? next.toInstant() : null;
     }
 
     /**

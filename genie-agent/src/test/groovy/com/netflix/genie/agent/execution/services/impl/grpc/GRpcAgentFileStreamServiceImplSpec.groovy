@@ -35,18 +35,16 @@ import io.grpc.testing.GrpcServerRule
 import org.assertj.core.util.Lists
 import org.junit.Rule
 import org.springframework.scheduling.TaskScheduler
+import org.springframework.scheduling.Trigger
 import spock.lang.Specification
 import spock.lang.TempDir
 
-import java.lang.reflect.Field
 import java.nio.file.Files
 import java.nio.file.Path
-import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import java.util.concurrent.atomic.AtomicLong
 
 class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
@@ -101,12 +99,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.start(jobId, this.temporaryFolder)
 
         then:
-        1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            Runnable r, Instant i ->
-                return scheduledTask
-        }
-        1 * this.taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
-            Runnable r, Duration d ->
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            Runnable r, Trigger t ->
                 runnableCapture = r
                 return scheduledTask
         }
@@ -132,6 +126,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     }
 
     def "Push manifest and handle errors"() {
+
         setup:
         Runnable runnableCapture
         AgentManifestMessage manifestMessage = AgentManifestMessage.getDefaultInstance()
@@ -140,20 +135,17 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.start(jobId, temporaryFolder)
 
         then:
-        // Capture the initial schedule task
-        1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            Runnable r, Instant i ->
-                // Execute the initial push task immediately
-                r.run()
-                return scheduledTask
-        }
-        // Capture the periodic check task
-        1 * this.taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
-            Runnable r, Duration d ->
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            Runnable r, Trigger t ->
                 runnableCapture = r
                 return scheduledTask
         }
-        // Verify the initial push task called the expected methods
+        runnableCapture != null
+
+        when:
+        runnableCapture.run()
+
+        then: "A sync channel is open and a manifest is transmitted"
         1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder) >> manifest
         1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
@@ -161,8 +153,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         manifestMessage == remoteService.manifestMessageReceived.get(0)
 
         when:
-        // Set last push time to long ago to ensure pushManifest is called
-        setLastPushTimeToLongAgo(agentFileStreamService)
         runnableCapture.run()
 
         then: "Handle manifest creation exception"
@@ -171,8 +161,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 == remoteService.activeSyncStreams.size()
 
         when:
-        // Set last push time to long ago to ensure pushManifest is called
-        setLastPushTimeToLongAgo(agentFileStreamService)
         runnableCapture.run()
 
         then: "Handle manifest message conversion exception"
@@ -183,8 +171,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         1 == remoteService.activeSyncStreams.size()
 
         when:
-        // Set last push time to long ago to ensure pushManifest is called
-        setLastPushTimeToLongAgo(agentFileStreamService)
         runnableCapture.run()
 
         then: "Another manifest is transmitted over the existing sync channel"
@@ -198,13 +184,10 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.forceServerSync()
 
         then:
-        1 * this.jobDirectoryManifestService.invalidateCachedDirectoryManifest(temporaryFolder)
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
         this.grpcServerRule.getChannel().shutdownNow()
-        // Set last push time to long ago to ensure pushManifest is called
-        setLastPushTimeToLongAgo(agentFileStreamService)
         runnableCapture.run()
 
         then:
@@ -222,6 +205,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     }
 
     def "Reconnect after stream closed from server"() {
+
         setup:
         Runnable runnableCapture
         AgentManifestMessage manifestMessage = AgentManifestMessage.getDefaultInstance()
@@ -230,18 +214,17 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.start(jobId, temporaryFolder)
 
         then:
-        1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            Runnable r, Instant i ->
-                // Execute the initial push task immediately
-                r.run()
-                return scheduledTask
-        }
-        1 * this.taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
-            Runnable r, Duration d ->
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            Runnable r, Trigger t ->
                 runnableCapture = r
                 return scheduledTask
         }
-        // Verify the initial push task called the expected methods
+        runnableCapture != null
+
+        when:
+        runnableCapture.run()
+
+        then: "A sync channel is open and a manifest is transmitted"
         1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder) >> manifest
         1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
@@ -280,18 +263,17 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.start(jobId, temporaryFolder)
 
         then:
-        1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            Runnable r, Instant i ->
-                // Execute the initial push task immediately
-                r.run()
-                return scheduledTask
-        }
-        1 * this.taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
-            Runnable r, Duration d ->
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            Runnable r, Trigger t ->
                 runnableCapture = r
                 return scheduledTask
         }
-        // Verify the initial push task called the expected methods
+        runnableCapture != null
+
+        when:
+        runnableCapture.run()
+
+        then: "A sync channel is open and a manifest is transmitted"
         1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder) >> manifest
         1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
@@ -492,18 +474,17 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.start(jobId, temporaryFolder)
 
         then:
-        1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant) >> {
-            Runnable r, Instant i ->
-                // Execute the initial push task immediately
-                r.run()
-                return scheduledTask
-        }
-        1 * this.taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Duration) >> {
-            Runnable r, Duration d ->
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            Runnable r, Trigger t ->
                 runnableCapture = r
                 return scheduledTask
         }
-        // Verify the initial push task called the expected methods
+        runnableCapture != null
+
+        when:
+        runnableCapture.run()
+
+        then: "A sync channel is open and a manifest is transmitted"
         1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder) >> manifest
         1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
@@ -575,14 +556,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         0 == remoteService.erroredTransmitStreams.size()
         0 == remoteService.activeTransmitStreams.size()
         1 == remoteService.completedSyncStreams.size()
-    }
-
-    // Helper method to set last push time to a long time ago
-    private void setLastPushTimeToLongAgo(GRpcAgentFileStreamServiceImpl service) {
-        Field lastManifestPushTimeField = GRpcAgentFileStreamServiceImpl.class.getDeclaredField("lastManifestPushTime")
-        lastManifestPushTimeField.setAccessible(true)
-        AtomicLong lastManifestPushTime = (AtomicLong) lastManifestPushTimeField.get(service)
-        lastManifestPushTime.set(0) // Set to epoch time, which is definitely a long time ago
     }
 
     class RemoteService extends FileStreamServiceGrpc.FileStreamServiceImplBase {
