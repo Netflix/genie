@@ -84,7 +84,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     private StreamObserver<AgentManifestMessage> controlStreamObserver;
     private String jobId;
     private Path jobDirectoryPath;
-    private AtomicBoolean started = new AtomicBoolean();
+    private final AtomicBoolean started = new AtomicBoolean();
     private ScheduledFuture<?> scheduledTask;
 
     GRpcAgentFileStreamServiceImpl(
@@ -118,7 +118,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         }
         this.jobId = claimedJobId;
         this.jobDirectoryPath = jobDirectoryRoot;
-        this.scheduledTask = this.taskScheduler.schedule(this::pushManifest, trigger);
+        this.scheduledTask = this.taskScheduler.schedule(this::pushManifestSync, trigger);
         log.debug("Started");
     }
 
@@ -160,11 +160,10 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     public synchronized Optional<ScheduledFuture<?>> forceServerSync() {
         if (started.get()) {
             try {
-                log.debug("Forcing a manifest refresh");
-                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
-                return Optional.of(this.taskScheduler.schedule(this::pushManifest, Instant.now()));
+                log.debug("Forcing an immediate manifest refresh");
+                return Optional.of(this.taskScheduler.schedule(this::pushManifestSync, Instant.now()));
             } catch (Exception e) {
-                log.error("Failed to force push a fresh manifest", e);
+                log.error("Failed to force an immediate manifest refresh", e);
             }
         }
         return Optional.empty();
@@ -202,10 +201,11 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         }
     }
 
-    private synchronized void pushManifest() {
+    private synchronized void pushManifestSync() {
         if (started.get()) {
             final AgentManifestMessage jobFileManifest;
             try {
+                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 jobFileManifest = manifestProtoConverter.manifestToProtoMessage(
                     this.jobId,
                     this.jobDirectoryManifestCreatorService.getDirectoryManifest(this.jobDirectoryPath)
@@ -222,7 +222,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
                 log.debug("Creating new control stream");
                 this.controlStreamObserver = fileStreamServiceStub.sync(this.responseObserver);
                 if (this.controlStreamObserver instanceof ClientCallStreamObserver) {
-                    ((ClientCallStreamObserver) this.controlStreamObserver)
+                    ((ClientCallStreamObserver<?>) this.controlStreamObserver)
                         .setMessageCompression(this.properties.isEnableCompression());
                 }
             }

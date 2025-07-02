@@ -64,6 +64,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -197,7 +198,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                         throw new GenieServerUnavailableException("Agent connection has moved or was terminated");
                     }
                     manifest = this.agentFileStreamService.getManifest(id).orElseThrow(
-                        () -> new GenieServerUnavailableException("Manifest not found for job " + id)
+                        () -> new GenieNotFoundException("Manifest not found for job " + id + " generally due to job not started.")
                     );
                     jobDirRoot = AgentFileProtocolResolver.createUri(
                         id,
@@ -275,24 +276,28 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                     parentPath -> {
                         final DirectoryManifest.ManifestEntry parentEntry = manifest
                             .getEntry(parentPath)
-                            .orElseThrow(IllegalArgumentException::new);
+                            .orElseThrow(() ->
+                                new IllegalArgumentException("Parent entry not found: " + parentPath));
                         directory.setParent(createEntry(parentEntry, baseUri));
                     }
                 );
 
                 for (final String childPath : entry.getChildren()) {
-                    final DirectoryManifest.ManifestEntry childEntry = manifest
-                        .getEntry(childPath)
-                        .orElseThrow(IllegalArgumentException::new);
+                    final Optional<DirectoryManifest.ManifestEntry> childEntryOpt = manifest.getEntry(childPath);
 
-                    if (childEntry.isDirectory()) {
-                        directories.add(this.createEntry(childEntry, baseUri));
+                    if (childEntryOpt.isPresent()) {
+                        final DirectoryManifest.ManifestEntry childEntry = childEntryOpt.get();
+                        if (childEntry.isDirectory()) {
+                            directories.add(this.createEntry(childEntry, baseUri));
+                        } else {
+                            files.add(this.createEntry(childEntry, baseUri));
+                        }
                     } else {
-                        files.add(this.createEntry(childEntry, baseUri));
+                        log.warn("Child entry not found in manifest, skipping: {}", childPath);
                     }
                 }
             } catch (final IllegalArgumentException iae) {
-                throw new GenieServerException("Error while traversing files manifest: " + iae.getMessage(), iae);
+                throw new GenieNotFoundException("Requested resource not found in manifest: " + iae.getMessage(), iae);
             }
 
             directories.sort(Comparator.comparing(DefaultDirectoryWriter.Entry::getName));

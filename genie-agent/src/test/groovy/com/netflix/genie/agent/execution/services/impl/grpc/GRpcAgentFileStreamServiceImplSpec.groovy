@@ -184,7 +184,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         agentFileStreamService.forceServerSync()
 
         then:
-        1 * this.jobDirectoryManifestService.invalidateCachedDirectoryManifest(temporaryFolder)
         1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
