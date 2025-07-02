@@ -8062,6 +8062,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Handle constraint violation exceptions.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/RangeErrorController.html#handleError(jakarta.servlet.http.HttpServletRequest)" class="member-name-link">handleError(HttpServletRequest)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/RangeErrorController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">RangeErrorController</a></dt>
+<dd>
+<div class="block">Handles all error requests, with special handling for 416 errors.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/GenieExceptionMapper.html#handleGenieCheckedException(com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException)" class="member-name-link">handleGenieCheckedException(GenieCheckedException)</a> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/GenieExceptionMapper.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">GenieExceptionMapper</a></dt>
 <dd>
 <div class="block">Handle <a href="com/netflix/genie/common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked"><code>GenieCheckedException</code></a> instances.</div>
@@ -10750,6 +10754,13 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Supply random types.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/RangeErrorController.html" class="type-name-link" title="class in com.netflix.genie.web.apis.rest.v3.controllers">RangeErrorController</a> - Class in <a href="com/netflix/genie/web/apis/rest/v3/controllers/package-summary.html">com.netflix.genie.web.apis.rest.v3.controllers</a></dt>
+<dd>
+<div class="block">Custom error controller that properly handles 416 Range Not Satisfiable errors
+ which are incorrectly mapped to 500 errors by Spring Boot's default error handling.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/RangeErrorController.html#%3Cinit%3E()" class="member-name-link">RangeErrorController()</a> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/RangeErrorController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">RangeErrorController</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/properties/HttpProperties.Read.html#%3Cinit%3E()" class="member-name-link">Read()</a> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HttpProperties.Read.html" title="class in com.netflix.genie.web.properties">HttpProperties.Read</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/States.html#READY" class="member-name-link">READY</a> - Enum constant in enum class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/States.html" title="enum class in com.netflix.genie.agent.execution.statemachine">States</a></dt>
