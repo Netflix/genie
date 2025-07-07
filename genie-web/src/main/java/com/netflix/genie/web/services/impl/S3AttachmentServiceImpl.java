@@ -198,19 +198,9 @@ public class S3AttachmentServiceImpl implements AttachmentService {
             URI attachmentURI = null;
 
             try {
-                // Prepare object URI
                 attachmentURI = new URI(S3, objectBucket, SLASH + objectKey, null);
 
-                final long contentLength;
-                try {
-                    contentLength = attachment.contentLength();
-                    if (contentLength <= 0) {
-                        throw new SaveAttachmentException("Invalid content length: " + contentLength);
-                    }
-                    log.debug("Uploading attachment {} with content length {}", filename, contentLength);
-                } catch (IOException e) {
-                    throw new SaveAttachmentException("Failed to determine content length for " + filename, e);
-                }
+                final long contentLength = attachment.contentLength();
 
                 try (InputStream inputStream = attachment.getInputStream()) {
                     s3Client.putObject(
@@ -233,8 +223,9 @@ public class S3AttachmentServiceImpl implements AttachmentService {
             } catch (IOException | SdkClientException | URISyntaxException e) {
                 log.error("Failed to upload attachment {}: {}", filename, e.getMessage());
                 throw new SaveAttachmentException(
-                    "Failed to upload attachment: " + (attachmentURI != null ? attachmentURI : filename) +
-                        " - " + e.getMessage(),
+                    "Failed to upload attachment: " + (attachmentURI != null ? attachmentURI : filename)
+                        + " - "
+                        + e.getMessage(),
                     e
                 );
             }
