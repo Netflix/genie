@@ -835,15 +835,36 @@ public class JobRestController {
         headers.add(JobConstants.GENIE_FORWARDED_FROM_HEADER, request.getRequestURL().toString());
     }
 
-    private void copyResponseHeaders(final HttpServletResponse response, final ClientHttpResponse forwardResponse) {
+    /**
+     * Copies response headers from the forwarded response to the current response.
+     * This method has package-private access for testing purposes.
+     */
+    void copyResponseHeaders(final HttpServletResponse response, final ClientHttpResponse forwardResponse) {
         final HttpHeaders headers = forwardResponse.getHeaders();
         for (final Map.Entry<String, String> header : headers.toSingleValueMap().entrySet()) {
-            //
-            // Do not add transfer encoding header since it forces Apache to truncate the response. Ideally we should
-            // only copy headers that are needed.
-            //
-            if (!TRANSFER_ENCODING_HEADER.equalsIgnoreCase(header.getKey())) {
-                response.setHeader(header.getKey(), header.getValue());
+            final String headerName = header.getKey();
+            final String headerValue = header.getValue();
+
+            // Handle Content-Length specially
+            if (HttpHeaders.CONTENT_LENGTH.equalsIgnoreCase(headerName)) {
+                try {
+                    final long contentLength = Long.parseLong(headerValue);
+
+                    // Only set actual Content-Length if it's within 2GB limit
+                    if (contentLength <= Integer.MAX_VALUE) {
+                        response.setHeader(headerName, headerValue);
+                    } else {
+                        // To bypass the 2GB limit, we skip Content-Length for large files, and
+                        // meanwhile set a custom X-Original-Content-Length header for the original size.
+                        response.setHeader("X-Original-Content-Length", headerValue);
+                    }
+                } catch (final NumberFormatException e) {
+                    // If not parseable, just pass it through
+                    response.setHeader(headerName, headerValue);
+                }
+            } else if (!TRANSFER_ENCODING_HEADER.equalsIgnoreCase(headerName)) {
+                // Do not add transfer encoding header since it forces Apache to truncate the response
+                response.setHeader(headerName, headerValue);
             }
         }
     }

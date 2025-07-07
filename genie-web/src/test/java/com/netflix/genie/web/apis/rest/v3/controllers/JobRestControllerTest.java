@@ -66,6 +66,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.mock.web.DelegatingServletOutputStream;
 import org.springframework.web.client.HttpClientErrorException;
@@ -540,6 +541,37 @@ class JobRestControllerTest {
                     Mockito.mock(HttpServletRequest.class)
                 ))
             .withMessage(errorMessage);
+    }
+
+    @Test
+    void canHandleLargeContentLengthInResponseHeaders() throws IOException {
+        // Setup
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final ClientHttpResponse clientResponse = Mockito.mock(org.springframework.http.client.ClientHttpResponse.class);
+
+        // Create headers with a Content-Length larger than Integer.MAX_VALUE
+        final HttpHeaders headers = new HttpHeaders();
+        final String largeContentLength = String.valueOf((long) Integer.MAX_VALUE + 1);
+        headers.set(HttpHeaders.CONTENT_LENGTH, largeContentLength);
+        headers.set("Other-Header", "some-value");
+
+        // Mock the headers returned by the client response
+        Mockito.when(clientResponse.getHeaders()).thenReturn(headers);
+
+        // Create a JobRestController instance with a real copyResponseHeaders method
+        final JobRestController controllerSpy = Mockito.spy(this.controller);
+
+        // Call the method we're testing
+        controllerSpy.copyResponseHeaders(response, clientResponse);
+
+        // Verify that X-Original-Content-Length was set with the original large value
+        Mockito.verify(response).setHeader("X-Original-Content-Length", largeContentLength);
+
+        // Verify that the original Content-Length header was NOT set
+        Mockito.verify(response, Mockito.never()).setHeader(HttpHeaders.CONTENT_LENGTH, largeContentLength);
+
+        // Verify that other headers were copied normally
+        Mockito.verify(response).setHeader("Other-Header", "some-value");
     }
 
     private EntityModelAssemblers createMockResourceAssembler() {
