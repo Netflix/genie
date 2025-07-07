@@ -138,6 +138,8 @@ class S3AttachmentServiceImplSpec extends Specification {
         String jobId = jobIdPresent ? UUID.randomUUID().toString() : null
         Resource attachment1 = Mock(Resource)
         Resource attachment2 = Mock(Resource)
+        InputStream inputStream1 = Mock(InputStream)
+        InputStream inputStream2 = Mock(InputStream)
 
         when: "Attachments upload successfully"
         Set<URI> attachmentUris = this.service.saveAttachments(jobId, Sets.newHashSet(attachment1, attachment2))
@@ -157,15 +159,16 @@ class S3AttachmentServiceImplSpec extends Specification {
 
         1 * attachment1.getFilename() >> "script1.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
-        1 * attachment1.getInputStream() >> inputStream
-        1 * inputStream.available() >> DataSize.ofMegabytes(3).toBytes()
+        1 * attachment1.getInputStream() >> inputStream1
+        1 * inputStream1.available() >> DataSize.ofMegabytes(1).toBytes()
 
         1 * attachment2.getFilename() >> "script2.sql"
         1 * attachment2.contentLength() >> DataSize.ofMegabytes(5).toBytes()
-        1 * attachment2.getInputStream() >> inputStream
-        1 * inputStream.available() >> DataSize.ofMegabytes(5).toBytes()
+        1 * attachment2.getInputStream() >> inputStream2
+        1 * inputStream2.available() >> DataSize.ofMegabytes(2).toBytes()
 
-        2 * inputStream.close()
+        2 * inputStream1.close() | inputStream2.close()
+
         2 * s3Client.putObject(
             { PutObjectRequest request ->
                 request.bucket() == BUCKET_NAME &&
@@ -173,8 +176,10 @@ class S3AttachmentServiceImplSpec extends Specification {
                     (request.contentLength() == DataSize.ofMegabytes(3).toBytes() ||
                         request.contentLength() == DataSize.ofMegabytes(5).toBytes())
             },
-            _ as RequestBody
+            { RequestBody body -> true
+            }
         )
+
         1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
         1 * timer.record(_, TimeUnit.NANOSECONDS)
 
@@ -183,6 +188,90 @@ class S3AttachmentServiceImplSpec extends Specification {
 
         where:
         jobIdPresent << [true, false]
+    }
+
+    def "Upload fails when available() less than contentLength and not fixed"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        Resource attachment = Mock(Resource)
+        InputStream mockStream = Mock(InputStream)
+        s3ClientFactory.getClient(s3Uri) >> s3Client
+
+        S3AttachmentServiceImpl oldImplementationService = new S3AttachmentServiceImpl(s3ClientFactory, serviceProperties, registry) {
+            @Override
+            protected RequestBody createRequestBody(InputStream inputStream, long contentLength) {
+                return RequestBody.fromInputStream(inputStream, inputStream.available())
+            }
+        }
+
+        when: "Upload with mismatched available() and contentLength"
+        oldImplementationService.saveAttachments(jobId, Sets.newHashSet(attachment))
+
+        then:
+        1 * registry.summary(S3AttachmentServiceImpl.COUNT_DISTRIBUTION) >> distributionSummary
+        1 * distributionSummary.record(1)
+        1 * attachment.getFilename() >> "script.sql"
+        1 * attachment.contentLength() >> DataSize.ofMegabytes(3).toBytes()
+        1 * registry.summary(S3AttachmentServiceImpl.LARGEST_SIZE_DISTRIBUTION) >> distributionSummary
+        1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
+        1 * distributionSummary.record(3 * 1024 * 1024)
+        1 * distributionSummary.record(3 * 1024 * 1024)
+        1 * attachment.getInputStream() >> mockStream
+        1 * mockStream.available() >> DataSize.ofMegabytes(1).toBytes()
+        1 * mockStream.close()
+
+        1 * s3Client.putObject(_, _) >> {
+            throw new IllegalStateException("The request content has fewer bytes than the specified content-length: " +
+                DataSize.ofMegabytes(3).toBytes() + " bytes.")
+        }
+
+        1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+
+        def exception = thrown(SaveAttachmentException)
+        exception.cause instanceof IllegalStateException
+        exception.message.contains("fewer bytes than the specified content-length")
+    }
+
+    def "Upload succeeds when available() less than contentLength but fixed implementation"() {
+        setup:
+        String jobId = UUID.randomUUID().toString()
+        Resource attachment = Mock(Resource)
+        InputStream mockStream = Mock(InputStream)
+        s3ClientFactory.getClient(s3Uri) >> s3Client
+
+        S3AttachmentServiceImpl fixedImplementationService = new S3AttachmentServiceImpl(s3ClientFactory, serviceProperties, registry) {
+            @Override
+            protected RequestBody createRequestBody(InputStream inputStream, long contentLength) {
+                return RequestBody.fromInputStream(inputStream, contentLength)
+            }
+        }
+
+        when: "Upload with mismatched available() and contentLength but fixed implementation"
+        fixedImplementationService.saveAttachments(jobId, Sets.newHashSet(attachment))
+
+        then:
+        1 * registry.summary(S3AttachmentServiceImpl.COUNT_DISTRIBUTION) >> distributionSummary
+        1 * distributionSummary.record(1)
+        1 * attachment.getFilename() >> "script.sql"
+        1 * attachment.contentLength() >> DataSize.ofMegabytes(3).toBytes()
+        1 * registry.summary(S3AttachmentServiceImpl.LARGEST_SIZE_DISTRIBUTION) >> distributionSummary
+        1 * registry.summary(S3AttachmentServiceImpl.TOTAL_SIZE_DISTRIBUTION) >> distributionSummary
+        1 * distributionSummary.record(3 * 1024 * 1024)
+        1 * distributionSummary.record(3 * 1024 * 1024)
+        1 * attachment.getInputStream() >> mockStream
+        1 * mockStream.available() >> DataSize.ofMegabytes(1).toBytes()
+        1 * mockStream.close()
+
+        1 * s3Client.putObject(
+            { PutObjectRequest request ->
+                request.contentLength() == DataSize.ofMegabytes(3).toBytes()
+            },
+            _ as RequestBody
+        )
+
+        1 * registry.timer(S3AttachmentServiceImpl.SAVE_TIMER, _) >> timer
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
     }
 
     @Unroll
@@ -207,7 +296,7 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * attachment1.getFilename() >> "script.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
         1 * attachment1.getInputStream() >> inputStream
-        1 * inputStream.available() >> DataSize.ofMegabytes(3).toBytes()
+        1 * inputStream.available() >> DataSize.ofMegabytes(1).toBytes()
         1 * inputStream.close()
         1 * s3Client.putObject(
             { PutObjectRequest request ->

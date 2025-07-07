@@ -197,25 +197,44 @@ public class S3AttachmentServiceImpl implements AttachmentService {
 
             URI attachmentURI = null;
 
-            try (InputStream inputStream = attachment.getInputStream()) {
-                // Prepare object
+            try {
+                // Prepare object URI
                 attachmentURI = new URI(S3, objectBucket, SLASH + objectKey, null);
-                // Upload
-                s3Client.putObject(
-                    PutObjectRequest.builder()
-                        .bucket(objectBucket)
-                        .key(objectKey)
-                        .contentLength(attachment.contentLength())
-                        .build(),
-                    RequestBody.fromInputStream(inputStream, inputStream.available())
-                );
 
-                // Add attachment URI to the set
-                attachmentURIs.add(attachmentURI);
+                final long contentLength;
+                try {
+                    contentLength = attachment.contentLength();
+                    if (contentLength <= 0) {
+                        throw new SaveAttachmentException("Invalid content length: " + contentLength);
+                    }
+                    log.debug("Uploading attachment {} with content length {}", filename, contentLength);
+                } catch (IOException e) {
+                    throw new SaveAttachmentException("Failed to determine content length for " + filename, e);
+                }
 
-            } catch (IOException | SdkClientException | URISyntaxException e) {
+                try (InputStream inputStream = attachment.getInputStream()) {
+                    s3Client.putObject(
+                        PutObjectRequest.builder()
+                            .bucket(objectBucket)
+                            .key(objectKey)
+                            .contentLength(contentLength)
+                            .build(),
+                        RequestBody.fromInputStream(inputStream, contentLength)
+                    );
+
+                    attachmentURIs.add(attachmentURI);
+                    log.debug("Successfully uploaded attachment: {}", attachmentURI);
+                }
+            } catch (IllegalStateException e) {
+                log.error("Content length mismatch for attachment {}: {}", filename, e.getMessage());
                 throw new SaveAttachmentException(
-                    "Failed to upload attachment: " + attachmentURI + " - " + e.getMessage(),
+                    "Content length mismatch for attachment " + filename + ": " + e.getMessage(), e
+                );
+            } catch (IOException | SdkClientException | URISyntaxException e) {
+                log.error("Failed to upload attachment {}: {}", filename, e.getMessage());
+                throw new SaveAttachmentException(
+                    "Failed to upload attachment: " + (attachmentURI != null ? attachmentURI : filename) +
+                        " - " + e.getMessage(),
                     e
                 );
             }
