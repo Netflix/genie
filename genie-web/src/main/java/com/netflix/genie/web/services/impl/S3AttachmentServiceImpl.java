@@ -212,6 +212,12 @@ public class S3AttachmentServiceImpl implements AttachmentService {
                         contentLength,
                         byteLength
                     );
+                } else {
+                    log.debug("Attachment: {} has equal content length {} and byte length {})",
+                        filename,
+                        contentLength,
+                        byteLength
+                    );
                 }
 
                 s3Client.putObject(
