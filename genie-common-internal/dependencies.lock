@@ -124,16 +124,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "integTestAnnotationProcessor": {
@@ -274,16 +274,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "integTestRuntimeClasspath": {
@@ -458,16 +458,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "jacocoAgent": {
@@ -624,16 +624,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "smokeTestAnnotationProcessor": {
@@ -774,16 +774,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "smokeTestRuntimeClasspath": {
@@ -958,16 +958,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "spotbugs": {
@@ -1118,16 +1118,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     },
     "testRuntimeClasspath": {
@@ -1302,16 +1302,16 @@
             "locked": "6.2.7"
         },
         "software.amazon.awssdk:aws-core": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:s3-transfer-manager": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         },
         "software.amazon.awssdk:sts": {
-            "locked": "2.30.17"
+            "locked": "2.30.16"
         }
     }
 }
