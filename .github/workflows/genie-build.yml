@@ -9,10 +9,6 @@ on:
       - v*.*.*-rc.*
   pull_request:
 
-concurrency:
-  group: gh-pages
-  cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
