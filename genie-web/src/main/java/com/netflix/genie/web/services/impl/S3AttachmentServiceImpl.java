@@ -99,7 +99,7 @@ public class S3AttachmentServiceImpl implements AttachmentService {
 
         log.debug("Saving {} attachments for job request with id: {}", attachments.size(), jobId);
 
-        if (attachments.size() == 0) {
+        if (attachments.isEmpty()) {
             return EMPTY_SET;
         }
 
@@ -196,36 +196,46 @@ public class S3AttachmentServiceImpl implements AttachmentService {
             final String objectKey = commonPrefix + filename;
 
             URI attachmentURI = null;
+            long contentLength = 0;
+            long byteLength = 0;
 
-            try {
+            try (InputStream inputStream = attachment.getInputStream()) {
                 attachmentURI = new URI(S3, objectBucket, SLASH + objectKey, null);
+                contentLength = attachment.contentLength();
 
-                final long contentLength = attachment.contentLength();
+                final byte[] content = inputStream.readAllBytes();
+                byteLength = content.length;
 
-                try (InputStream inputStream = attachment.getInputStream()) {
-                    s3Client.putObject(
-                        PutObjectRequest.builder()
-                            .bucket(objectBucket)
-                            .key(objectKey)
-                            .contentLength(contentLength)
-                            .build(),
-                        RequestBody.fromInputStream(inputStream, contentLength)
+                if (contentLength != byteLength) {
+                    log.debug("Attachment: {} has mismatched content length {} and byte length {})",
+                        filename,
+                        contentLength,
+                        byteLength
                     );
-
-                    attachmentURIs.add(attachmentURI);
-                    log.debug("Successfully uploaded attachment: {}", attachmentURI);
                 }
-            } catch (IllegalStateException e) {
-                log.error("Content length mismatch for attachment {}: {}", filename, e.getMessage());
-                throw new SaveAttachmentException(
-                    "Content length mismatch for attachment " + filename + ": " + e.getMessage(), e
+
+                s3Client.putObject(
+                    PutObjectRequest.builder()
+                        .bucket(objectBucket)
+                        .key(objectKey)
+                        .contentLength(byteLength)
+                        .build(),
+                    RequestBody.fromBytes(content)
                 );
-            } catch (IOException | SdkClientException | URISyntaxException e) {
-                log.error("Failed to upload attachment {}: {}", filename, e.getMessage());
+
+                attachmentURIs.add(attachmentURI);
+                log.debug("Successfully uploaded attachment: {}", attachmentURI);
+            } catch (IllegalStateException | IOException | SdkClientException | URISyntaxException e) {
+                if (e instanceof IllegalStateException) {
+                    log.error("Failed to upload attachment {} with content length {} and byte length {}: {}",
+                        filename, contentLength, byteLength, e.getMessage());
+                } else {
+                    log.error("Failed to upload attachment {}: {}", filename, e.getMessage());
+                }
+
                 throw new SaveAttachmentException(
                     "Failed to upload attachment: " + (attachmentURI != null ? attachmentURI : filename)
-                        + " - "
-                        + e.getMessage(),
+                        + " - " + e.getMessage(),
                     e
                 );
             }

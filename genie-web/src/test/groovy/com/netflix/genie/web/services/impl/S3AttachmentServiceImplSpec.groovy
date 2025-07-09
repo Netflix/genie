@@ -138,6 +138,8 @@ class S3AttachmentServiceImplSpec extends Specification {
         String jobId = jobIdPresent ? UUID.randomUUID().toString() : null
         Resource attachment1 = Mock(Resource)
         Resource attachment2 = Mock(Resource)
+        byte[] content1 = new byte[DataSize.ofMegabytes(3).toBytes() as int]
+        byte[] content2 = new byte[DataSize.ofMegabytes(5).toBytes() as int]
 
         when: "Attachments upload successfully"
         Set<URI> attachmentUris = this.service.saveAttachments(jobId, Sets.newHashSet(attachment1, attachment2))
@@ -158,10 +160,12 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * attachment1.getFilename() >> "script1.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
         1 * attachment1.getInputStream() >> inputStream
+        1 * inputStream.readAllBytes() >> content1
 
         1 * attachment2.getFilename() >> "script2.sql"
         1 * attachment2.contentLength() >> DataSize.ofMegabytes(5).toBytes()
         1 * attachment2.getInputStream() >> inputStream
+        1 * inputStream.readAllBytes() >> content2
 
         2 * inputStream.close()
         2 * s3Client.putObject(
@@ -183,17 +187,18 @@ class S3AttachmentServiceImplSpec extends Specification {
         jobIdPresent << [true, false]
     }
 
-    def "Verify correct RequestBody creation with contentLength"() {
+    def "Verify content length mismatch handling"() {
         setup:
         String jobId = UUID.randomUUID().toString()
         Resource attachment = Mock(Resource)
         InputStream mockStream = Mock(InputStream)
         s3ClientFactory.getClient(s3Uri) >> s3Client
+        byte[] shorterContent = new byte[DataSize.ofMegabytes(9).toBytes() as int]
 
-        when: "Upload attachment with new implementation"
+        when: "Upload attachment with content length mismatch"
         this.service.saveAttachments(jobId, Sets.newHashSet(attachment))
 
-        then: "Verify S3 client receives correct parameters"
+        then: "Verify debug log is used and actual size is used"
         1 * registry.summary(S3AttachmentServiceImpl.COUNT_DISTRIBUTION) >> distributionSummary
         1 * distributionSummary.record(1)
         2 * attachment.getFilename() >> "test.sql"
@@ -203,11 +208,12 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * distributionSummary.record(10 * 1024 * 1024)
         1 * distributionSummary.record(10 * 1024 * 1024)
         1 * attachment.getInputStream() >> mockStream
+        1 * mockStream.readAllBytes() >> shorterContent
         1 * mockStream.close()
 
         1 * s3Client.putObject(
             { PutObjectRequest request ->
-                request.contentLength() == DataSize.ofMegabytes(10).toBytes()
+                request.contentLength() == shorterContent.length
             },
             { RequestBody capturedBody ->
                 capturedBody != null
@@ -224,6 +230,7 @@ class S3AttachmentServiceImplSpec extends Specification {
         String jobId = jobIdPresent ? UUID.randomUUID().toString() : null
         Resource attachment1 = Mock(Resource)
         s3ClientFactory.getClient(s3Uri) >> s3Client
+        byte[] content = new byte[DataSize.ofMegabytes(3).toBytes() as int]
 
         when: "S3 upload fails"
         this.service.saveAttachments(jobId, Sets.newHashSet(attachment1))
@@ -240,12 +247,13 @@ class S3AttachmentServiceImplSpec extends Specification {
         1 * attachment1.getFilename() >> "script.sql"
         1 * attachment1.contentLength() >> DataSize.ofMegabytes(3).toBytes()
         1 * attachment1.getInputStream() >> inputStream
+        1 * inputStream.readAllBytes() >> content
         1 * inputStream.close()
         1 * s3Client.putObject(
             { PutObjectRequest request ->
                 request.bucket() == BUCKET_NAME &&
                     request.key() =~ /some\/prefix\/.+\/script\.sql/ &&
-                    request.contentLength() == DataSize.ofMegabytes(3).toBytes()
+                    request.contentLength() == content.length
             },
             _ as RequestBody
         ) >> {
