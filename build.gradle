@@ -76,7 +76,7 @@ configure((Set<Project>) ext.javaProjects) {
     apply plugin: "com.netflix.nebula.facet"
 
     lombok {
-        version = '1.18.24'
+        version = '1.18.38'
     }
 
     group = (String) "com.netflix.${githubProjectName}"
@@ -103,7 +103,7 @@ configure((Set<Project>) ext.javaProjects) {
                 mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_3_version}"
                 mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_3_version}"
                 mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${spring_cloud_aws_3_version}"
-                mavenBom "org.spockframework:spock-bom:2.4-M5-groovy-3.0"
+                mavenBom "org.spockframework:spock-bom:2.4-M6-groovy-3.0"
             }
             dependencies {
                 dependency("io.awspring.cloud:spring-cloud-aws-starter:${spring_cloud_aws_3_version}")
@@ -148,7 +148,7 @@ configure((Set<Project>) ext.javaProjects) {
             dependency("org.apache.tika:tika-core:2.3.0")
             dependency("org.apache.maven:maven-artifact:3.6.3")
             dependency("org.apache.zookeeper:zookeeper:3.5.8")
-            dependency("org.codehaus.groovy:groovy-all:3.0.9")
+            dependency("org.codehaus.groovy:groovy-all:3.0.25")
             dependency("org.codehaus.janino:janino:3.1.6")
             dependency("org.dbunit:dbunit:2.7.3")
             dependencySet(group: "org.springdoc", version: "2.8.8") {
