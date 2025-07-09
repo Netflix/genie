@@ -206,19 +206,12 @@ public class S3AttachmentServiceImpl implements AttachmentService {
                 final byte[] content = inputStream.readAllBytes();
                 byteLength = content.length;
 
-                if (contentLength != byteLength) {
-                    log.debug("Attachment: {} has mismatched content length {} and byte length {})",
-                        filename,
-                        contentLength,
-                        byteLength
-                    );
-                } else {
-                    log.debug("Attachment: {} has equal content length {} and byte length {})",
-                        filename,
-                        contentLength,
-                        byteLength
-                    );
-                }
+                log.debug("Attachment: {} has {} content length {} and byte length {})",
+                    attachmentURI,
+                    contentLength == byteLength ? "equal" : "mismatched",
+                    contentLength,
+                    byteLength
+                );
 
                 s3Client.putObject(
                     PutObjectRequest.builder()
@@ -234,7 +227,11 @@ public class S3AttachmentServiceImpl implements AttachmentService {
             } catch (IllegalStateException | IOException | SdkClientException | URISyntaxException e) {
                 if (e instanceof IllegalStateException) {
                     log.error("Failed to upload attachment {} with content length {} and byte length {}: {}",
-                        filename, contentLength, byteLength, e.getMessage());
+                        (attachmentURI != null ? attachmentURI : filename),
+                        contentLength,
+                        byteLength,
+                        e.getMessage()
+                    );
                 } else {
                     log.error("Failed to upload attachment {}: {}", filename, e.getMessage());
                 }
