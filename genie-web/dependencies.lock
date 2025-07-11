@@ -16,7 +16,7 @@
             "locked": "6.6.15.Final"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
             "locked": "3.4.6"
@@ -199,7 +199,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.glassfish.jaxb:jaxb-runtime": {
             "locked": "4.0.5"
@@ -208,7 +208,7 @@
             "locked": "8.0.2.Final"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"
@@ -329,7 +329,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "integTestCompileClasspath": {
@@ -525,7 +525,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.dbunit:dbunit": {
             "locked": "2.7.3"
@@ -543,16 +543,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"
@@ -941,7 +941,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.dbunit:dbunit": {
             "locked": "2.7.3"
@@ -982,13 +982,13 @@
             "locked": "42.7.5"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"
@@ -1366,7 +1366,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.flywaydb:flyway-core": {
             "locked": "10.20.1"
@@ -1511,7 +1511,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "smokeTestCompileClasspath": {
@@ -1701,7 +1701,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.dbunit:dbunit": {
             "locked": "2.7.3"
@@ -1719,16 +1719,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"
@@ -2105,7 +2105,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.dbunit:dbunit": {
             "locked": "2.7.3"
@@ -2146,13 +2146,13 @@
             "locked": "42.7.5"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"
@@ -2293,7 +2293,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "testCompileClasspath": {
@@ -2483,7 +2483,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.dbunit:dbunit": {
             "locked": "2.7.3"
@@ -2501,16 +2501,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"
@@ -2887,7 +2887,7 @@
             "locked": "1.9.24"
         },
         "org.codehaus.groovy:groovy-all": {
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.dbunit:dbunit": {
             "locked": "2.7.3"
@@ -2928,13 +2928,13 @@
             "locked": "42.7.5"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "locked": "3.4.6"

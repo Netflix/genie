@@ -7,7 +7,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "checkstyle": {
@@ -193,13 +193,13 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -317,7 +317,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "integTestCompileClasspath": {
@@ -510,7 +510,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -522,16 +522,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -980,7 +980,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.flywaydb:flyway-core": {
             "firstLevelTransitive": [
@@ -1037,13 +1037,13 @@
             "locked": "42.7.5"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -1565,7 +1565,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.flywaydb:flyway-core": {
             "firstLevelTransitive": [
@@ -1803,7 +1803,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "smokeTestCompileClasspath": {
@@ -1993,7 +1993,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -2005,16 +2005,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -2463,7 +2463,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.flywaydb:flyway-core": {
             "firstLevelTransitive": [
@@ -2520,13 +2520,13 @@
             "locked": "42.7.5"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -2736,7 +2736,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "testCompileClasspath": {
@@ -2926,7 +2926,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -2938,16 +2938,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [
@@ -3396,7 +3396,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "3.0.9"
+            "locked": "3.0.25"
         },
         "org.flywaydb:flyway-core": {
             "firstLevelTransitive": [
@@ -3453,13 +3453,13 @@
             "locked": "42.7.5"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
             "firstLevelTransitive": [

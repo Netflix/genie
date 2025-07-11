@@ -7,7 +7,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
             "locked": "3.4.6"
@@ -112,7 +112,7 @@
             "locked": "8.0.2.Final"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
@@ -144,7 +144,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "integTestCompileClasspath": {
@@ -250,16 +250,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
@@ -437,13 +437,13 @@
             "locked": "5.11.4"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
@@ -644,7 +644,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "smokeTestCompileClasspath": {
@@ -750,16 +750,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
@@ -937,13 +937,13 @@
             "locked": "5.11.4"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
@@ -988,7 +988,7 @@
             "locked": "1.0"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         }
     },
     "testCompileClasspath": {
@@ -1094,16 +1094,16 @@
             "locked": "5.11.4"
         },
         "org.projectlombok:lombok": {
-            "locked": "1.18.24"
+            "locked": "1.18.38"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
@@ -1281,13 +1281,13 @@
             "locked": "5.11.4"
         },
         "org.spockframework:spock-core": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-junit4": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.spockframework:spock-spring": {
-            "locked": "2.4-M5-groovy-3.0"
+            "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "locked": "3.4.6"
