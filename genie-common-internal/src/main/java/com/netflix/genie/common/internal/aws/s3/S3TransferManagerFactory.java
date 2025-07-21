@@ -115,6 +115,7 @@ public class S3TransferManagerFactory {
         return S3AsyncClient.builder()
             .region(s3ClientKey.getRegion())
             .credentialsProvider(credentialsProvider)
+            .multipartEnabled(true)
             .build();
     }
 
