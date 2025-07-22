@@ -23,7 +23,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Uri;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
-
 import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class S3TransferManagerFactory {
 
+    private static final long MIN_PART_SIZE_IN_BYTES = 256 * 1024 * 1024L;
     private final S3ClientFactory s3ClientFactory;
     private final ConcurrentHashMap<S3ClientFactory.S3ClientKey, S3AsyncClient> asyncClientCache;
     private final ConcurrentHashMap<S3AsyncClient, S3TransferManager> transferManagerCache;
@@ -115,6 +115,8 @@ public class S3TransferManagerFactory {
         return S3AsyncClient.builder()
             .region(s3ClientKey.getRegion())
             .credentialsProvider(credentialsProvider)
+            .multipartEnabled(true)
+            .multipartConfiguration(configBuilder -> configBuilder.minimumPartSizeInBytes(MIN_PART_SIZE_IN_BYTES))
             .build();
     }
 

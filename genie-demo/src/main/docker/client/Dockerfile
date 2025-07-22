@@ -1,4 +1,4 @@
-from python:3.8.3
+FROM python:3.10-slim
 MAINTAINER NetflixOSS <netflixoss@netflix.com>
 
 # Pin the python libs so the image layers can be better cached/reused
