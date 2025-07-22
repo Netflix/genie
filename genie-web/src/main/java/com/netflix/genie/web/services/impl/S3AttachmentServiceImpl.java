@@ -206,7 +206,7 @@ public class S3AttachmentServiceImpl implements AttachmentService {
                 final byte[] content = inputStream.readAllBytes();
                 byteLength = content.length;
 
-                log.debug("Attachment: {} has {} content length {} and byte length {})",
+                log.debug("Attachment: {} has {} content length {} and byte length {}",
                     attachmentURI,
                     contentLength == byteLength ? "equal" : "mismatched",
                     contentLength,
