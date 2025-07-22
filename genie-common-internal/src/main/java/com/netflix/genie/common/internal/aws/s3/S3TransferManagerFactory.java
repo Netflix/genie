@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class S3TransferManagerFactory {
 
-    private final static long MIN_PART_SIZE_IN_BYTES = 256 * 1024 * 1024L;
+    private static final long MIN_PART_SIZE_IN_BYTES = 256 * 1024 * 1024L;
     private final S3ClientFactory s3ClientFactory;
     private final ConcurrentHashMap<S3ClientFactory.S3ClientKey, S3AsyncClient> asyncClientCache;
     private final ConcurrentHashMap<S3AsyncClient, S3TransferManager> transferManagerCache;
