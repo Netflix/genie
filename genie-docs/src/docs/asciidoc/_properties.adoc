@@ -190,7 +190,7 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |genie.agent.launcher.titus.command-template
 |The container command array, placeholder values are substituted at runtime
 |[exec, --api-job, --launchInJobDirectory, --job-id, <JOB_ID>, --server-host, <SERVER_HOST>, --server-port, <SERVER_PORT>]
-|no
+|yes
 
 |genie.agent.launcher.titus.container-attributes
 |Map attributes to send to Titus specific to the container
@@ -215,7 +215,7 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-featu
 |genie.agent.launcher.titus.entry-point-template
 |The container entry point array, placeholder values are substituted at runtime
 |[/bin/genie-agent]
-|no
+|yes
 
 |genie.agent.launcher.titus.genie-server-host
 |The hostname of the Genie server or cluster for the agent to connect to
