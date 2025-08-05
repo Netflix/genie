@@ -95,6 +95,11 @@ public class TitusAgentLauncherProperties {
     public static final String CAPACITY_GROUP_PROPERTY = PREFIX + ".capacityGroup";
 
     /**
+     * The container command template array, placeholder values are substituted at runtime.
+     */
+    public static final String COMMAND_TEMPLATE = PREFIX + ".command-template";
+
+    /**
      * Any attributes that should be added to the request specifically for the container.
      */
     public static final String CONTAINER_ATTRIBUTES_PROPERTY = PREFIX + ".container-attributes";
@@ -103,6 +108,11 @@ public class TitusAgentLauncherProperties {
      * Name of the property that enables {@link TitusAgentLauncherImpl}.
      */
     public static final String ENABLE_PROPERTY = PREFIX + ".enabled";
+
+    /**
+     * The container entry point template array, placeholder values are substituted at runtime.
+     */
+    public static final String ENTRY_POINT_TEMPLATE = PREFIX + ".entry-point-template";
 
     /**
      * The name of the property that dictates which image to launch on Titus with.

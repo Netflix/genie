@@ -273,6 +273,60 @@ class TitusAgentLauncherImplSpec extends Specification {
         return new ObjectMapper().readValue(s, TitusBatchJobResponse.class)
     }
 
+    def "Check container entrypoint and command resolution"() {
+        TitusBatchJobResponse response = toTitusResponse("{ \"id\" : \"" + TITUS_JOB_ID + "\" }")
+        TitusBatchJobRequest requestCapture
+
+        when:
+        Optional<JsonNode> launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * adapter.modifyJobRequest(_ as TitusBatchJobRequest, resolvedJob)
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getEntryPoint() == ["/bin/genie-agent"]
+        requestCapture.getContainer().getCommand() == [
+            "exec",
+            "--api-job",
+            "--launchInJobDirectory",
+            "--job-id", JOB_ID,
+            "--server-host", launcherProperties.getGenieServerHost(),
+            "--server-port", launcherProperties.getGenieServerPort().toString()
+        ]
+
+        when:
+        def entryPointTemplate = ["my", "entrypoint"]
+        def commandTemplate = ["my", "command"]
+        environment.withProperty(
+            TitusAgentLauncherProperties.ENTRY_POINT_TEMPLATE,
+            entryPointTemplate.join(",")
+        )
+        environment.withProperty(
+            TitusAgentLauncherProperties.COMMAND_TEMPLATE,
+            commandTemplate.join(",")
+        )
+        launcherExt = launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * restTemplate.postForObject(TITUS_ENDPOINT, _ as TitusBatchJobRequest, TitusBatchJobResponse.class) >> {
+            args ->
+                requestCapture = args[1] as TitusBatchJobRequest
+                return response
+        }
+        1 * adapter.modifyJobRequest(_ as TitusBatchJobRequest, resolvedJob)
+        1 * cache.put(JOB_ID, TITUS_JOB_ID)
+        launcherExt.isPresent()
+        requestCapture != null
+        requestCapture.getContainer().getEntryPoint() == entryPointTemplate
+        requestCapture.getContainer().getCommand() == commandTemplate
+    }
+
     @Unroll
     def "Check memory allocation logic"() {
         if (envMinimumMemory != null) {

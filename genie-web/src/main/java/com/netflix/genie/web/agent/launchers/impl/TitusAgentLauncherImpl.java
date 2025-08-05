@@ -261,11 +261,17 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
 
         // Substitute all placeholders with their values for the container entry point and command
         final List<String> entryPoint = REPLACE_PLACEHOLDERS.apply(
-            this.titusAgentLauncherProperties.getEntryPointTemplate(),
+            this.binder
+                .bind(
+                    TitusAgentLauncherProperties.ENTRY_POINT_TEMPLATE,
+                    Bindable.listOf(String.class))
+                .orElse(this.titusAgentLauncherProperties.getEntryPointTemplate()),
             placeholdersMap
         );
         final List<String> command = REPLACE_PLACEHOLDERS.apply(
-            this.titusAgentLauncherProperties.getCommandTemplate(),
+            this.binder
+                .bind(TitusAgentLauncherProperties.COMMAND_TEMPLATE, Bindable.listOf(String.class))
+                .orElse(this.titusAgentLauncherProperties.getCommandTemplate()),
             placeholdersMap
         );
         final Duration runtimeLimit = this.titusAgentLauncherProperties.getRuntimeLimit();
