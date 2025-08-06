@@ -139,19 +139,29 @@ loadScripts(document, 'script');</script>
 <div class="block">The capacity group to launch Genie containers in Titus with.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#CONTAINER_ATTRIBUTES_PROPERTY" class="member-name-link">CONTAINER_ATTRIBUTES_PROPERTY</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#COMMAND_TEMPLATE" class="member-name-link">COMMAND_TEMPLATE</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">Any attributes that should be added to the request specifically for the container.</div>
+<div class="block">The container command template array, placeholder values are substituted at runtime.</div>
 </div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#CONTAINER_NETWORK_MODE" class="member-name-link">CONTAINER_NETWORK_MODE</a></code></div>
+<div class="col-second even-row-color"><code><a href="#CONTAINER_ATTRIBUTES_PROPERTY" class="member-name-link">CONTAINER_ATTRIBUTES_PROPERTY</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The property for titus container network mode.</div>
+<div class="block">Any attributes that should be added to the request specifically for the container.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#ENABLE_PROPERTY" class="member-name-link">ENABLE_PROPERTY</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#CONTAINER_NETWORK_MODE" class="member-name-link">CONTAINER_NETWORK_MODE</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">The property for titus container network mode.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#ENABLE_PROPERTY" class="member-name-link">ENABLE_PROPERTY</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Name of the property that enables <a href="../agent/launchers/impl/TitusAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl"><code>TitusAgentLauncherImpl</code></a>.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#ENTRY_POINT_TEMPLATE" class="member-name-link">ENTRY_POINT_TEMPLATE</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">The container entry point template array, placeholder values are substituted at runtime.</div>
 </div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#IMAGE_NAME_PROPERTY" class="member-name-link">IMAGE_NAME_PROPERTY</a></code></div>
@@ -388,6 +398,21 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="COMMAND_TEMPLATE">
+<h3>COMMAND_TEMPLATE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">COMMAND_TEMPLATE</span></div>
+<div class="block">The container command template array, placeholder values are substituted at runtime.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.COMMAND_TEMPLATE">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="CONTAINER_ATTRIBUTES_PROPERTY">
 <h3>CONTAINER_ATTRIBUTES_PROPERTY</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">CONTAINER_ATTRIBUTES_PROPERTY</span></div>
@@ -412,6 +437,21 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.ENABLE_PROPERTY">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="ENTRY_POINT_TEMPLATE">
+<h3>ENTRY_POINT_TEMPLATE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">ENTRY_POINT_TEMPLATE</span></div>
+<div class="block">The container entry point template array, placeholder values are substituted at runtime.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.TitusAgentLauncherProperties.ENTRY_POINT_TEMPLATE">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
