@@ -1,5 +1,5 @@
-from openjdk:17-jdk-slim
-MAINTAINER NetflixOSS <netflixoss@netflix.com>
+FROM eclipse-temurin:17-jdk
+LABEL maintainer="NetflixOSS <netflixoss@netflix.com>"
 EXPOSE 8080
 VOLUME /tmp
 ARG SERVER_JAR
