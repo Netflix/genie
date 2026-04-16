@@ -118,7 +118,7 @@ public class JobClient {
      *
      * @param jobRequest A job request containing all the details for running a job.
      * @return jobId The id of the job submitted.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public String submitJob(
@@ -134,7 +134,7 @@ public class JobClient {
      * @param upstreamSecurityTokenName the security token name provided by upstream.
      * @param upstreamSecurityTokenValue the security token value provided by upstream.
      * @return jobId The id of the job submitted.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public String submitJob(
@@ -167,7 +167,7 @@ public class JobClient {
      * @param jobRequest  A job request containing all the details for running a job.
      * @param attachments A map of filenames/input-streams needed to be sent to the server as attachments.
      * @return jobId The id of the job submitted.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public String submitJobWithAttachments(
@@ -185,7 +185,7 @@ public class JobClient {
      * @param upstreamSecurityTokenName the security token name provided by upstream.
      * @param upstreamSecurityTokenValue the security token value provided by upstream.
      * @return jobId The id of the job submitted.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public String submitJobWithAttachments(
@@ -249,7 +249,7 @@ public class JobClient {
      * Method to get a list of all the jobs.
      *
      * @return A list of jobs.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public List<JobSearchResult> getJobs() throws IOException, GenieClientException {
@@ -491,7 +491,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The cluster object.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public Cluster getJobCluster(
@@ -508,7 +508,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public Command getJobCommand(
@@ -525,7 +525,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The job requests object.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public JobRequest getJobRequest(
@@ -542,7 +542,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The job execution object.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public JobExecution getJobExecution(
@@ -559,7 +559,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The metadata object.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public JobMetadata getJobMetadata(final String jobId) throws IOException, GenieClientException {
@@ -574,7 +574,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The list of Applications.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public List<Application> getJobApplications(
@@ -758,7 +758,7 @@ public class JobClient {
      *
      * @param jobId The id of the job.
      * @return The status of the Job.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public JobStatus getJobStatus(
