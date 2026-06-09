@@ -1,4 +1,4 @@
-from openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 MAINTAINER NetflixOSS <netflixoss@netflix.com>
 EXPOSE 8080
 VOLUME /tmp
