@@ -1,5 +1,5 @@
 FROM eclipse-temurin:17-jdk-jammy
-MAINTAINER NetflixOSS <netflixoss@netflix.com>
+LABEL maintainer="NetflixOSS <netflixoss@netflix.com>"
 EXPOSE 8080
 VOLUME /tmp
 ARG SERVER_JAR

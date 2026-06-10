@@ -227,7 +227,9 @@ public class TitusAgentLauncherImpl implements AgentLauncher {
         } catch (Throwable t) {
             LOG.error("Failed to launch job on Titus", t);
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new AgentLaunchException("Failed to create titus job for job " + jobId, t);
+            throw new AgentLaunchException(
+                "Failed to create titus job for job " + jobId + ": " + t.getMessage(), t
+            );
         } finally {
             this.registry.timer(LAUNCH_TIMER, tags).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
             this.healthIndicatorCache.put(jobId, StringUtils.isBlank(titusJobId) ? "-" : titusJobId);

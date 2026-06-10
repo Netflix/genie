@@ -260,13 +260,29 @@ class TitusAgentLauncherImplSpec extends Specification {
         }
         1 * cache.put(JOB_ID, "-")
         1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob)
-        thrown(AgentLaunchException)
+        def e = thrown(AgentLaunchException)
+        e.message.contains(exception.message)
 
         where:
         _ | exception
-        _ | new RestClientException("...")
-        _ | new IOException("...")
-        _ | new RuntimeException("...")
+        _ | new RestClientException("rest client error")
+        _ | new IOException("io error")
+        _ | new RuntimeException("unexpected error")
+    }
+
+    def "Adapter AgentLaunchException message is preserved in thrown exception"() {
+        given:
+        def cause = new AgentLaunchException("Not authorized for scope [ads-warehouse]")
+
+        when:
+        launcher.launchAgent(resolvedJob, null)
+
+        then:
+        1 * this.adapter.modifyJobRequest(_ as TitusBatchJobRequest, this.resolvedJob) >> { throw cause }
+        0 * restTemplate.postForObject(_, _, _)
+        1 * cache.put(JOB_ID, "-")
+        def e = thrown(AgentLaunchException)
+        e.message.contains("Not authorized for scope [ads-warehouse]")
     }
 
     private static TitusBatchJobResponse toTitusResponse(String s) {
