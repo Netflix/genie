@@ -123,7 +123,7 @@
             "locked": "2.9.0"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -231,7 +231,7 @@
             "locked": "2.9.0"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"

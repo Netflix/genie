@@ -1557,7 +1557,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
             .get(JOBS_API + "/" + jobId + "/output/genie/command/" + CMD1_ID + "/config/" + GB18030_TXT)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_OCTET_STREAM_VALUE))
             .contentType(Matchers.containsString(utf8));
     }
 
