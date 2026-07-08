@@ -106,7 +106,7 @@
             "locked": "3.17.0"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -238,7 +238,7 @@
             "locked": "3.17.0"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -418,7 +418,7 @@
             "locked": "1.9"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -605,7 +605,7 @@
             "locked": "1.9"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -738,7 +738,7 @@
             "locked": "3.17.0"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -918,7 +918,7 @@
             "locked": "1.9"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [
@@ -1082,7 +1082,7 @@
             "locked": "3.17.0"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "locked": "8.0.2.Final"
@@ -1262,7 +1262,7 @@
             "locked": "1.9"
         },
         "org.apache.tika:tika-core": {
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.hibernate.validator:hibernate-validator": {
             "firstLevelTransitive": [

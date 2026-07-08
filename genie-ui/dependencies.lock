@@ -399,7 +399,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "firstLevelTransitive": [
@@ -771,7 +771,7 @@
                 "com.netflix.genie:genie-test-web",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "firstLevelTransitive": [
@@ -968,7 +968,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.aspectj:aspectjweaver": {
             "firstLevelTransitive": [
@@ -1358,7 +1358,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "firstLevelTransitive": [
@@ -1553,7 +1553,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.aspectj:aspectjweaver": {
             "firstLevelTransitive": [
@@ -2254,7 +2254,7 @@
                 "com.netflix.genie:genie-test-web",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "firstLevelTransitive": [
@@ -2451,7 +2451,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.aspectj:aspectjweaver": {
             "firstLevelTransitive": [
@@ -3187,7 +3187,7 @@
                 "com.netflix.genie:genie-test-web",
                 "com.netflix.genie:genie-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "firstLevelTransitive": [
@@ -3384,7 +3384,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.aspectj:aspectjweaver": {
             "firstLevelTransitive": [

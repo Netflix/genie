@@ -92,7 +92,7 @@
             "locked": "1.15"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -406,7 +406,7 @@
             "locked": "1.15"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -778,7 +778,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -932,7 +932,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.apache.tomcat:tomcat-jdbc": {
             "locked": "10.1.41"
@@ -1217,7 +1217,7 @@
             "locked": "1.15"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -1360,7 +1360,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.aspectj:aspectjweaver": {
             "locked": "1.9.24"
@@ -1585,7 +1585,7 @@
             "locked": "1.15"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -1945,7 +1945,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -2096,7 +2096,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.apache.tomcat:tomcat-jdbc": {
             "locked": "10.1.41"
@@ -2367,7 +2367,7 @@
             "locked": "1.15"
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -2727,7 +2727,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-test-web"
             ],
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "commons-validator:commons-validator": {
             "locked": "1.7"
@@ -2878,7 +2878,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.3.0"
+            "locked": "3.2.2"
         },
         "org.apache.tomcat:tomcat-jdbc": {
             "locked": "10.1.41"

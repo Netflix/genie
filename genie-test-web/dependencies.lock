@@ -26,7 +26,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -69,7 +69,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -113,7 +113,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -167,7 +167,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -207,7 +207,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -251,7 +251,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
@@ -322,7 +322,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "javax.annotation:javax.annotation-api": {
             "locked": "1.3.2"
@@ -366,7 +366,7 @@
             "project": true
         },
         "commons-io:commons-io": {
-            "locked": "2.11.0"
+            "locked": "2.20.0"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
