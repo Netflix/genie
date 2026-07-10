@@ -752,6 +752,12 @@ to the number of CPU cores x 2 + 1
 |30000
 |no
 
+|genie.tasks.user-metrics.split-by-submission-mode
+|Whether to additionally publish per-user metrics broken down by submission mode (`mode=api` vs `mode=agent`)
+under separate `*.by-submission-mode.gauge` names. Leaves the existing gauges unchanged
+|false
+|no
+
 |genie.zookeeper.discovery-path
 |The namespace to use for Genie discovery service (maps agents to the node they're connected to)
 |/genie/discovery/
