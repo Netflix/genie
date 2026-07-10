@@ -31,6 +31,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,12 +47,19 @@ public class UserMetricsTask extends LeaderTask {
     private static final String USER_ACTIVE_JOBS_METRIC_NAME = "genie.user.active-jobs.gauge";
     private static final String USER_ACTIVE_MEMORY_METRIC_NAME = "genie.user.active-memory.gauge";
     private static final String USER_ACTIVE_USERS_METRIC_NAME = "genie.user.active-users.gauge";
+    private static final String USER_ACTIVE_JOBS_BY_SUBMISSION_MODE_METRIC_NAME =
+        "genie.user.active-jobs.by-submission-mode.gauge";
+    private static final String USER_ACTIVE_MEMORY_BY_SUBMISSION_MODE_METRIC_NAME =
+        "genie.user.active-memory.by-submission-mode.gauge";
     private static final UserResourcesRecord USER_RECORD_PLACEHOLDER = new UserResourcesRecord("nobody");
     private final MeterRegistry registry;
     private final PersistenceService persistenceService;
     private final UserMetricsProperties userMetricsProperties;
 
     private final Map<String, UserResourcesRecord> userResourcesRecordMap = Maps.newHashMap();
+    // Records for the optional per-submission-mode resource breakdown: api (true/false) -> user -> record.
+    private final Map<Boolean, Map<String, UserResourcesRecord>> userResourcesBySubmissionModeRecordMap =
+        Maps.newHashMap();
     private final AtomicDouble activeUsersCount;
 
     /**
@@ -153,6 +161,13 @@ public class UserMetricsTask extends LeaderTask {
             ).update(jobs, memory);
         }
 
+        // Optionally publish a finer-grained breakdown tagged by submission mode (mode=api for REST vs
+        // mode=agent for agent/CLI). Emitted under separate metric names so the gauges above are unchanged.
+        // Disabled by default.
+        if (this.userMetricsProperties.isSplitBySubmissionMode()) {
+            this.publishResourcesBySubmissionMode(summaries);
+        }
+
         log.debug("Done publishing user metrics");
     }
 
@@ -166,6 +181,7 @@ public class UserMetricsTask extends LeaderTask {
 
         // Reset all users
         this.userResourcesRecordMap.clear();
+        this.userResourcesBySubmissionModeRecordMap.clear();
 
         // Reset active users count
         this.activeUsersCount.set(Double.NaN);
@@ -187,6 +203,70 @@ public class UserMetricsTask extends LeaderTask {
 
     private Number getUsersCount() {
         return activeUsersCount.get();
+    }
+
+    private void publishResourcesBySubmissionMode(final Map<String, UserResourcesSummary> apiSummaries) {
+        // Reuse the api=true summaries already fetched above; only the agent (api=false) slice is
+        // an additional query.
+        this.updateSubmissionModeRecords(true, apiSummaries);
+        this.updateSubmissionModeRecords(
+            false,
+            this.persistenceService.getUserResourcesSummaries(JobStatus.getActiveStatuses(), false)
+        );
+    }
+
+    private void updateSubmissionModeRecords(final boolean api, final Map<String, UserResourcesSummary> summaries) {
+        final Map<String, UserResourcesRecord> recordsForMode =
+            this.userResourcesBySubmissionModeRecordMap.computeIfAbsent(api, mode -> Maps.newHashMap());
+
+        final String modeTagValue =
+            api ? MetricsConstants.TagValues.MODE_API : MetricsConstants.TagValues.MODE_AGENT;
+
+        // Drop users no longer active in this mode so their gauges fall back to NaN.
+        recordsForMode.keySet().retainAll(summaries.keySet());
+
+        for (final UserResourcesSummary summary : summaries.values()) {
+            final String user = summary.getUser();
+            recordsForMode.computeIfAbsent(
+                user,
+                userName -> {
+                    // Gauge creation is idempotent so re-registration on reappearance is harmless.
+                    Gauge.builder(
+                            USER_ACTIVE_JOBS_BY_SUBMISSION_MODE_METRIC_NAME,
+                            () -> this.getSubmissionModeJobCount(api, userName)
+                        )
+                        .tags(
+                            MetricsConstants.TagKeys.USER, userName,
+                            MetricsConstants.TagKeys.MODE, modeTagValue
+                        )
+                        .register(this.registry);
+                    Gauge.builder(
+                            USER_ACTIVE_MEMORY_BY_SUBMISSION_MODE_METRIC_NAME,
+                            () -> this.getSubmissionModeMemoryAmount(api, userName)
+                        )
+                        .tags(
+                            MetricsConstants.TagKeys.USER, userName,
+                            MetricsConstants.TagKeys.MODE, modeTagValue
+                        )
+                        .register(this.registry);
+                    return new UserResourcesRecord(userName);
+                }
+            ).update(summary.getRunningJobsCount(), summary.getUsedMemory());
+        }
+    }
+
+    private Number getSubmissionModeJobCount(final boolean api, final String user) {
+        return this.userResourcesBySubmissionModeRecordMap
+            .getOrDefault(api, Collections.emptyMap())
+            .getOrDefault(user, USER_RECORD_PLACEHOLDER)
+            .jobCount.get();
+    }
+
+    private Number getSubmissionModeMemoryAmount(final boolean api, final String user) {
+        return this.userResourcesBySubmissionModeRecordMap
+            .getOrDefault(api, Collections.emptyMap())
+            .getOrDefault(user, USER_RECORD_PLACEHOLDER)
+            .memoryAmount.get();
     }
 
     private static class UserResourcesRecord {

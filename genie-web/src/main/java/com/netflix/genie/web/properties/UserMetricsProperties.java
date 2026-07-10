@@ -47,4 +47,13 @@ public class UserMetricsProperties {
     private boolean enabled = true;
 
     private long refreshInterval = 30_000;
+
+    /**
+     * Whether per-user metrics are additionally published broken down by job submission mode (tagged
+     * {@code mode=api} for REST vs {@code mode=agent} for agent/CLI), under the
+     * {@code *.by-submission-mode.gauge} metric names. The existing
+     * {@code genie.user.active-jobs.gauge}/{@code genie.user.active-memory.gauge} gauges are unaffected
+     * regardless of this setting.
+     */
+    private boolean splitBySubmissionMode;
 }
