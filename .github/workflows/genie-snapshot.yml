@@ -6,6 +6,12 @@ on:
       - master
       - dev-snapshot
 
+# Serialize gh-pages doc pushes across this workflow and genie-publish.yml so
+# concurrent gitPublishPush runs don't collide with a non-fast-forward rejection.
+concurrency:
+  group: gh-pages-publish
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
