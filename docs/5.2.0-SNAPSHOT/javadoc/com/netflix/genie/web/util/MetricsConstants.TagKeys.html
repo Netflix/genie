@@ -137,23 +137,28 @@ loadScripts(document, 'script');</script>
 <div class="block">Key to tag the user concurrent job limit.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#SCRIPT_URI" class="member-name-link">SCRIPT_URI</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#MODE" class="member-name-link">MODE</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">Key to tag the job submission mode (<code>api</code> for REST API, <code>agent</code> for agent/CLI).</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#SCRIPT_URI" class="member-name-link">SCRIPT_URI</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Key to tag the URI for a given script resource.</div>
 </div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#STATUS" class="member-name-link">STATUS</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#STATUS" class="member-name-link">STATUS</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Key to tag the status of a request or operation.</div>
 </div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#TO_STATE" class="member-name-link">TO_STATE</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TO_STATE" class="member-name-link">TO_STATE</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Key to tag the destination/target state of a state transition.</div>
 </div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#USER" class="member-name-link">USER</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#USER" class="member-name-link">USER</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Key to tag a username.</div>
 </div>
 </div>
@@ -307,6 +312,22 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../../constant-values.html#com.netflix.genie.web.util.MetricsConstants.TagKeys.USER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MODE">
+<h3>MODE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MODE</span></div>
+<div class="block">Key to tag the job submission mode (<code>api</code> for REST API, <code>agent</code> for agent/CLI). Kept short
+ by design: the metric name (e.g. <code>...by-submission-mode.gauge</code>) already conveys the full concept.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../../constant-values.html#com.netflix.genie.web.util.MetricsConstants.TagKeys.MODE">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>

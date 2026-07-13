@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 5.2.0-SNAPSHOT,</span>
-<span id="revdate">2026-07-08</span>
+<span id="revdate">2026-07-13</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -6083,6 +6083,13 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.user-metrics.split-by-submission-mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to additionally publish per-user metrics broken down by submission mode (<code>mode=api</code> vs <code>mode=agent</code>)
+under separate <code>*.by-submission-mode.gauge</code> names. Leaves the existing gauges unchanged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.discovery-path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie discovery service (maps agents to the node they&#8217;re connected to)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/discovery/</p></td>
@@ -7266,7 +7273,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 5.2.0-SNAPSHOT<br>
-Last updated 2026-07-08 21:02:12 UTC
+Last updated 2026-07-13 21:50:22 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
