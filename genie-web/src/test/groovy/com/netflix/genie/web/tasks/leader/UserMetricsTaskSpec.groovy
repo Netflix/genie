@@ -172,9 +172,77 @@ class UserMetricsTaskSpec extends Specification {
         measureMemory("boo") == Double.NaN
     }
 
+    def "Run publishes a per-submission-mode breakdown when split-by-submission-mode is enabled"() {
+        setup:
+        Map<String, UserResourcesSummary> apiSummaries = [
+            "foo": new UserResourcesSummary("foo", 10, 1024),
+            "bar": new UserResourcesSummary("bar", 20, 2048)
+        ]
+        Map<String, UserResourcesSummary> agentSummaries = [
+            "foo": new UserResourcesSummary("foo", 3, 256),
+            "baz": new UserResourcesSummary("baz", 5, 512)
+        ]
+
+        when:
+        this.task = new UserMetricsTask(this.registry, this.dataServices, this.userMetricProperties)
+
+        then:
+        1 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
+        }
+
+        when:
+        this.task.run()
+
+        then:
+        _ * userMetricProperties.isSplitBySubmissionMode() >> true
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, true) >> apiSummaries
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, false) >> agentSummaries
+        _ * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
+        }
+
+        // The existing api=true-only gauges are still published, unchanged.
+        measureJobs("foo") == 10
+        measureMemory("bar") == 2048
+
+        // New per-submission-mode gauges: api (REST) slice.
+        measureJobsBySubmissionMode("foo", "api") == 10
+        measureJobsBySubmissionMode("bar", "api") == 20
+        measureMemoryBySubmissionMode("foo", "api") == 1024
+        measureMemoryBySubmissionMode("bar", "api") == 2048
+
+        // New per-submission-mode gauges: agent slice.
+        measureJobsBySubmissionMode("foo", "agent") == 3
+        measureJobsBySubmissionMode("baz", "agent") == 5
+        measureMemoryBySubmissionMode("foo", "agent") == 256
+        measureMemoryBySubmissionMode("baz", "agent") == 512
+
+        when: "a user drops out of a mode on the next cycle"
+        this.task.run()
+
+        then:
+        _ * userMetricProperties.isSplitBySubmissionMode() >> true
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, true) >> apiSummaries
+        1 * persistenceService.getUserResourcesSummaries(JobStatus.activeStatuses, false) >>
+            (["foo": new UserResourcesSummary("foo", 3, 256)] as Map<String, UserResourcesSummary>)
+        _ * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
+        }
+
+        // baz no longer has agent jobs, so its by-submission-mode gauges report NaN.
+        measureJobsBySubmissionMode("baz", "agent") == Double.NaN
+        measureMemoryBySubmissionMode("baz", "agent") == Double.NaN
+        measureJobsBySubmissionMode("foo", "agent") == 3
+        measureMemoryBySubmissionMode("foo", "agent") == 256
+    }
+
     Gauge captureGauge(final Meter.Id id, final Object obj, final ToDoubleFunction<Object> f) {
         String userTagValue = id.getTag(MetricsConstants.TagKeys.USER)
-        String gaugeKey = id.getName() + (userTagValue == null ? "" : ("-" + userTagValue))
+        String modeTagValue = id.getTag(MetricsConstants.TagKeys.MODE)
+        String gaugeKey = id.getName() +
+            (userTagValue == null ? "" : ("-" + userTagValue)) +
+            (modeTagValue == null ? "" : ("-" + modeTagValue))
         this.gaugesFunctions.put(gaugeKey, { -> f.applyAsDouble(obj) })
         return Mock(Gauge)
     }
@@ -190,6 +258,18 @@ class UserMetricsTaskSpec extends Specification {
 
     double measureMemory(String user) {
         String gaugeKey = UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME + "-" + user
+        return gaugesFunctions.get(gaugeKey).call()
+    }
+
+    double measureJobsBySubmissionMode(String user, String submissionMode) {
+        String gaugeKey =
+            UserMetricsTask.USER_ACTIVE_JOBS_BY_SUBMISSION_MODE_METRIC_NAME + "-" + user + "-" + submissionMode
+        return gaugesFunctions.get(gaugeKey).call()
+    }
+
+    double measureMemoryBySubmissionMode(String user, String submissionMode) {
+        String gaugeKey =
+            UserMetricsTask.USER_ACTIVE_MEMORY_BY_SUBMISSION_MODE_METRIC_NAME + "-" + user + "-" + submissionMode
         return gaugesFunctions.get(gaugeKey).call()
     }
 }

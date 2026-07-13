@@ -1067,15 +1067,27 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
     void canGetUserResourceSummaries() {
-        final Map<String, UserResourcesSummary> summaries = this.service.getUserResourcesSummaries(
+        // API-submitted (api=true) jobs.
+        final Map<String, UserResourcesSummary> apiSummaries = this.service.getUserResourcesSummaries(
             JobStatus.getActiveStatuses(),
             true
         );
-        Assertions.assertThat(summaries.keySet()).contains("tgianos");
-        final UserResourcesSummary userResourcesSummary = summaries.get("tgianos");
-        Assertions.assertThat(userResourcesSummary.getUser()).isEqualTo("tgianos");
-        Assertions.assertThat(userResourcesSummary.getRunningJobsCount()).isEqualTo(2L);
-        Assertions.assertThat(userResourcesSummary.getUsedMemory()).isEqualTo(4096L);
+        Assertions.assertThat(apiSummaries.keySet()).contains("tgianos");
+        final UserResourcesSummary apiSummary = apiSummaries.get("tgianos");
+        Assertions.assertThat(apiSummary.getUser()).isEqualTo("tgianos");
+        Assertions.assertThat(apiSummary.getRunningJobsCount()).isEqualTo(2L);
+        Assertions.assertThat(apiSummary.getUsedMemory()).isEqualTo(4096L);
+
+        // Agent/CLI-submitted (api=false) jobs are reported separately, with memory populated.
+        final Map<String, UserResourcesSummary> agentSummaries = this.service.getUserResourcesSummaries(
+            JobStatus.getActiveStatuses(),
+            false
+        );
+        Assertions.assertThat(agentSummaries.keySet()).contains("tgianos");
+        final UserResourcesSummary agentSummary = agentSummaries.get("tgianos");
+        Assertions.assertThat(agentSummary.getUser()).isEqualTo("tgianos");
+        Assertions.assertThat(agentSummary.getRunningJobsCount()).isEqualTo(2L);
+        Assertions.assertThat(agentSummary.getUsedMemory()).isEqualTo(4096L);
     }
 
     @Test

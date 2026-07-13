@@ -82,6 +82,12 @@ public final class MetricsConstants {
         public static final String USER = "user";
 
         /**
+         * Key to tag the job submission mode ({@code api} for REST API, {@code agent} for agent/CLI). Kept short
+         * by design: the metric name (e.g. {@code ...by-submission-mode.gauge}) already conveys the full concept.
+         */
+        public static final String MODE = "mode";
+
+        /**
          * Key to tag the user concurrent job limit.
          */
         public static final String JOBS_USER_LIMIT = "jobsUserLimit";
@@ -121,6 +127,16 @@ public final class MetricsConstants {
          * Tag value to denote failure (used with TagKeys.STATUS).
          */
         public static final String FAILURE = "failure";
+
+        /**
+         * Tag value for jobs submitted through the REST API (used with TagKeys.MODE).
+         */
+        public static final String MODE_API = "api";
+
+        /**
+         * Tag value for jobs submitted through the agent/CLI (used with TagKeys.MODE).
+         */
+        public static final String MODE_AGENT = "agent";
 
         /**
          * Utility class private constructor.
