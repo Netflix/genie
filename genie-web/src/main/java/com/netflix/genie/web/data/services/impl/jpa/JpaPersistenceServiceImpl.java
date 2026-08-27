@@ -109,6 +109,7 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
+import com.netflix.genie.web.util.ResourceUriValidator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -2168,6 +2169,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final Set<@Size(max = 1024) String> configs,
         final Class<R> resourceClass
     ) throws NotFoundException {
+        ResourceUriValidator.validate(configs);
         final Set<FileEntity> configEntities = this.getResourceConfigEntities(id, resourceClass);
         configEntities.clear();
         configEntities.addAll(this.createOrGetFileEntities(configs));
@@ -2232,6 +2234,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final Set<@Size(max = 1024) String> dependencies,
         final Class<R> resourceClass
     ) throws NotFoundException {
+        ResourceUriValidator.validate(dependencies);
         final Set<FileEntity> dependencyEntities = this.getResourceDependenciesEntities(id, resourceClass);
         dependencyEntities.clear();
         dependencyEntities.addAll(this.createOrGetFileEntities(dependencies));
@@ -2514,6 +2517,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         final Consumer<Set<FileEntity>> configsConsumer,
         final Consumer<Set<FileEntity>> dependenciesConsumer
     ) {
+        // Reject setupFile/config/dependency URIs a server-managed Agent shouldn't resolve on the
+        // caller's behalf (e.g. file:) before anything gets persisted. See GH #1260.
+        ResourceUriValidator.validate(resources);
+
         // Save all the unowned entities first to avoid unintended flushes
         configsConsumer.accept(this.createOrGetFileEntities(resources.getConfigs()));
         dependenciesConsumer.accept(this.createOrGetFileEntities(resources.getDependencies()));
