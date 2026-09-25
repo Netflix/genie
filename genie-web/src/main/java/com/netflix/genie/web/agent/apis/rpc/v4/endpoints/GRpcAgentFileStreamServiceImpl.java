@@ -426,8 +426,14 @@ public class GRpcAgentFileStreamServiceImpl
                         transfer.lastAckTimestamp.plus(this.properties.getStalledTransferTimeout());
                     if (now.isAfter(deadline)) {
                         stalledTrasfersCounter.incrementAndGet();
-                        log.warn("Transfer {} is stalled of job {}, shutting it down", transferId,
-                            entry.getValue().jobId);
+                        // State NEW means no agent stream ever claimed this transfer, so there is no stream
+                        // to notify below and the failure is upstream of the agent sending its first chunk.
+                        log.warn(
+                            "Transfer {} is stalled of job {} (state: {}), shutting it down",
+                            transferId,
+                            transfer.jobId,
+                            transfer.state
+                        );
                         final TimeoutException exception = new TimeoutException("Transfer not making progress");
                         // Shut down stream, if one was associated to this transfer
                         final AgentFileChunkObserver observer = transfer.getAgentFileChunkObserver();
@@ -597,6 +603,24 @@ public class GRpcAgentFileStreamServiceImpl
 
             } else {
                 log.warn("Received a chunk for a transfer no longer in progress: {}", transferStreamId);
+                // No ACK will ever be sent for this chunk, so end the stream. Otherwise the agent waits
+                // forever and never releases its permit. This covers a chunk misrouted to this instance
+                // and one that arrived after the reaper removed the transfer (the reaper can't notify a
+                // stream that was never claimed).
+                try {
+                    agentFileChunkObserver.getResponseObserver().onError(
+                        new IllegalStateException("Transfer no longer active")
+                    );
+                } catch (final RuntimeException e) {
+                    // Throws IllegalStateException if the call is already closed, e.g. the reaper or the
+                    // unclaimed stream timeout closed it while this chunk was in flight. The agent was
+                    // notified then, so there is nothing more to do.
+                    log.debug(
+                        "Failed to terminate orphaned transfer stream {}: {}",
+                        transferStreamId,
+                        e.getMessage()
+                    );
+                }
             }
         }
 
