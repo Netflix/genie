@@ -638,6 +638,50 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         thrown(IOException)
     }
 
+    def "Chunk for a transfer reaped before its stream was claimed terminates the stream"() {
+        StreamObserver<AgentManifestMessage> controlStreamRequestObserver
+        StreamObserver<AgentFileMessage> transferStreamRequestObserver
+        String streamId
+        Optional<Resource> resource
+
+        when: "Control stream established"
+        controlStreamRequestObserver = this.service.sync(controlStreamResponseObserver)
+        controlStreamRequestObserver.onNext(manifestMessage)
+
+        then:
+        1 * converter.toManifest(manifestMessage) >> directoryManifest
+
+        when: "Request file transfer"
+        resource = service.getResource(jobId, relativePath, uri, null)
+
+        then:
+        1 * directoryManifest.getEntry(relativePath.toString()) >> Optional.of(manifestEntry)
+        1 * controlStreamResponseObserver.onNext(_ as ServerControlMessage) >> {
+            ServerControlMessage msg ->
+                streamId = msg.getServerFileRequest().getStreamId()
+        }
+        resource.isPresent()
+        StringUtils.isNotBlank(streamId)
+
+        when: "Transfer is reaped before the agent opens its transmit stream"
+        stalledTransfersTask.run()
+
+        then:
+        1 * serviceProperties.getStalledTransferTimeout() >> Duration.ofSeconds(-1)
+
+        when: "The agent opens the stream and sends its first chunk anyway"
+        transferStreamRequestObserver = this.service.transmit(transferStreamResponseObserver)
+        transferStreamRequestObserver.onNext(
+            AgentFileMessage.newBuilder()
+                .setStreamId(streamId)
+                .setData(ByteString.copyFrom(new byte[128]))
+                .build()
+        )
+
+        then: "Orphaned stream is terminated so the agent releases its transfer permit"
+        1 * transferStreamResponseObserver.onError(_ as IllegalStateException)
+    }
+
     def "Unclaimed stream timeout"() {
         StreamObserver<AgentFileMessage> transferStreamRequestObserver
 
