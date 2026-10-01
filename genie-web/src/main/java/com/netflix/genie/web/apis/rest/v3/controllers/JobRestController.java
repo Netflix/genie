@@ -64,6 +64,7 @@ import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.util.MetricsConstants;
+import com.netflix.genie.web.util.ResourceUriValidator;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -314,8 +315,15 @@ public class JobRestController {
             this.getGenieHeaders(httpServletRequest)
         );
 
+        final com.netflix.genie.common.internal.dtos.JobRequest v4JobRequest =
+            DtoConverters.toV4JobRequest(jobRequest);
+        // Reject setupFile/config/dependency URIs a server-managed Agent shouldn't resolve on the
+        // caller's behalf (e.g. file:). Scoped to this REST entry point only - a Genie Agent registering
+        // a job it's about to run itself (e.g. `genie exec`) doesn't go through here. See GH #1260.
+        ResourceUriValidator.validate(v4JobRequest.getResources());
+
         final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(
-            DtoConverters.toV4JobRequest(jobRequest),
+            v4JobRequest,
             metadata
         );
 
