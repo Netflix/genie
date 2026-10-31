@@ -22,12 +22,13 @@ import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.scheduling.TaskScheduler;
 
 import jakarta.validation.constraints.NotNull;
 import java.lang.management.ManagementFactory;
+import java.time.Duration;
 
 /**
  * Health indicator for system cpu usage. Mark the service out-of-service if it crosses the threshold.
@@ -78,7 +79,7 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
         this.summaryCpuMetric = summaryCpuMetric;
         this.summaryCpuMetric.record((long) (operatingSystemMXBean.getSystemCpuLoad() * 100));
         taskScheduler.scheduleAtFixedRate(() -> this.summaryCpuMetric
-            .record((long) (operatingSystemMXBean.getSystemCpuLoad() * 100)), 5000);
+            .record((long) (operatingSystemMXBean.getSystemCpuLoad() * 100)), Duration.ofMillis(5000));
     }
 
     @Override

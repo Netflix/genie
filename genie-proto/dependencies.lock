@@ -218,6 +218,9 @@
         "org.junit.jupiter:junit-jupiter-params": {
             "locked": "5.8.2"
         },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.8.2"
+        },
         "org.spockframework:spock-core": {
             "locked": "2.0-groovy-3.0"
         },
@@ -233,12 +236,12 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.12"
+            "locked": "0.8.13"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.12"
+            "locked": "0.8.13"
         }
     },
     "protobufToolsLocator_grpc": {
@@ -419,6 +422,9 @@
         "org.junit.jupiter:junit-jupiter-params": {
             "locked": "5.8.2"
         },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.8.2"
+        },
         "org.spockframework:spock-core": {
             "locked": "2.0-groovy-3.0"
         },
@@ -592,6 +598,9 @@
         },
         "org.junit.jupiter:junit-jupiter-params": {
             "locked": "5.8.2"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.8.2"
         },
         "org.spockframework:spock-core": {
             "locked": "2.0-groovy-3.0"

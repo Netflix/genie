@@ -149,13 +149,13 @@ class RequestForwardingServiceImplSpec extends Specification {
         1 * this.request.getHeader(header1) >> headers[header1]
         1 * this.request.getCookies() >> cookies.toArray(new Cookie[0])
         forwardRequest.getHeaders().size() == 4
-        forwardRequest.getHeaders().containsKey(header0)
+        forwardRequest.getHeaders().containsHeader(header0)
         forwardRequest.getHeaders().get(header0).contains(headers[header0])
-        forwardRequest.getHeaders().containsKey(header1)
+        forwardRequest.getHeaders().containsHeader(header1)
         forwardRequest.getHeaders().get(header1).contains(headers[header1])
-        forwardRequest.getHeaders().containsKey(JobConstants.GENIE_FORWARDED_FROM_HEADER)
+        forwardRequest.getHeaders().containsHeader(JobConstants.GENIE_FORWARDED_FROM_HEADER)
         forwardRequest.getHeaders().get(JobConstants.GENIE_FORWARDED_FROM_HEADER).contains(this.hostname)
-        forwardRequest.getHeaders().containsKey(RequestForwardingServiceImpl.NAME_HEADER_COOKIE)
+        forwardRequest.getHeaders().containsHeader(RequestForwardingServiceImpl.NAME_HEADER_COOKIE)
         !forwardRequest
             .getHeaders()
             .get(RequestForwardingServiceImpl.NAME_HEADER_COOKIE)

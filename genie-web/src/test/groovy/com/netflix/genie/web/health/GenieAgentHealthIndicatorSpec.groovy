@@ -18,7 +18,7 @@
 package com.netflix.genie.web.health
 
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService
-import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.health.contributor.Status
 import spock.lang.Specification
 
 /**

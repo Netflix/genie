@@ -23,9 +23,9 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.Signature
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
-import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.health.contributor.Health
+import org.springframework.boot.health.contributor.HealthIndicator
+import org.springframework.boot.health.contributor.Status
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit

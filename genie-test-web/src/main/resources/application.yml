@@ -100,7 +100,7 @@ spring:
     name: genie
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration
   banner:
     location: genie-banner.txt
   cloud:
@@ -126,7 +126,11 @@ spring:
     baselineDescription: Base Version
     baselineOnMigrate: true
     baselineVersion: 3.2.0
-  jackson:
+  http:
+    converters:
+      preferred-json-mapper: jackson2
+  # Binds to spring-boot-jackson2; spring.jackson.* is the Jackson 3 namespace in Boot 4.
+  jackson2:
     time-zone: UTC
     serialization:
       write-dates-as-timestamps: false

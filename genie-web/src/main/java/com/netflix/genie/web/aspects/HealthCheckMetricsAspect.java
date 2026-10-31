@@ -25,8 +25,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -62,8 +62,8 @@ public class HealthCheckMetricsAspect {
      * Pointcut that matches invocations of {@code HealthIndicator::getHealth(..)}.
      */
     @Pointcut(""
-        + "target(org.springframework.boot.actuate.health.HealthIndicator+) && "
-        + "execution(org.springframework.boot.actuate.health.Health getHealth(..))"
+        + "target(org.springframework.boot.health.contributor.HealthIndicator+) && "
+        + "execution(org.springframework.boot.health.contributor.Health getHealth(..))"
     )
     public void healthIndicatorGetHealth() {
     }

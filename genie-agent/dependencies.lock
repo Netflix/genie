@@ -10,10 +10,10 @@
             "locked": "1.18.38"
         },
         "org.springframework.boot:spring-boot-autoconfigure-processor": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-configuration-processor": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         }
     },
     "checkstyle": {
@@ -31,13 +31,13 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.github.spotbugs:spotbugs-annotations": {
             "locked": "4.8.2"
@@ -80,22 +80,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -104,25 +104,25 @@
             "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -130,52 +130,55 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "net.jcip:jcip-annotations": {
             "locked": "1.0"
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.projectlombok:lombok": {
             "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -226,13 +229,13 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.github.spotbugs:spotbugs-annotations": {
             "locked": "4.8.2"
@@ -278,22 +281,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -305,25 +308,25 @@
             "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -331,31 +334,31 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "net.jcip:jcip-annotations": {
             "locked": "1.0"
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-params": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.projectlombok:lombok": {
             "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M6-groovy-3.0"
@@ -367,34 +370,37 @@
             "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -434,26 +440,26 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.google.guava:guava": {
             "firstLevelTransitive": [
@@ -505,31 +511,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.21.0"
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -553,22 +559,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "firstLevelTransitive": [
@@ -580,7 +586,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -588,7 +594,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -604,7 +610,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
@@ -613,7 +619,7 @@
             "locked": "1.9"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.apache.tika:tika-core": {
             "firstLevelTransitive": [
@@ -627,19 +633,22 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-engine": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-params": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "6.0.3"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M6-groovy-3.0"
@@ -651,37 +660,43 @@
             "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -710,12 +725,12 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.12"
+            "locked": "0.8.13"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.12"
+            "locked": "0.8.13"
         }
     },
     "runtimeClasspath": {
@@ -728,26 +743,26 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.google.guava:guava": {
             "firstLevelTransitive": [
@@ -796,31 +811,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.21.0"
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -841,22 +856,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "firstLevelTransitive": [
@@ -868,7 +883,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -876,7 +891,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -891,7 +906,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
@@ -900,7 +915,7 @@
             "locked": "1.9"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.apache.tika:tika-core": {
             "firstLevelTransitive": [
@@ -914,40 +929,46 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -998,13 +1019,13 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.github.spotbugs:spotbugs-annotations": {
             "locked": "4.8.2"
@@ -1050,22 +1071,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -1077,25 +1098,25 @@
             "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -1103,31 +1124,31 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "net.jcip:jcip-annotations": {
             "locked": "1.0"
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-params": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.projectlombok:lombok": {
             "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M6-groovy-3.0"
@@ -1139,34 +1160,37 @@
             "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1206,26 +1230,26 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.google.guava:guava": {
             "firstLevelTransitive": [
@@ -1277,31 +1301,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.21.0"
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -1325,22 +1349,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "firstLevelTransitive": [
@@ -1352,7 +1376,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -1360,7 +1384,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -1376,7 +1400,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
@@ -1385,7 +1409,7 @@
             "locked": "1.9"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.apache.tika:tika-core": {
             "firstLevelTransitive": [
@@ -1399,19 +1423,22 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-engine": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-params": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "6.0.3"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M6-groovy-3.0"
@@ -1423,37 +1450,43 @@
             "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1514,13 +1547,13 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.github.spotbugs:spotbugs-annotations": {
             "locked": "4.8.2"
@@ -1566,22 +1599,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -1593,25 +1626,25 @@
             "locked": "1.63.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "locked": "3.0.3"
         },
         "jakarta.servlet:jakarta.servlet-api": {
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -1619,31 +1652,31 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "net.jcip:jcip-annotations": {
             "locked": "1.0"
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.hibernate.validator:hibernate-validator": {
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-params": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.projectlombok:lombok": {
             "locked": "1.18.38"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M6-groovy-3.0"
@@ -1655,34 +1688,37 @@
             "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
@@ -1722,26 +1758,26 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jdk8": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common",
                 "com.netflix.genie:genie-common-external"
             ],
-            "locked": "2.18.4"
+            "locked": "2.21.7"
         },
         "com.github.ben-manes.caffeine:caffeine": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.1.8"
+            "locked": "3.2.4"
         },
         "com.google.guava:guava": {
             "firstLevelTransitive": [
@@ -1793,31 +1829,31 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.17.2"
+            "locked": "1.21.0"
         },
         "io.awspring.cloud:spring-cloud-aws-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.awspring.cloud:spring-cloud-aws-starter-s3": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.3.1"
+            "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
             "locked": "1.63.1"
@@ -1841,22 +1877,22 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "1.4.6"
+            "locked": "1.7.2"
         },
         "io.zipkin.brave:brave": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.brave:brave-instrumentation-grpc": {
-            "locked": "6.0.3"
+            "locked": "6.3.1"
         },
         "io.zipkin.reporter2:zipkin-reporter": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.3"
+            "locked": "3.5.3"
         },
         "jakarta.el:jakarta.el-api": {
             "firstLevelTransitive": [
@@ -1868,7 +1904,7 @@
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.0.0"
+            "locked": "6.1.0"
         },
         "jakarta.validation:jakarta.validation-api": {
             "firstLevelTransitive": [
@@ -1876,7 +1912,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.0.2"
+            "locked": "3.1.1"
         },
         "javax.annotation:javax.annotation-api": {
             "firstLevelTransitive": [
@@ -1892,7 +1928,7 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.17.0"
+            "locked": "3.20.0"
         },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
@@ -1901,7 +1937,7 @@
             "locked": "1.9"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.24.3"
+            "locked": "2.25.5"
         },
         "org.apache.tika:tika-core": {
             "firstLevelTransitive": [
@@ -1915,19 +1951,22 @@
                 "com.netflix.genie:genie-common-external",
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "8.0.2.Final"
+            "locked": "9.1.5.Final"
         },
         "org.junit.jupiter:junit-jupiter-api": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-engine": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
         },
         "org.junit.jupiter:junit-jupiter-params": {
-            "locked": "5.11.4"
+            "locked": "6.0.3"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "6.0.3"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "2.0.17"
+            "locked": "2.0.20"
         },
         "org.spockframework:spock-core": {
             "locked": "2.4-M6-groovy-3.0"
@@ -1939,37 +1978,43 @@
             "locked": "2.4-M6-groovy-3.0"
         },
         "org.springframework.boot:spring-boot": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-actuator-autoconfigure": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "3.4.6"
+            "locked": "4.1.2"
+        },
+        "org.springframework.boot:spring-boot-micrometer-tracing-brave": {
+            "firstLevelTransitive": [
+                "com.netflix.genie:genie-common-internal"
+            ],
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-log4j2": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-test": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework.boot:spring-boot-starter-validation": {
-            "locked": "3.4.6"
+            "locked": "4.1.2"
         },
         "org.springframework:spring-context": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "org.springframework:spring-core": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-common-internal"
             ],
-            "locked": "6.2.7"
+            "locked": "7.0.10"
         },
         "software.amazon.awssdk:aws-core": {
             "firstLevelTransitive": [
