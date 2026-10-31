@@ -128,6 +128,7 @@ spring:
     baselineVersion: 3.2.0
   http:
     converters:
+      # Use jackson 2 in converters. Drop property when upgrading to jackson 3
       preferred-json-mapper: jackson2
   # Binds to spring-boot-jackson2; spring.jackson.* is the Jackson 3 namespace in Boot 4.
   jackson2:

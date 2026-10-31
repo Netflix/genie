@@ -40,8 +40,6 @@ import org.springframework.http.HttpStatus;
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @EnableAutoConfiguration
-// Boot 4 moved TestRestTemplate into spring-boot-resttestclient and made its auto-configuration
-// opt-in rather than implied by a RANDOM_PORT @SpringBootTest.
 @AutoConfigureTestRestTemplate
 class GenieAppSmokeTest {
 
