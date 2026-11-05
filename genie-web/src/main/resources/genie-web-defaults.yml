@@ -84,6 +84,8 @@ genie:
       enabled: true
     archive-status-cleanup:
       enabled: true
+    leader-task-heartbeat:
+      enabled: true
     database-cleanup:
       enabled: true
       expression: 0 0 0 * * *

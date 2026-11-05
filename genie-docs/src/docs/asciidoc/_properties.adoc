@@ -736,6 +736,11 @@ number of CPU cores x 2 + 1
 |1
 |no
 
+|genie.tasks.leader-task-heartbeat.enabled
+|Whether the leader scheduler heartbeat task is enabled.
+|true
+|no
+
 |genie.tasks.scheduler.pool.size
 |The number of available threads for the scheduler to use to run tasks on the node at scheduled intervals. Best to set
 to the number of CPU cores x 2 + 1
