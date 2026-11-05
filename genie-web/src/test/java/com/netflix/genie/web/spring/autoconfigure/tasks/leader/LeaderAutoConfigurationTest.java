@@ -22,10 +22,12 @@ import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.metrics.LeaderElectionMetrics;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ArchiveStatusCleanupProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.LeaderSchedulerHeartbeatProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
@@ -34,10 +36,12 @@ import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ArchiveStatusCleanupTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
+import com.netflix.genie.web.tasks.leader.LeaderSchedulerHeartbeatTask;
 import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import com.netflix.genie.web.tasks.leader.UserMetricsTask;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -46,8 +50,13 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.leader.event.OnGrantedEvent;
+import org.springframework.integration.leader.event.OnRevokedEvent;
 import org.springframework.integration.zookeeper.leader.LeaderInitiator;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Unit tests for the {@link LeaderAutoConfiguration} class.
@@ -62,7 +71,8 @@ class LeaderAutoConfigurationTest {
             .withConfiguration(
                 AutoConfigurations.of(
                     TasksAutoConfiguration.class,
-                    LeaderAutoConfiguration.class
+                    LeaderAutoConfiguration.class,
+                    LeaderElectionObservabilityAutoConfiguration.class
                 )
             )
             .withUserConfiguration(MockBeanConfig.class);
@@ -79,11 +89,14 @@ class LeaderAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                 Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
+                Assertions.assertThat(context).hasSingleBean(LeaderSchedulerHeartbeatProperties.class);
 
                 Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                 Assertions.assertThat(context).hasSingleBean(LocalLeader.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
                 Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
+                Assertions.assertThat(context).hasSingleBean(LeaderElectionMetrics.class);
+                Assertions.assertThat(context).hasSingleBean(LeaderSchedulerHeartbeatTask.class);
 
                 // Optional beans
                 Assertions.assertThat(context).doesNotHaveBean(DatabaseCleanupTask.class);
@@ -142,17 +155,67 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(LeaderSchedulerHeartbeatProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                     Assertions.assertThat(context).doesNotHaveBean(LocalLeader.class);
 
                     Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
                     Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
+                    Assertions.assertThat(context).hasSingleBean(LeaderElectionMetrics.class);
+                    Assertions.assertThat(context).hasSingleBean(LeaderSchedulerHeartbeatTask.class);
 
                     // Optional beans
                     Assertions.assertThat(context).doesNotHaveBean(DatabaseCleanupTask.class);
                     Assertions.assertThat(context).doesNotHaveBean(UserMetricsTask.class);
                     Assertions.assertThat(context).doesNotHaveBean(AgentJobCleanupTask.class);
+                }
+            );
+    }
+
+    /**
+     * User-provided observability beans override the defaults.
+     */
+    @Test
+    void userObservabilityBeansOverrideDefaults() {
+        this.contextRunner
+            .withUserConfiguration(CustomObservabilityConfig.class)
+            .run(
+                context -> {
+                    Assertions.assertThat(context.getBean(LeaderElectionMetrics.class))
+                        .isSameAs(context.getBean("customLeaderElectionMetrics"));
+                    Assertions.assertThat(context.getBean(LeaderSchedulerHeartbeatTask.class))
+                        .isSameAs(context.getBean("customLeaderSchedulerHeartbeatTask"));
+                }
+            );
+    }
+
+    /**
+     * The normal coordinator schedules and cancels the autoconfigured heartbeat task.
+     */
+    @Test
+    void autoConfiguredHeartbeatIsScheduledByCoordinator() {
+        this.contextRunner
+            .withUserConfiguration(SchedulerConfig.class)
+            .run(
+                context -> {
+                    final TaskScheduler scheduler = context.getBean("genieTaskScheduler", TaskScheduler.class);
+                    final ScheduledFuture<?> future = Mockito.mock(ScheduledFuture.class);
+                    Mockito.doReturn(future).when(scheduler).scheduleAtFixedRate(
+                        Mockito.any(Runnable.class),
+                        Mockito.eq(LeaderSchedulerHeartbeatTask.HEARTBEAT_INTERVAL_MILLIS)
+                    );
+                    final LeaderSchedulerHeartbeatTask heartbeat = context.getBean(LeaderSchedulerHeartbeatTask.class);
+                    final LeaderTasksCoordinator coordinator = context.getBean(LeaderTasksCoordinator.class);
+
+                    coordinator.onLeaderEvent(new OnGrantedEvent(this, null, "leader"));
+                    Mockito.verify(scheduler).scheduleAtFixedRate(
+                        heartbeat,
+                        LeaderSchedulerHeartbeatTask.HEARTBEAT_INTERVAL_MILLIS
+                    );
+
+                    coordinator.onLeaderEvent(new OnRevokedEvent(this, null, "leader"));
+                    Mockito.verify(future).cancel(true);
                 }
             );
     }
@@ -181,7 +244,7 @@ class LeaderAutoConfigurationTest {
 
         @Bean
         MeterRegistry meterRegistry() {
-            return Mockito.mock(MeterRegistry.class);
+            return new SimpleMeterRegistry();
         }
 
         @Bean
@@ -202,6 +265,38 @@ class LeaderAutoConfigurationTest {
         @Bean
         AgentRoutingService agentRoutingService() {
             return Mockito.mock(AgentRoutingService.class);
+        }
+    }
+
+    /**
+     * Configuration for verifying that user-provided beans override the defaults.
+     */
+    @Configuration
+    static class CustomObservabilityConfig {
+
+        @Bean
+        LeaderElectionMetrics customLeaderElectionMetrics(
+            final ClusterLeaderService clusterLeaderService,
+            final MeterRegistry registry
+        ) {
+            return new LeaderElectionMetrics(clusterLeaderService, registry);
+        }
+
+        @Bean
+        LeaderSchedulerHeartbeatTask customLeaderSchedulerHeartbeatTask(final MeterRegistry registry) {
+            return new LeaderSchedulerHeartbeatTask(registry);
+        }
+    }
+
+    /**
+     * Mock configuration for coordinator tests.
+     */
+    @Configuration
+    static class SchedulerConfig {
+
+        @Bean(name = "genieTaskScheduler")
+        TaskScheduler genieTaskScheduler() {
+            return Mockito.mock(TaskScheduler.class);
         }
     }
 

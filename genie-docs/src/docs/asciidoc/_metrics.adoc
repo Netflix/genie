@@ -137,6 +137,18 @@ It will have to be added if one is desired otherwise metrics are just published 
 |HealthCheckMetricsAspect
 |healthIndicatorClass, healthIndicatorStatus
 
+|genie.leaderElection.heartbeat.counter
+|Counts leader-task scheduler heartbeat
+|count
+|LeaderSchedulerHeartbeatTask
+|-
+
+|genie.leaderElection.leader.gauge
+|Whether this node is the elected Genie leader
+|count
+|LeaderElectionMetrics
+|-
+
 |genie.jobs.active.gauge
 |Number of jobs currently active locally
 |amount
