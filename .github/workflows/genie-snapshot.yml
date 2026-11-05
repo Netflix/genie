@@ -63,6 +63,8 @@ jobs:
       - name: Setup jdk 8 and 17
         uses: actions/setup-java@v5
         with:
+          # JDK 8 for the Java 8 Gradle toolchain (not guaranteed on runner images).
+          # The last version listed is the default.
           java-version: |
             8
             17
