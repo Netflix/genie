@@ -59,17 +59,18 @@ public class HealthCheckMetricsAspect {
     }
 
     /**
-     * Pointcut that matches invocations of {@code HealthIndicator::getHealth(..)}.
+     * Pointcut that matches invocations of {@code HealthIndicator::health(boolean)}, which Spring Boot 4's health
+     * endpoint calls (it was {@code getHealth(boolean)} in Boot 3).
      */
     @Pointcut(""
         + "target(org.springframework.boot.health.contributor.HealthIndicator+) && "
-        + "execution(org.springframework.boot.health.contributor.Health getHealth(..))"
+        + "execution(org.springframework.boot.health.contributor.Health health(boolean))"
     )
     public void healthIndicatorGetHealth() {
     }
 
     /**
-     * Aspect around join point for {@code HealthIndicator::getHealth(..)}.
+     * Aspect around join point for {@code HealthIndicator::health(boolean)}.
      * Measures the turnaround time for the indicator call and publishes it as metric, tagged with indicator class
      * and the status reported.
      *

@@ -26,6 +26,8 @@ import org.aspectj.lang.Signature
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.boot.health.contributor.Status
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.springframework.aop.aspectj.annotation.AspectJProxyFactory
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
@@ -58,14 +60,14 @@ class HealthCheckMetricsAspectSpec extends Specification {
         this.aspect = new HealthCheckMetricsAspect(registry)
     }
 
-    def "Around HealthIndicator::getHealth(...)"() {
+    def "Around HealthIndicator::health(boolean)"() {
         when:
         Health h = this.aspect.aroundHealthIndicatorGetHealth(joinPoint)
 
         then:
         1 * joinPoint.getTarget() >> healthIndicator
         1 * joinPoint.getSignature() >> signature
-        1 * signature.getName() >> "getHealth"
+        1 * signature.getName() >> "health"
         2 * joinPoint.getArgs() >> args
         1 * joinPoint.proceed(args) >> health
         1 * registry.timer(
@@ -85,7 +87,7 @@ class HealthCheckMetricsAspectSpec extends Specification {
         then:
         1 * joinPoint.getTarget() >> healthIndicator
         1 * joinPoint.getSignature() >> signature
-        1 * signature.getName() >> "getHealth"
+        1 * signature.getName() >> "health"
         2 * joinPoint.getArgs() >> args
         1 * joinPoint.proceed(args) >> { throw exception }
         1 * registry.timer(
@@ -98,5 +100,29 @@ class HealthCheckMetricsAspectSpec extends Specification {
         1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
         Throwable t = thrown(RuntimeException.class)
         t == exception
+    }
+
+    def "Pointcut intercepts HealthIndicator::health(boolean) through a proxy"() {
+        given:
+        def meterRegistry = new SimpleMeterRegistry()
+        def target = new HealthIndicator() {
+            @Override
+            Health health() {
+                return Health.up().build()
+            }
+        }
+        def proxyFactory = new AspectJProxyFactory(target)
+        proxyFactory.addAspect(new HealthCheckMetricsAspect(meterRegistry))
+        HealthIndicator proxy = proxyFactory.getProxy()
+
+        when:
+        Health h = proxy.health(true)
+
+        then:
+        h.getStatus() == Status.UP
+        meterRegistry.find(HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME)
+            .tag(HealthCheckMetricsAspect.HEALTH_INDICATOR_STATUS_TAG_NAME, Status.UP.getCode())
+            .timer()
+            .count() == 1
     }
 }
