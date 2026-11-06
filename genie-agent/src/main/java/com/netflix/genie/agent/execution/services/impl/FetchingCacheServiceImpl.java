@@ -39,7 +39,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
@@ -140,6 +142,8 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
 
         log.debug("Lookup: {}", uriString);
 
+        rejectUnsafeNetworkTarget(sourceFileUri);
+
         // Unique id to store the resource on local disk
         final String resourceCacheId = getResourceCacheId(sourceFileUri);
 
@@ -228,6 +232,56 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
         cleanUpTaskExecutor.execute(
             new CleanupOlderVersionsTask(resourceCacheId, resourceLastModified)
         );
+    }
+
+    /**
+     * Reject {@code http(s)} URIs that resolve to a loopback, link-local (including the
+     * {@code 169.254.169.254} cloud instance metadata address), or private (RFC 1918/4193) address.
+     *
+     * <p>Genie persists setupFile/config/dependency URIs from job submissions with no restriction beyond
+     * length/non-blankness (see GH #1260), and this method is the single point every one of those URIs
+     * passes through before the Agent makes a real network request on the submitter's behalf - regardless
+     * of whether the URI came from a REST-submitted Job or a persisted Application/Cluster/Command. Other
+     * schemes (e.g. {@code file:}, used by {@code genie exec} for local job execution) make no outbound
+     * network request and are unaffected by this check; scheme restrictions for the network-submitted paths
+     * that shouldn't use them at all are enforced earlier, server-side.
+     */
+    @VisibleForTesting
+    void rejectUnsafeNetworkTarget(final URI uri) throws DownloadException {
+        final String scheme = uri.getScheme();
+        if (scheme == null || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
+            return;
+        }
+        final String host = uri.getHost();
+        if (host == null) {
+            return;
+        }
+        final InetAddress[] addresses;
+        try {
+            addresses = InetAddress.getAllByName(host);
+        } catch (final UnknownHostException e) {
+            // Let the normal fetch path surface the failure to resolve the host.
+            return;
+        }
+        for (final InetAddress address : addresses) {
+            if (
+                address.isLoopbackAddress()
+                    || address.isLinkLocalAddress()
+                    || address.isSiteLocalAddress()
+                    || address.isAnyLocalAddress()
+                    || address.isMulticastAddress()
+            ) {
+                throw new DownloadException(
+                    "Refusing to fetch '"
+                        + uri
+                        + "': host '"
+                        + host
+                        + "' resolves to a non-routable or internal address ("
+                        + address.getHostAddress()
+                        + ")"
+                );
+            }
+        }
     }
 
     @VisibleForTesting

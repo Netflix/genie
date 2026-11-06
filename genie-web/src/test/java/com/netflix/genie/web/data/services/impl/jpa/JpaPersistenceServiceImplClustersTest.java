@@ -86,7 +86,11 @@ class JpaPersistenceServiceImplClustersTest {
 
     @Test
     void testCreateClusterAlreadyExists() {
-        final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
+        final Set<String> configs = Sets.newHashSet(
+            "http://example.com/a-config",
+            "http://example.com/another-config",
+            "http://example.com/yet-another-config"
+        );
         final ClusterRequest request = new ClusterRequest.Builder(
             new ClusterMetadata.Builder(
                 CLUSTER_1_NAME,
