@@ -98,10 +98,10 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.7.2"
@@ -299,13 +299,13 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-testing": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.7.2"
@@ -538,22 +538,22 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-testing": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -838,19 +838,19 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -1089,13 +1089,13 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-testing": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.7.2"
@@ -1328,22 +1328,22 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-testing": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
@@ -1617,13 +1617,13 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-testing": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "locked": "1.7.2"
@@ -1856,22 +1856,22 @@
             "locked": "4.0.2"
         },
         "io.grpc:grpc-netty": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-protobuf": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-stub": {
             "firstLevelTransitive": [
                 "com.netflix.genie:genie-proto"
             ],
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.grpc:grpc-testing": {
-            "locked": "1.63.1"
+            "locked": "1.84.1"
         },
         "io.micrometer:micrometer-tracing-bridge-brave": {
             "firstLevelTransitive": [
