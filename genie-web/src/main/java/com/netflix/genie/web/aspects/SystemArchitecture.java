@@ -30,7 +30,7 @@ import org.aspectj.lang.annotation.Pointcut;
 public class SystemArchitecture {
     /**
      * A join point is in the resource layer if the method is defined
-     * in a type in the com.netflix.genie.web.api.rest.v3.controllers package or any sub-package
+     * in a type in the com.netflix.genie.web.apis.rest.v3.controllers package or any sub-package
      * under that.
      */
     @Pointcut("within(com.netflix.genie.web.apis.rest.v3.controllers..*)")
@@ -56,27 +56,26 @@ public class SystemArchitecture {
     }
 
     /**
-     * A resource service is the execution of any method defined on a controller.
-     * This definition assumes that interfaces are placed in the
-     * "resources" package, and that implementation types are in sub-packages.
+     * A resource operation is the execution of any method declared on a type directly in the
+     * com.netflix.genie.web.apis.rest.v3.controllers package. Types in sub-packages are not matched.
      */
     @Pointcut("execution(* com.netflix.genie.web.apis.rest.v3.controllers.*.*(..))")
     public void resourceOperation() {
     }
 
     /**
-     * A service operation is the execution of any method defined on a
-     * service class/interface. This definition assumes that interfaces are placed in the
-     * "service" package, and that implementation types are in sub-packages.
+     * A service operation is the execution of any method declared on a type directly in the
+     * com.netflix.genie.web.services package. Implementations in sub-packages are still matched when they
+     * override a method declared on one of those types.
      */
     @Pointcut("execution(* com.netflix.genie.web.services.*.*(..))")
     public void serviceOperation() {
     }
 
     /**
-     * A data service operation is the execution of any method defined on a
-     * dao interface. This definition assumes that interfaces are placed in the
-     * "dao" package, and that implementation types are in sub-packages.
+     * A data service operation is the execution of any method declared on a type directly in the
+     * com.netflix.genie.web.data.services.impl.jpa package, which in practice is
+     * {@code JpaPersistenceServiceImpl}. Sub-packages such as the repositories and entities are not matched.
      */
     @Pointcut("execution(* com.netflix.genie.web.data.services.impl.jpa.*.*(..))")
     public void dataOperation() {

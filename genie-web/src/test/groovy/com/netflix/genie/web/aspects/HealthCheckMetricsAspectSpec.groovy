@@ -21,11 +21,13 @@ import com.google.common.collect.ImmutableSet
 import com.netflix.genie.web.health.GenieCpuHealthIndicator
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.Signature
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
-import org.springframework.boot.actuate.health.Status
+import org.springframework.aop.aspectj.annotation.AspectJProxyFactory
+import org.springframework.boot.health.contributor.Health
+import org.springframework.boot.health.contributor.HealthIndicator
+import org.springframework.boot.health.contributor.Status
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
@@ -98,5 +100,55 @@ class HealthCheckMetricsAspectSpec extends Specification {
         1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
         Throwable t = thrown(RuntimeException.class)
         t == exception
+    }
+
+    def "Pointcut matches HealthIndicator::health(boolean) on a real proxy"() {
+        setup:
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry()
+        AspectJProxyFactory proxyFactory = new AspectJProxyFactory(new UpHealthIndicator())
+        proxyFactory.addAspect(new HealthCheckMetricsAspect(meterRegistry))
+        HealthIndicator proxy = proxyFactory.getProxy() as HealthIndicator
+
+        when: "the health endpoint invokes the boolean overload through the proxy"
+        Health result = proxy.health(true)
+
+        then: "the call is intercepted and recorded exactly once"
+        result.getStatus() == Status.UP
+        meterRegistry
+            .get(HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME)
+            .tag(HealthCheckMetricsAspect.HEALTH_INDICATOR_CLASS_TAG_NAME, UpHealthIndicator.getSimpleName())
+            .tag(HealthCheckMetricsAspect.HEALTH_INDICATOR_STATUS_TAG_NAME, Status.UP.getCode())
+            .timer()
+            .count() == 1L
+    }
+
+    def "Pointcut does not match non-HealthIndicator beans"() {
+        setup:
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry()
+        AspectJProxyFactory proxyFactory = new AspectJProxyFactory(new NotAHealthIndicator())
+        // Groovy classes implement GroovyObject, so force CGLIB rather than a JDK interface proxy
+        proxyFactory.setProxyTargetClass(true)
+        proxyFactory.addAspect(new HealthCheckMetricsAspect(meterRegistry))
+        NotAHealthIndicator proxy = proxyFactory.getProxy() as NotAHealthIndicator
+
+        when:
+        proxy.health(true)
+
+        then:
+        meterRegistry.find(HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME).timer() == null
+    }
+
+    static class UpHealthIndicator implements HealthIndicator {
+        @Override
+        Health health() {
+            return Health.up().build()
+        }
+    }
+
+    static class NotAHealthIndicator {
+        @SuppressWarnings("unused")
+        Health health(boolean includeDetails) {
+            return Health.up().build()
+        }
     }
 }

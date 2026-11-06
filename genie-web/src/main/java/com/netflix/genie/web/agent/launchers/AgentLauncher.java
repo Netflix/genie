@@ -20,7 +20,7 @@ package com.netflix.genie.web.agent.launchers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.HealthIndicator;
 
 import jakarta.annotation.Nullable;
 import java.util.Optional;

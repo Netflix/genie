@@ -107,6 +107,15 @@ info:
     version: @genie.version@
 
 management:
+  tracing:
+    # Genie's trace propagation is B3 throughout (see BraveTracePropagator /
+    # EnvVarBraveTracePropagatorImpl). Boot 4 defaults this to W3C, which installs
+    # micrometer's W3CBaggagePropagator; that asks brave's GrpcServerRequest for
+    # arbitrary header names and brave throws
+    # "We currently don't support getting headers except propagation fields",
+    # failing every gRPC server call and breaking all agent communication.
+    propagation:
+      type: B3
   endpoints:
     web:
       base-path: /admin
@@ -125,6 +134,13 @@ spring:
         static: us-east-1
       stack:
         auto: false
+    # The 2025.1.x release train declares compatibility with Spring Boot 4.0.x only, and no train
+    # currently targets 4.1.x (2026.0.0-RC1 jumps to 4.2.0-RC1). Genie's entire Spring Cloud surface
+    # is the CuratorFramework bean from spring-cloud-zookeeper, which is disabled by default below,
+    # so the pairing is accepted deliberately rather than disabling the verifier outright.
+    compatibility-verifier:
+      compatible-boot-versions:
+        - 4.1.x
     zookeeper:
       enabled: false
   application:
@@ -151,7 +167,15 @@ spring:
     baselineDescription: Base Version
     baselineOnMigrate: true
     baselineVersion: 3.2.0
-  jackson:
+  http:
+    converters:
+      # Boot 4 defaults the HTTP message converters to Jackson 3. Genie's DTOs, its GenieObjectMapper
+      # singleton and the @JsonFilter on the exception types are all still Jackson 2, so keep the
+      # converters on Jackson 2 until Jackson 3 is migrated as its own piece of work.
+      preferred-json-mapper: jackson2
+  # These bind to spring-boot-jackson2. The plain spring.jackson.* namespace now binds to Jackson 3
+  # types whenever Jackson 3 is on the classpath, which it is transitively via webmvc and flyway.
+  jackson2:
     mapper:
       accept-case-insensitive-enums: true
     serialization:

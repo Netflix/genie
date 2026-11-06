@@ -5,5 +5,5 @@ grpc:
 spring:
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration
       - io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration

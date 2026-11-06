@@ -26,7 +26,7 @@ dependencies {
 
     implementation(project(":genie-web"))
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
 
     /*******************************
      * Compile Only Dependencies
@@ -44,6 +44,7 @@ dependencies {
     testImplementation(project(":genie-test-web"))
 
     integTestImplementation("commons-io:commons-io")
+    integTestImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }
 
 license {

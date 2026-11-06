@@ -42,7 +42,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.Executor
 import org.apache.commons.lang3.SystemUtils
-import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.health.contributor.Status
 import spock.lang.Specification
 import spock.lang.Unroll
 
