@@ -27,7 +27,7 @@ dependencies {
     implementation(project(":genie-web"))
     implementation(project(":genie-ui"))
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
 
     /*******************************
      * Compile Only Dependencies
@@ -43,6 +43,8 @@ dependencies {
 
     testImplementation(project(":genie-test"))
     testImplementation(project(":genie-test-web"))
+
+    smokeTestImplementation("org.springframework.boot:spring-boot-resttestclient")
 
     smokeTestRuntimeOnly("org.springframework:spring-webflux")
 

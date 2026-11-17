@@ -25,8 +25,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -59,17 +59,25 @@ public class HealthCheckMetricsAspect {
     }
 
     /**
-     * Pointcut that matches invocations of {@code HealthIndicator::getHealth(..)}.
+     * Pointcut that matches invocations of {@code HealthIndicator::health(boolean)}.
+     * <p>
+     * Spring Boot 4 renamed {@code HealthIndicator::getHealth(boolean)} to
+     * {@code HealthIndicator::health(boolean)} and moved the type from
+     * {@code org.springframework.boot.actuate.health} to
+     * {@code org.springframework.boot.health.contributor}. The {@code boolean} overload is the one the health
+     * endpoint invokes, and its default implementation self-invokes the no-arg {@code health()} on the target,
+     * bypassing the proxy. Matching only the {@code boolean} overload therefore records exactly one measurement
+     * per health check.
      */
     @Pointcut(""
-        + "target(org.springframework.boot.actuate.health.HealthIndicator+) && "
-        + "execution(org.springframework.boot.actuate.health.Health getHealth(..))"
+        + "target(org.springframework.boot.health.contributor.HealthIndicator+) && "
+        + "execution(org.springframework.boot.health.contributor.Health health(boolean))"
     )
     public void healthIndicatorGetHealth() {
     }
 
     /**
-     * Aspect around join point for {@code HealthIndicator::getHealth(..)}.
+     * Aspect around join point for {@code HealthIndicator::health(boolean)}.
      * Measures the turnaround time for the indicator call and publishes it as metric, tagged with indicator class
      * and the status reported.
      *

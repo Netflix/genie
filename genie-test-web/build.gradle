@@ -27,7 +27,7 @@ dependencies {
     implementation(project(":genie-test"))
     implementation("com.google.guava:guava")
     implementation("commons-io:commons-io")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-test")
 
     /*******************************

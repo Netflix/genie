@@ -23,7 +23,7 @@ import com.netflix.genie.web.agent.launchers.AgentLauncher
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.selectors.AgentLauncherSelectionContext
-import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.health.contributor.Health
 
 def binding = this.getBinding()
 

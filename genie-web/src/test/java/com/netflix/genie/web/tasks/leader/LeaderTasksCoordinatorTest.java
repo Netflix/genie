@@ -29,6 +29,7 @@ import org.springframework.integration.leader.event.OnRevokedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
@@ -78,10 +79,10 @@ class LeaderTasksCoordinatorTest {
 
         this.coordinator.onLeaderEvent(event);
 
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, task1Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, Duration.ofMillis(task1Period));
         Mockito.verify(this.task1, Mockito.never()).getFixedDelay();
         Mockito.verify(this.task1, Mockito.never()).getTrigger();
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, task2Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, Duration.ofMillis(task2Period));
         Mockito.verify(this.task2, Mockito.never()).getFixedRate();
         Mockito.verify(this.task2, Mockito.never()).getTrigger();
         Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task3, task3Trigger);
@@ -91,8 +92,8 @@ class LeaderTasksCoordinatorTest {
         //Make sure a second OnGrantedEvent doesn't do anything if it's already running
         this.coordinator.onLeaderEvent(event);
 
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, task1Period);
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, task2Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, Duration.ofMillis(task1Period));
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, Duration.ofMillis(task2Period));
         Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task3, task3Trigger);
     }
 
@@ -114,11 +115,11 @@ class LeaderTasksCoordinatorTest {
 
         final ScheduledFuture future1 = Mockito.mock(ScheduledFuture.class);
         Mockito.when(future1.cancel(true)).thenReturn(true);
-        Mockito.when(this.scheduler.scheduleAtFixedRate(this.task1, task1Period)).thenReturn(future1);
+        Mockito.when(this.scheduler.scheduleAtFixedRate(this.task1, Duration.ofMillis(task1Period))).thenReturn(future1);
 
         final ScheduledFuture future2 = Mockito.mock(ScheduledFuture.class);
         Mockito.when(future2.cancel(true)).thenReturn(true);
-        Mockito.when(this.scheduler.scheduleWithFixedDelay(this.task2, task2Period)).thenReturn(future2);
+        Mockito.when(this.scheduler.scheduleWithFixedDelay(this.task2, Duration.ofMillis(task2Period))).thenReturn(future2);
 
         final ScheduledFuture future3 = Mockito.mock(ScheduledFuture.class);
         Mockito.when(future3.cancel(true)).thenReturn(false);
@@ -128,10 +129,10 @@ class LeaderTasksCoordinatorTest {
 
         this.coordinator.onLeaderEvent(grantedEvent);
 
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, task1Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleAtFixedRate(this.task1, Duration.ofMillis(task1Period));
         Mockito.verify(this.task1, Mockito.never()).getFixedDelay();
         Mockito.verify(this.task1, Mockito.never()).getTrigger();
-        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, task2Period);
+        Mockito.verify(this.scheduler, Mockito.times(1)).scheduleWithFixedDelay(this.task2, Duration.ofMillis(task2Period));
         Mockito.verify(this.task2, Mockito.never()).getFixedRate();
         Mockito.verify(this.task2, Mockito.never()).getTrigger();
         Mockito.verify(this.scheduler, Mockito.times(1)).schedule(this.task3, task3Trigger);
@@ -161,30 +162,13 @@ class LeaderTasksCoordinatorTest {
      */
     @Test
     void doesIgnoreUnknownEvent() {
-        final AbstractLeaderEvent leaderEvent = new AbstractLeaderEvent(this) {
-            /**
-             * Gets the {@link Context} associated with this event.
-             *
-             * @return the context
-             */
-            @Override
-            public Context getContext() {
-                return new Context() {
-                    @Override
-                    public boolean isLeader() {
-                        return false;
-                    }
-
-                    @Override
-                    public void yield() {
-                    }
-                };
-            }
+        final Context context = () -> false;
+        final AbstractLeaderEvent leaderEvent = new AbstractLeaderEvent(this, context, "cluster") {
         };
 
         this.coordinator.onLeaderEvent(leaderEvent);
         Mockito.verify(
-            this.scheduler, Mockito.never()).scheduleAtFixedRate(Mockito.any(Runnable.class), Mockito.anyLong()
+            this.scheduler, Mockito.never()).scheduleAtFixedRate(Mockito.any(Runnable.class), Mockito.any(Duration.class)
         );
     }
 }

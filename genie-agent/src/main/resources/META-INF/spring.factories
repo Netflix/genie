@@ -1,2 +1,2 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
+org.springframework.boot.EnvironmentPostProcessor=\
   com.netflix.genie.agent.spring.processors.GenieDefaultPropertiesPostProcessor

@@ -27,6 +27,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
 import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -106,7 +107,9 @@ public class LeaderTasksCoordinator {
                                 task.getClass().getCanonicalName(),
                                 rate / 1000.0
                             );
-                            this.futures.add(this.taskScheduler.scheduleAtFixedRate(task, rate));
+                            this.futures.add(
+                                this.taskScheduler.scheduleAtFixedRate(task, Duration.ofMillis(rate))
+                            );
                             break;
                         case FIXED_DELAY:
                             final long delay = task.getFixedDelay();
@@ -115,7 +118,9 @@ public class LeaderTasksCoordinator {
                                 task.getClass().getCanonicalName(),
                                 delay / 1000.0
                             );
-                            this.futures.add(this.taskScheduler.scheduleWithFixedDelay(task, delay));
+                            this.futures.add(
+                                this.taskScheduler.scheduleWithFixedDelay(task, Duration.ofMillis(delay))
+                            );
                             break;
                         default:
                             log.error("Unknown Genie task type {}", task.getScheduleType());

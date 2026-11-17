@@ -21,7 +21,7 @@ import com.netflix.genie.web.properties.HealthProperties
 import com.sun.management.OperatingSystemMXBean
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.health.contributor.Status
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 import spock.lang.Unroll

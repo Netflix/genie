@@ -18,8 +18,8 @@
 package com.netflix.genie.web.health;
 
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 
 /**
  * Provides a health indicator relative to the behavior of Genie Agents and this Server.

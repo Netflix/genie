@@ -19,7 +19,7 @@ package com.netflix.genie.agent.spring.processors;
 
 import com.netflix.genie.common.internal.util.PropertySourceUtils;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.ClassPathResource;

@@ -43,7 +43,7 @@ dependencies {
 
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("org.glassfish.jaxb:jaxb-runtime")
-    annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen")
+    annotationProcessor("org.hibernate.orm:hibernate-processor")
     annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -102,8 +102,9 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.glassfish.jaxb:jaxb-runtime")
     implementation("org.hibernate.validator:hibernate-validator")
+    implementation("org.springframework.boot:spring-boot-jackson2")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: "org.hibernate.javax.persistence"
@@ -114,7 +115,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.cloud:spring-cloud-starter-zookeeper")
     implementation("org.springframework.integration:spring-integration-zookeeper")
     implementation("org.apache.maven:maven-artifact") {
@@ -131,6 +132,9 @@ dependencies {
 
     runtimeOnly("com.github.ben-manes.caffeine:caffeine")
     runtimeOnly("com.h2database:h2")
+    // Boot 4 moved FlywayAutoConfiguration out of spring-boot-autoconfigure into its own module.
+    // Without the starter nothing runs the migrations and the schema is never created.
+    runtimeOnly("org.springframework.boot:spring-boot-starter-flyway")
     runtimeOnly("org.flywaydb:flyway-core")
     runtimeOnly("org.flywaydb:flyway-mysql")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
@@ -149,7 +153,11 @@ dependencies {
     testImplementation("org.dbunit:dbunit")
     integTestImplementation("com.github.ppodgorsek:spring-test-dbunit-core")
     integTestImplementation("org.apache.curator:curator-test:5.1.0")
-    integTestImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
+    // Boot 4 split the slice-test support out of spring-boot-test-autoconfigure:
+    // @DataJpaTest and TestEntityManager now live in these modules.
+    integTestImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    integTestImplementation("org.springframework.boot:spring-boot-jpa-test")
+    integTestImplementation("org.wiremock.integrations:wiremock-spring-boot:4.4.3")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-core")
     integTestImplementation("org.springframework.restdocs:spring-restdocs-restassured")
     integTestRuntimeOnly("org.springframework:spring-webflux")

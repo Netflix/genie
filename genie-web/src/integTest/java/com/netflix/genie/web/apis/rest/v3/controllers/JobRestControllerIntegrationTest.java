@@ -73,6 +73,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,6 +99,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
 
     private static final long SLEEP_TIME = 500L;
+    private static final Duration POLL_TIMEOUT = Duration.ofMinutes(2);
     private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
     private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
     private static final String COMMAND_ARGS_PATH = "commandArgs";
@@ -1244,6 +1246,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         );
 
         this.waitForRunning(jobId);
+        this.waitForOutputAvailable(jobId, "stdout");
 
         // Make sure we can get output for a running job
         final ValidatableResponse outputResponse = RestAssured
@@ -1525,6 +1528,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         );
 
         this.waitForRunning(jobId);
+        this.waitForOutputAvailable(jobId, "stdout");
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1633,6 +1637,7 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
         );
 
         this.waitForRunning(jobId);
+        this.waitForOutputAvailable(jobId, "stdout");
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1667,30 +1672,74 @@ class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase
     }
 
     private void waitForDone(final String jobId) throws Exception {
-        int counter = 0;
+        final Instant deadline = Instant.now().plus(POLL_TIMEOUT);
         while (true) {
             final JobStatus status = this.getStatus(jobId);
-            if (status.isActive()) {
-                LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
-                Thread.sleep(SLEEP_TIME);
-                counter++;
-            } else {
-                break;
+            if (!status.isActive()) {
+                return;
+            } else if (Instant.now().isAfter(deadline)) {
+                throw new IllegalStateException(
+                    "Job " + jobId + " did not reach a terminal state within " + POLL_TIMEOUT
+                        + " (last status: " + status + ")"
+                );
             }
+            LOG.info("Job {} status is {}, sleeping for {} ms", jobId, status, SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
         }
     }
 
     private void waitForRunning(final String jobId) throws Exception {
-        int counter = 0;
+        final Instant deadline = Instant.now().plus(POLL_TIMEOUT);
         while (true) {
             final JobStatus status = this.getStatus(jobId);
-            if (status != JobStatus.RUNNING && !status.isFinished()) {
-                LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
-                Thread.sleep(SLEEP_TIME);
-                counter++;
-            } else {
-                break;
+            if (status == JobStatus.RUNNING || status.isFinished()) {
+                return;
+            } else if (Instant.now().isAfter(deadline)) {
+                throw new IllegalStateException(
+                    "Job " + jobId + " did not reach a running or finished state within " + POLL_TIMEOUT
+                        + " (last status: " + status + ")"
+                );
             }
+            LOG.info("Job {} status is {}, sleeping for {} ms", jobId, status, SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
+        }
+    }
+
+    /*
+     * Wait until the given job output path can actually be served.
+     *
+     * A job reaching RUNNING does not imply its output is retrievable. While a job is still running the server
+     * resolves output from the manifest the agent pushes over the file stream channel, and that push is not
+     * synchronized with the job status transition. Polling status alone therefore races the manifest and
+     * intermittently yields a 404.
+     */
+    private void waitForOutputAvailable(final String jobId, final String filePath) throws Exception {
+        final Instant deadline = Instant.now().plus(POLL_TIMEOUT);
+        while (true) {
+            final int statusCode = RestAssured
+                .given(this.getRequestSpecification())
+                .accept(MediaType.ALL_VALUE)
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/{id}/output/{filePath}", jobId, filePath)
+                .getStatusCode();
+
+            if (statusCode == HttpStatus.OK.value()) {
+                return;
+            } else if (Instant.now().isAfter(deadline)) {
+                throw new IllegalStateException(
+                    "Output \"" + filePath + "\" of job " + jobId + " was not servable within " + POLL_TIMEOUT
+                        + " (last response code: " + statusCode + ")"
+                );
+            }
+            LOG.info(
+                "Output \"{}\" of job {} not available yet (HTTP {}), sleeping for {} ms",
+                filePath,
+                jobId,
+                statusCode,
+                SLEEP_TIME
+            );
+            Thread.sleep(SLEEP_TIME);
         }
     }
 
