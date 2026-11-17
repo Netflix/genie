@@ -113,15 +113,15 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.boot.actuate.health.Health</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.boot.health.contributor.Health</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#aroundHealthIndicatorGetHealth(org.aspectj.lang.ProceedingJoinPoint)" class="member-name-link">aroundHealthIndicatorGetHealth</a><wbr>(org.aspectj.lang.ProceedingJoinPoint&nbsp;joinPoint)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Aspect around join point for <code>HealthIndicator::getHealth(..)</code>.</div>
+<div class="block">Aspect around join point for <code>HealthIndicator::health(boolean)</code>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#healthIndicatorGetHealth()" class="member-name-link">healthIndicatorGetHealth</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Pointcut that matches invocations of <code>HealthIndicator::getHealth(..)</code>.</div>
+<div class="block">Pointcut that matches invocations of <code>HealthIndicator::health(boolean)</code>.</div>
 </div>
 </div>
 </div>
@@ -163,15 +163,23 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="healthIndicatorGetHealth()">
 <h3>healthIndicatorGetHealth</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">healthIndicatorGetHealth</span>()</div>
-<div class="block">Pointcut that matches invocations of <code>HealthIndicator::getHealth(..)</code>.</div>
+<div class="block">Pointcut that matches invocations of <code>HealthIndicator::health(boolean)</code>.
+ <p>
+ Spring Boot 4 renamed <code>HealthIndicator::getHealth(boolean)</code> to
+ <code>HealthIndicator::health(boolean)</code> and moved the type from
+ <code>org.springframework.boot.actuate.health</code> to
+ <code>org.springframework.boot.health.contributor</code>. The <code>boolean</code> overload is the one the health
+ endpoint invokes, and its default implementation self-invokes the no-arg <code>health()</code> on the target,
+ bypassing the proxy. Matching only the <code>boolean</code> overload therefore records exactly one measurement
+ per health check.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="aroundHealthIndicatorGetHealth(org.aspectj.lang.ProceedingJoinPoint)">
 <h3>aroundHealthIndicatorGetHealth</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.boot.actuate.health.Health</span>&nbsp;<span class="element-name">aroundHealthIndicatorGetHealth</span><wbr><span class="parameters">(org.aspectj.lang.ProceedingJoinPoint&nbsp;joinPoint)</span>
-                                                                              throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a></span></div>
-<div class="block">Aspect around join point for <code>HealthIndicator::getHealth(..)</code>.
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.boot.health.contributor.Health</span>&nbsp;<span class="element-name">aroundHealthIndicatorGetHealth</span><wbr><span class="parameters">(org.aspectj.lang.ProceedingJoinPoint&nbsp;joinPoint)</span>
+                                                                                  throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a></span></div>
+<div class="block">Aspect around join point for <code>HealthIndicator::health(boolean)</code>.
  Measures the turnaround time for the indicator call and publishes it as metric, tagged with indicator class
  and the status reported.</div>
 <dl class="notes">

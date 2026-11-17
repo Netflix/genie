@@ -112,7 +112,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#apisObjectMapperCustomizer()" class="member-name-link">apisObjectMapperCustomizer</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Customizer for <code>ObjectMapper</code> used by controllers.</div>
@@ -128,8 +128,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Get the directory writer to use.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.web.client.RestTemplate</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#genieRestTemplate(com.netflix.genie.web.properties.HttpProperties,org.springframework.boot.web.client.RestTemplateBuilder)" class="member-name-link">genieRestTemplate</a><wbr>(<a href="../../../properties/HttpProperties.html" title="class in com.netflix.genie.web.properties">HttpProperties</a>&nbsp;httpProperties,
- org.springframework.boot.web.client.RestTemplateBuilder&nbsp;restTemplateBuilder)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#genieRestTemplate(com.netflix.genie.web.properties.HttpProperties,org.springframework.boot.restclient.RestTemplateBuilder)" class="member-name-link">genieRestTemplate</a><wbr>(<a href="../../../properties/HttpProperties.html" title="class in com.netflix.genie.web.properties">HttpProperties</a>&nbsp;httpProperties,
+ org.springframework.boot.restclient.RestTemplateBuilder&nbsp;restTemplateBuilder)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get RestTemplate for calling between Genie nodes.</div>
 </div>
@@ -194,12 +194,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="genieRestTemplate(com.netflix.genie.web.properties.HttpProperties,org.springframework.boot.web.client.RestTemplateBuilder)">
+<section class="detail" id="genieRestTemplate(com.netflix.genie.web.properties.HttpProperties,org.springframework.boot.restclient.RestTemplateBuilder)">
 <h3>genieRestTemplate</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @ConditionalOnMissingBean(name="genieRestTemplate")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.web.client.RestTemplate</span>&nbsp;<span class="element-name">genieRestTemplate</span><wbr><span class="parameters">(<a href="../../../properties/HttpProperties.html" title="class in com.netflix.genie.web.properties">HttpProperties</a>&nbsp;httpProperties,
- org.springframework.boot.web.client.RestTemplateBuilder&nbsp;restTemplateBuilder)</span></div>
+ org.springframework.boot.restclient.RestTemplateBuilder&nbsp;restTemplateBuilder)</span></div>
 <div class="block">Get RestTemplate for calling between Genie nodes.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -275,7 +275,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="apisObjectMapperCustomizer()">
 <h3>apisObjectMapperCustomizer</h3>
 <div class="member-signature"><span class="annotations">@Bean
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer</span>&nbsp;<span class="element-name">apisObjectMapperCustomizer</span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer</span>&nbsp;<span class="element-name">apisObjectMapperCustomizer</span>()</div>
 <div class="block">Customizer for <code>ObjectMapper</code> used by controllers.</div>
 <dl class="notes">
 <dt>Returns:</dt>

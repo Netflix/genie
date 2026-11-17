@@ -78,7 +78,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="annotations">@Configuration
 @EnableConfigurationProperties({<a href="../../../../properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties.class</a>,<a href="../../../../properties/TitusAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">TitusAgentLauncherProperties.class</a>})
-@AutoConfigureAfter(org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration.class)
+@AutoConfigureAfter(org.springframework.boot.restclient.autoconfigure.RestTemplateAutoConfiguration.class)
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">AgentLaunchersAutoConfiguration</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Auto configuration for beans responsible for launching Genie Agent instances.</div>
@@ -168,7 +168,7 @@ loadScripts(document, 'script');</script>
  if no other implementation has been provided elsewhere.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.web.client.RestTemplate</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#titusRestTemplate(org.springframework.boot.web.client.RestTemplateBuilder)" class="member-name-link">titusRestTemplate</a><wbr>(org.springframework.boot.web.client.RestTemplateBuilder&nbsp;restTemplateBuilder)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#titusRestTemplate(org.springframework.boot.restclient.RestTemplateBuilder)" class="member-name-link">titusRestTemplate</a><wbr>(org.springframework.boot.restclient.RestTemplateBuilder&nbsp;restTemplateBuilder)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Provide a <code>RestTemplate</code> instance used for calling the Titus REST API if no other instance is provided.</div>
 </div>
@@ -204,13 +204,13 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="titusRestTemplate(org.springframework.boot.web.client.RestTemplateBuilder)">
+<section class="detail" id="titusRestTemplate(org.springframework.boot.restclient.RestTemplateBuilder)">
 <h3>titusRestTemplate</h3>
 <div class="member-signature"><span class="annotations">@Bean
 @ConditionalOnProperty(name="genie.agent.launcher.titus.enabled",
                        havingValue="true")
 @ConditionalOnMissingBean(name="titusRestTemplate")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.web.client.RestTemplate</span>&nbsp;<span class="element-name">titusRestTemplate</span><wbr><span class="parameters">(org.springframework.boot.web.client.RestTemplateBuilder&nbsp;restTemplateBuilder)</span></div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.web.client.RestTemplate</span>&nbsp;<span class="element-name">titusRestTemplate</span><wbr><span class="parameters">(org.springframework.boot.restclient.RestTemplateBuilder&nbsp;restTemplateBuilder)</span></div>
 <div class="block">Provide a <code>RestTemplate</code> instance used for calling the Titus REST API if no other instance is provided.</div>
 <dl class="notes">
 <dt>Parameters:</dt>

@@ -113,8 +113,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dataOperation()" class="member-name-link">dataOperation</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">A data service operation is the execution of any method defined on a
- dao interface.</div>
+<div class="block">A data service operation is the execution of any method declared on a type directly in the
+ com.netflix.genie.web.data.services.impl.jpa package, which in practice is
+ <code>JpaPersistenceServiceImpl</code>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inDataLayer()" class="member-name-link">inDataLayer</a>()</code></div>
@@ -127,7 +128,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inResourceLayer()" class="member-name-link">inResourceLayer</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">A join point is in the resource layer if the method is defined
- in a type in the com.netflix.genie.web.api.rest.v3.controllers package or any sub-package
+ in a type in the com.netflix.genie.web.apis.rest.v3.controllers package or any sub-package
  under that.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
@@ -140,13 +141,14 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resourceOperation()" class="member-name-link">resourceOperation</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">A resource service is the execution of any method defined on a controller.</div>
+<div class="block">A resource operation is the execution of any method declared on a type directly in the
+ com.netflix.genie.web.apis.rest.v3.controllers package.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#serviceOperation()" class="member-name-link">serviceOperation</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">A service operation is the execution of any method defined on a
- service class/interface.</div>
+<div class="block">A service operation is the execution of any method declared on a type directly in the
+ com.netflix.genie.web.services package.</div>
 </div>
 </div>
 </div>
@@ -184,7 +186,7 @@ loadScripts(document, 'script');</script>
 <h3>inResourceLayer</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">inResourceLayer</span>()</div>
 <div class="block">A join point is in the resource layer if the method is defined
- in a type in the com.netflix.genie.web.api.rest.v3.controllers package or any sub-package
+ in a type in the com.netflix.genie.web.apis.rest.v3.controllers package or any sub-package
  under that.</div>
 </section>
 </li>
@@ -210,27 +212,26 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="resourceOperation()">
 <h3>resourceOperation</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">resourceOperation</span>()</div>
-<div class="block">A resource service is the execution of any method defined on a controller.
- This definition assumes that interfaces are placed in the
- "resources" package, and that implementation types are in sub-packages.</div>
+<div class="block">A resource operation is the execution of any method declared on a type directly in the
+ com.netflix.genie.web.apis.rest.v3.controllers package. Types in sub-packages are not matched.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="serviceOperation()">
 <h3>serviceOperation</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">serviceOperation</span>()</div>
-<div class="block">A service operation is the execution of any method defined on a
- service class/interface. This definition assumes that interfaces are placed in the
- "service" package, and that implementation types are in sub-packages.</div>
+<div class="block">A service operation is the execution of any method declared on a type directly in the
+ com.netflix.genie.web.services package. Implementations in sub-packages are still matched when they
+ override a method declared on one of those types.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="dataOperation()">
 <h3>dataOperation</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">dataOperation</span>()</div>
-<div class="block">A data service operation is the execution of any method defined on a
- dao interface. This definition assumes that interfaces are placed in the
- "dao" package, and that implementation types are in sub-packages.</div>
+<div class="block">A data service operation is the execution of any method declared on a type directly in the
+ com.netflix.genie.web.data.services.impl.jpa package, which in practice is
+ <code>JpaPersistenceServiceImpl</code>. Sub-packages such as the repositories and entities are not matched.</div>
 </section>
 </li>
 </ul>

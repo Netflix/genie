@@ -77,12 +77,12 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code>org.springframework.boot.actuate.health.HealthContributor</code>, <code>org.springframework.boot.actuate.health.HealthIndicator</code></dd>
+<dd><code>org.springframework.boot.health.contributor.HealthContributor</code>, <code>org.springframework.boot.health.contributor.HealthIndicator</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GenieCpuHealthIndicator</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements org.springframework.boot.actuate.health.HealthIndicator</span></div>
+implements org.springframework.boot.health.contributor.HealthIndicator</span></div>
 <div class="block">Health indicator for system cpu usage. Mark the service out-of-service if it crosses the threshold.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -119,7 +119,7 @@ implements org.springframework.boot.actuate.health.HealthIndicator</span></div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.boot.actuate.health.Health</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.boot.health.contributor.Health</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#health()" class="member-name-link">health</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
@@ -129,8 +129,8 @@ implements org.springframework.boot.actuate.health.HealthIndicator</span></div>
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.springframework.boot.actuate.health.HealthIndicator">Methods inherited from interface&nbsp;org.springframework.boot.actuate.health.HealthIndicator</h3>
-<code>getHealth</code></div>
+<h3 id="methods-inherited-from-class-org.springframework.boot.health.contributor.HealthIndicator">Methods inherited from interface&nbsp;org.springframework.boot.health.contributor.HealthIndicator</h3>
+<code>health</code></div>
 </section>
 </li>
 </ul>
@@ -171,10 +171,10 @@ implements org.springframework.boot.actuate.health.HealthIndicator</span></div>
 <li>
 <section class="detail" id="health()">
 <h3>health</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.boot.actuate.health.Health</span>&nbsp;<span class="element-name">health</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.boot.health.contributor.Health</span>&nbsp;<span class="element-name">health</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code>health</code>&nbsp;in interface&nbsp;<code>org.springframework.boot.actuate.health.HealthIndicator</code></dd>
+<dd><code>health</code>&nbsp;in interface&nbsp;<code>org.springframework.boot.health.contributor.HealthIndicator</code></dd>
 </dl>
 </section>
 </li>
