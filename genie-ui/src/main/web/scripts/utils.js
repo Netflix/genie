@@ -67,7 +67,7 @@ export const momentFormat = (
 ) => {
   // only UTC & PST are supported timezones
   // default is UTC
-  if (tz == "PST") {
+  if (tz === "PST") {
     return dateStr
       ? moment.tz(dateStr, "America/Los_Angeles").format(format)
       : "";
