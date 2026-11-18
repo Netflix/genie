@@ -38,6 +38,10 @@ ext.javaProjects = subprojects.findAll {
 def springBoot4ProjectNames = ['genie-agent', 'genie-agent-app', 'genie-app', 'genie-common-internal', 'genie-swagger', 'genie-ui', 'genie-web', 'genie-test-web']
 
 allprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
     apply plugin: "jacoco"
     apply plugin: "idea"
     apply plugin: "eclipse"
