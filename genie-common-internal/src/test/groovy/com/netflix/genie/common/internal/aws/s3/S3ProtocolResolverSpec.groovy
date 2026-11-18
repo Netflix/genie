@@ -245,7 +245,7 @@ class S3ProtocolResolverSpec extends Specification {
 
     @Unroll
     def "can parse range header: #rangeHeader"() {
-        Pair<Integer, Integer> range
+        Pair<Long, Long> range
 
         when:
         range = S3ProtocolResolver.parseRangeHeader(rangeHeader)
@@ -254,13 +254,15 @@ class S3ProtocolResolverSpec extends Specification {
         range == expectedRange
 
         where:
-        rangeHeader   | expectedRange
-        "bytes="      | ImmutablePair.of(null, null)
-        "blah"        | ImmutablePair.of(null, null)
-        ""            | ImmutablePair.of(null, null)
-        null          | ImmutablePair.of(null, null)
-        "bytes=-10"   | ImmutablePair.of(null, 10)
-        "bytes=10-20" | ImmutablePair.of(10, 20)
-        "bytes=10-"   | ImmutablePair.of(10, null)
+        rangeHeader                   | expectedRange
+        "bytes="                      | ImmutablePair.of(null, null)
+        "blah"                        | ImmutablePair.of(null, null)
+        ""                            | ImmutablePair.of(null, null)
+        null                          | ImmutablePair.of(null, null)
+        "bytes=-10"                   | ImmutablePair.of(null, 10L)
+        "bytes=10-20"                 | ImmutablePair.of(10L, 20L)
+        "bytes=10-"                   | ImmutablePair.of(10L, null)
+        "bytes=3000000000-"           | ImmutablePair.of(3_000_000_000L, null)
+        "bytes=3000000000-3000000099" | ImmutablePair.of(3_000_000_000L, 3_000_000_099L)
     }
 }

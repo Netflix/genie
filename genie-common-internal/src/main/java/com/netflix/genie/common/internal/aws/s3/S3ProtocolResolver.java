@@ -54,7 +54,7 @@ public class S3ProtocolResolver implements ProtocolResolver {
     private static final String S3A_PROTOCOL = "s3a:";
     private static final String S3_REGEX = "s3.:";
     private static final String S3_REPLACEMENT = "s3:";
-    private static final Pair<Integer, Integer> NULL_RANGE = ImmutablePair.of(null, null);
+    private static final Pair<Long, Long> NULL_RANGE = ImmutablePair.of(null, null);
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d*)-(\\d*)");
 
     private final S3ClientFactory s3ClientFactory;
@@ -74,7 +74,7 @@ public class S3ProtocolResolver implements ProtocolResolver {
      * currently depend on spring-web. And this class cannot be moved to genie-web since it is used by
      * {@link S3ProtocolResolver} which is shared with the genie-agent module.
      */
-    static Pair<Integer, Integer> parseRangeHeader(@Nullable final String rangeHeader) {
+    static Pair<Long, Long> parseRangeHeader(@Nullable final String rangeHeader) {
         if (StringUtils.isBlank(rangeHeader)) {
             return NULL_RANGE;
         }
@@ -88,15 +88,15 @@ public class S3ProtocolResolver implements ProtocolResolver {
         final String rangeStartString = matcher.group(1);
         final String rangeEndString = matcher.group(2);
 
-        Integer rangeStart = null;
-        Integer rangeEnd = null;
+        Long rangeStart = null;
+        Long rangeEnd = null;
 
         if (!StringUtils.isBlank(rangeStartString)) {
-            rangeStart = Integer.parseInt(rangeStartString);
+            rangeStart = Long.parseLong(rangeStartString);
         }
 
         if (!StringUtils.isBlank(rangeEndString)) {
-            rangeEnd = Integer.parseInt(rangeEndString);
+            rangeEnd = Long.parseLong(rangeEndString);
         }
 
         return ImmutablePair.of(rangeStart, rangeEnd);
@@ -140,7 +140,7 @@ public class S3ProtocolResolver implements ProtocolResolver {
         }
 
         final String rangeHeader = uri.getFragment();
-        final Pair<Integer, Integer> range = parseRangeHeader(rangeHeader);
+        final Pair<Long, Long> range = parseRangeHeader(rangeHeader);
 
         final S3Client client = this.s3ClientFactory.getClient(s3Uri);
         log.debug("{} is a valid S3 resource.", location);

@@ -44,7 +44,7 @@ public final class SimpleStorageRangeResource extends S3Resource {
     private final S3Client client;
     private final String bucket;
     private final String key;
-    private final Pair<Integer, Integer> range;
+    private final Pair<Long, Long> range;
     private final long contentLength;
 
     SimpleStorageRangeResource(
@@ -52,7 +52,7 @@ public final class SimpleStorageRangeResource extends S3Resource {
         final String key,
         final S3Client client,
         final S3OutputStreamProvider s3OutputStreamProvider,
-        final Pair<Integer, Integer> range
+        final Pair<Long, Long> range
     ) throws IOException {
         super(bucket, key, client, s3OutputStreamProvider);
         this.client = client;
@@ -70,8 +70,8 @@ public final class SimpleStorageRangeResource extends S3Resource {
         }
         this.contentLength = tempContentLength;
 
-        final Integer lower = this.range.getLeft();
-        final Integer upper = this.range.getRight();
+        final Long lower = this.range.getLeft();
+        final Long upper = this.range.getRight();
 
         if ((lower != null && upper != null && lower > upper)
             || (lower != null && lower > contentLength)) {
@@ -126,7 +126,7 @@ public final class SimpleStorageRangeResource extends S3Resource {
         final long skipBytes = Math.max(0, rangeStart);
 
         final InputStream inputStream;
-        if (rangeEnd - rangeStart < 0 || (rangeEnd == 0 && rangeStart == 0)) {
+        if (rangeEnd - rangeStart < 0 || this.contentLength == 0) {
             inputStream = new EmptyInputStream();
         } else {
             final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
