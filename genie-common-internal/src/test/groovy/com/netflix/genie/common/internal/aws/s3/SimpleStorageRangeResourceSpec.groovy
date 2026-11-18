@@ -43,7 +43,7 @@ class SimpleStorageRangeResourceSpec extends Specification {
     HeadObjectResponse headObjectResponse
     ResponseInputStream<GetObjectResponse> objectInputStream
     byte[] data = new byte[1024]
-    Pair<Integer, Integer> nullRange = ImmutablePair.of(null, null)
+    Pair<Long, Long> nullRange = ImmutablePair.of(null, null)
     InMemoryBufferingS3OutputStreamProvider outputStreamProvider
 
     void setup() {
@@ -65,7 +65,7 @@ class SimpleStorageRangeResourceSpec extends Specification {
         GetObjectRequest capturedRequest
 
         when:
-        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
+        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Long, Long>)
         InputStream inputStream = resource.getInputStream()
 
         then:
@@ -107,8 +107,8 @@ class SimpleStorageRangeResourceSpec extends Specification {
         where:
         range                        | _
         ImmutablePair.of(null, null) | _
-        ImmutablePair.of(0, 99)      | _
-        ImmutablePair.of(null, 999)  | _
+        ImmutablePair.of(0L, 99L)      | _
+        ImmutablePair.of(null, 999L)  | _
     }
 
     @Unroll
@@ -118,11 +118,11 @@ class SimpleStorageRangeResourceSpec extends Specification {
         long bytesRead
         int contentLength = 100
         assert skippedBytes + readBytes == contentLength
-        ImmutablePair<Integer, Integer> range = ImmutablePair.of(rangeStart, rangeEnd)
+        ImmutablePair<Long, Long> range = ImmutablePair.of(rangeStart as Long, rangeEnd as Long)
         GetObjectRequest capturedRequest
 
         when:
-        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
+        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Long, Long>)
         InputStream inputStream = resource.getInputStream()
 
         then:
@@ -188,9 +188,73 @@ class SimpleStorageRangeResourceSpec extends Specification {
     }
 
     @Unroll
+    def "Read single byte (object size: #contentLength, range: #range)"() {
+        setup:
+        byte[] buffer = new byte[512]
+        GetObjectRequest capturedRequest
+        long bytesRead
+
+        when:
+        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Long, Long>)
+        InputStream inputStream = resource.getInputStream()
+
+        then:
+        (1..2) * client.headObject(_ as Consumer) >> HeadObjectResponse.builder()
+            .contentLength(contentLength)
+            .lastModified(Instant.now())
+            .build()
+        1 * client.getObject(_ as GetObjectRequest) >> { GetObjectRequest request ->
+            capturedRequest = request
+            return objectInputStream
+        }
+        capturedRequest.range() == "bytes=0-0"
+
+        when:
+        bytesRead = inputStream.read(buffer, 0, buffer.size())
+
+        then:
+        1 * objectInputStream.read(buffer, 0, buffer.size()) >> 1
+        bytesRead == 1
+
+        where:
+        contentLength | range
+        1L            | ImmutablePair.of(null, null)
+        100L          | ImmutablePair.of(0L, 0L)
+    }
+
+    def "Read range past 2 GiB"() {
+        setup:
+        long contentLength = 5_000_000_000L
+        long rangeStart = 3_000_000_000L
+        GetObjectRequest capturedRequest
+
+        when:
+        SimpleStorageRangeResource resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, ImmutablePair.of(rangeStart, null) as Pair<Long, Long>)
+        InputStream inputStream = resource.getInputStream()
+
+        then:
+        (1..2) * client.headObject(_ as Consumer) >> HeadObjectResponse.builder()
+            .contentLength(contentLength)
+            .lastModified(Instant.now())
+            .build()
+        1 * client.getObject(_ as GetObjectRequest) >> { GetObjectRequest request ->
+            capturedRequest = request
+            return objectInputStream
+        }
+        capturedRequest.range() == "bytes=3000000000-4999999999"
+
+        when:
+        long skipped = inputStream.skip(rangeStart)
+
+        then:
+        skipped == rangeStart
+        0 * objectInputStream.skip(_)
+    }
+
+    @Unroll
     def "Invalid range #range"() {
         when:
-        new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
+        new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Long, Long>)
 
         then:
         // Exactly one call to headObject
@@ -206,8 +270,8 @@ class SimpleStorageRangeResourceSpec extends Specification {
 
         where:
         range                       | _
-        ImmutablePair.of(30, 20)    | _
-        ImmutablePair.of(200, null) | _
+        ImmutablePair.of(30L, 20L)    | _
+        ImmutablePair.of(200L, null) | _
     }
 
     @Unroll
@@ -217,7 +281,7 @@ class SimpleStorageRangeResourceSpec extends Specification {
         long bytesRead
 
         when:
-        resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Integer, Integer>)
+        resource = new SimpleStorageRangeResource(bucket, key, client, outputStreamProvider, range as Pair<Long, Long>)
 
         then:
         1 * client.headObject(_ as Consumer) >> { Consumer consumer ->
@@ -263,7 +327,7 @@ class SimpleStorageRangeResourceSpec extends Specification {
 
         where:
         range                        | contentLength | skip
-        ImmutablePair.of(100, null)  | 100           | 100
+        ImmutablePair.of(100L, null)  | 100           | 100
         ImmutablePair.of(null, null) | 0             | 0
     }
 
