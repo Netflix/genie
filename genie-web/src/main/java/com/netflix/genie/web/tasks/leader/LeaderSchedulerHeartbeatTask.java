@@ -24,9 +24,9 @@ import io.micrometer.core.instrument.MeterRegistry;
 /**
  * A leader-only task that records heartbeats from the shared leader-task scheduler.
  *
- * <p>When enabled via the `genie.tasks.leader-task-heartbeat.enabled` property, this task is scheduled to run
- * every 10 seconds and increments a counter when it runs. Consumers should evaluate its increment rate only for a node
- * that is currently the leader (see {@code LeaderElectionMetrics}).</p>
+ * <p>When enabled via the `genie.tasks.leader-task-heartbeat.enabled` property, this task is scheduled with a
+ * 10-second delay between executions and increments a counter when it runs. Consumers should evaluate its increment
+ * rate only for a node that is currently the leader (see {@code LeaderElectionMetrics}).</p>
  *
  */
 public class LeaderSchedulerHeartbeatTask extends LeaderTask {
@@ -67,20 +67,20 @@ public class LeaderSchedulerHeartbeatTask extends LeaderTask {
     /**
      * {@inheritDoc}
      *
-     * @return a fixed-rate schedule
+     * @return a fixed-delay schedule
      */
     @Override
     public GenieTaskScheduleType getScheduleType() {
-        return GenieTaskScheduleType.FIXED_RATE;
+        return GenieTaskScheduleType.FIXED_DELAY;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @return heartbeat interval
+     * @return heartbeat delay
      */
     @Override
-    public long getFixedRate() {
+    public long getFixedDelay() {
         return HEARTBEAT_INTERVAL_MILLIS;
     }
 }

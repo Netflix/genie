@@ -71,8 +71,7 @@ class LeaderAutoConfigurationTest {
             .withConfiguration(
                 AutoConfigurations.of(
                     TasksAutoConfiguration.class,
-                    LeaderAutoConfiguration.class,
-                    LeaderElectionObservabilityAutoConfiguration.class
+                    LeaderAutoConfiguration.class
                 )
             )
             .withUserConfiguration(MockBeanConfig.class);
@@ -201,7 +200,7 @@ class LeaderAutoConfigurationTest {
                 context -> {
                     final TaskScheduler scheduler = context.getBean("genieTaskScheduler", TaskScheduler.class);
                     final ScheduledFuture<?> future = Mockito.mock(ScheduledFuture.class);
-                    Mockito.doReturn(future).when(scheduler).scheduleAtFixedRate(
+                    Mockito.doReturn(future).when(scheduler).scheduleWithFixedDelay(
                         Mockito.any(Runnable.class),
                         Mockito.eq(LeaderSchedulerHeartbeatTask.HEARTBEAT_INTERVAL_MILLIS)
                     );
@@ -209,7 +208,7 @@ class LeaderAutoConfigurationTest {
                     final LeaderTasksCoordinator coordinator = context.getBean(LeaderTasksCoordinator.class);
 
                     coordinator.onLeaderEvent(new OnGrantedEvent(this, null, "leader"));
-                    Mockito.verify(scheduler).scheduleAtFixedRate(
+                    Mockito.verify(scheduler).scheduleWithFixedDelay(
                         heartbeat,
                         LeaderSchedulerHeartbeatTask.HEARTBEAT_INTERVAL_MILLIS
                     );
