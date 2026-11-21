@@ -20,9 +20,11 @@ package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.metrics.LeaderElectionMetrics;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ArchiveStatusCleanupProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
+import com.netflix.genie.web.properties.LeaderSchedulerHeartbeatProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
@@ -34,6 +36,7 @@ import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ArchiveStatusCleanupTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
+import com.netflix.genie.web.tasks.leader.LeaderSchedulerHeartbeatTask;
 import com.netflix.genie.web.tasks.leader.LeaderTask;
 import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
@@ -65,6 +68,7 @@ import java.util.Set;
         AgentCleanupProperties.class,
         ArchiveStatusCleanupProperties.class,
         DatabaseCleanupProperties.class,
+        LeaderSchedulerHeartbeatProperties.class,
         LeadershipProperties.class,
         UserMetricsProperties.class,
     }
@@ -92,6 +96,24 @@ public class LeaderAutoConfiguration {
         final Set<LeaderTask> tasks
     ) {
         return new LeaderTasksCoordinator(taskScheduler, tasks);
+    }
+
+    /**
+     * Register the leader-only heartbeat task for the default {@link LeaderTasksCoordinator} to schedule.
+     *
+     * @param registry the metrics registry
+     * @return the heartbeat task
+     */
+    @Bean
+    @ConditionalOnProperty(
+        value = LeaderSchedulerHeartbeatProperties.ENABLED_PROPERTY,
+        havingValue = "true",
+        matchIfMissing = true
+    )
+    @ConditionalOnBean(ClusterLeaderService.class)
+    @ConditionalOnMissingBean(LeaderSchedulerHeartbeatTask.class)
+    public LeaderSchedulerHeartbeatTask leaderSchedulerHeartbeatTask(final MeterRegistry registry) {
+        return new LeaderSchedulerHeartbeatTask(registry);
     }
 
     /**
@@ -257,5 +279,22 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(LeaderElectionActuator.class)
     public LeaderElectionActuator leaderElectionActuator(final ClusterLeaderService clusterLeaderService) {
         return new LeaderElectionActuator(clusterLeaderService);
+    }
+
+    /**
+     * Register leadership metrics.
+     *
+     * @param clusterLeaderService the application leader-election service
+     * @param registry             the metrics registry
+     * @return the leader metrics
+     */
+    @Bean
+    @ConditionalOnBean(ClusterLeaderService.class)
+    @ConditionalOnMissingBean(LeaderElectionMetrics.class)
+    public LeaderElectionMetrics leaderElectionMetrics(
+        final ClusterLeaderService clusterLeaderService,
+        final MeterRegistry registry
+    ) {
+        return new LeaderElectionMetrics(clusterLeaderService, registry);
     }
 }

@@ -15,6 +15,15 @@ The Genie instance elected leader of a given cluster performs different tasks:
  * Mark jobs whose agent is AWOL as failed
  * Collect and publish user metrics about running jobs
 
+==== Leader-election observability
+
+The `genie-web` module exposes leader-election metrics through Micrometer:
+
+ * `genie.leaderElection.leader.gauge` is `1` when this instance is the leader and `0` otherwise.
+ To find a cluster with no leader, group instances by their ZooKeeper leader path and ensemble, then sum the gauge (`0` means that no instance in the group is leader).
+ * `genie.leaderElection.heartbeat.counter` increments on a ten-second schedule while this instance holds leadership. Only meaningful when the
+ instance's leader gauge is `1`. Enabled by default; set `genie.tasks.leader-task-heartbeat.enabled=false` to disable it.
+
 === Execution stages
 
 Every job is executed by a dedicated agent.
